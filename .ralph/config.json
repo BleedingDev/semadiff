@@ -1,0 +1,20 @@
+{
+  "version": "1.0.10",
+  "language": "en",
+  "provider": "hcloud",
+  "vm_name": "semantic-diff",
+  "region": "fsn1",
+  "vm_ip": "",
+  "user": "satan",
+  "notifications": {
+    "ntfy_enabled": false,
+    "ntfy_topic": ""
+  },
+  "github": {
+    "username": "BleedingDev"
+  },
+  "agent": "codex",
+  "codex": {
+    "auth_method": "account"
+  }
+}

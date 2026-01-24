@@ -1,0 +1,16 @@
+node_modules
+.DS_Store
+tmp
+tree-sitter
+.vite
+.dist
+coverage
+playwright-report
+playwright/.cache
+test-results
+.cache
+.reference
+packages/**/dist
+packages/**/dist-types
+packages/**/.turbo
+.env

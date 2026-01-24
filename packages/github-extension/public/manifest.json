@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "SemaDiff",
+  "version": "0.1.0",
+  "description": "Semantic diff overlay for GitHub pull requests.",
+  "action": {
+    "default_title": "SemaDiff"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/pull/*"],
+      "js": ["content.js"],
+      "type": "module",
+      "css": ["content.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["semadiff-wasm/*"],
+      "matches": ["https://github.com/*/pull/*"]
+    }
+  ],
+  "permissions": []
+}

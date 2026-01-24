@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://semadiff.dev/schemas/explain/0.1.0.json",
+  "title": "ExplainDocument",
+  "type": "object",
+  "required": ["version", "operations", "moves", "renames"],
+  "properties": {
+    "version": { "const": "0.1.0" },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "rationale"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["insert", "delete", "update", "move"] },
+          "rationale": { "type": "string" },
+          "confidence": { "type": "number" },
+          "moveId": { "type": "string" },
+          "renameGroupId": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "moves": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "confidence", "rationale"],
+        "properties": {
+          "id": { "type": "string" },
+          "confidence": { "type": "number" },
+          "rationale": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "renames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "from",
+          "to",
+          "occurrences",
+          "confidence",
+          "rationale"
+        ],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "occurrences": { "type": "number" },
+          "confidence": { "type": "number" },
+          "rationale": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

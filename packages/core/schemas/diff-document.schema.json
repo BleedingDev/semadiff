@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://semadiff.dev/schemas/diff-document/0.1.0.json",
+  "title": "DiffDocument",
+  "type": "object",
+  "required": ["version", "operations", "moves", "renames"],
+  "properties": {
+    "version": { "const": "0.1.0" },
+    "operations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "enum": ["insert", "delete", "update", "move"] },
+          "oldRange": { "$ref": "#/definitions/range" },
+          "newRange": { "$ref": "#/definitions/range" },
+          "oldText": { "type": "string" },
+          "newText": { "type": "string" },
+          "meta": {
+            "type": "object",
+            "properties": {
+              "confidence": { "type": "number" },
+              "moveId": { "type": "string" },
+              "renameGroupId": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "moves": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "oldRange", "newRange", "confidence", "operations"],
+        "properties": {
+          "id": { "type": "string" },
+          "oldRange": { "$ref": "#/definitions/range" },
+          "newRange": { "$ref": "#/definitions/range" },
+          "confidence": { "type": "number" },
+          "operations": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "renames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to", "occurrences", "confidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "occurrences": { "type": "number" },
+          "confidence": { "type": "number" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "definitions": {
+    "position": {
+      "type": "object",
+      "required": ["line", "column"],
+      "properties": {
+        "line": { "type": "number" },
+        "column": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "range": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "$ref": "#/definitions/position" },
+        "end": { "$ref": "#/definitions/position" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

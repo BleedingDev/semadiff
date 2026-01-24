@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2022", "DOM"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "rewriteRelativeImportExtensions": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@semadiff/core": ["packages/core/dist/index.d.ts"],
+      "@semadiff/parsers": ["packages/parsers/dist/index.d.ts"],
+      "@semadiff/parser-tree-sitter-node": [
+        "packages/parser-tree-sitter-node/dist/index.d.ts"
+      ],
+      "@semadiff/parser-tree-sitter-wasm": [
+        "packages/parser-tree-sitter-wasm/dist/index.d.ts"
+      ],
+      "@semadiff/parser-swc": ["packages/parser-swc/dist/index.d.ts"],
+      "@semadiff/parser-lightningcss": [
+        "packages/parser-lightningcss/dist/index.d.ts"
+      ],
+      "@semadiff/render-terminal": ["packages/render-terminal/dist/index.d.ts"],
+      "@semadiff/render-html": ["packages/render-html/dist/index.d.ts"],
+      "@semadiff/cli": ["packages/cli/dist/index.d.ts"],
+      "@semadiff/github-extension": [
+        "packages/github-extension/dist-types/index.d.ts"
+      ],
+      "@semadiff/test-corpus": ["packages/test-corpus/dist/index.d.ts"]
+    }
+  }
+}

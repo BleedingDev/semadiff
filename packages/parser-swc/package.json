@@ -1,0 +1,18 @@
+{
+  "name": "@semadiff/parser-swc",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@semadiff/parsers": "workspace:*",
+    "effect": "^3.19.14",
+    "@swc/core": "^1.7.36"
+  }
+}

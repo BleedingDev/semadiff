@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://semadiff.dev/schemas/diagnostics/0.1.0.json",
+  "title": "DiagnosticsBundle",
+  "type": "object",
+  "required": ["version", "createdAt", "redacted", "summary"],
+  "properties": {
+    "version": { "const": "0.1.0" },
+    "createdAt": { "type": "string" },
+    "redacted": { "type": "boolean" },
+    "summary": {
+      "type": "object",
+      "required": ["operationCount", "moveCount", "renameCount"],
+      "properties": {
+        "operationCount": { "type": "number" },
+        "moveCount": { "type": "number" },
+        "renameCount": { "type": "number" }
+      },
+      "additionalProperties": false
+    },
+    "config": { "type": "object" },
+    "diff": { "type": "object" }
+  },
+  "additionalProperties": false
+}

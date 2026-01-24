@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist-types",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "tsBuildInfoFile": "dist-types/tsconfig.tsbuildinfo",
+    "types": ["vite/client"]
+  },
+  "references": [
+    { "path": "../core" },
+    { "path": "../render-html" },
+    { "path": "../parsers" },
+    { "path": "../parser-tree-sitter-wasm" }
+  ],
+  "include": ["src"]
+}

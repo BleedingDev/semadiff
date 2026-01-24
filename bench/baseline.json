@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "timestamp": "2026-01-20T00:00:00.000Z",
+  "threshold": 0.1,
+  "generated": false,
+  "cases": [],
+  "totals": {
+    "durationMs": 0
+  }
+}

@@ -1,0 +1,820 @@
+{
+  "prd": {
+    "id": "semadiff",
+    "version": "1.0.0",
+    "status": "complete",
+    "productName": "SemaDiff",
+    "oneLiner": "Semantic + structural diff engine for web-first languages, usable as CLI + Git external diff + GitHub overlay extension.",
+    "endGoal": {
+      "summary": "Replace legacy line-based diffs with AST/structure-aware diffs + semantic normalization + refactor/move visibility, across CLI/Git/GitHub.",
+      "mustHaveSurfaces": ["cli", "gitExternalDiff", "githubOverlayExtension"],
+      "primaryLanguages": [
+        "ts",
+        "tsx",
+        "js",
+        "jsx",
+        "css",
+        "md",
+        "toml",
+        "yaml"
+      ]
+    },
+    "principles": [
+      "Correctness > cleverness: never hide meaningful changes",
+      "Deterministic output (same inputs => same diff)",
+      "Modular parsers per language + guaranteed fallback",
+      "Effect-first architecture: services, layers, schemas, typed errors",
+      "Observability first-class via OpenTelemetry",
+      "Quality gates mandatory: lint/format/typecheck/test green"
+    ],
+    "users": [
+      {
+        "id": "cliDev",
+        "needs": [
+          "fast diff in terminal",
+          "works with git diff",
+          "readable refactor diffs"
+        ],
+        "environment": ["macOS", "Linux", "WSL"]
+      },
+      {
+        "id": "reviewer",
+        "needs": [
+          "better PR diff in GitHub UI",
+          "jump/comment/resolve from semantic view"
+        ],
+        "environment": ["Chrome", "Edge"]
+      }
+    ],
+    "useCases": [
+      "Run semantic diff between two files",
+      "Use as git external diff tool (git diff, git show --ext-diff, git log -p --ext-diff)",
+      "See moved blocks + edits inside moved blocks",
+      "Reduce noise from formatting-only changes",
+      "Reduce noise from Tailwind class reordering in JSX/TSX/HTML",
+      "Open GitHub PR semantic overlay; navigate to native diff; add/resolve comments; report extension bugs"
+    ],
+    "scope": {
+      "inScopeNowOrLater": {
+        "cli": true,
+        "git": {
+          "externalDiff": true,
+          "difftoolCompat": true,
+          "installerHelper": true,
+          "latestGitOnly": true
+        },
+        "languages": {
+          "webFirst": ["ts", "tsx", "js", "jsx", "css", "md", "toml", "yaml"],
+          "genericFallback": "text"
+        },
+        "githubExtension": {
+          "chromeEdgeOnly": true,
+          "overlaySemanticView": true,
+          "bridgeToGitHubCommenting": true,
+          "bugReport": true,
+          "futureFullReplacement": true
+        },
+        "semanticFeatures": {
+          "structuralDiff": true,
+          "semanticNormalization": true,
+          "moveDetection": true,
+          "renameGrouping": true,
+          "tailwindClassNormalization": true
+        },
+        "observability": {
+          "opentelemetry": true,
+          "traces": true,
+          "metrics": true,
+          "logs": true
+        }
+      },
+      "explicitNonGoals": [
+        "Type-only diff mode (types always matter; no hiding TS type changes)",
+        "Supporting legacy Git versions",
+        "Supporting non-Chromium browsers for the extension"
+      ]
+    },
+    "requirements": {
+      "functional": {
+        "coreEngine": [
+          {
+            "id": "engine.parse",
+            "desc": "Parse both sides into language trees when possible; else fallback.",
+            "acceptance": [
+              "Unsupported/invalid parse never crashes; falls back to text diff",
+              "Parser choice is pluggable per language",
+              "Parser pipeline supports fallback chain per language"
+            ]
+          },
+          {
+            "id": "engine.diff.structural",
+            "desc": "Tree/structure-aware diff producing stable edit operations.",
+            "acceptance": [
+              "Formatting-only changes produce minimal/no semantic edits (where safe)",
+              "Output includes node ranges (line/col) for old/new"
+            ]
+          },
+          {
+            "id": "engine.diff.moves",
+            "desc": "Detect moved blocks and show edits inside moved blocks.",
+            "acceptance": [
+              "Moved blocks are identified as moves, not delete+add when match confidence high",
+              "Edits inside moved blocks displayed as nested changes"
+            ]
+          },
+          {
+            "id": "engine.diff.renames",
+            "desc": "Detect repeated identifier rename patterns and group them.",
+            "acceptance": [
+              "Repeated consistent identifier mapping is summarized (and optionally collapsible in renderers)"
+            ]
+          },
+          {
+            "id": "engine.semantic.normalization",
+            "desc": "Language-aware normalizers reduce noise without hiding meaningful changes.",
+            "acceptance": [
+              "All normalizers are opt-in/out via config (global + per-language)",
+              "Normalizer rules are conservative; include rule-level tests"
+            ]
+          },
+          {
+            "id": "engine.semantic.tailwind",
+            "desc": "Treat Tailwind class list reordering as no-op in static class strings.",
+            "acceptance": [
+              "For JSX/TSX/HTML attributes class/className with static string, token order changes do not create diffs",
+              "Add/remove/change tokens still diffs",
+              "Rule can be disabled globally/per-project/per-language"
+            ]
+          }
+        ],
+        "cli": [
+          {
+            "id": "cli.effect",
+            "desc": "CLI built with @effect/cli; fully typed args/options; auto-help.",
+            "acceptance": [
+              "All commands produce deterministic stdout/stderr",
+              "Exit codes: 0 success; nonzero only for internal errors (git external mode must not fail on differences)"
+            ]
+          },
+          {
+            "id": "cli.commands",
+            "desc": "Commands for diffing, git integration, diagnostics, and machine output.",
+            "commands": {
+              "diff": "semadiff diff <old> <new> [options]",
+              "gitExternal": "semadiff git-external <path> <oldFile> <oldHex> <oldMode> <newFile> <newHex> <newMode>",
+              "difftool": "semadiff difftool (wrapper compatible with git difftool env vars)",
+              "installGit": "semadiff install-git (prints git config snippets + verification commands)",
+              "printConfig": "semadiff config (prints resolved config + provenance)",
+              "doctor": "semadiff doctor (env checks: git/node/permissions/parsers)",
+              "bench": "semadiff bench (runs local benchmarks + baseline compare)",
+              "explain": "semadiff explain (why diff chose a match/move/rename; emits JSON)"
+            },
+            "acceptance": [
+              "Supports ANSI renderer by default; plain and JSON outputs available",
+              "Supports reading stdin for one/both inputs (optional)",
+              "Binary files handled gracefully (no crash; informative output)"
+            ]
+          }
+        ],
+        "gitIntegration": [
+          {
+            "id": "git.external",
+            "desc": "Works as git external diff (7-arg contract).",
+            "acceptance": [
+              "Works with git diff and git show/log when configured as diff.external (with --ext-diff where required by user)",
+              "Handles /dev/null for added/removed files",
+              "Does not depend on legacy Git behavior; tested against latest Git in CI"
+            ]
+          },
+          {
+            "id": "git.setupDocs",
+            "desc": "Docs + helper command to configure global/per-repo usage.",
+            "acceptance": [
+              "install-git prints minimal config and a verification checklist",
+              "Docs include external diff + difftool setups"
+            ]
+          }
+        ],
+        "renderers": [
+          {
+            "id": "render.terminal",
+            "desc": "Readable terminal diff for structure-aware output.",
+            "acceptance": [
+              "Supports unified and side-by-side modes (configurable)",
+              "Has stable formatting suitable for snapshot tests"
+            ]
+          },
+          {
+            "id": "render.json",
+            "desc": "Machine-readable JSON diff output for tooling/extension reuse.",
+            "acceptance": [
+              "JSON schema defined and versioned",
+              "Includes operations: insert/delete/update/move + metadata"
+            ]
+          },
+          {
+            "id": "render.html",
+            "desc": "HTML renderer used by GitHub overlay (and optional CLI output to file).",
+            "acceptance": [
+              "Renders without external network",
+              "Supports large diffs via virtualization"
+            ]
+          }
+        ],
+        "githubExtension": [
+          {
+            "id": "ext.overlay",
+            "desc": "Chrome/Edge MV3 extension adds a semantic-diff overlay on GitHub PR 'Files changed'.",
+            "acceptance": [
+              "Overlay toggled by button + shortcut",
+              "Overlay lists files changed; lazy-load diff per file",
+              "Overlay uses same engine as CLI (shared packages)"
+            ]
+          },
+          {
+            "id": "ext.fetchBlobs",
+            "desc": "Fetch base/head file contents for each changed file, compute semantic diff locally.",
+            "acceptance": [
+              "Uses authenticated GitHub page context; no token storage",
+              "Graceful handling for large files and unavailable blobs"
+            ]
+          },
+          {
+            "id": "ext.githubActions.bridge",
+            "desc": "Bridge from overlay to native GitHub actions: jump to line, open comment UI, resolve thread (via native UI).",
+            "acceptance": [
+              "Clicking a node/line in overlay can scroll/highlight matching region in GitHub diff",
+              "Comment action opens GitHub's native comment UI on nearest relevant line (no wrong-line comments)",
+              "Resolve action navigates to and triggers GitHub native resolve where available"
+            ]
+          },
+          {
+            "id": "ext.bugReport",
+            "desc": "In-overlay bug report flow for extension issues.",
+            "acceptance": [
+              "Creates a diagnostic bundle (sanitized) + opens a prefilled GitHub issue link OR copies to clipboard",
+              "User must explicitly confirm any inclusion of code snippets; default is metadata-only"
+            ]
+          },
+          {
+            "id": "ext.future.fullReplace",
+            "desc": "Feature-flagged full replacement of GitHub diff blocks (optional mode).",
+            "acceptance": [
+              "Feature-flagged; off by default until stable",
+              "Has dedicated e2e suite due to DOM brittleness"
+            ]
+          },
+          {
+            "id": "ext.future.directApi",
+            "desc": "Create/resolve comments directly via GitHub APIs (GraphQL/REST) from overlay.",
+            "acceptance": [
+              "No secret persistence; uses in-page auth + CSRF tokens",
+              "Has robust mapping from semantic positions to GitHub comment positions"
+            ]
+          }
+        ],
+        "parserStrategy": [
+          {
+            "id": "parser.baseline",
+            "desc": "Baseline parser stack: Tree-sitter (Node for CLI, WASM for extension) per supported language.",
+            "acceptance": [
+              "Parsers packaged per environment (node native vs wasm)",
+              "Parser selection by file extension and optional shebang/content sniffing"
+            ]
+          },
+          {
+            "id": "parser.future.bestPerLanguage",
+            "desc": "Best parser per language (SWC for TS/JS; Lightning CSS for CSS) while keeping fallback to Tree-sitter/text.",
+            "acceptance": [
+              "Per-language parser priority chain: best -> baseline -> text",
+              "Capability reporting (e.g., token ranges, AST kinds, error recovery)"
+            ]
+          }
+        ]
+      },
+      "nonFunctional": {
+        "qualityGates": {
+          "lintFormat": "Ultracite + Biome (repo-wide, CI enforced).",
+          "typecheck": "tsc --noEmit (strict).",
+          "tests": "vitest + @effect/vitest; all required checks run in CI and pre-commit.",
+          "coverage": "Coverage collected; thresholds set and enforced (project-defined)."
+        },
+        "performance": {
+          "goals": [
+            "Avoid pathological memory blowups (streaming where possible)",
+            "Avoid O(n^2) worst-case on common cases; degrade gracefully",
+            "Bench suite required; perf regressions detected via baseline comparison"
+          ],
+          "benchmarks": [
+            "Small/medium/large file pairs per language",
+            "Moved-block scenarios",
+            "Tailwind-heavy JSX files",
+            "YAML/TOML large maps"
+          ]
+        },
+        "reliability": {
+          "requirements": [
+            "No crashes on malformed input",
+            "Deterministic output and stable sort orders",
+            "Clear error messages with tagged errors (Effect) and diagnostics"
+          ]
+        },
+        "securityPrivacy": {
+          "cli": [
+            "No outbound network by default",
+            "Telemetry exporters opt-in via config/env"
+          ],
+          "extension": [
+            "Minimal permissions",
+            "No credential storage",
+            "Diagnostics opt-in; redact by default"
+          ]
+        }
+      }
+    },
+    "architecture": {
+      "style": "Effect services + layers; modular packages; shared core types; strict schemas.",
+      "monorepo": {
+        "tooling": {
+          "packageManager": "pnpm",
+          "node": "latest LTS",
+          "git": "latest stable"
+        },
+        "packages": [
+          {
+            "name": "@semadiff/core",
+            "purpose": "AST/tree model, diff operations, semantic rules engine, schemas, shared types.",
+            "exports": [
+              "DiffDocument schema",
+              "DiffEngine service",
+              "Normalizer interfaces",
+              "LanguagePlugin interface"
+            ]
+          },
+          {
+            "name": "@semadiff/parsers",
+            "purpose": "Parser interfaces + registry + fallback chain logic.",
+            "exports": [
+              "Parser service",
+              "ParserRegistry",
+              "ParseResult schema",
+              "Capability model"
+            ]
+          },
+          {
+            "name": "@semadiff/parser-tree-sitter-node",
+            "purpose": "Tree-sitter parsers for Node CLI.",
+            "notes": [
+              "Baseline parser backend; provides Layer(Parser) per language."
+            ]
+          },
+          {
+            "name": "@semadiff/parser-tree-sitter-wasm",
+            "purpose": "Tree-sitter WASM parsers for browser/extension.",
+            "notes": ["Same interface as node; smaller bundles per language."]
+          },
+          {
+            "name": "@semadiff/parser-swc",
+            "purpose": "SWC-based TS/JS parser/AST.",
+            "status": "implemented"
+          },
+          {
+            "name": "@semadiff/parser-lightningcss",
+            "purpose": "Lightning CSS parser/AST.",
+            "status": "implemented"
+          },
+          {
+            "name": "@semadiff/render-terminal",
+            "purpose": "ANSI/plain rendering; side-by-side/unified; stable snapshots."
+          },
+          {
+            "name": "@semadiff/render-html",
+            "purpose": "HTML renderer + virtualization helpers for overlay."
+          },
+          {
+            "name": "@semadiff/cli",
+            "purpose": "CLI app using @effect/cli; integrates parsers, engine, renderers."
+          },
+          {
+            "name": "@semadiff/github-extension",
+            "purpose": "Chrome/Edge MV3 extension: content script + overlay UI + wasm parsers."
+          },
+          {
+            "name": "@semadiff/test-corpus",
+            "purpose": "Golden fixtures + generators + refactor/move scenarios across languages."
+          }
+        ]
+      },
+      "services": {
+        "tags": [
+          "Config",
+          "FileSystem",
+          "ParserRegistry",
+          "DiffEngine",
+          "Renderer",
+          "Telemetry",
+          "Clock",
+          "Random"
+        ],
+        "layeringRules": [
+          "Core is pure and platform-agnostic",
+          "Node CLI uses @effect/platform-node Layer for FS/Path/Process",
+          "Extension uses browser platform layers; no node-only deps",
+          "Parser backends are separate layers; registry composes priority+fallback"
+        ],
+        "errors": [
+          "All expected failures are tagged errors (Schema.TaggedError)",
+          "Defects reserved for truly impossible states; surfaced with diagnostics"
+        ],
+        "schemas": [
+          "Config schema (project + user + env)",
+          "DiffDocument schema (versioned)",
+          "Diagnostics bundle schema (redaction-aware)"
+        ]
+      },
+      "parserFallbackModel": {
+        "selection": "by language plugin + env capabilities (node/wasm) + config priority",
+        "fallbackChain": ["bestPerLanguage", "treeSitter", "textLineDiff"],
+        "capabilities": [
+          "hasAstKinds",
+          "hasTokenRanges",
+          "supportsErrorRecovery",
+          "supportsIncrementalParse(optional)"
+        ]
+      },
+      "semanticRulesModel": {
+        "ruleShape": {
+          "id": "string",
+          "language": "string|*",
+          "appliesTo": "nodeKinds|tokenKinds|patterns",
+          "normalize": "pure transform producing normalized view",
+          "safety": "conservative|aggressive",
+          "defaultEnabled": "boolean"
+        },
+        "initialRules": [
+          "whitespace/comments normalization (safe where grammar allows)",
+          "Tailwind class list normalization for static class strings",
+          "import specifier stable ordering (optional; conservative default off)",
+          "numeric literal canonicalization (optional; conservative with BigInt/-0/NaN rules)"
+        ]
+      },
+      "diffAlgorithm": {
+        "approach": [
+          "Primary: structure-aware alignment on trees/tokens",
+          "Secondary: move detection pass (block matching) + nested diff inside moves",
+          "Fallback: line-based diff when parsing fails"
+        ],
+        "outputs": [
+          "operations: insert/delete/update/move",
+          "grouping: hunks + moved blocks + rename groups",
+          "metadata: confidence scores + explanations (for explain command)"
+        ]
+      }
+    },
+    "observability": {
+      "model": "Effect spans + OpenTelemetry exporters; zero network by default.",
+      "cli": {
+        "instrumentation": [
+          "span: run",
+          "span: parse(old/new)",
+          "span: normalize",
+          "span: diff",
+          "span: render"
+        ],
+        "exporters": {
+          "default": "console (dev)",
+          "optional": ["OTLP/HTTP", "OTLP/gRPC"],
+          "config": ["env vars", "config file"]
+        },
+        "attributes": [
+          "language",
+          "fileSizeBytes(old/new)",
+          "nodeCounts(old/new)",
+          "diffOpCounts",
+          "moveCount",
+          "renameGroupCount"
+        ]
+      },
+      "extension": {
+        "instrumentation": [
+          "span: overlayOpen",
+          "span: fetchBlobs",
+          "span: parse",
+          "span: diff",
+          "span: render"
+        ],
+        "exporters": {
+          "default": "console only",
+          "optional": ["OTLP/HTTP (user-provided endpoint)"]
+        }
+      }
+    },
+    "testingAndValidation": {
+      "framework": "vitest + @effect/vitest",
+      "testTypes": [
+        {
+          "type": "unit",
+          "targets": [
+            "parsers (real inputs)",
+            "normalizers",
+            "diff core",
+            "renderers"
+          ],
+          "requirements": ["deterministic", "no network", "fast"]
+        },
+        {
+          "type": "golden",
+          "targets": [
+            "DiffDocument JSON for fixture pairs",
+            "terminal output snapshots",
+            "html snapshots (normalized)"
+          ],
+          "requirements": ["fixture versioning", "schema version pinning"]
+        },
+        {
+          "type": "property",
+          "targets": [
+            "normalizer invariants",
+            "diff stability",
+            "no crash guarantees"
+          ],
+          "requirements": ["seeded randomness", "shrinking/repro logs"]
+        },
+        {
+          "type": "integration.git",
+          "targets": [
+            "git external diff contract",
+            "difftool wrapper",
+            "install-git outputs"
+          ],
+          "requirements": [
+            "creates temp git repo in test",
+            "runs git diff/show/log with configured external tool",
+            "asserts exit code semantics and non-empty output for changes"
+          ]
+        },
+        {
+          "type": "e2e.extension",
+          "targets": [
+            "overlay injection",
+            "file list rendering",
+            "go-to-line bridge",
+            "comment UI open",
+            "bug report flow"
+          ],
+          "requirements": [
+            "Playwright runs against local static GitHub-like fixtures",
+            "Optional manual smoke test doc for real GitHub PR pages"
+          ]
+        },
+        {
+          "type": "fuzz",
+          "targets": ["parser inputs", "renderer inputs", "diff engine inputs"],
+          "requirements": [
+            "never crash",
+            "time-bounded",
+            "captures minimal repro case"
+          ]
+        },
+        {
+          "type": "bench",
+          "targets": [
+            "per-language perf",
+            "move detection perf",
+            "tailwind normalization perf"
+          ],
+          "requirements": [
+            "bench command produces JSON report",
+            "CI compares against committed baseline with allowed regression threshold"
+          ]
+        }
+      ],
+      "validationChecklist": [
+        "Schema validation for all public JSON outputs",
+        "Cross-platform CLI smoke tests",
+        "Large file safety tests (timeouts/limits configurable)",
+        "Determinism tests (same seed => same output)",
+        "No outbound network tests (unless explicitly enabled)"
+      ]
+    },
+    "repoQuality": {
+      "lintingFormatting": {
+        "toolchain": "Ultracite + Biome",
+        "requirements": [
+          "single command runs full lint+format check",
+          "CI blocks merges on violations",
+          "pre-commit hook runs: lint + typecheck + tests"
+        ]
+      },
+      "ci": {
+        "requiredChecks": [
+          "lint",
+          "format-check",
+          "typecheck",
+          "unit+golden+integration tests",
+          "extension build",
+          "bench regression check (on main or scheduled)"
+        ],
+        "artifacts": [
+          "cli build",
+          "extension build (unpacked zip)",
+          "bench reports",
+          "test diagnostics bundle on failure"
+        ]
+      }
+    },
+    "deliveryPlan": {
+      "rule": "No phase considered done unless all quality gates pass.",
+      "phases": [
+        {
+          "id": "P0",
+          "goal": "Scaffold repo + quality gates + Effect architecture skeleton.",
+          "includes": [
+            "pnpm workspace + packages skeleton",
+            "Ultracite+Biome config",
+            "tsconfig strict",
+            "@effect/cli skeleton",
+            "@effect/vitest harness",
+            "OTel plumbing scaffold (no exporter by default)"
+          ],
+          "doneWhen": [
+            "ci green",
+            "smoke diff command works with text fallback",
+            "schemas published"
+          ]
+        },
+        {
+          "id": "P1",
+          "goal": "CLI + Git external diff MVP with Tree-sitter baseline for web languages.",
+          "includes": [
+            "tree-sitter node parsers",
+            "structural diff basic",
+            "terminal renderer",
+            "git-external command",
+            "install-git helper + docs",
+            "integration.git tests"
+          ],
+          "doneWhen": [
+            "git external diff works end-to-end in tests",
+            "golden corpus started"
+          ]
+        },
+        {
+          "id": "P2",
+          "goal": "Semantic normalization (safe rules) + Tailwind class normalization.",
+          "includes": [
+            "normalizer framework",
+            "tailwind static class sort rule",
+            "yaml/toml/md baseline parsing or structured fallback",
+            "explain command JSON",
+            "expanded golden corpus"
+          ],
+          "doneWhen": [
+            "tailwind reorder produces no diff in fixtures",
+            "rule toggles via config verified"
+          ]
+        },
+        {
+          "id": "P3",
+          "goal": "Move detection + rename grouping + better rendering.",
+          "includes": [
+            "move detection pass",
+            "nested diff inside moved blocks",
+            "rename grouping summary",
+            "renderer UX improvements (still deterministic)"
+          ],
+          "doneWhen": [
+            "move fixtures pass",
+            "rename grouping fixtures pass",
+            "explain outputs stable"
+          ]
+        },
+        {
+          "id": "P4",
+          "goal": "GitHub overlay extension MVP (read-only semantic view).",
+          "includes": [
+            "MV3 extension scaffold",
+            "overlay UI",
+            "fetch base/head blobs",
+            "wasm parser backend",
+            "html renderer reuse"
+          ],
+          "doneWhen": [
+            "e2e.extension overlay tests pass",
+            "no token storage verified"
+          ]
+        },
+        {
+          "id": "P5",
+          "goal": "Overlay GitHub actions bridge + bug report flow.",
+          "includes": [
+            "go-to-line bridge",
+            "open native comment UI",
+            "resolve via native UI",
+            "bug report diagnostics bundle + prefilled issue link"
+          ],
+          "doneWhen": [
+            "e2e bridge flows pass",
+            "diagnostics redaction tests pass"
+          ]
+        },
+        {
+          "id": "P6",
+          "goal": "Best parser per language (fast path) while keeping fallback.",
+          "includes": [
+            "SWC parser module for TS/JS",
+            "Lightning CSS parser module",
+            "capability-driven parser selection + fallback chain",
+            "perf bench baselines updated"
+          ],
+          "doneWhen": [
+            "parser swap does not change public schemas",
+            "fallback still works on parser failure"
+          ]
+        },
+        {
+          "id": "P7",
+          "goal": "Optional full GitHub diff replacement mode.",
+          "includes": [
+            "DOM replacement feature flag",
+            "thread rendering (optional)",
+            "direct API commenting/resolving from overlay"
+          ],
+          "doneWhen": [
+            "feature flag stable in e2e",
+            "fallback to overlay-only always available"
+          ]
+        }
+      ]
+    },
+    "risks": [
+      "Semantic rules accidentally hiding meaningful changes -> mitigate with conservative defaults + rule-level tests + explain mode",
+      "GitHub DOM changes breaking extension -> mitigate with fixture-driven selectors + fast patch releases + overlay-first design",
+      "Parser licensing/packaging constraints (future parsers) -> mitigate by isolating in optional packages + documented licenses",
+      "Performance regressions -> mitigate with bench baselines + CI guard"
+    ],
+    "publicInterfaces": {
+      "cliStableInterfaces": [
+        "semadiff diff",
+        "semadiff git-external",
+        "semadiff difftool",
+        "semadiff config",
+        "semadiff explain (json)",
+        "semadiff doctor"
+      ],
+      "jsonSchemas": [
+        {
+          "name": "DiffDocument",
+          "versioning": "semver; breaking changes bump major",
+          "compat": "renderer and extension must support same major"
+        },
+        {
+          "name": "DiagnosticsBundle",
+          "versioning": "semver; must preserve redaction guarantees"
+        }
+      ]
+    },
+    "references": [
+      {
+        "topic": "Effect Solutions guidance",
+        "url": "https://www.effect.solutions/"
+      },
+      {
+        "topic": "Effect Solutions CLI guide",
+        "url": "https://www.effect.solutions/cli"
+      },
+      {
+        "topic": "Effect Solutions testing guide",
+        "url": "https://www.effect.solutions/testing"
+      },
+      {
+        "topic": "Effect tracing docs",
+        "url": "https://effect.website/docs/observability/tracing/"
+      },
+      {
+        "topic": "Effect OpenTelemetry package",
+        "url": "https://www.npmjs.com/package/@effect/opentelemetry"
+      },
+      {
+        "topic": "Ultracite",
+        "url": "https://github.com/haydenbleasel/ultracite"
+      },
+      {
+        "topic": "Ralph Loop tips (execution style)",
+        "url": "https://www.aihero.dev/tips-for-ai-coding-with-ralph-wiggum"
+      },
+      {
+        "topic": "SemanticDiff product reference",
+        "url": "https://semanticdiff.com/"
+      },
+      {
+        "topic": "difftastic reference (git external diff behavior)",
+        "url": "https://github.com/Wilfred/difftastic"
+      },
+      {
+        "topic": "GumTree reference (move detection inspiration)",
+        "url": "https://github.com/GumTreeDiff/gumtree"
+      }
+    ]
+  }
+}

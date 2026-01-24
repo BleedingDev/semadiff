@@ -1,0 +1,286 @@
+import type {
+  ParseResult,
+  ParserInput,
+  Parser as ParserShape,
+  TokenRange,
+} from "@semadiff/parsers";
+import { ParseError } from "@semadiff/parsers";
+import { Effect } from "effect";
+import { Parser as WebTreeSitterParser } from "web-tree-sitter";
+
+const languages = [
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+  "css",
+  "md",
+  "toml",
+  "yaml",
+] as const;
+const LINE_SPLIT_RE = /\r?\n/;
+
+type SupportedLanguage = (typeof languages)[number];
+
+function isSupportedLanguage(
+  language: string | undefined
+): language is SupportedLanguage {
+  return (
+    typeof language === "string" &&
+    languages.includes(language as SupportedLanguage)
+  );
+}
+
+interface WebTreeSitterModule {
+  init: (options?: {
+    locateFile?: (filename: string, directory?: string) => string;
+  }) => Promise<void>;
+  Language: {
+    load: (path: string | URL) => Promise<unknown>;
+  };
+  new (): {
+    setLanguage: (language: unknown) => void;
+    parse: (input: string) => {
+      rootNode: { hasError: boolean; isMissing: boolean };
+    };
+  };
+}
+
+const Parser = WebTreeSitterParser as unknown as WebTreeSitterModule;
+
+function resolveWasmUrl(modulePath: string, fallbackName: string) {
+  const runtime = (
+    globalThis as {
+      chrome?: { runtime?: { getURL?: (path: string) => string } };
+    }
+  ).chrome;
+  if (runtime?.runtime?.getURL) {
+    return runtime.runtime.getURL(`semadiff-wasm/${fallbackName}`);
+  }
+  const resolver = (import.meta as { resolve?: (specifier: string) => string })
+    .resolve;
+  if (typeof resolver === "function") {
+    try {
+      return resolver(modulePath);
+    } catch {
+      // Fall back to URL resolution for environments without module resolution.
+    }
+  }
+  try {
+    return new URL(
+      `./semadiff-wasm/${fallbackName}`,
+      import.meta.url
+    ).toString();
+  } catch {
+    return `./semadiff-wasm/${fallbackName}`;
+  }
+}
+
+const runtimeWasmUrl = resolveWasmUrl(
+  "web-tree-sitter/tree-sitter.wasm",
+  "tree-sitter.wasm"
+);
+
+const languageWasmUrls: Record<SupportedLanguage, string> = {
+  ts: resolveWasmUrl(
+    "tree-sitter-typescript/tree-sitter-typescript.wasm",
+    "tree-sitter-typescript.wasm"
+  ),
+  tsx: resolveWasmUrl(
+    "tree-sitter-typescript/tree-sitter-tsx.wasm",
+    "tree-sitter-tsx.wasm"
+  ),
+  js: resolveWasmUrl(
+    "tree-sitter-javascript/tree-sitter-javascript.wasm",
+    "tree-sitter-javascript.wasm"
+  ),
+  jsx: resolveWasmUrl(
+    "tree-sitter-javascript/tree-sitter-jsx.wasm",
+    "tree-sitter-jsx.wasm"
+  ),
+  css: resolveWasmUrl(
+    "tree-sitter-css/tree-sitter-css.wasm",
+    "tree-sitter-css.wasm"
+  ),
+  md: resolveWasmUrl(
+    "@tree-sitter-grammars/tree-sitter-markdown/tree-sitter-markdown.wasm",
+    "tree-sitter-markdown.wasm"
+  ),
+  toml: resolveWasmUrl(
+    "tree-sitter-toml/tree-sitter-toml.wasm",
+    "tree-sitter-toml.wasm"
+  ),
+  yaml: resolveWasmUrl(
+    "@tree-sitter-grammars/tree-sitter-yaml/tree-sitter-yaml.wasm",
+    "tree-sitter-yaml.wasm"
+  ),
+};
+
+interface ParserInstance {
+  setLanguage: (language: unknown) => void;
+  parse: (input: string) => {
+    rootNode: { hasError: boolean; isMissing: boolean };
+  };
+}
+
+interface TreeSitterNode {
+  startIndex: number;
+  endIndex: number;
+  childCount: number;
+  children?: TreeSitterNode[];
+}
+
+let initPromise: Promise<void> | null = null;
+const languageCache = new Map<SupportedLanguage, unknown>();
+const parserCache = new Map<SupportedLanguage, ParserInstance>();
+
+async function initRuntime() {
+  if (!initPromise) {
+    initPromise = Parser.init({
+      locateFile: () => runtimeWasmUrl,
+    });
+  }
+  await initPromise;
+}
+
+async function loadLanguage(language: SupportedLanguage) {
+  const cached = languageCache.get(language);
+  if (cached) {
+    return cached;
+  }
+  await initRuntime();
+  const wasmUrl = languageWasmUrls[language];
+  if (!wasmUrl) {
+    throw new Error(`Missing Tree-sitter wasm for ${language}`);
+  }
+  const lang = await Parser.Language.load(wasmUrl);
+  languageCache.set(language, lang);
+  return lang;
+}
+
+async function getParser(language: SupportedLanguage) {
+  const cached = parserCache.get(language);
+  if (cached) {
+    return cached;
+  }
+  const parser = new Parser();
+  const lang = await loadLanguage(language);
+  parser.setLanguage(lang);
+  parserCache.set(language, parser);
+  return parser;
+}
+
+function isTreeSitterNode(value: unknown): value is TreeSitterNode {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return (
+    typeof record.startIndex === "number" &&
+    typeof record.endIndex === "number" &&
+    typeof record.childCount === "number"
+  );
+}
+
+function collectLeafNodes(node: TreeSitterNode, leaves: TreeSitterNode[]) {
+  const children = Array.isArray(node.children) ? node.children : [];
+  if (children.length === 0) {
+    leaves.push(node);
+    return;
+  }
+  for (const child of children) {
+    if (isTreeSitterNode(child)) {
+      collectLeafNodes(child, leaves);
+    }
+  }
+}
+
+function buildTokenRanges(
+  rootNode: TreeSitterNode,
+  textLength: number
+): TokenRange[] {
+  const leaves: TreeSitterNode[] = [];
+  collectLeafNodes(rootNode, leaves);
+  if (leaves.length === 0) {
+    return [];
+  }
+  leaves.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+  const ranges: TokenRange[] = [];
+  let lastStart = -1;
+  let lastEnd = -1;
+  for (const leaf of leaves) {
+    const startIndex = Math.max(0, Math.min(textLength, leaf.startIndex));
+    const endIndex = Math.max(startIndex, Math.min(textLength, leaf.endIndex));
+    if (endIndex <= startIndex) {
+      continue;
+    }
+    if (startIndex === lastStart && endIndex === lastEnd) {
+      continue;
+    }
+    ranges.push({ startIndex, endIndex });
+    lastStart = startIndex;
+    lastEnd = endIndex;
+  }
+  return ranges;
+}
+
+async function parseWithTreeSitter(
+  input: ParserInput,
+  language: SupportedLanguage
+): Promise<ParseResult> {
+  const parser = await getParser(language);
+  const tree = parser.parse(input.content);
+  const tokens = buildTokenRanges(
+    tree.rootNode as unknown as TreeSitterNode,
+    input.content.length
+  );
+  const diagnostics: string[] = [];
+  if (tree.rootNode.hasError) {
+    diagnostics.push("Tree-sitter reported parse errors.");
+  }
+  if (tree.rootNode.isMissing) {
+    diagnostics.push("Tree-sitter reported missing nodes.");
+  }
+  const result: ParseResult = {
+    language,
+    kind: "tree",
+    text: input.content,
+    lines: input.content.split(LINE_SPLIT_RE),
+    capabilities: {
+      hasAstKinds: true,
+      hasTokenRanges: true,
+      supportsErrorRecovery: true,
+      supportsIncrementalParse: false,
+    },
+    root: tree.rootNode,
+    tokens,
+  };
+  return diagnostics.length > 0 ? { ...result, diagnostics } : result;
+}
+
+export const treeSitterWasmParser: ParserShape = {
+  id: "tree-sitter-wasm",
+  languages,
+  capabilities: {
+    hasAstKinds: true,
+    hasTokenRanges: true,
+    supportsErrorRecovery: true,
+    supportsIncrementalParse: false,
+  },
+  parse: (input: ParserInput) =>
+    Effect.tryPromise({
+      try: async () => {
+        const language = input.language;
+        if (!isSupportedLanguage(language)) {
+          throw new Error(`Unsupported language: ${language ?? "unknown"}`);
+        }
+        return await parseWithTreeSitter(input, language);
+      },
+      catch: (error) => {
+        const message = error instanceof Error ? error.message : String(error);
+        return ParseError.make({ parser: "tree-sitter-wasm", message });
+      },
+    }),
+};
+
+export const treeSitterWasmParsers = [treeSitterWasmParser];

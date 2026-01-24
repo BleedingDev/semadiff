@@ -1,0 +1,16 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/parsers" },
+    { "path": "packages/parser-tree-sitter-node" },
+    { "path": "packages/parser-tree-sitter-wasm" },
+    { "path": "packages/parser-swc" },
+    { "path": "packages/parser-lightningcss" },
+    { "path": "packages/render-terminal" },
+    { "path": "packages/render-html" },
+    { "path": "packages/cli" },
+    { "path": "packages/github-extension" },
+    { "path": "packages/test-corpus" }
+  ]
+}
