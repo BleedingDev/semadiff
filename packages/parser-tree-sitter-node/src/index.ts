@@ -38,6 +38,7 @@ interface TreeSitterNode {
   childCount: number;
   type?: string;
   children?: TreeSitterNode[];
+  namedChildren?: TreeSitterNode[];
 }
 
 function isSupportedLanguage(
@@ -116,12 +117,19 @@ function collectLeafNodes(node: TreeSitterNode, leaves: TreeSitterNode[]) {
   }
 }
 
+function jsonChildren(node: TreeSitterNode) {
+  if (Array.isArray(node.namedChildren) && node.namedChildren.length > 0) {
+    return node.namedChildren;
+  }
+  return Array.isArray(node.children) ? node.children : [];
+}
+
 function collectJsonPairs(
   node: TreeSitterNode,
   pairs: TreeSitterNode[]
 ): boolean {
   let hasChildPair = false;
-  const children = Array.isArray(node.children) ? node.children : [];
+  const children = jsonChildren(node);
   for (const child of children) {
     if (isTreeSitterNode(child)) {
       const childHasPair = collectJsonPairs(child, pairs);
@@ -135,6 +143,30 @@ function collectJsonPairs(
   return node.type === "pair" || hasChildPair;
 }
 
+function collectJsonArrayElements(
+  node: TreeSitterNode,
+  elements: TreeSitterNode[]
+): boolean {
+  if (node.type === "array") {
+    const children = jsonChildren(node);
+    for (const child of children) {
+      if (isTreeSitterNode(child)) {
+        elements.push(child);
+      }
+    }
+    return children.length > 0;
+  }
+  let hasElements = false;
+  const children = jsonChildren(node);
+  for (const child of children) {
+    if (isTreeSitterNode(child)) {
+      const childHasElements = collectJsonArrayElements(child, elements);
+      hasElements = hasElements || childHasElements;
+    }
+  }
+  return hasElements;
+}
+
 function buildTokenRanges(
   rootNode: TreeSitterNode,
   textLength: number,
@@ -143,6 +175,9 @@ function buildTokenRanges(
   const nodes: TreeSitterNode[] = [];
   if (language === "json") {
     collectJsonPairs(rootNode, nodes);
+    if (nodes.length === 0) {
+      collectJsonArrayElements(rootNode, nodes);
+    }
   }
   if (nodes.length === 0) {
     collectLeafNodes(rootNode, nodes);
