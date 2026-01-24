@@ -1260,13 +1260,13 @@ function backtrackArrayEdits(
   const edits: ArrayEdit[] = [];
 
   for (let d = trace.length - 1; d > 0; d -= 1) {
-    const v = trace[d - 1];
+    const v = trace[d];
     if (!v) {
       continue;
     }
     const offset = (v.length - 1) / 2;
     const k = x - y;
-    const prevK = selectPrevK(v, offset, k, d - 1);
+    const prevK = selectPrevK(v, offset, k, d);
     const prevX = v[offset + prevK] ?? 0;
     const prevY = prevX - prevK;
 
@@ -1328,7 +1328,6 @@ function diffArrayEdits(oldValues: string[], newValues: string[]) {
       }
       v[offset + k] = x;
       if (x >= n && y >= m) {
-        trace.push(v.slice());
         return backtrackArrayEdits(trace, oldValues, newValues, n, m);
       }
     }

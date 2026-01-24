@@ -969,7 +969,6 @@ function diffLines(
       }
       v[offset + k] = x;
       if (x >= n && y >= m) {
-        trace.push(v.slice());
         return backtrackEdits(trace, oldLines, newLines, n, m);
       }
     }
@@ -1037,14 +1036,16 @@ function backtrackEdits(
   n: number,
   m: number
 ): LineEdit[] {
-  const max = n + m;
-  const offset = max;
   let x = n;
   let y = m;
   const edits: LineEdit[] = [];
 
   for (let d = trace.length - 1; d > 0; d -= 1) {
-    const v = trace[d] ?? [];
+    const v = trace[d];
+    if (!v) {
+      continue;
+    }
+    const offset = (v.length - 1) / 2;
     const k = x - y;
     const prevK = selectPrevK(v, offset, k, d);
     const prevX = v[offset + prevK] ?? 0;
@@ -1104,6 +1105,8 @@ function buildLineBlocks(edits: LineEdit[]): LineBlock[] {
 
 const REORDERABLE_LINE_RE =
   /^[A-Za-z_$][\w$-]*\s*(?:[:=]|\?|$)|^\{?\.\.\.[^}]+}?\s*,?$/;
+const IMPORT_LINE_RE = /^\s*import\s+/;
+const SIDE_EFFECT_IMPORT_RE = /^\s*import\s+['"]/;
 
 function isReorderableLine(line: string) {
   const trimmed = line.trim();
@@ -1119,6 +1122,14 @@ function isReorderableLine(line: string) {
     return false;
   }
   return REORDERABLE_LINE_RE.test(trimmed);
+}
+
+function isImportLine(line: string) {
+  return IMPORT_LINE_RE.test(line.trim());
+}
+
+function isSideEffectImportLine(line: string) {
+  return SIDE_EFFECT_IMPORT_RE.test(line.trim());
 }
 
 function buildLineKeyCounts(
@@ -1148,6 +1159,30 @@ function collectReorderableKeys(
       continue;
     }
     const key = normalizeLine(line).trim();
+    keys.push(key);
+    keyByIndex.push(key);
+  }
+  return { keys, keyByIndex };
+}
+
+function collectImportKeys(
+  lines: string[],
+  normalizeLine: (line: string) => string
+) {
+  const keys: string[] = [];
+  const keyByIndex: (string | null)[] = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return null;
+    }
+    if (!isImportLine(trimmed)) {
+      return null;
+    }
+    if (isSideEffectImportLine(trimmed)) {
+      return null;
+    }
+    const key = normalizeLine(trimmed).trim();
     keys.push(key);
     keyByIndex.push(key);
   }
@@ -1221,6 +1256,20 @@ function reorderInsertLines(
 ) {
   if (!normalizeLine) {
     return null;
+  }
+  const importOld = collectImportKeys(oldLines, normalizeLine);
+  const importNew = collectImportKeys(newLines, normalizeLine);
+  if (importOld && importNew) {
+    if (!lineKeyCountsMatch(importOld.keys, importNew.keys)) {
+      return null;
+    }
+    const buckets = buildLineBuckets(newLines, importNew.keyByIndex);
+    return applyReorderedLines(
+      newLines,
+      importNew.keyByIndex,
+      importOld.keys,
+      buckets
+    );
   }
   const old = collectReorderableKeys(oldLines, normalizeLine);
   const next = collectReorderableKeys(newLines, normalizeLine);
@@ -1526,9 +1575,11 @@ function applyLineOperationToRow(
     return row;
   }
   if (normalizeLine) {
+    const hasBothLines = row.oldLine != null && row.newLine != null;
     const oldText = rowOldText(row);
     const newText = rowNewText(row);
     if (
+      hasBothLines &&
       oldText !== undefined &&
       newText !== undefined &&
       normalizeLine(oldText) === normalizeLine(newText)
