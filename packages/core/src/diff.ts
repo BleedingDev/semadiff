@@ -361,8 +361,15 @@ function tokenizeLines(text: string): DiffToken[] {
 function tokenize(
   text: string,
   root?: unknown,
-  ranges?: readonly TokenRange[]
+  ranges?: readonly TokenRange[],
+  language?: NormalizerLanguage
 ): DiffToken[] {
+  if (language === "json") {
+    if (text.includes("\n")) {
+      return tokenizeLines(text);
+    }
+    return tokenizeRegex(text);
+  }
   const explicitTokens = ranges ? tokenizeFromRanges(text, ranges) : null;
   if (explicitTokens && explicitTokens.length > 0) {
     return explicitTokens;
@@ -704,6 +711,17 @@ function suppressMovedLineOps(
 
 function normalizeCosmeticText(text: string) {
   return text.replace(/'([^'\\]*)'/g, '"$1"');
+}
+
+const COSMETIC_LANGUAGES = new Set<NormalizerLanguage>([
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+]);
+
+function isCosmeticLanguage(language: NormalizerLanguage | undefined) {
+  return language !== undefined && COSMETIC_LANGUAGES.has(language);
 }
 
 function isSideEffectImportLine(line: string) {
@@ -1120,8 +1138,18 @@ export function structuralDiff(
     };
   }
 
-  const oldTokens = tokenize(oldText, options?.oldRoot, options?.oldTokens);
-  const newTokens = tokenize(newText, options?.newRoot, options?.newTokens);
+  const oldTokens = tokenize(
+    oldText,
+    options?.oldRoot,
+    options?.oldTokens,
+    options?.language
+  );
+  const newTokens = tokenize(
+    newText,
+    options?.newRoot,
+    options?.newTokens,
+    options?.language
+  );
   const blocks = diffUnits(oldTokens, newTokens);
   const renames = detectRenames(oldText, newText);
   const renameGroupId = renames[0]?.id;
@@ -1133,8 +1161,10 @@ export function structuralDiff(
       (options?.oldTokens?.length ?? 0) > 0 ||
       (options?.newTokens?.length ?? 0) > 0
   );
+  const useStructuralTokens =
+    hasStructuralTokens && options?.language !== "json";
   const shouldDetectMoves =
-    options?.detectMoves !== false && hasStructuralTokens;
+    options?.detectMoves !== false && useStructuralTokens;
   const moveDetection = shouldDetectMoves
     ? detectMoves(blocks, oldTokens, newTokens, oldText, newText, renameGroupId)
     : ({
@@ -1220,10 +1250,12 @@ export function structuralDiff(
   }
 
   const coalesced = coalesceOperations(operations, oldText, newText);
-  const finalOps = hasStructuralTokens
+  const finalOps = useStructuralTokens
     ? coalesced
     : suppressMovedLineOps(coalesced, oldText, newText);
-  const sanitizedOps = suppressCosmeticUpdates(finalOps);
+  const sanitizedOps = isCosmeticLanguage(options?.language)
+    ? suppressCosmeticUpdates(finalOps)
+    : finalOps;
   return {
     version: "0.1.0",
     operations: sanitizedOps.concat(
