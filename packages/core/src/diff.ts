@@ -90,7 +90,8 @@ const EMPTY_RANGE: Range = {
   end: { line: 1, column: 1 },
 };
 const LINE_SPLIT_RE = /\r?\n/;
-const TRAILING_LINE_BREAK_RE = /\r?\n$/;
+const TRAILING_LINE_BREAK_RE = /\r?\n\s*$/;
+const JSON_PAIR_KEY_RE = /^\s*"([^"\\]*)"\s*:/;
 
 function rangeForText(text: string): Range {
   if (text.length === 0) {
@@ -364,12 +365,6 @@ function tokenize(
   ranges?: readonly TokenRange[],
   language?: NormalizerLanguage
 ): DiffToken[] {
-  if (language === "json") {
-    if (text.includes("\n")) {
-      return tokenizeLines(text);
-    }
-    return tokenizeRegex(text);
-  }
   const explicitTokens = ranges ? tokenizeFromRanges(text, ranges) : null;
   if (explicitTokens && explicitTokens.length > 0) {
     return explicitTokens;
@@ -377,6 +372,12 @@ function tokenize(
   const treeTokens = root ? tokenizeTreeSitter(text, root) : null;
   if (treeTokens && treeTokens.length > 0) {
     return treeTokens;
+  }
+  if (language === "json") {
+    if (text.includes("\n")) {
+      return tokenizeLines(text);
+    }
+    return tokenizeRegex(text);
   }
   if (text.includes("\n")) {
     return tokenizeLines(text);
@@ -722,6 +723,24 @@ const COSMETIC_LANGUAGES = new Set<NormalizerLanguage>([
 
 function isCosmeticLanguage(language: NormalizerLanguage | undefined) {
   return language !== undefined && COSMETIC_LANGUAGES.has(language);
+}
+
+function extractJsonPairKey(text: string) {
+  const match = JSON_PAIR_KEY_RE.exec(text);
+  return match?.[1];
+}
+
+function shouldPairDeleteInsert(
+  oldText: string,
+  newText: string,
+  language: NormalizerLanguage | undefined
+) {
+  if (language !== "json") {
+    return true;
+  }
+  const oldKey = extractJsonPairKey(oldText);
+  const newKey = extractJsonPairKey(newText);
+  return Boolean(oldKey && newKey && oldKey === newKey);
 }
 
 function isSideEffectImportLine(line: string) {
@@ -1197,23 +1216,41 @@ export function structuralDiff(
         next.type === "insert" &&
         !moveDetection.usedInserts.has(index + 1)
       ) {
+        const blockOldText = textForTokens(
+          oldText,
+          oldTokens,
+          block.start,
+          block.units.length
+        );
+        const blockNewText = textForTokens(
+          newText,
+          newTokens,
+          next.start,
+          next.units.length
+        );
+        if (
+          !shouldPairDeleteInsert(blockOldText, blockNewText, options?.language)
+        ) {
+          operations.push({
+            id: `op-${opCounter++}`,
+            type: "delete",
+            oldRange: rangeForTokens(
+              oldTokens,
+              block.start,
+              block.units.length
+            ),
+            oldText: blockOldText,
+            ...(renameMeta ? { meta: renameMeta } : {}),
+          });
+          continue;
+        }
         operations.push({
           id: `op-${opCounter++}`,
           type: "update",
           oldRange: rangeForTokens(oldTokens, block.start, block.units.length),
           newRange: rangeForTokens(newTokens, next.start, next.units.length),
-          oldText: textForTokens(
-            oldText,
-            oldTokens,
-            block.start,
-            block.units.length
-          ),
-          newText: textForTokens(
-            newText,
-            newTokens,
-            next.start,
-            next.units.length
-          ),
+          oldText: blockOldText,
+          newText: blockNewText,
           ...(renameMeta ? { meta: renameMeta } : {}),
         });
         index += 1;

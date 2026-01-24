@@ -154,6 +154,7 @@ interface TreeSitterNode {
   startIndex: number;
   endIndex: number;
   childCount: number;
+  type?: string;
   children?: TreeSitterNode[];
 }
 
@@ -222,22 +223,47 @@ function collectLeafNodes(node: TreeSitterNode, leaves: TreeSitterNode[]) {
   }
 }
 
+function collectJsonPairs(
+  node: TreeSitterNode,
+  pairs: TreeSitterNode[]
+): boolean {
+  let hasChildPair = false;
+  const children = Array.isArray(node.children) ? node.children : [];
+  for (const child of children) {
+    if (isTreeSitterNode(child)) {
+      const childHasPair = collectJsonPairs(child, pairs);
+      hasChildPair = hasChildPair || childHasPair;
+    }
+  }
+  if (node.type === "pair" && !hasChildPair) {
+    pairs.push(node);
+    return true;
+  }
+  return node.type === "pair" || hasChildPair;
+}
+
 function buildTokenRanges(
   rootNode: TreeSitterNode,
-  textLength: number
+  textLength: number,
+  language?: SupportedLanguage
 ): TokenRange[] {
-  const leaves: TreeSitterNode[] = [];
-  collectLeafNodes(rootNode, leaves);
-  if (leaves.length === 0) {
+  const nodes: TreeSitterNode[] = [];
+  if (language === "json") {
+    collectJsonPairs(rootNode, nodes);
+  }
+  if (nodes.length === 0) {
+    collectLeafNodes(rootNode, nodes);
+  }
+  if (nodes.length === 0) {
     return [];
   }
-  leaves.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
+  nodes.sort((a, b) => a.startIndex - b.startIndex || a.endIndex - b.endIndex);
   const ranges: TokenRange[] = [];
   let lastStart = -1;
   let lastEnd = -1;
-  for (const leaf of leaves) {
-    const startIndex = Math.max(0, Math.min(textLength, leaf.startIndex));
-    const endIndex = Math.max(startIndex, Math.min(textLength, leaf.endIndex));
+  for (const node of nodes) {
+    const startIndex = Math.max(0, Math.min(textLength, node.startIndex));
+    const endIndex = Math.max(startIndex, Math.min(textLength, node.endIndex));
     if (endIndex <= startIndex) {
       continue;
     }
@@ -259,7 +285,8 @@ async function parseWithTreeSitter(
   const tree = parser.parse(input.content);
   const tokens = buildTokenRanges(
     tree.rootNode as unknown as TreeSitterNode,
-    input.content.length
+    input.content.length,
+    language
   );
   const diagnostics: string[] = [];
   if (tree.rootNode.hasError) {
