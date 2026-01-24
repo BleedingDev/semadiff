@@ -11,16 +11,17 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
     "@effect/cli": "^0.73.0",
     "@effect/platform": "^0.94.1",
-    "@effect/platform-node": "^0.104.0",
+    "@effect/platform-bun": "^0.87.1",
     "@semadiff/core": "workspace:*",
     "@semadiff/parser-lightningcss": "workspace:*",
     "@semadiff/parser-swc": "workspace:*",
-    "@semadiff/parser-tree-sitter-node": "workspace:*",
+    "@semadiff/parser-tree-sitter-wasm": "workspace:*",
+    "@semadiff/pr-backend": "workspace:*",
     "@semadiff/parsers": "workspace:*",
     "@semadiff/render-terminal": "workspace:*",
     "effect": "^3.19.14"

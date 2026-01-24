@@ -7,7 +7,11 @@
 .sd-topbar {
   padding: 16px 32px 14px;
   border-bottom: 1px solid var(--sd-border);
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.6));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.95),
+    rgba(15, 23, 42, 0.6)
+  );
   box-shadow: var(--sd-shadow);
 }
 
@@ -157,11 +161,16 @@
 
 .sd-file-row {
   padding: 14px 16px;
+  border: none;
   border-bottom: 1px solid rgba(148, 163, 184, 0.08);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  background: transparent;
+  text-align: left;
+  font: inherit;
 }
 
 .sd-file-row:last-child {
@@ -225,7 +234,11 @@
 
 .sd-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, rgba(45, 212, 191, 0.8), rgba(59, 130, 246, 0.6));
+  background: linear-gradient(
+    90deg,
+    rgba(45, 212, 191, 0.8),
+    rgba(59, 130, 246, 0.6)
+  );
   width: 0%;
 }
 
@@ -291,6 +304,35 @@
 
 .sd-inline-meta--error {
   color: var(--sd-del);
+}
+
+.sd-warning {
+  border: 2px solid #f97316;
+  background: rgba(249, 115, 22, 0.1);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sd-warning-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fdba74;
+}
+
+.sd-warning-body {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fed7aa;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.sd-warning-item + .sd-warning-item {
+  margin-top: 6px;
 }
 
 .sd-inline-meta a {

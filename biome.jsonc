@@ -40,7 +40,10 @@
       }
     },
     {
-      "includes": ["apps/pr-viewer/src/logger.ts"],
+      "includes": [
+        "apps/pr-viewer/src/logger.ts",
+        "packages/github-extension/src/logger.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {

@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json && SEMADIFF_WASM_OUT=packages/parser-tree-sitter-wasm/dist/semadiff-wasm bun ../../scripts/copy-wasm.mjs"
   },
   "dependencies": {
     "@semadiff/parsers": "workspace:*",

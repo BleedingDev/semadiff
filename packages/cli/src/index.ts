@@ -7,8 +7,8 @@ import {
   writeFileSync,
 } from "node:fs";
 import { Args, Command, Options } from "@effect/cli";
-import { NodeContext, NodeRuntime } from "@effect/platform-node";
-import type { NormalizerSettings } from "@semadiff/core";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import type { DiffDocument, NormalizerSettings } from "@semadiff/core";
 import {
   ConfigSchema,
   explainDiff,
@@ -19,9 +19,15 @@ import {
 } from "@semadiff/core";
 import { lightningCssParsers } from "@semadiff/parser-lightningcss";
 import { swcParsers } from "@semadiff/parser-swc";
-import { treeSitterNodeParsers } from "@semadiff/parser-tree-sitter-node";
+import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
 import type { LanguageId } from "@semadiff/parsers";
 import { makeRegistry } from "@semadiff/parsers";
+import {
+  FileDiffDocumentSchema,
+  PrDiffLive,
+  PrDiffService,
+  PrSummarySchema,
+} from "@semadiff/pr-backend";
 import { renderTerminal } from "@semadiff/render-terminal";
 import { Console, Effect, Schema } from "effect";
 import { resolveConfig } from "./config/resolve.js";
@@ -43,6 +49,18 @@ function readInput(path: string): string {
 
 function isBinary(text: string) {
   return text.includes("\u0000");
+}
+
+function encodeJson<S extends Schema.Schema.AnyNoContext>(
+  schema: S,
+  value: Schema.Schema.Type<S>,
+  space?: number
+) {
+  const jsonSchema = Schema.parseJson(
+    schema,
+    space === undefined ? undefined : { space }
+  ) as unknown as Schema.Schema<Schema.Schema.Type<S>, string, never>;
+  return Schema.encodeSync(jsonSchema)(value);
 }
 
 const languageChoices = [
@@ -69,7 +87,7 @@ const ParserCapabilitiesSchema = Schema.Record({
   value: ParserCapabilitySchema,
 });
 const DoctorReportSchema = Schema.Struct({
-  node: Schema.String,
+  bun: Schema.String,
   git: Schema.String,
   cwd: Schema.String,
   canWriteCwd: Schema.Boolean,
@@ -237,6 +255,18 @@ const languageOption = Options.choice("language", languageChoices).pipe(
   Options.withDefault("auto"),
   Options.withDescription("Language hint (auto to infer).")
 );
+const prContextOption = Options.integer("context").pipe(
+  Options.withDefault(3),
+  Options.withDescription("Line context for diff caching (default 3).")
+);
+const prMovesOption = Options.boolean("moves").pipe(
+  Options.withDefault(true),
+  Options.withDescription("Enable move detection.")
+);
+const prSummaryCompactOption = Options.boolean("compact").pipe(
+  Options.withDefault(false),
+  Options.withDescription("Print compact JSON (no whitespace).")
+);
 
 function inferLanguageFromPath(path?: string): LanguageId | undefined {
   if (!path || path === "-") {
@@ -270,7 +300,7 @@ function inferLanguageFromPath(path?: string): LanguageId | undefined {
 const parserRegistry = makeRegistry([
   ...swcParsers,
   ...lightningCssParsers,
-  ...treeSitterNodeParsers,
+  ...treeSitterWasmParsers,
 ]);
 
 function runDiffEffect(params: {
@@ -456,6 +486,79 @@ const diffCommand = Command.make(
     )
 ).pipe(Command.withDescription("Run a semantic diff between two files."));
 
+const prSummaryCommand = Command.make(
+  "summary",
+  {
+    prUrl: Args.text({ name: "pr" }),
+    compact: prSummaryCompactOption,
+  },
+  ({ prUrl, compact }) =>
+    Effect.gen(function* () {
+      const service = yield* PrDiffService;
+      const summary = yield* service.getSummary(prUrl);
+      const json = encodeJson(
+        PrSummarySchema,
+        summary,
+        compact ? undefined : 2
+      );
+      yield* Console.log(json);
+    }).pipe(Effect.provide(PrDiffLive))
+).pipe(Command.withDescription("Fetch PR summary from GitHub."));
+
+const prFileCommand = Command.make(
+  "file",
+  {
+    prUrl: Args.text({ name: "pr" }),
+    file: Args.text({ name: "file" }),
+    format: formatOption,
+    layout: layoutOption,
+    context: prContextOption,
+    moves: prMovesOption,
+  },
+  ({ prUrl, file, format, layout, context, moves }) =>
+    Effect.gen(function* () {
+      const service = yield* PrDiffService;
+      const lineLayout = layout === "side-by-side" ? "split" : "unified";
+      const result = yield* service.getFileDiffDocument(
+        prUrl,
+        file,
+        context,
+        lineLayout,
+        moves
+      );
+      if (format === "json") {
+        yield* Console.log(encodeJson(FileDiffDocumentSchema, result, 2));
+        return;
+      }
+      if (result.file.warnings?.length) {
+        for (const warning of result.file.warnings) {
+          yield* Console.log(`WARNING: ${warning}`);
+        }
+      }
+      yield* Console.log(
+        `File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`
+      );
+      const diff: DiffDocument = {
+        ...result.diff,
+        operations: [...result.diff.operations],
+        moves: result.diff.moves.map((move) => ({
+          ...move,
+          operations: [...move.operations],
+        })),
+        renames: [...result.diff.renames],
+      };
+      const output = renderTerminal(diff, {
+        format,
+        layout,
+      });
+      yield* Console.log(output);
+    }).pipe(Effect.provide(PrDiffLive))
+).pipe(Command.withDescription("Render semantic diff for a PR file."));
+
+const prCommand = Command.make("pr", {}, () => Effect.void).pipe(
+  Command.withSubcommands([prSummaryCommand, prFileCommand])
+);
+
 const gitExternalCommand = Command.make(
   "git-external",
   {
@@ -611,7 +714,7 @@ const installGitCommand = Command.make("install-git", {}, () =>
 
 const doctorCommand = Command.make("doctor", {}, () =>
   Effect.gen(function* () {
-    const nodeVersion = process.versions.node;
+    const bunVersion = process.versions.bun ?? "unknown";
     const gitVersion = yield* Effect.try({
       try: () => execSync("git --version").toString().trim(),
       catch: (error) =>
@@ -625,7 +728,7 @@ const doctorCommand = Command.make("doctor", {}, () =>
       catch: (error) => CliSystemError.make({ operation: "access-cwd", error }),
     }).pipe(Effect.catchAll(() => Effect.succeed(false)));
     const report = {
-      node: nodeVersion,
+      bun: bunVersion,
       git: gitVersion,
       cwd: process.cwd(),
       canWriteCwd,
@@ -909,6 +1012,7 @@ const app = Command.make("semadiff", {}, () => Effect.void).pipe(
     doctorCommand,
     benchCommand,
     explainCommand,
+    prCommand,
   ])
 );
 
@@ -917,4 +1021,4 @@ const cli = Command.run(app, {
   version: "0.1.0",
 });
 
-cli(process.argv).pipe(Effect.provide(NodeContext.layer), NodeRuntime.runMain);
+cli(process.argv).pipe(Effect.provide(BunContext.layer), BunRuntime.runMain);

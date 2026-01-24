@@ -1,6 +1,7 @@
 import type { DiffDocument } from "@semadiff/core";
 import {
   createDiagnosticsBundle,
+  DiagnosticsBundleSchema,
   defaultConfig,
   structuralDiff,
 } from "@semadiff/core";
@@ -8,9 +9,10 @@ import { renderHtml } from "@semadiff/render-html";
 import "./content.css";
 import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
 import { makeRegistry } from "@semadiff/parsers";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import type { BlobResult } from "./blob";
 import { fetchBlob } from "./blob";
+import { logger } from "./logger";
 
 const STORAGE_KEY = "semadiff-overlay-open";
 const TELEMETRY_KEY = "semadiff-telemetry";
@@ -19,6 +21,37 @@ const TELEMETRY_ENDPOINT_KEY = "semadiff-telemetry-endpoint";
 const FULL_REPLACE_KEY = "semadiff-full-replace";
 const DIRECT_API_KEY = "semadiff-direct-api";
 const parserRegistry = makeRegistry(treeSitterWasmParsers);
+const TelemetryPayloadSchema = Schema.Struct({
+  span: Schema.String,
+  timestamp: Schema.String,
+  attributes: Schema.Record({ key: Schema.String, value: Schema.Unknown }),
+});
+const OtlpAttributeSchema = Schema.Struct({
+  key: Schema.String,
+  value: Schema.Struct({ stringValue: Schema.String }),
+});
+const OtlpSpanSchema = Schema.Struct({
+  name: Schema.String,
+  startTimeUnixNano: Schema.String,
+  endTimeUnixNano: Schema.String,
+  attributes: Schema.Array(OtlpAttributeSchema),
+});
+const OtlpScopeSchema = Schema.Struct({
+  scope: Schema.Struct({ name: Schema.String }),
+  spans: Schema.Array(OtlpSpanSchema),
+});
+const OtlpResourceSchema = Schema.Struct({
+  resource: Schema.Struct({ attributes: Schema.Array(OtlpAttributeSchema) }),
+  scopeSpans: Schema.Array(OtlpScopeSchema),
+});
+const OtlpPayloadSchema = Schema.Struct({
+  resourceSpans: Schema.Array(OtlpResourceSchema),
+});
+const TelemetryPayloadJson = Schema.parseJson(TelemetryPayloadSchema);
+const OtlpPayloadJson = Schema.parseJson(OtlpPayloadSchema);
+const DiagnosticsBundleJson = Schema.parseJson(DiagnosticsBundleSchema, {
+  space: 2,
+});
 function getFallbackStorage() {
   const store = (
     globalThis as { __semadiffSessionStorage?: Record<string, string> }
@@ -181,7 +214,7 @@ function telemetrySpan(name: string, attributes: Record<string, unknown>) {
       timestamp,
       attributes,
     };
-    console.log(JSON.stringify(payload));
+    logger.info(Schema.encodeSync(TelemetryPayloadJson)(payload));
     return;
   }
   const endpoint = readSessionStorage(TELEMETRY_ENDPOINT_KEY);
@@ -193,7 +226,7 @@ function telemetrySpan(name: string, attributes: Record<string, unknown>) {
   fetch(endpoint, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
+    body: Schema.encodeSync(OtlpPayloadJson)(body),
   }).catch(() => undefined);
 }
 
@@ -399,10 +432,7 @@ function renderDiffResult(params: {
       : Math.round(
           Math.max(
             0,
-            Math.min(
-              1,
-              1 - aggregate.operations / aggregate.changeLines
-            )
+            Math.min(1, 1 - aggregate.operations / aggregate.changeLines)
           ) * 100
         );
   metricValue.textContent = `${overallPercent}%`;
@@ -566,7 +596,9 @@ function mountOverlay() {
       diff: lastDiff ?? emptyDiff(),
       includeCode,
     });
-    const body = `Diagnostics:\\n\\n${JSON.stringify(diagnostics, null, 2)}`;
+    const body = `Diagnostics:\\n\\n${Schema.encodeSync(DiagnosticsBundleJson)(
+      diagnostics
+    )}`;
     try {
       await navigator.clipboard.writeText(body);
       // biome-ignore lint/suspicious/noAlert: native alert provides immediate feedback.

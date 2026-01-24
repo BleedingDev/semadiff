@@ -16,15 +16,17 @@ export interface Range {
 export interface DiffOperation {
   id: string;
   type: "insert" | "delete" | "update" | "move";
-  oldRange?: Range;
-  newRange?: Range;
-  oldText?: string;
-  newText?: string;
-  meta?: {
-    confidence?: number;
-    moveId?: string;
-    renameGroupId?: string;
-  };
+  oldRange?: Range | undefined;
+  newRange?: Range | undefined;
+  oldText?: string | undefined;
+  newText?: string | undefined;
+  meta?:
+    | {
+        confidence?: number | undefined;
+        moveId?: string | undefined;
+        renameGroupId?: string | undefined;
+      }
+    | undefined;
 }
 
 export interface DiffDocument {

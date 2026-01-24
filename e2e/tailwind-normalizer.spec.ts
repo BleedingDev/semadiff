@@ -1,6 +1,12 @@
-import { execFileSync, execSync } from "node:child_process";
+import { execSync } from "node:child_process";
 import { expect, test } from "@playwright/test";
-import { distFileUrl } from "./helpers.js";
+import {
+  decodeJson,
+  distFileUrl,
+  effectUrl,
+  encodeJson,
+  runBunEval,
+} from "./helpers.js";
 
 const coreUrl = distFileUrl("packages", "core", "dist", "index.js");
 
@@ -26,19 +32,19 @@ const normalizersDisabled = {
 
 function runTailwindCase(oldText: string, newText: string) {
   const script = `
-import { structuralDiff } from ${JSON.stringify(coreUrl)};
-const enabled = ${JSON.stringify(normalizersEnabled)};
-const disabled = ${JSON.stringify(normalizersDisabled)};
-const oldText = ${JSON.stringify(oldText)};
-const newText = ${JSON.stringify(newText)};
+import { Schema } from ${encodeJson(effectUrl)};
+import { structuralDiff } from ${encodeJson(coreUrl)};
+const enabled = ${encodeJson(normalizersEnabled)};
+const disabled = ${encodeJson(normalizersDisabled)};
+const oldText = ${encodeJson(oldText)};
+const newText = ${encodeJson(newText)};
 const diffEnabled = structuralDiff(oldText, newText, { normalizers: enabled, language: "tsx" });
 const diffDisabled = structuralDiff(oldText, newText, { normalizers: disabled, language: "tsx" });
-console.log(JSON.stringify({ enabled: diffEnabled.operations.length, disabled: diffDisabled.operations.length }));
+const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown));
+console.log(encodeJson({ enabled: diffEnabled.operations.length, disabled: diffDisabled.operations.length }));
 `;
-  const output = execFileSync("node", ["--input-type=module", "-e", script], {
-    encoding: "utf8",
-  });
-  return JSON.parse(output) as { enabled: number; disabled: number };
+  const output = runBunEval(script);
+  return decodeJson<{ enabled: number; disabled: number }>(output);
 }
 
 test.beforeAll(() => {

@@ -3,9 +3,11 @@ import { parsePrUrl } from "./pr-url";
 
 describe("parsePrUrl", () => {
   it("parses full GitHub PR URL", () => {
-    expect(
-      parsePrUrl("https://github.com/owner/repo/pull/123")
-    ).toEqual({ owner: "owner", repo: "repo", number: 123 });
+    expect(parsePrUrl("https://github.com/owner/repo/pull/123")).toEqual({
+      owner: "owner",
+      repo: "repo",
+      number: 123,
+    });
   });
 
   it("parses owner/repo/pull shorthand", () => {

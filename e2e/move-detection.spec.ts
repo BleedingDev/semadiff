@@ -1,17 +1,20 @@
 import { execSync } from "node:child_process";
 import { expect, test } from "@playwright/test";
-import { distFileUrl } from "./helpers.js";
+import { decodeJson, distFileUrl, runBunEval } from "./helpers.js";
 
 const coreUrl = distFileUrl("packages", "core", "dist", "index.js");
 
 test("moved block yields move op with confidence", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
-  const output = execSync(
-    `node --input-type=module -e "import { structuralDiff } from '${coreUrl}'; const oldText = 'alpha\\nbeta\\ngamma\\ndelta'; const newText = 'alpha\\ndelta\\nbeta\\ngamma'; const diff = structuralDiff(oldText, newText); console.log(JSON.stringify(diff));"`
-  ).toString();
+  const output = runBunEval(
+    `import { structuralDiff, renderJson } from '${coreUrl}'; const oldText = 'alpha\\nbeta\\ngamma\\ndelta'; const newText = 'alpha\\ndelta\\nbeta\\ngamma'; const diff = structuralDiff(oldText, newText); console.log(renderJson(diff));`
+  );
 
-  const diff = JSON.parse(output);
+  const diff = decodeJson<{
+    operations: { type: string; id: string; meta?: { moveId?: string } }[];
+    moves: { confidence: number }[];
+  }>(output);
   const moveOps = diff.operations.filter(
     (op: { type: string }) => op.type === "move"
   );
@@ -22,11 +25,13 @@ test("moved block yields move op with confidence", () => {
 test("moved block with edit yields nested update", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
-  const output = execSync(
-    `node --input-type=module -e "import { structuralDiff } from '${coreUrl}'; const oldText = 'alpha\\none\\ntwo\\nthree\\nomega'; const newText = 'alpha\\nomega\\none\\ntwo\\nthree updated'; const diff = structuralDiff(oldText, newText); console.log(JSON.stringify(diff));"`
-  ).toString();
+  const output = runBunEval(
+    `import { structuralDiff, renderJson } from '${coreUrl}'; const oldText = 'alpha\\none\\ntwo\\nthree\\nomega'; const newText = 'alpha\\nomega\\none\\ntwo\\nthree updated'; const diff = structuralDiff(oldText, newText); console.log(renderJson(diff));`
+  );
 
-  const diff = JSON.parse(output);
+  const diff = decodeJson<{
+    operations: { type: string; id: string; meta?: { moveId?: string } }[];
+  }>(output);
   const moveOps = diff.operations.filter(
     (op: { type: string }) => op.type === "move"
   );

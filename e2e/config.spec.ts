@@ -4,7 +4,12 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "@playwright/test";
-import { distPath } from "./helpers.js";
+import {
+  bunBinary,
+  decodeJson,
+  distPath,
+  encodeJsonPretty,
+} from "./helpers.js";
 
 const cliPath = distPath("packages", "cli", "dist", "index.js");
 
@@ -19,31 +24,23 @@ test("config resolution order is env, user, project", () => {
 
   writeFileSync(
     projectConfigPath,
-    JSON.stringify(
-      {
-        renderer: { format: "plain" },
-        normalizers: { global: { tailwind: false } },
-      },
-      null,
-      2
-    )
+    encodeJsonPretty({
+      renderer: { format: "plain" },
+      normalizers: { global: { tailwind: false } },
+    })
   );
 
   writeFileSync(
     userConfigPath,
-    JSON.stringify(
-      {
-        renderer: { format: "ansi" },
-        telemetry: { enabled: true, exporter: "otlp-http" },
-      },
-      null,
-      2
-    )
+    encodeJsonPretty({
+      renderer: { format: "ansi" },
+      telemetry: { enabled: true, exporter: "otlp-http" },
+    })
   );
 
   execSync("pnpm --filter @semadiff/cli build", { stdio: "inherit" });
 
-  const output = execSync(`node ${cliPath} config`, {
+  const output = execSync(`${bunBinary} ${cliPath} config`, {
     cwd: tempRoot,
     env: {
       ...process.env,
@@ -54,7 +51,19 @@ test("config resolution order is env, user, project", () => {
     },
   }).toString();
 
-  const parsed = JSON.parse(output);
+  const parsed = decodeJson<{
+    config: {
+      renderer: { format: string };
+      normalizers: { global: { tailwind: boolean } };
+      telemetry: { enabled: boolean; exporter: string; endpoint?: string };
+    };
+    sources: {
+      renderer: { format: string };
+      normalizers: { global: { tailwind: string } };
+      telemetry: { enabled: string; exporter: string; endpoint: string };
+    };
+    normalizerRules: unknown[];
+  }>(output);
   assert.equal(parsed.config.renderer.format, "json");
   assert.equal(parsed.config.normalizers.global.tailwind, false);
   assert.equal(parsed.config.telemetry.enabled, true);

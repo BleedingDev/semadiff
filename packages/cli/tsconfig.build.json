@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../core" },
+    { "path": "../parsers" },
+    { "path": "../parser-tree-sitter-wasm" },
+    { "path": "../parser-swc" },
+    { "path": "../parser-lightningcss" },
+    { "path": "../render-terminal" }
+  ],
+  "include": ["src"]
+}

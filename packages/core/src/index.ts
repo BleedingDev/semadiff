@@ -20,6 +20,7 @@ export {
 } from "./config.js";
 export type { DiagnosticsBundle } from "./diagnostics.js";
 export { createDiagnosticsBundle } from "./diagnostics.js";
+export { DiagnosticsBundleSchema } from "./diagnostics-schema.js";
 export type {
   DiffDocument,
   DiffOperation,
@@ -29,6 +30,14 @@ export type {
   RenameGroup,
 } from "./diff.js";
 export { structuralDiff } from "./diff.js";
+export {
+  DiffDocumentSchema,
+  DiffOperationSchema,
+  MoveGroupSchema,
+  PositionSchema,
+  RangeSchema,
+  RenameGroupSchema,
+} from "./diff-schema.js";
 export type { ExplainDocument, ExplainOperation } from "./explain.js";
 export { explainDiff } from "./explain.js";
 export type {

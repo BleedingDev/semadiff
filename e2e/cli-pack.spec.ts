@@ -3,6 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
+import { bunBinary, decodeJson, encodeJsonPretty } from "./helpers.js";
 
 function findTgz(dir: string, slug: string): string {
   const entries = readdirSync(dir);
@@ -36,10 +37,13 @@ test("packed CLI artifact can run a real diff", () => {
   const packages = [
     "@semadiff/cli",
     "@semadiff/core",
+    "@semadiff/pr-backend",
     "@semadiff/parsers",
     "@semadiff/parser-lightningcss",
     "@semadiff/parser-swc",
+    "@semadiff/parser-tree-sitter-wasm",
     "@semadiff/parser-tree-sitter-node",
+    "@semadiff/render-html",
     "@semadiff/render-terminal",
   ];
   const tarballMap = Object.fromEntries(
@@ -53,28 +57,24 @@ test("packed CLI artifact can run a real diff", () => {
       .filter(([name]) => name !== "@semadiff/cli")
       .map(([name, tarball]) => [name, `file:${tarball}`])
   );
-  const rootPackageJson = JSON.parse(
-    readFileSync(join(process.cwd(), "package.json"), "utf8")
-  ) as { pnpm?: { onlyBuiltDependencies?: string[] } };
+  const rootPackageJson = decodeJson<{
+    pnpm?: { onlyBuiltDependencies?: string[] };
+  }>(readFileSync(join(process.cwd(), "package.json"), "utf8"));
   const onlyBuiltDependencies =
     rootPackageJson.pnpm?.onlyBuiltDependencies ?? [];
   writeFileSync(
     join(consumerDir, "package.json"),
-    JSON.stringify(
-      {
-        name: "semadiff-consumer",
-        private: true,
-        dependencies: {
-          "@semadiff/cli": `file:${tarballMap["@semadiff/cli"]}`,
-        },
-        pnpm: {
-          overrides,
-          onlyBuiltDependencies,
-        },
+    encodeJsonPretty({
+      name: "semadiff-consumer",
+      private: true,
+      dependencies: {
+        "@semadiff/cli": `file:${tarballMap["@semadiff/cli"]}`,
       },
-      null,
-      2
-    )
+      pnpm: {
+        overrides,
+        onlyBuiltDependencies,
+      },
+    })
   );
   execSync("pnpm install", { cwd: consumerDir, stdio: "inherit" });
 
@@ -87,7 +87,7 @@ test("packed CLI artifact can run a real diff", () => {
     "index.js"
   );
 
-  const helpOutput = execSync(`node ${cliEntry} --help`, {
+  const helpOutput = execSync(`${bunBinary} ${cliEntry} --help`, {
     cwd: consumerDir,
   }).toString();
   expect(helpOutput).toContain("diff");
@@ -99,7 +99,7 @@ test("packed CLI artifact can run a real diff", () => {
   writeFileSync(newFile, "const value = 2;\n");
 
   const diffOutput = execSync(
-    `node ${cliEntry} diff --format plain ${oldFile} ${newFile}`,
+    `${bunBinary} ${cliEntry} diff --format plain ${oldFile} ${newFile}`,
     { cwd: consumerDir }
   ).toString();
   expect(diffOutput.length).toBeGreaterThan(0);

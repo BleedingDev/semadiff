@@ -11,13 +11,15 @@ const moduleSearchPaths = [
   resolve(repoRoot, "packages", "parser-tree-sitter-wasm"),
   resolve(repoRoot, "packages", "github-extension"),
 ];
-const outDir = resolve(
-  repoRoot,
-  "packages",
-  "github-extension",
-  "public",
-  "semadiff-wasm"
-);
+const outDir = process.env.SEMADIFF_WASM_OUT
+  ? resolve(repoRoot, process.env.SEMADIFF_WASM_OUT)
+  : resolve(
+      repoRoot,
+      "packages",
+      "github-extension",
+      "public",
+      "semadiff-wasm"
+    );
 
 const wasmFiles = [
   {

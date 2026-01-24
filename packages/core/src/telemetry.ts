@@ -1,4 +1,4 @@
-import { Effect, Exit, Layer, Schema } from "effect";
+import { Console, Effect, Exit, Layer, Schema } from "effect";
 
 export type TelemetryAttributes = Record<string, unknown>;
 
@@ -203,30 +203,34 @@ function deriveEndpoint(base: string, kind: "traces" | "logs" | "metrics") {
 export function TelemetryLive(options: TelemetryOptions) {
   let warned = false;
   let warnedGrpc = false;
-  const warnOnce = (message: string) => {
-    if (!warned) {
+  const warnOnce = (message: string) =>
+    Effect.suspend(() => {
+      if (warned) {
+        return Effect.void;
+      }
       warned = true;
-      console.warn(message);
-    }
-  };
-  const warnGrpcOnce = () => {
-    if (!warnedGrpc) {
+      return Console.warn(message);
+    });
+  const warnGrpcOnce = () =>
+    Effect.suspend(() => {
+      if (warnedGrpc) {
+        return Effect.void;
+      }
       warnedGrpc = true;
-      console.warn("OTLP gRPC exporter is using HTTP JSON fallback.");
-    }
-  };
+      return Console.warn("OTLP gRPC exporter is using HTTP JSON fallback.");
+    });
   const resolveEndpoint = () => {
     if (!options.endpoint) {
-      warnOnce(
+      return warnOnce(
         "Telemetry exporter enabled without endpoint; skipping OTLP export."
-      );
-      return null;
+      ).pipe(Effect.as(null));
     }
     if (typeof fetch !== "function") {
-      warnOnce("Telemetry exporter requires fetch; skipping OTLP export.");
-      return null;
+      return warnOnce(
+        "Telemetry exporter requires fetch; skipping OTLP export."
+      ).pipe(Effect.as(null));
     }
-    return options.endpoint;
+    return Effect.succeed(options.endpoint);
   };
   const exportSpan = (params: {
     name: string;
@@ -245,19 +249,20 @@ export function TelemetryLive(options: TelemetryOptions) {
           status: params.status,
         };
         const json = yield* encodeJson(payload);
-        console.log(json);
+        yield* Console.log(json);
       });
     }
-    const endpoint = resolveEndpoint();
-    if (!endpoint) {
-      return Effect.void;
-    }
-    if (options.exporter === "otlp-grpc") {
-      warnGrpcOnce();
-    }
-    const payload = buildOtelPayload(params);
-    return encodeJson(payload).pipe(
-      Effect.flatMap((body) =>
+    return Effect.gen(function* () {
+      const endpoint = yield* resolveEndpoint();
+      if (!endpoint) {
+        return;
+      }
+      if (options.exporter === "otlp-grpc") {
+        yield* warnGrpcOnce();
+      }
+      const payload = buildOtelPayload(params);
+      const body = yield* encodeJson(payload);
+      yield* Effect.ignore(
         Effect.tryPromise((signal) =>
           fetch(endpoint, {
             method: "POST",
@@ -268,9 +273,8 @@ export function TelemetryLive(options: TelemetryOptions) {
             signal,
           })
         )
-      ),
-      Effect.ignore
-    );
+      );
+    });
   };
 
   return Layer.succeed(
@@ -315,10 +319,10 @@ export function TelemetryLive(options: TelemetryOptions) {
               timestamp,
               attributes,
             });
-            console.log(json);
+            yield* Console.log(json);
             return;
           }
-          const endpoint = resolveEndpoint();
+          const endpoint = yield* resolveEndpoint();
           if (!endpoint) {
             return;
           }
@@ -359,10 +363,10 @@ export function TelemetryLive(options: TelemetryOptions) {
               timestamp,
               attributes,
             });
-            console.log(json);
+            yield* Console.log(json);
             return;
           }
-          const endpoint = resolveEndpoint();
+          const endpoint = yield* resolveEndpoint();
           if (!endpoint) {
             return;
           }

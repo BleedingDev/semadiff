@@ -6,7 +6,7 @@ import type {
 } from "@semadiff/parsers";
 import { ParseError } from "@semadiff/parsers";
 import { Effect } from "effect";
-import { Parser as WebTreeSitterParser } from "web-tree-sitter";
+import { Language, Parser as WebTreeSitterParser } from "web-tree-sitter";
 
 const languages = [
   "ts",
@@ -19,6 +19,7 @@ const languages = [
   "yaml",
 ] as const;
 const LINE_SPLIT_RE = /\r?\n/;
+const WINDOWS_DRIVE_RE = /^[A-Za-z]:/;
 
 type SupportedLanguage = (typeof languages)[number];
 
@@ -31,13 +32,15 @@ function isSupportedLanguage(
   );
 }
 
+interface TreeSitterLanguageModule {
+  load: (path: string | URL) => Promise<unknown>;
+}
+
 interface WebTreeSitterModule {
   init: (options?: {
     locateFile?: (filename: string, directory?: string) => string;
   }) => Promise<void>;
-  Language: {
-    load: (path: string | URL) => Promise<unknown>;
-  };
+  Language?: TreeSitterLanguageModule;
   new (): {
     setLanguage: (language: unknown) => void;
     parse: (input: string) => {
@@ -47,6 +50,8 @@ interface WebTreeSitterModule {
 }
 
 const Parser = WebTreeSitterParser as unknown as WebTreeSitterModule;
+const LanguageModule: TreeSitterLanguageModule =
+  Parser.Language ?? (Language as TreeSitterLanguageModule);
 
 function resolveWasmUrl(modulePath: string, fallbackName: string) {
   const runtime = (
@@ -57,22 +62,39 @@ function resolveWasmUrl(modulePath: string, fallbackName: string) {
   if (runtime?.runtime?.getURL) {
     return runtime.runtime.getURL(`semadiff-wasm/${fallbackName}`);
   }
+  const normalizeLocation = (location: string) => {
+    try {
+      const url = new URL(location);
+      if (url.protocol !== "file:") {
+        return location;
+      }
+      let pathname = decodeURIComponent(url.pathname);
+      if (
+        pathname.startsWith("/") &&
+        WINDOWS_DRIVE_RE.test(pathname.slice(1))
+      ) {
+        pathname = pathname.slice(1);
+      }
+      return pathname;
+    } catch {
+      return location;
+    }
+  };
   const resolver = (import.meta as { resolve?: (specifier: string) => string })
     .resolve;
   if (typeof resolver === "function") {
     try {
-      return resolver(modulePath);
+      return normalizeLocation(resolver(modulePath));
     } catch {
       // Fall back to URL resolution for environments without module resolution.
     }
   }
   try {
-    return new URL(
-      `./semadiff-wasm/${fallbackName}`,
-      import.meta.url
-    ).toString();
+    return normalizeLocation(
+      new URL(`./semadiff-wasm/${fallbackName}`, import.meta.url).toString()
+    );
   } catch {
-    return `./semadiff-wasm/${fallbackName}`;
+    return normalizeLocation(`./semadiff-wasm/${fallbackName}`);
   }
 }
 
@@ -153,7 +175,7 @@ async function loadLanguage(language: SupportedLanguage) {
   if (!wasmUrl) {
     throw new Error(`Missing Tree-sitter wasm for ${language}`);
   }
-  const lang = await Parser.Language.load(wasmUrl);
+  const lang = await LanguageModule.load(wasmUrl);
   languageCache.set(language, lang);
   return lang;
 }
@@ -163,8 +185,8 @@ async function getParser(language: SupportedLanguage) {
   if (cached) {
     return cached;
   }
-  const parser = new Parser();
   const lang = await loadLanguage(language);
+  const parser = new Parser();
   parser.setLanguage(lang);
   parserCache.set(language, parser);
   return parser;

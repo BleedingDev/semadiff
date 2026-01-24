@@ -1,3 +1,6 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   Config,
   Context,
@@ -8,10 +11,7 @@ import {
   Schedule,
   Schema,
 } from "effect";
-import { promises as fs } from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import type { PrRef } from "../shared/types";
+import type { PrRef } from "./types.js";
 
 export interface GitHubConfigService {
   readonly apiBase: string;
@@ -97,47 +97,49 @@ const CACHE_JSON_PATH = path.resolve(
   ".cache",
   "semadiff-github.json"
 );
+const RATE_LIMIT_REGEX = /rate limit/i;
 
-const makeMemoryCache = () => {
-  const store = new Map<string, { value: string; expiresAt: number }>();
-  return GitHubCache.of({
-    get: (key) =>
-      Effect.sync(() => {
-        const entry = store.get(key);
-        if (!entry) {
-          return Option.none();
-        }
-        if (entry.expiresAt <= Date.now()) {
-          store.delete(key);
-          return Option.none();
-        }
-        return Option.some(entry.value);
-      }),
-    set: (key, value, ttlMs) =>
-      Effect.sync(() => {
-        store.set(key, { value, expiresAt: Date.now() + ttlMs });
-      }),
-  });
-};
+const CacheEntrySchema = Schema.Struct({
+  value: Schema.String,
+  expiresAt: Schema.Number,
+});
+const CacheFileSchema = Schema.Struct({
+  entries: Schema.optional(
+    Schema.Array(Schema.Tuple(Schema.String, CacheEntrySchema))
+  ),
+});
+const CacheFileJson = Schema.parseJson(CacheFileSchema);
+const JsonUnknown = Schema.parseJson(Schema.Unknown);
+const ErrorMessageJson = Schema.parseJson(
+  Schema.Struct({ message: Schema.optional(Schema.String) })
+);
+
+interface SqliteStatement {
+  get: (key: string) => unknown;
+  run: (...args: readonly unknown[]) => void;
+}
+
+interface SqliteDatabase {
+  exec: (sql: string) => void;
+  query: (sql: string) => SqliteStatement;
+}
+
+interface SqliteModule {
+  Database: new (...args: readonly string[]) => SqliteDatabase;
+}
 
 const makeFileCache = Effect.gen(function* () {
   const store = new Map<string, { value: string; expiresAt: number }>();
 
-  yield* Effect.tryPromise({
-    try: () => fs.mkdir(path.dirname(CACHE_JSON_PATH), { recursive: true }),
-    catch: () => undefined,
-  });
+  yield* Effect.tryPromise(() =>
+    fs.mkdir(path.dirname(CACHE_JSON_PATH), { recursive: true })
+  ).pipe(Effect.catchAll(() => Effect.void));
 
-  const loaded = yield* Effect.tryPromise({
-    try: async () => {
-      const raw = await fs.readFile(CACHE_JSON_PATH, "utf8");
-      const parsed = JSON.parse(raw) as {
-        entries?: Array<[string, { value: string; expiresAt: number }]>;
-      };
-      return Array.isArray(parsed.entries) ? parsed.entries : [];
-    },
-    catch: () => [],
-  });
+  const loaded = yield* Effect.tryPromise(async () => {
+    const raw = await fs.readFile(CACHE_JSON_PATH, "utf8");
+    const parsed = Schema.decodeUnknownSync(CacheFileJson)(raw);
+    return Array.isArray(parsed.entries) ? parsed.entries : [];
+  }).pipe(Effect.catchAll(() => Effect.succeed([])));
 
   for (const [key, entry] of loaded) {
     if (!entry || typeof entry.value !== "string") {
@@ -150,15 +152,15 @@ const makeFileCache = Effect.gen(function* () {
   }
 
   const persist = (next: Map<string, { value: string; expiresAt: number }>) =>
-    Effect.tryPromise({
-      try: () =>
-        fs.writeFile(
-          CACHE_JSON_PATH,
-          JSON.stringify({ entries: [...next.entries()] }),
-          "utf8"
-        ),
-      catch: () => undefined,
-    }).pipe(Effect.asVoid);
+    Effect.tryPromise(() => {
+      const payload = Schema.encodeSync(CacheFileJson)({
+        entries: [...next.entries()],
+      });
+      return fs.writeFile(CACHE_JSON_PATH, payload, "utf8");
+    }).pipe(
+      Effect.catchAll(() => Effect.void),
+      Effect.asVoid
+    );
 
   yield* persist(store);
 
@@ -190,38 +192,34 @@ export const GitHubCacheLive = Layer.effect(
     const fileCache = yield* makeFileCache;
     const bunAvailable =
       typeof (globalThis as { Bun?: unknown }).Bun !== "undefined" ||
-      typeof (process.versions as { bun?: string | undefined }).bun === "string";
+      typeof (process.versions as { bun?: string | undefined }).bun ===
+        "string";
     if (!bunAvailable) {
       return fileCache;
     }
 
-    yield* Effect.tryPromise({
-      try: () => fs.mkdir(path.dirname(CACHE_DB_PATH), { recursive: true }),
-      catch: () => undefined,
-    });
+    yield* Effect.tryPromise(() =>
+      fs.mkdir(path.dirname(CACHE_DB_PATH), { recursive: true })
+    ).pipe(Effect.catchAll(() => Effect.void));
 
-    const sqliteModule = yield* Effect.tryPromise({
-      // @ts-expect-error bun:sqlite exists only under Bun runtime
-      try: () => import("bun:sqlite"),
-      catch: () => null,
-    });
+    const sqliteModule = yield* Effect.tryPromise(
+      () =>
+        // @ts-expect-error bun:sqlite exists only under Bun runtime
+        import("bun:sqlite")
+    ).pipe(Effect.catchAll(() => Effect.succeed(null)));
     if (!sqliteModule) {
       return fileCache;
     }
 
-    const Database = (sqliteModule as { Database: new (...args: never[]) => any })
-      .Database;
+    const Database = (sqliteModule as SqliteModule).Database;
     const db = new Database(CACHE_DB_PATH);
     db.exec(
       "CREATE TABLE IF NOT EXISTS github_cache (key TEXT PRIMARY KEY, value TEXT NOT NULL, expires_at INTEGER NOT NULL)"
     );
-    const sqliteReady = yield* Effect.tryPromise({
-      try: async () => {
-        const stat = await fs.stat(CACHE_DB_PATH);
-        return stat.isFile();
-      },
-      catch: () => false,
-    });
+    const sqliteReady = yield* Effect.tryPromise(async () => {
+      const stat = await fs.stat(CACHE_DB_PATH);
+      return stat.isFile();
+    }).pipe(Effect.catchAll(() => Effect.succeed(false)));
     if (!sqliteReady) {
       return fileCache;
     }
@@ -278,9 +276,7 @@ export const GitHubCacheLive = Layer.effect(
 const API_CACHE_TTL_MS = 5 * 60 * 1000;
 const RAW_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-const isRetryableError = (
-  error: GitHubRequestError | GitHubRateLimitError
-) => {
+const isRetryableError = (error: GitHubRequestError | GitHubRateLimitError) => {
   if (error._tag === "GitHubRateLimitError") {
     return true;
   }
@@ -296,8 +292,9 @@ const retrySchedule = Schedule.exponential("200 millis").pipe(
   Schedule.intersect(Schedule.recurWhile(isRetryableError))
 );
 
-const withGitHubRetry = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
-  effect.pipe(Effect.retry(retrySchedule));
+const withGitHubRetry = <A, R>(
+  effect: Effect.Effect<A, GitHubRequestError | GitHubRateLimitError, R>
+) => effect.pipe(Effect.retry(retrySchedule));
 
 export const PullRequestSchema = Schema.Struct({
   title: Schema.String,
@@ -370,7 +367,7 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   const cached = yield* cache.get(cacheKey);
   if (Option.isSome(cached)) {
     try {
-      return JSON.parse(cached.value) as unknown;
+      return Schema.decodeUnknownSync(JsonUnknown)(cached.value);
     } catch {
       // Ignore cache parse failures and re-fetch.
     }
@@ -393,14 +390,13 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   });
 
   if (!response.ok) {
-    const bodyText = yield* Effect.tryPromise({
-      try: () => response.text(),
-      catch: () => "",
-    });
+    const bodyText = yield* Effect.tryPromise(() => response.text()).pipe(
+      Effect.catchAll(() => Effect.succeed(""))
+    );
     let message = response.statusText;
     try {
-      const parsed = JSON.parse(bodyText) as { message?: string };
-      if (parsed?.message) {
+      const parsed = Schema.decodeUnknownSync(ErrorMessageJson)(bodyText);
+      if (parsed.message) {
         message = parsed.message;
       }
     } catch {
@@ -414,7 +410,7 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
       response.status === 429 ||
       remaining === "0" ||
       !!retryAfter ||
-      /rate limit/i.test(message);
+      RATE_LIMIT_REGEX.test(message);
     if (looksRateLimited) {
       return yield* GitHubRateLimitError.make({
         url,
@@ -438,7 +434,7 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
       }),
   });
 
-  yield* cache.set(cacheKey, JSON.stringify(json), ttlMs);
+  yield* cache.set(cacheKey, Schema.encodeSync(JsonUnknown)(json), ttlMs);
   return json;
 });
 
@@ -469,10 +465,9 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
   });
 
   if (!response.ok) {
-    const bodyText = yield* Effect.tryPromise({
-      try: () => response.text(),
-      catch: () => "",
-    });
+    const bodyText = yield* Effect.tryPromise(() => response.text()).pipe(
+      Effect.catchAll(() => Effect.succeed(""))
+    );
     let message = response.statusText;
     if (bodyText) {
       message = bodyText;
@@ -483,7 +478,7 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
       response.status === 429 ||
       remaining === "0" ||
       !!retryAfter ||
-      /rate limit/i.test(message);
+      RATE_LIMIT_REGEX.test(message);
     if (looksRateLimited) {
       return yield* GitHubRateLimitError.make({
         url,
@@ -497,7 +492,7 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
     });
   }
 
-  return yield* Effect.tryPromise({
+  const text = yield* Effect.tryPromise({
     try: () => response.text(),
     catch: (error) =>
       GitHubRequestError.make({
@@ -506,6 +501,8 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
         message: error instanceof Error ? error.message : String(error),
       }),
   });
+  yield* cache.set(cacheKey, text, ttlMs);
+  return text;
 });
 
 const getPullRequest = Effect.fn("GitHub.getPullRequest")(function* (
@@ -527,46 +524,49 @@ const getPullRequest = Effect.fn("GitHub.getPullRequest")(function* (
   );
 });
 
-const listPullRequestFiles = Effect.fn("GitHub.listPullRequestFiles")(function* (
-  config: GitHubConfigService,
-  cache: GitHubCacheService,
-  ref: PrRef
-) {
-  const results: PullRequestFile[] = [];
-  let page = 1;
-  while (true) {
-    const url = `${config.apiBase}/repos/${ref.owner}/${ref.repo}/pulls/${ref.number}/files?per_page=100&page=${page}`;
-    const json = yield* withGitHubRetry(
-      requestJson(config, cache, url, API_CACHE_TTL_MS)
-    );
-    const decoded = yield* Schema.decodeUnknown(
-      Schema.Array(PullRequestFileSchema)
-    )(json).pipe(
-      Effect.mapError((error) =>
-        GitHubDecodeError.make({
-          url,
-          message: error instanceof Error ? error.message : String(error),
-        })
-      )
-    );
-    results.push(...decoded);
-    if (decoded.length < 100) {
-      break;
+const listPullRequestFiles = Effect.fn("GitHub.listPullRequestFiles")(
+  function* (
+    config: GitHubConfigService,
+    cache: GitHubCacheService,
+    ref: PrRef
+  ) {
+    const results: PullRequestFile[] = [];
+    let page = 1;
+    while (true) {
+      const url = `${config.apiBase}/repos/${ref.owner}/${ref.repo}/pulls/${ref.number}/files?per_page=100&page=${page}`;
+      const json = yield* withGitHubRetry(
+        requestJson(config, cache, url, API_CACHE_TTL_MS)
+      );
+      const decoded = yield* Schema.decodeUnknown(
+        Schema.Array(PullRequestFileSchema)
+      )(json).pipe(
+        Effect.mapError((error) =>
+          GitHubDecodeError.make({
+            url,
+            message: error instanceof Error ? error.message : String(error),
+          })
+        )
+      );
+      results.push(...decoded);
+      if (decoded.length < 100) {
+        break;
+      }
+      page += 1;
     }
-    page += 1;
+    return results;
   }
-  return results;
-});
+);
 
 const getFileText = Effect.fn("GitHub.getFileText")(function* (
   config: GitHubConfigService,
   cache: GitHubCacheService,
   params: {
-  owner: string;
-  repo: string;
-  sha: string;
-  path: string;
-}) {
+    owner: string;
+    repo: string;
+    sha: string;
+    path: string;
+  }
+) {
   const url = `${config.rawBase}/${params.owner}/${params.repo}/${params.sha}/${encodePath(
     params.path
   )}`;

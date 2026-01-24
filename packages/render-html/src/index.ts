@@ -1,11 +1,12 @@
 import {
-  defaultConfig,
-  normalizeTextForLanguage,
   type DiffDocument,
   type DiffOperation,
+  defaultConfig,
   type NormalizerLanguage,
+  normalizeTextForLanguage,
   type Range,
 } from "@semadiff/core";
+import { Schema } from "effect";
 
 export interface HtmlRenderOptions {
   maxOperations?: number;
@@ -442,13 +443,16 @@ body.sd-embed .sd-lines {
 
 const LINE_SPLIT_RE = /\r?\n/;
 const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
+const HEX_BYTE_RE = /^[0-9a-fA-F]{2}$/;
+const HEX_SEQUENCE_RE = /^[0-9a-fA-F]+$/;
+const HEX_QUAD_RE = /^[0-9a-fA-F]{4}$/;
 
-type LineEdit = {
+interface LineEdit {
   type: "equal" | "insert" | "delete";
   line: string;
-};
+}
 
-type LineRow = {
+interface LineRow {
   type: "equal" | "insert" | "delete" | "replace" | "gap" | "hunk" | "move";
   oldLine?: number | null;
   newLine?: number | null;
@@ -457,7 +461,59 @@ type LineRow = {
   oldText?: string;
   newText?: string;
   header?: string;
-};
+}
+
+const JsonStringSchema = Schema.parseJson(Schema.String);
+const LineNumberSchema = Schema.Union(Schema.Number, Schema.Null);
+const LineRowSchema = Schema.Struct({
+  type: Schema.Literal(
+    "equal",
+    "insert",
+    "delete",
+    "replace",
+    "gap",
+    "hunk",
+    "move"
+  ),
+  oldLine: Schema.optional(LineNumberSchema),
+  newLine: Schema.optional(LineNumberSchema),
+  text: Schema.optional(Schema.String),
+  hidden: Schema.optional(Schema.Number),
+  oldText: Schema.optional(Schema.String),
+  newText: Schema.optional(Schema.String),
+  header: Schema.optional(Schema.String),
+});
+const LinePayloadSchema = Schema.Struct({
+  rows: Schema.Array(LineRowSchema),
+  batchSize: Schema.Number,
+  lineLayout: Schema.Literal("split", "unified"),
+});
+const OpsRangeSchema = Schema.Struct({
+  start: Schema.Struct({
+    line: Schema.Number,
+    column: Schema.Number,
+  }),
+  end: Schema.Struct({
+    line: Schema.Number,
+    column: Schema.Number,
+  }),
+});
+const OpsPayloadSchema = Schema.Struct({
+  operations: Schema.Array(
+    Schema.Struct({
+      id: Schema.String,
+      type: Schema.Literal("insert", "delete", "update", "move"),
+      oldText: Schema.String,
+      newText: Schema.String,
+      confidence: Schema.Union(Schema.Number, Schema.Null),
+      oldRange: Schema.Union(OpsRangeSchema, Schema.Null),
+      newRange: Schema.Union(OpsRangeSchema, Schema.Null),
+    })
+  ),
+  batchSize: Schema.Number,
+});
+const LinePayloadJson = Schema.parseJson(LinePayloadSchema);
+const OpsPayloadJson = Schema.parseJson(OpsPayloadSchema);
 
 const QUOTE_NORMALIZE_LANGUAGES = new Set<NormalizerLanguage>([
   "js",
@@ -466,6 +522,77 @@ const QUOTE_NORMALIZE_LANGUAGES = new Set<NormalizerLanguage>([
   "tsx",
   "css",
 ]);
+
+const SIMPLE_ESCAPES: Record<string, string> = {
+  n: "\n",
+  r: "\r",
+  t: "\t",
+  b: "\b",
+  f: "\f",
+  v: "\v",
+  0: "\0",
+};
+
+function decodeHexByte(content: string, index: number) {
+  const hex = content.slice(index + 1, index + 3);
+  if (!HEX_BYTE_RE.test(hex)) {
+    return null;
+  }
+  return {
+    value: String.fromCharCode(Number.parseInt(hex, 16)),
+    nextIndex: index + 2,
+  };
+}
+
+function decodeUnicodeEscape(content: string, index: number) {
+  const next = content[index + 1];
+  if (next === "{") {
+    const end = content.indexOf("}", index + 2);
+    if (end === -1) {
+      return null;
+    }
+    const code = content.slice(index + 2, end);
+    if (!HEX_SEQUENCE_RE.test(code)) {
+      return null;
+    }
+    return {
+      value: String.fromCodePoint(Number.parseInt(code, 16)),
+      nextIndex: end,
+    };
+  }
+  const hex = content.slice(index + 1, index + 5);
+  if (!HEX_QUAD_RE.test(hex)) {
+    return null;
+  }
+  return {
+    value: String.fromCharCode(Number.parseInt(hex, 16)),
+    nextIndex: index + 4,
+  };
+}
+
+function decodeEscapeSequence(content: string, index: number) {
+  const esc = content[index] ?? "";
+  const simple = SIMPLE_ESCAPES[esc];
+  if (simple !== undefined) {
+    return { value: simple, nextIndex: index };
+  }
+  if (esc === "x") {
+    const decoded = decodeHexByte(content, index);
+    return decoded ?? { value: "x", nextIndex: index };
+  }
+  if (esc === "u") {
+    const decoded = decodeUnicodeEscape(content, index);
+    return decoded ?? { value: "u", nextIndex: index };
+  }
+  if (esc === "\n") {
+    return { value: "", nextIndex: index };
+  }
+  if (esc === "\r") {
+    const nextIndex = content[index + 1] === "\n" ? index + 1 : index;
+    return { value: "", nextIndex };
+  }
+  return { value: esc, nextIndex: index };
+}
 
 function decodeJsStringContent(content: string) {
   let output = "";
@@ -480,78 +607,37 @@ function decodeJsStringContent(content: string) {
       output += "\\";
       break;
     }
-    const esc = content[i] ?? "";
-    switch (esc) {
-      case "n":
-        output += "\n";
-        break;
-      case "r":
-        output += "\r";
-        break;
-      case "t":
-        output += "\t";
-        break;
-      case "b":
-        output += "\b";
-        break;
-      case "f":
-        output += "\f";
-        break;
-      case "v":
-        output += "\v";
-        break;
-      case "0":
-        output += "\0";
-        break;
-      case "x": {
-        const hex = content.slice(i + 1, i + 3);
-        if (/^[0-9a-fA-F]{2}$/.test(hex)) {
-          output += String.fromCharCode(Number.parseInt(hex, 16));
-          i += 2;
-        } else {
-          output += "x";
-        }
-        break;
-      }
-      case "u": {
-        const next = content[i + 1];
-        if (next === "{") {
-          const end = content.indexOf("}", i + 2);
-          if (end !== -1) {
-            const code = content.slice(i + 2, end);
-            if (/^[0-9a-fA-F]+$/.test(code)) {
-              output += String.fromCodePoint(Number.parseInt(code, 16));
-              i = end;
-            } else {
-              output += "u";
-            }
-          } else {
-            output += "u";
-          }
-        } else {
-          const hex = content.slice(i + 1, i + 5);
-          if (/^[0-9a-fA-F]{4}$/.test(hex)) {
-            output += String.fromCharCode(Number.parseInt(hex, 16));
-            i += 4;
-          } else {
-            output += "u";
-          }
-        }
-        break;
-      }
-      case "\n":
-        break;
-      case "\r":
-        if (content[i + 1] === "\n") {
-          i += 1;
-        }
-        break;
-      default:
-        output += esc;
-        break;
-    }
+    const decoded = decodeEscapeSequence(content, i);
+    output += decoded.value;
+    i = decoded.nextIndex;
   }
   return output;
+}
+
+function readQuotedString(line: string, startIndex: number) {
+  const delimiter = line[startIndex];
+  if (delimiter !== "'" && delimiter !== '"') {
+    return null;
+  }
+  let content = "";
+  let escaped = false;
+  let index = startIndex + 1;
+  while (index < line.length) {
+    const current = line[index];
+    if (!escaped && current === delimiter) {
+      return { content, endIndex: index + 1 };
+    }
+    if (!escaped && current === "\\") {
+      escaped = true;
+      content += current;
+      index += 1;
+      continue;
+    }
+    escaped = false;
+    content += current ?? "";
+    index += 1;
+  }
+  return null;
 }
 
 function normalizeJsStringQuotes(line: string) {
@@ -567,35 +653,14 @@ function normalizeJsStringQuotes(line: string) {
       }
     }
     if (ch === "'" || ch === '"') {
-      const delimiter = ch;
-      let content = "";
-      let escaped = false;
-      let closed = false;
-      let cursor = index + 1;
-      while (cursor < line.length) {
-        const current = line[cursor];
-        if (!escaped && current === delimiter) {
-          closed = true;
-          cursor += 1;
-          break;
-        }
-        if (!escaped && current === "\\") {
-          escaped = true;
-          content += current;
-          cursor += 1;
-          continue;
-        }
-        escaped = false;
-        content += current ?? "";
-        cursor += 1;
-      }
-      if (!closed) {
+      const segment = readQuotedString(line, index);
+      if (!segment) {
         output += line.slice(index);
         break;
       }
-      const decoded = decodeJsStringContent(content);
-      output += JSON.stringify(decoded);
-      index = cursor;
+      const decoded = decodeJsStringContent(segment.content);
+      output += Schema.encodeSync(JsonStringSchema)(decoded);
+      index = segment.endIndex;
       continue;
     }
     output += ch;
@@ -746,9 +811,7 @@ function renderSummary(diff: DiffDocument) {
     highlights.push(`<span class="sd-pill">Renames: ${renames}</span>`);
   }
   if (diff.moves.length > 0) {
-    highlights.push(
-      `<span class="sd-pill">Moves: ${diff.moves.length}</span>`
-    );
+    highlights.push(`<span class="sd-pill">Moves: ${diff.moves.length}</span>`);
   }
 
   return `
@@ -779,7 +842,10 @@ function renderOperation(op: DiffOperation) {
   const oldLabel = formatRangeLabel(op.oldRange);
   const newLabel = formatRangeLabel(op.newRange);
   const rangeLabel = [oldLabel, newLabel].filter(Boolean).join(" → ");
-  const rangeDetail = [formatRangeDetail(op.oldRange), formatRangeDetail(op.newRange)]
+  const rangeDetail = [
+    formatRangeDetail(op.oldRange),
+    formatRangeDetail(op.newRange),
+  ]
     .filter(Boolean)
     .join(" → ");
 
@@ -879,7 +945,7 @@ function diffLines(
   const compareNew = newComparable ?? newLines;
   const max = n + m;
   const offset = max;
-  let v = new Array(2 * max + 1).fill(0);
+  const v = new Array(2 * max + 1).fill(0);
   const trace: number[][] = [];
 
   for (let d = 0; d <= max; d += 1) {
@@ -911,6 +977,58 @@ function diffLines(
   return backtrackEdits(trace, oldLines, newLines, n, m);
 }
 
+function selectPrevK(v: number[], offset: number, k: number, d: number) {
+  const left = v[offset + k - 1] ?? 0;
+  const right = v[offset + k + 1] ?? 0;
+  if (k === -d || (k !== d && left < right)) {
+    return k + 1;
+  }
+  return k - 1;
+}
+
+function drainEqualEdits(
+  edits: LineEdit[],
+  oldLines: string[],
+  x: number,
+  y: number,
+  prevX: number,
+  prevY: number
+) {
+  let nextX = x;
+  let nextY = y;
+  while (nextX > prevX && nextY > prevY) {
+    edits.push({ type: "equal", line: oldLines[nextX - 1] ?? "" });
+    nextX -= 1;
+    nextY -= 1;
+  }
+  return { x: nextX, y: nextY };
+}
+
+function drainRemainingEdits(
+  edits: LineEdit[],
+  oldLines: string[],
+  newLines: string[],
+  x: number,
+  y: number
+) {
+  let nextX = x;
+  let nextY = y;
+  while (nextX > 0 && nextY > 0) {
+    edits.push({ type: "equal", line: oldLines[nextX - 1] ?? "" });
+    nextX -= 1;
+    nextY -= 1;
+  }
+  while (nextX > 0) {
+    edits.push({ type: "delete", line: oldLines[nextX - 1] ?? "" });
+    nextX -= 1;
+  }
+  while (nextY > 0) {
+    edits.push({ type: "insert", line: newLines[nextY - 1] ?? "" });
+    nextY -= 1;
+  }
+  return { x: nextX, y: nextY };
+}
+
 function backtrackEdits(
   trace: number[][],
   oldLines: string[],
@@ -927,22 +1045,13 @@ function backtrackEdits(
   for (let d = trace.length - 1; d > 0; d -= 1) {
     const v = trace[d] ?? [];
     const k = x - y;
-    let prevK: number;
-    const left = v[offset + k - 1] ?? 0;
-    const right = v[offset + k + 1] ?? 0;
-    if (k === -d || (k !== d && left < right)) {
-      prevK = k + 1;
-    } else {
-      prevK = k - 1;
-    }
+    const prevK = selectPrevK(v, offset, k, d);
     const prevX = v[offset + prevK] ?? 0;
     const prevY = prevX - prevK;
 
-    while (x > prevX && y > prevY) {
-      edits.push({ type: "equal", line: oldLines[x - 1] ?? "" });
-      x -= 1;
-      y -= 1;
-    }
+    const drained = drainEqualEdits(edits, oldLines, x, y, prevX, prevY);
+    x = drained.x;
+    y = drained.y;
 
     if (x === prevX && y > prevY) {
       edits.push({ type: "insert", line: newLines[y - 1] ?? "" });
@@ -953,19 +1062,9 @@ function backtrackEdits(
     }
   }
 
-  while (x > 0 && y > 0) {
-    edits.push({ type: "equal", line: oldLines[x - 1] ?? "" });
-    x -= 1;
-    y -= 1;
-  }
-  while (x > 0) {
-    edits.push({ type: "delete", line: oldLines[x - 1] ?? "" });
-    x -= 1;
-  }
-  while (y > 0) {
-    edits.push({ type: "insert", line: newLines[y - 1] ?? "" });
-    y -= 1;
-  }
+  const drained = drainRemainingEdits(edits, oldLines, newLines, x, y);
+  x = drained.x;
+  y = drained.y;
 
   edits.reverse();
   return edits;
@@ -980,9 +1079,17 @@ function buildRawLineRows(
   const oldComparable = normalizeLine ? oldLines.map(normalizeLine) : oldLines;
   const newComparable = normalizeLine ? newLines.map(normalizeLine) : newLines;
   const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
+  const blocks = buildLineBlocks(edits);
+  return buildRowsFromBlocks(blocks, lineLayout);
+}
 
-  const blocks: Array<{ type: "equal" | "delete" | "insert"; lines: string[] }> =
-    [];
+interface LineBlock {
+  type: "equal" | "delete" | "insert";
+  lines: string[];
+}
+
+function buildLineBlocks(edits: LineEdit[]): LineBlock[] {
+  const blocks: LineBlock[] = [];
   for (const edit of edits) {
     const last = blocks.at(-1);
     if (last && last.type === edit.type) {
@@ -991,86 +1098,154 @@ function buildRawLineRows(
       blocks.push({ type: edit.type, lines: [edit.line] });
     }
   }
+  return blocks;
+}
 
+function appendUnifiedReplaceRows(
+  rows: LineRow[],
+  deleteLines: string[],
+  insertLines: string[],
+  oldLine: number,
+  newLine: number
+) {
+  let nextOld = oldLine;
+  let nextNew = newLine;
+  for (const line of deleteLines) {
+    rows.push({ type: "delete", oldLine: nextOld, newLine: null, text: line });
+    nextOld += 1;
+  }
+  for (const line of insertLines) {
+    rows.push({ type: "insert", oldLine: null, newLine: nextNew, text: line });
+    nextNew += 1;
+  }
+  return { oldLine: nextOld, newLine: nextNew };
+}
+
+function appendSplitReplaceRows(
+  rows: LineRow[],
+  deleteLines: string[],
+  insertLines: string[],
+  oldLine: number,
+  newLine: number
+) {
+  let nextOld = oldLine;
+  let nextNew = newLine;
+  const max = Math.max(deleteLines.length, insertLines.length);
+  for (let idx = 0; idx < max; idx += 1) {
+    const oldTextLine = deleteLines[idx];
+    const newTextLine = insertLines[idx];
+    if (oldTextLine !== undefined && newTextLine !== undefined) {
+      rows.push({
+        type: "replace",
+        oldLine: nextOld,
+        newLine: nextNew,
+        oldText: oldTextLine,
+        newText: newTextLine,
+      });
+      nextOld += 1;
+      nextNew += 1;
+      continue;
+    }
+    if (oldTextLine !== undefined) {
+      rows.push({
+        type: "delete",
+        oldLine: nextOld,
+        newLine: null,
+        text: oldTextLine,
+      });
+      nextOld += 1;
+      continue;
+    }
+    if (newTextLine !== undefined) {
+      rows.push({
+        type: "insert",
+        oldLine: null,
+        newLine: nextNew,
+        text: newTextLine,
+      });
+      nextNew += 1;
+    }
+  }
+  return { oldLine: nextOld, newLine: nextNew };
+}
+
+function appendBlockRows(
+  rows: LineRow[],
+  block: LineBlock,
+  oldLine: number,
+  newLine: number
+) {
+  let nextOld = oldLine;
+  let nextNew = newLine;
+  for (const line of block.lines) {
+    if (block.type === "equal") {
+      rows.push({
+        type: "equal",
+        oldLine: nextOld,
+        newLine: nextNew,
+        text: line,
+      });
+      nextOld += 1;
+      nextNew += 1;
+      continue;
+    }
+    if (block.type === "delete") {
+      rows.push({
+        type: "delete",
+        oldLine: nextOld,
+        newLine: null,
+        text: line,
+      });
+      nextOld += 1;
+      continue;
+    }
+    rows.push({ type: "insert", oldLine: null, newLine: nextNew, text: line });
+    nextNew += 1;
+  }
+  return { oldLine: nextOld, newLine: nextNew };
+}
+
+function buildRowsFromBlocks(
+  blocks: LineBlock[],
+  lineLayout: "split" | "unified"
+) {
   const rows: LineRow[] = [];
   let oldLine = 1;
   let newLine = 1;
 
   for (let i = 0; i < blocks.length; i += 1) {
-    const block = blocks[i]!;
+    const block = blocks[i];
+    if (!block) {
+      continue;
+    }
     const next = blocks[i + 1];
 
     if (block.type === "delete" && next?.type === "insert") {
-      if (lineLayout === "unified") {
-        for (const line of block.lines) {
-          rows.push({
-            type: "delete",
-            oldLine,
-            newLine: null,
-            text: line,
-          });
-          oldLine += 1;
-        }
-        for (const line of next.lines) {
-          rows.push({
-            type: "insert",
-            oldLine: null,
-            newLine,
-            text: line,
-          });
-          newLine += 1;
-        }
-      } else {
-        const max = Math.max(block.lines.length, next.lines.length);
-        for (let idx = 0; idx < max; idx += 1) {
-          const oldTextLine = block.lines[idx];
-          const newTextLine = next.lines[idx];
-          if (oldTextLine !== undefined && newTextLine !== undefined) {
-            rows.push({
-              type: "replace",
+      const result =
+        lineLayout === "unified"
+          ? appendUnifiedReplaceRows(
+              rows,
+              block.lines,
+              next.lines,
               oldLine,
-              newLine,
-              oldText: oldTextLine,
-              newText: newTextLine,
-            });
-            oldLine += 1;
-            newLine += 1;
-          } else if (oldTextLine !== undefined) {
-            rows.push({
-              type: "delete",
+              newLine
+            )
+          : appendSplitReplaceRows(
+              rows,
+              block.lines,
+              next.lines,
               oldLine,
-              newLine: null,
-              text: oldTextLine,
-            });
-            oldLine += 1;
-          } else if (newTextLine !== undefined) {
-            rows.push({
-              type: "insert",
-              oldLine: null,
-              newLine,
-              text: newTextLine,
-            });
-            newLine += 1;
-          }
-        }
-      }
+              newLine
+            );
+      oldLine = result.oldLine;
+      newLine = result.newLine;
       i += 1;
       continue;
     }
 
-    for (const line of block.lines) {
-      if (block.type === "equal") {
-        rows.push({ type: "equal", oldLine, newLine, text: line });
-        oldLine += 1;
-        newLine += 1;
-      } else if (block.type === "delete") {
-        rows.push({ type: "delete", oldLine, newLine: null, text: line });
-        oldLine += 1;
-      } else {
-        rows.push({ type: "insert", oldLine: null, newLine, text: line });
-        newLine += 1;
-      }
-    }
+    const result = appendBlockRows(rows, block, oldLine, newLine);
+    oldLine = result.oldLine;
+    newLine = result.newLine;
   }
 
   return rows;
@@ -1185,8 +1360,8 @@ function toMoveRow(
   includeOld: boolean,
   includeNew: boolean
 ): LineRow {
-  const oldLine = includeOld ? row.oldLine ?? null : null;
-  const newLine = includeNew ? row.newLine ?? null : null;
+  const oldLine = includeOld ? (row.oldLine ?? null) : null;
+  const newLine = includeNew ? (row.newLine ?? null) : null;
   const oldText = includeOld ? rowOldText(row) : undefined;
   const newText = includeNew ? rowNewText(row) : undefined;
   const output: LineRow = {
@@ -1203,6 +1378,37 @@ function toMoveRow(
   return output;
 }
 
+function applyLineOperationToRow(
+  row: LineRow,
+  marks: ReturnType<typeof buildLineMarkSets>
+) {
+  if (row.type === "gap" || row.type === "hunk") {
+    return row;
+  }
+  const oldLine = row.oldLine ?? null;
+  const newLine = row.newLine ?? null;
+  const oldChanged = oldLine !== null && marks.changedOld.has(oldLine);
+  const newChanged = newLine !== null && marks.changedNew.has(newLine);
+
+  if (oldChanged && newChanged) {
+    return toReplaceRow(row);
+  }
+  if (oldChanged) {
+    return toDeleteRow(row);
+  }
+  if (newChanged) {
+    return toInsertRow(row);
+  }
+
+  const oldMoved = oldLine !== null && marks.movedOld.has(oldLine);
+  const newMoved = newLine !== null && marks.movedNew.has(newLine);
+  if (oldMoved || newMoved) {
+    return toMoveRow(row, oldMoved, newMoved);
+  }
+
+  return toEqualRow(row);
+}
+
 function applyLineOperations(
   rows: LineRow[],
   operations: DiffOperation[],
@@ -1215,105 +1421,7 @@ function applyLineOperations(
 
   const marks = buildLineMarkSets(operations, oldLineCount, newLineCount);
 
-  return rows.map((row) => {
-    if (row.type === "gap" || row.type === "hunk") {
-      return row;
-    }
-    const oldLine = row.oldLine ?? null;
-    const newLine = row.newLine ?? null;
-    const oldChanged = oldLine !== null && marks.changedOld.has(oldLine);
-    const newChanged = newLine !== null && marks.changedNew.has(newLine);
-
-    if (oldChanged || newChanged) {
-      if (oldChanged && newChanged) {
-        return toReplaceRow(row);
-      }
-      if (oldChanged) {
-        return toDeleteRow(row);
-      }
-      if (newChanged) {
-        return toInsertRow(row);
-      }
-    }
-
-    const oldMoved = oldLine !== null && marks.movedOld.has(oldLine);
-    const newMoved = newLine !== null && marks.movedNew.has(newLine);
-    if (oldMoved || newMoved) {
-      return toMoveRow(row, oldMoved, newMoved);
-    }
-
-    return toEqualRow(row);
-  });
-}
-
-function compressLineChanges(
-  rows: LineRow[],
-  operations: DiffOperation[]
-): LineRow[] {
-  if (operations.length === 0) {
-    return rows;
-  }
-
-  const totalLines = rows.filter(
-    (row) => row.type !== "gap" && row.type !== "hunk"
-  ).length;
-  const changeLines = operations.reduce(
-    (total, op) => total + countLines(op.oldText) + countLines(op.newText),
-    0
-  );
-
-  if (operations.length <= 5 && changeLines <= 10) {
-    return totalLines > 0 ? [{ type: "gap", hidden: totalLines }] : rows;
-  }
-
-  const insertOps = operations.filter((op) => op.type === "insert").length;
-  const deleteOps = operations.filter((op) => op.type === "delete").length;
-  const mode: "insert" | "delete" =
-    deleteOps >= insertOps * 2 ? "delete" : "insert";
-
-  let kept = false;
-  const compressed = rows.map((row) => {
-    if (row.type === "gap" || row.type === "hunk") {
-      return row;
-    }
-    if (row.type === "move") {
-      return toEqualRow(row);
-    }
-    if (row.type !== "insert" && row.type !== "delete" && row.type !== "replace") {
-      return row;
-    }
-    if (kept) {
-      return toEqualRow(row);
-    }
-    if (mode === "insert") {
-      if (row.type === "insert") {
-        kept = true;
-        return row;
-      }
-      if (row.type === "replace") {
-        kept = true;
-        return toInsertRow(row);
-      }
-      return toEqualRow(row);
-    }
-    if (row.type === "delete") {
-      kept = true;
-      return row;
-    }
-    if (row.type === "replace") {
-      kept = true;
-      return toDeleteRow(row);
-    }
-    return toEqualRow(row);
-  });
-
-  const hasChanges = compressed.some((row) =>
-    row.type === "insert" || row.type === "delete" || row.type === "replace"
-  );
-  if (!hasChanges) {
-    return totalLines > 0 ? [{ type: "gap", hidden: totalLines }] : rows;
-  }
-  return compressed;
+  return rows.map((row) => applyLineOperationToRow(row, marks));
 }
 
 function applyLineContext(rows: LineRow[], contextLines: number): LineRow[] {
@@ -1373,8 +1481,12 @@ function buildLineRows(
   const oldLines = splitLines(oldText);
   const newLines = splitLines(newText);
   let rows = buildRawLineRows(oldLines, newLines, lineLayout, normalizeLine);
-  rows = applyLineOperations(rows, operations, oldLines.length, newLines.length);
-  rows = compressLineChanges(rows, operations);
+  rows = applyLineOperations(
+    rows,
+    operations,
+    oldLines.length,
+    newLines.length
+  );
   return applyLineContext(rows, contextLines);
 }
 
@@ -1392,11 +1504,15 @@ function addHunks(rows: LineRow[]): LineRow[] {
     let newCount = 0;
     for (const row of block) {
       if (row.oldLine != null) {
-        if (startOld === null) startOld = row.oldLine;
+        if (startOld === null) {
+          startOld = row.oldLine;
+        }
         oldCount += 1;
       }
       if (row.newLine != null) {
-        if (startNew === null) startNew = row.newLine;
+        if (startNew === null) {
+          startNew = row.newLine;
+        }
         newCount += 1;
       }
     }
@@ -1418,62 +1534,80 @@ function addHunks(rows: LineRow[]): LineRow[] {
   return output;
 }
 
-function renderLineRow(row: LineRow, lineLayout: "split" | "unified") {
-  if (row.type === "hunk") {
-    return `
-      <div class="sd-line sd-line--hunk">
-        <div class="sd-hunk">${escapeHtml(row.header ?? "")}</div>
-      </div>
-    `;
-  }
-  if (row.type === "gap") {
-    const count = row.hidden ?? 0;
-    const label = count === 1 ? "1 line hidden" : `${count} lines hidden`;
-    return `
-      <div class="sd-line sd-line--gap">
-        <div class="sd-gap">… ${label} …</div>
-      </div>
-    `;
-  }
+function renderHunkRow(row: LineRow) {
+  return `
+    <div class="sd-line sd-line--hunk">
+      <div class="sd-hunk">${escapeHtml(row.header ?? "")}</div>
+    </div>
+  `;
+}
 
+function renderGapRow(row: LineRow) {
+  const count = row.hidden ?? 0;
+  const label = count === 1 ? "1 line hidden" : `${count} lines hidden`;
+  return `
+    <div class="sd-line sd-line--gap">
+      <div class="sd-gap">… ${label} …</div>
+    </div>
+  `;
+}
+
+function getUnifiedPrefix(row: LineRow) {
+  if (row.type === "insert") {
+    return "+";
+  }
+  if (row.type === "delete") {
+    return "-";
+  }
+  if (row.type === "move") {
+    return ">";
+  }
+  return "";
+}
+
+function getUnifiedText(row: LineRow, oldText: string, newText: string) {
+  if (row.type === "insert") {
+    return newText;
+  }
+  if (row.type === "delete") {
+    return oldText;
+  }
+  if (row.type === "move") {
+    if (row.newLine !== null && row.oldLine === null) {
+      return newText;
+    }
+    if (row.oldLine !== null && row.newLine === null) {
+      return oldText;
+    }
+    return row.text ?? oldText ?? newText;
+  }
+  return row.text ?? oldText;
+}
+
+function renderUnifiedRow(row: LineRow) {
   const oldNumber = row.oldLine?.toString() ?? "";
   const newNumber = row.newLine?.toString() ?? "";
   const oldText = row.oldText ?? row.text ?? "";
   const newText = row.newText ?? row.text ?? "";
-  const rowClass = `sd-line sd-line--${row.type}${
-    lineLayout === "unified" ? " sd-line--unified" : ""
-  }`;
+  const rowClass = `sd-line sd-line--${row.type} sd-line--unified`;
+  const prefix = getUnifiedPrefix(row);
+  const text = getUnifiedText(row, oldText, newText);
+  return `
+    <div class="${rowClass}">
+      <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
+      <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
+      <div class="sd-cell sd-prefix">${escapeHtml(prefix)}</div>
+      <div class="sd-cell sd-code sd-cell--code">${escapeHtml(text)}</div>
+    </div>
+  `;
+}
 
-  if (lineLayout === "unified") {
-    const prefix =
-      row.type === "insert"
-        ? "+"
-        : row.type === "delete"
-        ? "-"
-        : row.type === "move"
-        ? ">"
-        : "";
-    const text =
-      row.type === "insert"
-        ? newText
-        : row.type === "delete"
-        ? oldText
-        : row.type === "move"
-        ? row.newLine !== null && row.oldLine === null
-          ? newText
-          : row.oldLine !== null && row.newLine === null
-          ? oldText
-          : row.text ?? oldText ?? newText
-        : row.text ?? oldText;
-    return `
-      <div class="${rowClass}">
-        <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
-        <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
-        <div class="sd-cell sd-prefix">${escapeHtml(prefix)}</div>
-        <div class="sd-cell sd-code sd-cell--code">${escapeHtml(text)}</div>
-      </div>
-    `;
-  }
+function renderSplitRow(row: LineRow) {
+  const oldNumber = row.oldLine?.toString() ?? "";
+  const newNumber = row.newLine?.toString() ?? "";
+  const oldText = row.oldText ?? row.text ?? "";
+  const newText = row.newText ?? row.text ?? "";
+  const rowClass = `sd-line sd-line--${row.type}`;
 
   if (row.type === "replace") {
     const { oldHtml, newHtml } = renderInlineDiff(oldText, newText);
@@ -1497,303 +1631,319 @@ function renderLineRow(row: LineRow, lineLayout: "split" | "unified") {
   `;
 }
 
-export function renderHtml(
-  diff: DiffDocument,
-  options: HtmlRenderOptions = {}
-) {
-  const maxOps = options.maxOperations ?? 200;
-  const batchSize = options.batchSize ?? maxOps;
-  const virtualize = options.virtualize ?? false;
-  const showBanner = options.showBanner ?? true;
-  const showSummary = options.showSummary ?? true;
-  const showFilePath = options.showFilePath ?? true;
-  const layout = options.layout ?? "full";
-  const summary = showSummary ? renderSummary(diff) : "";
-  const reduction = estimateReduction(diff);
-  const metricTitle = "Estimated vs raw line changes";
-  const filePath = showFilePath && options.filePath
-    ? `<div class="sd-file">${escapeHtml(options.filePath)}</div>`
-    : "";
+function renderLineRow(row: LineRow, lineLayout: "split" | "unified") {
+  if (row.type === "hunk") {
+    return renderHunkRow(row);
+  }
+  if (row.type === "gap") {
+    return renderGapRow(row);
+  }
+  if (lineLayout === "unified") {
+    return renderUnifiedRow(row);
+  }
+  return renderSplitRow(row);
+}
 
-  const header = showBanner
-    ? `
+const METRIC_TITLE = "Estimated vs raw line changes";
+
+interface RenderContext {
+  maxOps: number;
+  batchSize: number;
+  virtualize: boolean;
+  layout: "full" | "embed";
+  summaryHtml: string;
+  headerHtml: string;
+  filePathHtml: string;
+  view: "lines" | "semantic";
+  contextLines: number;
+  lineLayout: "split" | "unified";
+  canRenderLines: boolean;
+  useLineView: boolean;
+  title: string;
+}
+
+interface HtmlShellOptions {
+  title: string;
+  layout: "full" | "embed";
+  headerHtml: string;
+  filePathHtml: string;
+  summaryHtml: string;
+  sectionHtml: string;
+  statusHtml?: string;
+  payload?: string;
+  script?: string;
+}
+
+function buildHeaderHtml(showBanner: boolean, reductionPercent: number) {
+  if (!showBanner) {
+    return "";
+  }
+  return `
     <div class="sd-banner">
       <div class="sd-brand">
         <span>Review changes with</span>
         <span class="sd-badge">SemaDiff</span>
       </div>
-      <div class="sd-metric" title="${metricTitle}">
-        <span class="sd-metric-value">${reduction.percent}%</span>
+      <div class="sd-metric" title="${METRIC_TITLE}">
+        <span class="sd-metric-value">${reductionPercent}%</span>
         <span class="sd-metric-label">smaller</span>
       </div>
     </div>
-  `
+  `;
+}
+
+function buildFilePathHtml(showFilePath: boolean, filePath?: string) {
+  if (!showFilePath) {
+    return "";
+  }
+  if (!filePath) {
+    return "";
+  }
+  return `<div class="sd-file">${escapeHtml(filePath)}</div>`;
+}
+
+function buildHtmlShell({
+  title,
+  layout,
+  headerHtml,
+  filePathHtml,
+  summaryHtml,
+  sectionHtml,
+  statusHtml,
+  payload,
+  script,
+}: HtmlShellOptions) {
+  const bodyClass = layout === "embed" ? "sd-embed" : "";
+  const shellClass =
+    layout === "embed" ? "sd-shell sd-shell--embed" : "sd-shell";
+  const status = statusHtml ?? "";
+  const data = payload
+    ? `<script>globalThis.__SEMADIFF_DATA__ = ${payload};</script>`
     : "";
+  const scripts = script ? `<script>${script}</script>` : "";
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${title}</title>
+    <style>${baseStyles}</style>
+  </head>
+  <body class="${bodyClass}">
+    <main class="${shellClass}">
+      ${headerHtml}
+      ${filePathHtml}
+      ${summaryHtml}
+      ${sectionHtml}
+      ${status}
+    </main>
+    ${data}
+    ${scripts}
+  </body>
+</html>`;
+}
+
+function buildRenderContext(
+  diff: DiffDocument,
+  options: HtmlRenderOptions
+): RenderContext {
+  const maxOps = options.maxOperations ?? diff.operations.length;
+  const batchSize = options.batchSize ?? Math.min(maxOps, 200);
+  const virtualize =
+    options.virtualize ?? diff.operations.length > batchSize * 2;
+  const showBanner = options.showBanner ?? true;
+  const showSummary = options.showSummary ?? true;
+  const showFilePath = options.showFilePath ?? true;
+  const layout = options.layout ?? "full";
+  const summaryHtml = showSummary ? renderSummary(diff) : "";
+  const reduction = estimateReduction(diff);
+  const headerHtml = buildHeaderHtml(showBanner, reduction.percent);
+  const filePathHtml = buildFilePathHtml(showFilePath, options.filePath);
+  const title = escapeHtml(options.title ?? "SemaDiff");
 
   const view =
-    options.view ??
-    (options.oldText && options.newText ? "lines" : "semantic");
+    options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
   const contextLines = options.contextLines ?? 3;
   const lineLayout = options.lineLayout ?? "split";
 
   const canRenderLines =
     options.oldText !== undefined && options.newText !== undefined;
-  const useLineView =
-    view === "lines" || (view === "semantic" && canRenderLines);
+  const useLineView = view === "lines" && canRenderLines;
 
-  if (useLineView && canRenderLines) {
-    const normalizeLine =
-      view === "semantic"
-        ? (line: string) => normalizeLineForSemantic(line, options.language)
-        : undefined;
-    const oldText = options.oldText ?? "";
-    const newText = options.newText ?? "";
-    let rows = buildLineRows(
-      oldText,
-      newText,
-      contextLines,
-      lineLayout,
-      normalizeLine,
-      diff.operations
-    );
-    if (view === "semantic" && normalizeLine) {
-      rows = rows.flatMap((row) => {
-        if (row.type === "replace") {
-          const oldValue = row.oldText ?? "";
-          const newValue = row.newText ?? "";
-          if (normalizeLine(oldValue) === normalizeLine(newValue)) {
-            return [];
-          }
-        }
-        if (row.type === "gap" || row.type === "hunk") {
-          return [];
-        }
-        return [row];
-      });
+  return {
+    maxOps,
+    batchSize,
+    virtualize,
+    layout,
+    summaryHtml,
+    headerHtml,
+    filePathHtml,
+    view,
+    contextLines,
+    lineLayout,
+    canRenderLines,
+    useLineView,
+    title,
+  };
+}
+
+function filterSemanticRows(
+  rows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  const filtered: LineRow[] = [];
+  for (const row of rows) {
+    if (row.type === "gap" || row.type === "hunk") {
+      continue;
     }
-    const hasChanges = rows.some(
-      (row) =>
-        row.type === "insert" ||
-        row.type === "delete" ||
-        row.type === "replace" ||
-        row.type === "move"
-    );
-    if (view === "semantic" && !hasChanges) {
-      return "";
+    if (row.type === "replace") {
+      const oldValue = row.oldText ?? "";
+      const newValue = row.newText ?? "";
+      if (normalizeLine(oldValue) === normalizeLine(newValue)) {
+        continue;
+      }
     }
-
-    if (!virtualize) {
-      const body = rows.map((row) => renderLineRow(row, lineLayout)).join("\n");
-      return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(options.title ?? "SemaDiff")}</title>
-    <style>${baseStyles}</style>
-  </head>
-  <body class="${layout === "embed" ? "sd-embed" : ""}">
-    <main class="sd-shell${layout === "embed" ? " sd-shell--embed" : ""}">
-      ${header}
-      ${filePath}
-      ${summary}
-      <section class="sd-lines">${body}</section>
-    </main>
-  </body>
-</html>`;
-    }
-
-    const payload = escapeScript(
-      JSON.stringify({
-        rows,
-        batchSize,
-        lineLayout: "${lineLayout}",
-      })
-    );
-
-    const script = `
-      const data = document.getElementById("semadiff-data");
-      const parsed = data ? JSON.parse(data.textContent || "{}") : { rows: [], batchSize: ${batchSize}, lineLayout: "${lineLayout}" };
-      const rows = Array.isArray(parsed.rows) ? parsed.rows : [];
-      const batch = Number(parsed.batchSize || ${batchSize});
-      const layout = parsed.lineLayout === "unified" ? "unified" : "split";
-      const container = document.getElementById("sd-ops");
-      const status = document.getElementById("sd-status");
-      let rendered = 0;
-
-      function renderRow(row) {
-        if (!container) return;
-        if (row.type === "hunk") {
-          const hunk = document.createElement("div");
-          hunk.className = "sd-line sd-line--hunk";
-          const inner = document.createElement("div");
-          inner.className = "sd-hunk";
-          inner.textContent = row.header ?? "";
-          hunk.appendChild(inner);
-          container.appendChild(hunk);
-          return;
-        }
-        if (row.type === "gap") {
-          const gap = document.createElement("div");
-          gap.className = "sd-line sd-line--gap";
-          const label = row.hidden === 1 ? "1 line hidden" : row.hidden + " lines hidden";
-          const inner = document.createElement("div");
-          inner.className = "sd-gap";
-          inner.textContent = "… " + label + " …";
-          gap.appendChild(inner);
-          container.appendChild(gap);
-          return;
-        }
-
-        const wrapper = document.createElement("div");
-        wrapper.className =
-          "sd-line sd-line--" + row.type + (layout === "unified" ? " sd-line--unified" : "");
-
-        const oldNumber = document.createElement("div");
-        oldNumber.className = "sd-cell sd-gutter";
-        oldNumber.textContent = row.oldLine ?? "";
-
-        const newNumber = document.createElement("div");
-        newNumber.className = "sd-cell sd-gutter";
-        newNumber.textContent = row.newLine ?? "";
-
-        if (layout === "unified") {
-          const code = document.createElement("div");
-          code.className = "sd-cell sd-code sd-cell--code";
-          const prefix = document.createElement("div");
-          prefix.className = "sd-cell sd-prefix";
-          prefix.textContent =
-            row.type === "insert"
-              ? "+"
-              : row.type === "delete"
-              ? "-"
-              : row.type === "move"
-              ? ">"
-              : "";
-          const text =
-            row.type === "insert"
-              ? row.newText ?? row.text ?? ""
-              : row.type === "delete"
-              ? row.oldText ?? row.text ?? ""
-              : row.type === "move"
-              ? row.newLine !== null && row.oldLine === null
-                ? row.newText ?? row.text ?? ""
-                : row.oldLine !== null && row.newLine === null
-                ? row.oldText ?? row.text ?? ""
-                : row.text ?? row.oldText ?? row.newText ?? ""
-              : row.text ?? row.oldText ?? row.newText ?? "";
-          code.textContent = text;
-          wrapper.append(oldNumber, newNumber, prefix, code);
-        } else {
-          const oldCell = document.createElement("div");
-          oldCell.className = "sd-cell sd-code sd-cell--old";
-          oldCell.textContent = row.oldText ?? row.text ?? "";
-
-          const newCell = document.createElement("div");
-          newCell.className = "sd-cell sd-code sd-cell--new";
-          newCell.textContent = row.newText ?? row.text ?? "";
-
-          wrapper.append(oldNumber, oldCell, newNumber, newCell);
-        }
-        container.appendChild(wrapper);
-      }
-
-      function renderBatch() {
-        if (!container) return;
-        const slice = rows.slice(rendered, rendered + batch);
-        slice.forEach(renderRow);
-        rendered += slice.length;
-        if (status) {
-          status.textContent = "Loaded " + rendered + " of " + rows.length + " rows.";
-        }
-        if (rendered >= rows.length) {
-          window.removeEventListener("scroll", onScroll);
-        }
-      }
-
-      function onScroll() {
-        if (!container) return;
-        const rect = container.getBoundingClientRect();
-        if (rect.bottom - window.innerHeight < 600) {
-          renderBatch();
-        }
-      }
-
-      renderBatch();
-      window.addEventListener("scroll", onScroll);
-    `;
-
-    return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(options.title ?? "SemaDiff")}</title>
-    <style>${baseStyles}</style>
-  </head>
-  <body class="${layout === "embed" ? "sd-embed" : ""}">
-    <main class="sd-shell${layout === "embed" ? " sd-shell--embed" : ""}">
-      ${header}
-      ${filePath}
-      ${summary}
-      <section class="sd-lines" id="sd-ops"></section>
-      <div id="sd-status"></div>
-    </main>
-    <script id="semadiff-data" type="application/json">${payload}</script>
-    <script>${script}</script>
-  </body>
-</html>`;
+    filtered.push(row);
   }
+  return filtered;
+}
 
-  if (!virtualize) {
-    const ops = diff.operations.slice(0, maxOps);
-    const body = ops.map(renderOperation).join("\n");
-
-    const truncated =
-      diff.operations.length > ops.length
-        ? `<div class="sd-truncated">Showing ${ops.length} of ${diff.operations.length} operations.</div>`
-        : "";
-
-    return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(options.title ?? "SemaDiff")}</title>
-    <style>${baseStyles}</style>
-  </head>
-  <body class="${layout === "embed" ? "sd-embed" : ""}">
-    <main class="sd-shell${layout === "embed" ? " sd-shell--embed" : ""}">
-      ${header}
-      ${filePath}
-      ${summary}
-      <section class="sd-diff">${body}</section>
-      ${truncated}
-    </main>
-  </body>
-</html>`;
-  }
-
-  const opsData = diff.operations.map((op) => ({
-    id: op.id,
-    type: op.type,
-    oldText: op.oldText ?? "",
-    newText: op.newText ?? "",
-    confidence: op.meta?.confidence ?? null,
-    oldRange: op.oldRange ?? null,
-    newRange: op.newRange ?? null,
-  }));
-
-  const payload = escapeScript(
-    JSON.stringify({
-      operations: opsData,
-      batchSize,
-    })
+function hasLineChanges(rows: LineRow[]) {
+  return rows.some(
+    (row) =>
+      row.type === "insert" ||
+      row.type === "delete" ||
+      row.type === "replace" ||
+      row.type === "move"
   );
+}
 
-  const script = `
-    const data = document.getElementById("semadiff-data");
-    const parsed = data ? JSON.parse(data.textContent || "{}") : { operations: [], batchSize: ${batchSize} };
+function buildLineVirtualScript(
+  batchSize: number,
+  lineLayout: "split" | "unified"
+) {
+  return `
+    const raw = globalThis.__SEMADIFF_DATA__;
+    const parsed = raw && typeof raw === "object"
+      ? raw
+      : { rows: [], batchSize: ${batchSize}, lineLayout: "${lineLayout}" };
+    const rows = Array.isArray(parsed.rows) ? parsed.rows : [];
+    const batch = Number(parsed.batchSize || ${batchSize});
+    const layout = parsed.lineLayout === "unified" ? "unified" : "split";
+    const container = document.getElementById("sd-ops");
+    const status = document.getElementById("sd-status");
+    let rendered = 0;
+
+    function renderRow(row) {
+      if (!container) return;
+      if (row.type === "hunk") {
+        const hunk = document.createElement("div");
+        hunk.className = "sd-line sd-line--hunk";
+        const inner = document.createElement("div");
+        inner.className = "sd-hunk";
+        inner.textContent = row.header ?? "";
+        hunk.appendChild(inner);
+        container.appendChild(hunk);
+        return;
+      }
+      if (row.type === "gap") {
+        const gap = document.createElement("div");
+        gap.className = "sd-line sd-line--gap";
+        const label = row.hidden === 1 ? "1 line hidden" : row.hidden + " lines hidden";
+        const inner = document.createElement("div");
+        inner.className = "sd-gap";
+        inner.textContent = "… " + label + " …";
+        gap.appendChild(inner);
+        container.appendChild(gap);
+        return;
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className =
+        "sd-line sd-line--" + row.type + (layout === "unified" ? " sd-line--unified" : "");
+
+      const oldNumber = document.createElement("div");
+      oldNumber.className = "sd-cell sd-gutter";
+      oldNumber.textContent = row.oldLine ?? "";
+
+      const newNumber = document.createElement("div");
+      newNumber.className = "sd-cell sd-gutter";
+      newNumber.textContent = row.newLine ?? "";
+
+      if (layout === "unified") {
+        const code = document.createElement("div");
+        code.className = "sd-cell sd-code sd-cell--code";
+        const prefix = document.createElement("div");
+        prefix.className = "sd-cell sd-prefix";
+        prefix.textContent =
+          row.type === "insert"
+            ? "+"
+            : row.type === "delete"
+            ? "-"
+            : row.type === "move"
+            ? ">"
+            : "";
+        const text =
+          row.type === "insert"
+            ? row.newText ?? row.text ?? ""
+            : row.type === "delete"
+            ? row.oldText ?? row.text ?? ""
+            : row.type === "move"
+            ? row.newLine !== null && row.oldLine === null
+              ? row.newText ?? row.text ?? ""
+              : row.oldLine !== null && row.newLine === null
+              ? row.oldText ?? row.text ?? ""
+              : row.text ?? row.oldText ?? row.newText ?? ""
+            : row.text ?? row.oldText ?? row.newText ?? "";
+        code.textContent = text;
+        wrapper.append(oldNumber, newNumber, prefix, code);
+      } else {
+        const oldCell = document.createElement("div");
+        oldCell.className = "sd-cell sd-code sd-cell--old";
+        oldCell.textContent = row.oldText ?? row.text ?? "";
+
+        const newCell = document.createElement("div");
+        newCell.className = "sd-cell sd-code sd-cell--new";
+        newCell.textContent = row.newText ?? row.text ?? "";
+
+        wrapper.append(oldNumber, oldCell, newNumber, newCell);
+      }
+      container.appendChild(wrapper);
+    }
+
+    function renderBatch() {
+      if (!container) return;
+      const slice = rows.slice(rendered, rendered + batch);
+      slice.forEach(renderRow);
+      rendered += slice.length;
+      if (status) {
+        status.textContent = "Loaded " + rendered + " of " + rows.length + " rows.";
+      }
+      if (rendered >= rows.length) {
+        window.removeEventListener("scroll", onScroll);
+      }
+    }
+
+    function onScroll() {
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.bottom - window.innerHeight < 600) {
+        renderBatch();
+      }
+    }
+
+    renderBatch();
+    window.addEventListener("scroll", onScroll);
+  `;
+}
+
+function buildOpsVirtualScript(batchSize: number) {
+  return `
+    const raw = globalThis.__SEMADIFF_DATA__;
+    const parsed = raw && typeof raw === "object"
+      ? raw
+      : { operations: [], batchSize: ${batchSize} };
     const operations = Array.isArray(parsed.operations) ? parsed.operations : [];
     const batch = Number(parsed.batchSize || ${batchSize});
     const container = document.getElementById("sd-ops");
@@ -1931,25 +2081,133 @@ export function renderHtml(
     renderBatch();
     window.addEventListener("scroll", onScroll);
   `;
+}
 
-  return `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>${escapeHtml(options.title ?? "SemaDiff")}</title>
-    <style>${baseStyles}</style>
-  </head>
-  <body class="${layout === "embed" ? "sd-embed" : ""}">
-    <main class="sd-shell${layout === "embed" ? " sd-shell--embed" : ""}">
-      ${header}
-      ${filePath}
-      ${summary}
-      <section class="sd-diff" id="sd-ops"></section>
-      <div id="sd-status"></div>
-    </main>
-    <script id="semadiff-data" type="application/json">${payload}</script>
-    <script>${script}</script>
-  </body>
-</html>`;
+function renderLineView(
+  diff: DiffDocument,
+  options: HtmlRenderOptions,
+  context: RenderContext
+) {
+  if (!context.canRenderLines) {
+    return "";
+  }
+  const normalizeLine =
+    context.view === "semantic"
+      ? (line: string) => normalizeLineForSemantic(line, options.language)
+      : undefined;
+  const oldText = options.oldText ?? "";
+  const newText = options.newText ?? "";
+  let rows = buildLineRows(
+    oldText,
+    newText,
+    context.contextLines,
+    context.lineLayout,
+    normalizeLine,
+    diff.operations
+  );
+  if (context.view === "semantic" && normalizeLine) {
+    rows = filterSemanticRows(rows, normalizeLine);
+  }
+  if (context.view === "semantic" && !hasLineChanges(rows)) {
+    return "";
+  }
+
+  if (!context.virtualize) {
+    const body = rows
+      .map((row) => renderLineRow(row, context.lineLayout))
+      .join("\n");
+    const sectionHtml = `<section class="sd-lines">${body}</section>`;
+    return buildHtmlShell({
+      title: context.title,
+      layout: context.layout,
+      headerHtml: context.headerHtml,
+      filePathHtml: context.filePathHtml,
+      summaryHtml: context.summaryHtml,
+      sectionHtml,
+    });
+  }
+
+  const payload = escapeScript(
+    Schema.encodeSync(LinePayloadJson)({
+      rows,
+      batchSize: context.batchSize,
+      lineLayout: context.lineLayout,
+    })
+  );
+  const sectionHtml = `<section class="sd-lines" id="sd-ops"></section>`;
+  const statusHtml = `<div id="sd-status"></div>`;
+  const script = buildLineVirtualScript(context.batchSize, context.lineLayout);
+  return buildHtmlShell({
+    title: context.title,
+    layout: context.layout,
+    headerHtml: context.headerHtml,
+    filePathHtml: context.filePathHtml,
+    summaryHtml: context.summaryHtml,
+    sectionHtml,
+    statusHtml,
+    payload,
+    script,
+  });
+}
+
+function renderOperationsView(diff: DiffDocument, context: RenderContext) {
+  if (!context.virtualize) {
+    const ops = diff.operations.slice(0, context.maxOps);
+    const body = ops.map(renderOperation).join("\n");
+    const truncated =
+      diff.operations.length > ops.length
+        ? `<div class="sd-truncated">Showing ${ops.length} of ${diff.operations.length} operations.</div>`
+        : "";
+    const sectionHtml = `<section class="sd-diff">${body}</section>${truncated}`;
+    return buildHtmlShell({
+      title: context.title,
+      layout: context.layout,
+      headerHtml: context.headerHtml,
+      filePathHtml: context.filePathHtml,
+      summaryHtml: context.summaryHtml,
+      sectionHtml,
+    });
+  }
+
+  const opsData = diff.operations.map((op) => ({
+    id: op.id,
+    type: op.type,
+    oldText: op.oldText ?? "",
+    newText: op.newText ?? "",
+    confidence: op.meta?.confidence ?? null,
+    oldRange: op.oldRange ?? null,
+    newRange: op.newRange ?? null,
+  }));
+
+  const payload = escapeScript(
+    Schema.encodeSync(OpsPayloadJson)({
+      operations: opsData,
+      batchSize: context.batchSize,
+    })
+  );
+  const sectionHtml = `<section class="sd-diff" id="sd-ops"></section>`;
+  const statusHtml = `<div id="sd-status"></div>`;
+  const script = buildOpsVirtualScript(context.batchSize);
+  return buildHtmlShell({
+    title: context.title,
+    layout: context.layout,
+    headerHtml: context.headerHtml,
+    filePathHtml: context.filePathHtml,
+    summaryHtml: context.summaryHtml,
+    sectionHtml,
+    statusHtml,
+    payload,
+    script,
+  });
+}
+
+export function renderHtml(
+  diff: DiffDocument,
+  options: HtmlRenderOptions = {}
+) {
+  const context = buildRenderContext(diff, options);
+  if (context.useLineView && context.canRenderLines) {
+    return renderLineView(diff, options, context);
+  }
+  return renderOperationsView(diff, context);
 }

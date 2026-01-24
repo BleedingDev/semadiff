@@ -1,5 +1,5 @@
 {
-  "name": "@semadiff/render-html",
+  "name": "@semadiff/pr-backend",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -12,6 +12,11 @@
   },
   "dependencies": {
     "@semadiff/core": "workspace:*",
+    "@semadiff/parsers": "workspace:*",
+    "@semadiff/parser-swc": "workspace:*",
+    "@semadiff/parser-tree-sitter-wasm": "workspace:*",
+    "@semadiff/parser-lightningcss": "workspace:*",
+    "@semadiff/render-html": "workspace:*",
     "effect": "^3.19.14"
   }
 }

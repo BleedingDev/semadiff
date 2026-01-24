@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { distFileUrl } from "./helpers.js";
+import { decodeJson, distFileUrl, runBunEval } from "./helpers.js";
 
 const coreUrl = distFileUrl("packages", "core", "dist", "index.js");
 
@@ -112,17 +112,17 @@ function validate(
 test("JSON output validates with schema file", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
-  const diff = execSync(
-    `node --input-type=module -e "import { structuralDiff, renderJson } from '${coreUrl}'; const diff = structuralDiff('const x=1;', 'const y=2;'); console.log(renderJson(diff));"`
-  ).toString();
+  const diff = runBunEval(
+    `import { structuralDiff, renderJson } from '${coreUrl}'; const diff = structuralDiff('const x=1;', 'const y=2;'); console.log(renderJson(diff));`
+  );
 
-  const schema = JSON.parse(
+  const schema = decodeJson<JsonSchema>(
     readFileSync(
       join("packages", "core", "schemas", "diff-document.schema.json"),
       "utf8"
     )
-  ) as JsonSchema;
+  );
 
-  const parsed = JSON.parse(diff) as JsonValue;
+  const parsed = decodeJson<JsonValue>(diff);
   expect(validate(schema, parsed, schema)).toBe(true);
 });

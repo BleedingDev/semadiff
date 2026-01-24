@@ -1,6 +1,8 @@
+import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { Schema } from "effect";
 
 export const repoRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
@@ -41,3 +43,29 @@ export const effectUrl = (() => {
 
   return pathToFileURL(resolved).href;
 })();
+
+const JsonUnknown = Schema.parseJson(Schema.Unknown);
+const JsonUnknownPretty = Schema.parseJson(Schema.Unknown, { space: 2 });
+
+export const encodeJson = (value: unknown) =>
+  Schema.encodeSync(JsonUnknown)(value);
+
+export const encodeJsonPretty = (value: unknown) =>
+  Schema.encodeSync(JsonUnknownPretty)(value);
+
+export const decodeJson = <T = unknown>(value: string) =>
+  Schema.decodeUnknownSync(JsonUnknown)(value) as T;
+
+export const bunBinary = process.env.BUN_BINARY ?? "bun";
+
+export const bunEval = (script: string) =>
+  `${bunBinary} --eval ${encodeJson(script)}`;
+
+export const runBunEval = (
+  script: string,
+  options?: Parameters<typeof execFileSync>[2]
+) =>
+  execFileSync(bunBinary, ["--eval", script], {
+    encoding: "utf8",
+    ...options,
+  });

@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { distPath } from "./helpers.js";
+import { bunBinary, distPath } from "./helpers.js";
 
 const cliPath = distPath("packages", "cli", "dist", "index.js");
 
@@ -18,13 +18,16 @@ test("console exporter emits spans for a CLI run", () => {
   writeFileSync(oldFile, "const x = 1;\n");
   writeFileSync(newFile, "const y = 2;\n");
 
-  const output = execSync(`node ${cliPath} diff ${oldFile} ${newFile}`, {
-    env: {
-      ...process.env,
-      SEMADIFF_TELEMETRY_ENABLED: "true",
-      SEMADIFF_TELEMETRY_EXPORTER: "console",
-    },
-  }).toString();
+  const output = execSync(
+    `${bunBinary} ${cliPath} diff ${oldFile} ${newFile}`,
+    {
+      env: {
+        ...process.env,
+        SEMADIFF_TELEMETRY_ENABLED: "true",
+        SEMADIFF_TELEMETRY_EXPORTER: "console",
+      },
+    }
+  ).toString();
 
   expect(output).toContain('"span":"run"');
   expect(output).toContain('"span":"diff"');
@@ -40,7 +43,7 @@ test("telemetry disabled by default emits no spans", () => {
   writeFileSync(newFile, "const y = 2;\n");
 
   const output = execSync(
-    `node ${cliPath} diff --format plain ${oldFile} ${newFile}`,
+    `${bunBinary} ${cliPath} diff --format plain ${oldFile} ${newFile}`,
     {
       env: {
         ...process.env,

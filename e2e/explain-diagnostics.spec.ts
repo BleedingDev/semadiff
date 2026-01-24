@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { distFileUrl } from "./helpers.js";
+import { decodeJson, distFileUrl, effectUrl, runBunEval } from "./helpers.js";
 
 const coreUrl = distFileUrl("packages", "core", "dist", "index.js");
 
@@ -115,30 +115,30 @@ function validate(
 test("explain JSON validates and diagnostics redacts code by default", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
-  const output = execSync(
-    `node --input-type=module -e "import { structuralDiff, explainDiff, createDiagnosticsBundle } from '${coreUrl}'; const diff = structuralDiff('const x=1;', 'const y=2;'); const explain = explainDiff(diff); const diagnostics = createDiagnosticsBundle({ diff }); console.log(JSON.stringify({ explain, diagnostics }));"`
-  ).toString();
+  const output = runBunEval(
+    `import { Schema } from '${effectUrl}'; import { structuralDiff, explainDiff, createDiagnosticsBundle } from '${coreUrl}'; const diff = structuralDiff('const x=1;', 'const y=2;'); const explain = explainDiff(diff); const diagnostics = createDiagnosticsBundle({ diff }); const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown)); console.log(encodeJson({ explain, diagnostics }));`
+  );
 
-  const parsed = JSON.parse(output) as {
+  const parsed = decodeJson<{
     explain: JsonValue;
     diagnostics: {
       redacted: boolean;
       diff: { operations: { oldText?: string; newText?: string }[] };
     };
-  };
+  }>(output);
 
-  const schema = JSON.parse(
+  const schema = decodeJson<JsonSchema>(
     readFileSync(
       join("packages", "core", "schemas", "explain.schema.json"),
       "utf8"
     )
-  ) as JsonSchema;
-  const diagnosticsSchema = JSON.parse(
+  );
+  const diagnosticsSchema = decodeJson<JsonSchema>(
     readFileSync(
       join("packages", "core", "schemas", "diagnostics.schema.json"),
       "utf8"
     )
-  ) as JsonSchema;
+  );
 
   expect(validate(schema, parsed.explain, schema)).toBe(true);
   expect(

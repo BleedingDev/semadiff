@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 import { expect, test } from "@playwright/test";
-import { distFileUrl, effectUrl } from "./helpers.js";
+import { decodeJson, distFileUrl, effectUrl, runBunEval } from "./helpers.js";
 
 const parsersUrl = distFileUrl("packages", "parsers", "dist", "index.js");
 const swcUrl = distFileUrl("packages", "parser-swc", "dist", "index.js");
@@ -12,7 +12,7 @@ const lightningUrl = distFileUrl(
 );
 const treeSitterUrl = distFileUrl(
   "packages",
-  "parser-tree-sitter-node",
+  "parser-tree-sitter-wasm",
   "dist",
   "index.js"
 );
@@ -23,15 +23,15 @@ test("parser fallback chain uses next parser when best fails", () => {
   execSync("pnpm --filter @semadiff/parser-lightningcss build", {
     stdio: "inherit",
   });
-  execSync("pnpm --filter @semadiff/parser-tree-sitter-node build", {
+  execSync("pnpm --filter @semadiff/parser-tree-sitter-wasm build", {
     stdio: "inherit",
   });
 
-  const output = execSync(
-    `node --input-type=module -e "import { Effect } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { treeSitterNodeParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...treeSitterNodeParsers]); const parsed = Effect.runSync(registry.parse({ content: 'function {', path: 'file.js' })); const rootType = parsed.root?.type ?? parsed.root?.kind ?? null; console.log(JSON.stringify({ kind: parsed.kind, rootType }));"`
-  ).toString();
+  const output = runBunEval(
+    `import { Effect, Schema } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { treeSitterWasmParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...treeSitterWasmParsers]); const parsed = await Effect.runPromise(registry.parse({ content: 'function {', path: 'file.js' })); const rootType = parsed.root?.type ?? parsed.root?.kind ?? null; const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown)); console.log(encodeJson({ kind: parsed.kind, rootType }));`
+  );
 
-  const parsed = JSON.parse(output);
+  const parsed = decodeJson<{ kind: string; rootType: string | null }>(output);
   expect(parsed.kind).toBe("tree");
   expect(["program", "source_file"]).toContain(parsed.rootType);
 });
@@ -42,15 +42,15 @@ test("parser tokens are attached when available", () => {
   execSync("pnpm --filter @semadiff/parser-lightningcss build", {
     stdio: "inherit",
   });
-  execSync("pnpm --filter @semadiff/parser-tree-sitter-node build", {
+  execSync("pnpm --filter @semadiff/parser-tree-sitter-wasm build", {
     stdio: "inherit",
   });
 
-  const output = execSync(
-    `node --input-type=module -e "import { Effect } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { lightningCssParsers } from '${lightningUrl}'; import { treeSitterNodeParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...lightningCssParsers, ...treeSitterNodeParsers]); const parsedJs = Effect.runSync(registry.parse({ content: 'const foo = 1;', path: 'file.ts' })); const parsedCss = Effect.runSync(registry.parse({ content: 'a { color: red; }', path: 'file.css' })); console.log(JSON.stringify({ jsTokens: parsedJs.tokens?.length ?? 0, cssTokens: parsedCss.tokens?.length ?? 0 }));"`
-  ).toString();
+  const output = runBunEval(
+    `import { Effect, Schema } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { lightningCssParsers } from '${lightningUrl}'; import { treeSitterWasmParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...lightningCssParsers, ...treeSitterWasmParsers]); const parsedJs = await Effect.runPromise(registry.parse({ content: 'const foo = 1;', path: 'file.ts' })); const parsedCss = await Effect.runPromise(registry.parse({ content: 'a { color: red; }', path: 'file.css' })); const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown)); console.log(encodeJson({ jsTokens: parsedJs.tokens?.length ?? 0, cssTokens: parsedCss.tokens?.length ?? 0 }));`
+  );
 
-  const parsed = JSON.parse(output);
+  const parsed = decodeJson<{ jsTokens: number; cssTokens: number }>(output);
   expect(parsed.jsTokens).toBeGreaterThan(0);
   expect(parsed.cssTokens).toBeGreaterThan(0);
 });

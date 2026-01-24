@@ -3,6 +3,7 @@ import { chmodSync, copyFileSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
+import { bunBinary, encodeJson } from "./helpers.js";
 
 const cliPath = join(process.cwd(), "packages", "cli", "dist", "index.js");
 
@@ -19,7 +20,7 @@ function initRepo(): string {
 }
 
 function setExternalDiff(repo: string): void {
-  const diffExternal = `${JSON.stringify(process.execPath)} ${JSON.stringify(
+  const diffExternal = `${encodeJson(bunBinary)} ${encodeJson(
     cliPath
   )} git-external`;
   runGit(repo, ["config", "diff.external", diffExternal]);
