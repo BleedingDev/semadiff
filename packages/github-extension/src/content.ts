@@ -441,6 +441,7 @@ function renderDiffResult(params: {
     virtualize: true,
     filePath: path,
     view: "lines",
+    lineMode: "semantic",
     oldText,
     newText,
     contextLines: 3,

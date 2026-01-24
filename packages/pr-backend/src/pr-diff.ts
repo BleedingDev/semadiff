@@ -448,6 +448,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     title: `SemaDiff · ${summary.filename}`,
     filePath: summary.filename,
     view: "lines",
+    lineMode: "semantic",
     oldText,
     newText,
     contextLines,

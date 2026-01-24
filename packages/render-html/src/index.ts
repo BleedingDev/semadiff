@@ -15,6 +15,7 @@ export interface HtmlRenderOptions {
   filePath?: string;
   title?: string;
   view?: "semantic" | "lines";
+  lineMode?: "raw" | "semantic";
   oldText?: string;
   newText?: string;
   contextLines?: number;
@@ -1080,7 +1081,7 @@ function buildRawLineRows(
   const newComparable = normalizeLine ? newLines.map(normalizeLine) : newLines;
   const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
   const blocks = buildLineBlocks(edits);
-  return buildRowsFromBlocks(blocks, lineLayout);
+  return buildRowsFromBlocks(blocks, lineLayout, normalizeLine);
 }
 
 interface LineBlock {
@@ -1099,6 +1100,138 @@ function buildLineBlocks(edits: LineEdit[]): LineBlock[] {
     }
   }
   return blocks;
+}
+
+const REORDERABLE_LINE_RE =
+  /^[A-Za-z_$][\w$-]*\s*(?:[:=]|\?|$)|^\{?\.\.\.[^}]+}?\s*,?$/;
+
+function isReorderableLine(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed) {
+    return false;
+  }
+  if (
+    trimmed.startsWith("<") ||
+    trimmed.startsWith("</") ||
+    trimmed === ">" ||
+    trimmed === "/>"
+  ) {
+    return false;
+  }
+  return REORDERABLE_LINE_RE.test(trimmed);
+}
+
+function buildLineKeyCounts(
+  lines: string[],
+  normalizeLine?: (line: string) => string
+) {
+  const counts = new Map<string, number>();
+  for (const line of lines) {
+    const key = (normalizeLine ? normalizeLine(line) : line).trim();
+    if (!key) {
+      continue;
+    }
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function collectReorderableKeys(
+  lines: string[],
+  normalizeLine: (line: string) => string
+) {
+  const keys: string[] = [];
+  const keyByIndex: (string | null)[] = [];
+  for (const line of lines) {
+    if (!isReorderableLine(line)) {
+      keyByIndex.push(null);
+      continue;
+    }
+    const key = normalizeLine(line).trim();
+    keys.push(key);
+    keyByIndex.push(key);
+  }
+  return { keys, keyByIndex };
+}
+
+function lineKeyCountsMatch(oldKeys: string[], newKeys: string[]) {
+  const oldCounts = buildLineKeyCounts(oldKeys, (line) => line);
+  const newCounts = buildLineKeyCounts(newKeys, (line) => line);
+  if (oldCounts.size !== newCounts.size) {
+    return false;
+  }
+  for (const [key, count] of oldCounts) {
+    if ((newCounts.get(key) ?? 0) !== count) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function buildLineBuckets(lines: string[], keyByIndex: (string | null)[]) {
+  const buckets = new Map<string, string[]>();
+  for (let idx = 0; idx < lines.length; idx += 1) {
+    const key = keyByIndex[idx];
+    if (!key) {
+      continue;
+    }
+    const list = buckets.get(key);
+    if (list) {
+      list.push(lines[idx] ?? "");
+    } else {
+      buckets.set(key, [lines[idx] ?? ""]);
+    }
+  }
+  return buckets;
+}
+
+function applyReorderedLines(
+  lines: string[],
+  keyByIndex: (string | null)[],
+  desiredKeys: string[],
+  buckets: Map<string, string[]>
+) {
+  const reordered = [...lines];
+  let cursor = 0;
+  for (let idx = 0; idx < keyByIndex.length; idx += 1) {
+    if (!keyByIndex[idx]) {
+      continue;
+    }
+    const desiredKey = desiredKeys[cursor++];
+    if (!desiredKey) {
+      return null;
+    }
+    const bucket = buckets.get(desiredKey);
+    if (!bucket || bucket.length === 0) {
+      return null;
+    }
+    const nextValue = bucket.shift();
+    if (!nextValue) {
+      return null;
+    }
+    reordered[idx] = nextValue;
+  }
+  return reordered;
+}
+
+function reorderInsertLines(
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine?: (line: string) => string
+) {
+  if (!normalizeLine) {
+    return null;
+  }
+  const old = collectReorderableKeys(oldLines, normalizeLine);
+  const next = collectReorderableKeys(newLines, normalizeLine);
+  if (old.keys.length === 0 || old.keys.length !== next.keys.length) {
+    return null;
+  }
+  if (!lineKeyCountsMatch(old.keys, next.keys)) {
+    return null;
+  }
+  const buckets = buildLineBuckets(newLines, next.keyByIndex);
+  return applyReorderedLines(newLines, next.keyByIndex, old.keys, buckets);
 }
 
 function appendUnifiedReplaceRows(
@@ -1207,7 +1340,8 @@ function appendBlockRows(
 
 function buildRowsFromBlocks(
   blocks: LineBlock[],
-  lineLayout: "split" | "unified"
+  lineLayout: "split" | "unified",
+  normalizeLine?: (line: string) => string
 ) {
   const rows: LineRow[] = [];
   let oldLine = 1;
@@ -1221,19 +1355,24 @@ function buildRowsFromBlocks(
     const next = blocks[i + 1];
 
     if (block.type === "delete" && next?.type === "insert") {
+      const reorderedLines = reorderInsertLines(
+        block.lines,
+        next.lines,
+        normalizeLine
+      );
       const result =
         lineLayout === "unified"
           ? appendUnifiedReplaceRows(
               rows,
               block.lines,
-              next.lines,
+              reorderedLines ?? next.lines,
               oldLine,
               newLine
             )
           : appendSplitReplaceRows(
               rows,
               block.lines,
-              next.lines,
+              reorderedLines ?? next.lines,
               oldLine,
               newLine
             );
@@ -1380,10 +1519,22 @@ function toMoveRow(
 
 function applyLineOperationToRow(
   row: LineRow,
-  marks: ReturnType<typeof buildLineMarkSets>
+  marks: ReturnType<typeof buildLineMarkSets>,
+  normalizeLine?: (line: string) => string
 ) {
   if (row.type === "gap" || row.type === "hunk") {
     return row;
+  }
+  if (normalizeLine) {
+    const oldText = rowOldText(row);
+    const newText = rowNewText(row);
+    if (
+      oldText !== undefined &&
+      newText !== undefined &&
+      normalizeLine(oldText) === normalizeLine(newText)
+    ) {
+      return toEqualRow(row);
+    }
   }
   const oldLine = row.oldLine ?? null;
   const newLine = row.newLine ?? null;
@@ -1413,7 +1564,8 @@ function applyLineOperations(
   rows: LineRow[],
   operations: DiffOperation[],
   oldLineCount: number,
-  newLineCount: number
+  newLineCount: number,
+  normalizeLine?: (line: string) => string
 ): LineRow[] {
   if (operations.length === 0) {
     return rows;
@@ -1421,7 +1573,7 @@ function applyLineOperations(
 
   const marks = buildLineMarkSets(operations, oldLineCount, newLineCount);
 
-  return rows.map((row) => applyLineOperationToRow(row, marks));
+  return rows.map((row) => applyLineOperationToRow(row, marks, normalizeLine));
 }
 
 function applyLineContext(rows: LineRow[], contextLines: number): LineRow[] {
@@ -1485,7 +1637,8 @@ function buildLineRows(
     rows,
     operations,
     oldLines.length,
-    newLines.length
+    newLines.length,
+    normalizeLine
   );
   return applyLineContext(rows, contextLines);
 }
@@ -1655,6 +1808,7 @@ interface RenderContext {
   headerHtml: string;
   filePathHtml: string;
   view: "lines" | "semantic";
+  lineMode: "raw" | "semantic";
   contextLines: number;
   lineLayout: "split" | "unified";
   canRenderLines: boolean;
@@ -1766,6 +1920,7 @@ function buildRenderContext(
     options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
   const contextLines = options.contextLines ?? 3;
   const lineLayout = options.lineLayout ?? "split";
+  const lineMode = options.lineMode ?? "raw";
 
   const canRenderLines =
     options.oldText !== undefined && options.newText !== undefined;
@@ -1780,6 +1935,7 @@ function buildRenderContext(
     headerHtml,
     filePathHtml,
     view,
+    lineMode,
     contextLines,
     lineLayout,
     canRenderLines,
@@ -2092,7 +2248,7 @@ function renderLineView(
     return "";
   }
   const normalizeLine =
-    context.view === "semantic"
+    context.lineMode === "semantic"
       ? (line: string) => normalizeLineForSemantic(line, options.language)
       : undefined;
   const oldText = options.oldText ?? "";
@@ -2105,10 +2261,10 @@ function renderLineView(
     normalizeLine,
     diff.operations
   );
-  if (context.view === "semantic" && normalizeLine) {
+  if (context.lineMode === "semantic" && normalizeLine) {
     rows = filterSemanticRows(rows, normalizeLine);
   }
-  if (context.view === "semantic" && !hasLineChanges(rows)) {
+  if (context.lineMode === "semantic" && !hasLineChanges(rows)) {
     return "";
   }
 

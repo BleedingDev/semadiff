@@ -366,10 +366,11 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   const cacheKey = `json:${url}`;
   const cached = yield* cache.get(cacheKey);
   if (Option.isSome(cached)) {
-    try {
-      return Schema.decodeUnknownSync(JsonUnknown)(cached.value);
-    } catch {
-      // Ignore cache parse failures and re-fetch.
+    const decoded = yield* Schema.decodeUnknown(JsonUnknown)(cached.value).pipe(
+      Effect.catchAll(() => Effect.succeed(null))
+    );
+    if (decoded !== null) {
+      return decoded;
     }
   }
   const headers: Record<string, string> = {
@@ -394,15 +395,13 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
       Effect.catchAll(() => Effect.succeed(""))
     );
     let message = response.statusText;
-    try {
-      const parsed = Schema.decodeUnknownSync(ErrorMessageJson)(bodyText);
-      if (parsed.message) {
-        message = parsed.message;
-      }
-    } catch {
-      if (bodyText) {
-        message = bodyText;
-      }
+    const parsed = yield* Schema.decodeUnknown(ErrorMessageJson)(bodyText).pipe(
+      Effect.catchAll(() => Effect.succeed(null))
+    );
+    if (parsed?.message) {
+      message = parsed.message;
+    } else if (bodyText) {
+      message = bodyText;
     }
     const remaining = response.headers.get("x-ratelimit-remaining");
     const retryAfter = response.headers.get("retry-after");
@@ -434,7 +433,12 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
       }),
   });
 
-  yield* cache.set(cacheKey, Schema.encodeSync(JsonUnknown)(json), ttlMs);
+  const encoded = yield* Schema.encode(JsonUnknown)(json).pipe(
+    Effect.catchAll(() => Effect.succeed(null))
+  );
+  if (encoded !== null) {
+    yield* cache.set(cacheKey, encoded, ttlMs);
+  }
   return json;
 });
 

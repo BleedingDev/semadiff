@@ -156,10 +156,24 @@ function spansToTokenRanges(text: string, spans: SwcSpan[]): TokenRange[] {
   }
   const offsets = buildUtf8Offsets(text);
   const maxByte = offsets.at(-1) ?? 0;
+  let minStart = Number.POSITIVE_INFINITY;
+  for (const span of spans) {
+    if (span.start < minStart) {
+      minStart = span.start;
+    }
+  }
+  const baseOffset =
+    Number.isFinite(minStart) && minStart > 1 ? minStart - 1 : 0;
   const ranges: TokenRange[] = [];
   for (const span of spans) {
-    const startByte = Math.max(0, Math.min(maxByte, span.start - 1));
-    const endByte = Math.max(startByte, Math.min(maxByte, span.end - 1));
+    const startByte = Math.max(
+      0,
+      Math.min(maxByte, span.start - 1 - baseOffset)
+    );
+    const endByte = Math.max(
+      startByte,
+      Math.min(maxByte, span.end - 1 - baseOffset)
+    );
     const startIndex = byteOffsetToIndex(startByte, offsets);
     const endIndex = byteOffsetToIndex(endByte, offsets);
     if (endIndex > startIndex) {

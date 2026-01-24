@@ -74,6 +74,7 @@ export interface RenameGroup {
 
 interface DiffToken {
   text: string;
+  compareText: string;
   startIndex: number;
   endIndex: number;
   start: Position;
@@ -173,11 +174,12 @@ function makeToken(
   text: string,
   startIndex: number,
   endIndex: number,
-  lineOffsets: number[]
+  lineOffsets: number[],
+  compareText = text
 ) {
   const start = offsetToPosition(startIndex, lineOffsets);
   const end = offsetToPosition(endIndex, lineOffsets);
-  return { text, startIndex, endIndex, start, end };
+  return { text, compareText, startIndex, endIndex, start, end };
 }
 
 interface TreeSitterNode {
@@ -212,7 +214,11 @@ function collectLeafNodes(node: TreeSitterNode, leaves: TreeSitterNode[]) {
   }
 }
 
-function tokenizeTreeSitter(text: string, root: unknown): DiffToken[] | null {
+function tokenizeTreeSitter(
+  text: string,
+  root: unknown,
+  language?: NormalizerLanguage
+): DiffToken[] | null {
   if (!isTreeSitterNode(root)) {
     return null;
   }
@@ -231,19 +237,43 @@ function tokenizeTreeSitter(text: string, root: unknown): DiffToken[] | null {
     if (startIndex > cursor) {
       const gap = text.slice(cursor, startIndex);
       if (gap.length > 0) {
-        tokens.push(makeToken(gap, cursor, startIndex, lineOffsets));
+        tokens.push(
+          makeToken(
+            gap,
+            cursor,
+            startIndex,
+            lineOffsets,
+            buildCompareText(gap, language, true)
+          )
+        );
       }
     }
     if (endIndex > startIndex) {
       const tokenText = text.slice(startIndex, endIndex);
-      tokens.push(makeToken(tokenText, startIndex, endIndex, lineOffsets));
+      tokens.push(
+        makeToken(
+          tokenText,
+          startIndex,
+          endIndex,
+          lineOffsets,
+          buildCompareText(tokenText, language, false)
+        )
+      );
     }
     cursor = Math.max(cursor, endIndex);
   }
   if (cursor < text.length) {
     const tail = text.slice(cursor);
     if (tail.length > 0) {
-      tokens.push(makeToken(tail, cursor, text.length, lineOffsets));
+      tokens.push(
+        makeToken(
+          tail,
+          cursor,
+          text.length,
+          lineOffsets,
+          buildCompareText(tail, language, true)
+        )
+      );
     }
   }
   return tokens;
@@ -251,7 +281,8 @@ function tokenizeTreeSitter(text: string, root: unknown): DiffToken[] | null {
 
 function tokenizeFromRanges(
   text: string,
-  ranges: readonly TokenRange[]
+  ranges: readonly TokenRange[],
+  language?: NormalizerLanguage
 ): DiffToken[] | null {
   if (!Array.isArray(ranges) || ranges.length === 0) {
     return null;
@@ -278,12 +309,26 @@ function tokenizeFromRanges(
     if (range.startIndex > cursor) {
       const gap = text.slice(cursor, range.startIndex);
       if (gap.length > 0) {
-        tokens.push(makeToken(gap, cursor, range.startIndex, lineOffsets));
+        tokens.push(
+          makeToken(
+            gap,
+            cursor,
+            range.startIndex,
+            lineOffsets,
+            buildCompareText(gap, language, true)
+          )
+        );
       }
     }
     const tokenText = text.slice(range.startIndex, range.endIndex);
     tokens.push(
-      makeToken(tokenText, range.startIndex, range.endIndex, lineOffsets)
+      makeToken(
+        tokenText,
+        range.startIndex,
+        range.endIndex,
+        lineOffsets,
+        buildCompareText(tokenText, language, false)
+      )
     );
     cursor = Math.max(cursor, range.endIndex);
     lastStart = range.startIndex;
@@ -292,7 +337,15 @@ function tokenizeFromRanges(
   if (cursor < text.length) {
     const tail = text.slice(cursor);
     if (tail.length > 0) {
-      tokens.push(makeToken(tail, cursor, text.length, lineOffsets));
+      tokens.push(
+        makeToken(
+          tail,
+          cursor,
+          text.length,
+          lineOffsets,
+          buildCompareText(tail, language, true)
+        )
+      );
     }
   }
   return tokens;
@@ -301,7 +354,10 @@ function tokenizeFromRanges(
 const TOKEN_REGEX =
   /[A-Za-z_$][\w$]*|\d+(?:\.\d+)?|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|==|!=|<=|>=|=>|\+\+|--|&&|\|\||<<|>>|>>>|[{}()[\];,.<>+\-*/%=&|^!~?:]/g;
 
-function tokenizeRegex(text: string): DiffToken[] {
+function tokenizeRegex(
+  text: string,
+  language?: NormalizerLanguage
+): DiffToken[] {
   const lineOffsets = buildLineOffsets(text);
   const tokens: DiffToken[] = [];
   let cursor = 0;
@@ -310,27 +366,58 @@ function tokenizeRegex(text: string): DiffToken[] {
     const index = match.index ?? 0;
     if (index > cursor) {
       const gap = text.slice(cursor, index);
-      tokens.push(makeToken(gap, cursor, index, lineOffsets));
+      tokens.push(
+        makeToken(
+          gap,
+          cursor,
+          index,
+          lineOffsets,
+          buildCompareText(gap, language, true)
+        )
+      );
     }
     const tokenText = match[0];
     tokens.push(
-      makeToken(tokenText, index, index + tokenText.length, lineOffsets)
+      makeToken(
+        tokenText,
+        index,
+        index + tokenText.length,
+        lineOffsets,
+        buildCompareText(tokenText, language, false)
+      )
     );
     cursor = index + tokenText.length;
     match = TOKEN_REGEX.exec(text);
   }
   if (cursor < text.length) {
     tokens.push(
-      makeToken(text.slice(cursor), cursor, text.length, lineOffsets)
+      makeToken(
+        text.slice(cursor),
+        cursor,
+        text.length,
+        lineOffsets,
+        buildCompareText(text.slice(cursor), language, true)
+      )
     );
   }
   if (tokens.length === 0 && text.length > 0) {
-    tokens.push(makeToken(text, 0, text.length, lineOffsets));
+    tokens.push(
+      makeToken(
+        text,
+        0,
+        text.length,
+        lineOffsets,
+        buildCompareText(text, language, false)
+      )
+    );
   }
   return tokens;
 }
 
-function tokenizeLines(text: string): DiffToken[] {
+function tokenizeLines(
+  text: string,
+  language?: NormalizerLanguage
+): DiffToken[] {
   const lineOffsets = buildLineOffsets(text);
   const tokens: DiffToken[] = [];
   if (lineOffsets.length === 0) {
@@ -348,13 +435,22 @@ function tokenizeLines(text: string): DiffToken[] {
           text.slice(startIndex, endIndex),
           startIndex,
           endIndex,
-          lineOffsets
+          lineOffsets,
+          buildCompareText(text.slice(startIndex, endIndex), language, false)
         )
       );
     }
   }
   if (tokens.length === 0 && text.length > 0) {
-    tokens.push(makeToken(text, 0, text.length, lineOffsets));
+    tokens.push(
+      makeToken(
+        text,
+        0,
+        text.length,
+        lineOffsets,
+        buildCompareText(text, language, false)
+      )
+    );
   }
   return tokens;
 }
@@ -365,24 +461,26 @@ function tokenize(
   ranges?: readonly TokenRange[],
   language?: NormalizerLanguage
 ): DiffToken[] {
-  const explicitTokens = ranges ? tokenizeFromRanges(text, ranges) : null;
+  const explicitTokens = ranges
+    ? tokenizeFromRanges(text, ranges, language)
+    : null;
   if (explicitTokens && explicitTokens.length > 0) {
     return explicitTokens;
   }
-  const treeTokens = root ? tokenizeTreeSitter(text, root) : null;
+  const treeTokens = root ? tokenizeTreeSitter(text, root, language) : null;
   if (treeTokens && treeTokens.length > 0) {
     return treeTokens;
   }
   if (language === "json") {
     if (text.includes("\n")) {
-      return tokenizeLines(text);
+      return tokenizeLines(text, language);
     }
-    return tokenizeRegex(text);
+    return tokenizeRegex(text, language);
   }
   if (text.includes("\n")) {
-    return tokenizeLines(text);
+    return tokenizeLines(text, language);
   }
-  return tokenizeRegex(text);
+  return tokenizeRegex(text, language);
 }
 
 function rangeForTokens(
@@ -572,6 +670,23 @@ function normalizeLineText(text: string) {
 
 type LineOpMap = Map<string, DiffOperation[]>;
 
+function normalizeCosmeticLineText(text: string) {
+  return normalizeCosmeticText(text).trim();
+}
+
+function buildCosmeticLineCounts(text: string) {
+  const counts = new Map<string, number>();
+  const lines = text.split(LINE_SPLIT_RE);
+  for (const line of lines) {
+    const key = normalizeCosmeticLineText(line);
+    if (!key) {
+      continue;
+    }
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
+}
+
 function buildLineCounts(text: string) {
   const counts = new Map<string, number>();
   const lines = text.split(LINE_SPLIT_RE);
@@ -710,8 +825,241 @@ function suppressMovedLineOps(
   return output.filter((op) => !skipped.has(op.id));
 }
 
+const PROP_ASSIGN_RE = /^[A-Za-z_$][\w$-]*\s*=/;
+const TRAILING_COMMA_RE = /,\s*$/;
+const IMPORT_WORD_RE = /\bimport\b/;
+const FROM_WORD_RE = /\bfrom\b/;
+
+function isCosmeticMoveLine(line: string) {
+  if (!line) {
+    return false;
+  }
+  const trimmed = normalizeCosmeticText(line).trim();
+  if (!trimmed) {
+    return false;
+  }
+  if (trimmed === '"use client"') {
+    return true;
+  }
+  if (trimmed.startsWith("import ")) {
+    return !isSideEffectImportLine(trimmed);
+  }
+  return PROP_ASSIGN_RE.test(trimmed);
+}
+
+function collectSingleLineCosmeticOps(operations: DiffOperation[]) {
+  const insertsByText: LineOpMap = new Map();
+  const deletesByText: LineOpMap = new Map();
+
+  for (const op of operations) {
+    if (op.type === "insert" && isSingleLine(op.newText)) {
+      const key = normalizeCosmeticLineText(op.newText ?? "");
+      const list = insertsByText.get(key);
+      if (list) {
+        list.push(op);
+      } else {
+        insertsByText.set(key, [op]);
+      }
+      continue;
+    }
+    if (op.type === "delete" && isSingleLine(op.oldText)) {
+      const key = normalizeCosmeticLineText(op.oldText ?? "");
+      const list = deletesByText.get(key);
+      if (list) {
+        list.push(op);
+      } else {
+        deletesByText.set(key, [op]);
+      }
+    }
+  }
+
+  return { insertsByText, deletesByText };
+}
+
+function shouldSkipCosmeticLineMove(
+  key: string,
+  inserts: DiffOperation[] | undefined,
+  deletes: DiffOperation[] | undefined,
+  oldLineCounts: Map<string, number>,
+  newLineCounts: Map<string, number>
+) {
+  if (!(inserts && deletes)) {
+    return false;
+  }
+  if (inserts.length !== 1 || deletes.length !== 1) {
+    return false;
+  }
+  if ((oldLineCounts.get(key) ?? 0) !== (newLineCounts.get(key) ?? 0)) {
+    return false;
+  }
+  return isCosmeticMoveLine(key);
+}
+
+function suppressCosmeticLineMoves(
+  operations: DiffOperation[],
+  oldText: string,
+  newText: string
+) {
+  const { insertsByText, deletesByText } =
+    collectSingleLineCosmeticOps(operations);
+  const oldLineCounts = buildCosmeticLineCounts(oldText);
+  const newLineCounts = buildCosmeticLineCounts(newText);
+  const skipped = new Set<string>();
+
+  for (const [key, inserts] of insertsByText.entries()) {
+    const deletes = deletesByText.get(key);
+    if (
+      !shouldSkipCosmeticLineMove(
+        key,
+        inserts,
+        deletes,
+        oldLineCounts,
+        newLineCounts
+      )
+    ) {
+      continue;
+    }
+    const insert = inserts[0];
+    const del = deletes?.[0];
+    if (insert) {
+      skipped.add(insert.id);
+    }
+    if (del) {
+      skipped.add(del.id);
+    }
+  }
+
+  return operations.filter((op) => !skipped.has(op.id));
+}
+
 function normalizeCosmeticText(text: string) {
   return text.replace(/'([^'\\]*)'/g, '"$1"');
+}
+
+const ARROW_RETURN_RE = /=>\s*{\s*return\s*\(([\s\S]*?)\)\s*;?\s*}/g;
+
+function normalizeArrowReturn(text: string) {
+  return text.replace(ARROW_RETURN_RE, "=> ($1)");
+}
+
+const JSX_ATTRIBUTE_RE = /^([A-Za-z_$][\w$-]*)\b/;
+const JSX_SPREAD_RE = /^\{?\.\.\.[^}]+}?\s*,?$/;
+
+function isJsxAttributeLine(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed) {
+    return false;
+  }
+  if (JSX_SPREAD_RE.test(trimmed)) {
+    return true;
+  }
+  return JSX_ATTRIBUTE_RE.test(trimmed);
+}
+
+function getJsxAttributeKey(line: string) {
+  const trimmed = line.trim().replace(TRAILING_COMMA_RE, "");
+  if (JSX_SPREAD_RE.test(trimmed)) {
+    return null;
+  }
+  const match = JSX_ATTRIBUTE_RE.exec(trimmed);
+  return match?.[1] ?? null;
+}
+
+function sortJsxAttributeSegment(lines: string[]) {
+  const keyed = lines.map((line) => ({ line, key: getJsxAttributeKey(line) }));
+  if (keyed.some((entry) => !entry.key)) {
+    return lines;
+  }
+  const seen = new Set<string>();
+  for (const entry of keyed) {
+    if (!entry.key) {
+      return lines;
+    }
+    if (seen.has(entry.key)) {
+      return lines;
+    }
+    seen.add(entry.key);
+  }
+  return keyed
+    .sort((a, b) => {
+      if (a.key === b.key) {
+        return a.line.localeCompare(b.line);
+      }
+      return (a.key ?? "").localeCompare(b.key ?? "");
+    })
+    .map((entry) => entry.line);
+}
+
+function isJsxMultilineTagStart(line: string) {
+  return line.startsWith("<") && !line.startsWith("</") && !line.includes(">");
+}
+
+function findJsxAttributeBlock(lines: string[], startIndex: number) {
+  const attrLines: string[] = [];
+  const attrIndices: number[] = [];
+  for (let j = startIndex + 1; j < lines.length; j += 1) {
+    const line = lines[j] ?? "";
+    const lineTrimmed = line.trim();
+    if (lineTrimmed === ">" || lineTrimmed === "/>") {
+      return { end: j, attrLines, attrIndices };
+    }
+    attrLines.push(line);
+    attrIndices.push(j);
+  }
+  return null;
+}
+
+function buildSortedJsxAttributes(attrLines: string[]) {
+  if (attrLines.length < 2) {
+    return null;
+  }
+  if (!attrLines.every((line) => isJsxAttributeLine(line))) {
+    return null;
+  }
+  const segments: string[][] = [];
+  let segment: string[] = [];
+  for (const line of attrLines) {
+    if (JSX_SPREAD_RE.test(line.trim())) {
+      if (segment.length > 0) {
+        segments.push(sortJsxAttributeSegment(segment));
+        segment = [];
+      }
+      segments.push([line]);
+      continue;
+    }
+    segment.push(line);
+  }
+  if (segment.length > 0) {
+    segments.push(sortJsxAttributeSegment(segment));
+  }
+  return segments.flat();
+}
+
+function normalizeJsxAttributeOrder(text: string) {
+  const lines = text.split(LINE_SPLIT_RE);
+  const output = [...lines];
+
+  for (let i = 0; i < lines.length; i += 1) {
+    const trimmed = lines[i]?.trim() ?? "";
+    if (!isJsxMultilineTagStart(trimmed)) {
+      continue;
+    }
+    const block = findJsxAttributeBlock(lines, i);
+    if (!block) {
+      continue;
+    }
+    const sorted = buildSortedJsxAttributes(block.attrLines);
+    if (!sorted) {
+      i = block.end;
+      continue;
+    }
+    for (const [idx, targetIndex] of block.attrIndices.entries()) {
+      const existing = output[targetIndex] ?? "";
+      output[targetIndex] = sorted[idx] ?? existing;
+    }
+    i = block.end;
+  }
+  return output.join("\n");
 }
 
 const COSMETIC_LANGUAGES = new Set<NormalizerLanguage>([
@@ -723,6 +1071,26 @@ const COSMETIC_LANGUAGES = new Set<NormalizerLanguage>([
 
 function isCosmeticLanguage(language: NormalizerLanguage | undefined) {
   return language !== undefined && COSMETIC_LANGUAGES.has(language);
+}
+
+const WHITESPACE_RE = /\s+/g;
+
+function buildCompareText(
+  text: string,
+  language: NormalizerLanguage | undefined,
+  collapseWhitespace: boolean
+) {
+  if (!isCosmeticLanguage(language)) {
+    return text;
+  }
+  let normalized = normalizeCosmeticText(text);
+  if (collapseWhitespace) {
+    if (normalized.trim().length === 0) {
+      return " ";
+    }
+    normalized = normalized.replace(WHITESPACE_RE, " ").trim();
+  }
+  return normalized;
 }
 
 function extractJsonPairKey(text: string) {
@@ -754,9 +1122,12 @@ function isSideEffectImportLine(line: string) {
 }
 
 function normalizeCosmeticBlock(text: string) {
-  const lines = text
+  const normalizedText = normalizeJsxAttributeOrder(
+    normalizeArrowReturn(normalizeCosmeticText(text))
+  );
+  const lines = normalizedText
     .split(LINE_SPLIT_RE)
-    .map((line) => normalizeCosmeticText(line).trim())
+    .map((line) => line.trim())
     .filter(Boolean);
   if (lines.length === 0) {
     return "";
@@ -783,7 +1154,7 @@ function normalizeCosmeticBlock(text: string) {
 
 function suppressCosmeticUpdates(operations: DiffOperation[]) {
   return operations.filter((op) => {
-    if (op.type !== "update" || op.meta?.moveId) {
+    if (op.type !== "update") {
       return true;
     }
     if (!(op.oldText && op.newText)) {
@@ -795,10 +1166,75 @@ function suppressCosmeticUpdates(operations: DiffOperation[]) {
   });
 }
 
+const MOVE_SIGNATURE_CLEAN_RE = /[^A-Za-z0-9_@./-]+/g;
+
+function normalizeMoveSignature(text: string) {
+  return normalizeCosmeticText(text)
+    .replace(MOVE_SIGNATURE_CLEAN_RE, " ")
+    .trim();
+}
+
+function hasPropAssignment(text: string) {
+  return PROP_ASSIGN_RE.test(text);
+}
+
+function isCosmeticMove(oldText: string, newText: string) {
+  const oldNormalized = normalizeCosmeticBlock(oldText);
+  const newNormalized = normalizeCosmeticBlock(newText);
+  if (oldNormalized === newNormalized) {
+    if (oldNormalized.trim().length > 160) {
+      return false;
+    }
+    const lines = oldNormalized
+      .split(LINE_SPLIT_RE)
+      .map((line) => line.trim())
+      .filter(Boolean);
+    if (lines.length === 0) {
+      return true;
+    }
+    if (lines.length === 1 && PROP_ASSIGN_RE.test(lines[0] ?? "")) {
+      return true;
+    }
+    const joined = lines.join(" ");
+    return IMPORT_WORD_RE.test(joined) || FROM_WORD_RE.test(joined);
+  }
+  const oldSignature = normalizeMoveSignature(oldText);
+  const newSignature = normalizeMoveSignature(newText);
+  if (!oldSignature || oldSignature !== newSignature) {
+    return false;
+  }
+  const isImportMove =
+    IMPORT_WORD_RE.test(oldSignature) || FROM_WORD_RE.test(oldSignature);
+  const maxLength = isImportMove ? 160 : 80;
+  if (oldSignature.length > maxLength) {
+    return false;
+  }
+  if (isImportMove) {
+    return true;
+  }
+  return hasPropAssignment(oldText) || hasPropAssignment(newText);
+}
+
+function suppressCosmeticMoves(operations: DiffOperation[]) {
+  return operations.filter((op) => {
+    if (op.type !== "move") {
+      return true;
+    }
+    if (!(op.oldText && op.newText)) {
+      return true;
+    }
+    return !isCosmeticMove(op.oldText, op.newText);
+  });
+}
+
 interface UnitBlock {
   type: "delete" | "insert";
   start: number;
   units: DiffToken[];
+}
+
+function getComparableText(unit: DiffToken) {
+  return unit.compareText ?? unit.text;
 }
 
 function buildLcsTable(oldUnits: DiffToken[], newUnits: DiffToken[]) {
@@ -817,7 +1253,7 @@ function buildLcsTable(oldUnits: DiffToken[], newUnits: DiffToken[]) {
       if (!(row && downRow)) {
         continue;
       }
-      if (oldUnit.text === newUnit.text) {
+      if (getComparableText(oldUnit) === getComparableText(newUnit)) {
         row[j] = (downRow[j + 1] ?? 0) + 1;
       } else {
         row[j] = Math.max(downRow[j] ?? 0, row[j + 1] ?? 0);
@@ -856,7 +1292,11 @@ function diffUnits(oldUnits: DiffToken[], newUnits: DiffToken[]): UnitBlock[] {
     const hasNew = j < newUnits.length;
     const oldUnit = hasOld ? oldUnits[i] : undefined;
     const newUnit = hasNew ? newUnits[j] : undefined;
-    if (oldUnit && newUnit && oldUnit.text === newUnit.text) {
+    if (
+      oldUnit &&
+      newUnit &&
+      getComparableText(oldUnit) === getComparableText(newUnit)
+    ) {
       i += 1;
       j += 1;
       continue;
@@ -905,11 +1345,14 @@ function similarityRatio(a: string[], b: string[]) {
 }
 
 function normalizeMoveUnits(units: DiffToken[]) {
-  return units.filter((unit) => unit.text.trim().length > 0);
+  return units.filter((unit) => getComparableText(unit).trim().length > 0);
 }
 
 function moveUnitTextLength(units: DiffToken[]) {
-  return units.reduce((sum, unit) => sum + unit.text.trim().length, 0);
+  return units.reduce(
+    (sum, unit) => sum + getComparableText(unit).trim().length,
+    0
+  );
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: move detection requires branching on match confidence.
@@ -919,7 +1362,8 @@ function detectMoves(
   newTokens: DiffToken[],
   oldText: string,
   newText: string,
-  renameGroupId?: string
+  renameGroupId?: string,
+  language?: NormalizerLanguage
 ) {
   const deleteBlocks = blocks
     .map((block, index) => ({ block, index }))
@@ -957,8 +1401,8 @@ function detectMoves(
         continue;
       }
       const score = similarityRatio(
-        deleteUnits.map((unit) => unit.text),
-        insertUnits.map((unit) => unit.text)
+        deleteUnits.map((unit) => getComparableText(unit)),
+        insertUnits.map((unit) => getComparableText(unit))
       );
       if (score > bestScore) {
         bestScore = score;
@@ -1033,7 +1477,13 @@ function detectMoves(
       ...(meta ? { meta } : {}),
     });
 
-    if (bestScore < 1 || oldSlice !== newSlice) {
+    const comparableOld = isCosmeticLanguage(language)
+      ? normalizeCosmeticBlock(oldSlice)
+      : oldSlice;
+    const comparableNew = isCosmeticLanguage(language)
+      ? normalizeCosmeticBlock(newSlice)
+      : newSlice;
+    if (comparableOld !== comparableNew) {
       const updateId = `${moveId}-update-${opCounter++}`;
       moveGroup.operations.push(updateId);
       const updateMeta = buildMeta({
@@ -1185,7 +1635,15 @@ export function structuralDiff(
   const shouldDetectMoves =
     options?.detectMoves !== false && useStructuralTokens;
   const moveDetection = shouldDetectMoves
-    ? detectMoves(blocks, oldTokens, newTokens, oldText, newText, renameGroupId)
+    ? detectMoves(
+        blocks,
+        oldTokens,
+        newTokens,
+        oldText,
+        newText,
+        renameGroupId,
+        options?.language
+      )
     : ({
         moves: [],
         moveOps: [],
@@ -1287,18 +1745,23 @@ export function structuralDiff(
   }
 
   const coalesced = coalesceOperations(operations, oldText, newText);
-  const finalOps = useStructuralTokens
+  const baseOps = useStructuralTokens
     ? coalesced
     : suppressMovedLineOps(coalesced, oldText, newText);
+  const combinedOps = baseOps.concat(
+    moveDetection.moveOps,
+    moveDetection.nestedOps
+  );
   const sanitizedOps = isCosmeticLanguage(options?.language)
-    ? suppressCosmeticUpdates(finalOps)
-    : finalOps;
+    ? suppressCosmeticLineMoves(
+        suppressCosmeticMoves(suppressCosmeticUpdates(combinedOps)),
+        oldText,
+        newText
+      )
+    : combinedOps;
   return {
     version: "0.1.0",
-    operations: sanitizedOps.concat(
-      moveDetection.moveOps,
-      moveDetection.nestedOps
-    ),
+    operations: sanitizedOps,
     moves: moveDetection.moves,
     renames,
   };
