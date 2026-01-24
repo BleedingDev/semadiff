@@ -362,7 +362,7 @@ const buildFileDiffDocument = Effect.fn("PrDiff.buildFileDiffDocument")(
       oldText.length > MAX_FILE_SIZE || newText.length > MAX_FILE_SIZE;
     const binary = isBinary(oldText) || isBinary(newText);
 
-    if (oversized || binary) {
+    if (binary) {
       const warnings = buildFileWarnings({ oversized, binary });
       return {
         file: buildFileSummary(file, {
@@ -371,6 +371,25 @@ const buildFileDiffDocument = Effect.fn("PrDiff.buildFileDiffDocument")(
           ...(withWarnings(warnings) ?? {}),
         }),
         diff: emptyDiff(),
+        language: "text" as const,
+        oldText,
+        newText,
+      };
+    }
+
+    if (oversized) {
+      const warnings = buildFileWarnings({ oversized, binary });
+      const diff = structuralDiff(oldText, newText, {
+        normalizers: defaultConfig.normalizers,
+        language: "text",
+        detectMoves: false,
+      });
+      return {
+        file: buildFileSummary(file, {
+          oversized,
+          ...(withWarnings(warnings) ?? {}),
+        }),
+        diff,
         language: "text" as const,
         oldText,
         newText,
