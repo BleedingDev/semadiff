@@ -44,8 +44,9 @@ const tailwindRule: NormalizerRule = {
   language: "*",
   safety: "conservative",
   defaultEnabled: true,
-  apply: (text) =>
-    text.replace(
+  apply: (text) => {
+    const normalizedText = text.replace(/-\[var\((--[^)]+)\)\]/g, "-($1)");
+    return normalizedText.replace(
       /(class|className)=("([^"]*)"|'([^']*)')/g,
       (
         match: string,
@@ -60,13 +61,16 @@ const tailwindRule: NormalizerRule = {
         }
         const tokens = raw
           .split(WHITESPACE_SPLIT_RE)
-          .map((token) => token.trim())
+          .map((token) =>
+            token.trim().replace(/-\[var\((--[^)]+)\)\]/g, "-($1)")
+          )
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b));
         const normalized = tokens.join(" ");
         return `${attr}=${full[0]}${normalized}${full[0]}`;
       }
-    ),
+    );
+  },
 };
 
 const importOrderRule: NormalizerRule = {

@@ -90,6 +90,7 @@ const EMPTY_RANGE: Range = {
   end: { line: 1, column: 1 },
 };
 const LINE_SPLIT_RE = /\r?\n/;
+const TRAILING_LINE_BREAK_RE = /\r?\n$/;
 
 function rangeForText(text: string): Range {
   if (text.length === 0) {
@@ -111,6 +112,37 @@ function buildLineOffsets(text: string) {
     }
   }
   return offsets;
+}
+
+function positionToOffset(
+  position: Position,
+  lineOffsets: number[],
+  textLength: number
+) {
+  if (textLength === 0) {
+    return 0;
+  }
+  const lineIndex = Math.max(1, position.line) - 1;
+  const lineOffset =
+    lineOffsets[Math.min(lineIndex, lineOffsets.length - 1)] ?? textLength;
+  const columnOffset = Math.max(0, position.column - 1);
+  return Math.max(0, Math.min(textLength, lineOffset + columnOffset));
+}
+
+function sliceTextByRange(text: string, range: Range | undefined) {
+  if (!range) {
+    return "";
+  }
+  if (text.length === 0) {
+    return "";
+  }
+  const offsets = buildLineOffsets(text);
+  const start = positionToOffset(range.start, offsets, text.length);
+  const end = positionToOffset(range.end, offsets, text.length);
+  if (end <= start) {
+    return "";
+  }
+  return text.slice(start, end);
 }
 
 function offsetToPosition(offset: number, lineOffsets: number[]): Position {
@@ -297,6 +329,35 @@ function tokenizeRegex(text: string): DiffToken[] {
   return tokens;
 }
 
+function tokenizeLines(text: string): DiffToken[] {
+  const lineOffsets = buildLineOffsets(text);
+  const tokens: DiffToken[] = [];
+  if (lineOffsets.length === 0) {
+    return tokens;
+  }
+  for (let i = 0; i < lineOffsets.length; i += 1) {
+    const startIndex = lineOffsets[i] ?? 0;
+    const endIndex =
+      i + 1 < lineOffsets.length
+        ? (lineOffsets[i + 1] ?? text.length)
+        : text.length;
+    if (endIndex > startIndex) {
+      tokens.push(
+        makeToken(
+          text.slice(startIndex, endIndex),
+          startIndex,
+          endIndex,
+          lineOffsets
+        )
+      );
+    }
+  }
+  if (tokens.length === 0 && text.length > 0) {
+    tokens.push(makeToken(text, 0, text.length, lineOffsets));
+  }
+  return tokens;
+}
+
 function tokenize(
   text: string,
   root?: unknown,
@@ -309,6 +370,9 @@ function tokenize(
   const treeTokens = root ? tokenizeTreeSitter(text, root) : null;
   if (treeTokens && treeTokens.length > 0) {
     return treeTokens;
+  }
+  if (text.includes("\n")) {
+    return tokenizeLines(text);
   }
   return tokenizeRegex(text);
 }
@@ -342,6 +406,341 @@ function textForTokens(
   const startOffset = Math.max(0, Math.min(text.length, start.startIndex));
   const endOffset = Math.max(startOffset, Math.min(text.length, end.endIndex));
   return text.slice(startOffset, endOffset);
+}
+
+function comparePosition(a: Position, b: Position) {
+  if (a.line !== b.line) {
+    return a.line - b.line;
+  }
+  return a.column - b.column;
+}
+
+function minPosition(a: Position, b: Position) {
+  return comparePosition(a, b) <= 0 ? a : b;
+}
+
+function maxPosition(a: Position, b: Position) {
+  return comparePosition(a, b) >= 0 ? a : b;
+}
+
+function mergeRange(
+  a: Range | undefined,
+  b: Range | undefined
+): Range | undefined {
+  if (!(a || b)) {
+    return undefined;
+  }
+  if (!a) {
+    return b;
+  }
+  if (!b) {
+    return a;
+  }
+  return {
+    start: minPosition(a.start, b.start),
+    end: maxPosition(a.end, b.end),
+  };
+}
+
+function rangesAdjacent(a: Range | undefined, b: Range | undefined) {
+  if (!(a && b)) {
+    return false;
+  }
+  return b.start.line <= a.end.line + 1;
+}
+
+function sameMeta(left: DiffOperation["meta"], right: DiffOperation["meta"]) {
+  if (!(left || right)) {
+    return true;
+  }
+  if (!(left && right)) {
+    return false;
+  }
+  return (
+    left.moveId === right.moveId &&
+    left.renameGroupId === right.renameGroupId &&
+    left.confidence === right.confidence
+  );
+}
+
+function canMergeOperations(left: DiffOperation, right: DiffOperation) {
+  if (left.type !== right.type) {
+    return false;
+  }
+  if (left.type === "move" || right.type === "move") {
+    return false;
+  }
+  if (left.meta?.moveId || right.meta?.moveId) {
+    return false;
+  }
+  if (!sameMeta(left.meta, right.meta)) {
+    return false;
+  }
+  switch (left.type) {
+    case "insert":
+      return rangesAdjacent(left.newRange, right.newRange);
+    case "delete":
+      return rangesAdjacent(left.oldRange, right.oldRange);
+    case "update":
+      return (
+        rangesAdjacent(left.oldRange, right.oldRange) &&
+        rangesAdjacent(left.newRange, right.newRange)
+      );
+    default:
+      return false;
+  }
+}
+
+function mergeOperations(
+  left: DiffOperation,
+  right: DiffOperation,
+  oldText: string,
+  newText: string
+): DiffOperation {
+  const oldRange = mergeRange(left.oldRange, right.oldRange);
+  const newRange = mergeRange(left.newRange, right.newRange);
+  return {
+    id: left.id,
+    type: left.type,
+    oldRange,
+    newRange,
+    oldText: oldRange ? sliceTextByRange(oldText, oldRange) : undefined,
+    newText: newRange ? sliceTextByRange(newText, newRange) : undefined,
+    ...(left.meta ? { meta: left.meta } : {}),
+  };
+}
+
+function coalesceOperations(
+  operations: DiffOperation[],
+  oldText: string,
+  newText: string
+) {
+  if (operations.length === 0) {
+    return operations;
+  }
+  const result: DiffOperation[] = [];
+  let current: DiffOperation | null = null;
+
+  const flush = () => {
+    if (current) {
+      result.push(current);
+      current = null;
+    }
+  };
+
+  for (const op of operations) {
+    if (op.type === "move" || op.meta?.moveId) {
+      flush();
+      result.push(op);
+      continue;
+    }
+    if (!current) {
+      current = op;
+      continue;
+    }
+    if (canMergeOperations(current, op)) {
+      current = mergeOperations(current, op, oldText, newText);
+      continue;
+    }
+    flush();
+    current = op;
+  }
+
+  flush();
+  return result;
+}
+
+function isSingleLine(text: string | undefined) {
+  if (!text) {
+    return false;
+  }
+  const trimmed = text.replace(TRAILING_LINE_BREAK_RE, "");
+  return !(trimmed.includes("\n") || trimmed.includes("\r"));
+}
+
+function normalizeLineText(text: string) {
+  return text.replace(TRAILING_LINE_BREAK_RE, "").trimEnd();
+}
+
+type LineOpMap = Map<string, DiffOperation[]>;
+
+function indexSingleLineOps(operations: DiffOperation[]) {
+  const insertsByText: LineOpMap = new Map();
+  const deletesByText: LineOpMap = new Map();
+
+  for (const op of operations) {
+    if (op.type === "insert" && isSingleLine(op.newText)) {
+      const key = normalizeLineText(op.newText ?? "");
+      const list = insertsByText.get(key);
+      if (list) {
+        list.push(op);
+      } else {
+        insertsByText.set(key, [op]);
+      }
+      continue;
+    }
+    if (op.type === "delete" && isSingleLine(op.oldText)) {
+      const key = normalizeLineText(op.oldText ?? "");
+      const list = deletesByText.get(key);
+      if (list) {
+        list.push(op);
+      } else {
+        deletesByText.set(key, [op]);
+      }
+    }
+  }
+
+  return { insertsByText, deletesByText };
+}
+
+function popMatchingLineOp(map: LineOpMap, key: string, skipped: Set<string>) {
+  const list = map.get(key);
+  const match = list?.pop();
+  if (match) {
+    skipped.add(match.id);
+  }
+  return Boolean(match);
+}
+
+function updateToInsert(op: DiffOperation) {
+  return {
+    id: op.id,
+    type: "insert",
+    newRange: op.newRange,
+    newText: op.newText,
+    ...(op.meta ? { meta: op.meta } : {}),
+  } satisfies DiffOperation;
+}
+
+function updateToDelete(op: DiffOperation) {
+  return {
+    id: op.id,
+    type: "delete",
+    oldRange: op.oldRange,
+    oldText: op.oldText,
+    ...(op.meta ? { meta: op.meta } : {}),
+  } satisfies DiffOperation;
+}
+
+function toLineKey(text: string | undefined) {
+  return normalizeLineText(text ?? "");
+}
+
+function convertMovedLineUpdate(
+  op: DiffOperation,
+  insertsByText: LineOpMap,
+  deletesByText: LineOpMap,
+  skipped: Set<string>
+) {
+  if (
+    op.type !== "update" ||
+    !isSingleLine(op.oldText) ||
+    !isSingleLine(op.newText)
+  ) {
+    return null;
+  }
+
+  const oldKey = toLineKey(op.oldText);
+  const newKey = toLineKey(op.newText);
+
+  if (popMatchingLineOp(insertsByText, oldKey, skipped)) {
+    return updateToInsert(op);
+  }
+  if (popMatchingLineOp(deletesByText, newKey, skipped)) {
+    return updateToDelete(op);
+  }
+
+  return null;
+}
+
+function dropPairedLineMoves(
+  insertsByText: LineOpMap,
+  deletesByText: LineOpMap,
+  skipped: Set<string>
+) {
+  for (const [key, inserts] of insertsByText.entries()) {
+    const deletes = deletesByText.get(key);
+    if (!deletes || inserts.length === 0) {
+      continue;
+    }
+    while (inserts.length > 0 && deletes.length > 0) {
+      const insert = inserts.pop();
+      const del = deletes.pop();
+      if (insert) {
+        skipped.add(insert.id);
+      }
+      if (del) {
+        skipped.add(del.id);
+      }
+    }
+  }
+}
+
+function suppressMovedLineOps(operations: DiffOperation[]) {
+  const { insertsByText, deletesByText } = indexSingleLineOps(operations);
+
+  const skipped = new Set<string>();
+  const output: DiffOperation[] = [];
+
+  for (const op of operations) {
+    if (skipped.has(op.id)) {
+      continue;
+    }
+    const converted = convertMovedLineUpdate(
+      op,
+      insertsByText,
+      deletesByText,
+      skipped
+    );
+    if (converted) {
+      output.push(converted);
+      continue;
+    }
+    output.push(op);
+  }
+
+  dropPairedLineMoves(insertsByText, deletesByText, skipped);
+
+  return output.filter((op) => !skipped.has(op.id));
+}
+
+function normalizeCosmeticText(text: string) {
+  return text.replace(/'([^'\\]*)'/g, '"$1"');
+}
+
+function normalizeCosmeticBlock(text: string) {
+  const lines = text
+    .split(LINE_SPLIT_RE)
+    .map((line) => normalizeCosmeticText(line).trim())
+    .filter(Boolean);
+  if (lines.length === 0) {
+    return "";
+  }
+  const importLines = lines.filter(
+    (line) => line === '"use client"' || line.startsWith("import ")
+  );
+  if (importLines.length === lines.length) {
+    const useClient = importLines.filter((line) => line === '"use client"');
+    const imports = importLines
+      .filter((line) => line !== '"use client"')
+      .sort((a, b) => a.localeCompare(b));
+    return [...useClient, ...imports].join("\n");
+  }
+  return normalizeCosmeticText(text);
+}
+
+function suppressCosmeticUpdates(operations: DiffOperation[]) {
+  return operations.filter((op) => {
+    if (op.type !== "update" || op.meta?.moveId) {
+      return true;
+    }
+    if (!(op.oldText && op.newText)) {
+      return true;
+    }
+    const oldNormalized = normalizeCosmeticBlock(op.oldText);
+    const newNormalized = normalizeCosmeticBlock(op.newText);
+    return oldNormalized !== newNormalized;
+  });
 }
 
 interface UnitBlock {
@@ -713,23 +1112,23 @@ export function structuralDiff(
   const renameGroupId = renames[0]?.id;
   const renameMeta = renameGroupId ? { renameGroupId } : undefined;
 
-  const moveDetection =
-    options?.detectMoves === false
-      ? ({
-          moves: [],
-          moveOps: [],
-          nestedOps: [],
-          usedDeletes: new Set<number>(),
-          usedInserts: new Set<number>(),
-        } satisfies ReturnType<typeof detectMoves>)
-      : detectMoves(
-          blocks,
-          oldTokens,
-          newTokens,
-          oldText,
-          newText,
-          renameGroupId
-        );
+  const hasStructuralTokens = Boolean(
+    options?.oldRoot ||
+      options?.newRoot ||
+      (options?.oldTokens?.length ?? 0) > 0 ||
+      (options?.newTokens?.length ?? 0) > 0
+  );
+  const shouldDetectMoves =
+    options?.detectMoves !== false && hasStructuralTokens;
+  const moveDetection = shouldDetectMoves
+    ? detectMoves(blocks, oldTokens, newTokens, oldText, newText, renameGroupId)
+    : ({
+        moves: [],
+        moveOps: [],
+        nestedOps: [],
+        usedDeletes: new Set<number>(),
+        usedInserts: new Set<number>(),
+      } satisfies ReturnType<typeof detectMoves>);
 
   let opCounter = 1;
   const operations: DiffOperation[] = [];
@@ -805,9 +1204,14 @@ export function structuralDiff(
     });
   }
 
+  const coalesced = coalesceOperations(operations, oldText, newText);
+  const finalOps = hasStructuralTokens
+    ? coalesced
+    : suppressMovedLineOps(coalesced);
+  const sanitizedOps = suppressCosmeticUpdates(finalOps);
   return {
     version: "0.1.0",
-    operations: operations.concat(
+    operations: sanitizedOps.concat(
       moveDetection.moveOps,
       moveDetection.nestedOps
     ),
