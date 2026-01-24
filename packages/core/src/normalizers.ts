@@ -6,6 +6,7 @@ export type NormalizerLanguage =
   | "js"
   | "jsx"
   | "css"
+  | "json"
   | "md"
   | "toml"
   | "yaml"

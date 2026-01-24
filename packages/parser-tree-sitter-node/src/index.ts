@@ -9,6 +9,7 @@ import { Effect } from "effect";
 import Parser from "tree-sitter";
 import Css from "tree-sitter-css/bindings/node/index.js";
 import JavaScript from "tree-sitter-javascript";
+import Json from "tree-sitter-json";
 import Markdown from "tree-sitter-markdown";
 import Toml from "tree-sitter-toml";
 import TypeScript from "tree-sitter-typescript";
@@ -20,6 +21,7 @@ const languages = [
   "js",
   "jsx",
   "css",
+  "json",
   "md",
   "toml",
   "yaml",
@@ -65,6 +67,7 @@ const languageMap: Record<SupportedLanguage, TreeSitterLanguage> = {
   js: resolveLanguage(JavaScript, "javascript"),
   jsx: resolveLanguage(JavaScript, "jsx"),
   css: resolveLanguage(Css),
+  json: resolveLanguage(Json),
   md: resolveLanguage(Markdown, "markdown"),
   toml: resolveLanguage(Toml),
   yaml: resolveLanguage(Yaml),

@@ -6,6 +6,7 @@ export type LanguageId =
   | "js"
   | "jsx"
   | "css"
+  | "json"
   | "md"
   | "toml"
   | "yaml"
@@ -118,6 +119,8 @@ function selectLanguage(input: ParserInput): LanguageId {
         return "jsx";
       case "css":
         return "css";
+      case "json":
+        return "json";
       case "md":
       case "markdown":
         return "md";

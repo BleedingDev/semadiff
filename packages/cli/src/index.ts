@@ -69,6 +69,7 @@ const languageChoices = [
   "js",
   "jsx",
   "css",
+  "json",
   "md",
   "toml",
   "yaml",
@@ -107,6 +108,7 @@ const NormalizerLanguageSchema = Schema.Literal(
   "js",
   "jsx",
   "css",
+  "json",
   "md",
   "toml",
   "yaml",
@@ -284,6 +286,8 @@ function inferLanguageFromPath(path?: string): LanguageId | undefined {
       return "jsx";
     case "css":
       return "css";
+    case "json":
+      return "json";
     case "md":
     case "markdown":
       return "md";

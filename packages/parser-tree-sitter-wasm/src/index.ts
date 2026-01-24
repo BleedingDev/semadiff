@@ -14,6 +14,7 @@ const languages = [
   "js",
   "jsx",
   "css",
+  "json",
   "md",
   "toml",
   "yaml",
@@ -123,6 +124,10 @@ const languageWasmUrls: Record<SupportedLanguage, string> = {
   css: resolveWasmUrl(
     "tree-sitter-css/tree-sitter-css.wasm",
     "tree-sitter-css.wasm"
+  ),
+  json: resolveWasmUrl(
+    "tree-sitter-json/tree-sitter-json.wasm",
+    "tree-sitter-json.wasm"
   ),
   md: resolveWasmUrl(
     "@tree-sitter-grammars/tree-sitter-markdown/tree-sitter-markdown.wasm",

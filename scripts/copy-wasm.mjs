@@ -64,6 +64,11 @@ const wasmFiles = [
     target: "tree-sitter-css.wasm",
   },
   {
+    module: "tree-sitter-json",
+    candidates: ["tree-sitter-json.wasm", "dist/tree-sitter-json.wasm"],
+    target: "tree-sitter-json.wasm",
+  },
+  {
     module: "@tree-sitter-grammars/tree-sitter-markdown",
     candidates: ["tree-sitter-markdown.wasm"],
     target: "tree-sitter-markdown.wasm",

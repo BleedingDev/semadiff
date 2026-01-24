@@ -564,6 +564,19 @@ function normalizeLineText(text: string) {
 
 type LineOpMap = Map<string, DiffOperation[]>;
 
+function buildLineCounts(text: string) {
+  const counts = new Map<string, number>();
+  const lines = text.split(LINE_SPLIT_RE);
+  for (const line of lines) {
+    const key = normalizeLineText(line);
+    if (!key) {
+      continue;
+    }
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
+}
+
 function indexSingleLineOps(operations: DiffOperation[]) {
   const insertsByText: LineOpMap = new Map();
   const deletesByText: LineOpMap = new Map();
@@ -612,72 +625,40 @@ function updateToInsert(op: DiffOperation) {
   } satisfies DiffOperation;
 }
 
-function updateToDelete(op: DiffOperation) {
-  return {
-    id: op.id,
-    type: "delete",
-    oldRange: op.oldRange,
-    oldText: op.oldText,
-    ...(op.meta ? { meta: op.meta } : {}),
-  } satisfies DiffOperation;
-}
-
-function toLineKey(text: string | undefined) {
-  return normalizeLineText(text ?? "");
-}
-
-function convertMovedLineUpdate(
-  op: DiffOperation,
-  insertsByText: LineOpMap,
-  deletesByText: LineOpMap,
-  skipped: Set<string>
-) {
-  if (
-    op.type !== "update" ||
-    !isSingleLine(op.oldText) ||
-    !isSingleLine(op.newText)
-  ) {
-    return null;
-  }
-
-  const oldKey = toLineKey(op.oldText);
-  const newKey = toLineKey(op.newText);
-
-  if (popMatchingLineOp(insertsByText, oldKey, skipped)) {
-    return updateToInsert(op);
-  }
-  if (popMatchingLineOp(deletesByText, newKey, skipped)) {
-    return updateToDelete(op);
-  }
-
-  return null;
-}
-
 function dropPairedLineMoves(
   insertsByText: LineOpMap,
   deletesByText: LineOpMap,
-  skipped: Set<string>
+  skipped: Set<string>,
+  oldLineCounts: Map<string, number>,
+  newLineCounts: Map<string, number>
 ) {
   for (const [key, inserts] of insertsByText.entries()) {
     const deletes = deletesByText.get(key);
-    if (!deletes || inserts.length === 0) {
+    if (!deletes || inserts.length !== 1 || deletes.length !== 1) {
       continue;
     }
-    while (inserts.length > 0 && deletes.length > 0) {
-      const insert = inserts.pop();
-      const del = deletes.pop();
-      if (insert) {
-        skipped.add(insert.id);
-      }
-      if (del) {
-        skipped.add(del.id);
-      }
+    if ((oldLineCounts.get(key) ?? 0) !== (newLineCounts.get(key) ?? 0)) {
+      continue;
+    }
+    const insert = inserts[0];
+    const del = deletes[0];
+    if (insert) {
+      skipped.add(insert.id);
+    }
+    if (del) {
+      skipped.add(del.id);
     }
   }
 }
 
-function suppressMovedLineOps(operations: DiffOperation[]) {
+function suppressMovedLineOps(
+  operations: DiffOperation[],
+  oldText: string,
+  newText: string
+) {
   const { insertsByText, deletesByText } = indexSingleLineOps(operations);
+  const oldLineCounts = buildLineCounts(oldText);
+  const newLineCounts = buildLineCounts(newText);
 
   const skipped = new Set<string>();
   const output: DiffOperation[] = [];
@@ -686,26 +667,53 @@ function suppressMovedLineOps(operations: DiffOperation[]) {
     if (skipped.has(op.id)) {
       continue;
     }
-    const converted = convertMovedLineUpdate(
-      op,
-      insertsByText,
-      deletesByText,
-      skipped
-    );
-    if (converted) {
-      output.push(converted);
-      continue;
+    if (
+      op.type === "update" &&
+      isSingleLine(op.oldText) &&
+      isSingleLine(op.newText)
+    ) {
+      const oldKey = normalizeLineText(op.oldText ?? "");
+      const newKey = normalizeLineText(op.newText ?? "");
+      const oldKeyCount = oldLineCounts.get(oldKey) ?? 0;
+      const newKeyCount = newLineCounts.get(oldKey) ?? 0;
+      const oldNewKeyCount = oldLineCounts.get(newKey) ?? 0;
+      const newNewKeyCount = newLineCounts.get(newKey) ?? 0;
+      if (
+        oldKeyCount > 0 &&
+        oldKeyCount === newKeyCount &&
+        newNewKeyCount > oldNewKeyCount &&
+        popMatchingLineOp(insertsByText, oldKey, skipped)
+      ) {
+        output.push(updateToInsert(op));
+        continue;
+      }
     }
     output.push(op);
   }
 
-  dropPairedLineMoves(insertsByText, deletesByText, skipped);
+  dropPairedLineMoves(
+    insertsByText,
+    deletesByText,
+    skipped,
+    oldLineCounts,
+    newLineCounts
+  );
 
   return output.filter((op) => !skipped.has(op.id));
 }
 
 function normalizeCosmeticText(text: string) {
   return text.replace(/'([^'\\]*)'/g, '"$1"');
+}
+
+function isSideEffectImportLine(line: string) {
+  if (!line.startsWith("import ")) {
+    return false;
+  }
+  if (line.startsWith("import type ")) {
+    return false;
+  }
+  return !line.includes(" from ");
 }
 
 function normalizeCosmeticBlock(text: string) {
@@ -720,6 +728,13 @@ function normalizeCosmeticBlock(text: string) {
     (line) => line === '"use client"' || line.startsWith("import ")
   );
   if (importLines.length === lines.length) {
+    const hasSideEffectImport = importLines.some((line) =>
+      isSideEffectImportLine(line)
+    );
+    const useClientFirst = importLines[0] === '"use client"';
+    if (!useClientFirst || hasSideEffectImport) {
+      return importLines.join("\n");
+    }
     const useClient = importLines.filter((line) => line === '"use client"');
     const imports = importLines
       .filter((line) => line !== '"use client"')
@@ -1207,7 +1222,7 @@ export function structuralDiff(
   const coalesced = coalesceOperations(operations, oldText, newText);
   const finalOps = hasStructuralTokens
     ? coalesced
-    : suppressMovedLineOps(coalesced);
+    : suppressMovedLineOps(coalesced, oldText, newText);
   const sanitizedOps = suppressCosmeticUpdates(finalOps);
   return {
     version: "0.1.0",
