@@ -1107,6 +1107,86 @@ function backtrackEdits(
   return edits;
 }
 
+function getLineIndent(line: string) {
+  const match = line.match(LINE_INDENT_RE);
+  return match ? match[0] : "";
+}
+
+function collectDuplicateLineKeys(
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine: (line: string) => string
+) {
+  const counts = new Map<string, number>();
+  const add = (line: string) => {
+    const key = normalizeLine(line).trim();
+    if (!key) {
+      return;
+    }
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  };
+  for (const line of oldLines) {
+    add(line);
+  }
+  for (const line of newLines) {
+    add(line);
+  }
+  const duplicates = new Set<string>();
+  for (const [key, count] of counts) {
+    if (count > 1) {
+      duplicates.add(key);
+    }
+  }
+  return duplicates;
+}
+
+function buildComparableLines(
+  lines: string[],
+  normalizeLine: (line: string) => string,
+  duplicates: Set<string>,
+  importKeys?: (string | null)[]
+) {
+  return lines.map((line, index) => {
+    const normalized = normalizeLine(line);
+    const trimmed = normalized.trim();
+    if (!trimmed) {
+      return "";
+    }
+    const importKey = importKeys?.[index];
+    if (importKey) {
+      return `${trimmed}__${importKey}`;
+    }
+    if (!duplicates.has(trimmed)) {
+      return trimmed;
+    }
+    const indent = getLineIndent(line);
+    return `${indent}${trimmed}`;
+  });
+}
+
+function buildMultilineImportKeys(lines: string[]) {
+  const keys = new Array<string | null>(lines.length).fill(null);
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index] ?? "";
+    if (!MULTILINE_IMPORT_START_RE.test(line)) {
+      continue;
+    }
+    const scanLimit = Math.min(lines.length, index + 20);
+    for (let next = index + 1; next < scanLimit; next += 1) {
+      const candidate = lines[next] ?? "";
+      const match = MULTILINE_IMPORT_FROM_RE.exec(candidate);
+      if (match) {
+        keys[index] = match[1] ?? null;
+        break;
+      }
+      if (candidate.includes(";")) {
+        break;
+      }
+    }
+  }
+  return keys;
+}
+
 function buildRawLineRows(
   oldLines: string[],
   newLines: string[],
@@ -1117,12 +1197,31 @@ function buildRawLineRows(
   let oldComparable = oldLines;
   let newComparable = newLines;
   if (normalizeLine) {
+    const duplicates = useKeyMatching
+      ? new Set<string>()
+      : collectDuplicateLineKeys(oldLines, newLines, normalizeLine);
+    const importKeys = useKeyMatching
+      ? null
+      : {
+          old: buildMultilineImportKeys(oldLines),
+          next: buildMultilineImportKeys(newLines),
+        };
     oldComparable = useKeyMatching
       ? buildYamlComparableLines(oldLines, normalizeLine, true)
-      : oldLines.map((line) => normalizeLine(line));
+      : buildComparableLines(
+          oldLines,
+          normalizeLine,
+          duplicates,
+          importKeys?.old ?? undefined
+        );
     newComparable = useKeyMatching
       ? buildYamlComparableLines(newLines, normalizeLine, true)
-      : newLines.map((line) => normalizeLine(line));
+      : buildComparableLines(
+          newLines,
+          normalizeLine,
+          duplicates,
+          importKeys?.next ?? undefined
+        );
   }
   const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
   const blocks = buildLineBlocks(edits);
@@ -1133,6 +1232,261 @@ function buildRawLineRows(
     newLines,
     useKeyMatching
   );
+}
+
+function isMoveCandidateLine(text: string) {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return false;
+  }
+  return MOVE_CANDIDATE_RE.test(trimmed);
+}
+
+function getMoveKey(text: string, normalizeLine: (line: string) => string) {
+  if (!isMoveCandidateLine(text)) {
+    return null;
+  }
+  return normalizeLine(text);
+}
+
+function collectInsertMoveCandidates(
+  rows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  const insertByKey = new Map<string, number[]>();
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (row?.type !== "insert") {
+      continue;
+    }
+    const key = getMoveKey(row.text ?? "", normalizeLine);
+    if (!key) {
+      continue;
+    }
+    const list = insertByKey.get(key);
+    if (list) {
+      list.push(index);
+    } else {
+      insertByKey.set(key, [index]);
+    }
+  }
+  return insertByKey;
+}
+
+function takeFirstAvailable(list: number[] | undefined, used: Set<number>) {
+  if (!list || list.length === 0) {
+    return null;
+  }
+  let matchIndex = list[0];
+  while (matchIndex !== undefined && used.has(matchIndex)) {
+    list.shift();
+    matchIndex = list[0];
+  }
+  return matchIndex ?? null;
+}
+
+function pairIdenticalLineMoves(
+  rows: LineRow[],
+  normalizeLine?: (line: string) => string
+) {
+  if (!normalizeLine) {
+    return rows;
+  }
+  const insertByKey = collectInsertMoveCandidates(rows, normalizeLine);
+  if (insertByKey.size === 0) {
+    return rows;
+  }
+  const used = new Set<number>();
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    if (used.has(index)) {
+      continue;
+    }
+    const row = rows[index];
+    if (!row) {
+      continue;
+    }
+    if (row.type !== "delete") {
+      output.push(row);
+      continue;
+    }
+    const text = row.text ?? "";
+    const key = getMoveKey(text, normalizeLine);
+    if (!key) {
+      output.push(row);
+      continue;
+    }
+    const matchIndex = takeFirstAvailable(insertByKey.get(key), used);
+    if (matchIndex === null) {
+      output.push(row);
+      continue;
+    }
+    used.add(matchIndex);
+    const insertRow = rows[matchIndex];
+    output.push({
+      type: "equal",
+      oldLine: row.oldLine ?? null,
+      newLine: insertRow?.newLine ?? null,
+      text,
+    });
+  }
+  return output;
+}
+
+function buildNormalizedLineCounts(
+  lines: string[],
+  normalizeLine: (line: string) => string
+) {
+  const counts = new Map<string, number>();
+  for (const line of lines) {
+    const key = normalizeLine(line);
+    if (!key.trim()) {
+      continue;
+    }
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function suppressBalancedLineChanges(
+  rows: LineRow[],
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine?: (line: string) => string
+) {
+  if (!normalizeLine) {
+    return rows;
+  }
+  const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
+  const newCounts = buildNormalizedLineCounts(newLines, normalizeLine);
+  const balanced = new Set<string>();
+  for (const [key, count] of oldCounts) {
+    if (count > 0 && count === (newCounts.get(key) ?? 0)) {
+      balanced.add(key);
+    }
+  }
+  if (balanced.size === 0) {
+    return rows;
+  }
+  return rows.filter((row) => {
+    if (row?.type !== "insert" && row?.type !== "delete") {
+      return true;
+    }
+    const text = row.text ?? "";
+    if (!isMoveCandidateLine(text)) {
+      return true;
+    }
+    return !balanced.has(normalizeLine(text));
+  });
+}
+
+function suppressImportBlockStarts(rows: LineRow[]) {
+  return rows.filter((row) => {
+    if (row?.type !== "insert" && row?.type !== "delete") {
+      return true;
+    }
+    const text = row.text ?? "";
+    return !IMPORT_BLOCK_START_RE.test(text.trim());
+  });
+}
+
+function extractPropNames(text: string) {
+  const names = new Set<string>();
+  JSX_PROP_EXTRACT_RE.lastIndex = 0;
+  let match = JSX_PROP_EXTRACT_RE.exec(text);
+  while (match) {
+    if (match[1]) {
+      names.add(match[1]);
+    }
+    match = JSX_PROP_EXTRACT_RE.exec(text);
+  }
+  return names;
+}
+
+function suppressInlinePropChanges(rows: LineRow[]) {
+  const propsInInserts = new Set<string>();
+  for (const row of rows) {
+    let text = "";
+    if (row?.type === "replace") {
+      text = row.newText ?? "";
+    } else if (row?.type === "insert") {
+      text = row.text ?? "";
+    }
+    if (!text.includes("<")) {
+      continue;
+    }
+    for (const name of extractPropNames(text)) {
+      propsInInserts.add(name);
+    }
+  }
+
+  return rows.filter((row) => {
+    if (row?.type !== "delete") {
+      return true;
+    }
+    const text = row.text ?? "";
+    const match = JSX_PROP_LINE_RE.exec(text.trim());
+    if (!match) {
+      return true;
+    }
+    const name = match[1];
+    if (!name) {
+      return true;
+    }
+    return !propsInInserts.has(name);
+  });
+}
+
+function suppressRepeatedYamlChanges(
+  rows: LineRow[],
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine?: (line: string) => string
+) {
+  if (!normalizeLine) {
+    return rows;
+  }
+  const oldCounts = new Map<string, number>();
+  const newCounts = new Map<string, number>();
+  for (const line of oldLines) {
+    const key = normalizeLine(line).trim();
+    if (!key) {
+      continue;
+    }
+    oldCounts.set(key, (oldCounts.get(key) ?? 0) + 1);
+  }
+  for (const line of newLines) {
+    const key = normalizeLine(line).trim();
+    if (!key) {
+      continue;
+    }
+    newCounts.set(key, (newCounts.get(key) ?? 0) + 1);
+  }
+  const shared = new Set<string>();
+  for (const [key, count] of oldCounts) {
+    const nextCount = newCounts.get(key) ?? 0;
+    if (count < YAML_SHARED_THRESHOLD || nextCount < YAML_SHARED_THRESHOLD) {
+      continue;
+    }
+    const ratio = Math.abs(count - nextCount) / Math.max(count, nextCount);
+    if (ratio <= YAML_SHARED_DIFF_RATIO) {
+      shared.add(key);
+    }
+  }
+  if (shared.size === 0) {
+    return rows;
+  }
+  return rows.filter((row) => {
+    if (row?.type !== "insert" && row?.type !== "delete") {
+      return true;
+    }
+    const text = row.text ?? "";
+    const key = normalizeLine(text).trim();
+    if (!key) {
+      return true;
+    }
+    return !shared.has(key);
+  });
 }
 
 interface LineBlock {
@@ -1386,9 +1740,19 @@ const LINE_MATCH_KEYWORDS = new Set([
 const LINE_MATCH_IDENTIFIER_RE = /[A-Za-z_$][\w$]*/g;
 const LINE_MATCH_NUMBER_RE = /\b\d+(?:\.\d+)?\b/g;
 const LINE_MATCH_STRING_RE = /(["'])(?:\\.|(?!\1).)*\1/g;
+const SIMPLE_ASSIGN_RE = /^([A-Za-z_$][\w$-]*)(\s*[?:=])([\s\S]*)$/;
 const LINE_MATCH_CODE_HINT_RE =
   /\b(import|export|return|const|let|var|function|class|interface|type|enum|async|await|throw|new)\b|=>|=/;
 const YAML_KEY_RE = /^(\s*)([^:]+):(?:\s|$)/;
+const MOVE_CANDIDATE_RE = /[A-Za-z0-9]/;
+const LINE_INDENT_RE = /^\s*/;
+const MULTILINE_IMPORT_START_RE = /^\s*import\s+(?:type\s+)?\{\s*$/;
+const MULTILINE_IMPORT_FROM_RE = /\bfrom\s+["']([^"']+)["']/;
+const IMPORT_BLOCK_START_RE = /^(?:import|export)\s+\{$/;
+const JSX_PROP_LINE_RE = /^([A-Za-z_$][\w$-]*)\s*=/;
+const JSX_PROP_EXTRACT_RE = /([A-Za-z_$][\w$-]*)\s*=/g;
+const YAML_SHARED_THRESHOLD = 10;
+const YAML_SHARED_DIFF_RATIO = 0.058;
 
 function isLineComment(line: string) {
   const trimmed = line.trim();
@@ -1520,6 +1884,20 @@ function buildLineMatchKey(
     }
     return "*__COMMENT__";
   }
+  const assignMatch = SIMPLE_ASSIGN_RE.exec(trimmed);
+  if (assignMatch) {
+    const identifier = assignMatch[1] ?? "";
+    if (identifier && !LINE_MATCH_KEYWORDS.has(identifier)) {
+      const separator = assignMatch[2] ?? "=";
+      let output = assignMatch[3] ?? "";
+      output = output.replace(LINE_MATCH_STRING_RE, '"__STR__"');
+      output = output.replace(LINE_MATCH_NUMBER_RE, "__NUM__");
+      output = output.replace(LINE_MATCH_IDENTIFIER_RE, (token) =>
+        LINE_MATCH_KEYWORDS.has(token) ? token : "__ID__"
+      );
+      return `${identifier}${separator}${output}`;
+    }
+  }
   if (!LINE_MATCH_CODE_HINT_RE.test(trimmed)) {
     return trimmed;
   }
@@ -1560,9 +1938,43 @@ function resolveLooseYamlComparable(
   key: string
 ) {
   if (topKey === "packages" && indent === 2) {
-    return "__PKG_HEADER__";
+    return `__PKG__${key}`;
   }
   return key;
+}
+
+function resolveLooseYamlComparableWithPackages(
+  topKey: string,
+  indent: number,
+  key: string,
+  currentPackage: string,
+  packageStack: { indent: number; key: string }[]
+) {
+  if (topKey !== "packages") {
+    return {
+      key: resolveLooseYamlComparable(topKey, indent, key),
+      currentPackage,
+    };
+  }
+  if (indent === 2) {
+    packageStack.length = 0;
+    return { key: `__PKG__${key}`, currentPackage: key };
+  }
+  if (!currentPackage || indent <= 2) {
+    return {
+      key: resolveLooseYamlComparable(topKey, indent, key),
+      currentPackage,
+    };
+  }
+  while (
+    packageStack.length > 0 &&
+    (packageStack.at(-1)?.indent ?? 0) >= indent
+  ) {
+    packageStack.pop();
+  }
+  packageStack.push({ indent, key });
+  const path = packageStack.map((entry) => entry.key).join(">");
+  return { key: `${currentPackage}::${path}`, currentPackage };
 }
 
 function buildYamlComparableLines(
@@ -1572,7 +1984,9 @@ function buildYamlComparableLines(
 ) {
   const comparables: string[] = [];
   const stack: { indent: number; key: string }[] = [];
+  const packageStack: { indent: number; key: string }[] = [];
   let topKey = "";
+  let currentPackage = "";
   for (const line of lines) {
     const normalized = normalizeLine(line);
     const trimmed = normalized.trim();
@@ -1589,9 +2003,19 @@ function buildYamlComparableLines(
     const { indent, key } = parsed;
     if (indent === 0) {
       topKey = key;
+      currentPackage = "";
+      packageStack.length = 0;
     }
     if (looseKeys) {
-      comparables.push(resolveLooseYamlComparable(topKey, indent, key));
+      const resolved = resolveLooseYamlComparableWithPackages(
+        topKey,
+        indent,
+        key,
+        currentPackage,
+        packageStack
+      );
+      currentPackage = resolved.currentPackage;
+      comparables.push(resolved.key);
       continue;
     }
     while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
@@ -1754,17 +2178,51 @@ function appendAlignedReplaceRows(
   normalizeLine: (line: string) => string,
   preferIndexPairing?: boolean
 ) {
-  const oldComparable = deleteLines.map((line) =>
-    buildLineMatchKey(line, normalizeLine)
+  const importOldKeys = buildMultilineImportKeys(deleteLines);
+  const importNewKeys = buildMultilineImportKeys(insertLines);
+  const oldComparable = deleteLines.map((line, index) => {
+    const key = buildLineMatchKey(line, normalizeLine);
+    const importKey = importOldKeys[index];
+    return importKey ? `${key}__${importKey}` : key;
+  });
+  const newComparable = insertLines.map((line, index) => {
+    const key = buildLineMatchKey(line, normalizeLine);
+    const importKey = importNewKeys[index];
+    return importKey ? `${key}__${importKey}` : key;
+  });
+  const oldKeyCounts = buildLineKeyCounts(oldComparable, (line) => line);
+  const newKeyCounts = buildLineKeyCounts(newComparable, (line) => line);
+  const disambiguate = (
+    line: string,
+    key: string,
+    oldCount: number,
+    newCount: number
+  ) => (oldCount > 1 || newCount > 1 ? `${key}__${normalizeLine(line)}` : key);
+  const resolvedOldComparable = oldComparable.map((key, index) =>
+    key
+      ? disambiguate(
+          deleteLines[index] ?? "",
+          key,
+          oldKeyCounts.get(key) ?? 0,
+          newKeyCounts.get(key) ?? 0
+        )
+      : key
   );
-  const newComparable = insertLines.map((line) =>
-    buildLineMatchKey(line, normalizeLine)
+  const resolvedNewComparable = newComparable.map((key, index) =>
+    key
+      ? disambiguate(
+          insertLines[index] ?? "",
+          key,
+          oldKeyCounts.get(key) ?? 0,
+          newKeyCounts.get(key) ?? 0
+        )
+      : key
   );
   const edits = diffLines(
     deleteLines,
     insertLines,
-    oldComparable,
-    newComparable
+    resolvedOldComparable,
+    resolvedNewComparable
   );
   const indexCost =
     lineLayout === "unified"
@@ -1778,9 +2236,12 @@ function appendAlignedReplaceRows(
   );
   const maxLen = Math.max(deleteLines.length, insertLines.length);
   const matchRatio = maxLen > 0 ? equalCount / maxLen : 0;
+  const hasReorderableLines =
+    deleteLines.some(isReorderableLine) && insertLines.some(isReorderableLine);
   const shouldIndexPair =
-    alignedCost > indexCost ||
-    (preferIndexPairing && matchRatio > 0 && matchRatio < 0.35);
+    !hasReorderableLines &&
+    (alignedCost > indexCost ||
+      (preferIndexPairing && matchRatio > 0 && matchRatio < 0.35));
   if (shouldIndexPair) {
     return lineLayout === "unified"
       ? appendUnifiedReplaceRows(
@@ -2071,6 +2532,212 @@ function buildLineMarkSets(
   return { changedOld, changedNew, movedOld, movedNew };
 }
 
+function expandRangeLines(range: Range | undefined, maxLine: number) {
+  if (!range || maxLine <= 0) {
+    return [];
+  }
+  let start = Math.max(1, Math.min(maxLine, range.start.line));
+  let end = Math.max(1, Math.min(maxLine, range.end.line));
+  if (range.end.column <= 1 && end > start) {
+    end -= 1;
+  }
+  if (end < start) {
+    [start, end] = [end, start];
+  }
+  const lines: number[] = [];
+  for (let line = start; line <= end; line += 1) {
+    lines.push(line);
+  }
+  return lines;
+}
+
+function buildMoveLineMap(
+  operations: DiffOperation[],
+  oldLineCount: number,
+  newLineCount: number
+) {
+  const oldToNew = new Map<number, number>();
+  const newToOld = new Map<number, number>();
+  for (const op of operations) {
+    if (op.type !== "move") {
+      continue;
+    }
+    const oldLines = expandRangeLines(op.oldRange, oldLineCount);
+    const newLines = expandRangeLines(op.newRange, newLineCount);
+    const total = Math.min(oldLines.length, newLines.length);
+    for (let idx = 0; idx < total; idx += 1) {
+      const oldLine = oldLines[idx];
+      const newLine = newLines[idx];
+      if (!(oldLine && newLine)) {
+        continue;
+      }
+      if (oldToNew.has(oldLine) || newToOld.has(newLine)) {
+        continue;
+      }
+      oldToNew.set(oldLine, newLine);
+      newToOld.set(newLine, oldLine);
+    }
+  }
+  return { oldToNew, newToOld };
+}
+
+interface MoveRowEntry {
+  row: LineRow;
+  index: number;
+}
+
+function collectMoveRows(rows: LineRow[]) {
+  const oldMoves = new Map<number, MoveRowEntry>();
+  const newMoves = new Map<number, MoveRowEntry>();
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (!row || row.type !== "move") {
+      continue;
+    }
+    const hasOld = row.oldLine != null;
+    const hasNew = row.newLine != null;
+    if (hasOld && !hasNew) {
+      oldMoves.set(row.oldLine ?? 0, { row, index });
+      continue;
+    }
+    if (hasNew && !hasOld) {
+      newMoves.set(row.newLine ?? 0, { row, index });
+    }
+  }
+  return { oldMoves, newMoves };
+}
+
+function buildMergedMoveRow(
+  oldLine: number,
+  newLine: number,
+  oldText: string,
+  newText: string,
+  normalizeLine: (line: string) => string
+): LineRow {
+  if (normalizeLine(oldText) === normalizeLine(newText)) {
+    return { type: "equal", oldLine, newLine, text: oldText };
+  }
+  return { type: "move", oldLine, newLine, oldText, newText };
+}
+
+function mergeMoveFromOld(
+  row: LineRow,
+  newMoves: Map<number, MoveRowEntry>,
+  oldToNew: Map<number, number>,
+  used: Set<number>,
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine: (line: string) => string
+): LineRow | null {
+  if (row.oldLine == null || row.newLine != null) {
+    return null;
+  }
+  const oldLine = row.oldLine;
+  const newLine = oldToNew.get(oldLine) ?? null;
+  if (!newLine) {
+    return null;
+  }
+  const match = newMoves.get(newLine) ?? null;
+  if (!match) {
+    return null;
+  }
+  used.add(match.index);
+  const oldText = oldLines[oldLine - 1] ?? row.oldText ?? row.text ?? "";
+  const newText =
+    newLines[newLine - 1] ?? match.row.newText ?? match.row.text ?? "";
+  return buildMergedMoveRow(oldLine, newLine, oldText, newText, normalizeLine);
+}
+
+function mergeMoveFromNew(
+  row: LineRow,
+  oldMoves: Map<number, MoveRowEntry>,
+  newToOld: Map<number, number>,
+  used: Set<number>,
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine: (line: string) => string
+): LineRow | null {
+  if (row.newLine == null || row.oldLine != null) {
+    return null;
+  }
+  const newLine = row.newLine;
+  const oldLine = newToOld.get(newLine) ?? null;
+  if (!oldLine) {
+    return null;
+  }
+  const match = oldMoves.get(oldLine) ?? null;
+  if (!match) {
+    return null;
+  }
+  used.add(match.index);
+  const oldText =
+    oldLines[oldLine - 1] ?? match.row.oldText ?? match.row.text ?? "";
+  const newText = newLines[newLine - 1] ?? row.newText ?? row.text ?? "";
+  return buildMergedMoveRow(oldLine, newLine, oldText, newText, normalizeLine);
+}
+
+function collapseMoveRows(
+  rows: LineRow[],
+  operations: DiffOperation[],
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine?: (line: string) => string
+) {
+  if (!normalizeLine || rows.length === 0) {
+    return rows;
+  }
+  const { oldToNew, newToOld } = buildMoveLineMap(
+    operations,
+    oldLines.length,
+    newLines.length
+  );
+  if (oldToNew.size === 0) {
+    return rows;
+  }
+
+  const { oldMoves, newMoves } = collectMoveRows(rows);
+  if (oldMoves.size === 0 && newMoves.size === 0) {
+    return rows;
+  }
+
+  const used = new Set<number>();
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    if (used.has(index)) {
+      continue;
+    }
+    const row = rows[index];
+    if (!row) {
+      continue;
+    }
+    if (row.type !== "move") {
+      output.push(row);
+      continue;
+    }
+    const merged =
+      mergeMoveFromOld(
+        row,
+        newMoves,
+        oldToNew,
+        used,
+        oldLines,
+        newLines,
+        normalizeLine
+      ) ??
+      mergeMoveFromNew(
+        row,
+        oldMoves,
+        newToOld,
+        used,
+        oldLines,
+        newLines,
+        normalizeLine
+      );
+    output.push(merged ?? row);
+  }
+  return output;
+}
+
 function toEqualRow(row: LineRow): LineRow {
   return {
     type: "equal",
@@ -2257,6 +2924,7 @@ function buildLineRows(
     normalizeLine,
     useKeyMatching
   );
+  rows = pairIdenticalLineMoves(rows, normalizeLine);
   if (applyOperations) {
     rows = applyLineOperations(
       rows,
@@ -2265,6 +2933,24 @@ function buildLineRows(
       newLines.length,
       normalizeLine
     );
+    rows = collapseMoveRows(
+      rows,
+      operations,
+      oldLines,
+      newLines,
+      normalizeLine
+    );
+    rows = suppressBalancedLineChanges(rows, oldLines, newLines, normalizeLine);
+    rows = suppressImportBlockStarts(rows);
+    rows = suppressInlinePropChanges(rows);
+    if (useKeyMatching) {
+      rows = suppressRepeatedYamlChanges(
+        rows,
+        oldLines,
+        newLines,
+        normalizeLine
+      );
+    }
   }
   return applyLineContext(rows, contextLines);
 }
