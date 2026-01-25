@@ -673,7 +673,7 @@ function renderSummary(diff: DiffDocument) {
 function renderSemanticFallbackWarning() {
   return `
     <section class="sd-warning" role="alert">
-      <div class="sd-warning-title">Semantic diff collapsed all changes</div>
+      <div class="sd-warning-title">Semantic line view hid edits</div>
       <div class="sd-warning-body">
         Raw line diff is shown to avoid hiding edits. This file needs a stronger semantic normalizer.
       </div>
@@ -2743,7 +2743,8 @@ function buildLineRows(
   normalizeLine?: (line: string) => string,
   operations: DiffOperation[] = [],
   useKeyMatching?: boolean,
-  applyOperations = true
+  applyOperations = true,
+  applySuppression = true
 ): LineRow[] {
   const oldLines = splitLines(oldText);
   const newLines = splitLines(newText);
@@ -2770,16 +2771,23 @@ function buildLineRows(
       newLines,
       normalizeLine
     );
-    rows = suppressBalancedLineChanges(rows, oldLines, newLines, normalizeLine);
-    rows = suppressImportBlockStarts(rows);
-    rows = suppressInlinePropChanges(rows);
-    if (useKeyMatching) {
-      rows = suppressRepeatedYamlChanges(
+    if (applySuppression) {
+      rows = suppressBalancedLineChanges(
         rows,
         oldLines,
         newLines,
         normalizeLine
       );
+      rows = suppressImportBlockStarts(rows);
+      rows = suppressInlinePropChanges(rows);
+      if (useKeyMatching) {
+        rows = suppressRepeatedYamlChanges(
+          rows,
+          oldLines,
+          newLines,
+          normalizeLine
+        );
+      }
     }
   }
   return applyLineContext(rows, contextLines);
@@ -3461,6 +3469,17 @@ function renderLineView(
     (oldText.includes("lockfileVersion:") && oldText.includes("importers:")) ||
     (newText.includes("lockfileVersion:") && newText.includes("importers:"));
   const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
+  const rawRows = buildLineRows(
+    oldText,
+    newText,
+    context.contextLines,
+    context.lineLayout,
+    undefined,
+    diff.operations,
+    false,
+    false,
+    false
+  );
   let rows = buildLineRows(
     oldText,
     newText,
@@ -3469,7 +3488,8 @@ function renderLineView(
     normalizeLine,
     diff.operations,
     useKeyMatching,
-    context.lineMode === "semantic"
+    context.lineMode === "semantic",
+    false
   );
   if (context.lineMode === "semantic" && normalizeLine) {
     rows = filterSemanticRows(rows, normalizeLine);
@@ -3478,31 +3498,23 @@ function renderLineView(
     rows = filterLockfileRows(rows);
   }
   const hideComments = Boolean(options.hideComments);
-  if (hideComments) {
-    rows = applyLineContext(
-      filterCommentRows(stripContextRows(rows), options.language),
+  const applyHideComments = (nextRows: LineRow[]) =>
+    applyLineContext(
+      filterCommentRows(stripContextRows(nextRows), options.language),
       context.contextLines
     );
-  }
+  const rawForCompare = hideComments ? applyHideComments(rawRows) : rawRows;
+  let rowsForCompare = hideComments ? applyHideComments(rows) : rows;
   let warningHtml = "";
   if (
     context.lineMode === "semantic" &&
     normalizeLine &&
-    !hideComments &&
-    !hasLineChanges(rows)
+    !hasLineChanges(rowsForCompare)
   ) {
     warningHtml = renderSemanticFallbackWarning();
-    rows = buildLineRows(
-      oldText,
-      newText,
-      context.contextLines,
-      context.lineLayout,
-      undefined,
-      diff.operations,
-      false,
-      false
-    );
+    rowsForCompare = rawForCompare;
   }
+  rows = rowsForCompare;
   if (!hasLineChanges(rows)) {
     return "";
   }
