@@ -219,9 +219,12 @@ const diffCacheKey = (
   file: PullRequestFile,
   contextLines: number,
   lineLayout: "split" | "unified",
+  lineMode: "semantic" | "raw" | undefined,
   detectMoves: boolean
-) =>
-  `${CACHE_VERSION}:diff:${ref.owner}/${ref.repo}@${pr.base.sha}..${pr.head.sha}:${file.filename}:ctx=${contextLines}:layout=${lineLayout}:moves=${detectMoves ? "on" : "off"}`;
+) => {
+  const mode = lineMode ?? "semantic";
+  return `${CACHE_VERSION}:diff:${ref.owner}/${ref.repo}@${pr.base.sha}..${pr.head.sha}:${file.filename}:ctx=${contextLines}:layout=${lineLayout}:mode=${mode}:moves=${detectMoves ? "on" : "off"}`;
+};
 
 const diffDocumentCacheKey = (
   ref: { owner: string; repo: string },
@@ -229,9 +232,10 @@ const diffDocumentCacheKey = (
   file: PullRequestFile,
   contextLines: number,
   lineLayout: "split" | "unified",
-  detectMoves: boolean
+  detectMoves: boolean,
+  lineMode?: "semantic" | "raw"
 ) =>
-  `${diffCacheKey(ref, pr, file, contextLines, lineLayout, detectMoves)}:doc`;
+  `${diffCacheKey(ref, pr, file, contextLines, lineLayout, lineMode, detectMoves)}:doc`;
 
 const fetchFilePair = Effect.fn("PrDiff.fetchFilePair")(function* (
   getFileText: GitHubClientService["getFileText"],
@@ -425,6 +429,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
   file: PullRequestFile,
   contextLines: number,
   lineLayout: "split" | "unified",
+  lineMode: "semantic" | "raw",
   detectMoves: boolean
 ) {
   const {
@@ -467,7 +472,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     title: `SemaDiff · ${summary.filename}`,
     filePath: summary.filename,
     view: "lines",
-    lineMode: "semantic",
+    lineMode,
     oldText,
     newText,
     contextLines,
@@ -598,6 +603,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
         filename: string,
         contextLines: number,
         lineLayout: "split" | "unified",
+        lineMode: "semantic" | "raw",
         detectMoves: boolean
       ) {
         const { ref, pr, files, fileMap } = yield* getPrData(prUrl);
@@ -613,6 +619,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
           file,
           contextLines,
           lineLayout,
+          lineMode,
           detectMoves
         );
         const cached = yield* cache.get(key);
@@ -629,6 +636,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
           file,
           contextLines,
           lineLayout,
+          lineMode,
           detectMoves
         );
         yield* cache.set(
@@ -660,7 +668,8 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
             file,
             contextLines,
             lineLayout,
-            detectMoves
+            detectMoves,
+            undefined
           );
           const cached = yield* cache.get(key);
           if (Option.isSome(cached)) {

@@ -271,7 +271,7 @@ const getDiffEmptyMessage = (file: PrFileSummary) => {
   if (file.oversized) {
     return "File too large for semantic diff (over 1MB).";
   }
-  return "No semantic changes detected.";
+  return "No changes detected.";
 };
 
 interface PrefetchState {
@@ -322,6 +322,7 @@ interface DiffPanelHeaderProps {
   selectedFile: string | null;
   view: "semantic" | "lines";
   lineLayout: "split" | "unified";
+  lineMode: "semantic" | "raw";
   lineContextLines: number;
   compareMoves: boolean;
   minimapEnabled: boolean;
@@ -329,6 +330,7 @@ interface DiffPanelHeaderProps {
   onRefresh: () => void;
   onViewChange: (view: "semantic" | "lines") => void;
   onLineLayoutChange: (layout: "split" | "unified") => void;
+  onLineModeChange: (mode: "semantic" | "raw") => void;
   onLineContextChange: (value: number) => void;
   onNavigate: (direction: "next" | "prev") => void;
   onMinimapToggle: () => void;
@@ -516,6 +518,7 @@ function DiffPanelHeader({
   selectedFile,
   view,
   lineLayout,
+  lineMode,
   lineContextLines,
   compareMoves,
   minimapEnabled,
@@ -523,6 +526,7 @@ function DiffPanelHeader({
   onRefresh,
   onViewChange,
   onLineLayoutChange,
+  onLineModeChange,
   onLineContextChange,
   onNavigate,
   onMinimapToggle,
@@ -564,7 +568,7 @@ function DiffPanelHeader({
           active={view === "semantic"}
           onClick={() => onViewChange("semantic")}
         >
-          Semantic
+          Ops
         </ToggleButton>
         <ToggleButton
           active={view === "lines"}
@@ -572,6 +576,23 @@ function DiffPanelHeader({
         >
           Lines
         </ToggleButton>
+        {view === "lines" && (
+          <div className="sd-control-group">
+            <span className="sd-control-label">Line Mode</span>
+            <ToggleButton
+              active={lineMode === "semantic"}
+              onClick={() => onLineModeChange("semantic")}
+            >
+              Semantic
+            </ToggleButton>
+            <ToggleButton
+              active={lineMode === "raw"}
+              onClick={() => onLineModeChange("raw")}
+            >
+              Raw
+            </ToggleButton>
+          </div>
+        )}
         <ToggleButton
           active={lineLayout === "split"}
           onClick={() => onLineLayoutChange("split")}
@@ -724,6 +745,7 @@ function DiffPanel({
   selectedFile,
   view,
   lineLayout,
+  lineMode,
   lineContextLines,
   compareMoves,
   minimapEnabled,
@@ -731,6 +753,7 @@ function DiffPanel({
   onRefresh,
   onViewChange,
   onLineLayoutChange,
+  onLineModeChange,
   onLineContextChange,
   onNavigate,
   onMinimapToggle,
@@ -748,10 +771,12 @@ function DiffPanel({
         hasDiff={hasDiff}
         lineContextLines={lineContextLines}
         lineLayout={lineLayout}
+        lineMode={lineMode}
         minimapEnabled={minimapEnabled}
         onCompareMovesChange={onCompareMovesChange}
         onLineContextChange={onLineContextChange}
         onLineLayoutChange={onLineLayoutChange}
+        onLineModeChange={onLineModeChange}
         onMinimapToggle={onMinimapToggle}
         onNavigate={onNavigate}
         onRefresh={onRefresh}
@@ -803,8 +828,9 @@ function App() {
     total: 0,
     runId: 0,
   });
-  const [view, setView] = useState<"semantic" | "lines">("semantic");
+  const [view, setView] = useState<"semantic" | "lines">("lines");
   const [lineLayout, setLineLayout] = useState<"split" | "unified">("split");
+  const [lineMode, setLineMode] = useState<"semantic" | "raw">("semantic");
   const [lineContextLines, setLineContextLines] = useState(3);
   const [refreshToken, setRefreshToken] = useState(0);
   const [minimapEnabled, setMinimapEnabled] = useState(true);
@@ -970,6 +996,7 @@ function App() {
             filename,
             contextLines: lineContextLines,
             lineLayout,
+            lineMode,
             detectMoves: compareMoves,
           },
           signal: controller.signal,
@@ -1018,6 +1045,7 @@ function App() {
     summary,
     search.pr,
     lineLayout,
+    lineMode,
     lineContextLines,
     refreshToken,
     compareMoves,
@@ -1140,10 +1168,12 @@ function App() {
           iframeRef={iframeRef}
           lineContextLines={lineContextLines}
           lineLayout={lineLayout}
+          lineMode={lineMode}
           minimapEnabled={minimapEnabled}
           onCompareMovesChange={(next) => setCompareMoves(next)}
           onLineContextChange={(next) => setLineContextLines(next)}
           onLineLayoutChange={(next) => setLineLayout(next)}
+          onLineModeChange={setLineMode}
           onMinimapToggle={() => setMinimapEnabled((value) => !value)}
           onNavigate={sendNavigate}
           onRefresh={() => setRefreshToken((value) => value + 1)}
