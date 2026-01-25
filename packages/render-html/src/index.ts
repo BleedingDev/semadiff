@@ -154,6 +154,29 @@ body.sd-embed {
   margin-top: 6px;
 }
 
+.sd-warning {
+  margin: 18px 0 10px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 153, 51, 0.7);
+  background: linear-gradient(135deg, rgba(255, 153, 51, 0.22), rgba(15, 23, 42, 0.88));
+  box-shadow: 0 14px 30px rgba(255, 94, 0, 0.18);
+}
+
+.sd-warning-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  font-weight: 700;
+  color: #ffcc80;
+}
+
+.sd-warning-body {
+  font-size: 14px;
+  margin-top: 8px;
+  color: #ffe1b3;
+}
+
 .sd-highlight {
   display: flex;
   flex-wrap: wrap;
@@ -818,6 +841,17 @@ function renderSummary(diff: DiffDocument) {
   return `
     <section class="sd-summary">${cardMarkup}</section>
     ${highlights.length > 0 ? `<div class="sd-highlight">${highlights.join(" ")}</div>` : ""}
+  `;
+}
+
+function renderSemanticFallbackWarning() {
+  return `
+    <section class="sd-warning" role="alert">
+      <div class="sd-warning-title">Semantic diff collapsed all changes</div>
+      <div class="sd-warning-body">
+        Raw line diff is shown to avoid hiding edits. This file needs a stronger semantic normalizer.
+      </div>
+    </section>
   `;
 }
 
@@ -2786,9 +2820,30 @@ function renderLineView(
   if (useKeyMatching) {
     rows = filterLockfileRows(rows);
   }
-  if (context.lineMode === "semantic" && !hasLineChanges(rows)) {
+  let warningHtml = "";
+  if (
+    context.lineMode === "semantic" &&
+    normalizeLine &&
+    !hasLineChanges(rows)
+  ) {
+    warningHtml = renderSemanticFallbackWarning();
+    rows = buildLineRows(
+      oldText,
+      newText,
+      context.contextLines,
+      context.lineLayout,
+      undefined,
+      diff.operations,
+      false
+    );
+  }
+  if (!hasLineChanges(rows)) {
     return "";
   }
+
+  const summaryHtml = [context.summaryHtml, warningHtml]
+    .filter(Boolean)
+    .join("\n");
 
   if (!context.virtualize) {
     const body = rows
@@ -2800,7 +2855,7 @@ function renderLineView(
       layout: context.layout,
       headerHtml: context.headerHtml,
       filePathHtml: context.filePathHtml,
-      summaryHtml: context.summaryHtml,
+      summaryHtml,
       sectionHtml,
     });
   }
@@ -2820,7 +2875,7 @@ function renderLineView(
     layout: context.layout,
     headerHtml: context.headerHtml,
     filePathHtml: context.filePathHtml,
-    summaryHtml: context.summaryHtml,
+    summaryHtml,
     sectionHtml,
     statusHtml,
     payload,
