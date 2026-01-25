@@ -16,6 +16,7 @@ export interface HtmlRenderOptions {
   title?: string;
   view?: "semantic" | "lines";
   lineMode?: "raw" | "semantic";
+  hideComments?: boolean;
   oldText?: string;
   newText?: string;
   contextLines?: number;
@@ -1398,6 +1399,42 @@ function isLineComment(line: string) {
   );
 }
 
+function isCommentLineForLanguage(line: string, language?: NormalizerLanguage) {
+  if (!language || language === "*" || language === "text") {
+    return false;
+  }
+  const trimmed = line.trim();
+  if (!trimmed) {
+    return false;
+  }
+  switch (language) {
+    case "ts":
+    case "tsx":
+    case "js":
+    case "jsx":
+      return (
+        trimmed.startsWith("//") ||
+        trimmed.startsWith("/*") ||
+        trimmed.startsWith("*") ||
+        trimmed.startsWith("*/") ||
+        trimmed.startsWith("{/*")
+      );
+    case "css":
+      return (
+        trimmed.startsWith("/*") ||
+        trimmed.startsWith("*") ||
+        trimmed.startsWith("*/")
+      );
+    case "yaml":
+    case "toml":
+      return trimmed.startsWith("#");
+    case "md":
+      return trimmed.startsWith("<!--");
+    default:
+      return false;
+  }
+}
+
 function buildLineMatchKey(
   line: string,
   normalizeLine: (line: string) => string
@@ -2515,6 +2552,47 @@ function filterLockfileRows(rows: LineRow[]) {
   });
 }
 
+function stripContextRows(rows: LineRow[]) {
+  return rows.filter((row) => row.type !== "gap" && row.type !== "hunk");
+}
+
+function isCommentRow(row: LineRow, language?: NormalizerLanguage) {
+  switch (row.type) {
+    case "insert":
+      return isCommentLineForLanguage(rowNewText(row), language);
+    case "delete":
+      return isCommentLineForLanguage(rowOldText(row), language);
+    case "replace":
+      return (
+        isCommentLineForLanguage(rowOldText(row), language) &&
+        isCommentLineForLanguage(rowNewText(row), language)
+      );
+    case "move": {
+      const oldIs =
+        row.oldLine !== null &&
+        isCommentLineForLanguage(rowOldText(row), language);
+      const newIs =
+        row.newLine !== null &&
+        isCommentLineForLanguage(rowNewText(row), language);
+      if (row.oldLine !== null && row.newLine !== null) {
+        return oldIs && newIs;
+      }
+      return oldIs || newIs;
+    }
+    case "equal":
+      return isCommentLineForLanguage(rowText(row), language);
+    default:
+      return false;
+  }
+}
+
+function filterCommentRows(rows: LineRow[], language?: NormalizerLanguage) {
+  if (!language || language === "*" || language === "text") {
+    return rows;
+  }
+  return rows.filter((row) => !isCommentRow(row, language));
+}
+
 function hasLineChanges(rows: LineRow[]) {
   return rows.some(
     (row) =>
@@ -2824,10 +2902,18 @@ function renderLineView(
   if (useKeyMatching) {
     rows = filterLockfileRows(rows);
   }
+  const hideComments = Boolean(options.hideComments);
+  if (hideComments) {
+    rows = applyLineContext(
+      filterCommentRows(stripContextRows(rows), options.language),
+      context.contextLines
+    );
+  }
   let warningHtml = "";
   if (
     context.lineMode === "semantic" &&
     normalizeLine &&
+    !hideComments &&
     !hasLineChanges(rows)
   ) {
     warningHtml = renderSemanticFallbackWarning();

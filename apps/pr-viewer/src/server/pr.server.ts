@@ -13,6 +13,7 @@ interface FileDiffInput {
   contextLines?: number;
   lineLayout?: "split" | "unified";
   lineMode?: "semantic" | "raw";
+  hideComments?: boolean;
   detectMoves?: boolean;
 }
 
@@ -176,6 +177,7 @@ export const getFileDiff = createServerFn({ method: "GET" })
         : 3;
     const lineLayout = data.lineLayout === "unified" ? "unified" : "split";
     const lineMode = data.lineMode === "raw" ? "raw" : "semantic";
+    const hideComments = data.hideComments === true;
     const detectMoves =
       typeof data.detectMoves === "boolean" ? data.detectMoves : true;
     return runServerEffect(
@@ -187,6 +189,7 @@ export const getFileDiff = createServerFn({ method: "GET" })
           contextLines,
           lineLayout,
           lineMode,
+          hideComments,
           detectMoves
         );
       })

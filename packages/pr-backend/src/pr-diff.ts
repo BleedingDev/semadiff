@@ -220,10 +220,11 @@ const diffCacheKey = (
   contextLines: number,
   lineLayout: "split" | "unified",
   lineMode: "semantic" | "raw" | undefined,
+  hideComments: boolean,
   detectMoves: boolean
 ) => {
   const mode = lineMode ?? "semantic";
-  return `${CACHE_VERSION}:diff:${ref.owner}/${ref.repo}@${pr.base.sha}..${pr.head.sha}:${file.filename}:ctx=${contextLines}:layout=${lineLayout}:mode=${mode}:moves=${detectMoves ? "on" : "off"}`;
+  return `${CACHE_VERSION}:diff:${ref.owner}/${ref.repo}@${pr.base.sha}..${pr.head.sha}:${file.filename}:ctx=${contextLines}:layout=${lineLayout}:mode=${mode}:comments=${hideComments ? "hide" : "show"}:moves=${detectMoves ? "on" : "off"}`;
 };
 
 const diffDocumentCacheKey = (
@@ -235,7 +236,7 @@ const diffDocumentCacheKey = (
   detectMoves: boolean,
   lineMode?: "semantic" | "raw"
 ) =>
-  `${diffCacheKey(ref, pr, file, contextLines, lineLayout, lineMode, detectMoves)}:doc`;
+  `${diffCacheKey(ref, pr, file, contextLines, lineLayout, lineMode, false, detectMoves)}:doc`;
 
 const fetchFilePair = Effect.fn("PrDiff.fetchFilePair")(function* (
   getFileText: GitHubClientService["getFileText"],
@@ -430,6 +431,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
   contextLines: number,
   lineLayout: "split" | "unified",
   lineMode: "semantic" | "raw",
+  hideComments: boolean,
   detectMoves: boolean
 ) {
   const {
@@ -473,6 +475,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     filePath: summary.filename,
     view: "lines",
     lineMode,
+    hideComments,
     oldText,
     newText,
     contextLines,
@@ -604,6 +607,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
         contextLines: number,
         lineLayout: "split" | "unified",
         lineMode: "semantic" | "raw",
+        hideComments: boolean,
         detectMoves: boolean
       ) {
         const { ref, pr, files, fileMap } = yield* getPrData(prUrl);
@@ -620,6 +624,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
           contextLines,
           lineLayout,
           lineMode,
+          hideComments,
           detectMoves
         );
         const cached = yield* cache.get(key);
@@ -637,6 +642,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
           contextLines,
           lineLayout,
           lineMode,
+          hideComments,
           detectMoves
         );
         yield* cache.set(

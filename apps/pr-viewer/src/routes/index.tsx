@@ -323,6 +323,7 @@ interface DiffPanelHeaderProps {
   view: "semantic" | "lines";
   lineLayout: "split" | "unified";
   lineMode: "semantic" | "raw";
+  hideComments: boolean;
   lineContextLines: number;
   compareMoves: boolean;
   minimapEnabled: boolean;
@@ -331,6 +332,7 @@ interface DiffPanelHeaderProps {
   onViewChange: (view: "semantic" | "lines") => void;
   onLineLayoutChange: (layout: "split" | "unified") => void;
   onLineModeChange: (mode: "semantic" | "raw") => void;
+  onHideCommentsChange: (value: boolean) => void;
   onLineContextChange: (value: number) => void;
   onNavigate: (direction: "next" | "prev") => void;
   onMinimapToggle: () => void;
@@ -519,6 +521,7 @@ function DiffPanelHeader({
   view,
   lineLayout,
   lineMode,
+  hideComments,
   lineContextLines,
   compareMoves,
   minimapEnabled,
@@ -527,6 +530,7 @@ function DiffPanelHeader({
   onViewChange,
   onLineLayoutChange,
   onLineModeChange,
+  onHideCommentsChange,
   onLineContextChange,
   onNavigate,
   onMinimapToggle,
@@ -590,6 +594,23 @@ function DiffPanelHeader({
               onClick={() => onLineModeChange("raw")}
             >
               Raw
+            </ToggleButton>
+          </div>
+        )}
+        {view === "lines" && (
+          <div className="sd-control-group">
+            <span className="sd-control-label">Comments</span>
+            <ToggleButton
+              active={!hideComments}
+              onClick={() => onHideCommentsChange(false)}
+            >
+              Show
+            </ToggleButton>
+            <ToggleButton
+              active={hideComments}
+              onClick={() => onHideCommentsChange(true)}
+            >
+              Hide
             </ToggleButton>
           </div>
         )}
@@ -746,6 +767,7 @@ function DiffPanel({
   view,
   lineLayout,
   lineMode,
+  hideComments,
   lineContextLines,
   compareMoves,
   minimapEnabled,
@@ -754,6 +776,7 @@ function DiffPanel({
   onViewChange,
   onLineLayoutChange,
   onLineModeChange,
+  onHideCommentsChange,
   onLineContextChange,
   onNavigate,
   onMinimapToggle,
@@ -769,11 +792,13 @@ function DiffPanel({
       <DiffPanelHeader
         compareMoves={compareMoves}
         hasDiff={hasDiff}
+        hideComments={hideComments}
         lineContextLines={lineContextLines}
         lineLayout={lineLayout}
         lineMode={lineMode}
         minimapEnabled={minimapEnabled}
         onCompareMovesChange={onCompareMovesChange}
+        onHideCommentsChange={onHideCommentsChange}
         onLineContextChange={onLineContextChange}
         onLineLayoutChange={onLineLayoutChange}
         onLineModeChange={onLineModeChange}
@@ -831,6 +856,7 @@ function App() {
   const [view, setView] = useState<"semantic" | "lines">("lines");
   const [lineLayout, setLineLayout] = useState<"split" | "unified">("split");
   const [lineMode, setLineMode] = useState<"semantic" | "raw">("semantic");
+  const [hideComments, setHideComments] = useState(false);
   const [lineContextLines, setLineContextLines] = useState(3);
   const [refreshToken, setRefreshToken] = useState(0);
   const [minimapEnabled, setMinimapEnabled] = useState(true);
@@ -997,6 +1023,7 @@ function App() {
             contextLines: lineContextLines,
             lineLayout,
             lineMode,
+            hideComments,
             detectMoves: compareMoves,
           },
           signal: controller.signal,
@@ -1046,6 +1073,7 @@ function App() {
     search.pr,
     lineLayout,
     lineMode,
+    hideComments,
     lineContextLines,
     refreshToken,
     compareMoves,
@@ -1165,12 +1193,14 @@ function App() {
           diffHtml={diffHtml ?? null}
           diffLoading={diffLoading}
           hasDiff={hasDiff}
+          hideComments={hideComments}
           iframeRef={iframeRef}
           lineContextLines={lineContextLines}
           lineLayout={lineLayout}
           lineMode={lineMode}
           minimapEnabled={minimapEnabled}
           onCompareMovesChange={(next) => setCompareMoves(next)}
+          onHideCommentsChange={setHideComments}
           onLineContextChange={(next) => setLineContextLines(next)}
           onLineLayoutChange={(next) => setLineLayout(next)}
           onLineModeChange={setLineMode}
