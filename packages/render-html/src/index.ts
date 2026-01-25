@@ -1076,13 +1076,28 @@ function buildRawLineRows(
   oldLines: string[],
   newLines: string[],
   lineLayout: "split" | "unified",
-  normalizeLine?: (line: string) => string
+  normalizeLine?: (line: string) => string,
+  useKeyMatching?: boolean
 ): LineRow[] {
-  const oldComparable = normalizeLine ? oldLines.map(normalizeLine) : oldLines;
-  const newComparable = normalizeLine ? newLines.map(normalizeLine) : newLines;
+  let oldComparable = oldLines;
+  let newComparable = newLines;
+  if (normalizeLine) {
+    oldComparable = useKeyMatching
+      ? buildYamlComparableLines(oldLines, normalizeLine, true)
+      : oldLines.map((line) => normalizeLine(line));
+    newComparable = useKeyMatching
+      ? buildYamlComparableLines(newLines, normalizeLine, true)
+      : newLines.map((line) => normalizeLine(line));
+  }
   const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
   const blocks = buildLineBlocks(edits);
-  return buildRowsFromBlocks(blocks, lineLayout, normalizeLine);
+  return buildRowsFromBlocks(
+    blocks,
+    lineLayout,
+    normalizeLine,
+    newLines,
+    useKeyMatching
+  );
 }
 
 interface LineBlock {
@@ -1283,6 +1298,182 @@ function reorderInsertLines(
   return applyReorderedLines(newLines, next.keyByIndex, old.keys, buckets);
 }
 
+const LINE_MATCH_KEYWORDS = new Set([
+  "import",
+  "export",
+  "from",
+  "return",
+  "const",
+  "let",
+  "var",
+  "function",
+  "class",
+  "interface",
+  "type",
+  "enum",
+  "async",
+  "await",
+  "if",
+  "else",
+  "switch",
+  "case",
+  "default",
+  "for",
+  "while",
+  "do",
+  "try",
+  "catch",
+  "finally",
+  "throw",
+  "new",
+  "extends",
+  "implements",
+  "public",
+  "private",
+  "protected",
+  "readonly",
+  "static",
+  "get",
+  "set",
+  "yield",
+  "typeof",
+  "instanceof",
+  "in",
+  "of",
+  "as",
+  "asserts",
+  "satisfies",
+  "void",
+  "null",
+  "true",
+  "false",
+]);
+const LINE_MATCH_IDENTIFIER_RE = /[A-Za-z_$][\w$]*/g;
+const LINE_MATCH_NUMBER_RE = /\b\d+(?:\.\d+)?\b/g;
+const LINE_MATCH_STRING_RE = /(["'])(?:\\.|(?!\1).)*\1/g;
+const LINE_MATCH_CODE_HINT_RE =
+  /\b(import|export|return|const|let|var|function|class|interface|type|enum|async|await|throw|new)\b|=>|=/;
+const YAML_KEY_RE = /^(\s*)([^:]+):(?:\s|$)/;
+
+function isLineComment(line: string) {
+  const trimmed = line.trim();
+  return (
+    trimmed.startsWith("//") ||
+    trimmed.startsWith("/*") ||
+    trimmed.startsWith("*")
+  );
+}
+
+function buildLineMatchKey(
+  line: string,
+  normalizeLine: (line: string) => string
+) {
+  const normalized = normalizeLine(line);
+  const trimmed = normalized.trim();
+  if (!trimmed) {
+    return "";
+  }
+  const yamlMatch = YAML_KEY_RE.exec(normalized);
+  if (yamlMatch) {
+    const indent = yamlMatch[1] ?? "";
+    const key = (yamlMatch[2] ?? "").trim();
+    if (key) {
+      return `${indent}${key}:`;
+    }
+  }
+  if (isLineComment(trimmed)) {
+    if (trimmed.startsWith("//")) {
+      return "//__COMMENT__";
+    }
+    if (trimmed.startsWith("/*")) {
+      return "/*__COMMENT__";
+    }
+    return "*__COMMENT__";
+  }
+  if (!LINE_MATCH_CODE_HINT_RE.test(trimmed)) {
+    return trimmed;
+  }
+  let output = normalized.replace(LINE_MATCH_STRING_RE, '"__STR__"');
+  output = output.replace(LINE_MATCH_NUMBER_RE, "__NUM__");
+  output = output.replace(LINE_MATCH_IDENTIFIER_RE, (token) =>
+    LINE_MATCH_KEYWORDS.has(token) ? token : "__ID__"
+  );
+  return output;
+}
+
+function getSimpleYamlComparable(trimmed: string) {
+  if (!trimmed) {
+    return "";
+  }
+  if (isLineComment(trimmed)) {
+    return trimmed;
+  }
+  return null;
+}
+
+function parseYamlKey(normalized: string) {
+  const match = YAML_KEY_RE.exec(normalized);
+  if (!match) {
+    return null;
+  }
+  const indent = (match[1] ?? "").length;
+  const key = (match[2] ?? "").trim();
+  if (!key) {
+    return null;
+  }
+  return { indent, key };
+}
+
+function resolveLooseYamlComparable(
+  topKey: string,
+  indent: number,
+  key: string
+) {
+  if (topKey === "packages" && indent === 2) {
+    return "__PKG_HEADER__";
+  }
+  return key;
+}
+
+function buildYamlComparableLines(
+  lines: string[],
+  normalizeLine: (line: string) => string,
+  looseKeys?: boolean
+) {
+  const comparables: string[] = [];
+  const stack: { indent: number; key: string }[] = [];
+  let topKey = "";
+  for (const line of lines) {
+    const normalized = normalizeLine(line);
+    const trimmed = normalized.trim();
+    const simple = getSimpleYamlComparable(trimmed);
+    if (simple !== null) {
+      comparables.push(simple);
+      continue;
+    }
+    const parsed = parseYamlKey(normalized);
+    if (!parsed) {
+      comparables.push(normalized);
+      continue;
+    }
+    const { indent, key } = parsed;
+    if (indent === 0) {
+      topKey = key;
+    }
+    if (looseKeys) {
+      comparables.push(resolveLooseYamlComparable(topKey, indent, key));
+      continue;
+    }
+    while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
+      stack.pop();
+    }
+    stack.push({ indent, key });
+    const path = stack.map((entry) => entry.key).join(">");
+    comparables.push(path);
+  }
+  return comparables;
+}
+
 function appendUnifiedReplaceRows(
   rows: LineRow[],
   deleteLines: string[],
@@ -1301,6 +1492,191 @@ function appendUnifiedReplaceRows(
     nextNew += 1;
   }
   return { oldLine: nextOld, newLine: nextNew };
+}
+
+function computeAlignedCost(
+  edits: LineEdit[],
+  deleteLines: string[],
+  insertLines: string[],
+  lineLayout: "split" | "unified"
+) {
+  let alignedCost = 0;
+  let equalCount = 0;
+  let oldIndex = 0;
+  let newIndex = 0;
+  for (const edit of edits) {
+    if (edit.type === "equal") {
+      equalCount += 1;
+      const oldText = deleteLines[oldIndex] ?? "";
+      const newText = insertLines[newIndex] ?? "";
+      if (oldText !== newText) {
+        alignedCost += lineLayout === "unified" ? 2 : 1;
+      }
+      oldIndex += 1;
+      newIndex += 1;
+      continue;
+    }
+    if (edit.type === "delete") {
+      alignedCost += 1;
+      oldIndex += 1;
+      continue;
+    }
+    alignedCost += 1;
+    newIndex += 1;
+  }
+  return { alignedCost, equalCount };
+}
+
+function appendAlignedEditsRows(
+  rows: LineRow[],
+  edits: LineEdit[],
+  deleteLines: string[],
+  insertLines: string[],
+  oldLine: number,
+  newLine: number,
+  lineLayout: "split" | "unified"
+) {
+  let nextOld = oldLine;
+  let nextNew = newLine;
+  let oldIndex = 0;
+  let newIndex = 0;
+  for (const edit of edits) {
+    if (edit.type === "equal") {
+      const oldText = deleteLines[oldIndex] ?? "";
+      const newText = insertLines[newIndex] ?? "";
+      if (lineLayout === "unified") {
+        if (oldText === newText) {
+          rows.push({
+            type: "equal",
+            oldLine: nextOld,
+            newLine: nextNew,
+            text: oldText,
+          });
+        } else {
+          rows.push({
+            type: "delete",
+            oldLine: nextOld,
+            newLine: null,
+            text: oldText,
+          });
+          rows.push({
+            type: "insert",
+            oldLine: null,
+            newLine: nextNew,
+            text: newText,
+          });
+        }
+      } else if (oldText === newText) {
+        rows.push({
+          type: "equal",
+          oldLine: nextOld,
+          newLine: nextNew,
+          text: oldText,
+        });
+      } else {
+        rows.push({
+          type: "replace",
+          oldLine: nextOld,
+          newLine: nextNew,
+          oldText,
+          newText,
+        });
+      }
+      nextOld += 1;
+      nextNew += 1;
+      oldIndex += 1;
+      newIndex += 1;
+      continue;
+    }
+    if (edit.type === "delete") {
+      const oldText = deleteLines[oldIndex] ?? "";
+      rows.push({
+        type: "delete",
+        oldLine: nextOld,
+        newLine: null,
+        text: oldText,
+      });
+      nextOld += 1;
+      oldIndex += 1;
+      continue;
+    }
+    const newText = insertLines[newIndex] ?? "";
+    rows.push({
+      type: "insert",
+      oldLine: null,
+      newLine: nextNew,
+      text: newText,
+    });
+    nextNew += 1;
+    newIndex += 1;
+  }
+
+  return { oldLine: nextOld, newLine: nextNew };
+}
+
+function appendAlignedReplaceRows(
+  rows: LineRow[],
+  deleteLines: string[],
+  insertLines: string[],
+  oldLine: number,
+  newLine: number,
+  lineLayout: "split" | "unified",
+  normalizeLine: (line: string) => string,
+  preferIndexPairing?: boolean
+) {
+  const oldComparable = deleteLines.map((line) =>
+    buildLineMatchKey(line, normalizeLine)
+  );
+  const newComparable = insertLines.map((line) =>
+    buildLineMatchKey(line, normalizeLine)
+  );
+  const edits = diffLines(
+    deleteLines,
+    insertLines,
+    oldComparable,
+    newComparable
+  );
+  const indexCost =
+    lineLayout === "unified"
+      ? deleteLines.length + insertLines.length
+      : Math.max(deleteLines.length, insertLines.length);
+  const { alignedCost, equalCount } = computeAlignedCost(
+    edits,
+    deleteLines,
+    insertLines,
+    lineLayout
+  );
+  const maxLen = Math.max(deleteLines.length, insertLines.length);
+  const matchRatio = maxLen > 0 ? equalCount / maxLen : 0;
+  const shouldIndexPair =
+    alignedCost > indexCost ||
+    (preferIndexPairing && matchRatio > 0 && matchRatio < 0.35);
+  if (shouldIndexPair) {
+    return lineLayout === "unified"
+      ? appendUnifiedReplaceRows(
+          rows,
+          deleteLines,
+          insertLines,
+          oldLine,
+          newLine
+        )
+      : appendSplitReplaceRows(
+          rows,
+          deleteLines,
+          insertLines,
+          oldLine,
+          newLine
+        );
+  }
+  return appendAlignedEditsRows(
+    rows,
+    edits,
+    deleteLines,
+    insertLines,
+    oldLine,
+    newLine,
+    lineLayout
+  );
 }
 
 function appendSplitReplaceRows(
@@ -1355,18 +1731,50 @@ function appendBlockRows(
   rows: LineRow[],
   block: LineBlock,
   oldLine: number,
-  newLine: number
+  newLine: number,
+  lineLayout: "split" | "unified",
+  newLines?: string[],
+  allowKeyReplace?: boolean
 ) {
   let nextOld = oldLine;
   let nextNew = newLine;
   for (const line of block.lines) {
     if (block.type === "equal") {
-      rows.push({
-        type: "equal",
-        oldLine: nextOld,
-        newLine: nextNew,
-        text: line,
-      });
+      const newText =
+        newLines && newLines[nextNew - 1] !== undefined
+          ? (newLines[nextNew - 1] ?? "")
+          : line;
+      if (allowKeyReplace && newLines && line !== newText) {
+        if (lineLayout === "unified") {
+          rows.push({
+            type: "delete",
+            oldLine: nextOld,
+            newLine: null,
+            text: line,
+          });
+          rows.push({
+            type: "insert",
+            oldLine: null,
+            newLine: nextNew,
+            text: newText,
+          });
+        } else {
+          rows.push({
+            type: "replace",
+            oldLine: nextOld,
+            newLine: nextNew,
+            oldText: line,
+            newText,
+          });
+        }
+      } else {
+        rows.push({
+          type: "equal",
+          oldLine: nextOld,
+          newLine: nextNew,
+          text: line,
+        });
+      }
       nextOld += 1;
       nextNew += 1;
       continue;
@@ -1390,7 +1798,9 @@ function appendBlockRows(
 function buildRowsFromBlocks(
   blocks: LineBlock[],
   lineLayout: "split" | "unified",
-  normalizeLine?: (line: string) => string
+  normalizeLine?: (line: string) => string,
+  newLines?: string[],
+  useKeyMatching?: boolean
 ) {
   const rows: LineRow[] = [];
   let oldLine = 1;
@@ -1409,29 +1819,54 @@ function buildRowsFromBlocks(
         next.lines,
         normalizeLine
       );
-      const result =
-        lineLayout === "unified"
-          ? appendUnifiedReplaceRows(
-              rows,
-              block.lines,
-              reorderedLines ?? next.lines,
-              oldLine,
-              newLine
-            )
-          : appendSplitReplaceRows(
-              rows,
-              block.lines,
-              reorderedLines ?? next.lines,
-              oldLine,
-              newLine
-            );
+      const insertLines = reorderedLines ?? next.lines;
+      const shouldAlign =
+        normalizeLine !== undefined &&
+        block.lines.length + insertLines.length <= 4000;
+      let result: { oldLine: number; newLine: number };
+      if (shouldAlign && normalizeLine) {
+        result = appendAlignedReplaceRows(
+          rows,
+          block.lines,
+          insertLines,
+          oldLine,
+          newLine,
+          lineLayout,
+          normalizeLine,
+          useKeyMatching
+        );
+      } else if (lineLayout === "unified") {
+        result = appendUnifiedReplaceRows(
+          rows,
+          block.lines,
+          insertLines,
+          oldLine,
+          newLine
+        );
+      } else {
+        result = appendSplitReplaceRows(
+          rows,
+          block.lines,
+          insertLines,
+          oldLine,
+          newLine
+        );
+      }
       oldLine = result.oldLine;
       newLine = result.newLine;
       i += 1;
       continue;
     }
 
-    const result = appendBlockRows(rows, block, oldLine, newLine);
+    const result = appendBlockRows(
+      rows,
+      block,
+      oldLine,
+      newLine,
+      lineLayout,
+      newLines,
+      useKeyMatching
+    );
     oldLine = result.oldLine;
     newLine = result.newLine;
   }
@@ -1679,11 +2114,18 @@ function buildLineRows(
   contextLines: number,
   lineLayout: "split" | "unified",
   normalizeLine?: (line: string) => string,
-  operations: DiffOperation[] = []
+  operations: DiffOperation[] = [],
+  useKeyMatching?: boolean
 ): LineRow[] {
   const oldLines = splitLines(oldText);
   const newLines = splitLines(newText);
-  let rows = buildRawLineRows(oldLines, newLines, lineLayout, normalizeLine);
+  let rows = buildRawLineRows(
+    oldLines,
+    newLines,
+    lineLayout,
+    normalizeLine,
+    useKeyMatching
+  );
   rows = applyLineOperations(
     rows,
     operations,
@@ -2004,6 +2446,12 @@ function filterSemanticRows(
     if (row.type === "gap" || row.type === "hunk") {
       continue;
     }
+    if (row.type === "insert" || row.type === "delete") {
+      const text = rowText(row);
+      if (!normalizeLine(text).trim()) {
+        continue;
+      }
+    }
     if (row.type === "replace") {
       const oldValue = row.oldText ?? "";
       const newValue = row.newText ?? "";
@@ -2014,6 +2462,20 @@ function filterSemanticRows(
     filtered.push(row);
   }
   return filtered;
+}
+
+const LOCKFILE_HEADER_KEYS = new Set(["dependencies:", "peerDependencies:"]);
+
+function filterLockfileRows(rows: LineRow[]) {
+  return rows.filter((row) => {
+    if (row.type === "insert" || row.type === "delete") {
+      const text = rowText(row).trim();
+      if (LOCKFILE_HEADER_KEYS.has(text)) {
+        return false;
+      }
+    }
+    return true;
+  });
 }
 
 function hasLineChanges(rows: LineRow[]) {
@@ -2304,16 +2766,25 @@ function renderLineView(
       : undefined;
   const oldText = options.oldText ?? "";
   const newText = options.newText ?? "";
+  const isPnpmLock =
+    options.filePath?.endsWith("pnpm-lock.yaml") ||
+    (oldText.includes("lockfileVersion:") && oldText.includes("importers:")) ||
+    (newText.includes("lockfileVersion:") && newText.includes("importers:"));
+  const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
   let rows = buildLineRows(
     oldText,
     newText,
     context.contextLines,
     context.lineLayout,
     normalizeLine,
-    diff.operations
+    diff.operations,
+    useKeyMatching
   );
   if (context.lineMode === "semantic" && normalizeLine) {
     rows = filterSemanticRows(rows, normalizeLine);
+  }
+  if (useKeyMatching) {
+    rows = filterLockfileRows(rows);
   }
   if (context.lineMode === "semantic" && !hasLineChanges(rows)) {
     return "";
