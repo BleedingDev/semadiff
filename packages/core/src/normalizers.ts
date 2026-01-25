@@ -46,8 +46,7 @@ const tailwindRule: NormalizerRule = {
   safety: "conservative",
   defaultEnabled: true,
   apply: (text) => {
-    const normalizedText = text.replace(/-\[var\((--[^)]+)\)\]/g, "-($1)");
-    return normalizedText.replace(
+    return text.replace(
       /(class|className)=("([^"]*)"|'([^']*)')/g,
       (
         match: string,
@@ -62,9 +61,7 @@ const tailwindRule: NormalizerRule = {
         }
         const tokens = raw
           .split(WHITESPACE_SPLIT_RE)
-          .map((token) =>
-            token.trim().replace(/-\[var\((--[^)]+)\)\]/g, "-($1)")
-          )
+          .map((token) => token.trim())
           .filter(Boolean)
           .sort((a, b) => a.localeCompare(b));
         const normalized = tokens.join(" ");
