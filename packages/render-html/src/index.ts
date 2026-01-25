@@ -2149,7 +2149,8 @@ function buildLineRows(
   lineLayout: "split" | "unified",
   normalizeLine?: (line: string) => string,
   operations: DiffOperation[] = [],
-  useKeyMatching?: boolean
+  useKeyMatching?: boolean,
+  applyOperations = true
 ): LineRow[] {
   const oldLines = splitLines(oldText);
   const newLines = splitLines(newText);
@@ -2160,13 +2161,15 @@ function buildLineRows(
     normalizeLine,
     useKeyMatching
   );
-  rows = applyLineOperations(
-    rows,
-    operations,
-    oldLines.length,
-    newLines.length,
-    normalizeLine
-  );
+  if (applyOperations) {
+    rows = applyLineOperations(
+      rows,
+      operations,
+      oldLines.length,
+      newLines.length,
+      normalizeLine
+    );
+  }
   return applyLineContext(rows, contextLines);
 }
 
@@ -2812,7 +2815,8 @@ function renderLineView(
     context.lineLayout,
     normalizeLine,
     diff.operations,
-    useKeyMatching
+    useKeyMatching,
+    context.lineMode === "semantic"
   );
   if (context.lineMode === "semantic" && normalizeLine) {
     rows = filterSemanticRows(rows, normalizeLine);
@@ -2834,6 +2838,7 @@ function renderLineView(
       context.lineLayout,
       undefined,
       diff.operations,
+      false,
       false
     );
   }
