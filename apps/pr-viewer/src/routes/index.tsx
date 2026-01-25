@@ -597,23 +597,21 @@ function DiffPanelHeader({
             </ToggleButton>
           </div>
         )}
-        {view === "lines" && (
-          <div className="sd-control-group">
-            <span className="sd-control-label">Comments</span>
-            <ToggleButton
-              active={!hideComments}
-              onClick={() => onHideCommentsChange(false)}
-            >
-              Show
-            </ToggleButton>
-            <ToggleButton
-              active={hideComments}
-              onClick={() => onHideCommentsChange(true)}
-            >
-              Hide
-            </ToggleButton>
-          </div>
-        )}
+        <div className="sd-control-group">
+          <span className="sd-control-label">Comments</span>
+          <ToggleButton
+            active={!hideComments}
+            onClick={() => onHideCommentsChange(false)}
+          >
+            Show
+          </ToggleButton>
+          <ToggleButton
+            active={hideComments}
+            onClick={() => onHideCommentsChange(true)}
+          >
+            Hide
+          </ToggleButton>
+        </div>
         <ToggleButton
           active={lineLayout === "split"}
           onClick={() => onLineLayoutChange("split")}

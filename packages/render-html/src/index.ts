@@ -1435,6 +1435,65 @@ function isCommentLineForLanguage(line: string, language?: NormalizerLanguage) {
   }
 }
 
+function nonEmptyLines(text: string | undefined) {
+  if (!text) {
+    return [];
+  }
+  return splitLines(text).filter((line) => line.trim().length > 0);
+}
+
+function isCommentOnlyOperation(
+  op: DiffOperation,
+  language?: NormalizerLanguage
+) {
+  if (!language || language === "*" || language === "text") {
+    return false;
+  }
+  const lines = [...nonEmptyLines(op.oldText), ...nonEmptyLines(op.newText)];
+  if (lines.length === 0) {
+    return false;
+  }
+  return lines.every((line) => isCommentLineForLanguage(line, language));
+}
+
+function filterDiffForComments(
+  diff: DiffDocument,
+  language?: NormalizerLanguage
+) {
+  if (!language || language === "*" || language === "text") {
+    return diff;
+  }
+  let hasFiltered = false;
+  const operations = diff.operations.filter((op) => {
+    const commentOnly = isCommentOnlyOperation(op, language);
+    if (commentOnly) {
+      hasFiltered = true;
+    }
+    return !commentOnly;
+  });
+  if (!hasFiltered) {
+    return diff;
+  }
+  const opIds = new Set(operations.map((op) => op.id));
+  const moves = diff.moves.flatMap((move) => {
+    const filteredOps = move.operations.filter((id) => opIds.has(id));
+    if (filteredOps.length === 0) {
+      return [];
+    }
+    return [{ ...move, operations: filteredOps }];
+  });
+  const renameIds = new Set(
+    operations
+      .map((op) => op.meta?.renameGroupId)
+      .filter((id): id is string => Boolean(id))
+  );
+  const renames =
+    renameIds.size === 0
+      ? []
+      : diff.renames.filter((rename) => renameIds.has(rename.id));
+  return { ...diff, operations, moves, renames };
+}
+
 function buildLineMatchKey(
   line: string,
   normalizeLine: (line: string) => string
@@ -3029,9 +3088,13 @@ export function renderHtml(
   diff: DiffDocument,
   options: HtmlRenderOptions = {}
 ) {
-  const context = buildRenderContext(diff, options);
+  const diffForRender =
+    options.hideComments && options.language
+      ? filterDiffForComments(diff, options.language)
+      : diff;
+  const context = buildRenderContext(diffForRender, options);
   if (context.useLineView && context.canRenderLines) {
-    return renderLineView(diff, options, context);
+    return renderLineView(diffForRender, options, context);
   }
-  return renderOperationsView(diff, context);
+  return renderOperationsView(diffForRender, context);
 }
