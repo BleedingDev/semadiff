@@ -468,9 +468,6 @@ body.sd-embed .sd-lines {
 
 const LINE_SPLIT_RE = /\r?\n/;
 const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
-const HEX_BYTE_RE = /^[0-9a-fA-F]{2}$/;
-const HEX_SEQUENCE_RE = /^[0-9a-fA-F]+$/;
-const HEX_QUAD_RE = /^[0-9a-fA-F]{4}$/;
 
 interface LineEdit {
   type: "equal" | "insert" | "delete";
@@ -488,7 +485,6 @@ interface LineRow {
   header?: string;
 }
 
-const JsonStringSchema = Schema.parseJson(Schema.String);
 const LineNumberSchema = Schema.Union(Schema.Number, Schema.Null);
 const LineRowSchema = Schema.Struct({
   type: Schema.Literal(
@@ -540,179 +536,8 @@ const OpsPayloadSchema = Schema.Struct({
 const LinePayloadJson = Schema.parseJson(LinePayloadSchema);
 const OpsPayloadJson = Schema.parseJson(OpsPayloadSchema);
 
-const QUOTE_NORMALIZE_LANGUAGES = new Set<NormalizerLanguage>([
-  "js",
-  "jsx",
-  "ts",
-  "tsx",
-  "css",
-]);
-
-const SIMPLE_ESCAPES: Record<string, string> = {
-  n: "\n",
-  r: "\r",
-  t: "\t",
-  b: "\b",
-  f: "\f",
-  v: "\v",
-  0: "\0",
-};
-
-function decodeHexByte(content: string, index: number) {
-  const hex = content.slice(index + 1, index + 3);
-  if (!HEX_BYTE_RE.test(hex)) {
-    return null;
-  }
-  return {
-    value: String.fromCharCode(Number.parseInt(hex, 16)),
-    nextIndex: index + 2,
-  };
-}
-
-function decodeUnicodeEscape(content: string, index: number) {
-  const next = content[index + 1];
-  if (next === "{") {
-    const end = content.indexOf("}", index + 2);
-    if (end === -1) {
-      return null;
-    }
-    const code = content.slice(index + 2, end);
-    if (!HEX_SEQUENCE_RE.test(code)) {
-      return null;
-    }
-    return {
-      value: String.fromCodePoint(Number.parseInt(code, 16)),
-      nextIndex: end,
-    };
-  }
-  const hex = content.slice(index + 1, index + 5);
-  if (!HEX_QUAD_RE.test(hex)) {
-    return null;
-  }
-  return {
-    value: String.fromCharCode(Number.parseInt(hex, 16)),
-    nextIndex: index + 4,
-  };
-}
-
-function decodeEscapeSequence(content: string, index: number) {
-  const esc = content[index] ?? "";
-  const simple = SIMPLE_ESCAPES[esc];
-  if (simple !== undefined) {
-    return { value: simple, nextIndex: index };
-  }
-  if (esc === "x") {
-    const decoded = decodeHexByte(content, index);
-    return decoded ?? { value: "x", nextIndex: index };
-  }
-  if (esc === "u") {
-    const decoded = decodeUnicodeEscape(content, index);
-    return decoded ?? { value: "u", nextIndex: index };
-  }
-  if (esc === "\n") {
-    return { value: "", nextIndex: index };
-  }
-  if (esc === "\r") {
-    const nextIndex = content[index + 1] === "\n" ? index + 1 : index;
-    return { value: "", nextIndex };
-  }
-  return { value: esc, nextIndex: index };
-}
-
-function decodeJsStringContent(content: string) {
-  let output = "";
-  for (let i = 0; i < content.length; i += 1) {
-    const ch = content[i];
-    if (ch !== "\\") {
-      output += ch;
-      continue;
-    }
-    i += 1;
-    if (i >= content.length) {
-      output += "\\";
-      break;
-    }
-    const decoded = decodeEscapeSequence(content, i);
-    output += decoded.value;
-    i = decoded.nextIndex;
-  }
-  return output;
-}
-
-function readQuotedString(line: string, startIndex: number) {
-  const delimiter = line[startIndex];
-  if (delimiter !== "'" && delimiter !== '"') {
-    return null;
-  }
-  let content = "";
-  let escaped = false;
-  let index = startIndex + 1;
-  while (index < line.length) {
-    const current = line[index];
-    if (!escaped && current === delimiter) {
-      return { content, endIndex: index + 1 };
-    }
-    if (!escaped && current === "\\") {
-      escaped = true;
-      content += current;
-      index += 1;
-      continue;
-    }
-    escaped = false;
-    content += current ?? "";
-    index += 1;
-  }
-  return null;
-}
-
-function normalizeJsStringQuotes(line: string) {
-  let output = "";
-  let index = 0;
-  while (index < line.length) {
-    const ch = line[index];
-    if (ch === "/" && index + 1 < line.length) {
-      const next = line[index + 1];
-      if (next === "/" || next === "*") {
-        output += line.slice(index);
-        break;
-      }
-    }
-    if (ch === "'" || ch === '"') {
-      const segment = readQuotedString(line, index);
-      if (!segment) {
-        output += line.slice(index);
-        break;
-      }
-      const decoded = decodeJsStringContent(segment.content);
-      output += Schema.encodeSync(JsonStringSchema)(decoded);
-      index = segment.endIndex;
-      continue;
-    }
-    output += ch;
-    index += 1;
-  }
-  return output;
-}
-
 function normalizeLineForSemantic(line: string, language?: NormalizerLanguage) {
-  const normalized = normalizeTextForLanguage(
-    line,
-    defaultConfig.normalizers,
-    language
-  );
-  if (language && QUOTE_NORMALIZE_LANGUAGES.has(language)) {
-    return normalizeJsStringQuotes(normalized);
-  }
-  if (!language || language === "text") {
-    const trimmed = normalized.trim();
-    if (
-      (trimmed.startsWith("'") && trimmed.lastIndexOf("'") > 0) ||
-      (trimmed.startsWith('"') && trimmed.lastIndexOf('"') > 0)
-    ) {
-      return normalizeJsStringQuotes(normalized);
-    }
-  }
-  return normalized;
+  return normalizeTextForLanguage(line, defaultConfig.normalizers, language);
 }
 
 function escapeHtml(input: string) {
@@ -2806,6 +2631,17 @@ function applyLineOperationToRow(
   if (row.type === "gap" || row.type === "hunk") {
     return row;
   }
+  const oldLine = row.oldLine ?? null;
+  const newLine = row.newLine ?? null;
+  const oldChanged = oldLine !== null && marks.changedOld.has(oldLine);
+  const newChanged = newLine !== null && marks.changedNew.has(newLine);
+  const oldMoved = oldLine !== null && marks.movedOld.has(oldLine);
+  const newMoved = newLine !== null && marks.movedNew.has(newLine);
+
+  if (row.type !== "equal") {
+    return row;
+  }
+
   if (normalizeLine) {
     const hasBothLines = row.oldLine != null && row.newLine != null;
     const oldText = rowOldText(row);
@@ -2819,10 +2655,6 @@ function applyLineOperationToRow(
       return toEqualRow(row);
     }
   }
-  const oldLine = row.oldLine ?? null;
-  const newLine = row.newLine ?? null;
-  const oldChanged = oldLine !== null && marks.changedOld.has(oldLine);
-  const newChanged = newLine !== null && marks.changedNew.has(newLine);
 
   if (oldChanged && newChanged) {
     return toReplaceRow(row);
@@ -2834,8 +2666,6 @@ function applyLineOperationToRow(
     return toInsertRow(row);
   }
 
-  const oldMoved = oldLine !== null && marks.movedOld.has(oldLine);
-  const newMoved = newLine !== null && marks.movedNew.has(newLine);
   if (oldMoved || newMoved) {
     return toMoveRow(row, oldMoved, newMoved);
   }
