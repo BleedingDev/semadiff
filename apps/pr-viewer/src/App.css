@@ -1,5 +1,6 @@
 .sd-app {
   min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -112,6 +113,7 @@
   max-width: 1400px;
   width: 100%;
   margin: 0 auto;
+  min-height: 0;
 }
 
 .sd-panel {
@@ -156,7 +158,9 @@
 }
 
 .sd-file-list {
+  flex: 1;
   overflow: auto;
+  min-height: 0;
 }
 
 .sd-file-row {
@@ -244,6 +248,7 @@
 
 .sd-panel-body {
   padding: 18px;
+  flex: 1;
   overflow: auto;
 }
 

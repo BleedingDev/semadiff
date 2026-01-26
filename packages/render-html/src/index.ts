@@ -425,13 +425,13 @@ body.sd-embed .sd-lines {
 
 .sd-inline-del {
   background: rgba(255, 92, 119, 0.45);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 0 1px;
 }
 
 .sd-inline-add {
   background: rgba(34, 229, 143, 0.45);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 0 1px;
 }
 
@@ -676,6 +676,17 @@ function renderSemanticFallbackWarning() {
       <div class="sd-warning-title">Semantic line view hid edits</div>
       <div class="sd-warning-body">
         Raw line diff is shown to avoid hiding edits. This file needs a stronger semantic normalizer.
+      </div>
+    </section>
+  `;
+}
+
+function renderSemanticNoiseWarning() {
+  return `
+    <section class="sd-warning" role="alert">
+      <div class="sd-warning-title">Semantic line view was noisier</div>
+      <div class="sd-warning-body">
+        Raw line diff is shown because it has fewer edits. This keeps the diff minimal while we improve semantic rules.
       </div>
     </section>
   `;
@@ -971,6 +982,22 @@ function buildComparableLines(
   duplicates: Set<string>,
   importKeys?: (string | null)[]
 ) {
+  const findNeighbor = (start: number, step: number, skipComments: boolean) => {
+    for (
+      let index = start + step;
+      index >= 0 && index < lines.length;
+      index += step
+    ) {
+      const candidate = normalizeLine(lines[index] ?? "").trim();
+      if (candidate) {
+        if (skipComments && COMMENT_ONLY_RE.test(candidate)) {
+          continue;
+        }
+        return candidate.slice(0, 120);
+      }
+    }
+    return "";
+  };
   return lines.map((line, index) => {
     const normalized = normalizeLine(line);
     const trimmed = normalized.trim();
@@ -985,6 +1012,14 @@ function buildComparableLines(
       return trimmed;
     }
     const indent = getLineIndent(line);
+    if (COMMENT_ONLY_RE.test(trimmed)) {
+      const prev = findNeighbor(index, -1, true);
+      const next = findNeighbor(index, 1, true);
+      const context = prev || next ? `${prev}__${next}` : "";
+      return context
+        ? `${indent}${trimmed}__${context}`
+        : `${indent}${trimmed}`;
+    }
     return `${indent}${trimmed}`;
   });
 }
@@ -1215,50 +1250,66 @@ function suppressImportBlockStarts(rows: LineRow[]) {
   });
 }
 
-function extractPropNames(text: string) {
-  const names = new Set<string>();
-  JSX_PROP_EXTRACT_RE.lastIndex = 0;
-  let match = JSX_PROP_EXTRACT_RE.exec(text);
-  while (match) {
-    if (match[1]) {
-      names.add(match[1]);
-    }
-    match = JSX_PROP_EXTRACT_RE.exec(text);
-  }
-  return names;
-}
+function suppressInlinePropChanges(
+  rows: LineRow[],
+  normalizeLine?: (line: string) => string
+) {
+  const insertLines = new Set<string>();
+  const deleteLines = new Set<string>();
+  const normalize = (text: string) =>
+    (normalizeLine ? normalizeLine(text) : text).trim();
 
-function suppressInlinePropChanges(rows: LineRow[]) {
-  const propsInInserts = new Set<string>();
-  for (const row of rows) {
-    let text = "";
-    if (row?.type === "replace") {
-      text = row.newText ?? "";
-    } else if (row?.type === "insert") {
-      text = row.text ?? "";
+  const recordLine = (text: string, target: Set<string>) => {
+    if (!text) {
+      return;
     }
-    if (!text.includes("<")) {
+    const trimmed = text.trim();
+    const match = JSX_PROP_LINE_RE.exec(trimmed);
+    if (!match) {
+      return;
+    }
+    const key = normalize(text);
+    if (!key) {
+      return;
+    }
+    target.add(key);
+  };
+
+  for (const row of rows) {
+    if (!row) {
       continue;
     }
-    for (const name of extractPropNames(text)) {
-      propsInInserts.add(name);
+    if (row.type === "replace") {
+      recordLine(row.newText ?? "", insertLines);
+      recordLine(row.oldText ?? "", deleteLines);
+    } else if (row.type === "insert") {
+      recordLine(row.text ?? "", insertLines);
+    } else if (row.type === "delete") {
+      recordLine(row.text ?? "", deleteLines);
     }
   }
 
   return rows.filter((row) => {
-    if (row?.type !== "delete") {
-      return true;
+    if (!row) {
+      return false;
     }
-    const text = row.text ?? "";
-    const match = JSX_PROP_LINE_RE.exec(text.trim());
-    if (!match) {
-      return true;
+    if (row.type === "delete") {
+      const text = row.text ?? "";
+      if (!JSX_PROP_LINE_RE.test(text.trim())) {
+        return true;
+      }
+      const key = normalize(text);
+      return !(deleteLines.has(key) && insertLines.has(key));
     }
-    const name = match[1];
-    if (!name) {
-      return true;
+    if (row.type === "insert") {
+      const text = row.text ?? "";
+      if (!JSX_PROP_LINE_RE.test(text.trim())) {
+        return true;
+      }
+      const key = normalize(text);
+      return !(insertLines.has(key) && deleteLines.has(key));
     }
-    return !propsInInserts.has(name);
+    return true;
   });
 }
 
@@ -1575,7 +1626,10 @@ const MULTILINE_IMPORT_START_RE = /^\s*import\s+(?:type\s+)?\{\s*$/;
 const MULTILINE_IMPORT_FROM_RE = /\bfrom\s+["']([^"']+)["']/;
 const IMPORT_BLOCK_START_RE = /^(?:import|export)\s+\{$/;
 const JSX_PROP_LINE_RE = /^([A-Za-z_$][\w$-]*)\s*=/;
-const JSX_PROP_EXTRACT_RE = /([A-Za-z_$][\w$-]*)\s*=/g;
+const COMMENT_ONLY_RE = /^(?:\/\/|\/\*|\*\/|\*)/;
+const COMMENT_DELIMITER_LINES = new Set(["//", "/*", "/**", "*/", "*"]);
+const LOW_INFO_PUNCTUATION_RE = /^[\]{}(),;[]+$/;
+const ALNUM_RE = /[A-Za-z0-9]/;
 const YAML_SHARED_THRESHOLD = 10;
 const YAML_SHARED_DIFF_RATIO = 0.058;
 
@@ -1622,6 +1676,37 @@ function isCommentLineForLanguage(line: string, language?: NormalizerLanguage) {
     default:
       return false;
   }
+}
+
+function isLowInfoSemanticLine(normalized: string) {
+  if (COMMENT_DELIMITER_LINES.has(normalized)) {
+    return true;
+  }
+  if (isDecorativeComment(normalized)) {
+    return true;
+  }
+  if (LOW_INFO_PUNCTUATION_RE.test(normalized)) {
+    return true;
+  }
+  return false;
+}
+
+function isDecorativeComment(normalized: string) {
+  const trimmed = normalized.trim();
+  let rest = "";
+  if (trimmed.startsWith("//")) {
+    rest = trimmed.slice(2).trim();
+  } else if (trimmed.startsWith("/*")) {
+    rest = trimmed.slice(2).trim();
+  } else if (trimmed.startsWith("*")) {
+    rest = trimmed.slice(1).trim();
+  } else {
+    return false;
+  }
+  if (!rest) {
+    return true;
+  }
+  return !ALNUM_RE.test(rest);
 }
 
 function nonEmptyLines(text: string | undefined) {
@@ -2779,7 +2864,7 @@ function buildLineRows(
         normalizeLine
       );
       rows = suppressImportBlockStarts(rows);
-      rows = suppressInlinePropChanges(rows);
+      rows = suppressInlinePropChanges(rows, normalizeLine);
       if (useKeyMatching) {
         rows = suppressRepeatedYamlChanges(
           rows,
@@ -3105,7 +3190,8 @@ function filterSemanticRows(
     }
     if (row.type === "insert" || row.type === "delete") {
       const text = rowText(row);
-      if (!normalizeLine(text).trim()) {
+      const normalized = normalizeLine(text).trim();
+      if (!normalized || isLowInfoSemanticLine(normalized)) {
         continue;
       }
     }
@@ -3184,6 +3270,20 @@ function hasLineChanges(rows: LineRow[]) {
       row.type === "replace" ||
       row.type === "move"
   );
+}
+
+function countLineChanges(rows: LineRow[]) {
+  return rows.reduce((count, row) => {
+    if (
+      row.type === "insert" ||
+      row.type === "delete" ||
+      row.type === "replace" ||
+      row.type === "move"
+    ) {
+      return count + 1;
+    }
+    return count;
+  }, 0);
 }
 
 function buildLineVirtualScript(
@@ -3450,6 +3550,7 @@ function buildOpsVirtualScript(batchSize: number) {
   `;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: render flow is clearer in one place
 function renderLineView(
   diff: DiffDocument,
   options: HtmlRenderOptions,
@@ -3489,7 +3590,7 @@ function renderLineView(
     diff.operations,
     useKeyMatching,
     context.lineMode === "semantic",
-    false
+    context.lineMode === "semantic"
   );
   if (context.lineMode === "semantic" && normalizeLine) {
     rows = filterSemanticRows(rows, normalizeLine);
@@ -3513,6 +3614,13 @@ function renderLineView(
   ) {
     warningHtml = renderSemanticFallbackWarning();
     rowsForCompare = rawForCompare;
+  } else if (context.lineMode === "semantic" && normalizeLine) {
+    const rawCount = countLineChanges(rawForCompare);
+    const semanticCount = countLineChanges(rowsForCompare);
+    if (rawCount > 0 && rawCount < semanticCount) {
+      warningHtml = renderSemanticNoiseWarning();
+      rowsForCompare = rawForCompare;
+    }
   }
   rows = rowsForCompare;
   if (!hasLineChanges(rows)) {

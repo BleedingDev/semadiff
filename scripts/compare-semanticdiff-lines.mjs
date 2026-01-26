@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import { Effect, Schema } from "effect";
 import { defaultConfig, structuralDiff } from "../packages/core/src/index.js";
 import { lightningCssParsers } from "../packages/parser-lightningcss/src/index.js";
@@ -7,14 +6,40 @@ import { treeSitterWasmParsers } from "../packages/parser-tree-sitter-wasm/src/i
 import { makeRegistry } from "../packages/parsers/src/index.js";
 import { renderHtml } from "../packages/render-html/src/index.ts";
 
-const OWNER = "NMIT-WR";
-const REPO = "new-engine";
-const PR_NUMBER = 237;
-const MANIFEST_PATH = "tmp/semanticdiff/pr-237/manifest.json";
-const LINES_DIR = "tmp/semanticdiff/pr-237/lines";
-const LINE_SPLIT_RE = /\r?\n/;
-const PAYLOAD_RE = /__SEMADIFF_DATA__\s*=\s*(\{[\s\S]*?\});/;
-const JSON_FILE_RE = /\.json$/;
+const DEFAULT_OWNER = "NMIT-WR";
+const DEFAULT_REPO = "new-engine";
+const DEFAULT_PR = 237;
+const args = new Map();
+for (let i = 2; i < process.argv.length; i += 1) {
+  const arg = process.argv[i];
+  if (!arg?.startsWith("--")) {
+    continue;
+  }
+  const [rawKey, inlineValue] = arg.split("=", 2);
+  const key = rawKey.slice(2);
+  if (inlineValue !== undefined) {
+    args.set(key, inlineValue);
+    continue;
+  }
+  const next = process.argv[i + 1];
+  if (next && !next.startsWith("--")) {
+    args.set(key, next);
+    i += 1;
+  } else {
+    args.set(key, "true");
+  }
+}
+
+const OWNER = args.get("owner") ?? DEFAULT_OWNER;
+const REPO = args.get("repo") ?? DEFAULT_REPO;
+const PR_NUMBER = Number(args.get("pr") ?? DEFAULT_PR);
+const BASE_DIR = args.get("dir") ?? `tmp/semanticdiff/pr-${PR_NUMBER}`;
+const MANIFEST_PATH = args.get("manifest") ?? `${BASE_DIR}/manifest.json`;
+const CONTROLLER_PATH = args.get("controller") ?? `${BASE_DIR}/controller.json`;
+const DIFFS_DIR = args.get("diffs") ?? `${BASE_DIR}/diffs`;
+const OUTPUT_PATH = args.get("out") ?? `${BASE_DIR}/line-compare.json`;
+const SUMMARY_PATH =
+  args.get("summary") ?? `${BASE_DIR}/line-compare-summary.json`;
 const bun = globalThis.Bun;
 
 const registry = makeRegistry([
@@ -29,15 +54,18 @@ const githubHeaders = token
   : { Accept: "application/vnd.github+json" };
 
 const JsonUnknown = Schema.parseJson(Schema.Unknown);
-const JsonStringify = Schema.parseJson(Schema.Unknown);
 
-async function fetchJson(url) {
-  const res = await fetch(url, { headers: githubHeaders });
-  if (!res.ok) {
-    throw new Error(`Fetch failed ${res.status} ${url}`);
+const decodeJson = (value, label) => {
+  try {
+    return Schema.decodeUnknownSync(JsonUnknown)(value);
+  } catch (error) {
+    throw new Error(
+      `Failed to decode JSON${label ? ` (${label})` : ""}: ${String(error)}`
+    );
   }
-  return res.json();
-}
+};
+
+const encodeJson = (value) => Schema.encodeSync(JsonUnknown)(value);
 
 async function fetchText(url) {
   const res = await fetch(url);
@@ -58,7 +86,7 @@ async function fetchBlob(oid) {
   if (!res.ok) {
     return null;
   }
-  const json = await res.json();
+  const json = decodeJson(await res.text(), "blob");
   if (!json?.content) {
     return null;
   }
@@ -77,48 +105,22 @@ function parseDiffUrl(diffUrl) {
   };
 }
 
-function parseLinesTsv(tsv) {
-  const lines = tsv.split(LINE_SPLIT_RE);
-  const rows = [];
-  for (let i = 1; i < lines.length; i += 1) {
-    const line = lines[i];
-    if (!line) {
-      continue;
-    }
-    const cols = line.split("\t");
-    if (cols.length < 6) {
-      continue;
-    }
-    const [oldLineRaw, oldChange, oldText, newLineRaw, newChange, newText] =
-      cols;
-    const oldLine = oldLineRaw ? Number(oldLineRaw) : null;
-    const newLine = newLineRaw ? Number(newLineRaw) : null;
-    rows.push({
-      oldLine: Number.isFinite(oldLine) ? oldLine : null,
-      newLine: Number.isFinite(newLine) ? newLine : null,
-      oldChange: oldChange?.trim() ?? "",
-      newChange: newChange?.trim() ?? "",
-      oldText: oldText ?? "",
-      newText: newText ?? "",
-    });
-  }
-  return rows;
-}
-
-function isSemanticDiffChanged(row) {
-  return (
-    row.oldChange.length > 0 ||
-    row.newChange.length > 0 ||
-    row.oldText !== row.newText
-  );
-}
-
 function getPayloadRows(html) {
-  const match = html.match(PAYLOAD_RE);
-  if (!match) {
+  const marker = "globalThis.__SEMADIFF_DATA__ = ";
+  const start = html.indexOf(marker);
+  if (start === -1) {
     return [];
   }
-  const payload = Schema.decodeUnknownSync(JsonUnknown)(match[1]);
+  const from = start + marker.length;
+  const end = html.indexOf(";</script>", from);
+  if (end === -1) {
+    return [];
+  }
+  const jsonText = html.slice(from, end).trim();
+  if (!jsonText) {
+    return [];
+  }
+  const payload = decodeJson(jsonText, "semanticdiff-payload");
   if (!payload || typeof payload !== "object") {
     return [];
   }
@@ -126,8 +128,8 @@ function getPayloadRows(html) {
   return Array.isArray(rows) ? rows : [];
 }
 
-function addKey(map, key) {
-  map.set(key, (map.get(key) ?? 0) + 1);
+function addKey(map, key, count = 1) {
+  map.set(key, (map.get(key) ?? 0) + count);
 }
 
 function addOldKey(map, line, text) {
@@ -144,14 +146,42 @@ function addNewKey(map, line, text) {
   addKey(map, `${line}\t${text ?? ""}`);
 }
 
-function collectSideKeys(rows) {
+function mergeKeyMaps(target, source) {
+  for (const [key, count] of source.entries()) {
+    addKey(target, key, count);
+  }
+}
+
+function collectSdKeysFromDiffJson(diffJson) {
+  if (!diffJson || diffJson.type === "error") {
+    return null;
+  }
+  const blocks = diffJson.blocks;
+  if (!Array.isArray(blocks)) {
+    return null;
+  }
   const oldKeys = new Map();
   const newKeys = new Map();
-  for (const row of rows) {
-    const oldLine = row.oldLine ?? null;
-    const newLine = row.newLine ?? null;
-    addOldKey(oldKeys, oldLine, row.oldText ?? "");
-    addNewKey(newKeys, newLine, row.newText ?? "");
+  for (const block of blocks) {
+    const oldCol = block.old_column ?? [];
+    const newCol = block.new_column ?? [];
+    const len = Math.max(oldCol.length, newCol.length);
+    for (let i = 0; i < len; i += 1) {
+      const oldEntry = oldCol[i];
+      const newEntry = newCol[i];
+      const oldLine = oldEntry?.line ?? null;
+      const newLine = newEntry?.line ?? null;
+      const oldText = oldEntry?.content ?? "";
+      const newText = newEntry?.content ?? "";
+      const oldChange = oldEntry?.change ?? 0;
+      const newChange = newEntry?.change ?? 0;
+      const changed = oldChange !== 0 || newChange !== 0 || oldText !== newText;
+      if (!changed) {
+        continue;
+      }
+      addOldKey(oldKeys, oldLine, oldText);
+      addNewKey(newKeys, newLine, newText);
+    }
   }
   return { oldKeys, newKeys };
 }
@@ -208,31 +238,101 @@ function diffKeyMaps(expected, actual) {
   return { missing, extra };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: script orchestration
 async function main() {
   if (!bun) {
     throw new Error("This script requires Bun.");
   }
-  const manifest = await bun.file(MANIFEST_PATH).json();
-  const pr = await fetchJson(
-    `https://api.github.com/repos/${OWNER}/${REPO}/pulls/${PR_NUMBER}`
+  const manifestRaw = decodeJson(
+    await bun.file(MANIFEST_PATH).text(),
+    MANIFEST_PATH
   );
-  const baseSha = pr.base.sha;
-  const headSha = pr.head.sha;
-  const encodeJson = (value) => Schema.encodeSync(JsonStringify)(value);
+  const manifest = Array.isArray(manifestRaw) ? manifestRaw : [];
+  const controller = decodeJson(
+    await bun.file(CONTROLLER_PATH).text(),
+    CONTROLLER_PATH
+  );
+  const baseSha = controller?.diffInfo?.baseCommit;
+  const headSha = controller?.diffInfo?.headCommit;
+  if (!(baseSha && headSha)) {
+    throw new Error(
+      `Missing base/head commit from ${CONTROLLER_PATH}. Re-cache SemanticDiff data.`
+    );
+  }
+
+  const entriesByFile = new Map();
+  for (const entry of manifest) {
+    if (!(entry?.tracking_name && entry?.file && entry?.diff)) {
+      continue;
+    }
+    const record = entriesByFile.get(entry.tracking_name) ?? {
+      trackingName: entry.tracking_name,
+      files: [],
+      oldPath: null,
+      newPath: null,
+      oldOid: null,
+      newOid: null,
+    };
+    record.files.push(entry.file);
+    const parsed = parseDiffUrl(entry.diff);
+    if (parsed.oldPath && !record.oldPath) {
+      record.oldPath = parsed.oldPath;
+    }
+    if (parsed.newPath && !record.newPath) {
+      record.newPath = parsed.newPath;
+    }
+    if (parsed.oldOid && !record.oldOid) {
+      record.oldOid = parsed.oldOid;
+    }
+    if (parsed.newOid && !record.newOid) {
+      record.newOid = parsed.newOid;
+    }
+    entriesByFile.set(entry.tracking_name, record);
+  }
 
   const results = [];
-  for (const entry of manifest) {
-    const linesPath = `${LINES_DIR}/${entry.file.replace(JSON_FILE_RE, ".lines.tsv")}`;
-    const linesTsv = await readFile(linesPath, "utf8");
-    const sdRows = parseLinesTsv(linesTsv).filter(isSemanticDiffChanged);
-    const sdKeys = collectSideKeys(sdRows);
+  for (const entry of entriesByFile.values()) {
+    const sdKeys = { oldKeys: new Map(), newKeys: new Map() };
+    let sdError = null;
+    let sdOk = false;
+    for (const diffFile of entry.files) {
+      try {
+        const diffPath = `${DIFFS_DIR}/${diffFile}`;
+        const diffJson = decodeJson(await bun.file(diffPath).text(), diffPath);
+        if (diffJson?.type === "error") {
+          sdError = diffJson.error ?? diffJson;
+          continue;
+        }
+        const keys = collectSdKeysFromDiffJson(diffJson);
+        if (keys) {
+          mergeKeyMaps(sdKeys.oldKeys, keys.oldKeys);
+          mergeKeyMaps(sdKeys.newKeys, keys.newKeys);
+          sdOk = true;
+        }
+      } catch (error) {
+        sdError = { type: "read_error", message: String(error) };
+      }
+    }
 
-    const { oldPath, newPath, oldOid, newOid } = parseDiffUrl(entry.diff);
+    if (!sdOk) {
+      results.push({
+        file: entry.trackingName,
+        skipped: true,
+        reason: "sd_error",
+        sdError,
+      });
+      continue;
+    }
+
+    const oldPath = entry.oldPath ?? entry.trackingName;
+    const newPath = entry.newPath ?? entry.trackingName;
+    const oldOid = entry.oldOid;
+    const newOid = entry.newOid;
     let oldText = await fetchText(
-      `https://raw.githubusercontent.com/${OWNER}/${REPO}/${baseSha}/${oldPath ?? entry.tracking_name}`
+      `https://raw.githubusercontent.com/${OWNER}/${REPO}/${baseSha}/${oldPath}`
     );
     let newText = await fetchText(
-      `https://raw.githubusercontent.com/${OWNER}/${REPO}/${headSha}/${newPath ?? entry.tracking_name}`
+      `https://raw.githubusercontent.com/${OWNER}/${REPO}/${headSha}/${newPath}`
     );
     if (oldText === null && oldOid) {
       oldText = await fetchBlob(oldOid);
@@ -242,7 +342,7 @@ async function main() {
     }
     if (oldText === null || newText === null) {
       results.push({
-        file: entry.tracking_name,
+        file: entry.trackingName,
         skipped: true,
         reason: "missing_content",
       });
@@ -250,10 +350,10 @@ async function main() {
     }
 
     const oldParse = await Effect.runPromise(
-      registry.parse({ content: oldText, path: oldPath ?? entry.tracking_name })
+      registry.parse({ content: oldText, path: oldPath })
     );
     const newParse = await Effect.runPromise(
-      registry.parse({ content: newText, path: newPath ?? entry.tracking_name })
+      registry.parse({ content: newText, path: newPath })
     );
     const language =
       newParse.language !== "text" ? newParse.language : oldParse.language;
@@ -290,7 +390,7 @@ async function main() {
     const newDiff = diffKeyMaps(sdKeys.newKeys, ourKeys.newKeys);
 
     results.push({
-      file: entry.tracking_name,
+      file: entry.trackingName,
       sdOld: sdKeys.oldKeys.size,
       sdNew: sdKeys.newKeys.size,
       ourOld: ourKeys.oldKeys.size,
@@ -312,19 +412,15 @@ async function main() {
     return bMissing - aMissing;
   });
 
-  await bun.write(
-    "tmp/semanticdiff/pr-237/line-compare.json",
-    `${encodeJson(results)}\n`
-  );
-  const summary = results.map((row) => {
-    const missing = (row.missingOld ?? 0) + (row.missingNew ?? 0);
-    const extra = (row.extraOld ?? 0) + (row.extraNew ?? 0);
-    return { file: row.file, missing, extra };
-  });
-  await bun.write(
-    "tmp/semanticdiff/pr-237/line-compare-summary.json",
-    `${encodeJson(summary)}\n`
-  );
+  await bun.write(OUTPUT_PATH, `${encodeJson(results)}\n`);
+  const summary = results
+    .filter((row) => !row.skipped)
+    .map((row) => {
+      const missing = (row.missingOld ?? 0) + (row.missingNew ?? 0);
+      const extra = (row.extraOld ?? 0) + (row.extraNew ?? 0);
+      return { file: row.file, missing, extra };
+    });
+  await bun.write(SUMMARY_PATH, `${encodeJson(summary)}\n`);
 
   const worst = summary.filter((row) => row.missing > 0 || row.extra > 0);
   process.stdout.write(`Files with mismatches: ${worst.length}\n`);
