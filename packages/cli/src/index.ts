@@ -1072,9 +1072,67 @@ const app = Command.make("semadiff", {}, () => Effect.void).pipe(
   ])
 );
 
+function normalizeArgv(argv: string[]) {
+  if (argv.length <= 2) {
+    return argv;
+  }
+  const head = argv.slice(0, 2);
+  const rest = argv.slice(2);
+  const patterns: Array<{ path: string[] }> = [
+    { path: ["diff"] },
+    { path: ["pr", "file"] },
+    { path: ["pr", "summary"] },
+  ];
+
+  const normalizeTail = (tokens: string[]) => {
+    const options: string[] = [];
+    const positionals: string[] = [];
+    for (let i = 0; i < tokens.length; i += 1) {
+      const token = tokens[i] ?? "";
+      if (token === "--") {
+        positionals.push(...tokens.slice(i + 1));
+        break;
+      }
+      if (token.startsWith("-")) {
+        options.push(token);
+        if (!token.includes("=")) {
+          const next = tokens[i + 1];
+          if (next && !next.startsWith("-")) {
+            options.push(next);
+            i += 1;
+          }
+        }
+        continue;
+      }
+      positionals.push(token);
+    }
+    return [...options, ...positionals];
+  };
+
+  for (const pattern of patterns) {
+    const { path } = pattern;
+    const idx = rest.findIndex((_value, index) =>
+      path.every((segment, offset) => rest[index + offset] === segment)
+    );
+    if (idx === -1) {
+      continue;
+    }
+    const start = idx + path.length;
+    const before = rest.slice(0, start);
+    const after = rest.slice(start);
+    const normalized = normalizeTail(after);
+    return [...head, ...before, ...normalized];
+  }
+
+  return argv;
+}
+
 const cli = Command.run(app, {
   name: "semadiff",
   version: "0.1.0",
 });
 
-cli(process.argv).pipe(Effect.provide(BunContext.layer), BunRuntime.runMain);
+cli(normalizeArgv(process.argv)).pipe(
+  Effect.provide(BunContext.layer),
+  BunRuntime.runMain
+);
