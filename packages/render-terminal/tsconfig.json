@@ -9,6 +9,6 @@
     "sourceMap": true,
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "references": [{ "path": "../core" }],
+  "references": [{ "path": "../core" }, { "path": "../render-html" }],
   "include": ["src"]
 }

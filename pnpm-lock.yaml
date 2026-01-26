@@ -372,6 +372,9 @@ importers:
       '@semadiff/core':
         specifier: workspace:*
         version: link:../core
+      '@semadiff/render-html':
+        specifier: workspace:*
+        version: link:../render-html
 
   packages/test-corpus: {}
 

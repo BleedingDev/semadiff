@@ -28,7 +28,10 @@ import {
   PrDiffService,
   PrSummarySchema,
 } from "@semadiff/pr-backend";
-import { renderTerminal } from "@semadiff/render-terminal";
+import {
+  renderTerminal,
+  renderTerminalLinesFromHtml,
+} from "@semadiff/render-terminal";
 import { Console, Effect, Schema } from "effect";
 import { resolveConfig } from "./config/resolve.js";
 
@@ -37,6 +40,7 @@ interface DiffArgs {
   newPath: string;
   format: "ansi" | "plain" | "json";
   layout: "unified" | "side-by-side";
+  view: "semantic" | "lines";
   language?: LanguageId;
 }
 
@@ -253,6 +257,10 @@ const layoutOption = Options.choice("layout", [
   Options.withDefault("unified"),
   Options.withDescription("Diff layout.")
 );
+const viewOption = Options.choice("view", ["semantic", "lines"] as const).pipe(
+  Options.withDefault("lines"),
+  Options.withDescription("Render semantic ops or line diff view.")
+);
 const languageOption = Options.choice("language", languageChoices).pipe(
   Options.withDefault("auto"),
   Options.withDescription("Language hint (auto to infer).")
@@ -312,6 +320,7 @@ function runDiffEffect(params: {
   newText: string;
   format: DiffArgs["format"];
   layout: DiffArgs["layout"];
+  view: DiffArgs["view"];
   language?: LanguageId;
   normalizers: NormalizerSettings;
   oldPath?: string;
@@ -417,6 +426,10 @@ function runDiffEffect(params: {
         return renderTerminal(diff, {
           format: params.format,
           layout: params.layout,
+          view: params.view,
+          oldText: params.oldText,
+          newText: params.newText,
+          language: effectiveLanguage,
         });
       })
     );
@@ -432,9 +445,10 @@ const diffCommand = Command.make(
     newPath: Args.text({ name: "new" }),
     format: formatOption,
     layout: layoutOption,
+    view: viewOption,
     language: languageOption,
   },
-  ({ oldPath, newPath, format, layout, language }) =>
+  ({ oldPath, newPath, format, layout, view, language }) =>
     resolveConfig.pipe(
       Effect.flatMap((resolved) => {
         const telemetryOptions = {
@@ -472,6 +486,7 @@ const diffCommand = Command.make(
             newText,
             format,
             layout,
+            view,
             normalizers: resolved.config.normalizers,
             oldPath,
             newPath,
@@ -516,13 +531,51 @@ const prFileCommand = Command.make(
     file: Args.text({ name: "file" }),
     format: formatOption,
     layout: layoutOption,
+    view: viewOption,
     context: prContextOption,
     moves: prMovesOption,
   },
-  ({ prUrl, file, format, layout, context, moves }) =>
+  ({ prUrl, file, format, layout, view, context, moves }) =>
     Effect.gen(function* () {
       const service = yield* PrDiffService;
       const lineLayout = layout === "side-by-side" ? "split" : "unified";
+      if (format === "json") {
+        const result = yield* service.getFileDiffDocument(
+          prUrl,
+          file,
+          context,
+          lineLayout,
+          moves
+        );
+        yield* Console.log(encodeJson(FileDiffDocumentSchema, result, 2));
+        return;
+      }
+      if (view === "lines") {
+        const result = yield* service.getFileDiff(
+          prUrl,
+          file,
+          context,
+          lineLayout,
+          "semantic",
+          false,
+          moves
+        );
+        if (result.file.warnings?.length) {
+          for (const warning of result.file.warnings) {
+            yield* Console.log(`WARNING: ${warning}`);
+          }
+        }
+        yield* Console.log(
+          `File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`
+        );
+        const output = renderTerminalLinesFromHtml(result.linesHtml, {
+          format,
+          layout,
+          contextLines: context,
+        });
+        yield* Console.log(output);
+        return;
+      }
       const result = yield* service.getFileDiffDocument(
         prUrl,
         file,
@@ -530,10 +583,6 @@ const prFileCommand = Command.make(
         lineLayout,
         moves
       );
-      if (format === "json") {
-        yield* Console.log(encodeJson(FileDiffDocumentSchema, result, 2));
-        return;
-      }
       if (result.file.warnings?.length) {
         for (const warning of result.file.warnings) {
           yield* Console.log(`WARNING: ${warning}`);
@@ -554,6 +603,7 @@ const prFileCommand = Command.make(
       const output = renderTerminal(diff, {
         format,
         layout,
+        view,
       });
       yield* Console.log(output);
     }).pipe(Effect.provide(PrDiffLive))
@@ -617,6 +667,7 @@ const gitExternalCommand = Command.make(
             newText,
             format: resolved.config.renderer.format,
             layout: resolved.config.renderer.layout,
+            view: "lines",
             normalizers: resolved.config.normalizers,
             oldPath: oldFile,
             newPath: newFile,
@@ -683,6 +734,7 @@ const difftoolCommand = Command.make(
               newText,
               format: resolved.config.renderer.format,
               layout: resolved.config.renderer.layout,
+              view: "lines",
               normalizers: resolved.config.normalizers,
               oldPath: localPath,
               newPath: remotePath,

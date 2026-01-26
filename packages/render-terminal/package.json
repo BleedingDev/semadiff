@@ -11,6 +11,7 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@semadiff/core": "workspace:*"
+    "@semadiff/core": "workspace:*",
+    "@semadiff/render-html": "workspace:*"
   }
 }
