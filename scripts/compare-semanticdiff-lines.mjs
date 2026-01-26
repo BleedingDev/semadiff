@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { Effect, Schema } from "effect";
 import { defaultConfig, structuralDiff } from "../packages/core/src/index.js";
 import { lightningCssParsers } from "../packages/parser-lightningcss/src/index.js";
@@ -41,6 +42,8 @@ const OUTPUT_PATH = args.get("out") ?? `${BASE_DIR}/line-compare.json`;
 const SUMMARY_PATH =
   args.get("summary") ?? `${BASE_DIR}/line-compare-summary.json`;
 const bun = globalThis.Bun;
+const DIFF_HEADER_REGEX = /^diff --git a\/(.*?) b\/(.*)$/;
+const HUNK_HEADER_REGEX = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@/;
 
 const registry = makeRegistry([
   ...swcParsers,
@@ -52,6 +55,9 @@ const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || "";
 const githubHeaders = token
   ? { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" }
   : { Accept: "application/vnd.github+json" };
+const githubPatchHeaders = token
+  ? { Authorization: `Bearer ${token}` }
+  : undefined;
 
 const JsonUnknown = Schema.parseJson(Schema.Unknown);
 
@@ -73,6 +79,20 @@ async function fetchText(url) {
     return null;
   }
   return res.text();
+}
+
+async function fetchGitHubDiff(prNumber) {
+  const primary = `https://patch-diff.githubusercontent.com/raw/${OWNER}/${REPO}/pull/${prNumber}.diff`;
+  const fallback = `https://github.com/${OWNER}/${REPO}/pull/${prNumber}.diff`;
+  const res = await fetch(primary, { headers: githubPatchHeaders });
+  if (res.ok) {
+    return res.text();
+  }
+  const retry = await fetch(fallback, { headers: githubPatchHeaders });
+  if (!retry.ok) {
+    return null;
+  }
+  return retry.text();
 }
 
 async function fetchBlob(oid) {
@@ -103,6 +123,143 @@ function parseDiffUrl(diffUrl) {
     oldOid: params.get("old_oid"),
     newOid: params.get("new_oid"),
   };
+}
+
+function stripGitPrefix(path) {
+  if (!path) {
+    return null;
+  }
+  if (path.startsWith("a/") || path.startsWith("b/")) {
+    return path.slice(2);
+  }
+  return path;
+}
+
+function parseHunkHeader(line) {
+  const match = HUNK_HEADER_REGEX.exec(line);
+  if (!match) {
+    return null;
+  }
+  return {
+    oldStart: Number(match[1]),
+    newStart: Number(match[3]),
+  };
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: diff parser
+function parseGitHubDiff(diffText) {
+  if (!diffText) {
+    return [];
+  }
+  const files = [];
+  let current = null;
+  let oldLine = null;
+  let newLine = null;
+
+  const startFile = (oldPath, newPath) => {
+    current = {
+      oldPath,
+      newPath,
+      oldKeys: new Map(),
+      newKeys: new Map(),
+      hasHunks: false,
+    };
+    files.push(current);
+    oldLine = null;
+    newLine = null;
+  };
+
+  for (const line of diffText.split("\n")) {
+    if (line.startsWith("diff --git ")) {
+      const match = DIFF_HEADER_REGEX.exec(line);
+      if (match) {
+        startFile(match[1], match[2]);
+      } else {
+        startFile(null, null);
+      }
+      continue;
+    }
+    if (!current) {
+      continue;
+    }
+    if (line.startsWith("--- ")) {
+      const raw = line.slice(4).trim();
+      current.oldPath = raw === "/dev/null" ? null : stripGitPrefix(raw);
+      continue;
+    }
+    if (line.startsWith("+++ ")) {
+      const raw = line.slice(4).trim();
+      current.newPath = raw === "/dev/null" ? null : stripGitPrefix(raw);
+      continue;
+    }
+    if (line.startsWith("@@ ")) {
+      const hunk = parseHunkHeader(line);
+      if (hunk) {
+        current.hasHunks = true;
+        oldLine = hunk.oldStart;
+        newLine = hunk.newStart;
+      }
+      continue;
+    }
+    if (line === "\\ No newline at end of file") {
+      continue;
+    }
+    if (oldLine == null || newLine == null) {
+      continue;
+    }
+    if (line.startsWith("+")) {
+      if (!line.startsWith("+++")) {
+        addNewKey(current.newKeys, newLine, line.slice(1));
+        newLine += 1;
+      }
+      continue;
+    }
+    if (line.startsWith("-")) {
+      if (!line.startsWith("---")) {
+        addOldKey(current.oldKeys, oldLine, line.slice(1));
+        oldLine += 1;
+      }
+      continue;
+    }
+    if (line.startsWith(" ")) {
+      oldLine += 1;
+      newLine += 1;
+    }
+  }
+
+  return files;
+}
+
+function buildGitHubIndex(files) {
+  const map = new Map();
+  for (const file of files) {
+    if (!file) {
+      continue;
+    }
+    const existing =
+      (file.oldPath && map.get(file.oldPath)) ||
+      (file.newPath && map.get(file.newPath)) ||
+      null;
+    const entry = existing ?? {
+      oldPath: file.oldPath ?? null,
+      newPath: file.newPath ?? null,
+      oldKeys: new Map(),
+      newKeys: new Map(),
+      hasHunks: false,
+    };
+    if (file.oldPath) {
+      entry.oldPath = entry.oldPath ?? file.oldPath;
+      map.set(file.oldPath, entry);
+    }
+    if (file.newPath) {
+      entry.newPath = entry.newPath ?? file.newPath;
+      map.set(file.newPath, entry);
+    }
+    mergeKeyMaps(entry.oldKeys, file.oldKeys);
+    mergeKeyMaps(entry.newKeys, file.newKeys);
+    entry.hasHunks = entry.hasHunks || file.hasHunks;
+  }
+  return map;
 }
 
 function getPayloadRows(html) {
@@ -266,6 +423,19 @@ async function main() {
     );
   }
 
+  const githubDiffPath = args.get("githubDiff") ?? `${BASE_DIR}/github.diff`;
+  let githubDiffText = null;
+  if (existsSync(githubDiffPath)) {
+    githubDiffText = await bun.file(githubDiffPath).text();
+  } else {
+    githubDiffText = await fetchGitHubDiff(PR_NUMBER);
+    if (githubDiffText) {
+      await bun.write(githubDiffPath, githubDiffText);
+    }
+  }
+  const githubFiles = parseGitHubDiff(githubDiffText);
+  const githubIndex = buildGitHubIndex(githubFiles);
+
   const entriesByFile = new Map();
   for (const entry of manifest) {
     if (!(entry?.tracking_name && entry?.file && entry?.diff)) {
@@ -396,6 +566,20 @@ async function main() {
     const oldDiff = diffKeyMaps(sdKeys.oldKeys, ourKeys.oldKeys);
     const newDiff = diffKeyMaps(sdKeys.newKeys, ourKeys.newKeys);
 
+    const ghEntry =
+      githubIndex.get(entry.trackingName) ??
+      githubIndex.get(oldPath) ??
+      githubIndex.get(newPath);
+    const ghSkipped = !ghEntry?.hasHunks;
+    const ghOldKeys = ghSkipped ? null : ghEntry.oldKeys;
+    const ghNewKeys = ghSkipped ? null : ghEntry.newKeys;
+    const ghOldDiff = ghOldKeys
+      ? diffKeyMaps(ghOldKeys, ourKeys.oldKeys)
+      : { missing: [], extra: [] };
+    const ghNewDiff = ghNewKeys
+      ? diffKeyMaps(ghNewKeys, ourKeys.newKeys)
+      : { missing: [], extra: [] };
+
     results.push({
       file: entry.trackingName,
       sdOld: sdKeys.oldKeys.size,
@@ -406,10 +590,21 @@ async function main() {
       extraOld: oldDiff.extra.length,
       missingNew: newDiff.missing.length,
       extraNew: newDiff.extra.length,
+      ghOld: ghOldKeys ? ghOldKeys.size : 0,
+      ghNew: ghNewKeys ? ghNewKeys.size : 0,
+      ghMissingOld: ghOldDiff.missing.length,
+      ghExtraOld: ghOldDiff.extra.length,
+      ghMissingNew: ghNewDiff.missing.length,
+      ghExtraNew: ghNewDiff.extra.length,
+      ghSkipped,
       missingOldSamples: oldDiff.missing.slice(0, 3),
       extraOldSamples: oldDiff.extra.slice(0, 3),
       missingNewSamples: newDiff.missing.slice(0, 3),
       extraNewSamples: newDiff.extra.slice(0, 3),
+      ghMissingOldSamples: ghOldDiff.missing.slice(0, 3),
+      ghExtraOldSamples: ghOldDiff.extra.slice(0, 3),
+      ghMissingNewSamples: ghNewDiff.missing.slice(0, 3),
+      ghExtraNewSamples: ghNewDiff.extra.slice(0, 3),
     });
   }
 
@@ -425,7 +620,16 @@ async function main() {
     .map((row) => {
       const missing = (row.missingOld ?? 0) + (row.missingNew ?? 0);
       const extra = (row.extraOld ?? 0) + (row.extraNew ?? 0);
-      return { file: row.file, missing, extra };
+      const ghMissing = (row.ghMissingOld ?? 0) + (row.ghMissingNew ?? 0);
+      const ghExtra = (row.ghExtraOld ?? 0) + (row.ghExtraNew ?? 0);
+      return {
+        file: row.file,
+        missing,
+        extra,
+        ghMissing,
+        ghExtra,
+        ghSkipped: Boolean(row.ghSkipped),
+      };
     });
   await bun.write(SUMMARY_PATH, `${encodeJson(summary)}\n`);
 

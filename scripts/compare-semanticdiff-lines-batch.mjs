@@ -42,6 +42,7 @@ const decodeJson = (value, label) => {
 };
 const encodeJson = (value) => Schema.encodeSync(JsonUnknown)(value);
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: script orchestration
 async function runCompare(pr) {
   if (!bun) {
     throw new Error("This script requires Bun.");
@@ -82,6 +83,14 @@ async function runCompare(pr) {
   let extraOld = 0;
   let extraNew = 0;
   let mismatchedFiles = 0;
+  let ghOld = 0;
+  let ghNew = 0;
+  let ghMissingOld = 0;
+  let ghMissingNew = 0;
+  let ghExtraOld = 0;
+  let ghExtraNew = 0;
+  let ghFiles = 0;
+  let ghSkippedFiles = 0;
   for (const row of compareJson) {
     if (row.skipped) {
       continue;
@@ -101,6 +110,17 @@ async function runCompare(pr) {
     if (mOld + mNew + eOld + eNew > 0) {
       mismatchedFiles += 1;
     }
+    if (row.ghSkipped) {
+      ghSkippedFiles += 1;
+      continue;
+    }
+    ghFiles += 1;
+    ghOld += Number(row.ghOld ?? 0);
+    ghNew += Number(row.ghNew ?? 0);
+    ghMissingOld += Number(row.ghMissingOld ?? 0);
+    ghMissingNew += Number(row.ghMissingNew ?? 0);
+    ghExtraOld += Number(row.ghExtraOld ?? 0);
+    ghExtraNew += Number(row.ghExtraNew ?? 0);
   }
 
   return {
@@ -115,7 +135,17 @@ async function runCompare(pr) {
     extraOld,
     extraNew,
     mismatchedFiles,
-    github: { skipped: true },
+    github: {
+      skipped: ghFiles === 0,
+      files: ghFiles,
+      skippedFiles: ghSkippedFiles,
+      ghOld,
+      ghNew,
+      missingOld: ghMissingOld,
+      missingNew: ghMissingNew,
+      extraOld: ghExtraOld,
+      extraNew: ghExtraNew,
+    },
   };
 }
 
