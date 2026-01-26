@@ -318,7 +318,7 @@ body.sd-embed {
 .sd-lines {
   margin-top: 18px;
   border: 1px solid var(--sd-border);
-  border-radius: 14px;
+  border-radius: 0;
   overflow: hidden;
   background: rgba(11, 18, 36, 0.95);
   box-shadow: var(--sd-shadow);
@@ -326,7 +326,7 @@ body.sd-embed {
 
 body.sd-embed .sd-lines {
   margin-top: 0;
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: none;
 }
 
@@ -1052,7 +1052,8 @@ function buildRawLineRows(
   newLines: string[],
   lineLayout: "split" | "unified",
   normalizeLine?: (line: string) => string,
-  useKeyMatching?: boolean
+  useKeyMatching?: boolean,
+  useYamlComparable?: boolean
 ): LineRow[] {
   let oldComparable = oldLines;
   let newComparable = newLines;
@@ -1066,22 +1067,26 @@ function buildRawLineRows(
           old: buildMultilineImportKeys(oldLines),
           next: buildMultilineImportKeys(newLines),
         };
-    oldComparable = useKeyMatching
-      ? buildYamlComparableLines(oldLines, normalizeLine, true)
-      : buildComparableLines(
-          oldLines,
-          normalizeLine,
-          duplicates,
-          importKeys?.old ?? undefined
-        );
-    newComparable = useKeyMatching
-      ? buildYamlComparableLines(newLines, normalizeLine, true)
-      : buildComparableLines(
-          newLines,
-          normalizeLine,
-          duplicates,
-          importKeys?.next ?? undefined
-        );
+    if (useKeyMatching) {
+      oldComparable = buildYamlComparableLines(oldLines, normalizeLine, true);
+      newComparable = buildYamlComparableLines(newLines, normalizeLine, true);
+    } else if (useYamlComparable) {
+      oldComparable = buildYamlComparableLines(oldLines, normalizeLine, false);
+      newComparable = buildYamlComparableLines(newLines, normalizeLine, false);
+    } else {
+      oldComparable = buildComparableLines(
+        oldLines,
+        normalizeLine,
+        duplicates,
+        importKeys?.old ?? undefined
+      );
+      newComparable = buildComparableLines(
+        newLines,
+        normalizeLine,
+        duplicates,
+        importKeys?.next ?? undefined
+      );
+    }
   }
   const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
   const blocks = buildLineBlocks(edits);
@@ -1090,7 +1095,10 @@ function buildRawLineRows(
     lineLayout,
     normalizeLine,
     newLines,
-    useKeyMatching
+    useKeyMatching,
+    useYamlComparable,
+    normalizeLine ? oldComparable : undefined,
+    normalizeLine ? newComparable : undefined
   );
 }
 
@@ -1212,9 +1220,10 @@ function suppressBalancedLineChanges(
   rows: LineRow[],
   oldLines: string[],
   newLines: string[],
-  normalizeLine?: (line: string) => string
+  normalizeLine?: (line: string) => string,
+  useYamlComparable?: boolean
 ) {
-  if (!normalizeLine) {
+  if (!normalizeLine || useYamlComparable) {
     return rows;
   }
   const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
@@ -1630,6 +1639,9 @@ const COMMENT_ONLY_RE = /^(?:\/\/|\/\*|\*\/|\*)/;
 const COMMENT_DELIMITER_LINES = new Set(["//", "/*", "/**", "*/", "*"]);
 const LOW_INFO_PUNCTUATION_RE = /^[\]{}(),;[]+$/;
 const ALNUM_RE = /[A-Za-z0-9]/;
+const YAML_LIST_ITEM_RE = /^-\s*([^:]+):\s*(.*)$/;
+const YAML_NAME_KEY_RE = /^name:\s*(.+)$/;
+const YAML_USES_KEY_RE = /^uses:\s*(.+)$/;
 const YAML_SHARED_THRESHOLD = 10;
 const YAML_SHARED_DIFF_RATIO = 0.058;
 
@@ -1777,7 +1789,7 @@ function buildLineMatchKey(
   if (!trimmed) {
     return "";
   }
-  const yamlMatch = YAML_KEY_RE.exec(normalized);
+  const yamlMatch = YAML_KEY_RE.exec(line);
   if (yamlMatch) {
     const indent = yamlMatch[1] ?? "";
     const key = (yamlMatch[2] ?? "").trim();
@@ -1829,8 +1841,8 @@ function getSimpleYamlComparable(trimmed: string) {
   return null;
 }
 
-function parseYamlKey(normalized: string) {
-  const match = YAML_KEY_RE.exec(normalized);
+function parseYamlKey(line: string) {
+  const match = YAML_KEY_RE.exec(line);
   if (!match) {
     return null;
   }
@@ -1887,6 +1899,7 @@ function resolveLooseYamlComparableWithPackages(
   return { key: `${currentPackage}::${path}`, currentPackage };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: YAML heuristics are inherently branchy.
 function buildYamlComparableLines(
   lines: string[],
   normalizeLine: (line: string) => string,
@@ -1897,7 +1910,87 @@ function buildYamlComparableLines(
   const packageStack: { indent: number; key: string }[] = [];
   let topKey = "";
   let currentPackage = "";
-  for (const line of lines) {
+  const findUsesKey = (startIndex: number, baseIndent: number) => {
+    for (let index = startIndex + 1; index < lines.length; index += 1) {
+      const rawLine = lines[index] ?? "";
+      const normalized = normalizeLine(rawLine);
+      const indent = (rawLine.match(LINE_INDENT_RE)?.[0] ?? "").length;
+      if (indent <= baseIndent) {
+        break;
+      }
+      const trimmed = normalized.trim();
+      const match = YAML_USES_KEY_RE.exec(trimmed);
+      if (match?.[1]) {
+        return match[1].trim();
+      }
+    }
+    return null;
+  };
+  const findNameKey = (startIndex: number, baseIndent: number) => {
+    for (let index = startIndex + 1; index < lines.length; index += 1) {
+      const rawLine = lines[index] ?? "";
+      const normalized = normalizeLine(rawLine);
+      const indent = (rawLine.match(LINE_INDENT_RE)?.[0] ?? "").length;
+      if (indent <= baseIndent) {
+        break;
+      }
+      const trimmed = normalized.trim();
+      const match = YAML_NAME_KEY_RE.exec(trimmed);
+      if (match?.[1]) {
+        return match[1].trim();
+      }
+    }
+    return null;
+  };
+  const listAnchorInfo = new Map<number, { listKey: string; anchor: string }>();
+  const listAnchorCounts = new Map<string, number>();
+  if (!looseKeys) {
+    const listContextStack: { indent: number; key: string }[] = [];
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index] ?? "";
+      const normalized = normalizeLine(line);
+      const trimmed = normalized.trim();
+      const listMatch = YAML_LIST_ITEM_RE.exec(trimmed);
+      if (listMatch) {
+        const indent = (line.match(LINE_INDENT_RE)?.[0] ?? "").length;
+        while (
+          listContextStack.length > 0 &&
+          (listContextStack.at(-1)?.indent ?? 0) >= indent
+        ) {
+          listContextStack.pop();
+        }
+        const contextKey = listContextStack.map((entry) => entry.key).join(">");
+        const key = listMatch[1]?.trim() ?? "";
+        const value = listMatch[2]?.trim() ?? "";
+        const nameValue = key === "name" ? value : findNameKey(index, indent);
+        const usesValue = key === "uses" ? value : findUsesKey(index, indent);
+        let anchorBase = value ? `__ITEM__${key}::${value}` : `__ITEM__${key}`;
+        if (usesValue) {
+          anchorBase = `__ITEM__uses::${usesValue}`;
+        } else if (nameValue) {
+          anchorBase = `__ITEM__name::${nameValue}`;
+        }
+        const anchor = contextKey ? `${contextKey}::${anchorBase}` : anchorBase;
+        const listKey = anchor;
+        listAnchorInfo.set(index, { listKey, anchor });
+        listAnchorCounts.set(listKey, (listAnchorCounts.get(listKey) ?? 0) + 1);
+      }
+      const parsed = parseYamlKey(line);
+      if (parsed) {
+        const { indent, key } = parsed;
+        while (
+          listContextStack.length > 0 &&
+          (listContextStack.at(-1)?.indent ?? 0) >= indent
+        ) {
+          listContextStack.pop();
+        }
+        listContextStack.push({ indent, key });
+      }
+    }
+  }
+  const listAnchorRemaining = new Map(listAnchorCounts);
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index] ?? "";
     const normalized = normalizeLine(line);
     const trimmed = normalized.trim();
     const simple = getSimpleYamlComparable(trimmed);
@@ -1905,9 +1998,47 @@ function buildYamlComparableLines(
       comparables.push(simple);
       continue;
     }
-    const parsed = parseYamlKey(normalized);
+    const listMatch = YAML_LIST_ITEM_RE.exec(trimmed);
+    if (listMatch) {
+      const indent = (line.match(LINE_INDENT_RE)?.[0] ?? "").length;
+      const key = listMatch[1]?.trim() ?? "";
+      const value = listMatch[2]?.trim() ?? "";
+      let comparable = value ? `__ITEM__${key}::${value}` : `__ITEM__${key}`;
+      if (!looseKeys) {
+        const listInfo = listAnchorInfo.get(index);
+        if (listInfo) {
+          const remaining = listAnchorRemaining.get(listInfo.listKey);
+          if (remaining !== undefined) {
+            comparable = `${listInfo.anchor}::__IDX__${remaining}`;
+            listAnchorRemaining.set(listInfo.listKey, remaining - 1);
+          } else {
+            comparable = listInfo.anchor;
+          }
+        } else {
+          const usesValue = findUsesKey(index, indent);
+          if (usesValue) {
+            comparable = `__ITEM__uses::${usesValue}`;
+          }
+        }
+      }
+      if (looseKeys) {
+        comparables.push(`${indent}:${comparable}`);
+      } else {
+        while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
+          stack.pop();
+        }
+        stack.push({ indent, key: comparable });
+        const path = stack.map((entry) => entry.key).join(">");
+        comparables.push(path);
+      }
+      continue;
+    }
+    const parsed = parseYamlKey(line);
     if (!parsed) {
-      comparables.push(normalized);
+      const contextPath = stack.map((entry) => entry.key).join(">");
+      comparables.push(
+        contextPath ? `${contextPath}::${normalized}` : normalized
+      );
       continue;
     }
     const { indent, key } = parsed;
@@ -2086,20 +2217,53 @@ function appendAlignedReplaceRows(
   newLine: number,
   lineLayout: "split" | "unified",
   normalizeLine: (line: string) => string,
-  preferIndexPairing?: boolean
+  preferIndexPairing?: boolean,
+  useYamlComparable?: boolean,
+  oldComparableOverride?: string[],
+  newComparableOverride?: string[]
 ) {
-  const importOldKeys = buildMultilineImportKeys(deleteLines);
-  const importNewKeys = buildMultilineImportKeys(insertLines);
-  const oldComparable = deleteLines.map((line, index) => {
-    const key = buildLineMatchKey(line, normalizeLine);
-    const importKey = importOldKeys[index];
-    return importKey ? `${key}__${importKey}` : key;
-  });
-  const newComparable = insertLines.map((line, index) => {
-    const key = buildLineMatchKey(line, normalizeLine);
-    const importKey = importNewKeys[index];
-    return importKey ? `${key}__${importKey}` : key;
-  });
+  const importOldKeys = useYamlComparable
+    ? null
+    : buildMultilineImportKeys(deleteLines);
+  const importNewKeys = useYamlComparable
+    ? null
+    : buildMultilineImportKeys(insertLines);
+  const hasYamlOverride =
+    useYamlComparable &&
+    oldComparableOverride &&
+    newComparableOverride &&
+    oldComparableOverride.length === deleteLines.length &&
+    newComparableOverride.length === insertLines.length;
+  let oldComparable: string[];
+  let newComparable: string[];
+  if (useYamlComparable) {
+    if (hasYamlOverride && oldComparableOverride && newComparableOverride) {
+      oldComparable = oldComparableOverride;
+      newComparable = newComparableOverride;
+    } else {
+      oldComparable = buildYamlComparableLines(
+        deleteLines,
+        normalizeLine,
+        false
+      );
+      newComparable = buildYamlComparableLines(
+        insertLines,
+        normalizeLine,
+        false
+      );
+    }
+  } else {
+    oldComparable = deleteLines.map((line, index) => {
+      const key = buildLineMatchKey(line, normalizeLine);
+      const importKey = importOldKeys?.[index] ?? null;
+      return importKey ? `${key}__${importKey}` : key;
+    });
+    newComparable = insertLines.map((line, index) => {
+      const key = buildLineMatchKey(line, normalizeLine);
+      const importKey = importNewKeys?.[index] ?? null;
+      return importKey ? `${key}__${importKey}` : key;
+    });
+  }
   const oldKeyCounts = buildLineKeyCounts(oldComparable, (line) => line);
   const newKeyCounts = buildLineKeyCounts(newComparable, (line) => line);
   const disambiguate = (
@@ -2149,7 +2313,7 @@ function appendAlignedReplaceRows(
   const hasReorderableLines =
     deleteLines.some(isReorderableLine) && insertLines.some(isReorderableLine);
   const shouldIndexPair =
-    !hasReorderableLines &&
+    !(useYamlComparable || hasReorderableLines) &&
     (alignedCost > indexCost ||
       (preferIndexPairing && matchRatio > 0 && matchRatio < 0.35));
   if (shouldIndexPair) {
@@ -2296,12 +2460,16 @@ function appendBlockRows(
   return { oldLine: nextOld, newLine: nextNew };
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: block merging is clearer inline.
 function buildRowsFromBlocks(
   blocks: LineBlock[],
   lineLayout: "split" | "unified",
   normalizeLine?: (line: string) => string,
   newLines?: string[],
-  useKeyMatching?: boolean
+  useKeyMatching?: boolean,
+  useYamlComparable?: boolean,
+  oldComparable?: string[],
+  newComparable?: string[]
 ) {
   const rows: LineRow[] = [];
   let oldLine = 1;
@@ -2323,7 +2491,16 @@ function buildRowsFromBlocks(
       const insertLines = reorderedLines ?? next.lines;
       const shouldAlign =
         normalizeLine !== undefined &&
+        !useYamlComparable &&
         block.lines.length + insertLines.length <= 4000;
+      const oldComparableSlice =
+        useYamlComparable && oldComparable
+          ? oldComparable.slice(oldLine - 1, oldLine - 1 + block.lines.length)
+          : undefined;
+      const newComparableSlice =
+        useYamlComparable && newComparable
+          ? newComparable.slice(newLine - 1, newLine - 1 + insertLines.length)
+          : undefined;
       let result: { oldLine: number; newLine: number };
       if (shouldAlign && normalizeLine) {
         result = appendAlignedReplaceRows(
@@ -2334,7 +2511,10 @@ function buildRowsFromBlocks(
           newLine,
           lineLayout,
           normalizeLine,
-          useKeyMatching
+          useKeyMatching,
+          useYamlComparable,
+          oldComparableSlice,
+          newComparableSlice
         );
       } else if (lineLayout === "unified") {
         result = appendUnifiedReplaceRows(
@@ -2828,6 +3008,7 @@ function buildLineRows(
   normalizeLine?: (line: string) => string,
   operations: DiffOperation[] = [],
   useKeyMatching?: boolean,
+  useYamlComparable?: boolean,
   applyOperations = true,
   applySuppression = true
 ): LineRow[] {
@@ -2838,9 +3019,12 @@ function buildLineRows(
     newLines,
     lineLayout,
     normalizeLine,
-    useKeyMatching
+    useKeyMatching,
+    useYamlComparable
   );
-  rows = pairIdenticalLineMoves(rows, normalizeLine);
+  if (!useYamlComparable) {
+    rows = pairIdenticalLineMoves(rows, normalizeLine);
+  }
   if (applyOperations) {
     rows = applyLineOperations(
       rows,
@@ -2861,7 +3045,8 @@ function buildLineRows(
         rows,
         oldLines,
         newLines,
-        normalizeLine
+        normalizeLine,
+        useYamlComparable
       );
       rows = suppressImportBlockStarts(rows);
       rows = suppressInlinePropChanges(rows, normalizeLine);
@@ -3559,9 +3744,16 @@ function renderLineView(
   if (!context.canRenderLines) {
     return "";
   }
+  const isYamlPath =
+    options.filePath?.endsWith(".yml") || options.filePath?.endsWith(".yaml");
+  const yamlLanguage = options.language === "yaml" || Boolean(isYamlPath);
   const normalizeLine =
     context.lineMode === "semantic"
-      ? (line: string) => normalizeLineForSemantic(line, options.language)
+      ? (line: string) =>
+          normalizeLineForSemantic(
+            line,
+            yamlLanguage ? "yaml" : options.language
+          )
       : undefined;
   const oldText = options.oldText ?? "";
   const newText = options.newText ?? "";
@@ -3570,6 +3762,7 @@ function renderLineView(
     (oldText.includes("lockfileVersion:") && oldText.includes("importers:")) ||
     (newText.includes("lockfileVersion:") && newText.includes("importers:"));
   const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
+  const useYamlComparable = Boolean(normalizeLine && yamlLanguage);
   const rawRows = buildLineRows(
     oldText,
     newText,
@@ -3577,6 +3770,7 @@ function renderLineView(
     context.lineLayout,
     undefined,
     diff.operations,
+    false,
     false,
     false,
     false
@@ -3589,6 +3783,7 @@ function renderLineView(
     normalizeLine,
     diff.operations,
     useKeyMatching,
+    useYamlComparable,
     context.lineMode === "semantic",
     context.lineMode === "semantic"
   );
@@ -3607,17 +3802,13 @@ function renderLineView(
   const rawForCompare = hideComments ? applyHideComments(rawRows) : rawRows;
   let rowsForCompare = hideComments ? applyHideComments(rows) : rows;
   let warningHtml = "";
-  if (
-    context.lineMode === "semantic" &&
-    normalizeLine &&
-    !hasLineChanges(rowsForCompare)
-  ) {
-    warningHtml = renderSemanticFallbackWarning();
-    rowsForCompare = rawForCompare;
-  } else if (context.lineMode === "semantic" && normalizeLine) {
+  if (context.lineMode === "semantic" && normalizeLine) {
     const rawCount = countLineChanges(rawForCompare);
     const semanticCount = countLineChanges(rowsForCompare);
-    if (rawCount > 0 && rawCount < semanticCount) {
+    if (semanticCount === 0) {
+      warningHtml = renderSemanticFallbackWarning();
+      rowsForCompare = rawForCompare;
+    } else if (rawCount > 0 && rawCount < semanticCount) {
       warningHtml = renderSemanticNoiseWarning();
       rowsForCompare = rawForCompare;
     }

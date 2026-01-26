@@ -128,22 +128,28 @@ function getPayloadRows(html) {
   return Array.isArray(rows) ? rows : [];
 }
 
-function addKey(map, key, count = 1) {
+function addKey(map, key, count = 1, dedupe = false) {
+  if (dedupe) {
+    if (!map.has(key)) {
+      map.set(key, 1);
+    }
+    return;
+  }
   map.set(key, (map.get(key) ?? 0) + count);
 }
 
-function addOldKey(map, line, text) {
+function addOldKey(map, line, text, dedupe = false) {
   if (line == null) {
     return;
   }
-  addKey(map, `${line}\t${text ?? ""}`);
+  addKey(map, `${line}\t${text ?? ""}`, 1, dedupe);
 }
 
-function addNewKey(map, line, text) {
+function addNewKey(map, line, text, dedupe = false) {
   if (line == null) {
     return;
   }
-  addKey(map, `${line}\t${text ?? ""}`);
+  addKey(map, `${line}\t${text ?? ""}`, 1, dedupe);
 }
 
 function mergeKeyMaps(target, source) {
@@ -179,8 +185,8 @@ function collectSdKeysFromDiffJson(diffJson) {
       if (!changed) {
         continue;
       }
-      addOldKey(oldKeys, oldLine, oldText);
-      addNewKey(newKeys, newLine, newText);
+      addOldKey(oldKeys, oldLine, oldText, true);
+      addNewKey(newKeys, newLine, newText, true);
     }
   }
   return { oldKeys, newKeys };
@@ -372,6 +378,7 @@ async function main() {
       oldText,
       newText,
       language,
+      filePath: entry.trackingName ?? oldPath ?? newPath ?? undefined,
       view: "lines",
       lineMode: "semantic",
       contextLines: 0,
