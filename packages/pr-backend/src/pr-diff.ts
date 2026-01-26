@@ -71,7 +71,7 @@ const PR_CACHE_TTL_MS = 5 * 60 * 1000;
 const FILE_CACHE_TTL_MS = 5 * 60 * 1000;
 const SUMMARY_CACHE_TTL_MS = 60 * 60 * 1000;
 const DIFF_CACHE_TTL_MS = 60 * 60 * 1000;
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v5";
 const SEMANTIC_CONTEXT_LINES = 0;
 
 interface CachedPrData {
@@ -481,6 +481,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     newText,
     contextLines,
     lineLayout,
+    virtualize: true,
     showBanner: false,
     showSummary: false,
     showFilePath: false,

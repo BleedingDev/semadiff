@@ -6,6 +6,8 @@ import {
   readFileSync,
   writeFileSync,
 } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { Args, Command, Options } from "@effect/cli";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import type { DiffDocument, NormalizerSettings } from "@semadiff/core";
@@ -22,18 +24,24 @@ import { swcParsers } from "@semadiff/parser-swc";
 import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
 import type { LanguageId } from "@semadiff/parsers";
 import { makeRegistry } from "@semadiff/parsers";
-import {
-  FileDiffDocumentSchema,
-  PrDiffLive,
-  PrDiffService,
-  PrSummarySchema,
-} from "@semadiff/pr-backend";
+import type * as PrBackend from "@semadiff/pr-backend";
 import {
   renderTerminal,
   renderTerminalLinesFromHtml,
 } from "@semadiff/render-terminal";
 import { Console, Effect, Schema } from "effect";
 import { resolveConfig } from "./config/resolve.js";
+
+const isSourceRun = fileURLToPath(import.meta.url).includes(
+  `${path.sep}packages${path.sep}cli${path.sep}src${path.sep}`
+);
+const prBackendModule = (await import(
+  isSourceRun
+    ? new URL("../../pr-backend/src/index.ts", import.meta.url).href
+    : "@semadiff/pr-backend"
+)) as typeof PrBackend;
+const { FileDiffDocumentSchema, PrDiffLive, PrDiffService, PrSummarySchema } =
+  prBackendModule;
 
 interface DiffArgs {
   oldPath: string;
