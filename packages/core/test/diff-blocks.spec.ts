@@ -17,6 +17,12 @@ function makeToken(
   };
 }
 
+function buildSequence(size: number, prefix = "t") {
+  return Array.from({ length: size }, (_, index) =>
+    makeToken(`${prefix}${index}`, `${prefix}${index}`, index)
+  );
+}
+
 describe("diff block generation", () => {
   test("emits delete and insert blocks for replaced token", () => {
     const oldUnits = [makeToken("a", "a", 0)];
@@ -68,5 +74,28 @@ describe("diff block generation", () => {
     );
     const blocks = diffUnits(oldUnits, newUnits);
     expect(blocks).toHaveLength(0);
+  });
+
+  test("myers path emits delete+insert for a large replacement", () => {
+    const oldUnits = buildSequence(1500);
+    const newUnits = buildSequence(1500);
+    oldUnits[750] = makeToken("old-value", "old-value", 750);
+    newUnits[750] = makeToken("new-value", "new-value", 750);
+
+    const blocks = diffUnits(oldUnits, newUnits);
+    expect(blocks.map((block) => block.type)).toEqual(["delete", "insert"]);
+    expect(blocks[0]?.start).toBe(750);
+    expect(blocks[1]?.start).toBe(750);
+  });
+
+  test("myers path emits an insert block for large tail append", () => {
+    const oldUnits = buildSequence(1300);
+    const newUnits = buildSequence(1600);
+    const blocks = diffUnits(oldUnits, newUnits);
+
+    expect(blocks).toHaveLength(1);
+    expect(blocks[0]?.type).toBe("insert");
+    expect(blocks[0]?.start).toBe(1300);
+    expect(blocks[0]?.units).toHaveLength(300);
   });
 });

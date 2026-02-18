@@ -33,10 +33,7 @@ function backtrackArrayEdits(
   const edits: ArrayEdit[] = [];
 
   for (let d = trace.length - 1; d > 0; d -= 1) {
-    const v = trace[d];
-    if (!v) {
-      continue;
-    }
+    const v = trace[d] as number[];
     const offset = (v.length - 1) / 2;
     const k = x - y;
     const prevK = selectPrevK(v, offset, k, d);
@@ -119,16 +116,10 @@ function buildLcsTable(oldUnits: DiffToken[], newUnits: DiffToken[]) {
   );
   for (let i = oldUnits.length - 1; i >= 0; i -= 1) {
     for (let j = newUnits.length - 1; j >= 0; j -= 1) {
-      const oldUnit = oldUnits[i];
-      const newUnit = newUnits[j];
-      const row = table[i];
-      const downRow = table[i + 1];
-      if (!(oldUnit && newUnit)) {
-        continue;
-      }
-      if (!(row && downRow)) {
-        continue;
-      }
+      const oldUnit = oldUnits[i] as DiffToken;
+      const newUnit = newUnits[j] as DiffToken;
+      const row = table[i] as number[];
+      const downRow = table[i + 1] as number[];
       if (getComparableText(oldUnit) === getComparableText(newUnit)) {
         row[j] = (downRow[j + 1] ?? 0) + 1;
       } else {
