@@ -198,15 +198,15 @@ function collectDependencyUsage() {
 }
 
 function npmView(name, field = "version") {
-  const stdout = execFileSync(
-    "npm",
-    ["view", `${name}@latest`, field, "--json"],
-    {
-      cwd: ROOT,
-      stdio: ["ignore", "pipe", "pipe"],
-      encoding: "utf8",
-    }
-  ).trim();
+  return npmViewSpec(`${name}@latest`, field);
+}
+
+function npmViewSpec(spec, field = "version") {
+  const stdout = execFileSync("npm", ["view", spec, field, "--json"], {
+    cwd: ROOT,
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf8",
+  }).trim();
   if (!stdout) {
     return null;
   }
@@ -226,6 +226,25 @@ function npmVersionExists(spec) {
   }
 }
 
+function normalizeVersion(value) {
+  if (Array.isArray(value)) {
+    const last = value.at(-1);
+    return typeof last === "string" ? last : null;
+  }
+  return typeof value === "string" ? value : null;
+}
+
+function pickRegistrySpec(dep, usedBy) {
+  const declaredRanges = [...new Set(usedBy.map((entry) => entry.range))];
+  const firstRange = declaredRanges.find(
+    (range) =>
+      typeof range === "string" &&
+      range.length > 0 &&
+      !range.startsWith("workspace:")
+  );
+  return firstRange ? `${dep}@${firstRange}` : `${dep}@latest`;
+}
+
 function effectRangeSupportsV4(range) {
   if (!range) {
     return null;
@@ -242,7 +261,9 @@ function emptyDependencyStatus(dep, usedBy) {
   return {
     dependency: dep,
     usedBy,
+    checkedSpec: null,
     latestVersion: null,
+    resolvedVersion: null,
     peerEffectRange: null,
     supportsEffectV4: null,
     error: null,
@@ -252,21 +273,33 @@ function emptyDependencyStatus(dep, usedBy) {
 function collectDependencyStatus(dep, usedBy) {
   try {
     const latestVersion = npmView(dep, "version");
-    const peerDependencies = npmView(dep, "peerDependencies");
+    const checkedSpec = pickRegistrySpec(dep, usedBy);
+    const resolvedVersion = normalizeVersion(
+      npmViewSpec(checkedSpec, "version")
+    );
+    const peerDependencies = resolvedVersion
+      ? npmViewSpec(`${dep}@${resolvedVersion}`, "peerDependencies")
+      : npmViewSpec(checkedSpec, "peerDependencies");
     const peerEffectRange =
       peerDependencies && typeof peerDependencies === "object"
         ? (peerDependencies.effect ?? null)
         : null;
     let supportsEffectV4 = null;
     if (dep === "effect") {
-      supportsEffectV4 = npmVersionExists("effect@4.0.0-beta.0");
+      const ranges = usedBy.map((entry) => entry.range);
+      supportsEffectV4 =
+        ranges.length === 0
+          ? npmVersionExists("effect@4.0.0-beta.0")
+          : ranges.every((range) => effectRangeSupportsV4(range) === true);
     } else if (peerEffectRange) {
       supportsEffectV4 = effectRangeSupportsV4(peerEffectRange);
     }
     return {
       dependency: dep,
       usedBy,
+      checkedSpec,
       latestVersion,
+      resolvedVersion,
       peerEffectRange,
       supportsEffectV4,
       error: null,
@@ -275,7 +308,9 @@ function collectDependencyStatus(dep, usedBy) {
     return {
       dependency: dep,
       usedBy,
+      checkedSpec: null,
       latestVersion: null,
+      resolvedVersion: null,
       peerEffectRange: null,
       supportsEffectV4: null,
       error: cause instanceof Error ? cause.message : String(cause),
@@ -320,8 +355,10 @@ function buildBlockers(apiUsage, registryStatus) {
     if (dep.dependency !== "effect" && dep.supportsEffectV4 === false) {
       blockers.push({
         kind: "peer-constraint",
-        title: `${dep.dependency}@${dep.latestVersion ?? "latest"} does not declare effect v4 support`,
-        detail: `peerDependencies.effect is ${dep.peerEffectRange ?? "not declared"}`,
+        title: `${dep.dependency}@${dep.resolvedVersion ?? dep.latestVersion ?? "latest"} does not declare effect v4 support`,
+        detail: `checked=${dep.checkedSpec ?? "latest"}, peerDependencies.effect=${
+          dep.peerEffectRange ?? "not declared"
+        }`,
       });
     }
   }
@@ -344,9 +381,13 @@ function printSummary(report) {
       continue;
     }
     writeLine(
-      `- ${dep.dependency}: latest=${dep.latestVersion ?? "unknown"}, peer.effect=${
+      `- ${dep.dependency}: latest=${dep.latestVersion ?? "unknown"}, checked=${
+        dep.checkedSpec ?? "latest"
+      }, resolved=${dep.resolvedVersion ?? "unknown"}, peer.effect=${
         dep.peerEffectRange ?? "n/a"
-      }, supportsV4=${dep.supportsEffectV4 === null ? "unknown" : String(dep.supportsEffectV4)}`
+      }, supportsV4=${
+        dep.supportsEffectV4 === null ? "unknown" : String(dep.supportsEffectV4)
+      }`
     );
   }
   if (report.blockers.length === 0) {

@@ -32,48 +32,38 @@ Strict mode (non-zero exit on blockers):
 pnpm effect:v4:readiness -- --strict
 ```
 
-## Current blockers in this repo
+Current result (as of this update):
 
-### 1) Removed API usage still present
+- `pnpm effect:v4:readiness` => `Ready now: yes`
+- `pnpm effect:v4:readiness -- --strict` => exit code `0`
 
-The codebase currently uses APIs called out as removed or renamed in v4 migration docs:
+## What is complete
 
-- `Context.Tag(...)`
-- `Effect.Service<...>()(...)`
-- `Effect.Service.Default`
-- `Effect.Service` `dependencies` option
+- Removed API migration is complete:
+  - no `Context.Tag(...)`
+  - no `Effect.Service<...>()(...)`
+  - no `Effect.catchAll(...)`
+  - no `Effect.Service.Default`
+  - no `Effect.Service` `dependencies` option
+- Workspace dependencies are aligned to v4 beta where required:
+  - `effect@^4.0.0-beta.0`
+  - `@effect/platform-bun@^4.0.0-beta.0`
+  - `@effect/vitest@^4.0.0-beta.0`
+  - `vitest@^3.2.4`
+- Full validation passes:
+  - `lint`
+  - `format:check`
+  - `typecheck`
+  - `build`
+  - `test`
+  - `test:app`
+  - coverage pipeline via `pnpm quality`
 
-Note: direct `Effect.catchAll(...)` callsites were reduced to zero by introducing local compatibility aliases (`catchRecoverable`) so that future v4 change can be done in one place per file.
+## Remaining caveats
 
-### 2) Ecosystem package constraints
+- CLI remains on unstable v4 module surface (`effect/unstable/cli`), which is expected and may change across beta releases.
+- Bun platform and Vitest integrations are still separate packages (`@effect/platform-bun`, `@effect/vitest`), not collapsed into a single `effect` import surface.
 
-The workspace currently depends on packages that (latest release metadata) still declare `effect` peers in `^3.x`:
+## Ongoing guardrail
 
-- `@effect/cli`
-- `@effect/platform`
-
-`@effect/platform-bun` and `@effect/vitest` already publish `4.0.0-beta.0`, but we cannot do a full clean switch while core CLI/platform dependencies are still pinned to v3 peer constraints.
-
-## Practical migration plan for this repo
-
-1. Keep running `pnpm effect:v4:readiness` while upstream releases move.
-2. When `@effect/cli` and `@effect/platform` publish Effect v4-compatible versions:
-   - bump Effect stack dependencies on this branch,
-   - run `pnpm -s quality`,
-   - fix compile/runtime breakages.
-3. Apply code migration in this order:
-   - service definitions (`Context.Tag`, `Effect.Service`) to v4 service APIs,
-   - switch compatibility aliases from `Effect.catchAll` to v4 `Effect.catch`,
-   - remaining migration-doc deltas (runtime/yieldable/forking/fiberref/cause as needed).
-4. Merge once full test + typecheck passes on v4 stack.
-
-## Experiment status
-
-A practical override experiment was executed on branch `experiment/effect-v4-overrides`.  
-See `docs/EFFECT_V4_EXPERIMENT.md` for exact commands and breakpoints observed under forced v4 beta overrides.
-
-## Candidate upstream issues to file (if still unresolved)
-
-- `@effect/cli` v4 compatibility and peer range timeline.
-- `@effect/platform` v4 compatibility and peer range timeline.
-- Migration guidance for projects that currently use `Effect.Service.Default` and `dependencies`.
+Keep `pnpm effect:v4:readiness -- --strict` in migration validation so regressions to removed APIs or incompatible effect peer constraints fail early.

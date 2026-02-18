@@ -4,6 +4,7 @@
 
 - Branch: `chore/effect-v4-readiness`
 - Workspace migrated to `effect@^4.0.0-beta.0`
+- Readiness check now reports `Ready now: yes` (`pnpm effect:v4:readiness -- --strict` passes)
 - Validation status: `lint`, `format:check`, `typecheck`, `build`, `test`, `test:app`, and coverage pipeline are passing
 
 ## Package Surface Findings
@@ -37,9 +38,4 @@
 
 ## Remaining Non-Blocking Advisories
 
-`packages/pr-backend/src/github.ts` has effect-language-service advisories (not compile errors):
-
-- `TS15` (prefer Effect-native error handling over `try/catch` inside generators)
-- `TS44` (prefer Effect Schema JSON operations over `JSON.parse` / `JSON.stringify`)
-
-These are candidates for a follow-up hardening plate, but they are not blocking build/tests right now.
+The previous `TS15`/`TS44` effect-language-service advisories in `packages/pr-backend/src/github.ts` were eliminated by replacing in-generator `try/catch` and raw `JSON.parse`/`JSON.stringify` with Schema effectful decode/encode flows.
