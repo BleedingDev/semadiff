@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 import { Effect } from "effect";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { Telemetry, TelemetryLive } from "../src/telemetry";
 
 interface CapturedRequest {
@@ -17,6 +17,9 @@ interface OTelSpanPayload {
           key?: string;
           value?: {
             stringValue?: string;
+            boolValue?: boolean;
+            intValue?: string;
+            doubleValue?: number;
           };
         }>;
       }>;
@@ -169,6 +172,118 @@ describe("telemetry exporter", () => {
         (attribute) => attribute.key === "semadiff.status"
       );
       expect(status?.value?.stringValue).toBe("error");
+    }
+    await server.close();
+  });
+
+  test("missing endpoint warns once and skips otlp exports", async () => {
+    const warnSpy = vi
+      .spyOn(console, "warn")
+      .mockImplementation(() => undefined);
+    const program = Effect.gen(function* () {
+      const telemetry = yield* Telemetry;
+      yield* telemetry.span("run", {}, Effect.succeed("ok"));
+      yield* telemetry.log("hello");
+      yield* telemetry.metric("metric", 1);
+      yield* telemetry.span("run-2", {}, Effect.succeed("ok"));
+    });
+
+    await Effect.runPromise(
+      program.pipe(
+        Effect.provide(
+          TelemetryLive({
+            enabled: true,
+            exporter: "otlp-http",
+            endpoint: undefined,
+          })
+        )
+      )
+    );
+
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(String(warnSpy.mock.calls[0]?.[0] ?? "")).toContain(
+      "without endpoint"
+    );
+    warnSpy.mockRestore();
+  });
+
+  test("deriveEndpoint appends v1 paths for base OTLP endpoint", async () => {
+    const server = await createTelemetryServer();
+    const baseEndpoint = server.endpoint.replace("/v1/traces", "/collector");
+
+    const program = Effect.gen(function* () {
+      const telemetry = yield* Telemetry;
+      yield* telemetry.log("hello");
+      yield* telemetry.metric("semadiff.metric", 1);
+    });
+
+    await Effect.runPromise(
+      program.pipe(
+        Effect.provide(
+          TelemetryLive({
+            enabled: true,
+            exporter: "otlp-http",
+            endpoint: baseEndpoint,
+          })
+        )
+      )
+    );
+
+    const urls = server.getRequests().map((request) => request.url);
+    expect(urls).toContain("/collector/v1/logs");
+    expect(urls).toContain("/collector/v1/metrics");
+    await server.close();
+  });
+
+  test("encodes mixed attribute types into OTLP payload", async () => {
+    const server = await createTelemetryServer();
+
+    const program = Effect.gen(function* () {
+      const telemetry = yield* Telemetry;
+      yield* telemetry.span(
+        "mixed",
+        {
+          command: "diff",
+          ok: true,
+          count: 3,
+          ratio: 1.5,
+          nested: { key: "value" },
+          skip: undefined,
+        },
+        Effect.succeed("ok")
+      );
+    });
+
+    await Effect.runPromise(
+      program.pipe(
+        Effect.provide(
+          TelemetryLive({
+            enabled: true,
+            exporter: "otlp-http",
+            endpoint: server.endpoint,
+          })
+        )
+      )
+    );
+
+    const traceRequest = server
+      .getRequests()
+      .find((request) => request.url === "/v1/traces");
+    expect(traceRequest).toBeDefined();
+    if (traceRequest) {
+      const payload = JSON.parse(traceRequest.body) as OTelSpanPayload;
+      const attributes =
+        payload.resourceSpans?.[0]?.scopeSpans?.[0]?.spans?.[0]?.attributes ??
+        [];
+      const byKey = new Map(
+        attributes.map((attribute) => [attribute.key, attribute.value])
+      );
+      expect(byKey.get("command")?.stringValue).toBe("diff");
+      expect(byKey.get("ok")?.boolValue).toBe(true);
+      expect(byKey.get("count")?.intValue).toBe("3");
+      expect(byKey.get("ratio")?.doubleValue).toBe(1.5);
+      expect(byKey.get("nested")?.stringValue).toContain('"key":"value"');
+      expect(byKey.has("skip")).toBe(false);
     }
     await server.close();
   });
