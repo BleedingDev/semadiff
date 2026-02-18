@@ -67,6 +67,11 @@ The workspace currently depends on packages that (latest release metadata) still
    - remaining migration-doc deltas (runtime/yieldable/forking/fiberref/cause as needed).
 4. Merge once full test + typecheck passes on v4 stack.
 
+## Experiment status
+
+A practical override experiment was executed on branch `experiment/effect-v4-overrides`.  
+See `docs/EFFECT_V4_EXPERIMENT.md` for exact commands and breakpoints observed under forced v4 beta overrides.
+
 ## Candidate upstream issues to file (if still unresolved)
 
 - `@effect/cli` v4 compatibility and peer range timeline.
