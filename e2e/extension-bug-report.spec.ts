@@ -9,6 +9,7 @@ const contentScriptPath = join(
   "dist",
   "content.js"
 );
+const REDACTED_JSON_FIELD_REGEX = /"redacted"\s*:\s*true/;
 
 const prHtml = `<!doctype html>
 <html lang="en">
@@ -42,5 +43,5 @@ test("bug report copies diagnostics by default", async ({ page }) => {
   await page.getByRole("button", { name: "Report bug" }).click();
   const clipboard = await page.evaluate(() => (window as any).__clipboard);
   expect(clipboard).toContain("Diagnostics");
-  expect(clipboard).toContain('"redacted": true');
+  expect(clipboard).toMatch(REDACTED_JSON_FIELD_REGEX);
 });
