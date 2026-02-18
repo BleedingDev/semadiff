@@ -49,9 +49,11 @@ describe("diff characterization", () => {
           {
             "moveId": null,
             "newStartLine": 1,
-            "newText": "export const value = 2;\n",
+            "newText": "export const value = 2;
+      ",
             "oldStartLine": 1,
-            "oldText": "export const value = 1;\n",
+            "oldText": "export const value = 1;
+      ",
             "type": "update",
           },
         ],
@@ -71,9 +73,13 @@ describe("diff characterization", () => {
           {
             "moveId": null,
             "newStartLine": 1,
-            "newText": "export function compute(bar: number) {\n  return bar + bar;\n",
+            "newText": "export function compute(bar: number) {
+        return bar + bar;
+      ",
             "oldStartLine": 1,
-            "oldText": "export function compute(foo: number) {\n  return foo + foo;\n",
+            "oldText": "export function compute(foo: number) {
+        return foo + foo;
+      ",
             "type": "update",
           },
         ],
@@ -106,17 +112,37 @@ describe("diff characterization", () => {
           {
             "moveId": "move-1",
             "newStartLine": 4,
-            "newText": "\nexport function a() {\n  const value = 1;\n  return value + 0;\n}\n",
+            "newText": "
+      export function a() {
+        const value = 1;
+        return value + 0;
+      }
+      ",
             "oldStartLine": 1,
-            "oldText": "export function a() {\n  const value = 1;\n  return value;\n}\n\n",
+            "oldText": "export function a() {
+        const value = 1;
+        return value;
+      }
+
+      ",
             "type": "move",
           },
           {
             "moveId": "move-1",
             "newStartLine": 4,
-            "newText": "\nexport function a() {\n  const value = 1;\n  return value + 0;\n}\n",
+            "newText": "
+      export function a() {
+        const value = 1;
+        return value + 0;
+      }
+      ",
             "oldStartLine": 1,
-            "oldText": "export function a() {\n  const value = 1;\n  return value;\n}\n\n",
+            "oldText": "export function a() {
+        const value = 1;
+        return value;
+      }
+
+      ",
             "type": "update",
           },
         ],

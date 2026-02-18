@@ -120,7 +120,7 @@ const runServerEffect = <A>(effect: Effect.Effect<A, unknown, PrDiffService>) =>
       Effect.tapError((error) =>
         Effect.logError("Server effect failed", describeError(error))
       ),
-      Effect.tapErrorCause((cause) =>
+      Effect.tapCause((cause) =>
         Effect.logError("Server effect cause", Cause.pretty(cause))
       ),
       Effect.match({

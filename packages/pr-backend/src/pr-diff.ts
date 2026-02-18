@@ -12,7 +12,7 @@ import {
   type ParserRegistryService,
 } from "@semadiff/parsers";
 import { renderHtml } from "@semadiff/render-html";
-import { Effect, Layer, Option, Schema } from "effect";
+import { Effect, Layer, Option, Schema, ServiceMap } from "effect";
 import {
   GitHubCache,
   GitHubCacheLive,
@@ -30,9 +30,11 @@ import {
 import { parsePrUrl } from "./pr-url.js";
 import type {
   FileDiffDocument,
+  FileDiffPayload,
   PrFileStatus,
   PrFileSummary,
   PrRef,
+  PrSummary,
 } from "./types.js";
 import {
   FileDiffDocumentSchema,
@@ -40,7 +42,7 @@ import {
   PrFileSummarySchema,
 } from "./types.js";
 
-const catchRecoverable = Effect.catchAll;
+const catchRecoverable = Effect.catch;
 
 const parserRegistry = makeRegistry([
   ...swcParsers,
@@ -53,7 +55,7 @@ const GitHubClientLiveWithConfig = GitHubClientLive.pipe(
   Layer.provide(GitHubCacheLive)
 );
 
-export class PrFileNotFound extends Schema.TaggedError<PrFileNotFound>()(
+export class PrFileNotFound extends Schema.TaggedErrorClass<PrFileNotFound>()(
   "PrFileNotFound",
   {
     filename: Schema.String,
@@ -66,6 +68,29 @@ export type PrDiffError =
   | GitHubRateLimitError
   | GitHubDecodeError
   | PrFileNotFound;
+
+export interface PrDiffServiceApi {
+  readonly getSummary: (prUrl: string) => Effect.Effect<PrSummary, PrDiffError>;
+  readonly getFileDiff: (
+    prUrl: string,
+    filename: string,
+    contextLines: number,
+    lineLayout: "split" | "unified",
+    lineMode: "semantic" | "raw",
+    hideComments: boolean,
+    detectMoves: boolean
+  ) => Effect.Effect<FileDiffPayload, PrDiffError>;
+  readonly getFileDiffDocument: (
+    prUrl: string,
+    filename: string,
+    contextLines: number,
+    lineLayout: "split" | "unified",
+    detectMoves: boolean
+  ) => Effect.Effect<
+    Schema.Schema.Type<typeof FileDiffDocumentSchema>,
+    PrDiffError
+  >;
+}
 
 const MAX_FILE_SIZE = 1_000_000;
 const LINE_SPLIT_RE = /\r?\n/;
@@ -167,7 +192,7 @@ const parsePrUrlEffect = Effect.fn("PrDiff.parsePrUrl")(function* (
 ) {
   const parsed = parsePrUrl(input);
   if (!parsed) {
-    return yield* InvalidPrUrl.make({ input });
+    return yield* new InvalidPrUrl({ input });
   }
   return parsed;
 });
@@ -188,25 +213,25 @@ const buildFileSummary = (
   ...overrides,
 });
 
-const PrFileSummaryJson = Schema.parseJson(PrFileSummarySchema);
-const FileDiffPayloadJson = Schema.parseJson(FileDiffPayloadSchema);
-const FileDiffDocumentJson = Schema.parseJson(FileDiffDocumentSchema);
+const PrFileSummaryJson = Schema.fromJsonString(PrFileSummarySchema);
+const FileDiffPayloadJson = Schema.fromJsonString(FileDiffPayloadSchema);
+const FileDiffDocumentJson = Schema.fromJsonString(FileDiffDocumentSchema);
 
-const parseCachedJson = <S extends Schema.Schema.AnyNoContext>(
-  schema: S,
+const parseCachedJson = <S extends Schema.Top>(
+  _schema: S,
   value: string
-): Option.Option<Schema.Schema.Type<S>> => {
+): Option.Option<S["Type"]> => {
   try {
-    return Option.some(Schema.decodeUnknownSync(schema)(value));
+    return Option.some(JSON.parse(value) as S["Type"]);
   } catch {
     return Option.none();
   }
 };
 
-const encodeCachedJson = <S extends Schema.Schema.AnyNoContext>(
-  schema: S,
-  value: Schema.Schema.Type<S>
-): string => Schema.encodeSync(schema)(value);
+const encodeCachedJson = <S extends Schema.Top>(
+  _schema: S,
+  value: S["Type"]
+): string => JSON.stringify(value);
 
 const summaryCacheKey = (
   ref: { owner: string; repo: string },
@@ -493,125 +518,178 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
   return { file: summary, semanticHtml, linesHtml };
 });
 
-export class PrDiffService extends Effect.Service<PrDiffService>()(
-  "@semadiff/PrDiffService",
-  {
-    effect: Effect.gen(function* () {
-      const github = yield* GitHubClient;
-      const config = yield* GitHubConfig;
-      const registry = yield* ParserRegistry;
-      const cache = yield* GitHubCache;
-      const prCache = new Map<string, CachedPrData>();
-      const fileCache = new Map<string, { text: string; fetchedAt: number }>();
-      const hasToken = Option.isSome(config.token);
+export class PrDiffService extends ServiceMap.Service<
+  PrDiffService,
+  PrDiffServiceApi
+>()("@semadiff/PrDiffService") {}
 
-      const getPrData = Effect.fn("PrDiff.getPrData")(function* (
-        prUrl: string
-      ) {
-        const ref = yield* parsePrUrlEffect(prUrl);
-        const key = `${ref.owner}/${ref.repo}#${ref.number}`;
-        const now = Date.now();
-        const cached = prCache.get(key);
-        if (cached && now - cached.fetchedAt < PR_CACHE_TTL_MS) {
-          return cached;
-        }
-        const pr = yield* github.getPullRequest(ref);
-        const files = yield* github.listPullRequestFiles(ref);
-        const entry: CachedPrData = {
-          ref,
-          pr,
-          files,
-          fileMap: new Map(files.map((file) => [file.filename, file])),
-          fetchedAt: now,
-        };
-        prCache.set(key, entry);
-        return entry;
-      });
+export const PrDiffLive = Layer.effect(
+  PrDiffService,
+  Effect.gen(function* () {
+    const github = yield* GitHubClient;
+    const config = yield* GitHubConfig;
+    const registry = yield* ParserRegistry;
+    const cache = yield* GitHubCache;
+    const prCache = new Map<string, CachedPrData>();
+    const fileCache = new Map<string, { text: string; fetchedAt: number }>();
+    const hasToken = Option.isSome(config.token);
 
-      const getFileTextCached = Effect.fn("PrDiff.getFileTextCached")(
-        function* (params: Parameters<GitHubClientService["getFileText"]>[0]) {
-          const key = `${params.owner}/${params.repo}@${params.sha}:${params.path}`;
-          const now = Date.now();
-          const cached = fileCache.get(key);
-          if (cached && now - cached.fetchedAt < FILE_CACHE_TTL_MS) {
-            return cached.text;
-          }
-          const text = yield* github.getFileText(params);
-          fileCache.set(key, { text, fetchedAt: now });
-          return text;
-        }
-      );
+    const getPrData = Effect.fn("PrDiff.getPrData")(function* (prUrl: string) {
+      const ref = yield* parsePrUrlEffect(prUrl);
+      const key = `${ref.owner}/${ref.repo}#${ref.number}`;
+      const now = Date.now();
+      const cached = prCache.get(key);
+      if (cached && now - cached.fetchedAt < PR_CACHE_TTL_MS) {
+        return cached;
+      }
+      const pr = yield* github.getPullRequest(ref);
+      const files = yield* github.listPullRequestFiles(ref);
+      const entry: CachedPrData = {
+        ref,
+        pr,
+        files,
+        fileMap: new Map(files.map((file) => [file.filename, file])),
+        fetchedAt: now,
+      };
+      prCache.set(key, entry);
+      return entry;
+    });
 
-      const getSummary = Effect.fn("PrDiff.getSummary")(function* (
-        prUrl: string
-      ) {
-        const { ref, pr, files } = yield* getPrData(prUrl);
-        const summaries = hasToken
-          ? yield* Effect.forEach(
-              files,
-              (file) =>
-                Effect.gen(function* () {
-                  const key = summaryCacheKey(ref, pr, file);
-                  const cached = yield* cache.get(key);
-                  if (Option.isSome(cached)) {
-                    const parsed = parseCachedJson(
-                      PrFileSummaryJson,
-                      cached.value
-                    );
-                    if (Option.isSome(parsed)) {
-                      return parsed.value;
-                    }
+    const getFileTextCached = Effect.fn("PrDiff.getFileTextCached")(function* (
+      params: Parameters<GitHubClientService["getFileText"]>[0]
+    ) {
+      const key = `${params.owner}/${params.repo}@${params.sha}:${params.path}`;
+      const now = Date.now();
+      const cached = fileCache.get(key);
+      if (cached && now - cached.fetchedAt < FILE_CACHE_TTL_MS) {
+        return cached.text;
+      }
+      const text = yield* github.getFileText(params);
+      fileCache.set(key, { text, fetchedAt: now });
+      return text;
+    });
+
+    const getSummary = Effect.fn("PrDiff.getSummary")(function* (
+      prUrl: string
+    ) {
+      const { ref, pr, files } = yield* getPrData(prUrl);
+      const summaries = hasToken
+        ? yield* Effect.forEach(
+            files,
+            (file) =>
+              Effect.gen(function* () {
+                const key = summaryCacheKey(ref, pr, file);
+                const cached = yield* cache.get(key);
+                if (Option.isSome(cached)) {
+                  const parsed = parseCachedJson(
+                    PrFileSummaryJson,
+                    cached.value
+                  );
+                  if (Option.isSome(parsed)) {
+                    return parsed.value;
                   }
-                  const summary = yield* summarizeFile(
-                    getFileTextCached,
-                    registry,
-                    { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
-                    file
-                  ).pipe(
-                    catchRecoverable((error) =>
-                      Effect.gen(function* () {
-                        yield* Effect.logError(
-                          "Failed to summarize file",
-                          file.filename,
-                          error
-                        );
-                        return buildFileSummary(file, {
-                          warnings: [warningFromError(error)],
-                        });
-                      })
-                    )
-                  );
-                  yield* cache.set(
-                    key,
-                    encodeCachedJson(PrFileSummaryJson, summary),
-                    SUMMARY_CACHE_TTL_MS
-                  );
-                  return summary;
-                }),
-              { concurrency: 4 }
-            )
-          : files.map((file) => buildFileSummary(file));
-        return {
-          pr: {
-            title: pr.title,
-            url: pr.html_url,
-            baseSha: pr.base.sha,
-            headSha: pr.head.sha,
-            additions: pr.additions,
-            deletions: pr.deletions,
-            changedFiles: pr.changed_files,
-          },
-          files: summaries,
-        };
-      });
+                }
+                const summary = yield* summarizeFile(
+                  getFileTextCached,
+                  registry,
+                  { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
+                  file
+                ).pipe(
+                  catchRecoverable((error) =>
+                    Effect.gen(function* () {
+                      yield* Effect.logError(
+                        "Failed to summarize file",
+                        file.filename,
+                        error
+                      );
+                      return buildFileSummary(file, {
+                        warnings: [warningFromError(error)],
+                      });
+                    })
+                  )
+                );
+                yield* cache.set(
+                  key,
+                  encodeCachedJson(PrFileSummaryJson, summary),
+                  SUMMARY_CACHE_TTL_MS
+                );
+                return summary;
+              }),
+            { concurrency: 4 }
+          )
+        : files.map((file) => buildFileSummary(file));
+      return {
+        pr: {
+          title: pr.title,
+          url: pr.html_url,
+          baseSha: pr.base.sha,
+          headSha: pr.head.sha,
+          additions: pr.additions,
+          deletions: pr.deletions,
+          changedFiles: pr.changed_files,
+        },
+        files: summaries,
+      };
+    });
 
-      const getFileDiff = Effect.fn("PrDiff.getFileDiff")(function* (
+    const getFileDiff = Effect.fn("PrDiff.getFileDiff")(function* (
+      prUrl: string,
+      filename: string,
+      contextLines: number,
+      lineLayout: "split" | "unified",
+      lineMode: "semantic" | "raw",
+      hideComments: boolean,
+      detectMoves: boolean
+    ) {
+      const { ref, pr, files, fileMap } = yield* getPrData(prUrl);
+      const file =
+        fileMap.get(filename) ??
+        files.find((item) => item.filename === filename);
+      if (!file) {
+        return yield* new PrFileNotFound({ filename });
+      }
+      const key = diffCacheKey(
+        ref,
+        pr,
+        file,
+        contextLines,
+        lineLayout,
+        lineMode,
+        hideComments,
+        detectMoves
+      );
+      const cached = yield* cache.get(key);
+      if (Option.isSome(cached)) {
+        const parsed = parseCachedJson(FileDiffPayloadJson, cached.value);
+        if (Option.isSome(parsed)) {
+          return parsed.value;
+        }
+      }
+      const result = yield* buildFileDiff(
+        getFileTextCached,
+        registry,
+        { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
+        file,
+        contextLines,
+        lineLayout,
+        lineMode,
+        hideComments,
+        detectMoves
+      );
+      yield* cache.set(
+        key,
+        encodeCachedJson(FileDiffPayloadJson, result),
+        DIFF_CACHE_TTL_MS
+      );
+      return result;
+    });
+
+    const getFileDiffDocument = Effect.fn("PrDiff.getFileDiffDocument")(
+      function* (
         prUrl: string,
         filename: string,
         contextLines: number,
         lineLayout: "split" | "unified",
-        lineMode: "semantic" | "raw",
-        hideComments: boolean,
         detectMoves: boolean
       ) {
         const { ref, pr, files, fileMap } = yield* getPrData(prUrl);
@@ -619,104 +697,49 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
           fileMap.get(filename) ??
           files.find((item) => item.filename === filename);
         if (!file) {
-          return yield* PrFileNotFound.make({ filename });
+          return yield* new PrFileNotFound({ filename });
         }
-        const key = diffCacheKey(
+        const key = diffDocumentCacheKey(
           ref,
           pr,
           file,
           contextLines,
           lineLayout,
-          lineMode,
-          hideComments,
-          detectMoves
+          detectMoves,
+          undefined
         );
         const cached = yield* cache.get(key);
         if (Option.isSome(cached)) {
-          const parsed = parseCachedJson(FileDiffPayloadJson, cached.value);
+          const parsed = parseCachedJson(FileDiffDocumentJson, cached.value);
           if (Option.isSome(parsed)) {
             return parsed.value;
           }
         }
-        const result = yield* buildFileDiff(
+        const result = yield* buildFileDiffDocument(
           getFileTextCached,
           registry,
           { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
           file,
-          contextLines,
-          lineLayout,
-          lineMode,
-          hideComments,
           detectMoves
         );
+        const payload: FileDiffDocument = {
+          file: result.file,
+          diff: result.diff,
+        };
         yield* cache.set(
           key,
-          encodeCachedJson(FileDiffPayloadJson, result),
+          encodeCachedJson(FileDiffDocumentJson, payload),
           DIFF_CACHE_TTL_MS
         );
-        return result;
-      });
+        return payload;
+      }
+    );
 
-      const getFileDiffDocument = Effect.fn("PrDiff.getFileDiffDocument")(
-        function* (
-          prUrl: string,
-          filename: string,
-          contextLines: number,
-          lineLayout: "split" | "unified",
-          detectMoves: boolean
-        ) {
-          const { ref, pr, files, fileMap } = yield* getPrData(prUrl);
-          const file =
-            fileMap.get(filename) ??
-            files.find((item) => item.filename === filename);
-          if (!file) {
-            return yield* PrFileNotFound.make({ filename });
-          }
-          const key = diffDocumentCacheKey(
-            ref,
-            pr,
-            file,
-            contextLines,
-            lineLayout,
-            detectMoves,
-            undefined
-          );
-          const cached = yield* cache.get(key);
-          if (Option.isSome(cached)) {
-            const parsed = parseCachedJson(FileDiffDocumentJson, cached.value);
-            if (Option.isSome(parsed)) {
-              return parsed.value;
-            }
-          }
-          const result = yield* buildFileDiffDocument(
-            getFileTextCached,
-            registry,
-            { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
-            file,
-            detectMoves
-          );
-          const payload: FileDiffDocument = {
-            file: result.file,
-            diff: result.diff,
-          };
-          yield* cache.set(
-            key,
-            encodeCachedJson(FileDiffDocumentJson, payload),
-            DIFF_CACHE_TTL_MS
-          );
-          return payload;
-        }
-      );
-
-      return { getSummary, getFileDiff, getFileDiffDocument };
-    }),
-    dependencies: [
-      GitHubConfig.layer,
-      GitHubCacheLive,
-      GitHubClientLiveWithConfig,
-      ParserRegistryLive,
-    ],
-  }
-) {}
-
-export const PrDiffLive = PrDiffService.Default;
+    return PrDiffService.of({ getSummary, getFileDiff, getFileDiffDocument });
+  })
+).pipe(
+  Layer.provide(GitHubConfig.layer),
+  Layer.provide(GitHubCacheLive),
+  Layer.provide(GitHubClientLiveWithConfig),
+  Layer.provide(ParserRegistryLive)
+);

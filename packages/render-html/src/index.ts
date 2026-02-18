@@ -485,17 +485,17 @@ interface LineRow {
   header?: string;
 }
 
-const LineNumberSchema = Schema.Union(Schema.Number, Schema.Null);
+const LineNumberSchema = Schema.Union([Schema.Number, Schema.Null] as const);
 const LineRowSchema = Schema.Struct({
-  type: Schema.Literal(
+  type: Schema.Literals([
     "equal",
     "insert",
     "delete",
     "replace",
     "gap",
     "hunk",
-    "move"
-  ),
+    "move",
+  ] as const),
   oldLine: Schema.optional(LineNumberSchema),
   newLine: Schema.optional(LineNumberSchema),
   text: Schema.optional(Schema.String),
@@ -507,7 +507,7 @@ const LineRowSchema = Schema.Struct({
 const LinePayloadSchema = Schema.Struct({
   rows: Schema.Array(LineRowSchema),
   batchSize: Schema.Number,
-  lineLayout: Schema.Literal("split", "unified"),
+  lineLayout: Schema.Literals(["split", "unified"] as const),
 });
 const OpsRangeSchema = Schema.Struct({
   start: Schema.Struct({
@@ -523,18 +523,18 @@ const OpsPayloadSchema = Schema.Struct({
   operations: Schema.Array(
     Schema.Struct({
       id: Schema.String,
-      type: Schema.Literal("insert", "delete", "update", "move"),
+      type: Schema.Literals(["insert", "delete", "update", "move"] as const),
       oldText: Schema.String,
       newText: Schema.String,
-      confidence: Schema.Union(Schema.Number, Schema.Null),
-      oldRange: Schema.Union(OpsRangeSchema, Schema.Null),
-      newRange: Schema.Union(OpsRangeSchema, Schema.Null),
+      confidence: Schema.Union([Schema.Number, Schema.Null] as const),
+      oldRange: Schema.Union([OpsRangeSchema, Schema.Null] as const),
+      newRange: Schema.Union([OpsRangeSchema, Schema.Null] as const),
     })
   ),
   batchSize: Schema.Number,
 });
-const LinePayloadJson = Schema.parseJson(LinePayloadSchema);
-const OpsPayloadJson = Schema.parseJson(OpsPayloadSchema);
+const LinePayloadJson = Schema.fromJsonString(LinePayloadSchema);
+const OpsPayloadJson = Schema.fromJsonString(OpsPayloadSchema);
 
 function normalizeLineForSemantic(line: string, language?: NormalizerLanguage) {
   return normalizeTextForLanguage(line, defaultConfig.normalizers, language);

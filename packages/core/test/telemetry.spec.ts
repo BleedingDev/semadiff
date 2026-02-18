@@ -142,9 +142,9 @@ describe("telemetry exporter", () => {
 
     const program = Effect.gen(function* () {
       const telemetry = yield* Telemetry;
-      return yield* telemetry
-        .span("run", { command: "diff" }, Effect.fail("boom"))
-        .pipe(Effect.either);
+      return yield* Effect.result(
+        telemetry.span("run", { command: "diff" }, Effect.fail("boom"))
+      );
     });
 
     await Effect.runPromise(

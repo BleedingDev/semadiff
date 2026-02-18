@@ -62,7 +62,7 @@ export const lightningCssParser: Parser = {
     Effect.gen(function* () {
       const language = input.language;
       if (!isSupportedLanguage(language)) {
-        return yield* ParseError.make({
+        return yield* new ParseError({
           parser: "lightningcss",
           message: `Unsupported language: ${language ?? "unknown"}`,
         });
@@ -70,7 +70,7 @@ export const lightningCssParser: Parser = {
       return yield* Effect.try({
         try: () => parseWithLightning(input, language),
         catch: (error) =>
-          ParseError.make({
+          new ParseError({
             parser: "lightningcss",
             message: toParseErrorMessage(error),
           }),

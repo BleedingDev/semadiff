@@ -18,7 +18,7 @@ const DiffMetaSchema = Schema.Struct({
 
 export const DiffOperationSchema = Schema.Struct({
   id: Schema.String,
-  type: Schema.Literal("insert", "delete", "update", "move"),
+  type: Schema.Literals(["insert", "delete", "update", "move"] as const),
   oldRange: Schema.optional(RangeSchema),
   newRange: Schema.optional(RangeSchema),
   oldText: Schema.optional(Schema.String),

@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@semadiff/parsers": "workspace:*",
-    "effect": "^3.19.14",
+    "effect": "^4.0.0-beta.0",
     "@tree-sitter-grammars/tree-sitter-markdown": "^0.3.2",
     "@tree-sitter-grammars/tree-sitter-yaml": "^0.7.1",
     "tree-sitter-css": "^0.25.0",

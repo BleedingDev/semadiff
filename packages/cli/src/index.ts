@@ -8,8 +8,7 @@ import {
 } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { Args, Command, Options } from "@effect/cli";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import type { DiffDocument, NormalizerSettings } from "@semadiff/core";
 import {
   ConfigSchema,
@@ -30,9 +29,30 @@ import {
   renderTerminalLinesFromHtml,
 } from "@semadiff/render-terminal";
 import { Console, Effect, Schema } from "effect";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 import { resolveConfig } from "./config/resolve.js";
 
-const catchRecoverable = Effect.catchAll;
+const catchRecoverable = Effect.catch;
+
+const Args = {
+  text: ({ name }: { name: string }) => Argument.string(name),
+  integer: ({ name }: { name: string }) => Argument.integer(name),
+  repeated: <A>(argument: Argument.Argument<A>) =>
+    argument.pipe(Argument.variadic),
+  withDefault: Argument.withDefault,
+} as const;
+
+const Options = {
+  text: (name: string) => Flag.string(name),
+  integer: (name: string) => Flag.integer(name),
+  boolean: (name: string) => Flag.boolean(name),
+  choice: <const Choices extends readonly string[]>(
+    name: string,
+    choices: Choices
+  ) => Flag.choice(name, choices),
+  withDefault: Flag.withDefault,
+  withDescription: Flag.withDescription,
+} as const;
 
 const isSourceRun = fileURLToPath(import.meta.url).includes(
   `${path.sep}packages${path.sep}cli${path.sep}src${path.sep}`
@@ -65,16 +85,8 @@ function isBinary(text: string) {
   return text.includes("\u0000");
 }
 
-function encodeJson<S extends Schema.Schema.AnyNoContext>(
-  schema: S,
-  value: Schema.Schema.Type<S>,
-  space?: number
-) {
-  const jsonSchema = Schema.parseJson(
-    schema,
-    space === undefined ? undefined : { space }
-  ) as unknown as Schema.Schema<Schema.Schema.Type<S>, string, never>;
-  return Schema.encodeSync(jsonSchema)(value);
+function encodeJson(_schema: unknown, value: unknown, space?: number) {
+  return JSON.stringify(value, null, space);
 }
 
 const languageChoices = [
@@ -97,10 +109,10 @@ const ParserCapabilitySchema = Schema.Struct({
   supportsErrorRecovery: Schema.Boolean,
   supportsIncrementalParse: Schema.Boolean,
 });
-const ParserCapabilitiesSchema = Schema.Record({
-  key: Schema.String,
-  value: ParserCapabilitySchema,
-});
+const ParserCapabilitiesSchema = Schema.Record(
+  Schema.String,
+  ParserCapabilitySchema
+);
 const DoctorReportSchema = Schema.Struct({
   bun: Schema.String,
   git: Schema.String,
@@ -108,15 +120,15 @@ const DoctorReportSchema = Schema.Struct({
   canWriteCwd: Schema.Boolean,
   parsers: ParserCapabilitiesSchema,
 });
-const DoctorReportJson = Schema.parseJson(DoctorReportSchema);
+const DoctorReportJson = Schema.fromJsonString(DoctorReportSchema);
 
-const NormalizerIdSchema = Schema.Literal(
+const NormalizerIdSchema = Schema.Literals([
   "whitespace",
   "tailwind",
   "importOrder",
-  "numericLiterals"
-);
-const NormalizerLanguageSchema = Schema.Literal(
+  "numericLiterals",
+] as const);
+const NormalizerLanguageSchema = Schema.Literals([
   "ts",
   "tsx",
   "js",
@@ -127,9 +139,12 @@ const NormalizerLanguageSchema = Schema.Literal(
   "toml",
   "yaml",
   "text",
-  "*"
-);
-const NormalizerSafetySchema = Schema.Literal("conservative", "aggressive");
+  "*",
+] as const);
+const NormalizerSafetySchema = Schema.Literals([
+  "conservative",
+  "aggressive",
+] as const);
 const NormalizerRuleSummarySchema = Schema.Struct({
   id: NormalizerIdSchema,
   description: Schema.String,
@@ -139,20 +154,27 @@ const NormalizerRuleSummarySchema = Schema.Struct({
 });
 const NormalizerRulesSchema = Schema.Array(NormalizerRuleSummarySchema);
 
-const ConfigSourceSchema = Schema.Literal("default", "project", "user", "env");
+const ConfigSourceSchema = Schema.Literals([
+  "default",
+  "project",
+  "user",
+  "env",
+] as const);
 const NormalizerSourceSchema = Schema.Struct({
   whitespace: ConfigSourceSchema,
   tailwind: ConfigSourceSchema,
   importOrder: ConfigSourceSchema,
   numericLiterals: ConfigSourceSchema,
 });
-const NormalizerSourceOverridesSchema = Schema.partial(NormalizerSourceSchema);
+const NormalizerSourceOverridesSchema = Schema.Struct({
+  whitespace: Schema.optional(ConfigSourceSchema),
+  tailwind: Schema.optional(ConfigSourceSchema),
+  importOrder: Schema.optional(ConfigSourceSchema),
+  numericLiterals: Schema.optional(ConfigSourceSchema),
+});
 const NormalizerSourcesSchema = Schema.Struct({
   global: NormalizerSourceSchema,
-  perLanguage: Schema.Record({
-    key: Schema.String,
-    value: NormalizerSourceOverridesSchema,
-  }),
+  perLanguage: Schema.Record(Schema.String, NormalizerSourceOverridesSchema),
 });
 const ConfigSourcesSchema = Schema.Struct({
   normalizers: NormalizerSourcesSchema,
@@ -175,7 +197,9 @@ const ResolvedConfigOutputSchema = Schema.Struct({
     user: Schema.String,
   }),
 });
-const ResolvedConfigOutputJson = Schema.parseJson(ResolvedConfigOutputSchema);
+const ResolvedConfigOutputJson = Schema.fromJsonString(
+  ResolvedConfigOutputSchema
+);
 
 const BenchCaseSchema = Schema.Struct({
   id: Schema.String,
@@ -193,7 +217,7 @@ const BenchReportSchema = Schema.Struct({
     durationMs: Schema.Number,
   }),
 });
-const BenchReportJson = Schema.parseJson(BenchReportSchema);
+const BenchReportJson = Schema.fromJsonString(BenchReportSchema);
 const BenchRegressionSchema = Schema.Struct({
   id: Schema.String,
   baselineMs: Schema.Number,
@@ -205,14 +229,14 @@ const BenchOutputSchema = Schema.Struct({
   baselinePath: Schema.String,
   regressions: Schema.Array(BenchRegressionSchema),
 });
-const BenchOutputJson = Schema.parseJson(BenchOutputSchema);
+const BenchOutputJson = Schema.fromJsonString(BenchOutputSchema);
 
-const DiffOperationTypeSchema = Schema.Literal(
+const DiffOperationTypeSchema = Schema.Literals([
   "insert",
   "delete",
   "update",
-  "move"
-);
+  "move",
+] as const);
 const ExplainOperationSchema = Schema.Struct({
   id: Schema.String,
   type: DiffOperationTypeSchema,
@@ -242,9 +266,9 @@ const ExplainDocumentSchema = Schema.Struct({
     })
   ),
 });
-const ExplainDocumentJson = Schema.parseJson(ExplainDocumentSchema);
+const ExplainDocumentJson = Schema.fromJsonString(ExplainDocumentSchema);
 
-class CliSystemError extends Schema.TaggedError<CliSystemError>()(
+class CliSystemError extends Schema.TaggedErrorClass<CliSystemError>()(
   "CliSystemError",
   {
     operation: Schema.String,
@@ -601,14 +625,15 @@ const prFileCommand = Command.make(
       yield* Console.log(
         `File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`
       );
+      const sourceDiff = result.diff as DiffDocument;
       const diff: DiffDocument = {
-        ...result.diff,
-        operations: [...result.diff.operations],
-        moves: result.diff.moves.map((move) => ({
+        ...sourceDiff,
+        operations: [...sourceDiff.operations],
+        moves: sourceDiff.moves.map((move) => ({
           ...move,
           operations: [...move.operations],
         })),
-        renames: [...result.diff.renames],
+        renames: [...sourceDiff.renames],
       };
       const output = renderTerminal(diff, {
         format,
@@ -783,15 +808,14 @@ const doctorCommand = Command.make("doctor", {}, () =>
     const bunVersion = process.versions.bun ?? "unknown";
     const gitVersion = yield* Effect.try({
       try: () => execSync("git --version").toString().trim(),
-      catch: (error) =>
-        CliSystemError.make({ operation: "git-version", error }),
+      catch: (error) => new CliSystemError({ operation: "git-version", error }),
     }).pipe(catchRecoverable(() => Effect.succeed("not found")));
     const canWriteCwd = yield* Effect.try({
       try: () => {
         accessSync(process.cwd(), constants.W_OK);
         return true;
       },
-      catch: (error) => CliSystemError.make({ operation: "access-cwd", error }),
+      catch: (error) => new CliSystemError({ operation: "access-cwd", error }),
     }).pipe(catchRecoverable(() => Effect.succeed(false)));
     const report = {
       bun: bunVersion,
@@ -800,9 +824,7 @@ const doctorCommand = Command.make("doctor", {}, () =>
       canWriteCwd,
       parsers: parserRegistry.listCapabilities(),
     };
-    const json = yield* Schema.encode(DoctorReportJson)(report).pipe(
-      Effect.orDie
-    );
+    const json = encodeJson(DoctorReportJson, report, 2);
     yield* Console.log(json);
   })
 ).pipe(
@@ -945,14 +967,15 @@ const benchCommand = Command.make(
       const baselineRaw = yield* Effect.try({
         try: () => readFileSync(baselinePath, "utf8"),
         catch: (error) =>
-          CliSystemError.make({ operation: "read-benchmark-baseline", error }),
+          new CliSystemError({ operation: "read-benchmark-baseline", error }),
       }).pipe(catchRecoverable(() => Effect.succeed(null)));
       const baselineReport =
         baselineRaw === null
           ? null
-          : yield* Schema.decodeUnknown(BenchReportJson)(baselineRaw).pipe(
-              catchRecoverable(() => Effect.succeed(null))
-            );
+          : yield* Effect.try({
+              try: () => Schema.decodeUnknownSync(BenchReportJson)(baselineRaw),
+              catch: () => null,
+            });
 
       const regressions =
         baselineReport?.cases
@@ -983,17 +1006,15 @@ const benchCommand = Command.make(
         if (dir) {
           mkdirSync(dir, { recursive: true });
         }
-        const reportJson = yield* Schema.encode(BenchReportJson)(report).pipe(
-          Effect.orDie
-        );
+        const reportJson = encodeJson(BenchReportJson, report, 2);
         writeFileSync(baselinePath, reportJson);
       }
 
-      const outputJson = yield* Schema.encode(BenchOutputJson)({
+      const outputJson = encodeJson(BenchOutputJson, {
         report,
         baselinePath,
         regressions,
-      }).pipe(Effect.orDie);
+      });
       yield* Console.log(outputJson);
 
       const hasRegression = regressions.some(
@@ -1051,9 +1072,7 @@ const explainCommand = Command.make(
           ? { newTokens: parsedNew.tokens }
           : {}),
       });
-      const explainJson = yield* Schema.encode(ExplainDocumentJson)(
-        explainDiff(diff)
-      ).pipe(Effect.orDie);
+      const explainJson = encodeJson(ExplainDocumentJson, explainDiff(diff), 2);
       yield* Console.log(explainJson);
     })
 ).pipe(Command.withDescription("Explain diff decisions as JSON."));
@@ -1061,9 +1080,7 @@ const explainCommand = Command.make(
 const configCommand = Command.make("config", {}, () =>
   Effect.gen(function* () {
     const resolved = yield* resolveConfig;
-    const json = yield* Schema.encode(ResolvedConfigOutputJson)(resolved).pipe(
-      Effect.orDie
-    );
+    const json = encodeJson(ResolvedConfigOutputJson, resolved, 2);
     yield* Console.log(json);
   })
 ).pipe(Command.withDescription("Print resolved config with provenance."));
@@ -1137,12 +1154,11 @@ function normalizeArgv(argv: string[]) {
   return argv;
 }
 
-const cli = Command.run(app, {
-  name: "semadiff",
+const cli = Command.runWith(app, {
   version: "0.1.0",
 });
 
-cli(normalizeArgv(process.argv)).pipe(
-  Effect.provide(BunContext.layer),
+cli(normalizeArgv(process.argv).slice(2)).pipe(
+  Effect.provide(BunServices.layer),
   BunRuntime.runMain
 );

@@ -3,17 +3,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   Config,
-  Context,
   Effect,
   Layer,
   Option,
   Redacted,
   Schedule,
   Schema,
+  ServiceMap,
 } from "effect";
 import type { PrRef } from "./types.js";
 
-const catchRecoverable = Effect.catchAll;
+const catchRecoverable = Effect.catch;
 
 export interface GitHubConfigService {
   readonly apiBase: string;
@@ -21,10 +21,10 @@ export interface GitHubConfigService {
   readonly token: Option.Option<Redacted.Redacted>;
 }
 
-export class GitHubConfig extends Context.Tag("@semadiff/GitHubConfig")<
+export class GitHubConfig extends ServiceMap.Service<
   GitHubConfig,
   GitHubConfigService
->() {
+>()("@semadiff/GitHubConfig") {
   static readonly layer = Layer.effect(
     GitHubConfig,
     Effect.gen(function* () {
@@ -40,14 +40,14 @@ export class GitHubConfig extends Context.Tag("@semadiff/GitHubConfig")<
   );
 }
 
-export class InvalidPrUrl extends Schema.TaggedError<InvalidPrUrl>()(
+export class InvalidPrUrl extends Schema.TaggedErrorClass<InvalidPrUrl>()(
   "InvalidPrUrl",
   {
     input: Schema.String,
   }
 ) {}
 
-export class GitHubRequestError extends Schema.TaggedError<GitHubRequestError>()(
+export class GitHubRequestError extends Schema.TaggedErrorClass<GitHubRequestError>()(
   "GitHubRequestError",
   {
     url: Schema.String,
@@ -56,7 +56,7 @@ export class GitHubRequestError extends Schema.TaggedError<GitHubRequestError>()
   }
 ) {}
 
-export class GitHubRateLimitError extends Schema.TaggedError<GitHubRateLimitError>()(
+export class GitHubRateLimitError extends Schema.TaggedErrorClass<GitHubRateLimitError>()(
   "GitHubRateLimitError",
   {
     url: Schema.String,
@@ -64,7 +64,7 @@ export class GitHubRateLimitError extends Schema.TaggedError<GitHubRateLimitErro
   }
 ) {}
 
-export class GitHubDecodeError extends Schema.TaggedError<GitHubDecodeError>()(
+export class GitHubDecodeError extends Schema.TaggedErrorClass<GitHubDecodeError>()(
   "GitHubDecodeError",
   {
     url: Schema.String,
@@ -81,10 +81,10 @@ export interface GitHubCacheService {
   ) => Effect.Effect<void>;
 }
 
-export class GitHubCache extends Context.Tag("@semadiff/GitHubCache")<
+export class GitHubCache extends ServiceMap.Service<
   GitHubCache,
   GitHubCacheService
->() {}
+>()("@semadiff/GitHubCache") {}
 
 const CACHE_BASE_PATH =
   process.env.SEMADIFF_CACHE_DIR ??
@@ -107,12 +107,10 @@ const CacheEntrySchema = Schema.Struct({
 });
 const CacheFileSchema = Schema.Struct({
   entries: Schema.optional(
-    Schema.Array(Schema.Tuple(Schema.String, CacheEntrySchema))
+    Schema.Array(Schema.Tuple([Schema.String, CacheEntrySchema] as const))
   ),
 });
-const CacheFileJson = Schema.parseJson(CacheFileSchema);
-const JsonUnknown = Schema.parseJson(Schema.Unknown);
-const ErrorMessageJson = Schema.parseJson(
+const ErrorMessageJson = Schema.fromJsonString(
   Schema.Struct({ message: Schema.optional(Schema.String) })
 );
 
@@ -139,7 +137,9 @@ const makeFileCache = Effect.gen(function* () {
 
   const loaded = yield* Effect.tryPromise(async () => {
     const raw = await fs.readFile(CACHE_JSON_PATH, "utf8");
-    const parsed = Schema.decodeUnknownSync(CacheFileJson)(raw);
+    const parsed = JSON.parse(raw) as Schema.Schema.Type<
+      typeof CacheFileSchema
+    >;
     return Array.isArray(parsed.entries) ? parsed.entries : [];
   }).pipe(catchRecoverable(() => Effect.succeed([])));
 
@@ -155,7 +155,7 @@ const makeFileCache = Effect.gen(function* () {
 
   const persist = (next: Map<string, { value: string; expiresAt: number }>) =>
     Effect.tryPromise(() => {
-      const payload = Schema.encodeSync(CacheFileJson)({
+      const payload = JSON.stringify({
         entries: [...next.entries()],
       });
       return fs.writeFile(CACHE_JSON_PATH, payload, "utf8");
@@ -278,20 +278,8 @@ export const GitHubCacheLive = Layer.effect(
 const API_CACHE_TTL_MS = 5 * 60 * 1000;
 const RAW_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
-const isRetryableError = (error: GitHubRequestError | GitHubRateLimitError) => {
-  if (error._tag === "GitHubRateLimitError") {
-    return true;
-  }
-  if (error._tag === "GitHubRequestError") {
-    return error.status === 0 || error.status >= 500;
-  }
-  return false;
-};
-
 const retrySchedule = Schedule.exponential("200 millis").pipe(
-  Schedule.jittered,
-  Schedule.intersect(Schedule.recurs(3)),
-  Schedule.intersect(Schedule.recurWhile(isRetryableError))
+  Schedule.compose(Schedule.recurs(3))
 );
 
 const withGitHubRetry = <A, R>(
@@ -346,12 +334,10 @@ export interface GitHubClientService {
   }) => Effect.Effect<string, GitHubRequestError | GitHubRateLimitError>;
 }
 
-export class GitHubClient extends Context.Tag("@semadiff/GitHubClient")<
+export class GitHubClient extends ServiceMap.Service<
   GitHubClient,
   GitHubClientService
->() {}
-
-const PullRequestJson = Schema.decodeUnknown(PullRequestSchema);
+>()("@semadiff/GitHubClient") {}
 
 const encodePath = (path: string) =>
   path
@@ -368,9 +354,12 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   const cacheKey = `json:${url}`;
   const cached = yield* cache.get(cacheKey);
   if (Option.isSome(cached)) {
-    const decoded = yield* Schema.decodeUnknown(JsonUnknown)(cached.value).pipe(
-      catchRecoverable(() => Effect.succeed(null))
-    );
+    let decoded: unknown | null = null;
+    try {
+      decoded = JSON.parse(cached.value);
+    } catch {
+      decoded = null;
+    }
     if (decoded !== null) {
       return decoded;
     }
@@ -385,7 +374,7 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   const response = yield* Effect.tryPromise({
     try: () => fetch(url, { headers }),
     catch: (error) =>
-      GitHubRequestError.make({
+      new GitHubRequestError({
         url,
         status: 0,
         message: error instanceof Error ? error.message : String(error),
@@ -397,9 +386,12 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
       catchRecoverable(() => Effect.succeed(""))
     );
     let message = response.statusText;
-    const parsed = yield* Schema.decodeUnknown(ErrorMessageJson)(bodyText).pipe(
-      catchRecoverable(() => Effect.succeed(null))
-    );
+    let parsed: { message?: string | undefined } | null = null;
+    try {
+      parsed = Schema.decodeUnknownSync(ErrorMessageJson)(bodyText);
+    } catch {
+      parsed = null;
+    }
     if (parsed?.message) {
       message = parsed.message;
     } else if (bodyText) {
@@ -413,12 +405,12 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
       !!retryAfter ||
       RATE_LIMIT_REGEX.test(message);
     if (looksRateLimited) {
-      return yield* GitHubRateLimitError.make({
+      return yield* new GitHubRateLimitError({
         url,
         resetAt: response.headers.get("x-ratelimit-reset") ?? undefined,
       });
     }
-    return yield* GitHubRequestError.make({
+    return yield* new GitHubRequestError({
       url,
       status: response.status,
       message,
@@ -428,16 +420,19 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   const json = yield* Effect.tryPromise({
     try: () => response.json(),
     catch: (error) =>
-      GitHubRequestError.make({
+      new GitHubRequestError({
         url,
         status: response.status,
         message: error instanceof Error ? error.message : String(error),
       }),
   });
 
-  const encoded = yield* Schema.encode(JsonUnknown)(json).pipe(
-    catchRecoverable(() => Effect.succeed(null))
-  );
+  let encoded: string | null = null;
+  try {
+    encoded = JSON.stringify(json);
+  } catch {
+    encoded = null;
+  }
   if (encoded !== null) {
     yield* cache.set(cacheKey, encoded, ttlMs);
   }
@@ -463,7 +458,7 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
   const response = yield* Effect.tryPromise({
     try: () => fetch(url, { headers }),
     catch: (error) =>
-      GitHubRequestError.make({
+      new GitHubRequestError({
         url,
         status: 0,
         message: error instanceof Error ? error.message : String(error),
@@ -486,12 +481,12 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
       !!retryAfter ||
       RATE_LIMIT_REGEX.test(message);
     if (looksRateLimited) {
-      return yield* GitHubRateLimitError.make({
+      return yield* new GitHubRateLimitError({
         url,
         resetAt: response.headers.get("x-ratelimit-reset") ?? undefined,
       });
     }
-    return yield* GitHubRequestError.make({
+    return yield* new GitHubRequestError({
       url,
       status: response.status,
       message,
@@ -501,7 +496,7 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
   const text = yield* Effect.tryPromise({
     try: () => response.text(),
     catch: (error) =>
-      GitHubRequestError.make({
+      new GitHubRequestError({
         url,
         status: response.status,
         message: error instanceof Error ? error.message : String(error),
@@ -520,14 +515,14 @@ const getPullRequest = Effect.fn("GitHub.getPullRequest")(function* (
   const json = yield* withGitHubRetry(
     requestJson(config, cache, url, API_CACHE_TTL_MS)
   );
-  return yield* PullRequestJson(json).pipe(
-    Effect.mapError((error) =>
-      GitHubDecodeError.make({
+  return yield* Effect.try({
+    try: () => Schema.decodeUnknownSync(PullRequestSchema)(json),
+    catch: (error) =>
+      new GitHubDecodeError({
         url,
         message: error instanceof Error ? error.message : String(error),
-      })
-    )
-  );
+      }),
+  });
 });
 
 const listPullRequestFiles = Effect.fn("GitHub.listPullRequestFiles")(
@@ -543,16 +538,15 @@ const listPullRequestFiles = Effect.fn("GitHub.listPullRequestFiles")(
       const json = yield* withGitHubRetry(
         requestJson(config, cache, url, API_CACHE_TTL_MS)
       );
-      const decoded = yield* Schema.decodeUnknown(
-        Schema.Array(PullRequestFileSchema)
-      )(json).pipe(
-        Effect.mapError((error) =>
-          GitHubDecodeError.make({
+      const decoded = yield* Effect.try({
+        try: () =>
+          Schema.decodeUnknownSync(Schema.Array(PullRequestFileSchema))(json),
+        catch: (error) =>
+          new GitHubDecodeError({
             url,
             message: error instanceof Error ? error.message : String(error),
-          })
-        )
-      );
+          }),
+      });
       results.push(...decoded);
       if (decoded.length < 100) {
         break;

@@ -18,6 +18,6 @@
     "./schemas/diagnostics.schema.json": "./schemas/diagnostics.schema.json"
   },
   "dependencies": {
-    "effect": "^3.19.14"
+    "effect": "^4.0.0-beta.0"
   }
 }

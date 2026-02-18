@@ -57,12 +57,12 @@ export interface AuthStatus {
   hasToken: boolean;
 }
 
-export const PrFileStatusSchema = Schema.Literal(
+export const PrFileStatusSchema = Schema.Literals([
   "added",
   "modified",
   "removed",
-  "renamed"
-);
+  "renamed",
+] as const);
 
 export const PrRefSchema = Schema.Struct({
   owner: Schema.String,

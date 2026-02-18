@@ -258,7 +258,7 @@ export const treeSitterNodeParser: ParserShape = {
     Effect.gen(function* () {
       const language = input.language;
       if (!isSupportedLanguage(language)) {
-        return yield* ParseError.make({
+        return yield* new ParseError({
           parser: "tree-sitter-node",
           message: `Unsupported language: ${language ?? "unknown"}`,
         });
@@ -266,7 +266,7 @@ export const treeSitterNodeParser: ParserShape = {
       return yield* Effect.try({
         try: () => parseWithTreeSitter(input, language),
         catch: (error) =>
-          ParseError.make({
+          new ParseError({
             parser: "tree-sitter-node",
             message: toParseErrorMessage(error),
           }),

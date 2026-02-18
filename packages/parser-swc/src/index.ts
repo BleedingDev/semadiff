@@ -214,7 +214,7 @@ export const swcParser: Parser = {
     Effect.gen(function* () {
       const language = input.language;
       if (!isSupportedLanguage(language)) {
-        return yield* ParseError.make({
+        return yield* new ParseError({
           parser: "swc",
           message: `Unsupported language: ${language ?? "unknown"}`,
         });
@@ -222,7 +222,7 @@ export const swcParser: Parser = {
       return yield* Effect.try({
         try: () => parseWithSwc(input, language),
         catch: (error) =>
-          ParseError.make({
+          new ParseError({
             parser: "swc",
             message: toParseErrorMessage(error),
           }),

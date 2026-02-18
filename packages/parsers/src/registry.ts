@@ -1,6 +1,6 @@
-import { Context, Effect, Schema } from "effect";
+import { Effect, Schema, ServiceMap } from "effect";
 
-const catchRecoverable = Effect.catchAll;
+const catchRecoverable = Effect.catch;
 
 export type LanguageId =
   | "ts"
@@ -43,10 +43,13 @@ export interface ParserInput {
   language?: LanguageId;
 }
 
-export class ParseError extends Schema.TaggedError<ParseError>()("ParseError", {
-  parser: Schema.String,
-  message: Schema.String,
-}) {}
+export class ParseError extends Schema.TaggedErrorClass<ParseError>()(
+  "ParseError",
+  {
+    parser: Schema.String,
+    message: Schema.String,
+  }
+) {}
 
 export interface Parser {
   id: string;
@@ -61,10 +64,10 @@ export interface ParserRegistryService {
   listCapabilities: () => Record<string, ParserCapability>;
 }
 
-export class ParserRegistry extends Context.Tag("@semadiff/ParserRegistry")<
+export class ParserRegistry extends ServiceMap.Service<
   ParserRegistry,
   ParserRegistryService
->() {}
+>()("@semadiff/ParserRegistry") {}
 
 const LINE_SPLIT_RE = /\r?\n/;
 

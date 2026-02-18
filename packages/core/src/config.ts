@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-export class ConfigValidationError extends Schema.TaggedError<ConfigValidationError>()(
+export class ConfigValidationError extends Schema.TaggedErrorClass<ConfigValidationError>()(
   "ConfigValidationError",
   {
     source: Schema.String,
@@ -15,11 +15,16 @@ const NormalizerConfigSchema = Schema.Struct({
   numericLiterals: Schema.Boolean,
 });
 
-const NormalizerOverridesSchema = Schema.partial(NormalizerConfigSchema);
-const NormalizerPerLanguageSchema = Schema.Record({
-  key: Schema.String,
-  value: NormalizerOverridesSchema,
+const NormalizerOverridesSchema = Schema.Struct({
+  whitespace: Schema.optional(Schema.Boolean),
+  tailwind: Schema.optional(Schema.Boolean),
+  importOrder: Schema.optional(Schema.Boolean),
+  numericLiterals: Schema.optional(Schema.Boolean),
 });
+const NormalizerPerLanguageSchema = Schema.Record(
+  Schema.String,
+  NormalizerOverridesSchema
+);
 
 const NormalizerSettingsSchema = Schema.Struct({
   global: NormalizerConfigSchema,
@@ -27,13 +32,13 @@ const NormalizerSettingsSchema = Schema.Struct({
 });
 
 const RendererConfigSchema = Schema.Struct({
-  format: Schema.Literal("ansi", "plain", "json"),
-  layout: Schema.Literal("unified", "side-by-side"),
+  format: Schema.Literals(["ansi", "plain", "json"] as const),
+  layout: Schema.Literals(["unified", "side-by-side"] as const),
 });
 
 const TelemetryConfigSchema = Schema.Struct({
   enabled: Schema.Boolean,
-  exporter: Schema.Literal("console", "otlp-http", "otlp-grpc"),
+  exporter: Schema.Literals(["console", "otlp-http", "otlp-grpc"] as const),
   endpoint: Schema.optional(Schema.String),
 });
 
@@ -42,8 +47,19 @@ export const ConfigSchema = Schema.Struct({
   renderer: RendererConfigSchema,
   telemetry: TelemetryConfigSchema,
 });
-const RendererConfigInputSchema = Schema.partial(RendererConfigSchema);
-const TelemetryConfigInputSchema = Schema.partial(TelemetryConfigSchema);
+const RendererConfigInputSchema = Schema.Struct({
+  format: Schema.optional(Schema.Literals(["ansi", "plain", "json"] as const)),
+  layout: Schema.optional(
+    Schema.Literals(["unified", "side-by-side"] as const)
+  ),
+});
+const TelemetryConfigInputSchema = Schema.Struct({
+  enabled: Schema.optional(Schema.Boolean),
+  exporter: Schema.optional(
+    Schema.Literals(["console", "otlp-http", "otlp-grpc"] as const)
+  ),
+  endpoint: Schema.optional(Schema.String),
+});
 
 export const ConfigInputSchema = Schema.Struct({
   normalizers: Schema.optional(
@@ -55,7 +71,7 @@ export const ConfigInputSchema = Schema.Struct({
   renderer: Schema.optional(RendererConfigInputSchema),
   telemetry: Schema.optional(TelemetryConfigInputSchema),
 });
-const ConfigInputJsonSchema = Schema.parseJson(ConfigInputSchema);
+const ConfigInputJsonSchema = Schema.fromJsonString(ConfigInputSchema);
 
 export type Config = Schema.Schema.Type<typeof ConfigSchema>;
 export type ConfigInput = Schema.Schema.Type<typeof ConfigInputSchema>;
@@ -145,12 +161,10 @@ export const defaultSources: ConfigSources = {
 
 export function decodeConfigInput(source: string, input: unknown): ConfigInput {
   try {
-    return Schema.decodeUnknownSync(ConfigInputSchema)(input, {
-      onExcessProperty: "error",
-    });
+    return Schema.decodeUnknownSync(ConfigInputSchema)(input);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw ConfigValidationError.make({ source, message });
+    throw new ConfigValidationError({ source, message });
   }
 }
 
@@ -159,12 +173,10 @@ export function decodeConfigInputJson(
   input: string
 ): ConfigInput {
   try {
-    return Schema.decodeUnknownSync(ConfigInputJsonSchema)(input, {
-      onExcessProperty: "error",
-    });
+    return Schema.decodeUnknownSync(ConfigInputJsonSchema)(input);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw ConfigValidationError.make({ source, message });
+    throw new ConfigValidationError({ source, message });
   }
 }
 

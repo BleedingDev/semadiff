@@ -367,7 +367,7 @@ export const treeSitterWasmParser: ParserShape = {
       },
       catch: (error) => {
         const message = error instanceof Error ? error.message : String(error);
-        return ParseError.make({ parser: "tree-sitter-wasm", message });
+        return new ParseError({ parser: "tree-sitter-wasm", message });
       },
     }),
 };

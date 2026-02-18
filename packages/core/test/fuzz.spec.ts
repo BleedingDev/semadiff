@@ -28,15 +28,15 @@ function randomString(rng: () => number, length: number) {
 
 describe("fuzz: structuralDiff stability", () => {
   test("random inputs do not crash and are deterministic", () => {
-    const diffJson = Schema.parseJson(DiffDocumentSchema);
+    const diffJson = Schema.toCodecJson(DiffDocumentSchema);
     const rng = mulberry32(1337);
     for (let i = 0; i < 25; i += 1) {
       const oldText = randomString(rng, 64);
       const newText = randomString(rng, 64);
       const first = structuralDiff(oldText, newText);
       const second = structuralDiff(oldText, newText);
-      expect(Schema.encodeSync(diffJson)(first)).toBe(
-        Schema.encodeSync(diffJson)(second)
+      expect(JSON.stringify(Schema.encodeSync(diffJson)(first))).toBe(
+        JSON.stringify(Schema.encodeSync(diffJson)(second))
       );
     }
   });

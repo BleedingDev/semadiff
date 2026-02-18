@@ -24,7 +24,7 @@ const parserRegistry = makeRegistry(treeSitterWasmParsers);
 const TelemetryPayloadSchema = Schema.Struct({
   span: Schema.String,
   timestamp: Schema.String,
-  attributes: Schema.Record({ key: Schema.String, value: Schema.Unknown }),
+  attributes: Schema.Record(Schema.String, Schema.Unknown),
 });
 const OtlpAttributeSchema = Schema.Struct({
   key: Schema.String,
@@ -47,11 +47,9 @@ const OtlpResourceSchema = Schema.Struct({
 const OtlpPayloadSchema = Schema.Struct({
   resourceSpans: Schema.Array(OtlpResourceSchema),
 });
-const TelemetryPayloadJson = Schema.parseJson(TelemetryPayloadSchema);
-const OtlpPayloadJson = Schema.parseJson(OtlpPayloadSchema);
-const DiagnosticsBundleJson = Schema.parseJson(DiagnosticsBundleSchema, {
-  space: 2,
-});
+const TelemetryPayloadJson = Schema.fromJsonString(TelemetryPayloadSchema);
+const OtlpPayloadJson = Schema.fromJsonString(OtlpPayloadSchema);
+const DiagnosticsBundleJson = Schema.fromJsonString(DiagnosticsBundleSchema);
 function getFallbackStorage() {
   const store = (
     globalThis as { __semadiffSessionStorage?: Record<string, string> }

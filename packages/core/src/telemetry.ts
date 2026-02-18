@@ -1,4 +1,4 @@
-import { Console, Effect, Exit, Layer, Schema } from "effect";
+import { Console, Effect, Exit, Layer, ServiceMap } from "effect";
 
 export type TelemetryAttributes = Record<string, unknown>;
 
@@ -19,18 +19,10 @@ export interface TelemetryService {
   ) => Effect.Effect<void, never>;
 }
 
-const TelemetryNoop: TelemetryService = {
-  span: (_name, _attributes, effect) => effect,
-  log: () => Effect.void,
-  metric: () => Effect.void,
-};
-
-export class Telemetry extends Effect.Service<Telemetry>()(
-  "@semadiff/Telemetry",
-  {
-    sync: () => TelemetryNoop,
-  }
-) {}
+export class Telemetry extends ServiceMap.Service<
+  Telemetry,
+  TelemetryService
+>()("@semadiff/Telemetry") {}
 
 export interface TelemetryOptions {
   enabled: boolean;
@@ -49,12 +41,10 @@ interface OTelAttribute {
   value: OTelAttributeValue;
 }
 
-const JsonUnknown = Schema.parseJson(Schema.Unknown);
-const encodeJson = (value: unknown) =>
-  Schema.encode(JsonUnknown)(value).pipe(Effect.orDie);
+const encodeJson = (value: unknown) => Effect.sync(() => JSON.stringify(value));
 const encodeJsonSync = (value: unknown) => {
   try {
-    return Schema.encodeSync(JsonUnknown)(value);
+    return JSON.stringify(value);
   } catch (error) {
     return String(error);
   }
@@ -279,7 +269,7 @@ export function TelemetryLive(options: TelemetryOptions) {
 
   return Layer.succeed(
     Telemetry,
-    Telemetry.make({
+    Telemetry.of({
       span: <A, E, R>(
         name: string,
         attributes: TelemetryAttributes,
