@@ -43,9 +43,9 @@ export interface DiffOperation {
 
 export interface DiffDocument {
   version: "0.1.0";
-  operations: DiffOperation[];
-  moves: MoveGroup[];
-  renames: RenameGroup[];
+  operations: readonly DiffOperation[];
+  moves: readonly MoveGroup[];
+  renames: readonly RenameGroup[];
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: structural diff pipeline trades complexity for clarity.

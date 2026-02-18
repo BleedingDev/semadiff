@@ -9,7 +9,7 @@ import {
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import type { DiffDocument, NormalizerSettings } from "@semadiff/core";
+import type { NormalizerSettings } from "@semadiff/core";
 import {
   ConfigSchema,
   explainDiff,
@@ -623,17 +623,7 @@ const prFileCommand = Command.make(
       yield* Console.log(
         `File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`
       );
-      const sourceDiff = result.diff as DiffDocument;
-      const diff: DiffDocument = {
-        ...sourceDiff,
-        operations: [...sourceDiff.operations],
-        moves: sourceDiff.moves.map((move) => ({
-          ...move,
-          operations: [...move.operations],
-        })),
-        renames: [...sourceDiff.renames],
-      };
-      const output = renderTerminal(diff, {
+      const output = renderTerminal(result.diff, {
         format,
         layout,
         view,

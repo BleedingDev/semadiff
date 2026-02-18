@@ -2589,7 +2589,7 @@ function addRangeLines(
 }
 
 function buildLineMarkSets(
-  operations: DiffOperation[],
+  operations: readonly DiffOperation[],
   oldLineCount: number,
   newLineCount: number
 ) {
@@ -2642,7 +2642,7 @@ function expandRangeLines(range: Range | undefined, maxLine: number) {
 }
 
 function buildMoveLineMap(
-  operations: DiffOperation[],
+  operations: readonly DiffOperation[],
   oldLineCount: number,
   newLineCount: number
 ) {
@@ -2768,7 +2768,7 @@ function mergeMoveFromNew(
 
 function collapseMoveRows(
   rows: LineRow[],
-  operations: DiffOperation[],
+  operations: readonly DiffOperation[],
   oldLines: string[],
   newLines: string[],
   normalizeLine?: (line: string) => string
@@ -2940,7 +2940,7 @@ function applyLineOperationToRow(
 
 function applyLineOperations(
   rows: LineRow[],
-  operations: DiffOperation[],
+  operations: readonly DiffOperation[],
   oldLineCount: number,
   newLineCount: number,
   normalizeLine?: (line: string) => string
@@ -3006,7 +3006,7 @@ function buildLineRows(
   contextLines: number,
   lineLayout: "split" | "unified",
   normalizeLine?: (line: string) => string,
-  operations: DiffOperation[] = [],
+  operations: readonly DiffOperation[] = [],
   useKeyMatching?: boolean,
   useYamlComparable?: boolean,
   applyOperations = true,

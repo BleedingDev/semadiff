@@ -32,7 +32,7 @@ export interface MoveGroup {
   oldRange: Range;
   newRange: Range;
   confidence: number;
-  operations: string[];
+  operations: readonly string[];
 }
 
 export interface MoveDetection {
@@ -146,6 +146,7 @@ export function detectMoves(
       moveId,
       ...(renameGroupId ? { renameGroupId } : {}),
     });
+    const operationIds = [moveId];
     const moveGroup: MoveGroup = {
       id: moveId,
       oldRange: rangeForTokens(
@@ -159,7 +160,7 @@ export function detectMoves(
         insertMatch.block.units.length
       ),
       confidence,
-      operations: [moveId],
+      operations: operationIds,
     };
 
     const oldSlice = textForTokens(
@@ -193,7 +194,7 @@ export function detectMoves(
       : newSlice;
     if (comparableOld !== comparableNew) {
       const updateId = `${moveId}-update-${opCounter++}`;
-      moveGroup.operations.push(updateId);
+      operationIds.push(updateId);
       const updateMeta = buildMoveMeta({
         confidence,
         moveId,
