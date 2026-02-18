@@ -1,11 +1,18 @@
 name: CI
 
 on:
-  push:
   pull_request:
+  push:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  build-test:
+  quality:
+    name: Quality
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,37 +32,117 @@ jobs:
           bun-version: "1.3.9"
       - name: Install dependencies
         run: pnpm install
-      - name: Build
-        run: pnpm build
       - name: Quality gates
         run: pnpm quality
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-      - name: Playwright e2e
-        run: pnpm test:e2e
-      - name: Upload CLI build
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cli-dist
-          path: packages/cli/dist
-      - name: Upload extension build
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: extension-dist
-          path: packages/github-extension/dist
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: coverage
           path: coverage
+
+  wasm-verify:
+    name: WASM Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build parser WASM package
+        run: pnpm --filter @semadiff/parser-tree-sitter-wasm build
+      - name: Build extension bundle
+        run: pnpm --filter @semadiff/github-extension build
+      - name: Verify extension and parser WASM outputs
+        run: |
+          bun scripts/verify-wasm-assets.mjs --dir packages/github-extension/public/semadiff-wasm --dir packages/github-extension/dist/semadiff-wasm
+          bun scripts/verify-wasm-assets.mjs --dir packages/parser-tree-sitter-wasm/dist/semadiff-wasm
+      - name: Upload extension build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-dist
+          path: packages/github-extension/dist
+
+  e2e-smoke:
+    name: E2E Smoke
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright smoke test
+        run: pnpm test:e2e -- e2e/smoke.spec.ts
       - name: Upload diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: diagnostics
+          name: diagnostics-smoke
+          path: |
+            playwright-report
+            test-results
+
+  e2e-full:
+    name: E2E Full
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: Run full Playwright suite
+        run: pnpm test:e2e
+      - name: Upload diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics-full
           path: |
             playwright-report
             test-results
