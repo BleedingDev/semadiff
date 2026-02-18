@@ -15,7 +15,7 @@
     "test": "vitest run",
     "test:app": "pnpm --filter pr-viewer test",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/run-with-colors.mjs playwright test",
     "compare:semanticdiff-lines": "bun scripts/compare-semanticdiff-lines.mjs",
     "quality": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm typecheck:app && pnpm test:coverage && pnpm test:app"
   },
