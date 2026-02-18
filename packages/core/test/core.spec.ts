@@ -137,4 +137,23 @@ describe("core diff basics", () => {
     expect(diff.operations.some((op) => op.type === "move")).toBe(false);
     expect(diff.operations.length).toBeGreaterThan(0);
   });
+
+  test("json key changes stay as delete+insert instead of update pairing", () => {
+    const oldText = '{\n  "name": 1,\n}\n';
+    const newText = '{\n  "title": 1,\n}\n';
+    const diff = structuralDiff(oldText, newText, { language: "json" });
+    expect(diff.moves).toHaveLength(0);
+    expect(diff.operations.map((op) => op.type)).toEqual(["delete", "insert"]);
+    expect(diff.operations[0]?.oldText).toContain('"name": 1,');
+    expect(diff.operations[1]?.newText).toContain('"title": 1,');
+  });
+
+  test("appending a new line emits a standalone insert operation", () => {
+    const oldText = "const a = 1;\n";
+    const newText = "const a = 1;\nconst b = 2;\n";
+    const diff = structuralDiff(oldText, newText, { language: "ts" });
+    expect(diff.operations).toHaveLength(1);
+    expect(diff.operations[0]?.type).toBe("insert");
+    expect(diff.operations[0]?.newText).toBe("const b = 2;\n");
+  });
 });
