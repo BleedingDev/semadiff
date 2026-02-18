@@ -48,7 +48,7 @@ curl -I http://127.0.0.1:3000/
 - `packages/github-extension`: overlay UI/bridge
 - `apps/pr-viewer`: web app for PR summary and file diff inspection
 - `e2e`: Playwright end-to-end tests
-- `docs`: focused docs (`CONFIG.md`, `GIT_INTEGRATION.md`, `IMPLEMENTATION_PLAN.md`)
+- `docs`: focused docs (`ARCHITECTURE.md`, `CONTRIBUTING.md`, `CONFIG.md`, `GIT_INTEGRATION.md`, `IMPLEMENTATION_PLAN.md`)
 
 ## Configuration
 
@@ -57,3 +57,8 @@ See `docs/CONFIG.md` for config file shape and supported `SEMADIFF_*` environmen
 ## Git Integration
 
 See `docs/GIT_INTEGRATION.md` for `git diff` external tool and `difftool` setup.
+
+## Architecture + Contributing
+
+- Architecture map: `docs/ARCHITECTURE.md`
+- Contributor workflow and extension runbooks: `docs/CONTRIBUTING.md`
