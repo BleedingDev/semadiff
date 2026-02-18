@@ -6,12 +6,13 @@ import { fetchBlob } from "../src/blob";
 async function createBlobServer(options: {
   body: string;
   contentLengthHeader?: string;
+  statusCode?: number;
 }) {
   const server = createServer((_req, res) => {
     if (options.contentLengthHeader) {
       res.setHeader("content-length", options.contentLengthHeader);
     }
-    res.statusCode = 200;
+    res.statusCode = options.statusCode ?? 200;
     res.end(options.body);
   });
   await new Promise<void>((resolve) => {
@@ -62,5 +63,50 @@ describe("fetchBlob", () => {
     }
 
     await server.close();
+  });
+
+  test("returns status error when request is not successful", async () => {
+    const server = await createBlobServer({
+      body: "not found",
+      statusCode: 404,
+    });
+
+    const result = await fetchBlob(server.url);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error).toContain("404");
+    }
+
+    await server.close();
+  });
+
+  test("returns content when blob fetch succeeds", async () => {
+    const server = await createBlobServer({
+      body: "hello blob",
+      contentLengthHeader: "10",
+    });
+
+    const result = await fetchBlob(server.url);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.content).toBe("hello blob");
+    }
+
+    await server.close();
+  });
+
+  test("returns thrown fetch error message", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = () => Promise.reject(new Error("network exploded"));
+
+    try {
+      const result = await fetchBlob("http://example.test/blob");
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toContain("network exploded");
+      }
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 });
