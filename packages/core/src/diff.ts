@@ -9,12 +9,15 @@ import {
 } from "./diff-cosmetic.js";
 import type { Position, Range } from "./diff-range.js";
 import { LINE_SPLIT_RE, rangeForText, sliceTextByRange } from "./diff-range.js";
+import type { RenameGroup } from "./diff-rename.js";
+import { detectRenames } from "./diff-rename.js";
 import type { DiffToken, TokenRange } from "./diff-tokenize.js";
 import { rangeForTokens, textForTokens, tokenize } from "./diff-tokenize.js";
 import type { NormalizerLanguage } from "./normalizers.js";
 import { normalizeTextForLanguage } from "./normalizers.js";
 
 export type { Position, Range } from "./diff-range.js";
+export type { RenameGroup } from "./diff-rename.js";
 
 export interface DiffOperation {
   id: string;
@@ -65,14 +68,6 @@ export interface MoveGroup {
   newRange: Range;
   confidence: number;
   operations: string[];
-}
-
-export interface RenameGroup {
-  id: string;
-  from: string;
-  to: string;
-  occurrences: number;
-  confidence: number;
 }
 
 const TRAILING_LINE_BREAK_RE = /\r?\n\s*$/;
@@ -1003,43 +998,6 @@ function detectMoves(
   }
 
   return { moves, moveOps, nestedOps, usedDeletes, usedInserts };
-}
-
-function detectRenames(oldText: string, newText: string): RenameGroup[] {
-  const oldTokens = oldText.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? [];
-  const newTokens = newText.match(/[A-Za-z_][A-Za-z0-9_]*/g) ?? [];
-  if (oldTokens.length === 0 || oldTokens.length !== newTokens.length) {
-    return [];
-  }
-
-  const mappingCounts = new Map<string, number>();
-  for (let i = 0; i < oldTokens.length; i += 1) {
-    const from = oldTokens[i];
-    const to = newTokens[i];
-    if (from !== to) {
-      const key = `${from}->${to}`;
-      mappingCounts.set(key, (mappingCounts.get(key) ?? 0) + 1);
-    }
-  }
-
-  const results: RenameGroup[] = [];
-  for (const [key, count] of mappingCounts.entries()) {
-    if (count < 2) {
-      continue;
-    }
-    const [from, to] = key.split("->");
-    if (!(from && to)) {
-      continue;
-    }
-    results.push({
-      id: `rename-${results.length + 1}`,
-      from,
-      to,
-      occurrences: count,
-      confidence: count / oldTokens.length,
-    });
-  }
-  return results;
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: structural diff pipeline trades complexity for clarity.
