@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "bun ../../scripts/copy-wasm.mjs && tsc -p tsconfig.json && vite build",
+    "build": "bun ../../scripts/copy-wasm.mjs && bun ../../scripts/verify-wasm-assets.mjs --dir packages/github-extension/public/semadiff-wasm && tsc -p tsconfig.json && vite build && bun ../../scripts/verify-wasm-assets.mjs --dir packages/github-extension/dist/semadiff-wasm",
     "preview": "vite preview",
     "lint": "biome lint ."
   },
