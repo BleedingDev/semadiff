@@ -42,8 +42,6 @@ import {
   PrFileSummarySchema,
 } from "./types.js";
 
-const catchRecoverable = Effect.catch;
-
 const parserRegistry = makeRegistry([
   ...swcParsers,
   ...treeSitterWasmParsers,
@@ -595,7 +593,7 @@ export const PrDiffLive = Layer.effect(
                   { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
                   file
                 ).pipe(
-                  catchRecoverable((error) =>
+                  Effect.catch((error) =>
                     Effect.gen(function* () {
                       yield* Effect.logError(
                         "Failed to summarize file",

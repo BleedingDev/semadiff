@@ -32,8 +32,6 @@ import { Console, Effect, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 import { resolveConfig } from "./config/resolve.js";
 
-const catchRecoverable = Effect.catch;
-
 const Args = {
   text: ({ name }: { name: string }) => Argument.string(name),
   integer: ({ name }: { name: string }) => Argument.integer(name),
@@ -809,14 +807,14 @@ const doctorCommand = Command.make("doctor", {}, () =>
     const gitVersion = yield* Effect.try({
       try: () => execSync("git --version").toString().trim(),
       catch: (error) => new CliSystemError({ operation: "git-version", error }),
-    }).pipe(catchRecoverable(() => Effect.succeed("not found")));
+    }).pipe(Effect.catch(() => Effect.succeed("not found")));
     const canWriteCwd = yield* Effect.try({
       try: () => {
         accessSync(process.cwd(), constants.W_OK);
         return true;
       },
       catch: (error) => new CliSystemError({ operation: "access-cwd", error }),
-    }).pipe(catchRecoverable(() => Effect.succeed(false)));
+    }).pipe(Effect.catch(() => Effect.succeed(false)));
     const report = {
       bun: bunVersion,
       git: gitVersion,
@@ -968,7 +966,7 @@ const benchCommand = Command.make(
         try: () => readFileSync(baselinePath, "utf8"),
         catch: (error) =>
           new CliSystemError({ operation: "read-benchmark-baseline", error }),
-      }).pipe(catchRecoverable(() => Effect.succeed(null)));
+      }).pipe(Effect.catch(() => Effect.succeed(null)));
       const baselineReport =
         baselineRaw === null
           ? null
