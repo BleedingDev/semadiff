@@ -5,15 +5,27 @@ export default defineConfig({
     environment: "node",
     include: ["packages/**/*.test.ts", "packages/**/*.spec.ts"],
     reporters: "default",
-  },
-  coverage: {
-    provider: "v8",
-    reporter: ["text", "json", "html"],
-    thresholds: {
-      lines: 1,
-      functions: 1,
-      branches: 1,
-      statements: 1,
+    coverage: {
+      provider: "v8",
+      all: false,
+      reporter: ["text", "json", "html"],
+      exclude: [
+        "**/*.d.ts",
+        "**/dist/**",
+        "**/test/**",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "apps/**",
+        "e2e/**",
+        "scripts/**",
+        "tmp/**",
+      ],
+      thresholds: {
+        lines: 50,
+        functions: 50,
+        branches: 50,
+        statements: 50,
+      },
     },
   },
 });
