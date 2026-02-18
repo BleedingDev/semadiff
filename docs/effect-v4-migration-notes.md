@@ -20,6 +20,7 @@
 - Bun runtime/services are still provided by `@effect/platform-bun`.
 - Node runtime/services are provided by `@effect/platform-node`.
 - CLI entrypoint now selects Bun vs Node runtime at startup and runs on both engines.
+- Packed CLI e2e (`e2e/cli-pack.spec.ts`) validates both runtime branches.
 - This is not collapsed into the main `effect` package export surface.
 
 ### Vitest Integration
@@ -27,8 +28,28 @@
 - Effect-aware Vitest helpers are still in `@effect/vitest`.
 - `vitest` itself remains a separate dependency.
 - `@effect/vitest` and `effect` versions should be kept aligned during upgrades.
+- We now have explicit harness coverage in `packages/core/test/effect-vitest.spec.ts` for:
+  - `ServiceMap.Service` layer provisioning
+  - `TestClock` scheduling
+  - typed failure propagation
 
-## Peer/Version Constraints Guidance
+### Schema JSON Helpers
+
+- `Schema.parseJson(...)` is not used in v4 migration paths anymore.
+- e2e helper and benchmark scripts use `Schema.UnknownFromJsonString` for decode/encode.
+- Bun eval snippets that only need serialization now use `JSON.stringify`.
+
+## Validation runbook
+
+Run these checks when upgrading any Effect beta:
+
+1. `pnpm effect:v4:readiness -- --strict`
+2. `pnpm quality`
+3. `pnpm exec playwright test e2e/cli-pack.spec.ts`
+4. `pnpm exec vitest run packages/core/test/effect-vitest.spec.ts`
+5. `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
+
+## Peer/Version constraints guidance
 
 - Do not collapse constraints to only `effect` yet.
 - Keep the following aligned per upgrade step:

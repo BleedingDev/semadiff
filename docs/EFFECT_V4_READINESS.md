@@ -59,6 +59,52 @@ Current result (as of this update):
   - `test`
   - `test:app`
   - coverage pipeline via `pnpm quality`
+  - targeted v4 runtime/integration checks:
+    - `pnpm exec playwright test e2e/cli-pack.spec.ts`
+    - `pnpm exec vitest run packages/core/test/effect-vitest.spec.ts`
+    - `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
+
+## Runtime verification runbook
+
+Use this when validating migration parity after Effect beta bumps.
+
+1. Verify baseline readiness:
+
+   ```bash
+   pnpm effect:v4:readiness -- --strict
+   ```
+
+2. Verify packed CLI runtime parity (Bun + Node):
+
+   ```bash
+   pnpm exec playwright test e2e/cli-pack.spec.ts
+   ```
+
+   Expected:
+   - installs packed tarballs in an isolated consumer project
+   - runs `dist/index.js --help` via Bun and Node
+   - runs `dist/index.js diff` via Bun and Node
+
+3. Verify Effect test harness parity:
+
+   ```bash
+   pnpm exec vitest run packages/core/test/effect-vitest.spec.ts
+   ```
+
+   Expected:
+   - `@effect/vitest` layer provisioning with `ServiceMap.Service`
+   - `TestClock.adjust` scheduling behavior
+   - typed failure propagation from provided services
+
+4. Verify eval/script JSON compatibility on v4 Schema API:
+
+   ```bash
+   pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts
+   ```
+
+   Expected:
+   - no `Schema.parseJson` runtime usage
+   - helper/script JSON encode/decode uses `Schema.UnknownFromJsonString` or `JSON.stringify`
 
 ## Remaining caveats
 

@@ -40,6 +40,71 @@ Please add an explicit migration section (or dedicated page) with before/after c
 - `.Default` replacement
 - `dependencies` replacement
 
+## Local cookbook draft (what worked for us)
+
+### 1) `Context.Tag` to `ServiceMap.Service`
+
+Before:
+
+```ts
+class Repo extends Context.Tag("Repo")<
+  Repo,
+  { readonly get: (id: string) => Effect.Effect<Item> }
+>() {}
+const RepoLive = Layer.succeed(Repo, { get: ... });
+```
+
+After:
+
+```ts
+const Repo = ServiceMap.Service<{
+  readonly get: (id: string) => Effect.Effect<Item>;
+}>("Repo");
+const RepoLive = Layer.succeed(Repo, { get: ... });
+```
+
+### 2) `Effect.Service` with `dependencies` / `.Default`
+
+Before:
+
+```ts
+class UserRepo extends Effect.Service<UserRepo>()("UserRepo", {
+  effect: Effect.gen(function*() {
+    const db = yield* Database;
+    return { find: (id: string) => db.find(id) };
+  }),
+  dependencies: [Database.Default]
+}) {}
+```
+
+After:
+
+```ts
+class UserRepo extends ServiceMap.Service<UserRepo>()("UserRepo", {
+  make: Effect.gen(function*() {
+    const db = yield* Database;
+    return { find: (id: string) => db.find(id) };
+  })
+}) {}
+
+const UserRepoLive = Layer.effect(UserRepo, UserRepo.make);
+const AppLive = UserRepoLive.pipe(Layer.provideMerge(DatabaseLive));
+```
+
+### 3) Default layer usage
+
+Before:
+
+```ts
+program.pipe(Effect.provide(UserRepo.Default));
+```
+
+After:
+
+```ts
+program.pipe(Effect.provide(UserRepoLive));
+```
+
 ## Example Environment (where this blocks us)
 
 - Effect v4 beta evaluation branch in a multi-package TypeScript monorepo
