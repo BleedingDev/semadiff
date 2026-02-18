@@ -82,6 +82,20 @@ describe("core diff basics", () => {
     ).toBe(true);
   });
 
+  test("move detection also works without language hint", () => {
+    const diff = structuralDiff(
+      "export function a() {\n  const value = 1;\n  return value;\n}\n\nexport function b() {\n  return 2;\n}\n",
+      "export function b() {\n  return 2;\n}\n\nexport function a() {\n  const value = 1;\n  return value + 0;\n}\n"
+    );
+    expect(diff.moves.length).toBeGreaterThan(0);
+    expect(diff.operations.some((op) => op.type === "move")).toBe(true);
+    expect(
+      diff.operations.some(
+        (op) => op.type === "update" && op.meta?.moveId !== undefined
+      )
+    ).toBe(true);
+  });
+
   test("empty old text yields a single insert operation", () => {
     const newText = "export const value = 1;\n";
     const diff = structuralDiff("", newText, { language: "ts" });

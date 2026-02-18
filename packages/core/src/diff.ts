@@ -1111,10 +1111,7 @@ export function structuralDiff(
   const operations: DiffOperation[] = [];
 
   for (let index = 0; index < blocks.length; index += 1) {
-    const block = blocks[index];
-    if (!block) {
-      continue;
-    }
+    const block = blocks[index] as UnitBlock;
     if (block.type === "delete" && moveDetection.usedDeletes.has(index)) {
       continue;
     }
