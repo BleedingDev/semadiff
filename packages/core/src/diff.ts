@@ -1788,7 +1788,7 @@ export function structuralDiff(
   const useStructuralTokens =
     hasStructuralTokens && options?.language !== "json";
   const shouldDetectMoves =
-    options?.detectMoves !== false && useStructuralTokens;
+    options?.detectMoves !== false && options?.language !== "json";
   const moveDetection = shouldDetectMoves
     ? detectMoves(
         blocks,

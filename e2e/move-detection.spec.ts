@@ -8,7 +8,7 @@ test("moved block yields move op with confidence", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
   const output = runBunEval(
-    `import { structuralDiff, renderJson } from '${coreUrl}'; const oldText = 'alpha\\nbeta\\ngamma\\ndelta'; const newText = 'alpha\\ndelta\\nbeta\\ngamma'; const diff = structuralDiff(oldText, newText); console.log(renderJson(diff));`
+    `import { structuralDiff, renderJson } from '${coreUrl}'; const oldText = 'export function a() {\\n  const value = 1;\\n  return value;\\n}\\n\\nexport function b() {\\n  return 2;\\n}\\n'; const newText = 'export function b() {\\n  return 2;\\n}\\n\\nexport function a() {\\n  const value = 1;\\n  return value;\\n}\\n'; const diff = structuralDiff(oldText, newText, { language: 'ts' }); console.log(renderJson(diff));`
   );
 
   const diff = decodeJson<{
@@ -26,7 +26,7 @@ test("moved block with edit yields nested update", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
   const output = runBunEval(
-    `import { structuralDiff, renderJson } from '${coreUrl}'; const oldText = 'alpha\\none\\ntwo\\nthree\\nomega'; const newText = 'alpha\\nomega\\none\\ntwo\\nthree updated'; const diff = structuralDiff(oldText, newText); console.log(renderJson(diff));`
+    `import { structuralDiff, renderJson } from '${coreUrl}'; const oldText = 'export function a() {\\n  const value = 1;\\n  return value;\\n}\\n\\nexport function b() {\\n  return 2;\\n}\\n'; const newText = 'export function b() {\\n  return 2;\\n}\\n\\nexport function a() {\\n  const value = 1;\\n  return value + 0;\\n}\\n'; const diff = structuralDiff(oldText, newText, { language: 'ts' }); console.log(renderJson(diff));`
   );
 
   const diff = decodeJson<{

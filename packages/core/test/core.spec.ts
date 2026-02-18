@@ -66,4 +66,19 @@ describe("core diff basics", () => {
     expect(diffEnabled.operations.length).toBe(0);
     expect(diffDisabled.operations.length).toBeGreaterThan(0);
   });
+
+  test("moves are detected without parser roots for code blocks", () => {
+    const diff = structuralDiff(
+      "export function a() {\n  const value = 1;\n  return value;\n}\n\nexport function b() {\n  return 2;\n}\n",
+      "export function b() {\n  return 2;\n}\n\nexport function a() {\n  const value = 1;\n  return value + 0;\n}\n",
+      { language: "ts" }
+    );
+    expect(diff.moves.length).toBeGreaterThan(0);
+    expect(diff.operations.some((op) => op.type === "move")).toBe(true);
+    expect(
+      diff.operations.some(
+        (op) => op.type === "update" && op.meta?.moveId !== undefined
+      )
+    ).toBe(true);
+  });
 });
