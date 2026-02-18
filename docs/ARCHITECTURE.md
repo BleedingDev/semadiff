@@ -29,6 +29,15 @@ input files
 - `packages/core`
   - owns `DiffDocument` schema and structural diff behavior
   - must stay UI-agnostic and transport-agnostic
+  - internal engine modules:
+    - `diff-range.ts`: shared range/offset math utilities
+    - `diff-tokenize.ts`: tokenization and token-slice helpers
+    - `diff-blocks.ts`: token block diff (LCS/Myers fallback)
+    - `diff-move-math.ts`: move similarity/scoring helpers
+    - `diff-moves.ts`: move detection and nested move-update emission
+    - `diff-rename.ts`: rename group detection
+    - `diff-cosmetic.ts`: cosmetic normalization/suppression logic
+    - `diff.ts`: orchestration pipeline and final operation assembly
 - `packages/parsers`
   - parser registry and language selection/fallback chain
 - `packages/parser-*`
