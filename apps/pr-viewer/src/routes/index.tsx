@@ -16,6 +16,7 @@ import type {
   FileDiffPayload,
   PrFileSummary,
   PrSummary,
+  ServerError,
   ServerResult,
 } from "../shared/types";
 
@@ -345,7 +346,7 @@ interface DiffPanelBodyProps {
   diffData: FileDiffPayload | null;
   diffHtml: string | null;
   view: "semantic" | "lines";
-  iframeRef: RefObject<HTMLIFrameElement>;
+  iframeRef: RefObject<HTMLIFrameElement | null>;
 }
 
 interface DiffPanelProps extends DiffPanelHeaderProps, DiffPanelBodyProps {}
@@ -988,6 +989,7 @@ function App() {
       });
       return;
     }
+    const prUrl = search.pr;
 
     let active = true;
     const controllers = new Map<string, AbortController>();
@@ -1009,6 +1011,9 @@ function App() {
       while (inFlight < concurrency && index < files.length) {
         const filename = files[index];
         index += 1;
+        if (!filename) {
+          continue;
+        }
         inFlight += 1;
 
         const controller = new AbortController();
@@ -1016,7 +1021,7 @@ function App() {
 
         getFileDiff({
           data: {
-            prUrl: search.pr,
+            prUrl,
             filename,
             contextLines: lineContextLines,
             lineLayout,

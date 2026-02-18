@@ -40,10 +40,15 @@ interface TaggedError {
   resetAt?: string;
 }
 
+interface FormattedError {
+  code: string;
+  message: string;
+}
+
 const isTaggedError = (error: unknown): error is TaggedError =>
   Boolean(error && typeof error === "object" && "_tag" in error);
 
-const formatArrayError = (errors: unknown[]) => {
+const formatArrayError = (errors: unknown[]): FormattedError => {
   if (errors.length === 0) {
     return { code: "UnknownError", message: "Unexpected error" };
   }
@@ -53,8 +58,8 @@ const formatArrayError = (errors: unknown[]) => {
   return { code: first.code, message: `${first.message}${suffix}` };
 };
 
-const formatTaggedError = (tag: string, error: TaggedError) => {
-  const handlers: Record<string, () => { code: string; message: string }> = {
+const formatTaggedError = (tag: string, error: TaggedError): FormattedError => {
+  const handlers: Record<string, () => FormattedError> = {
     InvalidPrUrl: () => ({
       code: tag,
       message:
@@ -92,7 +97,7 @@ const formatTaggedError = (tag: string, error: TaggedError) => {
       };
 };
 
-const formatError = (error: unknown) => {
+const formatError = (error: unknown): FormattedError => {
   if (Array.isArray(error)) {
     return formatArrayError(error);
   }
