@@ -1,5 +1,7 @@
 import { Context, Effect, Schema } from "effect";
 
+const catchRecoverable = Effect.catchAll;
+
 export type LanguageId =
   | "ts"
   | "tsx"
@@ -198,7 +200,7 @@ export function makeRegistry(
           if (!parser.capabilities.hasTokenRanges) {
             return findTokenParser(index + 1);
           }
-          return Effect.catchAll(parser.parse(parseInput), () =>
+          return catchRecoverable(parser.parse(parseInput), () =>
             findTokenParser(index + 1)
           ).pipe(
             Effect.flatMap((tokenResult) => {

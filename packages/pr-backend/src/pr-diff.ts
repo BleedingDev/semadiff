@@ -40,6 +40,8 @@ import {
   PrFileSummarySchema,
 } from "./types.js";
 
+const catchRecoverable = Effect.catchAll;
+
 const parserRegistry = makeRegistry([
   ...swcParsers,
   ...treeSitterWasmParsers,
@@ -566,7 +568,7 @@ export class PrDiffService extends Effect.Service<PrDiffService>()(
                     { ...ref, baseSha: pr.base.sha, headSha: pr.head.sha },
                     file
                   ).pipe(
-                    Effect.catchAll((error) =>
+                    catchRecoverable((error) =>
                       Effect.gen(function* () {
                         yield* Effect.logError(
                           "Failed to summarize file",

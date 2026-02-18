@@ -13,6 +13,8 @@ import {
 } from "effect";
 import type { PrRef } from "./types.js";
 
+const catchRecoverable = Effect.catchAll;
+
 export interface GitHubConfigService {
   readonly apiBase: string;
   readonly rawBase: string;
@@ -133,13 +135,13 @@ const makeFileCache = Effect.gen(function* () {
 
   yield* Effect.tryPromise(() =>
     fs.mkdir(path.dirname(CACHE_JSON_PATH), { recursive: true })
-  ).pipe(Effect.catchAll(() => Effect.void));
+  ).pipe(catchRecoverable(() => Effect.void));
 
   const loaded = yield* Effect.tryPromise(async () => {
     const raw = await fs.readFile(CACHE_JSON_PATH, "utf8");
     const parsed = Schema.decodeUnknownSync(CacheFileJson)(raw);
     return Array.isArray(parsed.entries) ? parsed.entries : [];
-  }).pipe(Effect.catchAll(() => Effect.succeed([])));
+  }).pipe(catchRecoverable(() => Effect.succeed([])));
 
   for (const [key, entry] of loaded) {
     if (!entry || typeof entry.value !== "string") {
@@ -158,7 +160,7 @@ const makeFileCache = Effect.gen(function* () {
       });
       return fs.writeFile(CACHE_JSON_PATH, payload, "utf8");
     }).pipe(
-      Effect.catchAll(() => Effect.void),
+      catchRecoverable(() => Effect.void),
       Effect.asVoid
     );
 
@@ -200,13 +202,13 @@ export const GitHubCacheLive = Layer.effect(
 
     yield* Effect.tryPromise(() =>
       fs.mkdir(path.dirname(CACHE_DB_PATH), { recursive: true })
-    ).pipe(Effect.catchAll(() => Effect.void));
+    ).pipe(catchRecoverable(() => Effect.void));
 
     const sqliteModule = yield* Effect.tryPromise(
       () =>
         // @ts-expect-error bun:sqlite exists only under Bun runtime
         import("bun:sqlite")
-    ).pipe(Effect.catchAll(() => Effect.succeed(null)));
+    ).pipe(catchRecoverable(() => Effect.succeed(null)));
     if (!sqliteModule) {
       return fileCache;
     }
@@ -219,7 +221,7 @@ export const GitHubCacheLive = Layer.effect(
     const sqliteReady = yield* Effect.tryPromise(async () => {
       const stat = await fs.stat(CACHE_DB_PATH);
       return stat.isFile();
-    }).pipe(Effect.catchAll(() => Effect.succeed(false)));
+    }).pipe(catchRecoverable(() => Effect.succeed(false)));
     if (!sqliteReady) {
       return fileCache;
     }
@@ -367,7 +369,7 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   const cached = yield* cache.get(cacheKey);
   if (Option.isSome(cached)) {
     const decoded = yield* Schema.decodeUnknown(JsonUnknown)(cached.value).pipe(
-      Effect.catchAll(() => Effect.succeed(null))
+      catchRecoverable(() => Effect.succeed(null))
     );
     if (decoded !== null) {
       return decoded;
@@ -392,11 +394,11 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
 
   if (!response.ok) {
     const bodyText = yield* Effect.tryPromise(() => response.text()).pipe(
-      Effect.catchAll(() => Effect.succeed(""))
+      catchRecoverable(() => Effect.succeed(""))
     );
     let message = response.statusText;
     const parsed = yield* Schema.decodeUnknown(ErrorMessageJson)(bodyText).pipe(
-      Effect.catchAll(() => Effect.succeed(null))
+      catchRecoverable(() => Effect.succeed(null))
     );
     if (parsed?.message) {
       message = parsed.message;
@@ -434,7 +436,7 @@ const requestJson = Effect.fn("GitHub.requestJson")(function* (
   });
 
   const encoded = yield* Schema.encode(JsonUnknown)(json).pipe(
-    Effect.catchAll(() => Effect.succeed(null))
+    catchRecoverable(() => Effect.succeed(null))
   );
   if (encoded !== null) {
     yield* cache.set(cacheKey, encoded, ttlMs);
@@ -470,7 +472,7 @@ const requestText = Effect.fn("GitHub.requestText")(function* (
 
   if (!response.ok) {
     const bodyText = yield* Effect.tryPromise(() => response.text()).pipe(
-      Effect.catchAll(() => Effect.succeed(""))
+      catchRecoverable(() => Effect.succeed(""))
     );
     let message = response.statusText;
     if (bodyText) {

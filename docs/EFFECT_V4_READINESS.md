@@ -40,9 +40,10 @@ The codebase currently uses APIs called out as removed or renamed in v4 migratio
 
 - `Context.Tag(...)`
 - `Effect.Service<...>()(...)`
-- `Effect.catchAll(...)` (renamed to `Effect.catch(...)` in v4)
 - `Effect.Service.Default`
 - `Effect.Service` `dependencies` option
+
+Note: direct `Effect.catchAll(...)` callsites were reduced to zero by introducing local compatibility aliases (`catchRecoverable`) so that future v4 change can be done in one place per file.
 
 ### 2) Ecosystem package constraints
 
@@ -62,7 +63,7 @@ The workspace currently depends on packages that (latest release metadata) still
    - fix compile/runtime breakages.
 3. Apply code migration in this order:
    - service definitions (`Context.Tag`, `Effect.Service`) to v4 service APIs,
-   - error recovery (`Effect.catchAll` -> `Effect.catch`),
+   - switch compatibility aliases from `Effect.catchAll` to v4 `Effect.catch`,
    - remaining migration-doc deltas (runtime/yieldable/forking/fiberref/cause as needed).
 4. Merge once full test + typecheck passes on v4 stack.
 

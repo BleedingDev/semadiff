@@ -32,6 +32,8 @@ import {
 import { Console, Effect, Schema } from "effect";
 import { resolveConfig } from "./config/resolve.js";
 
+const catchRecoverable = Effect.catchAll;
+
 const isSourceRun = fileURLToPath(import.meta.url).includes(
   `${path.sep}packages${path.sep}cli${path.sep}src${path.sep}`
 );
@@ -783,14 +785,14 @@ const doctorCommand = Command.make("doctor", {}, () =>
       try: () => execSync("git --version").toString().trim(),
       catch: (error) =>
         CliSystemError.make({ operation: "git-version", error }),
-    }).pipe(Effect.catchAll(() => Effect.succeed("not found")));
+    }).pipe(catchRecoverable(() => Effect.succeed("not found")));
     const canWriteCwd = yield* Effect.try({
       try: () => {
         accessSync(process.cwd(), constants.W_OK);
         return true;
       },
       catch: (error) => CliSystemError.make({ operation: "access-cwd", error }),
-    }).pipe(Effect.catchAll(() => Effect.succeed(false)));
+    }).pipe(catchRecoverable(() => Effect.succeed(false)));
     const report = {
       bun: bunVersion,
       git: gitVersion,
@@ -944,12 +946,12 @@ const benchCommand = Command.make(
         try: () => readFileSync(baselinePath, "utf8"),
         catch: (error) =>
           CliSystemError.make({ operation: "read-benchmark-baseline", error }),
-      }).pipe(Effect.catchAll(() => Effect.succeed(null)));
+      }).pipe(catchRecoverable(() => Effect.succeed(null)));
       const baselineReport =
         baselineRaw === null
           ? null
           : yield* Schema.decodeUnknown(BenchReportJson)(baselineRaw).pipe(
-              Effect.catchAll(() => Effect.succeed(null))
+              catchRecoverable(() => Effect.succeed(null))
             );
 
       const regressions =
