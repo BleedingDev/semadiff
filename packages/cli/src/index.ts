@@ -8,7 +8,6 @@ import {
 } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { BunRuntime, BunServices } from "@effect/platform-bun";
 import type { NormalizerSettings } from "@semadiff/core";
 import {
   ConfigSchema,
@@ -1146,7 +1145,19 @@ const cli = Command.runWith(app, {
   version: "0.1.0",
 });
 
-cli(normalizeArgv(process.argv).slice(2)).pipe(
-  Effect.provide(BunServices.layer),
-  BunRuntime.runMain
-);
+const isBunRuntime = () =>
+  typeof (globalThis as { Bun?: unknown }).Bun !== "undefined" ||
+  typeof (process.versions as { bun?: string | undefined }).bun === "string";
+
+const runMain = async () => {
+  const argv = normalizeArgv(process.argv).slice(2);
+  if (isBunRuntime()) {
+    const { BunRuntime, BunServices } = await import("@effect/platform-bun");
+    cli(argv).pipe(Effect.provide(BunServices.layer), BunRuntime.runMain);
+    return;
+  }
+  const { NodeRuntime, NodeServices } = await import("@effect/platform-node");
+  cli(argv).pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain);
+};
+
+await runMain();

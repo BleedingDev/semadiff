@@ -48,6 +48,7 @@ Current result (as of this update):
 - Workspace dependencies are aligned to v4 beta where required:
   - `effect@^4.0.0-beta.0`
   - `@effect/platform-bun@^4.0.0-beta.0`
+  - `@effect/platform-node@^4.0.0-beta.0`
   - `@effect/vitest@^4.0.0-beta.0`
   - `vitest@^3.2.4`
 - Full validation passes:
@@ -62,7 +63,7 @@ Current result (as of this update):
 ## Remaining caveats
 
 - CLI remains on unstable v4 module surface (`effect/unstable/cli`), which is expected and may change across beta releases.
-- Bun platform and Vitest integrations are still separate packages (`@effect/platform-bun`, `@effect/vitest`), not collapsed into a single `effect` import surface.
+- Platform and Vitest integrations are still separate packages (`@effect/platform-bun`, `@effect/platform-node`, `@effect/vitest`), not collapsed into a single `effect` import surface.
 
 ## Ongoing guardrail
 

@@ -18,7 +18,8 @@
 ### Platform (Bun)
 
 - Bun runtime/services are still provided by `@effect/platform-bun`.
-- We use `BunRuntime` and `BunServices` from that package.
+- Node runtime/services are provided by `@effect/platform-node`.
+- CLI entrypoint now selects Bun vs Node runtime at startup and runs on both engines.
 - This is not collapsed into the main `effect` package export surface.
 
 ### Vitest Integration
@@ -33,6 +34,7 @@
 - Keep the following aligned per upgrade step:
   - `effect`
   - `@effect/platform-bun`
+  - `@effect/platform-node`
   - `@effect/vitest`
   - `vitest`
 
