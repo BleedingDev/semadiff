@@ -81,4 +81,60 @@ describe("core diff basics", () => {
       )
     ).toBe(true);
   });
+
+  test("empty old text yields a single insert operation", () => {
+    const newText = "export const value = 1;\n";
+    const diff = structuralDiff("", newText, { language: "ts" });
+    expect(diff.moves).toHaveLength(0);
+    expect(diff.renames).toHaveLength(0);
+    expect(diff.operations).toHaveLength(1);
+    expect(diff.operations[0]?.type).toBe("insert");
+    expect(diff.operations[0]?.newText).toBe(newText);
+    expect(diff.operations[0]?.newRange).toEqual({
+      start: { line: 1, column: 1 },
+      end: { line: 2, column: 1 },
+    });
+  });
+
+  test("empty new text yields a single delete operation", () => {
+    const oldText = "export const value = 1;\n";
+    const diff = structuralDiff(oldText, "", { language: "ts" });
+    expect(diff.moves).toHaveLength(0);
+    expect(diff.renames).toHaveLength(0);
+    expect(diff.operations).toHaveLength(1);
+    expect(diff.operations[0]?.type).toBe("delete");
+    expect(diff.operations[0]?.oldText).toBe(oldText);
+    expect(diff.operations[0]?.oldRange).toEqual({
+      start: { line: 1, column: 1 },
+      end: { line: 2, column: 1 },
+    });
+  });
+
+  test("explicit token ranges force structural token diff path", () => {
+    const oldText = "const a = 1;\nconst b = 2;\n";
+    const newText = "const b = 2;\nconst a = 1;\n";
+
+    const baseline = structuralDiff(oldText, newText, { language: "ts" });
+    const withExplicitTokens = structuralDiff(oldText, newText, {
+      language: "ts",
+      oldTokens: [{ startIndex: 0, endIndex: oldText.length }],
+      newTokens: [{ startIndex: 0, endIndex: newText.length }],
+    });
+
+    expect(baseline.operations.some((op) => op.type === "move")).toBe(true);
+    expect(withExplicitTokens.operations).toHaveLength(1);
+    expect(withExplicitTokens.operations[0]?.type).toBe("update");
+    expect(withExplicitTokens.moves).toHaveLength(0);
+  });
+
+  test("detectMoves=false disables move detection output", () => {
+    const diff = structuralDiff(
+      "export function a() {\n  const value = 1;\n  return value;\n}\n\nexport function b() {\n  return 2;\n}\n",
+      "export function b() {\n  return 2;\n}\n\nexport function a() {\n  const value = 1;\n  return value + 0;\n}\n",
+      { language: "ts", detectMoves: false }
+    );
+    expect(diff.moves).toHaveLength(0);
+    expect(diff.operations.some((op) => op.type === "move")).toBe(false);
+    expect(diff.operations.length).toBeGreaterThan(0);
+  });
 });
