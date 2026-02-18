@@ -97,6 +97,7 @@ const CACHE_JSON_PATH = path.resolve(
   ".cache",
   "semadiff-github.json"
 );
+const BUN_SQLITE_SPECIFIER = "bun:sqlite";
 const RATE_LIMIT_REGEX = /rate limit/i;
 
 const CacheEntrySchema = Schema.Struct({
@@ -217,9 +218,7 @@ export const GitHubCacheLive = Layer.effect(
     ).pipe(Effect.catch(() => Effect.void));
 
     const sqliteModule = yield* Effect.tryPromise(
-      () =>
-        // @ts-expect-error bun:sqlite exists only under Bun runtime
-        import("bun:sqlite")
+      () => import(BUN_SQLITE_SPECIFIER)
     ).pipe(Effect.catch(() => Effect.succeed(null)));
     if (!isSqliteModule(sqliteModule)) {
       return fileCache;
