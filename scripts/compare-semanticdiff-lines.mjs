@@ -59,7 +59,7 @@ const githubPatchHeaders = token
   ? { Authorization: `Bearer ${token}` }
   : undefined;
 
-const JsonUnknown = Schema.parseJson(Schema.Unknown);
+const JsonUnknown = Schema.UnknownFromJsonString;
 
 const decodeJson = (value, label) => {
   try {

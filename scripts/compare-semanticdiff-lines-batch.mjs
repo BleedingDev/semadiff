@@ -30,7 +30,7 @@ const repo = args.get("repo") ?? DEFAULT_REPO;
 const listPath = args.get("list") ?? "tmp/semanticdiff/pr-list.json";
 const outPath = args.get("out") ?? "tmp/semanticdiff/benchmark-summary.json";
 
-const JsonUnknown = Schema.parseJson(Schema.Unknown);
+const JsonUnknown = Schema.UnknownFromJsonString;
 const decodeJson = (value, label) => {
   try {
     return Schema.decodeUnknownSync(JsonUnknown)(value);

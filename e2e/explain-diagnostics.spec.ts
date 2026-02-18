@@ -2,7 +2,7 @@ import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
-import { decodeJson, distFileUrl, effectUrl, runBunEval } from "./helpers.js";
+import { decodeJson, distFileUrl, runBunEval } from "./helpers.js";
 
 const coreUrl = distFileUrl("packages", "core", "dist", "index.js");
 
@@ -116,7 +116,7 @@ test("explain JSON validates and diagnostics redacts code by default", () => {
   execSync("pnpm --filter @semadiff/core build", { stdio: "inherit" });
 
   const output = runBunEval(
-    `import { Schema } from '${effectUrl}'; import { structuralDiff, explainDiff, createDiagnosticsBundle } from '${coreUrl}'; const diff = structuralDiff('const x=1;', 'const y=2;'); const explain = explainDiff(diff); const diagnostics = createDiagnosticsBundle({ diff }); const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown)); console.log(encodeJson({ explain, diagnostics }));`
+    `import { structuralDiff, explainDiff, createDiagnosticsBundle } from '${coreUrl}'; const diff = structuralDiff('const x=1;', 'const y=2;'); const explain = explainDiff(diff); const diagnostics = createDiagnosticsBundle({ diff }); console.log(JSON.stringify({ explain, diagnostics }));`
   );
 
   const parsed = decodeJson<{

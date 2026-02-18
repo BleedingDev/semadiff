@@ -13,7 +13,9 @@ export const distFileUrl = (...segments: string[]) =>
 
 export const effectUrl = (() => {
   const candidates = [
+    distPath("node_modules", "effect", "dist", "index.js"),
     distPath("node_modules", "effect", "dist", "esm", "index.js"),
+    distPath("packages", "core", "node_modules", "effect", "dist", "index.js"),
     distPath(
       "packages",
       "core",
@@ -21,6 +23,14 @@ export const effectUrl = (() => {
       "effect",
       "dist",
       "esm",
+      "index.js"
+    ),
+    distPath(
+      "packages",
+      "parsers",
+      "node_modules",
+      "effect",
+      "dist",
       "index.js"
     ),
     distPath(
@@ -44,17 +54,14 @@ export const effectUrl = (() => {
   return pathToFileURL(resolved).href;
 })();
 
-const JsonUnknown = Schema.parseJson(Schema.Unknown);
-const JsonUnknownPretty = Schema.parseJson(Schema.Unknown, { space: 2 });
-
 export const encodeJson = (value: unknown) =>
-  Schema.encodeSync(JsonUnknown)(value);
+  Schema.encodeSync(Schema.UnknownFromJsonString)(value);
 
 export const encodeJsonPretty = (value: unknown) =>
-  Schema.encodeSync(JsonUnknownPretty)(value);
+  JSON.stringify(value, null, 2) ?? "null";
 
 export const decodeJson = <T = unknown>(value: string) =>
-  Schema.decodeUnknownSync(JsonUnknown)(value) as T;
+  Schema.decodeUnknownSync(Schema.UnknownFromJsonString)(value) as T;
 
 export const bunBinary = process.env.BUN_BINARY ?? "bun";
 

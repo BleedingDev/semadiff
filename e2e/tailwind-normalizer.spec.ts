@@ -1,12 +1,6 @@
 import { execSync } from "node:child_process";
 import { expect, test } from "@playwright/test";
-import {
-  decodeJson,
-  distFileUrl,
-  effectUrl,
-  encodeJson,
-  runBunEval,
-} from "./helpers.js";
+import { decodeJson, distFileUrl, encodeJson, runBunEval } from "./helpers.js";
 
 const coreUrl = distFileUrl("packages", "core", "dist", "index.js");
 
@@ -32,7 +26,6 @@ const normalizersDisabled = {
 
 function runTailwindCase(oldText: string, newText: string) {
   const script = `
-import { Schema } from ${encodeJson(effectUrl)};
 import { structuralDiff } from ${encodeJson(coreUrl)};
 const enabled = ${encodeJson(normalizersEnabled)};
 const disabled = ${encodeJson(normalizersDisabled)};
@@ -40,8 +33,7 @@ const oldText = ${encodeJson(oldText)};
 const newText = ${encodeJson(newText)};
 const diffEnabled = structuralDiff(oldText, newText, { normalizers: enabled, language: "tsx" });
 const diffDisabled = structuralDiff(oldText, newText, { normalizers: disabled, language: "tsx" });
-const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown));
-console.log(encodeJson({ enabled: diffEnabled.operations.length, disabled: diffDisabled.operations.length }));
+console.log(JSON.stringify({ enabled: diffEnabled.operations.length, disabled: diffDisabled.operations.length }));
 `;
   const output = runBunEval(script);
   return decodeJson<{ enabled: number; disabled: number }>(output);

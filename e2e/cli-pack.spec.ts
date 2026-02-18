@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -28,12 +28,6 @@ function packPackage(packDir: string, name: string): string {
 }
 
 test("packed CLI artifact can run a real diff", () => {
-  execSync("pnpm build", { stdio: "inherit" });
-
-  const tempDir = mkdtempSync(join(tmpdir(), "semadiff-pack-"));
-  const packDir = join(tempDir, "packs");
-  execSync(`mkdir -p ${packDir}`);
-
   const packages = [
     "@semadiff/cli",
     "@semadiff/core",
@@ -46,6 +40,15 @@ test("packed CLI artifact can run a real diff", () => {
     "@semadiff/render-html",
     "@semadiff/render-terminal",
   ];
+
+  for (const pkg of packages) {
+    execSync(`pnpm --filter ${pkg} build`, { stdio: "inherit" });
+  }
+
+  const tempDir = mkdtempSync(join(tmpdir(), "semadiff-pack-"));
+  const packDir = join(tempDir, "packs");
+  execSync(`mkdir -p ${packDir}`);
+
   const tarballMap = Object.fromEntries(
     packages.map((pkg) => [pkg, packPackage(packDir, pkg)])
   );
@@ -87,20 +90,29 @@ test("packed CLI artifact can run a real diff", () => {
     "index.js"
   );
 
-  const helpOutput = execSync(`${bunBinary} ${cliEntry} --help`, {
-    cwd: consumerDir,
-  }).toString();
-  expect(helpOutput).toContain("diff");
-  expect(helpOutput).toContain("git-external");
-
   const oldFile = join(tempDir, "old.ts");
   const newFile = join(tempDir, "new.ts");
   writeFileSync(oldFile, "const value = 1;\n");
   writeFileSync(newFile, "const value = 2;\n");
 
-  const diffOutput = execSync(
-    `${bunBinary} ${cliEntry} diff --format plain ${oldFile} ${newFile}`,
-    { cwd: consumerDir }
-  ).toString();
-  expect(diffOutput.length).toBeGreaterThan(0);
+  const runtimes = [
+    { name: "bun", binary: bunBinary },
+    { name: "node", binary: process.execPath },
+  ];
+
+  for (const runtime of runtimes) {
+    const helpOutput = execFileSync(runtime.binary, [cliEntry, "--help"], {
+      cwd: consumerDir,
+      encoding: "utf8",
+    });
+    expect(helpOutput).toContain("diff");
+    expect(helpOutput).toContain("git-external");
+
+    const diffOutput = execFileSync(
+      runtime.binary,
+      [cliEntry, "diff", "--format", "plain", oldFile, newFile],
+      { cwd: consumerDir, encoding: "utf8" }
+    );
+    expect(diffOutput.length).toBeGreaterThan(0);
+  }
 });

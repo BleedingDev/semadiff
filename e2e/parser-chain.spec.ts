@@ -28,7 +28,7 @@ test("parser fallback chain uses next parser when best fails", () => {
   });
 
   const output = runBunEval(
-    `import { Effect, Schema } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { treeSitterWasmParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...treeSitterWasmParsers]); const parsed = await Effect.runPromise(registry.parse({ content: 'function {', path: 'file.js' })); const rootType = parsed.root?.type ?? parsed.root?.kind ?? null; const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown)); console.log(encodeJson({ kind: parsed.kind, rootType }));`
+    `import { Effect } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { treeSitterWasmParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...treeSitterWasmParsers]); const parsed = await Effect.runPromise(registry.parse({ content: 'function {', path: 'file.js' })); const rootType = parsed.root?.type ?? parsed.root?.kind ?? null; console.log(JSON.stringify({ kind: parsed.kind, rootType }));`
   );
 
   const parsed = decodeJson<{ kind: string; rootType: string | null }>(output);
@@ -47,7 +47,7 @@ test("parser tokens are attached when available", () => {
   });
 
   const output = runBunEval(
-    `import { Effect, Schema } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { lightningCssParsers } from '${lightningUrl}'; import { treeSitterWasmParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...lightningCssParsers, ...treeSitterWasmParsers]); const parsedJs = await Effect.runPromise(registry.parse({ content: 'const foo = 1;', path: 'file.ts' })); const parsedCss = await Effect.runPromise(registry.parse({ content: 'a { color: red; }', path: 'file.css' })); const encodeJson = Schema.encodeSync(Schema.parseJson(Schema.Unknown)); console.log(encodeJson({ jsTokens: parsedJs.tokens?.length ?? 0, cssTokens: parsedCss.tokens?.length ?? 0 }));`
+    `import { Effect } from '${effectUrl}'; import { makeRegistry } from '${parsersUrl}'; import { swcParsers } from '${swcUrl}'; import { lightningCssParsers } from '${lightningUrl}'; import { treeSitterWasmParsers } from '${treeSitterUrl}'; const registry = makeRegistry([...swcParsers, ...lightningCssParsers, ...treeSitterWasmParsers]); const parsedJs = await Effect.runPromise(registry.parse({ content: 'const foo = 1;', path: 'file.ts' })); const parsedCss = await Effect.runPromise(registry.parse({ content: 'a { color: red; }', path: 'file.css' })); console.log(JSON.stringify({ jsTokens: parsedJs.tokens?.length ?? 0, cssTokens: parsedCss.tokens?.length ?? 0 }));`
   );
 
   const parsed = decodeJson<{ jsTokens: number; cssTokens: number }>(output);
