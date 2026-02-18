@@ -9,6 +9,12 @@ import {
   normalizeCosmeticText,
   shouldPairDeleteInsert,
 } from "./diff-cosmetic.js";
+import {
+  getComparableText,
+  moveUnitTextLength,
+  normalizeMoveUnits,
+  similarityRatio,
+} from "./diff-move-math.js";
 import type { Position, Range } from "./diff-range.js";
 import { LINE_SPLIT_RE, rangeForText, sliceTextByRange } from "./diff-range.js";
 import type { RenameGroup } from "./diff-rename.js";
@@ -564,46 +570,6 @@ function suppressCosmeticMoves(operations: DiffOperation[]) {
     }
     return !isCosmeticMove(op.oldText, op.newText);
   });
-}
-
-function getComparableText(unit: DiffToken) {
-  return unit.compareText ?? unit.text;
-}
-
-function lcsLength(a: string[], b: string[]) {
-  const dp = new Array(b.length + 1).fill(0);
-  for (let i = 1; i <= a.length; i += 1) {
-    let prev = 0;
-    for (let j = 1; j <= b.length; j += 1) {
-      const temp = dp[j];
-      if (a[i - 1] === b[j - 1]) {
-        dp[j] = prev + 1;
-      } else {
-        dp[j] = Math.max(dp[j], dp[j - 1]);
-      }
-      prev = temp;
-    }
-  }
-  return dp[b.length];
-}
-
-function similarityRatio(a: string[], b: string[]) {
-  if (a.length === 0 && b.length === 0) {
-    return 1;
-  }
-  const common = lcsLength(a, b);
-  return common / Math.max(a.length, b.length, 1);
-}
-
-function normalizeMoveUnits(units: DiffToken[]) {
-  return units.filter((unit) => getComparableText(unit).trim().length > 0);
-}
-
-function moveUnitTextLength(units: DiffToken[]) {
-  return units.reduce(
-    (sum, unit) => sum + getComparableText(unit).trim().length,
-    0
-  );
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: move detection requires branching on match confidence.
