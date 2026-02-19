@@ -296,7 +296,7 @@
         "qualityGates": {
           "lintFormat": "Ultracite + Biome (repo-wide, CI enforced).",
           "typecheck": "tsc --noEmit (strict).",
-          "tests": "vitest + @effect/vitest; all required checks run in CI and pre-commit.",
+          "tests": "vitest + local Effect test harness; all required checks run in CI and pre-commit.",
           "coverage": "Coverage collected; thresholds set and enforced (project-defined)."
         },
         "performance": {
@@ -510,7 +510,7 @@
       }
     },
     "testingAndValidation": {
-      "framework": "vitest + @effect/vitest",
+      "framework": "vitest + local Effect test harness",
       "testTypes": [
         {
           "type": "unit",
@@ -634,7 +634,7 @@
             "Ultracite+Biome config",
             "tsconfig strict",
             "@effect/cli skeleton",
-            "@effect/vitest harness",
+            "Effect testing harness",
             "OTel plumbing scaffold (no exporter by default)"
           ],
           "doneWhen": [

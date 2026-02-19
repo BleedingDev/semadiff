@@ -3,7 +3,7 @@
 ## Current Status
 
 - Branch: `chore/effect-v4-readiness`
-- Workspace migrated to `effect@^4.0.0-beta.0`
+- Workspace migrated to `effect@4.0.0-beta.3`
 - Readiness check now reports `Ready now: yes` (`pnpm effect:v4:readiness -- --strict` passes)
 - Validation status: `lint`, `format:check`, `typecheck`, `build`, `test`, `test:app`, and coverage pipeline are passing
 
@@ -25,10 +25,12 @@
 
 ### Vitest Integration
 
-- Effect-aware Vitest helpers are still in `@effect/vitest`.
 - `vitest` itself remains a separate dependency.
-- `@effect/vitest` and `effect` versions should be kept aligned during upgrades.
-- We now have explicit harness coverage in `packages/core/test/effect-vitest.spec.ts` for:
+- We run Effect integration tests with a local harness:
+  - `Effect.runPromise(...)`
+  - `Effect.scoped`
+  - `TestClock.layer()` from `effect/testing/TestClock`
+- We now have explicit harness coverage in `packages/core/test/effect-testing-harness.spec.ts` for:
   - `ServiceMap.Service` layer provisioning
   - `TestClock` scheduling
   - typed failure propagation
@@ -46,7 +48,7 @@ Run these checks when upgrading any Effect beta:
 1. `pnpm effect:v4:readiness -- --strict`
 2. `pnpm quality`
 3. `pnpm exec playwright test e2e/cli-pack.spec.ts`
-4. `pnpm exec vitest run packages/core/test/effect-vitest.spec.ts`
+4. `pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts`
 5. `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
 
 ## Peer/Version constraints guidance
@@ -56,7 +58,6 @@ Run these checks when upgrading any Effect beta:
   - `effect`
   - `@effect/platform-bun`
   - `@effect/platform-node`
-  - `@effect/vitest`
   - `vitest`
 
 ## Remaining Non-Blocking Advisories

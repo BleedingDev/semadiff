@@ -21,9 +21,6 @@ importers:
       '@effect/language-service':
         specifier: ^0.74.0
         version: 0.74.0
-      '@effect/vitest':
-        specifier: 4.0.0-beta.3
-        version: 4.0.0-beta.3(effect@4.0.0-beta.3)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       '@playwright/test':
         specifier: ^1.48.0
         version: 1.57.0
@@ -617,12 +614,6 @@ packages:
     peerDependencies:
       effect: ^4.0.0-beta.3
       ioredis: ^5.7.0
-
-  '@effect/vitest@4.0.0-beta.3':
-    resolution: {integrity: sha512-I2O7HkmQUTeodZtBH/bqCyWyNM5vGNwU3iT6gJkL9T+49N3oyLHeigojRkOEyfoXoD5E07tWndth71WxtAhl2A==}
-    peerDependencies:
-      effect: ^4.0.0-beta.3
-      vitest: ^3.0.0
 
   '@emnapi/core@1.8.1':
     resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
@@ -3651,11 +3642,6 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
-
-  '@effect/vitest@4.0.0-beta.3(effect@4.0.0-beta.3)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
-    dependencies:
-      effect: 4.0.0-beta.3
-      vitest: 3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@emnapi/core@1.8.1':
     dependencies:

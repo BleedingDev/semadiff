@@ -70,7 +70,6 @@ const DEPENDENCY_NAMES = [
   "@effect/platform",
   "@effect/platform-bun",
   "@effect/platform-node",
-  "@effect/vitest",
   "@effect/language-service",
 ];
 
@@ -294,7 +293,7 @@ function collectDependencyStatus(dep, usedBy) {
       const ranges = usedBy.map((entry) => entry.range);
       supportsEffectV4 =
         ranges.length === 0
-          ? npmVersionExists("effect@4.0.0-beta.0")
+          ? npmVersionExists("effect@beta")
           : ranges.every((range) => effectRangeSupportsV4(range) === true);
     } else if (peerEffectRange) {
       supportsEffectV4 = effectRangeSupportsV4(peerEffectRange);

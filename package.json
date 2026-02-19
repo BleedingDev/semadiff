@@ -23,7 +23,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
     "@effect/language-service": "^0.74.0",
-    "@effect/vitest": "4.0.0-beta.3",
     "@playwright/test": "^1.48.0",
     "@types/node": "^20.14.15",
     "@vitest/coverage-v8": "^3.2.4",

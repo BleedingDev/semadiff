@@ -1,17 +1,17 @@
 # Effect v4 Beta Readiness
 
-Last updated: 2026-02-18
+Last updated: 2026-02-19
 
 This repository is on a dedicated prep branch: `chore/effect-v4-readiness`.
 
 ## Why this exists
 
-Effect published `effect@4.0.0-beta.0` and announced a major migration surface (smaller runtime, package consolidation, and API changes).  
+Effect published the v4 beta line and announced a major migration surface (smaller runtime, package consolidation, and API changes).  
 Source: https://effect.website/blog/releases/effect/40-beta/
 
 ## Key v4 beta signals (from upstream)
 
-- `effect@4.0.0-beta.0` is available.
+- `effect@4.0.0-beta.3` is available on the beta channel.
 - The v4 effort is based on the smaller `effect-smol` architecture.
 - Functionality from several `@effect/*` packages is being moved into `effect` under unstable modules.
 - Upstream migration docs are maintained in `effect-smol`:
@@ -46,10 +46,9 @@ Current result (as of this update):
   - no `Effect.Service.Default`
   - no `Effect.Service` `dependencies` option
 - Workspace dependencies are aligned to v4 beta where required:
-  - `effect@^4.0.0-beta.0`
-  - `@effect/platform-bun@^4.0.0-beta.0`
-  - `@effect/platform-node@^4.0.0-beta.0`
-  - `@effect/vitest@^4.0.0-beta.0`
+  - `effect@4.0.0-beta.3`
+  - `@effect/platform-bun@4.0.0-beta.3`
+  - `@effect/platform-node@4.0.0-beta.3`
   - `vitest@^3.2.4`
 - Full validation passes:
   - `lint`
@@ -61,7 +60,7 @@ Current result (as of this update):
   - coverage pipeline via `pnpm quality`
   - targeted v4 runtime/integration checks:
     - `pnpm exec playwright test e2e/cli-pack.spec.ts`
-    - `pnpm exec vitest run packages/core/test/effect-vitest.spec.ts`
+    - `pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts`
     - `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
 
 ## Runtime verification runbook
@@ -88,11 +87,11 @@ Use this when validating migration parity after Effect beta bumps.
 3. Verify Effect test harness parity:
 
    ```bash
-   pnpm exec vitest run packages/core/test/effect-vitest.spec.ts
+   pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts
    ```
 
    Expected:
-   - `@effect/vitest` layer provisioning with `ServiceMap.Service`
+   - local Vitest harness uses `Effect.runPromise` + `TestClock.layer()` with `ServiceMap.Service`
    - `TestClock.adjust` scheduling behavior
    - typed failure propagation from provided services
 
@@ -109,7 +108,7 @@ Use this when validating migration parity after Effect beta bumps.
 ## Remaining caveats
 
 - CLI remains on unstable v4 module surface (`effect/unstable/cli`), which is expected and may change across beta releases.
-- Platform and Vitest integrations are still separate packages (`@effect/platform-bun`, `@effect/platform-node`, `@effect/vitest`), not collapsed into a single `effect` import surface.
+- Platform integrations are still separate packages (`@effect/platform-bun`, `@effect/platform-node`), not collapsed into a single `effect` import surface.
 
 ## Ongoing guardrail
 
