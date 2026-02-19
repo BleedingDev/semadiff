@@ -69,7 +69,6 @@ const DEPENDENCY_NAMES = [
   "effect",
   "@effect/cli",
   "@effect/platform",
-  "@effect/platform-bun",
   "@effect/platform-node",
   "@effect/language-service",
 ];

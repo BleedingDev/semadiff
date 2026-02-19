@@ -16,13 +16,12 @@
 - There is no stable `effect/cli` export in the installed v4 beta.
 - This is an expected `unstable` dependency and may break across beta updates.
 
-### Platform (Bun)
+### Platform Runtime
 
-- Bun runtime/services are still provided by `@effect/platform-bun`.
-- Node runtime/services are provided by `@effect/platform-node`.
-- CLI entrypoint now selects Bun vs Node runtime at startup and runs on both engines.
-- Packed CLI e2e (`e2e/cli-pack.spec.ts`) validates both runtime branches.
-- This is not collapsed into the main `effect` package export surface.
+- Runtime/services are provided by `@effect/platform-node`.
+- CLI entrypoint now uses `NodeServices`/`NodeRuntime` under both Bun and Node hosts.
+- Packed CLI e2e (`e2e/cli-pack.spec.ts`) validates both host executions.
+- This is still not collapsed into the main `effect` package export surface.
 
 ### Vitest Integration
 
@@ -61,7 +60,6 @@ Run these checks when upgrading any Effect beta:
   - App packages
 - Keep these runtime dependencies aligned per beta update:
   - `effect`
-  - `@effect/platform-bun`
   - `@effect/platform-node`
 - `vitest` remains independent and should be verified with each beta update.
 

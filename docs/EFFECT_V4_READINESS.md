@@ -47,7 +47,6 @@ Current result (as of this update):
   - no `Effect.Service` `dependencies` option
 - Workspace dependencies are aligned to v4 beta where required:
   - `effect@4.0.0-beta.4`
-  - `@effect/platform-bun@4.0.0-beta.4`
   - `@effect/platform-node@4.0.0-beta.4`
   - `vitest@^3.2.4`
 - Publishable library packages now use `peerDependencies.effect` (`>=4.0.0-beta.4 <5`) to prevent nested runtime copies and keep consumers on one Effect runtime.
@@ -110,7 +109,7 @@ Use this when validating migration parity after Effect beta bumps.
 ## Remaining caveats
 
 - CLI remains on unstable v4 module surface (`effect/unstable/cli`), which is expected and may change across beta releases.
-- Platform integrations are still separate packages (`@effect/platform-bun`, `@effect/platform-node`), not collapsed into a single `effect` import surface.
+- CLI runtime services still require `@effect/platform-node`; there is no single-package `effect` runtime layer replacement yet.
 
 ## Ongoing guardrail
 
