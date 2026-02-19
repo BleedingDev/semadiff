@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@semadiff/core": "workspace:*",
-    "@semadiff/parsers": "workspace:*",
+    "@semadiff/parser-lightningcss": "workspace:*",
     "@semadiff/parser-swc": "workspace:*",
     "@semadiff/parser-tree-sitter-wasm": "workspace:*",
-    "@semadiff/parser-lightningcss": "workspace:*",
+    "@semadiff/parsers": "workspace:*",
     "@semadiff/render-html": "workspace:*",
-    "effect": "^4.0.0-beta.0"
+    "effect": "4.0.0-beta.3"
   }
 }

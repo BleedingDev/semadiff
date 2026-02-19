@@ -28,7 +28,9 @@ const SKIP_DIRS = new Set([
 ]);
 
 const NEWLINE_SPLIT_RE = /\r?\n/;
+const EFFECT_RANGE_EXACT_4_RE = /^\s*4(\.|$)/;
 const EFFECT_RANGE_CARET_4_RE = /\^4(\.|$)/;
+const EFFECT_RANGE_TILDE_4_RE = /~\s*4(\.|$)/;
 const EFFECT_RANGE_GTE_4_RE = />=\s*4(\.|$)/;
 const EFFECT_RANGE_LT_5_RE = /<\s*5/;
 const EFFECT_RANGE_OR_RE = /\|\|/;
@@ -251,7 +253,9 @@ function effectRangeSupportsV4(range) {
     return null;
   }
   return (
+    EFFECT_RANGE_EXACT_4_RE.test(range) ||
     EFFECT_RANGE_CARET_4_RE.test(range) ||
+    EFFECT_RANGE_TILDE_4_RE.test(range) ||
     EFFECT_RANGE_GTE_4_RE.test(range) ||
     EFFECT_RANGE_LT_5_RE.test(range) ||
     (EFFECT_RANGE_OR_RE.test(range) && EFFECT_RANGE_HAS_4_RE.test(range))

@@ -22,8 +22,8 @@ importers:
         specifier: ^0.74.0
         version: 0.74.0
       '@effect/vitest':
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0(effect@4.0.0-beta.0)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3(effect@4.0.0-beta.3)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       '@playwright/test':
         specifier: ^1.48.0
         version: 1.57.0
@@ -34,8 +34,8 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
       tree-sitter-cli:
         specifier: ^0.26.3
         version: 0.26.3
@@ -44,7 +44,7 @@ importers:
         version: 5.9.3
       ultracite:
         specifier: ^7.0.12
-        version: 7.0.12(effect@4.0.0-beta.0)(typescript@5.9.3)
+        version: 7.0.12(effect@4.0.0-beta.3)(typescript@5.9.3)
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)
@@ -91,8 +91,8 @@ importers:
         specifier: ^1.132.0
         version: 1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
       lucide-react:
         specifier: ^0.561.0
         version: 0.561.0(react@19.2.3)
@@ -149,11 +149,11 @@ importers:
   packages/cli:
     dependencies:
       '@effect/platform-bun':
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0(effect@4.0.0-beta.0)
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3(effect@4.0.0-beta.3)
       '@effect/platform-node':
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0(effect@4.0.0-beta.0)(ioredis@5.9.3)
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3(effect@4.0.0-beta.3)(ioredis@5.9.3)
       '@semadiff/core':
         specifier: workspace:*
         version: link:../core
@@ -176,8 +176,8 @@ importers:
         specifier: workspace:*
         version: link:../render-terminal
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
     devDependencies:
       '@types/node':
         specifier: ^20.14.15
@@ -186,8 +186,8 @@ importers:
   packages/core:
     dependencies:
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
 
   packages/github-extension:
     dependencies:
@@ -204,8 +204,8 @@ importers:
         specifier: workspace:*
         version: link:../render-html
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -241,8 +241,8 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
       lightningcss:
         specifier: ^1.25.1
         version: 1.31.0
@@ -256,8 +256,8 @@ importers:
         specifier: ^1.7.36
         version: 1.15.10
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
 
   packages/parser-tree-sitter-node:
     dependencies:
@@ -265,8 +265,8 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
       tree-sitter:
         specifier: ^0.25.0
         version: 0.25.0
@@ -298,8 +298,8 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
       web-tree-sitter:
         specifier: ^0.26.3
         version: 0.26.3
@@ -329,8 +329,8 @@ importers:
   packages/parsers:
     dependencies:
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
 
   packages/pr-backend:
     dependencies:
@@ -353,8 +353,8 @@ importers:
         specifier: workspace:*
         version: link:../render-html
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
 
   packages/render-html:
     dependencies:
@@ -362,8 +362,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
+        specifier: 4.0.0-beta.3
+        version: 4.0.0-beta.3
 
   packages/render-terminal:
     dependencies:
@@ -600,28 +600,28 @@ packages:
     resolution: {integrity: sha512-ZqOvxCUo70WtnV8Kf4ORcEW6euepPn3Yu9btB0vpDhN5ydf1RC3/kl2M2b22tzB0MOITeJzNn5HK7w7NJhQFaw==}
     hasBin: true
 
-  '@effect/platform-bun@4.0.0-beta.0':
-    resolution: {integrity: sha512-ZHvy+R/vJ7XyFu2hccp9FbS7PwJQKZZt9tDTsvCUL8v8pAGtuy5l5G56+PQnyEA+vTMk/mIajGc5OXdlfLvcvw==}
+  '@effect/platform-bun@4.0.0-beta.3':
+    resolution: {integrity: sha512-dgpVWdBvPoOqXGLG3fyvy0VYYmpMI/PwNVR6M4xkX/V9KMeE4naaZu3Rey9FTm4sGmdwtIGPxt4MHs1MFvcC9Q==}
     peerDependencies:
-      effect: ^4.0.0-beta.0
+      effect: ^4.0.0-beta.3
 
-  '@effect/platform-node-shared@4.0.0-beta.0':
-    resolution: {integrity: sha512-yR/j1Ko9oQA+zrbXCK+jSzD2hCOXfJeskVr74gCqvFSvBLAuLqDWtEVCINmxgOAsRBKHPbXK9PfRJ31bHvFkzg==}
+  '@effect/platform-node-shared@4.0.0-beta.3':
+    resolution: {integrity: sha512-0K2djycHAtgks3+ALYR3+rachlc/MJ/AKwvnQ81iolczW3eMuHVdCi4gTZcTm2GLbDI5NcgJEOhOoLR1ttt+9A==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      effect: ^4.0.0-beta.0
+      effect: ^4.0.0-beta.3
 
-  '@effect/platform-node@4.0.0-beta.0':
-    resolution: {integrity: sha512-T/05kyqBNAKb1++m0P6RXIG/9ICKzQNpLMMYhgkXNA7JN99a9IjACGAI2Hm1k0cAKLPuePKQB2KDv1smpfP1ww==}
+  '@effect/platform-node@4.0.0-beta.3':
+    resolution: {integrity: sha512-NGkT38g4DFstZylbcDWHFd2M/wMie/eXYQc1VAZui/Ab2u0IN7JnqNJ6DkZuisIGdUqEb5h07G81CGOxDE86dg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      effect: ^4.0.0-beta.0
+      effect: ^4.0.0-beta.3
       ioredis: ^5.7.0
 
-  '@effect/vitest@4.0.0-beta.0':
-    resolution: {integrity: sha512-7AdZVL0gjzrp9iQL+0syjJY/HyBm+hxyAfDV9dLk9ryOZ67Muj3eV3NWYaqmLmiutUsTFBdEZ/7f8V9RWAkH4w==}
+  '@effect/vitest@4.0.0-beta.3':
+    resolution: {integrity: sha512-I2O7HkmQUTeodZtBH/bqCyWyNM5vGNwU3iT6gJkL9T+49N3oyLHeigojRkOEyfoXoD5E07tWndth71WxtAhl2A==}
     peerDependencies:
-      effect: ^4.0.0-beta.0
+      effect: ^4.0.0-beta.3
       vitest: ^3.0.0
 
   '@emnapi/core@1.8.1':
@@ -1999,8 +1999,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  effect@4.0.0-beta.0:
-    resolution: {integrity: sha512-3LpZEqYeJEYZs/vXnbqb7LHdR4/3iUOS7Hv1s/KFHV1gRTcgmlVM8CGhx09SIUIJc8/TPl6SrRaGGkuN7GYuYg==}
+  effect@4.0.0-beta.3:
+    resolution: {integrity: sha512-hSc3GKzm7qK6c7MDrX/+rtSlds3+TJXvOJ6JmraQqEMeNHdu2tsrPbfAHt0ppfJAWzd6EipcXlTgEEMHw8V0fA==}
 
   electron-to-chromium@1.5.267:
     resolution: {integrity: sha512-0Drusm6MVRXSOJpGbaSVgcQsuB4hEkMpHXaVstcPmhu5LIedxs1xNK/nIxmQIU/RPC0+1/o0AVZfBTkTNJOdUw==}
@@ -3624,27 +3624,27 @@ snapshots:
 
   '@effect/language-service@0.74.0': {}
 
-  '@effect/platform-bun@4.0.0-beta.0(effect@4.0.0-beta.0)':
+  '@effect/platform-bun@4.0.0-beta.3(effect@4.0.0-beta.3)':
     dependencies:
-      '@effect/platform-node-shared': 4.0.0-beta.0(effect@4.0.0-beta.0)
-      effect: 4.0.0-beta.0
+      '@effect/platform-node-shared': 4.0.0-beta.3(effect@4.0.0-beta.3)
+      effect: 4.0.0-beta.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform-node-shared@4.0.0-beta.0(effect@4.0.0-beta.0)':
+  '@effect/platform-node-shared@4.0.0-beta.3(effect@4.0.0-beta.3)':
     dependencies:
       '@types/ws': 8.18.1
-      effect: 4.0.0-beta.0
+      effect: 4.0.0-beta.3
       ws: 8.19.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
 
-  '@effect/platform-node@4.0.0-beta.0(effect@4.0.0-beta.0)(ioredis@5.9.3)':
+  '@effect/platform-node@4.0.0-beta.3(effect@4.0.0-beta.3)(ioredis@5.9.3)':
     dependencies:
-      '@effect/platform-node-shared': 4.0.0-beta.0(effect@4.0.0-beta.0)
-      effect: 4.0.0-beta.0
+      '@effect/platform-node-shared': 4.0.0-beta.3(effect@4.0.0-beta.3)
+      effect: 4.0.0-beta.3
       ioredis: 5.9.3
       mime: 4.1.0
       undici: 7.22.0
@@ -3652,9 +3652,9 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@effect/vitest@4.0.0-beta.0(effect@4.0.0-beta.0)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
+  '@effect/vitest@4.0.0-beta.3(effect@4.0.0-beta.3)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
-      effect: 4.0.0-beta.0
+      effect: 4.0.0-beta.3
       vitest: 3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@emnapi/core@1.8.1':
@@ -4534,7 +4534,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.19.7
+      '@types/node': 20.19.30
 
   '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@22.19.7)(lightningcss@1.31.0))':
     dependencies:
@@ -4882,7 +4882,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@4.0.0-beta.0:
+  effect@4.0.0-beta.3:
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 4.5.3
@@ -5921,12 +5921,12 @@ snapshots:
       node-addon-api: 8.5.0
       node-gyp-build: 4.8.4
 
-  trpc-cli@0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.0)(zod@4.3.5):
+  trpc-cli@0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.3)(zod@4.3.5):
     dependencies:
       commander: 14.0.2
     optionalDependencies:
       '@trpc/server': 11.8.1(typescript@5.9.3)
-      effect: 4.0.0-beta.0
+      effect: 4.0.0-beta.3
       zod: 4.3.5
 
   ts-interface-checker@0.1.13: {}
@@ -5948,7 +5948,7 @@ snapshots:
 
   ufo@1.6.3: {}
 
-  ultracite@7.0.12(effect@4.0.0-beta.0)(typescript@5.9.3):
+  ultracite@7.0.12(effect@4.0.0-beta.3)(typescript@5.9.3):
     dependencies:
       '@clack/prompts': 0.11.0
       '@trpc/server': 11.8.1(typescript@5.9.3)
@@ -5956,7 +5956,7 @@ snapshots:
       glob: 13.0.0
       jsonc-parser: 3.3.1
       nypm: 0.6.4
-      trpc-cli: 0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.0)(zod@4.3.5)
+      trpc-cli: 0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.3)(zod@4.3.5)
       zod: 4.3.5
     transitivePeerDependencies:
       - '@orpc/server'

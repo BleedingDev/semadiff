@@ -14,8 +14,8 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "@effect/platform-bun": "^4.0.0-beta.0",
-    "@effect/platform-node": "^4.0.0-beta.0",
+    "@effect/platform-bun": "4.0.0-beta.3",
+    "@effect/platform-node": "4.0.0-beta.3",
     "@semadiff/core": "workspace:*",
     "@semadiff/parser-lightningcss": "workspace:*",
     "@semadiff/parser-swc": "workspace:*",
@@ -23,7 +23,7 @@
     "@semadiff/parsers": "workspace:*",
     "@semadiff/pr-backend": "workspace:*",
     "@semadiff/render-terminal": "workspace:*",
-    "effect": "^4.0.0-beta.0"
+    "effect": "4.0.0-beta.3"
   },
   "devDependencies": {
     "@types/node": "^20.14.15"
