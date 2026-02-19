@@ -8,7 +8,7 @@ Effect v4 CLI requires custom local service layer to run without `@effect/platfo
 
 We migrated a CLI to `effect@4.0.0-beta.4` and removed `@effect/platform-*` dependencies.
 
-To do that, we had to provide a custom local layer for the `effect/unstable/cli` runtime environment (`ChildProcessSpawner | FileSystem | Path | Terminal`) and run with `Effect.runPromiseExit`.
+To do that, we had to provide a custom local layer (`packages/cli/src/runtime-layer.ts`) for the `effect/unstable/cli` runtime environment (`ChildProcessSpawner | FileSystem | Path | Terminal`) and run with `Effect.runPromiseExit`.
 
 This works for our current command surface, but it requires local runtime shims that should ideally be provided by upstream as an official Effect v4 runtime layer.
 

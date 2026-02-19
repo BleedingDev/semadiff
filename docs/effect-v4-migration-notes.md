@@ -18,19 +18,18 @@
 
 ### Platform Runtime
 
-- Runtime/services are provided by a local Effect layer in `packages/cli/src/index.ts`.
+- Runtime/services are provided by a local Effect layer in `packages/cli/src/runtime-layer.ts`.
 - The layer composes `Path.layer`, `FileSystem.layerNoop({})`, and local `Terminal` / `ChildProcessSpawner` service implementations.
 - No `@effect/platform-*` runtime dependencies remain in workspace manifests.
 - Packed CLI e2e (`e2e/cli-pack.spec.ts`) validates both host executions.
+- Direct CLI parity e2e (`e2e/cli-v4-parity.spec.ts`) covers `doctor`, `explain`, `bench`, and `difftool`.
+- Runtime shim behavior is explicitly tested in `packages/cli/test/runtime-layer.spec.ts`.
 - This is still not collapsed into the main `effect` package export surface.
 
 ### Vitest Integration
 
 - `vitest` itself remains a separate dependency.
-- We run Effect integration tests with a local harness:
-  - `Effect.runPromise(...)`
-  - `Effect.scoped`
-  - `TestClock.layer()` from `effect/testing/TestClock`
+- `@effect/vitest@4.0.0-beta.4` is now used for Effect-native test execution (`it.effect`).
 - We now have explicit harness coverage in `packages/core/test/effect-testing-harness.spec.ts` for:
   - `ServiceMap.Service` layer provisioning
   - `TestClock` scheduling
@@ -49,8 +48,10 @@ Run these checks when upgrading any Effect beta:
 1. `pnpm effect:v4:readiness -- --strict`
 2. `pnpm quality`
 3. `pnpm exec playwright test e2e/cli-pack.spec.ts`
-4. `pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts`
-5. `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
+4. `pnpm exec playwright test e2e/cli-v4-parity.spec.ts`
+5. `pnpm exec vitest run packages/cli/test/runtime-layer.spec.ts`
+6. `pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts`
+7. `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
 
 ## Peer/Version constraints guidance
 
@@ -61,6 +62,7 @@ Run these checks when upgrading any Effect beta:
   - App packages
 - Keep these runtime dependencies aligned per beta update:
   - `effect`
+  - `@effect/vitest`
 - `vitest` remains independent and should be verified with each beta update.
 
 ## Remaining Non-Blocking Advisories

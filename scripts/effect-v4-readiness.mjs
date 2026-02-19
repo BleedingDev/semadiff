@@ -67,6 +67,7 @@ const REMOVED_API_PATTERNS = [
 
 const DEPENDENCY_NAMES = [
   "effect",
+  "@effect/vitest",
   "@effect/cli",
   "@effect/platform",
   "@effect/platform-node",

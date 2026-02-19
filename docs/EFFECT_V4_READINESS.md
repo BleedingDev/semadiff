@@ -47,10 +47,12 @@ Current result (as of this update):
   - no `Effect.Service` `dependencies` option
 - Workspace dependencies are aligned to v4 beta where required:
   - `effect@4.0.0-beta.4`
+  - `@effect/vitest@4.0.0-beta.4`
   - `vitest@^3.2.4`
 - Publishable library packages now use `peerDependencies.effect` (`>=4.0.0-beta.4 <5`) to prevent nested runtime copies and keep consumers on one Effect runtime.
 - Runtime entrypoints (`@semadiff/cli`, app packages) keep direct `effect` dependencies.
 - CLI runtime now provides required services through a local Effect layer (Path + FileSystem + Terminal + ChildProcessSpawner) without `@effect/platform-*` dependencies.
+- Runtime shims are isolated in `packages/cli/src/runtime-layer.ts` and covered by `packages/cli/test/runtime-layer.spec.ts`.
 - Full validation passes:
   - `lint`
   - `format:check`
@@ -61,6 +63,8 @@ Current result (as of this update):
   - coverage pipeline via `pnpm quality`
   - targeted v4 runtime/integration checks:
     - `pnpm exec playwright test e2e/cli-pack.spec.ts`
+    - `pnpm exec playwright test e2e/cli-v4-parity.spec.ts`
+    - `pnpm exec vitest run packages/cli/test/runtime-layer.spec.ts`
     - `pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts`
     - `pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts`
 
@@ -85,18 +89,41 @@ Use this when validating migration parity after Effect beta bumps.
    - runs `dist/index.js --help` via Bun and Node
    - runs `dist/index.js diff` via Bun and Node
 
-3. Verify Effect test harness parity:
+3. Verify direct CLI command parity coverage:
+
+   ```bash
+   pnpm exec playwright test e2e/cli-v4-parity.spec.ts
+   ```
+
+   Expected:
+   - `doctor` emits structured JSON
+   - `explain` emits stable explain JSON payload
+   - `bench` writes baseline and emits benchmark report JSON
+   - `difftool` executes successfully with explicit inputs
+
+4. Verify Effect test harness parity:
 
    ```bash
    pnpm exec vitest run packages/core/test/effect-testing-harness.spec.ts
    ```
 
    Expected:
-   - local Vitest harness uses `Effect.runPromise` + `TestClock.layer()` with `ServiceMap.Service`
+   - `@effect/vitest` executes `it.effect(...)` tests correctly
+   - `ServiceMap.Service` layers resolve correctly
    - `TestClock.adjust` scheduling behavior
    - typed failure propagation from provided services
 
-4. Verify eval/script JSON compatibility on v4 Schema API:
+5. Verify CLI runtime shim guardrails:
+
+   ```bash
+   pnpm exec vitest run packages/cli/test/runtime-layer.spec.ts
+   ```
+
+   Expected:
+   - `Terminal.readLine` fails with `QuitError`
+   - unsupported `Terminal.readInput` and `ChildProcessSpawner.spawn` paths fail with explicit defect messages
+
+6. Verify eval/script JSON compatibility on v4 Schema API:
 
    ```bash
    pnpm exec playwright test e2e/parser-registry.spec.ts e2e/parser-chain.spec.ts e2e/render-html.spec.ts e2e/explain-diagnostics.spec.ts e2e/normalizer-framework.spec.ts e2e/tailwind-normalizer.spec.ts
