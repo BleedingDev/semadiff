@@ -1,50 +1,20 @@
-# Draft Issue: `@effect/cli` Effect v4 Compatibility
+# Archived Issue: `@effect/cli` Effect v4 Compatibility
 
-## Title
+## Status
 
-`@effect/cli` latest release still peers on Effect v3 (`^3.x`) and blocks v4 beta migration
+Resolved for this repository as of 2026-02-19.
 
-## Target Repository
+We no longer depend on published `@effect/cli`. The CLI now uses
+`effect/unstable/cli` and runs on `@effect/platform-node` services, all aligned
+to `effect@4.0.0-beta.5`.
 
-`Effect-TS/effect`
+## Why this file still exists
 
-## Summary
+This issue draft is kept as migration history only. It captured a real blocker
+on earlier v4 betas, when `@effect/cli` packages still peered on Effect v3.
 
-Effect v4 beta is published (`effect@4.0.0-beta.4` on the `beta` tag), but `@effect/cli` latest release still declares a v3-only peer dependency on `effect`.
+## Current migration path used here
 
-This blocks projects that use `@effect/cli` from testing or adopting v4 without force-overrides.
-
-## Reproduction
-
-Run:
-
-```bash
-npm view effect@4.0.0-beta.4 version --json
-npm view @effect/cli@latest version --json
-npm view @effect/cli@latest peerDependencies --json
-```
-
-Observed on 2026-02-19:
-
-- `effect@4.0.0-beta.4` exists.
-- `@effect/cli@0.73.2` is latest.
-- `@effect/cli@0.73.2` has `peerDependencies.effect: "^3.19.16"`.
-
-## Expected
-
-- A `@effect/cli` release that supports Effect v4 (or clear guidance + timeline).
-
-## Actual
-
-- Peer dependency range excludes Effect v4.
-
-## Impact
-
-- CLI projects are pinned to Effect v3 even when they want to evaluate v4 beta.
-- Migration work must be deferred or done behind brittle overrides.
-
-## Request
-
-1. Confirm planned `@effect/cli` version for Effect v4 support.
-2. Share migration notes specific to `@effect/cli` users (if any).
-3. Clarify whether interim beta tags are planned before stable.
+1. Replace `@effect/cli` package usage with imports from `effect/unstable/cli`.
+2. Provide runtime services with `@effect/platform-node` (`NodeServices.layer`).
+3. Keep `effect`, `@effect/vitest`, and `@effect/platform-node` on the same beta.

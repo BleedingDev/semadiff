@@ -1,76 +1,27 @@
-# Effect v4 Override Experiment
+# Effect v4 Override Experiment (Archived)
 
-Date: 2026-02-18  
-Experiment branch: `experiment/effect-v4-overrides`  
-Baseline branch: `chore/effect-v4-readiness`
+Date: 2026-02-18
+Experiment branch: `experiment/effect-v4-overrides`
+Baseline branch at that time: `chore/effect-v4-readiness`
 
-## Goal
+## Historical context
 
-Validate practical breakpoints by forcing Effect v4 beta into the current workspace without changing application code.
+This document recorded an early forced-override run on `effect@4.0.0-beta.0`.
+It is preserved as migration history only and is not the current state.
 
-## Temporary override used
+## Current status (2026-02-19)
 
-Applied on the experiment branch (not kept committed):
+- Workspace is on `effect@4.0.0-beta.5`.
+- Test integration is on `@effect/vitest@4.0.0-beta.5`.
+- CLI runtime uses `@effect/platform-node@4.0.0-beta.5` via
+  `NodeServices.layer`.
+- CLI command model uses `effect/unstable/cli`.
+- `pnpm quality`, `pnpm effect:v4:readiness -- --strict`, and `pnpm test:e2e`
+  pass on the migration branch.
 
-```json
-{
-  "pnpm": {
-    "overrides": {
-      "effect": "4.0.0-beta.0",
-      "@effect/platform-bun": "4.0.0-beta.0",
-      "@effect/vitest": "4.0.0-beta.0"
-    }
-  }
-}
-```
+## Why this file remains
 
-## Commands run
-
-```bash
-pnpm install --no-frozen-lockfile
-pnpm typecheck
-pnpm -s quality
-```
-
-## Results
-
-### 1) Install: `pass` with important peer warnings
-
-- `@effect/vitest` upgraded to `4.0.0-beta.0`
-- `effect` upgraded to `4.0.0-beta.0`
-- Peer mismatch warning remained:
-  - `@effect/vitest@4.0.0-beta.0` expects `vitest@^3.0.0`, workspace has `vitest@2.1.9`
-- Existing non-Effect `tree-sitter` peer warnings were also reported.
-
-### 2) Typecheck: `pass`
-
-`pnpm typecheck` (`tsc -b`) completed successfully.
-
-### 3) Full quality: `fail`
-
-`pnpm -s quality` failed during app typecheck with Effect-v4-related type/API breakpoints.
-
-Representative failures:
-
-- `apps/pr-viewer/src/server/pr.server.ts`
-  - `Effect.tapErrorCause` no longer exists on Effect v4 type surface.
-  - Multiple environment (`R`) type inference failures (`unknown` vs expected service).
-  - `yield* PrDiffService` / `yield* GitHubConfig` patterns fail type expectations.
-- `apps/pr-viewer/src/routes/index.tsx`
-  - `unknown` values no longer satisfy existing `ServerResult<...>` state assignments.
-
-## Interpretation
-
-Even with forced v4 overrides, the stack is not migration-ready end to end:
-
-1. Dependency ecosystem is still partially v3-pegged (`@effect/cli`, `@effect/platform`).
-2. Internal app/server code needs targeted migration for changed Effect APIs and service typing model.
-3. Test stack alignment is required (`@effect/vitest@4` expects Vitest v3).
-
-## Recommendation
-
-Treat this as a proving run only. Keep production branches on v3 until:
-
-1. Effect ecosystem versions align (`@effect/cli` + `@effect/platform` v4-compatible releases).
-2. Service model migration (`Context.Tag`/`Effect.Service`) is completed.
-3. App/server Effect API changes are applied and validated under full `quality`.
+The `beta.0` experiment captured useful early breakpoints (API and service
+typing shifts) before the current migration path stabilized. Keep it as a
+record, but rely on `docs/EFFECT_V4_READINESS.md` and
+`docs/effect-v4-migration-notes.md` for current guidance.
