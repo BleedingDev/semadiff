@@ -67,10 +67,11 @@ const insertRow = insertHtml.match(/<div class="sd-line sd-line--insert">[\\s\\S
 const deleteRow = deleteHtml.match(/<div class="sd-line sd-line--delete">[\\s\\S]*?<\\/div>\\s*<\\/div>/)?.[0] ?? '';
 console.log(JSON.stringify({
   insertOldBlank: /sd-cell--old"><\\/div>/.test(insertRow),
-  insertNewHasText: /sd-cell--new">added<\\/div>/.test(insertRow),
-  deleteOldHasText: /sd-cell--old">removed<\\/div>/.test(deleteRow),
+  insertNewHasText: /sd-cell--new"><span class="sd-inline-add">added<\\/span><\\/div>/.test(insertRow),
+  deleteOldHasText: /sd-cell--old"><span class="sd-inline-del">removed<\\/span><\\/div>/.test(deleteRow),
   deleteNewBlank: /sd-cell--new"><\\/div>/.test(deleteRow),
   wrapsCode: insertHtml.includes('.sd-code {\\n  white-space: pre-wrap;'),
+  hasCellBackgroundTint: insertHtml.includes('.sd-line--insert .sd-cell--new {\\n  background: rgba('),
 }));`
   );
 
@@ -80,6 +81,7 @@ console.log(JSON.stringify({
     deleteOldHasText: boolean;
     deleteNewBlank: boolean;
     wrapsCode: boolean;
+    hasCellBackgroundTint: boolean;
   }>(output);
 
   expect(parsed.insertOldBlank).toBe(true);
@@ -87,6 +89,64 @@ console.log(JSON.stringify({
   expect(parsed.deleteOldHasText).toBe(true);
   expect(parsed.deleteNewBlank).toBe(true);
   expect(parsed.wrapsCode).toBe(true);
+  expect(parsed.hasCellBackgroundTint).toBe(false);
+});
+
+test("semantic line mode auto-picks lower-noise rows when raw is cleaner", () => {
+  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+
+  const output = runBunEval(
+    `import { renderHtml } from '${renderHtmlUrl}';
+const diff = {
+  version: '0.1.0',
+  operations: [
+    {
+      id: 'op-delete',
+      type: 'delete',
+      oldRange: { start: { line: 2, column: 1 }, end: { line: 2, column: 2 } },
+      oldText: 'c',
+    },
+  ],
+  moves: [],
+  renames: [],
+};
+const oldText = 'const v = 2;\\nc\\n';
+const newText = 'd\\n';
+const rowKinds = (html) =>
+  [...html.matchAll(/<div class="sd-line sd-line--(equal|insert|delete|replace|move)/g)].map((match) => match[1]);
+const semanticHtml = renderHtml(diff, {
+  oldText,
+  newText,
+  language: 'ts',
+  view: 'lines',
+  lineMode: 'semantic',
+  lineLayout: 'split',
+  contextLines: 6,
+  virtualize: false,
+});
+const rawHtml = renderHtml(diff, {
+  oldText,
+  newText,
+  language: 'ts',
+  view: 'lines',
+  lineMode: 'raw',
+  lineLayout: 'split',
+  contextLines: 6,
+  virtualize: false,
+});
+console.log(JSON.stringify({
+  semanticKinds: rowKinds(semanticHtml),
+  rawKinds: rowKinds(rawHtml),
+}));`
+  );
+
+  const parsed = decodeJson<{
+    semanticKinds: string[];
+    rawKinds: string[];
+  }>(output);
+
+  expect(parsed.rawKinds).toEqual(["replace", "delete"]);
+  expect(parsed.semanticKinds).toEqual(parsed.rawKinds);
 });
 
 test("semantic line mode suppresses AST-projected formatting rows", () => {

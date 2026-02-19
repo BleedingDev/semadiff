@@ -395,59 +395,33 @@ body.sd-embed .sd-lines {
   background: transparent;
 }
 
-.sd-line--delete .sd-cell--old,
-.sd-line--replace .sd-cell--old {
-  background: rgba(255, 92, 119, 0.18);
-  border-left: 3px solid rgba(255, 92, 119, 0.55);
-}
-
 .sd-line--insert .sd-cell--new,
-.sd-line--replace .sd-cell--new {
-  background: rgba(34, 229, 143, 0.18);
-  border-left: 3px solid rgba(34, 229, 143, 0.55);
-}
-
+.sd-line--delete .sd-cell--old,
+.sd-line--replace .sd-cell--old,
+.sd-line--replace .sd-cell--new,
 .sd-line--move .sd-cell--old,
-.sd-line--move .sd-cell--new {
-  background: rgba(89, 166, 255, 0.18);
-  border-left: 3px solid rgba(89, 166, 255, 0.55);
-}
-
-.sd-line--delete .sd-cell--code {
-  background: rgba(255, 92, 119, 0.18);
-}
-
-.sd-line--insert .sd-cell--code {
-  background: rgba(34, 229, 143, 0.18);
-}
-
-.sd-line--move .sd-cell--code {
-  background: rgba(89, 166, 255, 0.18);
-}
-
+.sd-line--move .sd-cell--new,
+.sd-line--delete .sd-cell--code,
+.sd-line--insert .sd-cell--code,
+.sd-line--move .sd-cell--code,
 .sd-line--replace .sd-cell--code {
   background: transparent;
-}
-
-.sd-line--replace .sd-cell--old {
-  background: rgba(255, 92, 119, 0.18);
-  border-left: 3px solid rgba(255, 92, 119, 0.55);
-}
-
-.sd-line--replace .sd-cell--new {
-  background: rgba(34, 229, 143, 0.18);
-  border-left: 3px solid rgba(34, 229, 143, 0.55);
+  border-left: none;
 }
 
 .sd-inline-del {
-  background: rgba(255, 92, 119, 0.45);
-  border-radius: 0;
+  background: rgba(255, 92, 119, 0.28);
+  border: 1px solid rgba(255, 92, 119, 0.42);
+  color: #ffd6de;
+  border-radius: 2px;
   padding: 0 1px;
 }
 
 .sd-inline-add {
-  background: rgba(34, 229, 143, 0.45);
-  border-radius: 0;
+  background: rgba(34, 229, 143, 0.26);
+  border: 1px solid rgba(34, 229, 143, 0.4);
+  color: #d8ffe9;
+  border-radius: 2px;
   padding: 0 1px;
 }
 
@@ -923,6 +897,16 @@ function renderInlineDiff(oldText: string, newText: string) {
     }
   }
   return { oldHtml, newHtml };
+}
+
+function renderInlineMarkedText(
+  text: string,
+  className: "sd-inline-add" | "sd-inline-del"
+) {
+  if (!text) {
+    return "";
+  }
+  return `<span class="${className}">${escapeHtml(text)}</span>`;
 }
 
 function diffLines(
@@ -3285,12 +3269,20 @@ function renderUnifiedRow(row: LineRow) {
   const rowClass = `sd-line sd-line--${row.type} sd-line--unified`;
   const prefix = getUnifiedPrefix(row);
   const text = getUnifiedText(row, oldText, newText);
+  let textHtml = escapeHtml(text);
+  if (row.type === "insert") {
+    textHtml = renderInlineMarkedText(text, "sd-inline-add");
+  } else if (row.type === "delete") {
+    textHtml = renderInlineMarkedText(text, "sd-inline-del");
+  } else if (row.type === "replace") {
+    textHtml = renderInlineDiff(oldText, newText).newHtml;
+  }
   return `
     <div class="${rowClass}">
       <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
       <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
       <div class="sd-cell sd-prefix">${escapeHtml(prefix)}</div>
-      <div class="sd-cell sd-code sd-cell--code">${escapeHtml(text)}</div>
+      <div class="sd-cell sd-code sd-cell--code">${textHtml}</div>
     </div>
   `;
 }
@@ -3320,7 +3312,10 @@ function renderSplitRow(row: LineRow) {
         <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
         <div class="sd-cell sd-code sd-cell--old"></div>
         <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
-        <div class="sd-cell sd-code sd-cell--new">${escapeHtml(newText)}</div>
+        <div class="sd-cell sd-code sd-cell--new">${renderInlineMarkedText(
+          newText,
+          "sd-inline-add"
+        )}</div>
       </div>
     `;
   }
@@ -3329,7 +3324,10 @@ function renderSplitRow(row: LineRow) {
     return `
       <div class="${rowClass}">
         <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
-        <div class="sd-cell sd-code sd-cell--old">${escapeHtml(oldText)}</div>
+        <div class="sd-cell sd-code sd-cell--old">${renderInlineMarkedText(
+          oldText,
+          "sd-inline-del"
+        )}</div>
         <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
         <div class="sd-cell sd-code sd-cell--new"></div>
       </div>
@@ -3732,6 +3730,36 @@ function hasLineChanges(rows: LineRow[]) {
   );
 }
 
+function countLineNoise(rows: LineRow[]) {
+  let noise = 0;
+  for (const row of rows) {
+    if (
+      row.type === "insert" ||
+      row.type === "delete" ||
+      row.type === "replace" ||
+      row.type === "move"
+    ) {
+      noise += 1;
+    }
+  }
+  return noise;
+}
+
+function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
+  const preferredNoise = countLineNoise(preferred);
+  const candidateNoise = countLineNoise(candidate);
+  if (candidateNoise < preferredNoise) {
+    return candidate;
+  }
+  if (candidateNoise > preferredNoise) {
+    return preferred;
+  }
+  if (candidate.length < preferred.length) {
+    return candidate;
+  }
+  return preferred;
+}
+
 function buildLineVirtualScript(
   batchSize: number,
   lineLayout: "split" | "unified"
@@ -3746,7 +3774,89 @@ function buildLineVirtualScript(
     const layout = parsed.lineLayout === "unified" ? "unified" : "split";
     const container = document.getElementById("sd-ops");
     const status = document.getElementById("sd-status");
+    const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\\s+|[^A-Za-z0-9_\\s])/g;
     let rendered = 0;
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function tokenizeInline(text) {
+      const value = String(text ?? "");
+      const tokens = value.match(INLINE_TOKEN_RE);
+      if (!tokens || tokens.length === 0) {
+        return [value];
+      }
+      return tokens;
+    }
+
+    function renderInlineMarkedText(text, className) {
+      const value = String(text ?? "");
+      if (value.length === 0) {
+        return "";
+      }
+      return '<span class="' + className + '">' + escapeHtml(value) + '</span>';
+    }
+
+    function renderInlineDiffPair(oldText, newText) {
+      const oldTokens = tokenizeInline(oldText);
+      const newTokens = tokenizeInline(newText);
+      const oldLen = oldTokens.length;
+      const newLen = newTokens.length;
+      const lcs = Array.from({ length: oldLen + 1 }, () =>
+        Array(newLen + 1).fill(0)
+      );
+      for (let i = oldLen - 1; i >= 0; i -= 1) {
+        for (let j = newLen - 1; j >= 0; j -= 1) {
+          if (oldTokens[i] === newTokens[j]) {
+            lcs[i][j] = lcs[i + 1][j + 1] + 1;
+          } else {
+            lcs[i][j] = Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+          }
+        }
+      }
+
+      let i = 0;
+      let j = 0;
+      let oldHtml = "";
+      let newHtml = "";
+      while (i < oldLen && j < newLen) {
+        if (oldTokens[i] === newTokens[j]) {
+          const escaped = escapeHtml(oldTokens[i]);
+          oldHtml += escaped;
+          newHtml += escaped;
+          i += 1;
+          j += 1;
+          continue;
+        }
+        if (lcs[i + 1][j] >= lcs[i][j + 1]) {
+          oldHtml +=
+            '<span class="sd-inline-del">' + escapeHtml(oldTokens[i]) + '</span>';
+          i += 1;
+          continue;
+        }
+        newHtml +=
+          '<span class="sd-inline-add">' + escapeHtml(newTokens[j]) + '</span>';
+        j += 1;
+      }
+      while (i < oldLen) {
+        oldHtml +=
+          '<span class="sd-inline-del">' + escapeHtml(oldTokens[i]) + '</span>';
+        i += 1;
+      }
+      while (j < newLen) {
+        newHtml +=
+          '<span class="sd-inline-add">' + escapeHtml(newTokens[j]) + '</span>';
+        j += 1;
+      }
+
+      return { oldHtml, newHtml };
+    }
 
     function renderRow(row) {
       if (!container) return;
@@ -3809,22 +3919,41 @@ function buildLineVirtualScript(
               ? row.oldText ?? row.text ?? ""
               : row.text ?? row.oldText ?? row.newText ?? ""
             : row.text ?? row.oldText ?? row.newText ?? "";
-        code.textContent = text;
+        if (row.type === "insert") {
+          code.innerHTML = renderInlineMarkedText(text, "sd-inline-add");
+        } else if (row.type === "delete") {
+          code.innerHTML = renderInlineMarkedText(text, "sd-inline-del");
+        } else if (row.type === "replace") {
+          const inline = renderInlineDiffPair(
+            row.oldText ?? row.text ?? "",
+            row.newText ?? row.text ?? ""
+          );
+          code.innerHTML = inline.newHtml;
+        } else {
+          code.textContent = text;
+        }
         wrapper.append(oldNumber, newNumber, prefix, code);
       } else {
         const oldCell = document.createElement("div");
         oldCell.className = "sd-cell sd-code sd-cell--old";
-        oldCell.textContent =
-          row.type === "insert"
-            ? ""
-            : row.oldText ?? row.text ?? "";
-
         const newCell = document.createElement("div");
         newCell.className = "sd-cell sd-code sd-cell--new";
-        newCell.textContent =
-          row.type === "delete"
-            ? ""
-            : row.newText ?? row.text ?? "";
+        const oldText = row.oldText ?? row.text ?? "";
+        const newText = row.newText ?? row.text ?? "";
+        if (row.type === "replace") {
+          const inline = renderInlineDiffPair(oldText, newText);
+          oldCell.innerHTML = inline.oldHtml;
+          newCell.innerHTML = inline.newHtml;
+        } else if (row.type === "delete") {
+          oldCell.innerHTML = renderInlineMarkedText(oldText, "sd-inline-del");
+          newCell.textContent = "";
+        } else if (row.type === "insert") {
+          oldCell.textContent = "";
+          newCell.innerHTML = renderInlineMarkedText(newText, "sd-inline-add");
+        } else {
+          oldCell.textContent = oldText;
+          newCell.textContent = newText;
+        }
 
         wrapper.append(oldNumber, oldCell, newNumber, newCell);
       }
@@ -4002,7 +4131,6 @@ function buildOpsVirtualScript(batchSize: number) {
   `;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: render flow is clearer in one place
 function renderLineView(
   diff: DiffDocument,
   options: HtmlRenderOptions,
@@ -4015,66 +4143,77 @@ function renderLineView(
     options.filePath?.endsWith(".yml") || options.filePath?.endsWith(".yaml");
   const yamlLanguage = options.language === "yaml" || Boolean(isYamlPath);
   const semanticLanguage = yamlLanguage ? "yaml" : options.language;
-  const normalizeLine =
-    context.lineMode === "semantic"
-      ? (line: string) => normalizeLineForSemantic(line, semanticLanguage)
-      : undefined;
   const oldText = options.oldText ?? "";
   const newText = options.newText ?? "";
+  const oldLineCount = splitLines(oldText).length;
+  const newLineCount = splitLines(newText).length;
   const isPnpmLock =
     options.filePath?.endsWith("pnpm-lock.yaml") ||
     (oldText.includes("lockfileVersion:") && oldText.includes("importers:")) ||
     (newText.includes("lockfileVersion:") && newText.includes("importers:"));
-  const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
-  const useYamlComparable = Boolean(normalizeLine && yamlLanguage);
-  let rows = buildLineRows(
-    oldText,
-    newText,
-    context.contextLines,
-    context.lineLayout,
-    normalizeLine,
-    diff.operations,
-    useKeyMatching,
-    useYamlComparable,
-    context.lineMode === "semantic",
-    context.lineMode === "semantic"
-  );
-  if (context.lineMode === "semantic" && normalizeLine) {
-    const oldTokenByLine = buildLineTokenMap(
-      oldText,
-      options.semanticTokens?.old,
-      semanticLanguage
-    );
-    const newTokenByLine = buildLineTokenMap(
-      newText,
-      options.semanticTokens?.new,
-      semanticLanguage
-    );
-    if (oldTokenByLine.size > 0 && newTokenByLine.size > 0) {
-      const marks = buildLineMarkSets(
-        diff.operations,
-        splitLines(oldText).length,
-        splitLines(newText).length
-      );
-      rows = filterAstProjectedRows(
-        rows,
-        marks,
-        oldTokenByLine,
-        newTokenByLine
-      );
-    }
-    rows = filterSemanticRows(rows, normalizeLine);
-  }
-  if (useKeyMatching) {
-    rows = filterLockfileRows(rows);
-  }
   const hideComments = Boolean(options.hideComments);
   const applyHideComments = (nextRows: LineRow[]) =>
     applyLineContext(
       filterCommentRows(stripContextRows(nextRows), options.language),
       context.contextLines
     );
-  rows = hideComments ? applyHideComments(rows) : rows;
+  const buildRowsForMode = (mode: "semantic" | "raw") => {
+    const semanticMode = mode === "semantic";
+    const normalizeLine = semanticMode
+      ? (line: string) => normalizeLineForSemantic(line, semanticLanguage)
+      : undefined;
+    const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
+    const useYamlComparable = Boolean(normalizeLine && yamlLanguage);
+    let modeRows = buildLineRows(
+      oldText,
+      newText,
+      context.contextLines,
+      context.lineLayout,
+      normalizeLine,
+      diff.operations,
+      useKeyMatching,
+      useYamlComparable,
+      semanticMode,
+      semanticMode
+    );
+    if (semanticMode && normalizeLine) {
+      const oldTokenByLine = buildLineTokenMap(
+        oldText,
+        options.semanticTokens?.old,
+        semanticLanguage
+      );
+      const newTokenByLine = buildLineTokenMap(
+        newText,
+        options.semanticTokens?.new,
+        semanticLanguage
+      );
+      if (oldTokenByLine.size > 0 && newTokenByLine.size > 0) {
+        const marks = buildLineMarkSets(
+          diff.operations,
+          oldLineCount,
+          newLineCount
+        );
+        modeRows = filterAstProjectedRows(
+          modeRows,
+          marks,
+          oldTokenByLine,
+          newTokenByLine
+        );
+      }
+      modeRows = filterSemanticRows(modeRows, normalizeLine);
+    }
+    if (useKeyMatching) {
+      modeRows = filterLockfileRows(modeRows);
+    }
+    return hideComments ? applyHideComments(modeRows) : modeRows;
+  };
+  const rows =
+    context.lineMode === "raw"
+      ? buildRowsForMode("raw")
+      : chooseLowerNoiseRows(
+          buildRowsForMode("semantic"),
+          buildRowsForMode("raw")
+        );
   if (!hasLineChanges(rows)) {
     return "";
   }
