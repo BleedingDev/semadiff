@@ -28,75 +28,9 @@ const NAVIGATION_SCRIPT = `
 <script>
 (function () {
   const selector = '.sd-line--insert, .sd-line--delete, .sd-line--replace, .sd-line--move';
-  const MAX_MARKERS = 2000;
-  const MINIMAP_ID = 'sd-minimap';
-  const STYLE_ID = 'sd-minimap-style';
 
   function getChanges() {
     return Array.from(document.querySelectorAll(selector));
-  }
-
-  function getType(el) {
-    if (el.classList.contains('sd-line--insert')) return 'insert';
-    if (el.classList.contains('sd-line--delete')) return 'delete';
-    if (el.classList.contains('sd-line--replace')) return 'replace';
-    if (el.classList.contains('sd-line--move')) return 'move';
-    return 'replace';
-  }
-
-  function ensureStyles() {
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement('style');
-    style.id = STYLE_ID;
-    style.textContent = \`
-      #\${MINIMAP_ID} {
-        position: fixed;
-        top: 16px;
-        right: 10px;
-        width: 12px;
-        height: calc(100% - 32px);
-        background: rgba(15, 23, 42, 0.45);
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        border-radius: 999px;
-        padding: 4px 2px;
-        z-index: 9999;
-        box-sizing: border-box;
-      }
-      #\${MINIMAP_ID} .sd-minimap-track {
-        position: relative;
-        width: 100%;
-        height: 100%;
-      }
-      #\${MINIMAP_ID} .sd-minimap-markers {
-        position: absolute;
-        inset: 0;
-      }
-      #\${MINIMAP_ID} .sd-minimap-tick {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 2px;
-        opacity: 0.85;
-        border-radius: 2px;
-      }
-      #\${MINIMAP_ID} .sd-minimap-tick--insert { background: #34d399; }
-      #\${MINIMAP_ID} .sd-minimap-tick--delete { background: #f87171; }
-      #\${MINIMAP_ID} .sd-minimap-tick--replace { background: #fbbf24; }
-      #\${MINIMAP_ID} .sd-minimap-tick--move { background: #60a5fa; }
-      #\${MINIMAP_ID} .sd-minimap-viewport {
-        position: absolute;
-        left: 0;
-        right: 0;
-        border: 1px solid rgba(45, 212, 191, 0.9);
-        background: rgba(45, 212, 191, 0.12);
-        border-radius: 4px;
-        pointer-events: none;
-      }
-      @media (max-width: 960px) {
-        #\${MINIMAP_ID} { display: none !important; }
-      }
-    \`;
-    document.head.appendChild(style);
   }
 
   function scrollToEl(el) {
@@ -124,120 +58,11 @@ const NAVIGATION_SCRIPT = `
     return positions[0].el;
   }
 
-  let minimapState = null;
-  let renderScheduled = false;
-  let minimapEnabled = true;
-
-  function buildMinimap() {
-    ensureStyles();
-    let minimap = document.getElementById(MINIMAP_ID);
-    if (!minimap) {
-      minimap = document.createElement('div');
-      minimap.id = MINIMAP_ID;
-      minimap.innerHTML =
-        '<div class="sd-minimap-track"><div class="sd-minimap-markers"></div><div class="sd-minimap-viewport"></div></div>';
-      document.body.appendChild(minimap);
-      minimap.addEventListener('click', (event) => {
-        const rect = minimap.getBoundingClientRect();
-        const ratio = (event.clientY - rect.top) / rect.height;
-        const scrollHeight = Math.max(
-          1,
-          document.documentElement.scrollHeight - window.innerHeight,
-        );
-        window.scrollTo({
-          top: Math.max(0, ratio * scrollHeight),
-          behavior: 'smooth',
-        });
-      });
-    }
-    const markers = minimap.querySelector('.sd-minimap-markers');
-    const viewport = minimap.querySelector('.sd-minimap-viewport');
-    if (!markers || !viewport) return null;
-    return { minimap, markers, viewport };
-  }
-
-  function renderMarkers() {
-    if (!minimapEnabled) {
-      if (minimapState && minimapState.minimap) {
-        minimapState.minimap.style.display = 'none';
-      }
-      return;
-    }
-    if (!minimapState) return;
-    const { minimap, markers, viewport } = minimapState;
-    const items = getChanges();
-    const scrollHeight = document.documentElement.scrollHeight;
-    const scrollable = scrollHeight - window.innerHeight;
-    if (!items.length || scrollable <= 0) {
-      minimap.style.display = 'none';
-      return;
-    }
-    minimap.style.display = '';
-    markers.innerHTML = '';
-    const trackHeight = minimap.clientHeight;
-    const step = Math.max(1, Math.ceil(items.length / MAX_MARKERS));
-    for (let i = 0; i < items.length; i += step) {
-      const item = items[i];
-      const top = item.getBoundingClientRect().top + window.scrollY;
-      const ratio = Math.min(1, Math.max(0, top / scrollable));
-      const tick = document.createElement('div');
-      tick.className = \`sd-minimap-tick sd-minimap-tick--\${getType(item)}\`;
-      tick.style.top = \`\${ratio * (trackHeight - 2)}px\`;
-      markers.appendChild(tick);
-    }
-    updateViewport(minimap, viewport, scrollable, trackHeight);
-  }
-
-  function updateViewport(minimap, viewport, scrollable, trackHeight) {
-    const heightRatio = window.innerHeight / document.documentElement.scrollHeight;
-    const viewportHeight = Math.max(18, heightRatio * trackHeight);
-    const scrollRatio = Math.max(0, window.scrollY / scrollable);
-    viewport.style.height = \`\${viewportHeight}px\`;
-    viewport.style.top = \`\${scrollRatio * (trackHeight - viewportHeight)}px\`;
-  }
-
-  function scheduleRender() {
-    if (renderScheduled) return;
-    renderScheduled = true;
-    requestAnimationFrame(() => {
-      renderScheduled = false;
-      minimapState = buildMinimap();
-      renderMarkers();
-    });
-  }
-
-  window.addEventListener('scroll', () => {
-    if (!minimapEnabled || !minimapState) return;
-    const { minimap, viewport } = minimapState;
-    const scrollable = Math.max(
-      1,
-      document.documentElement.scrollHeight - window.innerHeight,
-    );
-    const trackHeight = minimap.clientHeight;
-    updateViewport(minimap, viewport, scrollable, trackHeight);
-  }, { passive: true });
-
-  window.addEventListener('resize', scheduleRender);
-  scheduleRender();
-
   window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || data.type !== 'semadiff:navigate') return;
     const dir = data.direction === 'prev' ? 'prev' : 'next';
     scrollToEl(findNext(dir));
-  });
-
-  window.addEventListener('message', (event) => {
-    const data = event.data;
-    if (!data || data.type !== 'semadiff:minimap') return;
-    minimapEnabled = data.enabled !== false;
-    if (!minimapEnabled) {
-      if (minimapState && minimapState.minimap) {
-        minimapState.minimap.style.display = 'none';
-      }
-      return;
-    }
-    scheduleRender();
   });
 })();
 </script>
@@ -325,18 +150,14 @@ interface DiffPanelHeaderProps {
   lineLayout: "split" | "unified";
   lineMode: "semantic" | "raw";
   hideComments: boolean;
-  lineContextLines: number;
   compareMoves: boolean;
-  minimapEnabled: boolean;
   hasDiff: boolean;
   onRefresh: () => void;
   onViewChange: (view: "semantic" | "lines") => void;
   onLineLayoutChange: (layout: "split" | "unified") => void;
   onLineModeChange: (mode: "semantic" | "raw") => void;
   onHideCommentsChange: (value: boolean) => void;
-  onLineContextChange: (value: number) => void;
   onNavigate: (direction: "next" | "prev") => void;
-  onMinimapToggle: () => void;
   onCompareMovesChange: (value: boolean) => void;
 }
 
@@ -523,18 +344,14 @@ function DiffPanelHeader({
   lineLayout,
   lineMode,
   hideComments,
-  lineContextLines,
   compareMoves,
-  minimapEnabled,
   hasDiff,
   onRefresh,
   onViewChange,
   onLineLayoutChange,
   onLineModeChange,
   onHideCommentsChange,
-  onLineContextChange,
   onNavigate,
-  onMinimapToggle,
   onCompareMovesChange,
 }: DiffPanelHeaderProps) {
   return (
@@ -635,37 +452,6 @@ function DiffPanelHeader({
             onClick={() => onLineLayoutChange("split")}
           >
             Split
-          </ToggleButton>
-        </div>
-        <div className="sd-control-group">
-          <span className="sd-control-label">Context</span>
-          <ToggleButton
-            active={lineContextLines === 3}
-            onClick={() => onLineContextChange(3)}
-          >
-            Tight
-          </ToggleButton>
-          <ToggleButton
-            active={lineContextLines === 6}
-            onClick={() => onLineContextChange(6)}
-          >
-            Default
-          </ToggleButton>
-          <ToggleButton
-            active={lineContextLines === 12}
-            onClick={() => onLineContextChange(12)}
-          >
-            Wide
-          </ToggleButton>
-        </div>
-        <div className="sd-control-group">
-          <span className="sd-control-label">Minimap</span>
-          <ToggleButton
-            active={minimapEnabled}
-            disabled={!hasDiff}
-            onClick={onMinimapToggle}
-          >
-            {minimapEnabled ? "On" : "Off"}
           </ToggleButton>
         </div>
         <div className="sd-control-group">
@@ -770,18 +556,14 @@ function DiffPanel({
   lineLayout,
   lineMode,
   hideComments,
-  lineContextLines,
   compareMoves,
-  minimapEnabled,
   hasDiff,
   onRefresh,
   onViewChange,
   onLineLayoutChange,
   onLineModeChange,
   onHideCommentsChange,
-  onLineContextChange,
   onNavigate,
-  onMinimapToggle,
   onCompareMovesChange,
   diffLoading,
   diffError,
@@ -795,16 +577,12 @@ function DiffPanel({
         compareMoves={compareMoves}
         hasDiff={hasDiff}
         hideComments={hideComments}
-        lineContextLines={lineContextLines}
         lineLayout={lineLayout}
         lineMode={lineMode}
-        minimapEnabled={minimapEnabled}
         onCompareMovesChange={onCompareMovesChange}
         onHideCommentsChange={onHideCommentsChange}
-        onLineContextChange={onLineContextChange}
         onLineLayoutChange={onLineLayoutChange}
         onLineModeChange={onLineModeChange}
-        onMinimapToggle={onMinimapToggle}
         onNavigate={onNavigate}
         onRefresh={onRefresh}
         onViewChange={onViewChange}
@@ -833,6 +611,7 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
+  const lineContextLines = 12;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
@@ -859,9 +638,7 @@ function App() {
   const [lineLayout, setLineLayout] = useState<"split" | "unified">("unified");
   const [lineMode, setLineMode] = useState<"semantic" | "raw">("semantic");
   const [hideComments, setHideComments] = useState(false);
-  const [lineContextLines, setLineContextLines] = useState(6);
   const [refreshToken, setRefreshToken] = useState(0);
-  const [minimapEnabled, setMinimapEnabled] = useState(true);
   const [compareMoves, setCompareMoves] = useState(true);
 
   const summary = summaryResult?.ok ? summaryResult.data : null;
@@ -1080,7 +857,6 @@ function App() {
     lineLayout,
     lineMode,
     hideComments,
-    lineContextLines,
     refreshToken,
     compareMoves,
   ]);
@@ -1129,37 +905,6 @@ function App() {
     );
   }, []);
 
-  const sendMinimapState = useCallback(() => {
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: "semadiff:minimap", enabled: minimapEnabled },
-      "*"
-    );
-  }, [minimapEnabled]);
-
-  useEffect(() => {
-    if (!diffHtml) {
-      return;
-    }
-    sendMinimapState();
-  }, [diffHtml, sendMinimapState]);
-
-  useEffect(() => {
-    if (!diffHtml) {
-      return;
-    }
-    const iframe = iframeRef.current;
-    if (!iframe) {
-      return;
-    }
-    const handleLoad = () => {
-      sendMinimapState();
-    };
-    iframe.addEventListener("load", handleLoad);
-    return () => {
-      iframe.removeEventListener("load", handleLoad);
-    };
-  }, [diffHtml, sendMinimapState]);
-
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     if (!input.trim()) {
@@ -1201,16 +946,12 @@ function App() {
           hasDiff={hasDiff}
           hideComments={hideComments}
           iframeRef={iframeRef}
-          lineContextLines={lineContextLines}
           lineLayout={lineLayout}
           lineMode={lineMode}
-          minimapEnabled={minimapEnabled}
           onCompareMovesChange={(next) => setCompareMoves(next)}
           onHideCommentsChange={setHideComments}
-          onLineContextChange={(next) => setLineContextLines(next)}
           onLineLayoutChange={(next) => setLineLayout(next)}
           onLineModeChange={setLineMode}
-          onMinimapToggle={() => setMinimapEnabled((value) => !value)}
           onNavigate={sendNavigate}
           onRefresh={() => setRefreshToken((value) => value + 1)}
           onViewChange={(next) => setView(next)}
