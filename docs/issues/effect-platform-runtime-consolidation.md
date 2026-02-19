@@ -1,18 +1,18 @@
-# Draft Issue: Official CLI Runtime Layer for Effect v4
+# Resolved: Official CLI Runtime Layer for Effect v4
 
 ## Title
 
-Effect v4 CLI requires custom local service layer to run without `@effect/platform-*`
+Effect v4 CLI can run on official `@effect/platform-node` runtime services (`NodeServices.layer`)
 
 ## Summary
 
-We migrated a CLI to `effect@4.0.0-beta.4` and removed `@effect/platform-*` dependencies.
+Initially, this repository used a custom local runtime layer for `effect/unstable/cli` while preparing for Effect v4.
 
-To do that, we had to provide a custom local layer (`packages/cli/src/runtime-layer.ts`) for the `effect/unstable/cli` runtime environment (`ChildProcessSpawner | FileSystem | Path | Terminal`) and run with `Effect.runPromiseExit`.
+As of `effect@4.0.0-beta.5`, `@effect/vitest@4.0.0-beta.5`, and `@effect/platform-node@4.0.0-beta.5`, the CLI runtime now uses upstream Node services via `NodeServices.layer` in `packages/cli/src/runtime-layer.ts`.
 
-This works for our current command surface, but it requires local runtime shims that should ideally be provided by upstream as an official Effect v4 runtime layer.
+This removes the in-house shim path and keeps runtime wiring on official package surfaces.
 
-## Reproduction
+## Previous Reproduction (Historical)
 
 1. Build a CLI with `effect/unstable/cli`.
 2. Remove `@effect/platform-node` / `@effect/platform-bun`.
@@ -28,15 +28,12 @@ The command effect requires environment services:
 - `Terminal`
 
 Without these, type-checking/runtime wiring fails.  
-To proceed, projects must provide local implementations.
+Without platform services, projects must provide local implementations.
 
-## Expected
+## Resolution
 
-One of:
+- `packages/cli` now depends on `@effect/platform-node@4.0.0-beta.5`.
+- `packages/cli/src/runtime-layer.ts` now exports `NodeServices.layer`.
+- `packages/cli/test/runtime-layer.spec.ts` validates required service availability from the official runtime layer.
 
-1. An official v4 runtime layer in main `effect` for CLI execution contexts.
-2. A documented, recommended minimal runtime-layer constructor for CLI apps in v4.
-
-## Why this matters
-
-Effect v4 consolidation is significantly improved, but projects still need custom runtime shims for `effect/unstable/cli` when avoiding `@effect/platform-*`.
+The underlying requirement remains expected behavior: `effect/unstable/cli` needs `ChildProcessSpawner | FileSystem | Path | Terminal`, and `@effect/platform-node` is now the standard way this repository provides those services.

@@ -11,7 +11,7 @@ Source: https://effect.website/blog/releases/effect/40-beta/
 
 ## Key v4 beta signals (from upstream)
 
-- `effect@4.0.0-beta.4` is available on the beta channel.
+- `effect@4.0.0-beta.5` is available on the beta channel.
 - The v4 effort is based on the smaller `effect-smol` architecture.
 - Functionality from several `@effect/*` packages is being moved into `effect` under unstable modules.
 - Upstream migration docs are maintained in `effect-smol`:
@@ -46,13 +46,13 @@ Current result (as of this update):
   - no `Effect.Service.Default`
   - no `Effect.Service` `dependencies` option
 - Workspace dependencies are aligned to v4 beta where required:
-  - `effect@4.0.0-beta.4`
-  - `@effect/vitest@4.0.0-beta.4`
+  - `effect@4.0.0-beta.5`
+  - `@effect/vitest@4.0.0-beta.5`
   - `vitest@^3.2.4`
-- Publishable library packages now use `peerDependencies.effect` (`>=4.0.0-beta.4 <5`) to prevent nested runtime copies and keep consumers on one Effect runtime.
+- Publishable library packages now use `peerDependencies.effect` (`>=4.0.0-beta.5 <5`) to prevent nested runtime copies and keep consumers on one Effect runtime.
 - Runtime entrypoints (`@semadiff/cli`, app packages) keep direct `effect` dependencies.
-- CLI runtime now provides required services through a local Effect layer (Path + FileSystem + Terminal + ChildProcessSpawner) without `@effect/platform-*` dependencies.
-- Runtime shims are isolated in `packages/cli/src/runtime-layer.ts` and covered by `packages/cli/test/runtime-layer.spec.ts`.
+- CLI runtime now uses official Node platform services via `@effect/platform-node` (`NodeServices.layer`) for `Path`, `FileSystem`, `Terminal`, and `ChildProcessSpawner`.
+- Runtime wiring is isolated in `packages/cli/src/runtime-layer.ts` and covered by `packages/cli/test/runtime-layer.spec.ts`.
 - Full validation passes:
   - `lint`
   - `format:check`
@@ -113,15 +113,15 @@ Use this when validating migration parity after Effect beta bumps.
    - `TestClock.adjust` scheduling behavior
    - typed failure propagation from provided services
 
-5. Verify CLI runtime shim guardrails:
+5. Verify CLI runtime platform wiring:
 
    ```bash
    pnpm exec vitest run packages/cli/test/runtime-layer.spec.ts
    ```
 
    Expected:
-   - `Terminal.readLine` fails with `QuitError`
-   - unsupported `Terminal.readInput` and `ChildProcessSpawner.spawn` paths fail with explicit defect messages
+   - `FileSystem`, `Path`, `Terminal`, and `ChildProcessSpawner` services resolve from `cliRuntimeLayer`
+   - runtime layer is backed by `@effect/platform-node` (no local in-house service implementations)
 
 6. Verify eval/script JSON compatibility on v4 Schema API:
 
@@ -136,7 +136,7 @@ Use this when validating migration parity after Effect beta bumps.
 ## Remaining caveats
 
 - CLI remains on unstable v4 module surface (`effect/unstable/cli`), which is expected and may change across beta releases.
-- CLI runtime layer is intentionally minimal today (for example prompt input / child-process services are shimmed for current command surface), so if CLI features expand to use those primitives directly we should harden that layer.
+- CLI runtime now depends on `@effect/platform-node@4.0.0-beta.5`; keep this aligned with `effect` and `@effect/vitest` on each beta bump.
 
 ## Ongoing guardrail
 

@@ -145,6 +145,9 @@ importers:
 
   packages/cli:
     dependencies:
+      '@effect/platform-node':
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5(effect@4.0.0-beta.5)(ioredis@5.9.3)
       '@semadiff/core':
         specifier: workspace:*
         version: link:../core
@@ -586,6 +589,19 @@ packages:
   '@csstools/css-tokenizer@3.0.4':
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
+
+  '@effect/platform-node-shared@4.0.0-beta.5':
+    resolution: {integrity: sha512-tXgq+qQ/6Zk8MdQ2H4Xu2ui1SZDkkbnuoxMv4MTFgnZwZsALCcgDtP5mtl6t4T0nJncqqvbIsaotFAQXs0TEWA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      effect: ^4.0.0-beta.5
+
+  '@effect/platform-node@4.0.0-beta.5':
+    resolution: {integrity: sha512-quaHbE5sYsNbkvw//cWynWGf1AhnvwTZKVlciv+atyJlA9ISSMzf46SH8Z4f9MhoR97GWBe4vr5Bj6cx696ZIA==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      effect: ^4.0.0-beta.5
+      ioredis: ^5.7.0
 
   '@effect/vitest@4.0.0-beta.5':
     resolution: {integrity: sha512-76rWM0dbvBfuSuyd8sVKoLmSMwayk99CSqmdGftjMHB4o1y4EAtZk8vkvEL0Euq+WUbvDLIPfoLMEGWcXvuRww==}
@@ -1623,6 +1639,9 @@ packages:
   '@types/react@19.2.9':
     resolution: {integrity: sha512-Lpo8kgb/igvMIPeNV2rsYKTgaORYdO1XGVZ4Qz3akwOj0ySGYMPlQWa8BaLn0G63D1aSaAQ5ldR06wCpChQCjA==}
 
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
+
   '@vitejs/plugin-react@4.7.0':
     resolution: {integrity: sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -2395,6 +2414,11 @@ packages:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
     engines: {node: '>=8.6'}
 
+  mime@4.1.0:
+    resolution: {integrity: sha512-X5ju04+cAzsojXKes0B/S4tcYtFAJ6tTMuSPBEn9CPGlrWr8Fiw7qYeLT0XyH80HSoAoqWCaz+MWKh22P7G1cw==}
+    engines: {node: '>=16'}
+    hasBin: true
+
   minimatch@10.1.1:
     resolution: {integrity: sha512-enIvLvRAFZYXJzkCYG5RKmPfrFArdLv+R+lbQ53BmIMLIry74bjKzX6iHAm8WYamJkhSSEabrWN5D97XnKObjQ==}
     engines: {node: 20 || >=22}
@@ -3042,6 +3066,10 @@ packages:
     resolution: {integrity: sha512-y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==}
     engines: {node: '>=20.18.1'}
 
+  undici@7.22.0:
+    resolution: {integrity: sha512-RqslV2Us5BrllB+JeiZnK4peryVTndy9Dnqq62S3yYRRTj0tFQCwEniUy2167skdGOy3vqRzEvl1Dm4sV2ReDg==}
+    engines: {node: '>=20.18.1'}
+
   unenv@2.0.0-rc.24:
     resolution: {integrity: sha512-i7qRCmY42zmCwnYlh9H2SvLEypEFGye5iRmEMKjcGi7zk9UquigRjFtTLz0TYqr0ZGLZhaMHl/foy1bZR+Cwlw==}
 
@@ -3579,6 +3607,26 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
+  '@effect/platform-node-shared@4.0.0-beta.5(effect@4.0.0-beta.5)':
+    dependencies:
+      '@types/ws': 8.18.1
+      effect: 4.0.0-beta.5
+      ws: 8.19.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
+  '@effect/platform-node@4.0.0-beta.5(effect@4.0.0-beta.5)(ioredis@5.9.3)':
+    dependencies:
+      '@effect/platform-node-shared': 4.0.0-beta.5(effect@4.0.0-beta.5)
+      effect: 4.0.0-beta.5
+      ioredis: 5.9.3
+      mime: 4.1.0
+      undici: 7.22.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@effect/vitest@4.0.0-beta.5(effect@4.0.0-beta.5)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       effect: 4.0.0-beta.5
@@ -3749,8 +3797,7 @@ snapshots:
 
   '@exodus/bytes@1.9.0': {}
 
-  '@ioredis/commands@1.5.0':
-    optional: true
+  '@ioredis/commands@1.5.0': {}
 
   '@isaacs/balanced-match@4.0.1': {}
 
@@ -4460,6 +4507,10 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
+  '@types/ws@8.18.1':
+    dependencies:
+      '@types/node': 22.19.7
+
   '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@22.19.7)(lightningcss@1.31.0))':
     dependencies:
       '@babel/core': 7.28.6
@@ -4701,8 +4752,7 @@ snapshots:
 
   clsx@2.1.1: {}
 
-  cluster-key-slot@1.1.2:
-    optional: true
+  cluster-key-slot@1.1.2: {}
 
   color-convert@2.0.1:
     dependencies:
@@ -4773,8 +4823,7 @@ snapshots:
 
   deepmerge@4.3.1: {}
 
-  denque@2.1.0:
-    optional: true
+  denque@2.1.0: {}
 
   dequal@2.0.3: {}
 
@@ -5053,7 +5102,6 @@ snapshots:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
-    optional: true
 
   is-binary-path@2.1.0:
     dependencies:
@@ -5215,11 +5263,9 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lodash.defaults@4.2.0:
-    optional: true
+  lodash.defaults@4.2.0: {}
 
-  lodash.isarguments@3.1.0:
-    optional: true
+  lodash.isarguments@3.1.0: {}
 
   loose-envify@1.4.0:
     dependencies:
@@ -5263,6 +5309,8 @@ snapshots:
     dependencies:
       braces: 3.0.3
       picomatch: 2.3.1
+
+  mime@4.1.0: {}
 
   minimatch@10.1.1:
     dependencies:
@@ -5530,13 +5578,11 @@ snapshots:
       tiny-invariant: 1.3.3
       tslib: 2.8.1
 
-  redis-errors@1.2.0:
-    optional: true
+  redis-errors@1.2.0: {}
 
   redis-parser@3.0.0:
     dependencies:
       redis-errors: 1.2.0
-    optional: true
 
   require-from-string@2.0.2: {}
 
@@ -5666,8 +5712,7 @@ snapshots:
 
   stackback@0.0.2: {}
 
-  standard-as-callback@2.1.0:
-    optional: true
+  standard-as-callback@2.1.0: {}
 
   std-env@3.10.0: {}
 
@@ -5898,6 +5943,8 @@ snapshots:
   undici-types@6.21.0: {}
 
   undici@7.18.2: {}
+
+  undici@7.22.0: {}
 
   unenv@2.0.0-rc.24:
     dependencies:

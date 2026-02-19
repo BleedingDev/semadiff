@@ -76,7 +76,6 @@ const DEPENDENCY_NAMES = [
 const DISALLOWED_EFFECT_PACKAGES = new Set([
   "@effect/cli",
   "@effect/platform",
-  "@effect/platform-node",
   "@effect/language-service",
 ]);
 

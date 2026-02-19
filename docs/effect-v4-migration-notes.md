@@ -3,7 +3,7 @@
 ## Current Status
 
 - Branch: `chore/effect-v4-readiness`
-- Workspace migrated to `effect@4.0.0-beta.4`
+- Workspace migrated to `effect@4.0.0-beta.5`
 - Readiness check now reports `Ready now: yes` (`pnpm effect:v4:readiness -- --strict` passes)
 - Validation status: `lint`, `format:check`, `typecheck`, `build`, `test`, `test:app`, and coverage pipeline are passing
 - Removed optional `@effect/language-service` plugin/patch from workspace tooling to keep migration surface focused on Effect v4 runtime packages.
@@ -18,18 +18,16 @@
 
 ### Platform Runtime
 
-- Runtime/services are provided by a local Effect layer in `packages/cli/src/runtime-layer.ts`.
-- The layer composes `Path.layer`, `FileSystem.layerNoop({})`, and local `Terminal` / `ChildProcessSpawner` service implementations.
-- No `@effect/platform-*` runtime dependencies remain in workspace manifests.
+- Runtime/services are provided through official Node platform services via `@effect/platform-node` (`NodeServices.layer`) in `packages/cli/src/runtime-layer.ts`.
+- Required unstable CLI runtime services (`Path`, `FileSystem`, `Terminal`, `ChildProcessSpawner`) are now sourced from upstream platform-node wiring instead of local in-house shims.
 - Packed CLI e2e (`e2e/cli-pack.spec.ts`) validates both host executions.
 - Direct CLI parity e2e (`e2e/cli-v4-parity.spec.ts`) covers `doctor`, `explain`, `bench`, and `difftool`.
-- Runtime shim behavior is explicitly tested in `packages/cli/test/runtime-layer.spec.ts`.
-- This is still not collapsed into the main `effect` package export surface.
+- Runtime layer wiring is explicitly tested in `packages/cli/test/runtime-layer.spec.ts`.
 
 ### Vitest Integration
 
 - `vitest` itself remains a separate dependency.
-- `@effect/vitest@4.0.0-beta.4` is now used for Effect-native test execution (`it.effect`).
+- `@effect/vitest@4.0.0-beta.5` is now used for Effect-native test execution (`it.effect`).
 - We now have explicit harness coverage in `packages/core/test/effect-testing-harness.spec.ts` for:
   - `ServiceMap.Service` layer provisioning
   - `TestClock` scheduling
@@ -56,10 +54,11 @@ Run these checks when upgrading any Effect beta:
 ## Peer/Version constraints guidance
 
 - Publishable library packages now expose Effect as a peer:
-  - `peerDependencies.effect: ">=4.0.0-beta.4 <5"`
+  - `peerDependencies.effect: ">=4.0.0-beta.5 <5"`
 - Runtime entrypoints still keep direct `effect` dependencies:
   - CLI package
   - App packages
+- CLI runtime entrypoint now also keeps direct `@effect/platform-node` dependency for official Node services.
 - Keep these runtime dependencies aligned per beta update:
   - `effect`
   - `@effect/vitest`
