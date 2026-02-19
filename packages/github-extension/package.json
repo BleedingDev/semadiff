@@ -14,7 +14,7 @@
     "@semadiff/parser-tree-sitter-wasm": "workspace:*",
     "@semadiff/parsers": "workspace:*",
     "@semadiff/render-html": "workspace:*",
-    "effect": "4.0.0-beta.4",
+    "effect": "4.0.0-beta.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

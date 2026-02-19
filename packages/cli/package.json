@@ -21,7 +21,7 @@
     "@semadiff/parsers": "workspace:*",
     "@semadiff/pr-backend": "workspace:*",
     "@semadiff/render-terminal": "workspace:*",
-    "effect": "4.0.0-beta.4"
+    "effect": "4.0.0-beta.5"
   },
   "devDependencies": {
     "@types/node": "^20.14.15"

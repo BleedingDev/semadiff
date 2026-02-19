@@ -19,8 +19,8 @@ importers:
         specifier: ^2.3.11
         version: 2.3.11
       '@effect/vitest':
-        specifier: 4.0.0-beta.4
-        version: 4.0.0-beta.4(effect@4.0.0-beta.4)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5(effect@4.0.0-beta.5)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       '@playwright/test':
         specifier: ^1.48.0
         version: 1.57.0
@@ -31,8 +31,8 @@ importers:
         specifier: ^3.2.4
         version: 3.2.4(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       effect:
-        specifier: 4.0.0-beta.4
-        version: 4.0.0-beta.4
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5
       tree-sitter-cli:
         specifier: ^0.26.3
         version: 0.26.3
@@ -41,7 +41,7 @@ importers:
         version: 5.9.3
       ultracite:
         specifier: ^7.0.12
-        version: 7.0.12(effect@4.0.0-beta.4)(typescript@5.9.3)
+        version: 7.0.12(effect@4.0.0-beta.5)(typescript@5.9.3)
       vitest:
         specifier: ^3.2.4
         version: 3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)
@@ -83,19 +83,19 @@ importers:
         version: 1.154.7(@tanstack/query-core@5.90.19)(@tanstack/react-query@5.90.19(react@19.2.3))(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@tanstack/router-core@1.154.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tanstack/react-start':
         specifier: ^1.132.0
-        version: 1.154.7(crossws@0.4.4(srvx@0.11.6))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
+        version: 1.154.7(crossws@0.4.4(srvx@0.11.7))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       '@tanstack/router-plugin':
         specifier: ^1.132.0
         version: 1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       effect:
-        specifier: 4.0.0-beta.4
-        version: 4.0.0-beta.4
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5
       lucide-react:
         specifier: ^0.561.0
         version: 0.561.0(react@19.2.3)
       nitro:
         specifier: npm:nitro-nightly@latest
-        version: nitro-nightly@3.0.1-20260218-103033-254ff340(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
+        version: nitro-nightly@3.0.1-20260219-081345-4df7aab2(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       react:
         specifier: ^19.2.0
         version: 19.2.3
@@ -167,8 +167,8 @@ importers:
         specifier: workspace:*
         version: link:../render-terminal
       effect:
-        specifier: 4.0.0-beta.4
-        version: 4.0.0-beta.4
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5
     devDependencies:
       '@types/node':
         specifier: ^20.14.15
@@ -177,8 +177,8 @@ importers:
   packages/core:
     dependencies:
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
 
   packages/github-extension:
     dependencies:
@@ -195,8 +195,8 @@ importers:
         specifier: workspace:*
         version: link:../render-html
       effect:
-        specifier: 4.0.0-beta.4
-        version: 4.0.0-beta.4
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -232,8 +232,8 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
       lightningcss:
         specifier: ^1.25.1
         version: 1.31.0
@@ -247,8 +247,8 @@ importers:
         specifier: ^1.7.36
         version: 1.15.10
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
 
   packages/parser-tree-sitter-node:
     dependencies:
@@ -256,8 +256,8 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
       tree-sitter:
         specifier: ^0.25.0
         version: 0.25.0
@@ -289,8 +289,8 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
       web-tree-sitter:
         specifier: ^0.26.3
         version: 0.26.3
@@ -320,8 +320,8 @@ importers:
   packages/parsers:
     dependencies:
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
 
   packages/pr-backend:
     dependencies:
@@ -344,8 +344,8 @@ importers:
         specifier: workspace:*
         version: link:../render-html
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
 
   packages/render-html:
     dependencies:
@@ -353,8 +353,8 @@ importers:
         specifier: workspace:*
         version: link:../core
       effect:
-        specifier: '>=4.0.0-beta.4 <5'
-        version: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
 
   packages/render-terminal:
     dependencies:
@@ -587,10 +587,10 @@ packages:
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
 
-  '@effect/vitest@4.0.0-beta.4':
-    resolution: {integrity: sha512-0iZtR1vN0zeQSUAhUOMnC2JOO4xOAA8rItf/ufQrO7LSw9iZX1c1oSK+iQLbtp/yP3DDLKVaPvqqwhYnDfuwzw==}
+  '@effect/vitest@4.0.0-beta.5':
+    resolution: {integrity: sha512-76rWM0dbvBfuSuyd8sVKoLmSMwayk99CSqmdGftjMHB4o1y4EAtZk8vkvEL0Euq+WUbvDLIPfoLMEGWcXvuRww==}
     peerDependencies:
-      effect: ^4.0.0-beta.4
+      effect: ^4.0.0-beta.5
       vitest: ^3.0.0
 
   '@emnapi/core@1.8.1':
@@ -1965,8 +1965,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  effect@4.0.0-beta.4:
-    resolution: {integrity: sha512-oS7yB+gWK1JQDD15JlWh+rF9lfV04TDCN+ui2YOShMjyFPIWsuStaUYWGRmqjheP128NDr3mvMtU9+leEksqhw==}
+  effect@4.0.0-beta.5:
+    resolution: {integrity: sha512-M78LYkzjnfUgYvdNF/CoLF9gK74zEORHd0pSoSa/p2BQNJhe7fuOyksddBaZULfJeajzTEOKyRfymsBdaxKA7w==}
 
   electron-to-chromium@1.5.267:
     resolution: {integrity: sha512-0Drusm6MVRXSOJpGbaSVgcQsuB4hEkMpHXaVstcPmhu5LIedxs1xNK/nIxmQIU/RPC0+1/o0AVZfBTkTNJOdUw==}
@@ -2434,8 +2434,8 @@ packages:
   nf3@0.3.10:
     resolution: {integrity: sha512-UlqmHkZiHGgSkRj17yrOXEsSu5ECvtlJ3Xm1W5WsWrTKgu9m7OjrMZh9H/ME2LcWrTlMD0/vmmNVpyBG4yRdGg==}
 
-  nitro-nightly@3.0.1-20260218-103033-254ff340:
-    resolution: {integrity: sha512-YULyFJjFHaJLDmbOYY4AWHT9yx0MVxFFHHac1Va3FV1yprX9OGvjkHpQpgkJBbpn72lcVSUAc4UPymL9QxzB4Q==}
+  nitro-nightly@3.0.1-20260219-081345-4df7aab2:
+    resolution: {integrity: sha512-H32F+NLO4/SNrkLcE6Xe1fJElF6UuMynL7Mi6uUynOb2v52ee5KpZ8WEuOqm+DvHzmafFUrrVag+01Ti15j/hA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -2796,8 +2796,8 @@ packages:
     engines: {node: '>=20.16.0'}
     hasBin: true
 
-  srvx@0.11.6:
-    resolution: {integrity: sha512-qbICRHIiLMBq5vlWrl+x7rlM75IIXwd54QWMjHSOP7/VaSMYVpX6KnwTrcU7rFC1y74WWGua0lsCCNNZ7eQNYw==}
+  srvx@0.11.7:
+    resolution: {integrity: sha512-p9qj9wkv/MqG1VoJpOsqXv1QcaVcYRk7ifsC6i3TEwDXFyugdhJN4J3KzQPZq2IJJ2ZCt7ASOB++85pEK38jRw==}
     engines: {node: '>=20.16.0'}
     hasBin: true
 
@@ -3579,9 +3579,9 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
-  '@effect/vitest@4.0.0-beta.4(effect@4.0.0-beta.4)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
+  '@effect/vitest@4.0.0-beta.5(effect@4.0.0-beta.5)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
-      effect: 4.0.0-beta.4
+      effect: 4.0.0-beta.5
       vitest: 3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@emnapi/core@1.8.1':
@@ -4189,27 +4189,27 @@ snapshots:
       tiny-invariant: 1.3.3
       tiny-warning: 1.0.3
 
-  '@tanstack/react-start-server@1.154.7(crossws@0.4.4(srvx@0.11.6))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@tanstack/react-start-server@1.154.7(crossws@0.4.4(srvx@0.11.7))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@tanstack/history': 1.154.7
       '@tanstack/react-router': 1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tanstack/router-core': 1.154.7
       '@tanstack/start-client-core': 1.154.7
-      '@tanstack/start-server-core': 1.154.7(crossws@0.4.4(srvx@0.11.6))
+      '@tanstack/start-server-core': 1.154.7(crossws@0.4.4(srvx@0.11.7))
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
     transitivePeerDependencies:
       - crossws
 
-  '@tanstack/react-start@1.154.7(crossws@0.4.4(srvx@0.11.6))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
+  '@tanstack/react-start@1.154.7(crossws@0.4.4(srvx@0.11.7))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@tanstack/react-router': 1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tanstack/react-start-client': 1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      '@tanstack/react-start-server': 1.154.7(crossws@0.4.4(srvx@0.11.6))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@tanstack/react-start-server': 1.154.7(crossws@0.4.4(srvx@0.11.7))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tanstack/router-utils': 1.154.7
       '@tanstack/start-client-core': 1.154.7
-      '@tanstack/start-plugin-core': 1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(crossws@0.4.4(srvx@0.11.6))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
-      '@tanstack/start-server-core': 1.154.7(crossws@0.4.4(srvx@0.11.6))
+      '@tanstack/start-plugin-core': 1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(crossws@0.4.4(srvx@0.11.7))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
+      '@tanstack/start-server-core': 1.154.7(crossws@0.4.4(srvx@0.11.7))
       pathe: 2.0.3
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
@@ -4310,7 +4310,7 @@ snapshots:
 
   '@tanstack/start-fn-stubs@1.154.7': {}
 
-  '@tanstack/start-plugin-core@1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(crossws@0.4.4(srvx@0.11.6))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
+  '@tanstack/start-plugin-core@1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(crossws@0.4.4(srvx@0.11.7))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@babel/code-frame': 7.27.1
       '@babel/core': 7.28.6
@@ -4321,7 +4321,7 @@ snapshots:
       '@tanstack/router-plugin': 1.154.7(@tanstack/react-router@1.154.7(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       '@tanstack/router-utils': 1.154.7
       '@tanstack/start-client-core': 1.154.7
-      '@tanstack/start-server-core': 1.154.7(crossws@0.4.4(srvx@0.11.6))
+      '@tanstack/start-server-core': 1.154.7(crossws@0.4.4(srvx@0.11.7))
       babel-dead-code-elimination: 1.0.12
       cheerio: 1.1.2
       exsolve: 1.0.8
@@ -4341,13 +4341,13 @@ snapshots:
       - vite-plugin-solid
       - webpack
 
-  '@tanstack/start-server-core@1.154.7(crossws@0.4.4(srvx@0.11.6))':
+  '@tanstack/start-server-core@1.154.7(crossws@0.4.4(srvx@0.11.7))':
     dependencies:
       '@tanstack/history': 1.154.7
       '@tanstack/router-core': 1.154.7
       '@tanstack/start-client-core': 1.154.7
       '@tanstack/start-storage-context': 1.154.7
-      h3-v2: h3@2.0.1-rc.11(crossws@0.4.4(srvx@0.11.6))
+      h3-v2: h3@2.0.1-rc.11(crossws@0.4.4(srvx@0.11.7))
       seroval: 1.4.2
       tiny-invariant: 1.3.3
     transitivePeerDependencies:
@@ -4726,9 +4726,9 @@ snapshots:
       shebang-command: 2.0.0
       which: 2.0.2
 
-  crossws@0.4.4(srvx@0.11.6):
+  crossws@0.4.4(srvx@0.11.7):
     optionalDependencies:
-      srvx: 0.11.6
+      srvx: 0.11.7
 
   css-select@5.2.2:
     dependencies:
@@ -4808,7 +4808,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  effect@4.0.0-beta.4:
+  effect@4.0.0-beta.5:
     dependencies:
       '@standard-schema/spec': 1.1.0
       fast-check: 4.5.3
@@ -4983,19 +4983,19 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  h3@2.0.1-rc.11(crossws@0.4.4(srvx@0.11.6)):
+  h3@2.0.1-rc.11(crossws@0.4.4(srvx@0.11.7)):
     dependencies:
       rou3: 0.7.12
       srvx: 0.10.1
     optionalDependencies:
-      crossws: 0.4.4(srvx@0.11.6)
+      crossws: 0.4.4(srvx@0.11.7)
 
-  h3@2.0.1-rc.14(crossws@0.4.4(srvx@0.11.6)):
+  h3@2.0.1-rc.14(crossws@0.4.4(srvx@0.11.7)):
     dependencies:
       rou3: 0.7.12
-      srvx: 0.11.6
+      srvx: 0.11.7
     optionalDependencies:
-      crossws: 0.4.4(srvx@0.11.6)
+      crossws: 0.4.4(srvx@0.11.7)
 
   has-flag@4.0.0: {}
 
@@ -5306,18 +5306,18 @@ snapshots:
 
   nf3@0.3.10: {}
 
-  nitro-nightly@3.0.1-20260218-103033-254ff340(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)):
+  nitro-nightly@3.0.1-20260219-081345-4df7aab2(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       consola: 3.4.2
-      crossws: 0.4.4(srvx@0.11.6)
+      crossws: 0.4.4(srvx@0.11.7)
       db0: 0.3.4
-      h3: 2.0.1-rc.14(crossws@0.4.4(srvx@0.11.6))
+      h3: 2.0.1-rc.14(crossws@0.4.4(srvx@0.11.7))
       hookable: 6.0.1
       nf3: 0.3.10
       ofetch: 2.0.0-alpha.3
       ohash: 2.0.11
       rolldown: 1.0.0-rc.5
-      srvx: 0.11.6
+      srvx: 0.11.7
       unenv: 2.0.0-rc.24
       unstorage: 2.0.0-alpha.5(db0@0.3.4)(ioredis@5.9.3)(lru-cache@11.2.4)(ofetch@2.0.0-alpha.3)
     optionalDependencies:
@@ -5662,7 +5662,7 @@ snapshots:
 
   srvx@0.10.1: {}
 
-  srvx@0.11.6: {}
+  srvx@0.11.7: {}
 
   stackback@0.0.2: {}
 
@@ -5851,12 +5851,12 @@ snapshots:
       node-addon-api: 8.5.0
       node-gyp-build: 4.8.4
 
-  trpc-cli@0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.4)(zod@4.3.5):
+  trpc-cli@0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.5)(zod@4.3.5):
     dependencies:
       commander: 14.0.2
     optionalDependencies:
       '@trpc/server': 11.8.1(typescript@5.9.3)
-      effect: 4.0.0-beta.4
+      effect: 4.0.0-beta.5
       zod: 4.3.5
 
   ts-interface-checker@0.1.13: {}
@@ -5878,7 +5878,7 @@ snapshots:
 
   ufo@1.6.3: {}
 
-  ultracite@7.0.12(effect@4.0.0-beta.4)(typescript@5.9.3):
+  ultracite@7.0.12(effect@4.0.0-beta.5)(typescript@5.9.3):
     dependencies:
       '@clack/prompts': 0.11.0
       '@trpc/server': 11.8.1(typescript@5.9.3)
@@ -5886,7 +5886,7 @@ snapshots:
       glob: 13.0.0
       jsonc-parser: 3.3.1
       nypm: 0.6.4
-      trpc-cli: 0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.4)(zod@4.3.5)
+      trpc-cli: 0.12.2(@trpc/server@11.8.1(typescript@5.9.3))(effect@4.0.0-beta.5)(zod@4.3.5)
       zod: 4.3.5
     transitivePeerDependencies:
       - '@orpc/server'
