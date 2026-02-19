@@ -27,23 +27,10 @@ import {
   renderTerminal,
   renderTerminalLinesFromHtml,
 } from "@semadiff/render-terminal";
-import {
-  Cause,
-  Console,
-  Effect,
-  Exit,
-  FileSystem,
-  Layer,
-  Path,
-  Schema,
-  Terminal,
-} from "effect";
+import { Cause, Console, Effect, Exit, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
-import {
-  ChildProcessSpawner,
-  type ChildProcessSpawner as ChildProcessSpawnerService,
-} from "effect/unstable/process/ChildProcessSpawner";
 import { resolveConfig } from "./config/resolve.js";
+import { cliRuntimeLayer } from "./runtime-layer.js";
 
 const Args = {
   text: ({ name }: { name: string }) => Argument.string(name),
@@ -1158,35 +1145,6 @@ function normalizeArgv(argv: string[]) {
 const cli = Command.runWith(app, {
   version: "0.1.0",
 });
-
-const terminalLayer = Layer.succeed(
-  Terminal.Terminal,
-  Terminal.make({
-    columns: Effect.sync(() => process.stdout.columns ?? 80),
-    display: (text) =>
-      Effect.sync(() => {
-        process.stdout.write(text);
-      }),
-    readLine: Effect.fail(new Terminal.QuitError({})),
-    readInput: Effect.die(
-      "Terminal.readInput is not supported in semadiff CLI runtime"
-    ),
-  })
-);
-
-const childProcessSpawner: ChildProcessSpawnerService = {
-  spawn: () =>
-    Effect.die(
-      "ChildProcessSpawner.spawn is not supported in semadiff CLI runtime"
-    ),
-};
-
-const cliRuntimeLayer = Layer.mergeAll(
-  Path.layer,
-  FileSystem.layerNoop({}),
-  terminalLayer,
-  Layer.succeed(ChildProcessSpawner, childProcessSpawner)
-);
 
 const runMain = async () => {
   const argv = normalizeArgv(process.argv).slice(2);
