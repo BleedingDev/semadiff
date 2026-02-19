@@ -297,15 +297,19 @@ importers:
       '@semadiff/parsers':
         specifier: workspace:*
         version: link:../parsers
+      effect:
+        specifier: ^4.0.0-beta.0
+        version: 4.0.0-beta.0
+      web-tree-sitter:
+        specifier: ^0.26.3
+        version: 0.26.3
+    devDependencies:
       '@tree-sitter-grammars/tree-sitter-markdown':
         specifier: ^0.3.2
         version: 0.3.2
       '@tree-sitter-grammars/tree-sitter-yaml':
         specifier: ^0.7.1
         version: 0.7.1
-      effect:
-        specifier: ^4.0.0-beta.0
-        version: 4.0.0-beta.0
       tree-sitter-css:
         specifier: ^0.25.0
         version: 0.25.0(tree-sitter@0.25.0)
@@ -321,9 +325,6 @@ importers:
       tree-sitter-typescript:
         specifier: ^0.23.2
         version: 0.23.2(tree-sitter@0.25.0)
-      web-tree-sitter:
-        specifier: ^0.26.3
-        version: 0.26.3
 
   packages/parsers:
     dependencies:
