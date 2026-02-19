@@ -149,6 +149,55 @@ console.log(JSON.stringify({
   expect(parsed.semanticKinds).toEqual(parsed.rawKinds);
 });
 
+test("unified line view highlights only changed token for delete/insert pairs", () => {
+  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+
+  const output = runBunEval(
+    `import { renderHtml } from '${renderHtmlUrl}';
+const diff = {
+  version: '0.1.0',
+  operations: [
+    {
+      id: 'op-update',
+      type: 'update',
+      oldRange: { start: { line: 3, column: 1 }, end: { line: 3, column: 40 } },
+      newRange: { start: { line: 3, column: 1 }, end: { line: 3, column: 44 } },
+      oldText: 'import "./.next/types/routes.d.ts"',
+      newText: 'import "./.next/dev/types/routes.d.ts";',
+    },
+  ],
+  moves: [],
+  renames: [],
+};
+const oldText = '/// <reference types="next" />\\n/// <reference types="next/image-types/global" />\\nimport "./.next/types/routes.d.ts"\\n';
+const newText = '/// <reference types="next" />\\n/// <reference types="next/image-types/global" />\\nimport "./.next/dev/types/routes.d.ts";\\n';
+const html = renderHtml(diff, {
+  oldText,
+  newText,
+  language: 'ts',
+  view: 'lines',
+  lineMode: 'semantic',
+  lineLayout: 'unified',
+  contextLines: 6,
+  virtualize: false,
+});
+const hasInlineAdd = html.includes('sd-inline-add');
+const hasWholeLineTint = html.includes('<span class="sd-inline-add">import "./.next/dev/types/routes.d.ts";</span>');
+const hasDevToken = html.includes('dev');
+console.log(JSON.stringify({ hasInlineAdd, hasWholeLineTint, hasDevToken }));`
+  );
+
+  const parsed = decodeJson<{
+    hasInlineAdd: boolean;
+    hasWholeLineTint: boolean;
+    hasDevToken: boolean;
+  }>(output);
+
+  expect(parsed.hasInlineAdd).toBe(true);
+  expect(parsed.hasDevToken).toBe(true);
+  expect(parsed.hasWholeLineTint).toBe(false);
+});
+
 test("semantic line mode suppresses AST-projected formatting rows", () => {
   execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 

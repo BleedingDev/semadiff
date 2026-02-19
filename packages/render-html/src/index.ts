@@ -3272,9 +3272,17 @@ function renderUnifiedRow(row: LineRow) {
   const text = getUnifiedText(row, oldText, newText);
   let textHtml = escapeHtml(text);
   if (row.type === "insert") {
-    textHtml = renderInlineMarkedText(text, "sd-inline-add");
+    if (row.oldText !== undefined && row.newText !== undefined) {
+      textHtml = renderInlineDiff(row.oldText, row.newText).newHtml;
+    } else {
+      textHtml = renderInlineMarkedText(text, "sd-inline-add");
+    }
   } else if (row.type === "delete") {
-    textHtml = renderInlineMarkedText(text, "sd-inline-del");
+    if (row.oldText !== undefined && row.newText !== undefined) {
+      textHtml = renderInlineDiff(row.oldText, row.newText).oldHtml;
+    } else {
+      textHtml = renderInlineMarkedText(text, "sd-inline-del");
+    }
   } else if (row.type === "replace") {
     textHtml = renderInlineDiff(oldText, newText).newHtml;
   }
@@ -3769,13 +3777,33 @@ function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
   if (candidateNoise < preferredNoise) {
     return candidate;
   }
-  if (candidateNoise > preferredNoise) {
-    return preferred;
-  }
-  if (candidate.length < preferred.length) {
-    return candidate;
-  }
   return preferred;
+}
+
+function annotateUnifiedAdjacentPairs(rows: LineRow[]) {
+  if (rows.length <= 1) {
+    return rows;
+  }
+
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (!row) {
+      continue;
+    }
+    const next = rows[index + 1];
+    if (row.type === "delete" && next?.type === "insert") {
+      const oldText = rowOldText(row);
+      const newText = rowNewText(next);
+      output.push({ ...row, oldText, newText });
+      output.push({ ...next, oldText, newText });
+      index += 1;
+      continue;
+    }
+    output.push(row);
+  }
+
+  return output;
 }
 
 function addLineDiscontinuityGaps(rows: LineRow[]) {
@@ -3982,9 +4010,19 @@ function buildLineVirtualScript(
               : row.text ?? row.oldText ?? row.newText ?? ""
             : row.text ?? row.oldText ?? row.newText ?? "";
         if (row.type === "insert") {
-          code.innerHTML = renderInlineMarkedText(text, "sd-inline-add");
+          if (row.oldText !== undefined && row.newText !== undefined) {
+            const inline = renderInlineDiffPair(row.oldText, row.newText);
+            code.innerHTML = inline.newHtml;
+          } else {
+            code.innerHTML = renderInlineMarkedText(text, "sd-inline-add");
+          }
         } else if (row.type === "delete") {
-          code.innerHTML = renderInlineMarkedText(text, "sd-inline-del");
+          if (row.oldText !== undefined && row.newText !== undefined) {
+            const inline = renderInlineDiffPair(row.oldText, row.newText);
+            code.innerHTML = inline.oldHtml;
+          } else {
+            code.innerHTML = renderInlineMarkedText(text, "sd-inline-del");
+          }
         } else if (row.type === "replace") {
           const inline = renderInlineDiffPair(
             row.oldText ?? row.text ?? "",
@@ -4279,7 +4317,11 @@ function renderLineView(
   if (!hasLineChanges(selectedRows)) {
     return "";
   }
-  const rows = addLineDiscontinuityGaps(selectedRows);
+  const rows = addLineDiscontinuityGaps(
+    context.lineLayout === "unified"
+      ? annotateUnifiedAdjacentPairs(selectedRows)
+      : selectedRows
+  );
 
   const summaryHtml = context.summaryHtml;
 
