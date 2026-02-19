@@ -218,6 +218,7 @@ console.log(JSON.stringify({
   withoutTokenRows,
   hasStorefrontInsert,
   hasFallbackWarning: withTokens.includes('Raw line diff is shown'),
+  hasGapRows: withTokens.includes('sd-line--gap'),
 }));`
   );
 
@@ -226,6 +227,7 @@ console.log(JSON.stringify({
     withoutTokenRows: string[];
     hasStorefrontInsert: boolean;
     hasFallbackWarning: boolean;
+    hasGapRows: boolean;
   }>(output);
 
   expect(parsed.withTokenRows).toEqual(["equal", "insert", "equal"]);
@@ -234,4 +236,5 @@ console.log(JSON.stringify({
   );
   expect(parsed.hasStorefrontInsert).toBe(true);
   expect(parsed.hasFallbackWarning).toBe(false);
+  expect(parsed.hasGapRows).toBe(true);
 });

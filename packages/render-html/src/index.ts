@@ -3760,6 +3760,50 @@ function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
   return preferred;
 }
 
+function addLineDiscontinuityGaps(rows: LineRow[]) {
+  if (rows.length === 0) {
+    return rows;
+  }
+
+  const output: LineRow[] = [];
+  let lastOldLine: number | null = null;
+  let lastNewLine: number | null = null;
+
+  for (const row of rows) {
+    if (row.type === "hunk" || row.type === "gap") {
+      output.push(row);
+      lastOldLine = null;
+      lastNewLine = null;
+      continue;
+    }
+
+    const oldGap =
+      row.oldLine != null && lastOldLine != null
+        ? row.oldLine - lastOldLine - 1
+        : 0;
+    const newGap =
+      row.newLine != null && lastNewLine != null
+        ? row.newLine - lastNewLine - 1
+        : 0;
+    const hidden = Math.max(oldGap, newGap, 0);
+
+    if (hidden > 0) {
+      output.push({ type: "gap", hidden });
+    }
+
+    output.push(row);
+
+    if (row.oldLine != null) {
+      lastOldLine = row.oldLine;
+    }
+    if (row.newLine != null) {
+      lastNewLine = row.newLine;
+    }
+  }
+
+  return output;
+}
+
 function buildLineVirtualScript(
   batchSize: number,
   lineLayout: "split" | "unified"
@@ -4207,16 +4251,17 @@ function renderLineView(
     }
     return hideComments ? applyHideComments(modeRows) : modeRows;
   };
-  const rows =
+  const selectedRows =
     context.lineMode === "raw"
       ? buildRowsForMode("raw")
       : chooseLowerNoiseRows(
           buildRowsForMode("semantic"),
           buildRowsForMode("raw")
         );
-  if (!hasLineChanges(rows)) {
+  if (!hasLineChanges(selectedRows)) {
     return "";
   }
+  const rows = addLineDiscontinuityGaps(selectedRows);
 
   const summaryHtml = context.summaryHtml;
 
