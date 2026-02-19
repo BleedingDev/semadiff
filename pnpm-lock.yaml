@@ -18,6 +18,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.11
         version: 2.3.11
+      '@effect/vitest':
+        specifier: 4.0.0-beta.4
+        version: 4.0.0-beta.4(effect@4.0.0-beta.4)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       '@playwright/test':
         specifier: ^1.48.0
         version: 1.57.0
@@ -583,6 +586,12 @@ packages:
   '@csstools/css-tokenizer@3.0.4':
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
+
+  '@effect/vitest@4.0.0-beta.4':
+    resolution: {integrity: sha512-0iZtR1vN0zeQSUAhUOMnC2JOO4xOAA8rItf/ufQrO7LSw9iZX1c1oSK+iQLbtp/yP3DDLKVaPvqqwhYnDfuwzw==}
+    peerDependencies:
+      effect: ^4.0.0-beta.4
+      vitest: ^3.0.0
 
   '@emnapi/core@1.8.1':
     resolution: {integrity: sha512-AvT9QFpxK0Zd8J0jopedNm+w/2fIzvtPKPjqyw9jwvBaReTTqPBk9Hixaz7KbjimP+QNz605/XnjFcDAL2pqBg==}
@@ -3569,6 +3578,11 @@ snapshots:
   '@csstools/css-syntax-patches-for-csstree@1.0.25': {}
 
   '@csstools/css-tokenizer@3.0.4': {}
+
+  '@effect/vitest@4.0.0-beta.4(effect@4.0.0-beta.4)(vitest@3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))':
+    dependencies:
+      effect: 4.0.0-beta.4
+      vitest: 3.2.4(@types/node@20.19.30)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@emnapi/core@1.8.1':
     dependencies:
