@@ -3482,7 +3482,7 @@ function buildRenderContext(
     options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
   const contextLines = options.contextLines ?? 3;
   const lineLayout = options.lineLayout ?? "split";
-  const lineMode = options.lineMode ?? "raw";
+  const lineMode = options.lineMode ?? "semantic";
 
   const canRenderLines =
     options.oldText !== undefined && options.newText !== undefined;

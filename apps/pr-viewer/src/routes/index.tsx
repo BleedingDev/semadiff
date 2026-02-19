@@ -871,8 +871,8 @@ function App() {
     runId: 0,
   });
   const [view, setView] = useState<"semantic" | "lines">("lines");
-  const [lineLayout, setLineLayout] = useState<"split" | "unified">("unified");
-  const [lineMode, setLineMode] = useState<"semantic" | "raw">("raw");
+  const [lineLayout, setLineLayout] = useState<"split" | "unified">("split");
+  const [lineMode, setLineMode] = useState<"semantic" | "raw">("semantic");
   const [showAdvancedControls, setShowAdvancedControls] = useState(false);
   const [hideComments, setHideComments] = useState(false);
   const [lineContextLines, setLineContextLines] = useState(6);
