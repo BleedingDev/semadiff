@@ -8,6 +8,11 @@ import {
 } from "@semadiff/core";
 import { Schema } from "effect";
 
+interface SemanticTokenRange {
+  startIndex: number;
+  endIndex: number;
+}
+
 export interface HtmlRenderOptions {
   maxOperations?: number;
   batchSize?: number;
@@ -26,6 +31,10 @@ export interface HtmlRenderOptions {
   showSummary?: boolean;
   showFilePath?: boolean;
   layout?: "full" | "embed";
+  semanticTokens?: {
+    old?: readonly SemanticTokenRange[];
+    new?: readonly SemanticTokenRange[];
+  };
 }
 
 const baseStyles = `
@@ -475,6 +484,7 @@ body.sd-embed .sd-lines {
 
 const LINE_SPLIT_RE = /\r?\n/;
 const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
+const SEMANTIC_TOKEN_CONTENT_RE = /[A-Za-z0-9_$"']/;
 
 interface LineEdit {
   type: "equal" | "insert" | "delete";
@@ -677,28 +687,6 @@ function renderSummary(diff: DiffDocument) {
   `;
 }
 
-function renderSemanticFallbackWarning() {
-  return `
-    <section class="sd-warning" role="alert">
-      <div class="sd-warning-title">Semantic line view hid edits</div>
-      <div class="sd-warning-body">
-        Raw line diff is shown to avoid hiding edits. This file needs a stronger semantic normalizer.
-      </div>
-    </section>
-  `;
-}
-
-function renderSemanticNoiseWarning() {
-  return `
-    <section class="sd-warning" role="alert">
-      <div class="sd-warning-title">Semantic line view was noisier</div>
-      <div class="sd-warning-body">
-        Raw line diff is shown because it has fewer edits. This keeps the diff minimal while we improve semantic rules.
-      </div>
-    </section>
-  `;
-}
-
 function renderSide(
   title: string,
   text: string,
@@ -782,6 +770,131 @@ function splitLines(text: string) {
     lines.pop();
   }
   return lines;
+}
+
+function clampTokenIndex(value: number, max: number) {
+  if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(max, Math.floor(value)));
+}
+
+function buildLineStartOffsets(text: string) {
+  const starts = [0];
+  for (let index = 0; index < text.length; index += 1) {
+    if (text.charCodeAt(index) === 10) {
+      const next = index + 1;
+      if (next < text.length) {
+        starts.push(next);
+      }
+    }
+  }
+  return starts;
+}
+
+function findLineForOffset(offset: number, lineStarts: number[]) {
+  let low = 0;
+  let high = lineStarts.length - 1;
+  let best = 0;
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const start = lineStarts[mid] ?? 0;
+    if (start <= offset) {
+      best = mid;
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return best + 1;
+}
+
+function buildLineTokenMap(
+  text: string,
+  tokens: readonly SemanticTokenRange[] | undefined,
+  language?: NormalizerLanguage
+) {
+  const byLine = new Map<number, string[]>();
+  if (!tokens || tokens.length === 0 || text.length === 0) {
+    return byLine;
+  }
+  const lineStarts = buildLineStartOffsets(text);
+  const maxLine = splitLines(text).length;
+  if (maxLine === 0) {
+    return byLine;
+  }
+
+  for (const token of tokens) {
+    const startIndex = clampTokenIndex(token.startIndex, text.length);
+    const endIndex = Math.max(
+      startIndex,
+      clampTokenIndex(token.endIndex, text.length)
+    );
+    if (endIndex <= startIndex) {
+      continue;
+    }
+    const tokenText = text.slice(startIndex, endIndex);
+    const normalized = normalizeTextForLanguage(
+      tokenText,
+      defaultConfig.normalizers,
+      language
+    ).trim();
+    if (!(normalized && SEMANTIC_TOKEN_CONTENT_RE.test(normalized))) {
+      continue;
+    }
+    const line = findLineForOffset(startIndex, lineStarts);
+    if (line < 1 || line > maxLine) {
+      continue;
+    }
+    const list = byLine.get(line);
+    if (list) {
+      list.push(normalized);
+    } else {
+      byLine.set(line, [normalized]);
+    }
+  }
+
+  return byLine;
+}
+
+function addTokenCounts(target: Map<string, number>, tokens: string[]) {
+  for (const token of tokens) {
+    target.set(token, (target.get(token) ?? 0) + 1);
+  }
+}
+
+function canConsumeTokenCounts(budget: Map<string, number>, tokens: string[]) {
+  if (tokens.length === 0) {
+    return true;
+  }
+  const required = new Map<string, number>();
+  for (const token of tokens) {
+    required.set(token, (required.get(token) ?? 0) + 1);
+  }
+  for (const [token, needed] of required) {
+    if ((budget.get(token) ?? 0) < needed) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function consumeTokenCounts(budget: Map<string, number>, tokens: string[]) {
+  if (tokens.length === 0) {
+    return;
+  }
+  const required = new Map<string, number>();
+  for (const token of tokens) {
+    required.set(token, (required.get(token) ?? 0) + 1);
+  }
+  for (const [token, needed] of required) {
+    const next = (budget.get(token) ?? 0) - needed;
+    if (next > 0) {
+      budget.set(token, next);
+    } else {
+      budget.delete(token);
+    }
+  }
 }
 
 function tokenizeInline(text: string) {
@@ -3421,6 +3534,139 @@ function filterSemanticRows(
   return filtered;
 }
 
+interface PendingTokenProjectionState {
+  pendingDeletes: LineRow[];
+  budget: Map<string, number>;
+  consumedFromPending: boolean;
+}
+
+function createPendingTokenProjectionState(): PendingTokenProjectionState {
+  return {
+    pendingDeletes: [],
+    budget: new Map<string, number>(),
+    consumedFromPending: false,
+  };
+}
+
+function resetPendingTokenProjectionState(state: PendingTokenProjectionState) {
+  state.pendingDeletes = [];
+  state.budget = new Map<string, number>();
+  state.consumedFromPending = false;
+}
+
+function flushPendingTokenProjectionRows(
+  state: PendingTokenProjectionState,
+  output: LineRow[]
+) {
+  if (state.pendingDeletes.length === 0) {
+    return;
+  }
+  if (!state.consumedFromPending) {
+    output.push(...state.pendingDeletes);
+  }
+  resetPendingTokenProjectionState(state);
+}
+
+function isAstUnchangedDelete(
+  row: LineRow,
+  marks: ReturnType<typeof buildLineMarkSets>
+) {
+  if (row.oldLine == null) {
+    return false;
+  }
+  return !(
+    marks.changedOld.has(row.oldLine) || marks.movedOld.has(row.oldLine)
+  );
+}
+
+function queuePendingProjectedDelete(
+  row: LineRow,
+  state: PendingTokenProjectionState,
+  oldTokenByLine: Map<number, string[]>
+) {
+  if (row.oldLine == null) {
+    return;
+  }
+  state.pendingDeletes.push(row);
+  addTokenCounts(state.budget, oldTokenByLine.get(row.oldLine) ?? []);
+}
+
+function tryConsumeProjectedInsert(
+  row: LineRow,
+  state: PendingTokenProjectionState,
+  newTokenByLine: Map<number, string[]>
+) {
+  if (row.newLine == null || state.pendingDeletes.length === 0) {
+    return false;
+  }
+  const tokens = newTokenByLine.get(row.newLine) ?? [];
+  if (!canConsumeTokenCounts(state.budget, tokens)) {
+    return false;
+  }
+  consumeTokenCounts(state.budget, tokens);
+  state.consumedFromPending = true;
+  return true;
+}
+
+function filterAstProjectedRows(
+  rows: LineRow[],
+  marks: ReturnType<typeof buildLineMarkSets>,
+  oldTokenByLine: Map<number, string[]>,
+  newTokenByLine: Map<number, string[]>
+) {
+  if (
+    rows.length === 0 ||
+    oldTokenByLine.size === 0 ||
+    newTokenByLine.size === 0
+  ) {
+    return rows;
+  }
+
+  const output: LineRow[] = [];
+  const state = createPendingTokenProjectionState();
+
+  for (const row of rows) {
+    if (row.type === "gap" || row.type === "hunk") {
+      flushPendingTokenProjectionRows(state, output);
+      output.push(row);
+      continue;
+    }
+
+    if (row.type === "delete") {
+      if (isAstUnchangedDelete(row, marks)) {
+        queuePendingProjectedDelete(row, state, oldTokenByLine);
+      } else {
+        flushPendingTokenProjectionRows(state, output);
+        output.push(row);
+      }
+      continue;
+    }
+
+    if (
+      row.type === "insert" &&
+      tryConsumeProjectedInsert(row, state, newTokenByLine)
+    ) {
+      continue;
+    }
+
+    if (row.type === "insert" && state.pendingDeletes.length > 0) {
+      if (state.consumedFromPending) {
+        resetPendingTokenProjectionState(state);
+      } else {
+        flushPendingTokenProjectionRows(state, output);
+      }
+      output.push(row);
+      continue;
+    }
+
+    flushPendingTokenProjectionRows(state, output);
+    output.push(row);
+  }
+
+  flushPendingTokenProjectionRows(state, output);
+  return output;
+}
+
 const LOCKFILE_HEADER_KEYS = new Set(["dependencies:", "peerDependencies:"]);
 
 function filterLockfileRows(rows: LineRow[]) {
@@ -3484,20 +3730,6 @@ function hasLineChanges(rows: LineRow[]) {
       row.type === "replace" ||
       row.type === "move"
   );
-}
-
-function countLineChanges(rows: LineRow[]) {
-  return rows.reduce((count, row) => {
-    if (
-      row.type === "insert" ||
-      row.type === "delete" ||
-      row.type === "replace" ||
-      row.type === "move"
-    ) {
-      return count + 1;
-    }
-    return count;
-  }, 0);
 }
 
 function buildLineVirtualScript(
@@ -3782,13 +4014,10 @@ function renderLineView(
   const isYamlPath =
     options.filePath?.endsWith(".yml") || options.filePath?.endsWith(".yaml");
   const yamlLanguage = options.language === "yaml" || Boolean(isYamlPath);
+  const semanticLanguage = yamlLanguage ? "yaml" : options.language;
   const normalizeLine =
     context.lineMode === "semantic"
-      ? (line: string) =>
-          normalizeLineForSemantic(
-            line,
-            yamlLanguage ? "yaml" : options.language
-          )
+      ? (line: string) => normalizeLineForSemantic(line, semanticLanguage)
       : undefined;
   const oldText = options.oldText ?? "";
   const newText = options.newText ?? "";
@@ -3798,18 +4027,6 @@ function renderLineView(
     (newText.includes("lockfileVersion:") && newText.includes("importers:"));
   const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
   const useYamlComparable = Boolean(normalizeLine && yamlLanguage);
-  const rawRows = buildLineRows(
-    oldText,
-    newText,
-    context.contextLines,
-    context.lineLayout,
-    undefined,
-    diff.operations,
-    false,
-    false,
-    false,
-    false
-  );
   let rows = buildLineRows(
     oldText,
     newText,
@@ -3823,6 +4040,29 @@ function renderLineView(
     context.lineMode === "semantic"
   );
   if (context.lineMode === "semantic" && normalizeLine) {
+    const oldTokenByLine = buildLineTokenMap(
+      oldText,
+      options.semanticTokens?.old,
+      semanticLanguage
+    );
+    const newTokenByLine = buildLineTokenMap(
+      newText,
+      options.semanticTokens?.new,
+      semanticLanguage
+    );
+    if (oldTokenByLine.size > 0 && newTokenByLine.size > 0) {
+      const marks = buildLineMarkSets(
+        diff.operations,
+        splitLines(oldText).length,
+        splitLines(newText).length
+      );
+      rows = filterAstProjectedRows(
+        rows,
+        marks,
+        oldTokenByLine,
+        newTokenByLine
+      );
+    }
     rows = filterSemanticRows(rows, normalizeLine);
   }
   if (useKeyMatching) {
@@ -3834,28 +4074,12 @@ function renderLineView(
       filterCommentRows(stripContextRows(nextRows), options.language),
       context.contextLines
     );
-  const rawForCompare = hideComments ? applyHideComments(rawRows) : rawRows;
-  let rowsForCompare = hideComments ? applyHideComments(rows) : rows;
-  let warningHtml = "";
-  if (context.lineMode === "semantic" && normalizeLine) {
-    const rawCount = countLineChanges(rawForCompare);
-    const semanticCount = countLineChanges(rowsForCompare);
-    if (semanticCount === 0) {
-      warningHtml = renderSemanticFallbackWarning();
-      rowsForCompare = rawForCompare;
-    } else if (rawCount > 0 && rawCount < semanticCount) {
-      warningHtml = renderSemanticNoiseWarning();
-      rowsForCompare = rawForCompare;
-    }
-  }
-  rows = rowsForCompare;
+  rows = hideComments ? applyHideComments(rows) : rows;
   if (!hasLineChanges(rows)) {
     return "";
   }
 
-  const summaryHtml = [context.summaryHtml, warningHtml]
-    .filter(Boolean)
-    .join("\n");
+  const summaryHtml = context.summaryHtml;
 
   if (!context.virtualize) {
     const body = rows

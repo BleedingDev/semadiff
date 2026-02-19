@@ -88,3 +88,90 @@ console.log(JSON.stringify({
   expect(parsed.deleteNewBlank).toBe(true);
   expect(parsed.wrapsCode).toBe(true);
 });
+
+test("semantic line mode suppresses AST-projected formatting rows", () => {
+  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+
+  const output = runBunEval(
+    `import { renderHtml } from '${renderHtmlUrl}';
+const oldText = 'const config =\\n  transpilePackages: ["@new-engine/ui", "@techsio/analytics"],\\n};';
+const newText = 'const config =\\n  transpilePackages: [\\n    "@new-engine/ui",\\n    "@techsio/analytics",\\n    "@techsio/storefront-data",\\n  ],\\n};';
+const diff = {
+  version: '0.1.0',
+  operations: [
+    {
+      id: 'op-insert',
+      type: 'insert',
+      newRange: { start: { line: 2, column: 23 }, end: { line: 6, column: 3 } },
+      newText: '\\n    "@new-engine/ui",\\n    "@techsio/analytics",\\n    "@techsio/storefront-data",\\n  ',
+    },
+  ],
+  moves: [],
+  renames: [],
+};
+const rangeFor = (text, fragment, from = 0) => {
+  const index = text.indexOf(fragment, from);
+  if (index === -1) {
+    throw new Error('Missing fragment: ' + fragment);
+  }
+  return { startIndex: index, endIndex: index + fragment.length };
+};
+const oldTokens = [
+  rangeFor(oldText, 'transpilePackages'),
+  rangeFor(oldText, '"@new-engine/ui"'),
+  rangeFor(oldText, '"@techsio/analytics"'),
+];
+const newTokens = [
+  rangeFor(newText, 'transpilePackages'),
+  rangeFor(newText, '"@new-engine/ui"'),
+  rangeFor(newText, '"@techsio/analytics"'),
+  rangeFor(newText, '"@techsio/storefront-data"'),
+];
+const rowKinds = (html) =>
+  [...html.matchAll(/<div class="sd-line sd-line--(equal|insert|delete|replace|move)/g)].map((match) => match[1]);
+const withTokens = renderHtml(diff, {
+  oldText,
+  newText,
+  language: 'ts',
+  view: 'lines',
+  lineMode: 'semantic',
+  lineLayout: 'unified',
+  contextLines: 6,
+  virtualize: false,
+  semanticTokens: { old: oldTokens, new: newTokens },
+});
+const withoutTokens = renderHtml(diff, {
+  oldText,
+  newText,
+  language: 'ts',
+  view: 'lines',
+  lineMode: 'semantic',
+  lineLayout: 'unified',
+  contextLines: 6,
+  virtualize: false,
+});
+const withTokenRows = rowKinds(withTokens);
+const withoutTokenRows = rowKinds(withoutTokens);
+const hasStorefrontInsert = withTokens.includes("sd-line--insert") && withTokens.includes("@techsio/storefront-data");
+console.log(JSON.stringify({
+  withTokenRows,
+  withoutTokenRows,
+  hasStorefrontInsert,
+  hasFallbackWarning: withTokens.includes('Raw line diff is shown'),
+}));`
+  );
+
+  const parsed = decodeJson<{
+    withTokenRows: string[];
+    withoutTokenRows: string[];
+    hasStorefrontInsert: boolean;
+    hasFallbackWarning: boolean;
+  }>(output);
+
+  expect(parsed.withTokenRows).toEqual(["equal", "insert", "equal"]);
+  expect(parsed.withoutTokenRows.length).toBeGreaterThan(
+    parsed.withTokenRows.length
+  );
+  expect(parsed.hasStorefrontInsert).toBe(true);
+  expect(parsed.hasFallbackWarning).toBe(false);
+});

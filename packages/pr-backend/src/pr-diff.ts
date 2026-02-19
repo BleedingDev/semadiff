@@ -326,7 +326,12 @@ const computeDiff = Effect.fn("PrDiff.computeDiff")(function* (
       : {}),
   });
 
-  return { diff, language };
+  return {
+    diff,
+    language,
+    oldTokens: oldParse.tokens,
+    newTokens: newParse.tokens,
+  };
 });
 
 const summarizeFile = Effect.fn("PrDiff.summarizeFile")(function* (
@@ -404,6 +409,8 @@ const buildFileDiffDocument = Effect.fn("PrDiff.buildFileDiffDocument")(
         language: "text" as const,
         oldText,
         newText,
+        oldTokens: undefined,
+        newTokens: undefined,
       };
     }
 
@@ -423,16 +430,21 @@ const buildFileDiffDocument = Effect.fn("PrDiff.buildFileDiffDocument")(
         language: "text" as const,
         oldText,
         newText,
+        oldTokens: undefined,
+        newTokens: undefined,
       };
     }
 
-    const { diff, language } = yield* computeDiff(registry, {
-      oldText,
-      newText,
-      oldPath,
-      newPath,
-      detectMoves,
-    });
+    const { diff, language, oldTokens, newTokens } = yield* computeDiff(
+      registry,
+      {
+        oldText,
+        newText,
+        oldPath,
+        newPath,
+        detectMoves,
+      }
+    );
     const reduction = estimateReduction(diff);
     const warnings = buildFileWarnings({ language });
     const summary = buildFileSummary(file, {
@@ -444,7 +456,15 @@ const buildFileDiffDocument = Effect.fn("PrDiff.buildFileDiffDocument")(
       ...(withWarnings(warnings) ?? {}),
     });
 
-    return { file: summary, diff, language, oldText, newText };
+    return {
+      file: summary,
+      diff,
+      language,
+      oldText,
+      newText,
+      oldTokens,
+      newTokens,
+    };
   }
 );
 
@@ -465,6 +485,8 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     language,
     oldText,
     newText,
+    oldTokens,
+    newTokens,
   } = yield* buildFileDiffDocument(
     getFileText,
     registry,
@@ -481,6 +503,16 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     };
   }
 
+  const semanticTokensOption =
+    oldTokens || newTokens
+      ? {
+          semanticTokens: {
+            ...(oldTokens ? { old: oldTokens } : {}),
+            ...(newTokens ? { new: newTokens } : {}),
+          },
+        }
+      : {};
+
   const semanticHtml = renderHtml(diff, {
     title: `SemaDiff · ${summary.filename}`,
     filePath: summary.filename,
@@ -495,6 +527,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     showSummary: false,
     showFilePath: false,
     layout: "embed",
+    ...semanticTokensOption,
   });
   const linesHtml = renderHtml(diff, {
     title: `SemaDiff · ${summary.filename}`,
@@ -511,6 +544,7 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     showSummary: false,
     showFilePath: false,
     layout: "embed",
+    ...semanticTokensOption,
   });
 
   return { file: summary, semanticHtml, linesHtml };
