@@ -1,3 +1,4 @@
+import path from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -5,6 +6,36 @@ import viteReact from "@vitejs/plugin-react";
 import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 import viteTsConfigPaths from "vite-tsconfig-paths";
+
+// lightningcss resolves a non-existent ../pkg path when this env var is truthy.
+process.env.CSS_TRANSFORMER_WASM = "";
+
+const lightningCssPkgVirtualId = "\0lightningcss-pkg";
+const lightningCssPkgPlugin = {
+  name: "resolve-lightningcss-pkg",
+  resolveId(id: string, importer?: string) {
+    const specifier = id.split("?")[0].split("#")[0];
+    if (specifier !== "../pkg") {
+      return;
+    }
+    const normalizedImporter = importer?.split(path.sep).join("/");
+    if (!normalizedImporter) {
+      return;
+    }
+    if (
+      normalizedImporter.includes("/lightningcss/") &&
+      normalizedImporter.endsWith("/node/index.js")
+    ) {
+      return lightningCssPkgVirtualId;
+    }
+  },
+  load(id: string) {
+    if (id !== lightningCssPkgVirtualId) {
+      return;
+    }
+    return "const lightningCssPkgStub = {}; export default lightningCssPkgStub;";
+  },
+};
 
 const config = defineConfig(({ mode }) => {
   const isTest = mode === "test" || process.env.VITEST === "true";
@@ -68,6 +99,7 @@ const config = defineConfig(({ mode }) => {
       ],
     },
     plugins: [
+      lightningCssPkgPlugin,
       !isTest &&
         devtoolsEnabled &&
         devtools({
