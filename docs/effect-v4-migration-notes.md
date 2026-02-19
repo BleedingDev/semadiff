@@ -3,7 +3,7 @@
 ## Current Status
 
 - Branch: `chore/effect-v4-readiness`
-- Workspace migrated to `effect@4.0.0-beta.3`
+- Workspace migrated to `effect@4.0.0-beta.4`
 - Readiness check now reports `Ready now: yes` (`pnpm effect:v4:readiness -- --strict` passes)
 - Validation status: `lint`, `format:check`, `typecheck`, `build`, `test`, `test:app`, and coverage pipeline are passing
 
@@ -53,12 +53,16 @@ Run these checks when upgrading any Effect beta:
 
 ## Peer/Version constraints guidance
 
-- Do not collapse constraints to only `effect` yet.
-- Keep the following aligned per upgrade step:
+- Publishable library packages now expose Effect as a peer:
+  - `peerDependencies.effect: ">=4.0.0-beta.4 <5"`
+- Runtime entrypoints still keep direct `effect` dependencies:
+  - CLI package
+  - App packages
+- Keep these runtime dependencies aligned per beta update:
   - `effect`
   - `@effect/platform-bun`
   - `@effect/platform-node`
-  - `vitest`
+- `vitest` remains independent and should be verified with each beta update.
 
 ## Remaining Non-Blocking Advisories
 

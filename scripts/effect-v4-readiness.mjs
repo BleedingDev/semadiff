@@ -35,6 +35,7 @@ const EFFECT_RANGE_GTE_4_RE = />=\s*4(\.|$)/;
 const EFFECT_RANGE_LT_5_RE = /<\s*5/;
 const EFFECT_RANGE_OR_RE = /\|\|/;
 const EFFECT_RANGE_HAS_4_RE = /4(\.|$)/;
+const EFFECT_RANGE_HAS_BETA_RE = /beta/i;
 
 const REMOVED_API_PATTERNS = [
   {
@@ -199,11 +200,7 @@ function collectDependencyUsage() {
   return usage;
 }
 
-function npmView(name, field = "version") {
-  return npmViewSpec(`${name}@latest`, field);
-}
-
-function npmViewSpec(spec, field = "version") {
+function npmViewQuery(spec, field = "version") {
   const stdout = execFileSync("npm", ["view", spec, field, "--json"], {
     cwd: ROOT,
     stdio: ["ignore", "pipe", "pipe"],
@@ -213,6 +210,18 @@ function npmViewSpec(spec, field = "version") {
     return null;
   }
   return JSON.parse(stdout);
+}
+
+function npmView(name, field = "version") {
+  return npmViewQuery(`${name}@latest`, field);
+}
+
+function npmViewPackage(name, field = "version") {
+  return npmViewQuery(name, field);
+}
+
+function npmViewSpec(spec, field = "version") {
+  return npmViewQuery(spec, field);
 }
 
 function npmVersionExists(spec) {
@@ -234,6 +243,16 @@ function normalizeVersion(value) {
     return typeof last === "string" ? last : null;
   }
   return typeof value === "string" ? value : null;
+}
+
+function normalizeDistTags(value) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value
+    : null;
+}
+
+function rangeTargetsBeta(range) {
+  return typeof range === "string" && EFFECT_RANGE_HAS_BETA_RE.test(range);
 }
 
 function pickRegistrySpec(dep, usedBy) {
@@ -267,16 +286,22 @@ function emptyDependencyStatus(dep, usedBy) {
     usedBy,
     checkedSpec: null,
     latestVersion: null,
+    latestBetaVersion: null,
     resolvedVersion: null,
     peerEffectRange: null,
     supportsEffectV4: null,
+    onLatestBeta: null,
     error: null,
   };
 }
 
 function collectDependencyStatus(dep, usedBy) {
   try {
-    const latestVersion = npmView(dep, "version");
+    const distTags = normalizeDistTags(npmViewPackage(dep, "dist-tags"));
+    const latestVersion = normalizeVersion(
+      distTags?.latest ?? npmView(dep, "version")
+    );
+    const latestBetaVersion = normalizeVersion(distTags?.beta);
     const checkedSpec = pickRegistrySpec(dep, usedBy);
     const resolvedVersion = normalizeVersion(
       npmViewSpec(checkedSpec, "version")
@@ -298,14 +323,22 @@ function collectDependencyStatus(dep, usedBy) {
     } else if (peerEffectRange) {
       supportsEffectV4 = effectRangeSupportsV4(peerEffectRange);
     }
+    const onLatestBeta =
+      latestBetaVersion &&
+      resolvedVersion &&
+      usedBy.some((entry) => rangeTargetsBeta(entry.range))
+        ? resolvedVersion === latestBetaVersion
+        : null;
     return {
       dependency: dep,
       usedBy,
       checkedSpec,
       latestVersion,
+      latestBetaVersion,
       resolvedVersion,
       peerEffectRange,
       supportsEffectV4,
+      onLatestBeta,
       error: null,
     };
   } catch (cause) {
@@ -314,9 +347,11 @@ function collectDependencyStatus(dep, usedBy) {
       usedBy,
       checkedSpec: null,
       latestVersion: null,
+      latestBetaVersion: null,
       resolvedVersion: null,
       peerEffectRange: null,
       supportsEffectV4: null,
+      onLatestBeta: null,
       error: cause instanceof Error ? cause.message : String(cause),
     };
   }
@@ -365,6 +400,15 @@ function buildBlockers(apiUsage, registryStatus) {
         }`,
       });
     }
+    if (dep.onLatestBeta === false) {
+      blockers.push({
+        kind: "beta-version-lag",
+        title: `${dep.dependency}@${dep.resolvedVersion} is not on latest beta`,
+        detail: `latest beta=${dep.latestBetaVersion ?? "unknown"}, checked=${
+          dep.checkedSpec ?? "latest"
+        }`,
+      });
+    }
   }
   return blockers;
 }
@@ -385,12 +429,16 @@ function printSummary(report) {
       continue;
     }
     writeLine(
-      `- ${dep.dependency}: latest=${dep.latestVersion ?? "unknown"}, checked=${
+      `- ${dep.dependency}: latest=${dep.latestVersion ?? "unknown"}, beta=${
+        dep.latestBetaVersion ?? "n/a"
+      }, checked=${
         dep.checkedSpec ?? "latest"
       }, resolved=${dep.resolvedVersion ?? "unknown"}, peer.effect=${
         dep.peerEffectRange ?? "n/a"
       }, supportsV4=${
         dep.supportsEffectV4 === null ? "unknown" : String(dep.supportsEffectV4)
+      }, onLatestBeta=${
+        dep.onLatestBeta === null ? "n/a" : String(dep.onLatestBeta)
       }`
     );
   }

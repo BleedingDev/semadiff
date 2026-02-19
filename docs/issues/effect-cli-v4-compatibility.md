@@ -10,7 +10,7 @@
 
 ## Summary
 
-Effect v4 beta is published (`effect@4.0.0-beta.0`), but `@effect/cli` latest release still declares a v3-only peer dependency on `effect`.
+Effect v4 beta is published (`effect@4.0.0-beta.4` on the `beta` tag), but `@effect/cli` latest release still declares a v3-only peer dependency on `effect`.
 
 This blocks projects that use `@effect/cli` from testing or adopting v4 without force-overrides.
 
@@ -19,14 +19,14 @@ This blocks projects that use `@effect/cli` from testing or adopting v4 without 
 Run:
 
 ```bash
-npm view effect@4.0.0-beta.0 version --json
+npm view effect@4.0.0-beta.4 version --json
 npm view @effect/cli@latest version --json
 npm view @effect/cli@latest peerDependencies --json
 ```
 
-Observed on 2026-02-18:
+Observed on 2026-02-19:
 
-- `effect@4.0.0-beta.0` exists.
+- `effect@4.0.0-beta.4` exists.
 - `@effect/cli@0.73.2` is latest.
 - `@effect/cli@0.73.2` has `peerDependencies.effect: "^3.19.16"`.
 

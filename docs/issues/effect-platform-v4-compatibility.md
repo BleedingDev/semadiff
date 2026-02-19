@@ -10,7 +10,7 @@
 
 ## Summary
 
-Effect v4 beta is available, but `@effect/platform` latest release still declares a v3-only peer dependency on `effect`.
+Effect v4 beta is available (`effect@4.0.0-beta.4` on the `beta` tag), but `@effect/platform` latest release still declares a v3-only peer dependency on `effect`.
 
 Projects using `@effect/platform` (directly or via `@effect/cli`) cannot adopt v4 without peer-range overrides.
 
@@ -19,14 +19,14 @@ Projects using `@effect/platform` (directly or via `@effect/cli`) cannot adopt v
 Run:
 
 ```bash
-npm view effect@4.0.0-beta.0 version --json
+npm view effect@4.0.0-beta.4 version --json
 npm view @effect/platform@latest version --json
 npm view @effect/platform@latest peerDependencies --json
 ```
 
-Observed on 2026-02-18:
+Observed on 2026-02-19:
 
-- `effect@4.0.0-beta.0` exists.
+- `effect@4.0.0-beta.4` exists.
 - `@effect/platform@0.94.5` is latest.
 - `@effect/platform@0.94.5` has `peerDependencies.effect: "^3.19.17"`.
 

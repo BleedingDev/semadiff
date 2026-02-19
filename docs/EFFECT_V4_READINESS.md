@@ -11,7 +11,7 @@ Source: https://effect.website/blog/releases/effect/40-beta/
 
 ## Key v4 beta signals (from upstream)
 
-- `effect@4.0.0-beta.3` is available on the beta channel.
+- `effect@4.0.0-beta.4` is available on the beta channel.
 - The v4 effort is based on the smaller `effect-smol` architecture.
 - Functionality from several `@effect/*` packages is being moved into `effect` under unstable modules.
 - Upstream migration docs are maintained in `effect-smol`:
@@ -46,10 +46,12 @@ Current result (as of this update):
   - no `Effect.Service.Default`
   - no `Effect.Service` `dependencies` option
 - Workspace dependencies are aligned to v4 beta where required:
-  - `effect@4.0.0-beta.3`
-  - `@effect/platform-bun@4.0.0-beta.3`
-  - `@effect/platform-node@4.0.0-beta.3`
+  - `effect@4.0.0-beta.4`
+  - `@effect/platform-bun@4.0.0-beta.4`
+  - `@effect/platform-node@4.0.0-beta.4`
   - `vitest@^3.2.4`
+- Publishable library packages now use `peerDependencies.effect` (`>=4.0.0-beta.4 <5`) to prevent nested runtime copies and keep consumers on one Effect runtime.
+- Runtime entrypoints (`@semadiff/cli`, app packages) keep direct `effect` dependencies.
 - Full validation passes:
   - `lint`
   - `format:check`
@@ -112,4 +114,4 @@ Use this when validating migration parity after Effect beta bumps.
 
 ## Ongoing guardrail
 
-Keep `pnpm effect:v4:readiness -- --strict` in migration validation so regressions to removed APIs or incompatible effect peer constraints fail early.
+Keep `pnpm effect:v4:readiness -- --strict` in migration validation so regressions to removed APIs, incompatible peer constraints, or lagging beta versions fail early.
