@@ -3220,14 +3220,8 @@ function renderHunkRow(row: LineRow) {
   `;
 }
 
-function renderGapRow(row: LineRow) {
-  const count = row.hidden ?? 0;
-  const label = count === 1 ? "1 line hidden" : `${count} lines hidden`;
-  return `
-    <div class="sd-line sd-line--gap">
-      <div class="sd-gap">… ${label} …</div>
-    </div>
-  `;
+function renderGapRow(_row: LineRow) {
+  return "";
 }
 
 function getUnifiedPrefix(row: LineRow) {
@@ -3487,7 +3481,7 @@ function buildRenderContext(
 
   const view =
     options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
-  const contextLines = options.contextLines ?? 3;
+  const contextLines = options.contextLines ?? 12;
   const lineLayout = options.lineLayout ?? "unified";
   const lineMode = options.lineMode ?? "semantic";
 
@@ -3961,14 +3955,6 @@ function buildLineVirtualScript(
         return;
       }
       if (row.type === "gap") {
-        const gap = document.createElement("div");
-        gap.className = "sd-line sd-line--gap";
-        const label = row.hidden === 1 ? "1 line hidden" : row.hidden + " lines hidden";
-        const inner = document.createElement("div");
-        inner.className = "sd-gap";
-        inner.textContent = "… " + label + " …";
-        gap.appendChild(inner);
-        container.appendChild(gap);
         return;
       }
 

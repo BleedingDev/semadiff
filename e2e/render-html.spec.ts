@@ -269,7 +269,7 @@ console.log(JSON.stringify({
   hasStorefrontInsert,
   hasAnchorInsert,
   hasFallbackWarning: withTokens.includes('Raw line diff is shown'),
-  hasGapRows: withTokens.includes('sd-line--gap'),
+  hasGapRows: withTokens.includes('<div class="sd-line sd-line--gap">'),
 }));`
   );
 
@@ -289,5 +289,5 @@ console.log(JSON.stringify({
   expect(parsed.hasStorefrontInsert).toBe(true);
   expect(parsed.hasAnchorInsert).toBe(true);
   expect(parsed.hasFallbackWarning).toBe(false);
-  expect(parsed.hasGapRows).toBe(true);
+  expect(parsed.hasGapRows).toBe(false);
 });
