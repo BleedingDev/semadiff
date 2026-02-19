@@ -6,6 +6,7 @@
 - Workspace migrated to `effect@4.0.0-beta.4`
 - Readiness check now reports `Ready now: yes` (`pnpm effect:v4:readiness -- --strict` passes)
 - Validation status: `lint`, `format:check`, `typecheck`, `build`, `test`, `test:app`, and coverage pipeline are passing
+- Removed optional `@effect/language-service` plugin/patch from workspace tooling to keep migration surface focused on Effect v4 runtime packages.
 
 ## Package Surface Findings
 

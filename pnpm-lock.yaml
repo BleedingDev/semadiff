@@ -18,9 +18,6 @@ importers:
       '@biomejs/biome':
         specifier: ^2.3.11
         version: 2.3.11
-      '@effect/language-service':
-        specifier: ^0.74.0
-        version: 0.74.0
       '@playwright/test':
         specifier: ^1.48.0
         version: 1.57.0
@@ -589,10 +586,6 @@ packages:
   '@csstools/css-tokenizer@3.0.4':
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
-
-  '@effect/language-service@0.74.0':
-    resolution: {integrity: sha512-ZqOvxCUo70WtnV8Kf4ORcEW6euepPn3Yu9btB0vpDhN5ydf1RC3/kl2M2b22tzB0MOITeJzNn5HK7w7NJhQFaw==}
-    hasBin: true
 
   '@effect/platform-node-shared@4.0.0-beta.4':
     resolution: {integrity: sha512-/+l1W+v4HgL9VPCKdg88OoER50y5fdtyAmc/d2uSMJHicDCJS/QGfbNkpamDBoF25o2Idl+IgLI0ZEOz7aIyHw==}
@@ -3604,8 +3597,6 @@ snapshots:
   '@csstools/css-syntax-patches-for-csstree@1.0.25': {}
 
   '@csstools/css-tokenizer@3.0.4': {}
-
-  '@effect/language-service@0.74.0': {}
 
   '@effect/platform-node-shared@4.0.0-beta.4(effect@4.0.0-beta.4)':
     dependencies:
