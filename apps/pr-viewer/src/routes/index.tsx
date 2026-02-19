@@ -321,6 +321,7 @@ interface DiffPanelHeaderProps {
   summary: PrSummary | null;
   selectedSummary: PrFileSummary | null;
   selectedFile: string | null;
+  showAdvancedControls: boolean;
   view: "semantic" | "lines";
   lineLayout: "split" | "unified";
   lineMode: "semantic" | "raw";
@@ -338,6 +339,7 @@ interface DiffPanelHeaderProps {
   onNavigate: (direction: "next" | "prev") => void;
   onMinimapToggle: () => void;
   onCompareMovesChange: (value: boolean) => void;
+  onToggleAdvancedControls: () => void;
 }
 
 interface DiffPanelBodyProps {
@@ -519,6 +521,7 @@ function DiffPanelHeader({
   summary,
   selectedSummary,
   selectedFile,
+  showAdvancedControls,
   view,
   lineLayout,
   lineMode,
@@ -536,6 +539,7 @@ function DiffPanelHeader({
   onNavigate,
   onMinimapToggle,
   onCompareMovesChange,
+  onToggleAdvancedControls,
 }: DiffPanelHeaderProps) {
   return (
     <div className="sd-panel-header">
@@ -581,71 +585,12 @@ function DiffPanelHeader({
         >
           Lines
         </ToggleButton>
-        {view === "lines" && (
-          <div className="sd-control-group">
-            <span className="sd-control-label">Line Mode</span>
-            <ToggleButton
-              active={lineMode === "semantic"}
-              onClick={() => onLineModeChange("semantic")}
-            >
-              Semantic
-            </ToggleButton>
-            <ToggleButton
-              active={lineMode === "raw"}
-              onClick={() => onLineModeChange("raw")}
-            >
-              Raw
-            </ToggleButton>
-          </div>
-        )}
-        <div className="sd-control-group">
-          <span className="sd-control-label">Comments</span>
-          <ToggleButton
-            active={!hideComments}
-            onClick={() => onHideCommentsChange(false)}
-          >
-            Show
-          </ToggleButton>
-          <ToggleButton
-            active={hideComments}
-            onClick={() => onHideCommentsChange(true)}
-          >
-            Hide
-          </ToggleButton>
-        </div>
         <ToggleButton
-          active={lineLayout === "split"}
-          onClick={() => onLineLayoutChange("split")}
+          active={showAdvancedControls}
+          onClick={onToggleAdvancedControls}
         >
-          Split
+          Advanced
         </ToggleButton>
-        <ToggleButton
-          active={lineLayout === "unified"}
-          onClick={() => onLineLayoutChange("unified")}
-        >
-          Unified
-        </ToggleButton>
-        <div className="sd-control-group">
-          <span className="sd-control-label">Context</span>
-          <ToggleButton
-            active={lineContextLines === 0}
-            onClick={() => onLineContextChange(0)}
-          >
-            Collapse
-          </ToggleButton>
-          <ToggleButton
-            active={lineContextLines === 3}
-            onClick={() => onLineContextChange(3)}
-          >
-            Default
-          </ToggleButton>
-          <ToggleButton
-            active={lineContextLines === 10}
-            onClick={() => onLineContextChange(10)}
-          >
-            Expand
-          </ToggleButton>
-        </div>
         <div className="sd-control-group">
           <span className="sd-control-label">Changes</span>
           <ToggleButton disabled={!hasDiff} onClick={() => onNavigate("prev")}>
@@ -655,33 +600,102 @@ function DiffPanelHeader({
             Next
           </ToggleButton>
         </div>
-        <div className="sd-control-group">
-          <span className="sd-control-label">Minimap</span>
-          <ToggleButton
-            active={minimapEnabled}
-            disabled={!hasDiff}
-            onClick={onMinimapToggle}
-          >
-            {minimapEnabled ? "On" : "Off"}
-          </ToggleButton>
-        </div>
-        <div className="sd-control-group">
-          <span className="sd-control-label">Moves</span>
-          <ToggleButton
-            active={compareMoves}
-            disabled={!summary}
-            onClick={() => onCompareMovesChange(true)}
-          >
-            On
-          </ToggleButton>
-          <ToggleButton
-            active={!compareMoves}
-            disabled={!summary}
-            onClick={() => onCompareMovesChange(false)}
-          >
-            Off
-          </ToggleButton>
-        </div>
+        {showAdvancedControls && (
+          <>
+            {view === "lines" && (
+              <div className="sd-control-group">
+                <span className="sd-control-label">Line Mode</span>
+                <ToggleButton
+                  active={lineMode === "semantic"}
+                  onClick={() => onLineModeChange("semantic")}
+                >
+                  Semantic
+                </ToggleButton>
+                <ToggleButton
+                  active={lineMode === "raw"}
+                  onClick={() => onLineModeChange("raw")}
+                >
+                  Raw
+                </ToggleButton>
+              </div>
+            )}
+            <div className="sd-control-group">
+              <span className="sd-control-label">Comments</span>
+              <ToggleButton
+                active={!hideComments}
+                onClick={() => onHideCommentsChange(false)}
+              >
+                Show
+              </ToggleButton>
+              <ToggleButton
+                active={hideComments}
+                onClick={() => onHideCommentsChange(true)}
+              >
+                Hide
+              </ToggleButton>
+            </div>
+            <ToggleButton
+              active={lineLayout === "split"}
+              onClick={() => onLineLayoutChange("split")}
+            >
+              Split
+            </ToggleButton>
+            <ToggleButton
+              active={lineLayout === "unified"}
+              onClick={() => onLineLayoutChange("unified")}
+            >
+              Unified
+            </ToggleButton>
+            <div className="sd-control-group">
+              <span className="sd-control-label">Context</span>
+              <ToggleButton
+                active={lineContextLines === 3}
+                onClick={() => onLineContextChange(3)}
+              >
+                Tight
+              </ToggleButton>
+              <ToggleButton
+                active={lineContextLines === 6}
+                onClick={() => onLineContextChange(6)}
+              >
+                Default
+              </ToggleButton>
+              <ToggleButton
+                active={lineContextLines === 12}
+                onClick={() => onLineContextChange(12)}
+              >
+                Wide
+              </ToggleButton>
+            </div>
+            <div className="sd-control-group">
+              <span className="sd-control-label">Minimap</span>
+              <ToggleButton
+                active={minimapEnabled}
+                disabled={!hasDiff}
+                onClick={onMinimapToggle}
+              >
+                {minimapEnabled ? "On" : "Off"}
+              </ToggleButton>
+            </div>
+            <div className="sd-control-group">
+              <span className="sd-control-label">Moves</span>
+              <ToggleButton
+                active={compareMoves}
+                disabled={!summary}
+                onClick={() => onCompareMovesChange(true)}
+              >
+                On
+              </ToggleButton>
+              <ToggleButton
+                active={!compareMoves}
+                disabled={!summary}
+                onClick={() => onCompareMovesChange(false)}
+              >
+                Off
+              </ToggleButton>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -763,6 +777,7 @@ function DiffPanel({
   summary,
   selectedSummary,
   selectedFile,
+  showAdvancedControls,
   view,
   lineLayout,
   lineMode,
@@ -780,6 +795,7 @@ function DiffPanel({
   onNavigate,
   onMinimapToggle,
   onCompareMovesChange,
+  onToggleAdvancedControls,
   diffLoading,
   diffError,
   diffData,
@@ -804,9 +820,11 @@ function DiffPanel({
         onMinimapToggle={onMinimapToggle}
         onNavigate={onNavigate}
         onRefresh={onRefresh}
+        onToggleAdvancedControls={onToggleAdvancedControls}
         onViewChange={onViewChange}
         selectedFile={selectedFile}
         selectedSummary={selectedSummary}
+        showAdvancedControls={showAdvancedControls}
         summary={summary}
         view={view}
       />
@@ -853,10 +871,11 @@ function App() {
     runId: 0,
   });
   const [view, setView] = useState<"semantic" | "lines">("lines");
-  const [lineLayout, setLineLayout] = useState<"split" | "unified">("split");
-  const [lineMode, setLineMode] = useState<"semantic" | "raw">("semantic");
+  const [lineLayout, setLineLayout] = useState<"split" | "unified">("unified");
+  const [lineMode, setLineMode] = useState<"semantic" | "raw">("raw");
+  const [showAdvancedControls, setShowAdvancedControls] = useState(false);
   const [hideComments, setHideComments] = useState(false);
-  const [lineContextLines, setLineContextLines] = useState(3);
+  const [lineContextLines, setLineContextLines] = useState(6);
   const [refreshToken, setRefreshToken] = useState(0);
   const [minimapEnabled, setMinimapEnabled] = useState(true);
   const [compareMoves, setCompareMoves] = useState(true);
@@ -1210,9 +1229,13 @@ function App() {
           onMinimapToggle={() => setMinimapEnabled((value) => !value)}
           onNavigate={sendNavigate}
           onRefresh={() => setRefreshToken((value) => value + 1)}
+          onToggleAdvancedControls={() =>
+            setShowAdvancedControls((value) => !value)
+          }
           onViewChange={(next) => setView(next)}
           selectedFile={selectedFile}
           selectedSummary={selectedSummary ?? null}
+          showAdvancedControls={showAdvancedControls}
           summary={summary}
           view={view}
         />

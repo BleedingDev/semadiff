@@ -375,7 +375,10 @@ body.sd-embed .sd-lines {
 }
 
 .sd-code {
-  white-space: pre;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
   color: #e2e8f0;
 }
 
@@ -417,10 +420,14 @@ body.sd-embed .sd-lines {
   background: transparent;
 }
 
-.sd-line--replace .sd-cell--old,
+.sd-line--replace .sd-cell--old {
+  background: rgba(255, 92, 119, 0.18);
+  border-left: 3px solid rgba(255, 92, 119, 0.55);
+}
+
 .sd-line--replace .sd-cell--new {
-  background: transparent;
-  border-left: none;
+  background: rgba(34, 229, 143, 0.18);
+  border-left: 3px solid rgba(34, 229, 143, 0.55);
 }
 
 .sd-inline-del {
@@ -3194,6 +3201,28 @@ function renderSplitRow(row: LineRow) {
     `;
   }
 
+  if (row.type === "insert") {
+    return `
+      <div class="${rowClass}">
+        <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
+        <div class="sd-cell sd-code sd-cell--old"></div>
+        <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
+        <div class="sd-cell sd-code sd-cell--new">${escapeHtml(newText)}</div>
+      </div>
+    `;
+  }
+
+  if (row.type === "delete") {
+    return `
+      <div class="${rowClass}">
+        <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
+        <div class="sd-cell sd-code sd-cell--old">${escapeHtml(oldText)}</div>
+        <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
+        <div class="sd-cell sd-code sd-cell--new"></div>
+      </div>
+    `;
+  }
+
   return `
     <div class="${rowClass}">
       <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
@@ -3553,11 +3582,17 @@ function buildLineVirtualScript(
       } else {
         const oldCell = document.createElement("div");
         oldCell.className = "sd-cell sd-code sd-cell--old";
-        oldCell.textContent = row.oldText ?? row.text ?? "";
+        oldCell.textContent =
+          row.type === "insert"
+            ? ""
+            : row.oldText ?? row.text ?? "";
 
         const newCell = document.createElement("div");
         newCell.className = "sd-cell sd-code sd-cell--new";
-        newCell.textContent = row.newText ?? row.text ?? "";
+        newCell.textContent =
+          row.type === "delete"
+            ? ""
+            : row.newText ?? row.text ?? "";
 
         wrapper.append(oldNumber, oldCell, newNumber, newCell);
       }
