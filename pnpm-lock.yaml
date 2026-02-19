@@ -145,9 +145,6 @@ importers:
 
   packages/cli:
     dependencies:
-      '@effect/platform-bun':
-        specifier: 4.0.0-beta.4
-        version: 4.0.0-beta.4(effect@4.0.0-beta.4)
       '@effect/platform-node':
         specifier: 4.0.0-beta.4
         version: 4.0.0-beta.4(effect@4.0.0-beta.4)(ioredis@5.9.3)
@@ -596,11 +593,6 @@ packages:
   '@effect/language-service@0.74.0':
     resolution: {integrity: sha512-ZqOvxCUo70WtnV8Kf4ORcEW6euepPn3Yu9btB0vpDhN5ydf1RC3/kl2M2b22tzB0MOITeJzNn5HK7w7NJhQFaw==}
     hasBin: true
-
-  '@effect/platform-bun@4.0.0-beta.4':
-    resolution: {integrity: sha512-U8uH5xV9pI+rXkSbB9Sbhsj2EkF1PklwHKaPeub2h07srJKBxy//aMO7UfCftqyn9SGO5W7S3NEZaeX/8r7Ltg==}
-    peerDependencies:
-      effect: ^4.0.0-beta.4
 
   '@effect/platform-node-shared@4.0.0-beta.4':
     resolution: {integrity: sha512-/+l1W+v4HgL9VPCKdg88OoER50y5fdtyAmc/d2uSMJHicDCJS/QGfbNkpamDBoF25o2Idl+IgLI0ZEOz7aIyHw==}
@@ -3614,14 +3606,6 @@ snapshots:
   '@csstools/css-tokenizer@3.0.4': {}
 
   '@effect/language-service@0.74.0': {}
-
-  '@effect/platform-bun@4.0.0-beta.4(effect@4.0.0-beta.4)':
-    dependencies:
-      '@effect/platform-node-shared': 4.0.0-beta.4(effect@4.0.0-beta.4)
-      effect: 4.0.0-beta.4
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
 
   '@effect/platform-node-shared@4.0.0-beta.4(effect@4.0.0-beta.4)':
     dependencies:

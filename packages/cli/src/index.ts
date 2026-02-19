@@ -1145,17 +1145,8 @@ const cli = Command.runWith(app, {
   version: "0.1.0",
 });
 
-const isBunRuntime = () =>
-  typeof (globalThis as { Bun?: unknown }).Bun !== "undefined" ||
-  typeof (process.versions as { bun?: string | undefined }).bun === "string";
-
 const runMain = async () => {
   const argv = normalizeArgv(process.argv).slice(2);
-  if (isBunRuntime()) {
-    const { BunRuntime, BunServices } = await import("@effect/platform-bun");
-    cli(argv).pipe(Effect.provide(BunServices.layer), BunRuntime.runMain);
-    return;
-  }
   const { NodeRuntime, NodeServices } = await import("@effect/platform-node");
   cli(argv).pipe(Effect.provide(NodeServices.layer), NodeRuntime.runMain);
 };
