@@ -12,6 +12,6 @@
   },
   "dependencies": {
     "@semadiff/core": "workspace:*",
-    "effect": "4.0.0-beta.3"
+    "effect": "4.0.0-beta.4"
   }
 }
