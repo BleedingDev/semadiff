@@ -183,7 +183,7 @@ importers:
   packages/core:
     dependencies:
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
 
   packages/github-extension:
@@ -238,7 +238,7 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
       lightningcss:
         specifier: ^1.25.1
@@ -253,7 +253,7 @@ importers:
         specifier: ^1.7.36
         version: 1.15.10
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
 
   packages/parser-tree-sitter-node:
@@ -262,7 +262,7 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
       tree-sitter:
         specifier: ^0.25.0
@@ -295,7 +295,7 @@ importers:
         specifier: workspace:*
         version: link:../parsers
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
       web-tree-sitter:
         specifier: ^0.26.3
@@ -326,7 +326,7 @@ importers:
   packages/parsers:
     dependencies:
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
 
   packages/pr-backend:
@@ -350,7 +350,7 @@ importers:
         specifier: workspace:*
         version: link:../render-html
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
 
   packages/render-html:
@@ -359,7 +359,7 @@ importers:
         specifier: workspace:*
         version: link:../core
       effect:
-        specifier: 4.0.0-beta.4
+        specifier: '>=4.0.0-beta.4 <5'
         version: 4.0.0-beta.4
 
   packages/render-terminal:

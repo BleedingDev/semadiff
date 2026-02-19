@@ -16,7 +16,9 @@
     "@semadiff/parser-swc": "workspace:*",
     "@semadiff/parser-tree-sitter-wasm": "workspace:*",
     "@semadiff/parsers": "workspace:*",
-    "@semadiff/render-html": "workspace:*",
-    "effect": "4.0.0-beta.4"
+    "@semadiff/render-html": "workspace:*"
+  },
+  "peerDependencies": {
+    "effect": ">=4.0.0-beta.4 <5"
   }
 }

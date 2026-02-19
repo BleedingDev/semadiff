@@ -17,7 +17,7 @@
     "./schemas/explain.schema.json": "./schemas/explain.schema.json",
     "./schemas/diagnostics.schema.json": "./schemas/diagnostics.schema.json"
   },
-  "dependencies": {
-    "effect": "4.0.0-beta.4"
+  "peerDependencies": {
+    "effect": ">=4.0.0-beta.4 <5"
   }
 }
