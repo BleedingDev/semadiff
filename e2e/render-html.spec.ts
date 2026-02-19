@@ -213,10 +213,12 @@ const withoutTokens = renderHtml(diff, {
 const withTokenRows = rowKinds(withTokens);
 const withoutTokenRows = rowKinds(withoutTokens);
 const hasStorefrontInsert = withTokens.includes("sd-line--insert") && withTokens.includes("@techsio/storefront-data");
+const hasAnchorInsert = withTokens.includes("transpilePackages: [");
 console.log(JSON.stringify({
   withTokenRows,
   withoutTokenRows,
   hasStorefrontInsert,
+  hasAnchorInsert,
   hasFallbackWarning: withTokens.includes('Raw line diff is shown'),
   hasGapRows: withTokens.includes('sd-line--gap'),
 }));`
@@ -226,15 +228,17 @@ console.log(JSON.stringify({
     withTokenRows: string[];
     withoutTokenRows: string[];
     hasStorefrontInsert: boolean;
+    hasAnchorInsert: boolean;
     hasFallbackWarning: boolean;
     hasGapRows: boolean;
   }>(output);
 
-  expect(parsed.withTokenRows).toEqual(["equal", "insert", "equal"]);
+  expect(parsed.withTokenRows).toEqual(["equal", "insert", "insert", "equal"]);
   expect(parsed.withoutTokenRows.length).toBeGreaterThan(
     parsed.withTokenRows.length
   );
   expect(parsed.hasStorefrontInsert).toBe(true);
+  expect(parsed.hasAnchorInsert).toBe(true);
   expect(parsed.hasFallbackWarning).toBe(false);
   expect(parsed.hasGapRows).toBe(true);
 });

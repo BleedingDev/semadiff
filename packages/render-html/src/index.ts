@@ -1739,6 +1739,7 @@ const MULTILINE_IMPORT_START_RE = /^\s*import\s+(?:type\s+)?\{\s*$/;
 const MULTILINE_IMPORT_FROM_RE = /\bfrom\s+["']([^"']+)["']/;
 const IMPORT_BLOCK_START_RE = /^(?:import|export)\s+\{$/;
 const JSX_PROP_LINE_RE = /^([A-Za-z_$][\w$-]*)\s*=/;
+const STRUCTURAL_ANCHOR_END_RE = /[:=][\s\S]*[[{(]\s*,?\s*$/;
 const COMMENT_ONLY_RE = /^(?:\/\/|\/\*|\*\/|\*)/;
 const COMMENT_DELIMITER_LINES = new Set(["//", "/*", "/**", "*/", "*"]);
 const LOW_INFO_PUNCTUATION_RE = /^[\]{}(),;[]+$/;
@@ -3479,7 +3480,7 @@ function buildRenderContext(
   const view =
     options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
   const contextLines = options.contextLines ?? 3;
-  const lineLayout = options.lineLayout ?? "split";
+  const lineLayout = options.lineLayout ?? "unified";
   const lineMode = options.lineMode ?? "semantic";
 
   const canRenderLines =
@@ -3589,6 +3590,17 @@ function queuePendingProjectedDelete(
   addTokenCounts(state.budget, oldTokenByLine.get(row.oldLine) ?? []);
 }
 
+function isStructuralAnchorRow(row: LineRow) {
+  if (row.type !== "insert" && row.type !== "delete") {
+    return false;
+  }
+  const text = rowText(row).trim();
+  if (!text) {
+    return false;
+  }
+  return STRUCTURAL_ANCHOR_END_RE.test(text);
+}
+
 function tryConsumeProjectedInsert(
   row: LineRow,
   state: PendingTokenProjectionState,
@@ -3606,6 +3618,7 @@ function tryConsumeProjectedInsert(
   return true;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: token projection matching is a state-machine.
 function filterAstProjectedRows(
   rows: LineRow[],
   marks: ReturnType<typeof buildLineMarkSets>,
@@ -3642,12 +3655,17 @@ function filterAstProjectedRows(
 
     if (
       row.type === "insert" &&
+      !isStructuralAnchorRow(row) &&
       tryConsumeProjectedInsert(row, state, newTokenByLine)
     ) {
       continue;
     }
 
     if (row.type === "insert" && state.pendingDeletes.length > 0) {
+      if (isStructuralAnchorRow(row)) {
+        output.push(row);
+        continue;
+      }
       if (state.consumedFromPending) {
         resetPendingTokenProjectionState(state);
       } else {
