@@ -1,50 +1,42 @@
-# Draft Issue: CLI Runtime Consolidation in Effect v4
+# Draft Issue: Official CLI Runtime Layer for Effect v4
 
 ## Title
 
-Effect v4 CLI cannot drop `@effect/platform-node` yet due required platform services in command runtime context
+Effect v4 CLI requires custom local service layer to run without `@effect/platform-*`
 
 ## Summary
 
-This repository can run CLI via Bun and Node hosts using only `@effect/platform-node`, but cannot remove platform runtime packages entirely.
+We migrated a CLI to `effect@4.0.0-beta.4` and removed `@effect/platform-*` dependencies.
 
-When attempting to run the CLI with pure `effect` runtime (`Effect.runPromiseExit`) and removing `@effect/platform-node`, the program no longer typechecks because the command effect still requires platform service context:
+To do that, we had to provide a custom local layer for the `effect/unstable/cli` runtime environment (`ChildProcessSpawner | FileSystem | Path | Terminal`) and run with `Effect.runPromiseExit`.
+
+This works for our current command surface, but it requires local runtime shims that should ideally be provided by upstream as an official Effect v4 runtime layer.
+
+## Reproduction
+
+1. Build a CLI with `effect/unstable/cli`.
+2. Remove `@effect/platform-node` / `@effect/platform-bun`.
+3. Try to run `Command.runWith(...)` program directly with `Effect.runPromiseExit(...)` without providing runtime services.
+
+## Observed
+
+The command effect requires environment services:
 
 - `ChildProcessSpawner`
 - `FileSystem`
 - `Path`
 - `Terminal`
 
-This blocks full consolidation to the main `effect` package for CLI runtime execution.
-
-## Reproduction
-
-1. Remove platform runtime imports from `packages/cli/src/index.ts` and replace runtime launch with:
-
-   - `Effect.runPromiseExit(cli(argv))`
-
-2. Remove `@effect/platform-node` from `packages/cli/package.json`.
-
-3. Run:
-
-   ```bash
-   pnpm --filter @semadiff/cli build
-   ```
-
-## Observed Errors
-
-TypeScript fails with missing context services (from `packages/cli/src/index.ts` at runtime call site):
-
-- `Missing 'ChildProcessSpawner | FileSystem | Path | Terminal' in the expected Effect context.`
-- `Argument of type 'Effect<..., Environment>' is not assignable to parameter of type 'Effect<..., never>'`
+Without these, type-checking/runtime wiring fails.  
+To proceed, projects must provide local implementations.
 
 ## Expected
 
-Either:
+One of:
 
-- a stable Effect v4 runtime path that can run `effect/unstable/cli` programs without explicit platform packages, or
-- a consolidated export path inside `effect` that provides the required platform services for CLI runtime execution.
+1. An official v4 runtime layer in main `effect` for CLI execution contexts.
+2. A documented, recommended minimal runtime-layer constructor for CLI apps in v4.
 
 ## Why this matters
 
-Projects migrating to Effect v4 beta can now remove many legacy APIs and reduce platform deps (for example, this repo removed `@effect/platform-bun`), but full single-package parity is still blocked by required platform runtime layers for CLI entrypoint execution.
+Effect v4 consolidation is significantly improved, but projects still need custom runtime shims for `effect/unstable/cli` when avoiding `@effect/platform-*`.

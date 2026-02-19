@@ -72,6 +72,12 @@ const DEPENDENCY_NAMES = [
   "@effect/platform-node",
   "@effect/language-service",
 ];
+const DISALLOWED_EFFECT_PACKAGES = new Set([
+  "@effect/cli",
+  "@effect/platform",
+  "@effect/platform-node",
+  "@effect/language-service",
+]);
 
 function writeLine(text = "") {
   process.stdout.write(`${text}\n`);
@@ -366,7 +372,7 @@ function collectRegistryStatus(usage) {
   });
 }
 
-function buildBlockers(apiUsage, registryStatus) {
+function buildRemovedApiBlockers(apiUsage) {
   const blockers = [];
   for (const usage of apiUsage) {
     if (usage.count === 0) {
@@ -378,38 +384,59 @@ function buildBlockers(apiUsage, registryStatus) {
       detail: usage.note,
     });
   }
-  for (const dep of registryStatus) {
-    if (dep.usedBy.length === 0) {
-      continue;
-    }
-    if (dep.error) {
-      blockers.push({
+  return blockers;
+}
+
+function buildDependencyBlockers(dep) {
+  if (dep.usedBy.length === 0) {
+    return [];
+  }
+  if (dep.error) {
+    return [
+      {
         kind: "registry-error",
         title: `Failed checking ${dep.dependency}`,
         detail: dep.error,
-      });
-      continue;
-    }
-    if (dep.dependency !== "effect" && dep.supportsEffectV4 === false) {
-      blockers.push({
-        kind: "peer-constraint",
-        title: `${dep.dependency}@${dep.resolvedVersion ?? dep.latestVersion ?? "latest"} does not declare effect v4 support`,
-        detail: `checked=${dep.checkedSpec ?? "latest"}, peerDependencies.effect=${
-          dep.peerEffectRange ?? "not declared"
-        }`,
-      });
-    }
-    if (dep.onLatestBeta === false) {
-      blockers.push({
-        kind: "beta-version-lag",
-        title: `${dep.dependency}@${dep.resolvedVersion} is not on latest beta`,
-        detail: `latest beta=${dep.latestBetaVersion ?? "unknown"}, checked=${
-          dep.checkedSpec ?? "latest"
-        }`,
-      });
-    }
+      },
+    ];
+  }
+
+  const blockers = [];
+  if (dep.dependency !== "effect" && dep.supportsEffectV4 === false) {
+    blockers.push({
+      kind: "peer-constraint",
+      title: `${dep.dependency}@${dep.resolvedVersion ?? dep.latestVersion ?? "latest"} does not declare effect v4 support`,
+      detail: `checked=${dep.checkedSpec ?? "latest"}, peerDependencies.effect=${
+        dep.peerEffectRange ?? "not declared"
+      }`,
+    });
+  }
+  if (DISALLOWED_EFFECT_PACKAGES.has(dep.dependency)) {
+    blockers.push({
+      kind: "consolidation-regression",
+      title: `${dep.dependency} should not be required in the v4-consolidated workspace`,
+      detail: `remove ${dep.dependency} usage from manifests: ${dep.usedBy
+        .map((entry) => `${entry.manifest} (${entry.range})`)
+        .join(", ")}`,
+    });
+  }
+  if (dep.onLatestBeta === false) {
+    blockers.push({
+      kind: "beta-version-lag",
+      title: `${dep.dependency}@${dep.resolvedVersion} is not on latest beta`,
+      detail: `latest beta=${dep.latestBetaVersion ?? "unknown"}, checked=${
+        dep.checkedSpec ?? "latest"
+      }`,
+    });
   }
   return blockers;
+}
+
+function buildBlockers(apiUsage, registryStatus) {
+  return [
+    ...buildRemovedApiBlockers(apiUsage),
+    ...registryStatus.flatMap(buildDependencyBlockers),
+  ];
 }
 
 function printSummary(report) {

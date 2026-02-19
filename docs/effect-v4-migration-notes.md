@@ -18,8 +18,9 @@
 
 ### Platform Runtime
 
-- Runtime/services are provided by `@effect/platform-node`.
-- CLI entrypoint now uses `NodeServices`/`NodeRuntime` under both Bun and Node hosts.
+- Runtime/services are provided by a local Effect layer in `packages/cli/src/index.ts`.
+- The layer composes `Path.layer`, `FileSystem.layerNoop({})`, and local `Terminal` / `ChildProcessSpawner` service implementations.
+- No `@effect/platform-*` runtime dependencies remain in workspace manifests.
 - Packed CLI e2e (`e2e/cli-pack.spec.ts`) validates both host executions.
 - This is still not collapsed into the main `effect` package export surface.
 
@@ -60,7 +61,6 @@ Run these checks when upgrading any Effect beta:
   - App packages
 - Keep these runtime dependencies aligned per beta update:
   - `effect`
-  - `@effect/platform-node`
 - `vitest` remains independent and should be verified with each beta update.
 
 ## Remaining Non-Blocking Advisories
