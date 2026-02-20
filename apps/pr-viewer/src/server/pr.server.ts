@@ -178,8 +178,8 @@ export const getFileDiff = createServerFn({ method: "GET" })
     const contextLines =
       typeof data.contextLines === "number" &&
       Number.isFinite(data.contextLines)
-        ? Math.min(Math.max(Math.trunc(data.contextLines), 0), 20)
-        : 12;
+        ? Math.min(Math.max(Math.trunc(data.contextLines), -1), 20)
+        : -1;
     const lineLayout = data.lineLayout === "split" ? "split" : "unified";
     const lineMode = data.lineMode === "raw" ? "raw" : "semantic";
     const hideComments = data.hideComments === true;

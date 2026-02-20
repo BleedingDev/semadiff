@@ -9,9 +9,8 @@ import {
   useState,
 } from "react";
 import "../App.css";
-import { getAuthStatus, getFileDiff, getPrSummary } from "../server/pr.server";
+import { getFileDiff, getPrSummary } from "../server/pr.server";
 import type {
-  AuthStatus,
   FileDiffPayload,
   PrFileSummary,
   PrSummary,
@@ -25,9 +24,6 @@ interface SearchParams {
 
 const formatPercent = (value?: number) =>
   typeof value === "number" ? `${value}%` : "—";
-
-const formatStatus = (file: PrFileSummary) =>
-  `${file.additions}+ / ${file.deletions}-`;
 
 const getToggleClass = (active: boolean) =>
   active ? "sd-toggle sd-toggle--active" : "sd-toggle";
@@ -52,12 +48,6 @@ interface PrefetchState {
   runId: number;
 }
 
-interface AggregateStats {
-  percent: number | null;
-  totalOps: number;
-  totalLines: number;
-}
-
 interface ToggleButtonProps {
   active?: boolean;
   disabled?: boolean;
@@ -65,17 +55,18 @@ interface ToggleButtonProps {
   children: ReactNode;
 }
 
+interface ChangeTotalsProps {
+  additions: number;
+  deletions: number;
+}
+
 interface HeaderProps {
   input: string;
   onInputChange: (next: string) => void;
   onSubmit: (event: FormEvent) => void;
-  authStatus: AuthStatus | null;
-  authError: ServerError | null;
   summaryLoading: boolean;
-  prefetchState: PrefetchState;
   summary: PrSummary | null;
   summaryError: ServerError | null;
-  aggregate: AggregateStats;
 }
 
 interface FilePanelProps {
@@ -128,17 +119,22 @@ function ToggleButton({
   );
 }
 
+export function ChangeTotals({ additions, deletions }: ChangeTotalsProps) {
+  return (
+    <span className="sd-counts" data-testid="change-totals">
+      <span className="sd-count sd-count--add">+{additions}</span>
+      <span className="sd-count sd-count--del">-{deletions}</span>
+    </span>
+  );
+}
+
 function Header({
   input,
   onInputChange,
   onSubmit,
-  authStatus,
-  authError,
   summaryLoading,
-  prefetchState,
   summary,
   summaryError,
-  aggregate,
 }: HeaderProps) {
   return (
     <header className="sd-topbar">
@@ -159,36 +155,17 @@ function Header({
           </button>
         </form>
       </div>
-      {authStatus && (
-        <div className="sd-inline-meta">
-          GitHub token {authStatus.hasToken ? "detected" : "missing"}
-        </div>
-      )}
-      {authError && (
-        <div className="sd-inline-meta sd-inline-meta--error">
-          {authError.message}
-        </div>
-      )}
       {summaryLoading && (
         <div className="sd-inline-meta">Loading PR summary…</div>
-      )}
-      {!summaryLoading && prefetchState.total > 0 && (
-        <div className="sd-inline-meta">
-          Prefetching diffs {prefetchState.loaded}/{prefetchState.total}
-        </div>
       )}
       {summary && !summaryLoading && (
         <div className="sd-inline-meta">
           <span>{summary.pr.title}</span>
-          <span>
-            {summary.pr.additions}+ / {summary.pr.deletions}- ·{" "}
-            {summary.pr.changedFiles} files
-          </span>
-          <span>
-            {typeof aggregate.percent === "number"
-              ? `${aggregate.percent}% smaller`
-              : "Reduction —"}
-          </span>
+          <ChangeTotals
+            additions={summary.pr.additions}
+            deletions={summary.pr.deletions}
+          />
+          <span>{summary.pr.changedFiles} files</span>
           <a href={summary.pr.url} rel="noreferrer" target="_blank">
             Open on GitHub
           </a>
@@ -253,7 +230,10 @@ function FilePanel({
                 <span className={`sd-status sd-status--${file.status}`}>
                   {file.status}
                 </span>
-                <span>{formatStatus(file)}</span>
+                <ChangeTotals
+                  additions={file.additions}
+                  deletions={file.deletions}
+                />
                 <span>{percent}</span>
               </div>
               <div className="sd-bar">
@@ -291,9 +271,10 @@ export function DiffPanelHeader({
       <div className="sd-panel-title">{selectedFile ?? "Diff Viewer"}</div>
       {selectedSummary && (
         <div className="sd-inline-meta">
-          <span>
-            {selectedSummary.additions}+ / {selectedSummary.deletions}-
-          </span>
+          <ChangeTotals
+            additions={selectedSummary.additions}
+            deletions={selectedSummary.deletions}
+          />
           {typeof selectedSummary.reductionPercent === "number" && (
             <span>{selectedSummary.reductionPercent}% smaller</span>
           )}
@@ -370,7 +351,7 @@ export function DiffPanelHeader({
   );
 }
 
-function DiffPanelBody({
+export function DiffPanelBody({
   diffLoading,
   diffError,
   diffData,
@@ -402,28 +383,12 @@ function DiffPanelBody({
     content = <div className="sd-empty">Error: {diffError.message}</div>;
   } else if (diffData && diffHtml) {
     content = (
-      <>
-        <div className="sd-review-card">
-          <div className="sd-review-title">
-            Review changes with{" "}
-            <span className="sd-review-badge">SemaDiff</span>
-          </div>
-          {typeof diffData.file.reductionPercent === "number" && (
-            <div className="sd-review-metric">
-              <span className="sd-review-percent">
-                {diffData.file.reductionPercent}%
-              </span>
-              <span className="sd-review-label">smaller</span>
-            </div>
-          )}
-        </div>
-        <iframe
-          className="sd-diff-frame"
-          ref={iframeRef}
-          srcDoc={diffHtml}
-          title={`diff-${diffData.file.filename}`}
-        />
-      </>
+      <iframe
+        className="sd-diff-frame"
+        ref={iframeRef}
+        srcDoc={diffHtml}
+        title={`diff-${diffData.file.filename}`}
+      />
     );
   } else if (diffData) {
     content = (
@@ -489,16 +454,13 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
-  const lineContextLines = 12;
+  const lineContextLines = -1;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const [summaryResult, setSummaryResult] =
     useState<ServerResult<PrSummary> | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
-  const [authResult, setAuthResult] = useState<ServerResult<AuthStatus> | null>(
-    null
-  );
 
   const [input, setInput] = useState(search.pr ?? "");
   const [fileFilter, setFileFilter] = useState("");
@@ -520,8 +482,6 @@ function App() {
   const summary = summaryResult?.ok ? summaryResult.data : null;
   const summaryError =
     summaryResult && !summaryResult.ok ? summaryResult.error : null;
-  const authStatus = authResult?.ok ? authResult.data : null;
-  const authError = authResult && !authResult.ok ? authResult.error : null;
   const selectedSummary = summary?.files.find(
     (file) => file.filename === selectedFile
   );
@@ -542,30 +502,6 @@ function App() {
       return filenameMatch || previousMatch;
     });
   }, [summary, fileFilter]);
-
-  useEffect(() => {
-    let active = true;
-    getAuthStatus()
-      .then((result) => {
-        if (active) {
-          setAuthResult(result);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setAuthResult({
-            ok: false,
-            error: {
-              code: "AuthStatusError",
-              message: "Failed to load auth status.",
-            },
-          });
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (!search.pr) {
@@ -736,29 +672,6 @@ function App() {
     compareMoves,
   ]);
 
-  const aggregate: AggregateStats = useMemo(() => {
-    if (!summary) {
-      return { percent: null as number | null, totalOps: 0, totalLines: 0 };
-    }
-    const hasOps = summary.files.every(
-      (file) => typeof file.operations === "number"
-    );
-    const totalOps = summary.files.reduce(
-      (sum, file) =>
-        sum + (typeof file.operations === "number" ? file.operations : 0),
-      0
-    );
-    const totalLines = summary.files.reduce(
-      (sum, file) => sum + file.additions + file.deletions,
-      0
-    );
-    if (!hasOps || totalLines === 0) {
-      return { percent: null, totalOps, totalLines };
-    }
-    const percent = Math.round((1 - totalOps / totalLines) * 100);
-    return { percent: Math.max(0, percent), totalOps, totalLines };
-  }, [summary]);
-
   const diffResult = selectedFile ? (diffCache[selectedFile] ?? null) : null;
   const diffData = diffResult?.ok ? diffResult.data : null;
   const diffError = diffResult && !diffResult.ok ? diffResult.error : null;
@@ -778,13 +691,9 @@ function App() {
   return (
     <div className="sd-app">
       <Header
-        aggregate={aggregate}
-        authError={authError}
-        authStatus={authStatus}
         input={input}
         onInputChange={(next) => setInput(next)}
         onSubmit={handleSubmit}
-        prefetchState={prefetchState}
         summary={summary}
         summaryError={summaryError}
         summaryLoading={summaryLoading}

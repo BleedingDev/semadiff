@@ -8,7 +8,6 @@
 
 .sd-topbar {
   padding: 16px 32px 14px;
-  border-bottom: 1px solid var(--sd-border);
   background: linear-gradient(
     135deg,
     rgba(15, 23, 42, 0.95),
@@ -24,7 +23,7 @@
   align-items: center;
   gap: 20px;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .sd-brand {
@@ -52,20 +51,24 @@
 
 .sd-input-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
   align-items: center;
-  min-width: 320px;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 .sd-input {
-  flex: 1 1 320px;
+  flex: 1 1 680px;
+  min-width: 520px;
   padding: 12px 14px;
   border-radius: 12px;
-  border: 1px solid var(--sd-border);
+  border: none;
   background: rgba(15, 23, 42, 0.8);
   color: var(--sd-text);
   font-size: 14px;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
 }
 
 .sd-input--compact {
@@ -94,8 +97,8 @@
 }
 
 .sd-button--ghost {
-  background: transparent;
-  border: 1px solid var(--sd-border);
+  background: rgba(15, 23, 42, 0.48);
+  border: none;
   color: var(--sd-text);
 }
 
@@ -121,7 +124,6 @@
 .sd-panel {
   background: rgba(11, 18, 36, 0.92);
   border-radius: 18px;
-  border: 1px solid var(--sd-border);
   box-shadow: var(--sd-shadow);
   display: flex;
   flex-direction: column;
@@ -131,12 +133,12 @@
 
 .sd-panel-header {
   padding: 14px 18px;
-  border-bottom: 1px solid var(--sd-border);
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
   gap: 10px;
+  background: rgba(8, 14, 30, 0.45);
 }
 
 .sd-panel-header-main {
@@ -171,7 +173,6 @@
 .sd-file-row {
   padding: 14px 16px;
   border: none;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -183,7 +184,7 @@
 }
 
 .sd-file-row:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
 }
 
 .sd-file-row--active {
@@ -269,9 +270,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding-left: 4px;
-  border-left: 1px solid rgba(148, 163, 184, 0.2);
-  margin-left: 4px;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .sd-control-label {
@@ -287,7 +287,7 @@
   gap: 6px;
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid var(--sd-border);
+  border: none;
   background: rgba(15, 23, 42, 0.6);
   font-size: 12px;
   color: var(--sd-muted);
@@ -301,8 +301,8 @@
 
 .sd-toggle--active {
   color: var(--sd-text);
-  border-color: rgba(45, 212, 191, 0.6);
   background: rgba(45, 212, 191, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.42);
 }
 
 .sd-inline-meta {
@@ -314,6 +314,25 @@
 }
 
 .sd-inline-meta--error {
+  color: var(--sd-del);
+}
+
+.sd-counts {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sd-count {
+  font-weight: 700;
+}
+
+.sd-count--add {
+  color: var(--sd-add);
+}
+
+.sd-count--del {
   color: var(--sd-del);
 }
 
@@ -364,56 +383,6 @@
   background: transparent;
 }
 
-.sd-review-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--sd-border);
-  background: rgba(15, 23, 42, 0.7);
-  margin-bottom: 12px;
-}
-
-.sd-review-title {
-  font-size: 12px;
-  color: var(--sd-text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sd-review-badge {
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(45, 212, 191, 0.4);
-  background: rgba(45, 212, 191, 0.12);
-  color: var(--sd-accent);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-}
-
-.sd-review-metric {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  color: var(--sd-accent);
-}
-
-.sd-review-percent {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.sd-review-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  color: var(--sd-muted);
-}
-
 .sd-empty {
   padding: 18px;
   color: var(--sd-muted);
@@ -422,7 +391,17 @@
 @media (max-width: 1024px) {
   .sd-topbar-inner {
     align-items: flex-start;
+    flex-wrap: wrap;
   }
+
+  .sd-input-row {
+    width: 100%;
+  }
+
+  .sd-input {
+    min-width: 0;
+  }
+
   .sd-main {
     grid-template-columns: 1fr;
   }

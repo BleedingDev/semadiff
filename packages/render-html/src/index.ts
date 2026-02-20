@@ -3061,6 +3061,10 @@ function applyLineOperations(
 }
 
 function applyLineContext(rows: LineRow[], contextLines: number): LineRow[] {
+  if (contextLines < 0) {
+    return addHunks(rows);
+  }
+
   const changeIndices = rows
     .map((row, index) =>
       row.type === "equal" || row.type === "gap" || row.type === "hunk"

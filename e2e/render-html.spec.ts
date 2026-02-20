@@ -326,3 +326,68 @@ console.log(JSON.stringify({
   expect(parsed.hasUnifiedGapRows).toBe(false);
   expect(parsed.hasSplitGapRows).toBe(false);
 });
+
+test("line view keeps full context when contextLines is -1", () => {
+  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+
+  const output = runBunEval(
+    `import { renderHtml } from '${renderHtmlUrl}';
+const oldText = 'line-1\\nline-2\\nline-3\\nline-4\\nline-5\\nline-6\\nline-7\\n';
+const newText = 'line-1\\nline-2\\nline-3\\nline-4-updated\\nline-5\\nline-6\\nline-7\\n';
+const diff = {
+  version: '0.1.0',
+  operations: [
+    {
+      id: 'op-update',
+      type: 'update',
+      oldRange: { start: { line: 4, column: 1 }, end: { line: 4, column: 7 } },
+      newRange: { start: { line: 4, column: 1 }, end: { line: 4, column: 15 } },
+      oldText: 'line-4',
+      newText: 'line-4-updated',
+    },
+  ],
+  moves: [],
+  renames: [],
+};
+const extractRows = (html) => {
+  const marker = "globalThis.__SEMADIFF_DATA__ = ";
+  const start = html.indexOf(marker);
+  if (start === -1) {
+    throw new Error("Missing virtualized payload");
+  }
+  const from = start + marker.length;
+  const end = html.indexOf(";</script>", from);
+  if (end === -1) {
+    throw new Error("Missing payload terminator");
+  }
+  const payload = JSON.parse(html.slice(from, end));
+  return payload.rows ?? [];
+};
+const html = renderHtml(diff, {
+  oldText,
+  newText,
+  language: "ts",
+  view: "lines",
+  lineMode: "semantic",
+  lineLayout: "unified",
+  contextLines: -1,
+  virtualize: true,
+});
+const rows = extractRows(html);
+console.log(JSON.stringify({
+  hasGapRows: rows.some((row) => row.type === "gap"),
+  hasHiddenLabel: html.includes("lines hidden"),
+  hasBoundaryLine: rows.some((row) => String(row.text ?? row.newText ?? row.oldText ?? "").includes("line-7")),
+}));`
+  );
+
+  const parsed = decodeJson<{
+    hasGapRows: boolean;
+    hasHiddenLabel: boolean;
+    hasBoundaryLine: boolean;
+  }>(output);
+
+  expect(parsed.hasGapRows).toBe(false);
+  expect(parsed.hasHiddenLabel).toBe(false);
+  expect(parsed.hasBoundaryLine).toBe(true);
+});
