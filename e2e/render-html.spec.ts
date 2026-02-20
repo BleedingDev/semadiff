@@ -391,3 +391,60 @@ console.log(JSON.stringify({
   expect(parsed.hasHiddenLabel).toBe(false);
   expect(parsed.hasBoundaryLine).toBe(true);
 });
+
+test("semantic line selection falls back to raw rows for meaningful hidden changes", () => {
+  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+
+  const output = runBunEval(
+    `import { __testing } from '${renderHtmlUrl}';
+const semanticRows = [{ type: "equal", oldLine: 1, newLine: 1, text: "context" }];
+const meaningfulRawRows = [
+  {
+    type: "replace",
+    oldLine: 2,
+    newLine: 2,
+    oldText: "form.setValues(address)",
+    newText: "form.setFieldValue(\\"shippingAddress\\", address)",
+  },
+];
+const cosmeticRawRows = [
+  {
+    type: "replace",
+    oldLine: 3,
+    newLine: 3,
+    oldText: "import './file'",
+    newText: "import \\"./file\\";",
+  },
+];
+const normalize = (line) =>
+  line.replaceAll('"', "'").replaceAll(";", "").replace(/\\s+/g, " ").trim();
+const meaningfulSelected = __testing.chooseSemanticRowsWithFallback(
+  semanticRows,
+  meaningfulRawRows,
+  normalize
+);
+const cosmeticSelected = __testing.chooseSemanticRowsWithFallback(
+  semanticRows,
+  cosmeticRawRows,
+  normalize
+);
+console.log(
+  JSON.stringify({
+    meaningfulUsesRaw:
+      meaningfulSelected[0]?.type === "replace" &&
+      meaningfulSelected[0]?.newText?.includes("setFieldValue"),
+    cosmeticKeepsSemantic:
+      cosmeticSelected[0]?.type === "equal" &&
+      cosmeticSelected[0]?.text === "context",
+  })
+);`
+  );
+
+  const parsed = decodeJson<{
+    meaningfulUsesRaw: boolean;
+    cosmeticKeepsSemantic: boolean;
+  }>(output);
+
+  expect(parsed.meaningfulUsesRaw).toBe(true);
+  expect(parsed.cosmeticKeepsSemantic).toBe(true);
+});

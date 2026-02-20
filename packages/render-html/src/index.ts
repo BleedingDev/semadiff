@@ -4120,6 +4120,75 @@ function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
   return preferred;
 }
 
+function isMeaningfulNormalizedLine(normalized: string) {
+  return normalized.length > 0 && !isLowInfoSemanticLine(normalized);
+}
+
+function hasMeaningfulReplaceRow(
+  row: LineRow,
+  normalizeLine: (line: string) => string
+) {
+  if (row.type !== "replace") {
+    return false;
+  }
+  const oldNormalized = normalizeLine(rowOldText(row)).trim();
+  const newNormalized = normalizeLine(rowNewText(row)).trim();
+  if (!(oldNormalized || newNormalized)) {
+    return false;
+  }
+  if (oldNormalized === newNormalized) {
+    return false;
+  }
+  return (
+    isMeaningfulNormalizedLine(oldNormalized) ||
+    isMeaningfulNormalizedLine(newNormalized)
+  );
+}
+
+function hasMeaningfulInsertDeleteRow(
+  row: LineRow,
+  normalizeLine: (line: string) => string
+) {
+  if (row.type !== "insert" && row.type !== "delete") {
+    return false;
+  }
+  const normalized = normalizeLine(rowText(row)).trim();
+  return isMeaningfulNormalizedLine(normalized);
+}
+
+function hasMeaningfulRawLineChanges(
+  rows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  for (const row of rows) {
+    if (row.type === "move") {
+      return true;
+    }
+    if (hasMeaningfulReplaceRow(row, normalizeLine)) {
+      return true;
+    }
+    if (hasMeaningfulInsertDeleteRow(row, normalizeLine)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function chooseSemanticRowsWithFallback(
+  semanticRows: LineRow[],
+  rawRows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  const chosenRows = chooseLowerNoiseRows(semanticRows, rawRows);
+  if (hasLineChanges(chosenRows)) {
+    return chosenRows;
+  }
+  return hasLineChanges(rawRows) &&
+    hasMeaningfulRawLineChanges(rawRows, normalizeLine)
+    ? rawRows
+    : chosenRows;
+}
+
 function annotateUnifiedAdjacentPairs(rows: LineRow[]) {
   if (rows.length <= 1) {
     return rows;
@@ -4728,10 +4797,13 @@ function renderLineView(
   const selectedRows =
     context.lineMode === "raw"
       ? buildRowsForMode("raw")
-      : chooseLowerNoiseRows(
-          buildRowsForMode("semantic"),
-          buildRowsForMode("raw")
-        );
+      : (() => {
+          const semanticRows = buildRowsForMode("semantic");
+          const rawRows = buildRowsForMode("raw");
+          return chooseSemanticRowsWithFallback(semanticRows, rawRows, (line) =>
+            normalizeLineForSemantic(line, semanticLanguage)
+          );
+        })();
   if (!hasLineChanges(selectedRows)) {
     return "";
   }
@@ -4854,3 +4926,8 @@ export function renderHtml(
   }
   return renderOperationsView(diffForRender, context);
 }
+
+export const __testing = {
+  chooseSemanticRowsWithFallback,
+  hasMeaningfulRawLineChanges,
+};
