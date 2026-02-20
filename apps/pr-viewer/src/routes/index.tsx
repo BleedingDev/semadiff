@@ -3,7 +3,6 @@ import {
   type FormEvent,
   type ReactNode,
   type RefObject,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -23,60 +22,6 @@ import type {
 interface SearchParams {
   pr?: string;
 }
-
-const NAVIGATION_SCRIPT = `
-<script>
-(function () {
-  const selector = '.sd-line--insert, .sd-line--delete, .sd-line--replace, .sd-line--move';
-
-  function getChanges() {
-    return Array.from(document.querySelectorAll(selector));
-  }
-
-  function scrollToEl(el) {
-    if (!el) return;
-    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }
-
-  function findNext(direction) {
-    const items = getChanges();
-    if (!items.length) return null;
-    const viewportTop = window.scrollY + 8;
-    const positions = items.map((el) => ({
-      el,
-      top: el.getBoundingClientRect().top + window.scrollY,
-    }));
-    if (direction === 'prev') {
-      for (let i = positions.length - 1; i >= 0; i -= 1) {
-        if (positions[i].top < viewportTop) return positions[i].el;
-      }
-      return positions[positions.length - 1].el;
-    }
-    for (const item of positions) {
-      if (item.top > viewportTop) return item.el;
-    }
-    return positions[0].el;
-  }
-
-  window.addEventListener('message', (event) => {
-    const data = event.data;
-    if (!data || data.type !== 'semadiff:navigate') return;
-    const dir = data.direction === 'prev' ? 'prev' : 'next';
-    scrollToEl(findNext(dir));
-  });
-})();
-</script>
-`;
-
-const injectNavigation = (html: string) => {
-  if (!html || html.includes("semadiff:navigate")) {
-    return html;
-  }
-  if (html.includes("</body>")) {
-    return html.replace("</body>", `${NAVIGATION_SCRIPT}</body>`);
-  }
-  return `${html}${NAVIGATION_SCRIPT}`;
-};
 
 const formatPercent = (value?: number) =>
   typeof value === "number" ? `${value}%` : "—";
@@ -146,18 +91,12 @@ interface DiffPanelHeaderProps {
   summary: PrSummary | null;
   selectedSummary: PrFileSummary | null;
   selectedFile: string | null;
-  view: "semantic" | "lines";
   lineLayout: "split" | "unified";
-  lineMode: "semantic" | "raw";
   hideComments: boolean;
   compareMoves: boolean;
-  hasDiff: boolean;
   onRefresh: () => void;
-  onViewChange: (view: "semantic" | "lines") => void;
   onLineLayoutChange: (layout: "split" | "unified") => void;
-  onLineModeChange: (mode: "semantic" | "raw") => void;
   onHideCommentsChange: (value: boolean) => void;
-  onNavigate: (direction: "next" | "prev") => void;
   onCompareMovesChange: (value: boolean) => void;
 }
 
@@ -166,7 +105,6 @@ interface DiffPanelBodyProps {
   diffError: ServerError | null;
   diffData: FileDiffPayload | null;
   diffHtml: string | null;
-  view: "semantic" | "lines";
   iframeRef: RefObject<HTMLIFrameElement | null>;
 }
 
@@ -336,22 +274,16 @@ function FilePanel({
   );
 }
 
-function DiffPanelHeader({
+export function DiffPanelHeader({
   summary,
   selectedSummary,
   selectedFile,
-  view,
   lineLayout,
-  lineMode,
   hideComments,
   compareMoves,
-  hasDiff,
   onRefresh,
-  onViewChange,
   onLineLayoutChange,
-  onLineModeChange,
   onHideCommentsChange,
-  onNavigate,
   onCompareMovesChange,
 }: DiffPanelHeaderProps) {
   return (
@@ -386,44 +318,6 @@ function DiffPanelHeader({
         >
           Recompute
         </button>
-        <ToggleButton
-          active={view === "semantic"}
-          onClick={() => onViewChange("semantic")}
-        >
-          Ops
-        </ToggleButton>
-        <ToggleButton
-          active={view === "lines"}
-          onClick={() => onViewChange("lines")}
-        >
-          Lines
-        </ToggleButton>
-        <div className="sd-control-group">
-          <span className="sd-control-label">Changes</span>
-          <ToggleButton disabled={!hasDiff} onClick={() => onNavigate("prev")}>
-            Prev
-          </ToggleButton>
-          <ToggleButton disabled={!hasDiff} onClick={() => onNavigate("next")}>
-            Next
-          </ToggleButton>
-        </div>
-        {view === "lines" && (
-          <div className="sd-control-group">
-            <span className="sd-control-label">Line Mode</span>
-            <ToggleButton
-              active={lineMode === "semantic"}
-              onClick={() => onLineModeChange("semantic")}
-            >
-              Semantic
-            </ToggleButton>
-            <ToggleButton
-              active={lineMode === "raw"}
-              onClick={() => onLineModeChange("raw")}
-            >
-              Raw
-            </ToggleButton>
-          </div>
-        )}
         <div className="sd-control-group">
           <span className="sd-control-label">Comments</span>
           <ToggleButton
@@ -481,7 +375,6 @@ function DiffPanelBody({
   diffError,
   diffData,
   diffHtml,
-  view,
   iframeRef,
 }: DiffPanelBodyProps) {
   const warnings = diffData?.file.warnings ?? [];
@@ -510,22 +403,20 @@ function DiffPanelBody({
   } else if (diffData && diffHtml) {
     content = (
       <>
-        {view === "lines" && (
-          <div className="sd-review-card">
-            <div className="sd-review-title">
-              Review changes with{" "}
-              <span className="sd-review-badge">SemaDiff</span>
-            </div>
-            {typeof diffData.file.reductionPercent === "number" && (
-              <div className="sd-review-metric">
-                <span className="sd-review-percent">
-                  {diffData.file.reductionPercent}%
-                </span>
-                <span className="sd-review-label">smaller</span>
-              </div>
-            )}
+        <div className="sd-review-card">
+          <div className="sd-review-title">
+            Review changes with{" "}
+            <span className="sd-review-badge">SemaDiff</span>
           </div>
-        )}
+          {typeof diffData.file.reductionPercent === "number" && (
+            <div className="sd-review-metric">
+              <span className="sd-review-percent">
+                {diffData.file.reductionPercent}%
+              </span>
+              <span className="sd-review-label">smaller</span>
+            </div>
+          )}
+        </div>
         <iframe
           className="sd-diff-frame"
           ref={iframeRef}
@@ -552,18 +443,12 @@ function DiffPanel({
   summary,
   selectedSummary,
   selectedFile,
-  view,
   lineLayout,
-  lineMode,
   hideComments,
   compareMoves,
-  hasDiff,
   onRefresh,
-  onViewChange,
   onLineLayoutChange,
-  onLineModeChange,
   onHideCommentsChange,
-  onNavigate,
   onCompareMovesChange,
   diffLoading,
   diffError,
@@ -575,21 +460,15 @@ function DiffPanel({
     <section className="sd-panel">
       <DiffPanelHeader
         compareMoves={compareMoves}
-        hasDiff={hasDiff}
         hideComments={hideComments}
         lineLayout={lineLayout}
-        lineMode={lineMode}
         onCompareMovesChange={onCompareMovesChange}
         onHideCommentsChange={onHideCommentsChange}
         onLineLayoutChange={onLineLayoutChange}
-        onLineModeChange={onLineModeChange}
-        onNavigate={onNavigate}
         onRefresh={onRefresh}
-        onViewChange={onViewChange}
         selectedFile={selectedFile}
         selectedSummary={selectedSummary}
         summary={summary}
-        view={view}
       />
       <DiffPanelBody
         diffData={diffData}
@@ -597,7 +476,6 @@ function DiffPanel({
         diffHtml={diffHtml}
         diffLoading={diffLoading}
         iframeRef={iframeRef}
-        view={view}
       />
     </section>
   );
@@ -634,9 +512,7 @@ function App() {
     total: 0,
     runId: 0,
   });
-  const [view, setView] = useState<"semantic" | "lines">("lines");
   const [lineLayout, setLineLayout] = useState<"split" | "unified">("unified");
-  const [lineMode, setLineMode] = useState<"semantic" | "raw">("semantic");
   const [hideComments, setHideComments] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);
   const [compareMoves, setCompareMoves] = useState(true);
@@ -805,7 +681,7 @@ function App() {
             filename,
             contextLines: lineContextLines,
             lineLayout,
-            lineMode,
+            lineMode: "semantic",
             hideComments,
             detectMoves: compareMoves,
           },
@@ -855,7 +731,6 @@ function App() {
     summary,
     search.pr,
     lineLayout,
-    lineMode,
     hideComments,
     refreshToken,
     compareMoves,
@@ -890,20 +765,7 @@ function App() {
   const diffLoading =
     !!selectedFile &&
     (!diffResult || (prefetchState.active && !diffCache[selectedFile]));
-  const diffHtmlRaw =
-    diffData && view === "semantic"
-      ? diffData.semanticHtml
-      : diffData?.linesHtml;
-  const diffHtml = diffHtmlRaw ? injectNavigation(diffHtmlRaw) : diffHtmlRaw;
-
-  const hasDiff = Boolean(diffHtml);
-
-  const sendNavigate = useCallback((direction: "next" | "prev") => {
-    iframeRef.current?.contentWindow?.postMessage(
-      { type: "semadiff:navigate", direction },
-      "*"
-    );
-  }, []);
+  const diffHtml = diffData?.linesHtml ?? null;
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -943,22 +805,16 @@ function App() {
           diffError={diffError}
           diffHtml={diffHtml ?? null}
           diffLoading={diffLoading}
-          hasDiff={hasDiff}
           hideComments={hideComments}
           iframeRef={iframeRef}
           lineLayout={lineLayout}
-          lineMode={lineMode}
           onCompareMovesChange={(next) => setCompareMoves(next)}
           onHideCommentsChange={setHideComments}
           onLineLayoutChange={(next) => setLineLayout(next)}
-          onLineModeChange={setLineMode}
-          onNavigate={sendNavigate}
           onRefresh={() => setRefreshToken((value) => value + 1)}
-          onViewChange={(next) => setView(next)}
           selectedFile={selectedFile}
           selectedSummary={selectedSummary ?? null}
           summary={summary}
-          view={view}
         />
       </main>
     </div>

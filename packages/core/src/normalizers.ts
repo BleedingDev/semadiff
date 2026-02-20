@@ -29,6 +29,13 @@ export type NormalizerRuleSummary = Omit<NormalizerRule, "apply">;
 const WHITESPACE_SPLIT_RE = /\s+/;
 const AS_SPLIT_RE = /\s+as\s+/i;
 const EXPONENT_SPLIT_RE = /[eE]/;
+const SINGLE_QUOTED_STRING_RE = /'((?:\\.|[^'\\])*)'/g;
+const QUOTE_STYLE_LANGUAGES = new Set<NormalizerLanguage>([
+  "ts",
+  "tsx",
+  "js",
+  "jsx",
+]);
 
 const whitespaceRule: NormalizerRule = {
   id: "whitespace",
@@ -159,6 +166,16 @@ function normalizeNumericLiteral(literal: string) {
   return stripped;
 }
 
+function normalizeQuoteStyleForLanguage(
+  text: string,
+  language?: NormalizerLanguage
+) {
+  if (!(language && QUOTE_STYLE_LANGUAGES.has(language))) {
+    return text;
+  }
+  return text.replace(SINGLE_QUOTED_STRING_RE, '"$1"');
+}
+
 export function normalizeText(text: string, config: NormalizerConfig): string {
   return allRules.reduce((current, rule) => {
     if (!config[rule.id]) {
@@ -190,7 +207,10 @@ export function normalizeTextForLanguage(
   settings: NormalizerSettings,
   language?: NormalizerLanguage
 ): string {
-  return normalizeText(text, resolveNormalizerConfig(settings, language));
+  return normalizeQuoteStyleForLanguage(
+    normalizeText(text, resolveNormalizerConfig(settings, language)),
+    language
+  );
 }
 
 export function listNormalizerRules(): NormalizerRuleSummary[] {

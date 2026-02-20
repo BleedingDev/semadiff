@@ -135,4 +135,40 @@ describe("normalizer config resolution", () => {
     );
     expect(output).toBe('import {a, z} from "pkg";');
   });
+
+  test("normalizeTextForLanguage ignores quote-style-only changes for JS/TS", () => {
+    const settings = {
+      global: {
+        whitespace: false,
+        tailwind: false,
+        importOrder: false,
+        numericLiterals: false,
+      },
+      perLanguage: {},
+    };
+    const output = normalizeTextForLanguage(
+      "const a = 'one'; const b = \"two\";",
+      settings,
+      "ts"
+    );
+    expect(output).toBe('const a = "one"; const b = "two";');
+  });
+
+  test("normalizeTextForLanguage keeps quote style for non-JS/TS languages", () => {
+    const settings = {
+      global: {
+        whitespace: false,
+        tailwind: false,
+        importOrder: false,
+        numericLiterals: false,
+      },
+      perLanguage: {},
+    };
+    const output = normalizeTextForLanguage(
+      "\"single-quote: 'x'\"",
+      settings,
+      "md"
+    );
+    expect(output).toBe("\"single-quote: 'x'\"");
+  });
 });
