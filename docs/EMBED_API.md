@@ -121,3 +121,20 @@ interface UseSemaDiffExplorerStateInput {
    - Gate: embed example apps work (React 19+).
 5. Plate 5: migrate `apps/pr-viewer` to consume extracted packages only.
    - Gate: full quality + e2e regression pass.
+
+## Current Status
+
+- ✅ Plate 1 complete (`8cb3d74`)
+- ✅ Plate 2 complete (`b3a05fc`)
+- ✅ Plate 3 complete (`cf4098c`)
+- ✅ Plate 4 complete (`1e703bf`)
+- ✅ Plate 5 complete (`d06ff57`)
+- ✅ Plate 6 complete: `@semadiff/react-ui` now ships `styles.css` for embed consumers (`ffa88bb`).
+
+### Validation Notes
+
+- Full `pnpm quality` passes on each plate commit.
+- Workspace and app tests pass after Plate 6.
+- `pnpm test:e2e` currently has one unrelated existing failure in `e2e/cli-pack.spec.ts`:
+  - `Cannot find module 'effect/Latch'` in packed consumer runtime.
+  - This failure is outside the React embed migration path and should be tracked separately.
