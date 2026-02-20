@@ -1,3 +1,4 @@
+export * from "./embed-api.js";
 export * from "./github.js";
 export * from "./pr-diff.js";
 export * from "./pr-url.js";
