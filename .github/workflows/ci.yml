@@ -34,6 +34,8 @@ jobs:
         run: pnpm install
       - name: Quality gates
         run: pnpm quality
+      - name: Publint package metadata
+        run: pnpm publint
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4

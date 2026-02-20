@@ -52,5 +52,6 @@ A change is expected to keep these green:
 
 1. `pnpm quality`
 2. `pnpm test:e2e`
-3. Build and verify packable artifacts as needed.
-4. Ensure docs/config/schema updates are included for user-facing changes.
+3. `pnpm publint`
+4. Build and verify packable artifacts as needed.
+5. Ensure docs/config/schema updates are included for user-facing changes.

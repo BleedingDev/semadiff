@@ -14,6 +14,17 @@ export default defineConfig({
       output: {
         target: "web",
       },
+      tools: {
+        swc: {
+          jsc: {
+            transform: {
+              react: {
+                runtime: "automatic",
+              },
+            },
+          },
+        },
+      },
     },
   ],
 });
