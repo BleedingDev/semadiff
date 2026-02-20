@@ -41,6 +41,30 @@ const getDiffEmptyMessage = (file: PrFileSummary) => {
   return "No changes detected.";
 };
 
+const FIRST_CHANGED_LINE_SELECTOR =
+  ".sd-line--insert, .sd-line--delete, .sd-line--replace, .sd-line--move";
+
+export const findFirstChangedLine = (doc: Document | null) =>
+  doc?.querySelector(FIRST_CHANGED_LINE_SELECTOR) ?? null;
+
+export const scrollDiffDocumentToFirstChange = (doc: Document | null) => {
+  const firstChanged = findFirstChangedLine(doc);
+  if (!firstChanged) {
+    return false;
+  }
+  firstChanged.scrollIntoView({ block: "center", inline: "nearest" });
+  return true;
+};
+
+export const focusFirstDiffChange = (iframe: HTMLIFrameElement | null) => {
+  if (!iframe) {
+    return false;
+  }
+  return scrollDiffDocumentToFirstChange(
+    iframe.contentDocument ?? iframe.contentWindow?.document ?? null
+  );
+};
+
 interface PrefetchState {
   active: boolean;
   loaded: number;
@@ -358,6 +382,21 @@ export function DiffPanelBody({
   diffHtml,
   iframeRef,
 }: DiffPanelBodyProps) {
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) {
+      return;
+    }
+    const handleLoad = () => {
+      focusFirstDiffChange(iframe);
+    };
+    iframe.addEventListener("load", handleLoad);
+    handleLoad();
+    return () => {
+      iframe.removeEventListener("load", handleLoad);
+    };
+  }, [iframeRef]);
+
   const warnings = diffData?.file.warnings ?? [];
   const warningBanner =
     warnings.length > 0 ? (

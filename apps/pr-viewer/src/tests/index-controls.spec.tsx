@@ -15,7 +15,14 @@ vi.mock("../server/pr.server", () => ({
   getPrSummary: vi.fn(),
 }));
 
-import { ChangeTotals, DiffPanelBody, DiffPanelHeader } from "../routes/index";
+import {
+  ChangeTotals,
+  DiffPanelBody,
+  DiffPanelHeader,
+  findFirstChangedLine,
+  focusFirstDiffChange,
+  scrollDiffDocumentToFirstChange,
+} from "../routes/index";
 
 const REVIEW_CARD_TEXT = /Review changes with/i;
 
@@ -111,5 +118,38 @@ describe("DiffPanelBody", () => {
 
     expect(screen.getByTitle("diff-apps/n1/next.config.ts")).toBeDefined();
     expect(screen.queryByText(REVIEW_CARD_TEXT)).toBeNull();
+  });
+});
+
+describe("Diff auto-focus", () => {
+  test("finds the first changed line in document order", () => {
+    const doc = document.implementation.createHTMLDocument("diff");
+    doc.body.innerHTML = `
+      <div class="sd-line sd-line--equal"></div>
+      <div class="sd-line sd-line--delete"></div>
+      <div class="sd-line sd-line--insert"></div>
+    `;
+
+    const first = findFirstChangedLine(doc);
+    expect(first?.className).toContain("sd-line--delete");
+  });
+
+  test("scrolls the first changed line into view", () => {
+    const doc = document.implementation.createHTMLDocument("diff");
+    doc.body.innerHTML = `
+      <div class="sd-line sd-line--equal"></div>
+      <div class="sd-line sd-line--replace"></div>
+    `;
+    const first = doc.querySelector(".sd-line--replace") as HTMLElement;
+    const spy = vi.fn();
+    first.scrollIntoView = spy;
+
+    const didScroll = scrollDiffDocumentToFirstChange(doc);
+    expect(didScroll).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  test("focusFirstDiffChange returns false when iframe is missing", () => {
+    expect(focusFirstDiffChange(null)).toBe(false);
   });
 });
