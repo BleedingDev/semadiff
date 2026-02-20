@@ -236,70 +236,93 @@ const newTokens = [
   rangeFor(newText, '"@techsio/analytics"'),
   rangeFor(newText, '"@techsio/storefront-data"'),
 ];
-const rowKinds = (html) =>
-  [...html.matchAll(/<div class="sd-line sd-line--(equal|insert|delete|replace|move)/g)].map((match) => match[1]);
-const withTokens = renderHtml(diff, {
-  oldText,
-  newText,
-  language: 'ts',
-  view: 'lines',
-  lineMode: 'semantic',
-  lineLayout: 'unified',
-  contextLines: 6,
-  virtualize: false,
-  semanticTokens: { old: oldTokens, new: newTokens },
-});
-const withoutTokens = renderHtml(diff, {
-  oldText,
-  newText,
-  language: 'ts',
-  view: 'lines',
-  lineMode: 'semantic',
-  lineLayout: 'unified',
-  contextLines: 6,
-  virtualize: false,
-});
-const withTokenRows = rowKinds(withTokens);
-const withoutTokenRows = rowKinds(withoutTokens);
-const hasStorefrontInsert = withTokens.includes("sd-line--insert") && withTokens.includes("@techsio/storefront-data");
-const hasAnchorInsert = withTokens.includes("transpilePackages: [");
-const hasUiContextLine = withTokens.includes("@new-engine/ui");
-const hasAnalyticsContextLine = withTokens.includes("@techsio/analytics");
-const hasClosingBracket = withTokens.includes("],");
+const extractRows = (html) => {
+  const marker = "globalThis.__SEMADIFF_DATA__ = ";
+  const start = html.indexOf(marker);
+  if (start === -1) {
+    throw new Error("Missing virtualized payload");
+  }
+  const from = start + marker.length;
+  const end = html.indexOf(";</script>", from);
+  if (end === -1) {
+    throw new Error("Missing payload terminator");
+  }
+  const payload = JSON.parse(html.slice(from, end));
+  return payload.rows ?? [];
+};
+const rowKinds = (rows) => rows.map((row) => row.type);
+const rowValue = (row) => String(row.text ?? row.newText ?? row.oldText ?? "");
+const typesFor = (rows, fragment) =>
+  rows.filter((row) => rowValue(row).includes(fragment)).map((row) => row.type);
+const renderFor = (lineLayout, semanticTokens) =>
+  renderHtml(diff, {
+    oldText,
+    newText,
+    language: "ts",
+    view: "lines",
+    lineMode: "semantic",
+    lineLayout,
+    contextLines: 6,
+    virtualize: true,
+    semanticTokens,
+  });
+const withTokensUnifiedHtml = renderFor("unified", { old: oldTokens, new: newTokens });
+const withTokensSplitHtml = renderFor("split", { old: oldTokens, new: newTokens });
+const withoutTokensUnifiedHtml = renderFor("unified", undefined);
+const withTokensUnifiedRows = extractRows(withTokensUnifiedHtml);
+const withTokensSplitRows = extractRows(withTokensSplitHtml);
+const withoutTokensUnifiedRows = extractRows(withoutTokensUnifiedHtml);
 console.log(JSON.stringify({
-  withTokenRows,
-  withoutTokenRows,
-  hasStorefrontInsert,
-  hasAnchorInsert,
-  hasUiContextLine,
-  hasAnalyticsContextLine,
-  hasClosingBracket,
-  hasFallbackWarning: withTokens.includes('Raw line diff is shown'),
-  hasGapRows: withTokens.includes('<div class="sd-line sd-line--gap">'),
+  withTokenUnifiedRows: rowKinds(withTokensUnifiedRows),
+  withTokenSplitRows: rowKinds(withTokensSplitRows),
+  withoutTokenUnifiedRows: rowKinds(withoutTokensUnifiedRows),
+  unifiedUiTypes: typesFor(withTokensUnifiedRows, "@new-engine/ui"),
+  splitUiTypes: typesFor(withTokensSplitRows, "@new-engine/ui"),
+  unifiedAnalyticsTypes: typesFor(withTokensUnifiedRows, "@techsio/analytics"),
+  splitAnalyticsTypes: typesFor(withTokensSplitRows, "@techsio/analytics"),
+  unifiedStorefrontTypes: typesFor(withTokensUnifiedRows, "@techsio/storefront-data"),
+  splitStorefrontTypes: typesFor(withTokensSplitRows, "@techsio/storefront-data"),
+  unifiedClosingTypes: typesFor(withTokensUnifiedRows, "],"),
+  splitClosingTypes: typesFor(withTokensSplitRows, "],"),
+  hasFallbackWarning:
+    withTokensUnifiedHtml.includes('Raw line diff is shown') ||
+    withTokensSplitHtml.includes('Raw line diff is shown'),
+  hasUnifiedGapRows: withTokensUnifiedRows.some((row) => row.type === "gap"),
+  hasSplitGapRows: withTokensSplitRows.some((row) => row.type === "gap"),
 }));`
   );
 
   const parsed = decodeJson<{
-    withTokenRows: string[];
-    withoutTokenRows: string[];
-    hasStorefrontInsert: boolean;
-    hasAnchorInsert: boolean;
-    hasUiContextLine: boolean;
-    hasAnalyticsContextLine: boolean;
-    hasClosingBracket: boolean;
+    withTokenUnifiedRows: string[];
+    withTokenSplitRows: string[];
+    withoutTokenUnifiedRows: string[];
+    unifiedUiTypes: string[];
+    splitUiTypes: string[];
+    unifiedAnalyticsTypes: string[];
+    splitAnalyticsTypes: string[];
+    unifiedStorefrontTypes: string[];
+    splitStorefrontTypes: string[];
+    unifiedClosingTypes: string[];
+    splitClosingTypes: string[];
     hasFallbackWarning: boolean;
-    hasGapRows: boolean;
+    hasUnifiedGapRows: boolean;
+    hasSplitGapRows: boolean;
   }>(output);
 
-  expect(parsed.withTokenRows.length).toBeGreaterThan(4);
-  expect(parsed.withoutTokenRows.length).toBeGreaterThan(
-    parsed.withTokenRows.length
+  expect(parsed.withTokenUnifiedRows.length).toBeGreaterThan(4);
+  expect(parsed.withTokenSplitRows.length).toBeGreaterThan(4);
+  expect(parsed.withoutTokenUnifiedRows.length).toBeGreaterThan(
+    parsed.withTokenUnifiedRows.length
   );
-  expect(parsed.hasStorefrontInsert).toBe(true);
-  expect(parsed.hasAnchorInsert).toBe(true);
-  expect(parsed.hasUiContextLine).toBe(true);
-  expect(parsed.hasAnalyticsContextLine).toBe(true);
-  expect(parsed.hasClosingBracket).toBe(true);
+  expect(parsed.unifiedUiTypes).not.toContain("insert");
+  expect(parsed.splitUiTypes).not.toContain("insert");
+  expect(parsed.unifiedAnalyticsTypes).not.toContain("insert");
+  expect(parsed.splitAnalyticsTypes).not.toContain("insert");
+  expect(parsed.unifiedStorefrontTypes).toContain("insert");
+  expect(parsed.splitStorefrontTypes).toContain("insert");
+  expect(parsed.unifiedClosingTypes).not.toContain("insert");
+  expect(parsed.splitClosingTypes).not.toContain("insert");
   expect(parsed.hasFallbackWarning).toBe(false);
-  expect(parsed.hasGapRows).toBe(false);
+  expect(parsed.hasUnifiedGapRows).toBe(false);
+  expect(parsed.hasSplitGapRows).toBe(false);
 });

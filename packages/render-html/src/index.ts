@@ -459,6 +459,7 @@ body.sd-embed .sd-lines {
 const LINE_SPLIT_RE = /\r?\n/;
 const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
 const SEMANTIC_TOKEN_CONTENT_RE = /[A-Za-z0-9_$"']/;
+const PROJECTION_FRAGMENT_RE = /[^A-Za-z0-9@_./-]+/g;
 
 interface LineEdit {
   type: "equal" | "insert" | "delete";
@@ -3535,6 +3536,337 @@ function filterSemanticRows(
   return filtered;
 }
 
+function toProjectedEqualRow(row: LineRow): LineRow {
+  if (row.type === "replace") {
+    return {
+      type: "equal",
+      oldLine: row.oldLine ?? null,
+      newLine: row.newLine ?? null,
+      text: rowNewText(row),
+    };
+  }
+
+  return {
+    type: "equal",
+    oldLine: row.oldLine ?? null,
+    newLine: row.newLine ?? null,
+    text: rowText(row),
+  };
+}
+
+function collectFollowingInsertRows(rows: LineRow[], startIndex: number) {
+  const inserts: LineRow[] = [];
+  let probe = startIndex + 1;
+  while (probe < rows.length && rows[probe]?.type === "insert") {
+    const next = rows[probe];
+    if (next) {
+      inserts.push(next);
+    }
+    probe += 1;
+  }
+  return { inserts, probe };
+}
+
+function normalizeInsertRowsAgainstOld(
+  inserts: LineRow[],
+  oldNormalized: string,
+  normalizeLine: (line: string) => string
+) {
+  let matchedInsertCount = 0;
+  const normalizedInserts = inserts.map((insertRow) => {
+    const insertNormalized = normalizeLine(rowText(insertRow)).trim();
+    if (matchesProjectedAnchor(insertNormalized, oldNormalized)) {
+      matchedInsertCount += 1;
+      return toProjectedEqualRow(insertRow);
+    }
+    return insertRow;
+  });
+  return { normalizedInserts, matchedInsertCount };
+}
+
+function toProjectionFragments(normalized: string) {
+  return normalized
+    .split(PROJECTION_FRAGMENT_RE)
+    .map((fragment) => fragment.trim())
+    .filter((fragment) => fragment.length > 0);
+}
+
+function matchesProjectedAnchor(
+  insertNormalized: string,
+  anchorNormalized: string
+) {
+  if (!(insertNormalized && anchorNormalized)) {
+    return false;
+  }
+  if (anchorNormalized.includes(insertNormalized)) {
+    return true;
+  }
+  const insertFragments = toProjectionFragments(insertNormalized);
+  if (insertFragments.length === 0) {
+    return false;
+  }
+  const anchorFragments = new Set(toProjectionFragments(anchorNormalized));
+  return insertFragments.every((fragment) => anchorFragments.has(fragment));
+}
+
+function shouldDowngradeReplaceRow(
+  row: LineRow,
+  oldNormalized: string,
+  normalizeLine: (line: string) => string
+) {
+  const newNormalized = normalizeLine(rowNewText(row)).trim();
+  return Boolean(newNormalized && oldNormalized.includes(newNormalized));
+}
+
+function reconcileAstProjectedInserts(
+  rows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  if (rows.length < 2) {
+    return rows;
+  }
+
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (!row || row.type !== "replace") {
+      if (row) {
+        output.push(row);
+      }
+      continue;
+    }
+
+    const { inserts, probe } = collectFollowingInsertRows(rows, index);
+    if (inserts.length === 0) {
+      output.push(row);
+      continue;
+    }
+
+    const oldNormalized = normalizeLine(rowOldText(row)).trim();
+    if (!oldNormalized) {
+      output.push(row, ...inserts);
+      index = probe - 1;
+      continue;
+    }
+
+    const { normalizedInserts, matchedInsertCount } =
+      normalizeInsertRowsAgainstOld(inserts, oldNormalized, normalizeLine);
+
+    if (matchedInsertCount === 0) {
+      output.push(row, ...inserts);
+      index = probe - 1;
+      continue;
+    }
+
+    if (shouldDowngradeReplaceRow(row, oldNormalized, normalizeLine)) {
+      output.push(toProjectedEqualRow(row));
+    } else {
+      output.push(row);
+    }
+    output.push(...normalizedInserts);
+    index = probe - 1;
+  }
+
+  return output;
+}
+
+function collectLeadingInsertRows(rows: LineRow[], startIndex: number) {
+  const inserts: LineRow[] = [];
+  let probe = startIndex;
+  while (probe < rows.length) {
+    const next = rows[probe];
+    if (!next || next.type !== "insert" || next.oldLine !== null) {
+      break;
+    }
+    inserts.push(next);
+    probe += 1;
+  }
+  return { inserts, probe };
+}
+
+function normalizeRowsAgainstAnchorLine(
+  rows: LineRow[],
+  anchorNormalized: string,
+  normalizeLine: (line: string) => string
+) {
+  return rows.map((row) => {
+    if (row.type !== "insert") {
+      return row;
+    }
+    const insertNormalized = normalizeLine(rowText(row)).trim();
+    if (matchesProjectedAnchor(insertNormalized, anchorNormalized)) {
+      return toProjectedEqualInsert(row);
+    }
+    return row;
+  });
+}
+
+function reconcileInsertBlocksAgainstTrailingReplace(
+  rows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  if (rows.length < 2) {
+    return rows;
+  }
+
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (!row || row.type !== "insert" || row.oldLine !== null) {
+      if (row) {
+        output.push(row);
+      }
+      continue;
+    }
+
+    const { inserts, probe } = collectLeadingInsertRows(rows, index);
+    if (inserts.length === 0) {
+      continue;
+    }
+
+    const trailing = rows[probe];
+    if (!trailing || trailing.type !== "replace") {
+      output.push(...inserts);
+      index = probe - 1;
+      continue;
+    }
+
+    const oldNormalized = normalizeLine(rowOldText(trailing)).trim();
+    if (!oldNormalized) {
+      output.push(...inserts, trailing);
+      index = probe;
+      continue;
+    }
+
+    const { normalizedInserts, matchedInsertCount } =
+      normalizeInsertRowsAgainstOld(inserts, oldNormalized, normalizeLine);
+    if (matchedInsertCount === 0) {
+      output.push(...inserts, trailing);
+      index = probe;
+      continue;
+    }
+
+    output.push(...normalizedInserts);
+    if (shouldDowngradeReplaceRow(trailing, oldNormalized, normalizeLine)) {
+      output.push(toProjectedEqualRow(trailing));
+    } else {
+      output.push(trailing);
+    }
+    index = probe;
+  }
+
+  return output;
+}
+
+function isTrailingProjectedRow(row: LineRow | undefined): row is LineRow {
+  return Boolean(
+    row &&
+      row.oldLine == null &&
+      (row.type === "equal" || row.type === "insert")
+  );
+}
+
+function collectTrailingProjectedRows(rows: LineRow[], startIndex: number) {
+  let probe = startIndex + 1;
+  const trailingRows: LineRow[] = [];
+  while (probe < rows.length) {
+    const trailing = rows[probe];
+    if (!isTrailingProjectedRow(trailing)) {
+      break;
+    }
+    trailingRows.push(trailing);
+    probe += 1;
+  }
+  return { trailingRows, probe };
+}
+
+function hasTrailingProjectedInsertRows(rows: LineRow[]) {
+  return rows.some((entry) => entry.type === "insert");
+}
+
+function resumesOnNextOldLine(row: LineRow, next: LineRow | undefined) {
+  if (row.oldLine == null) {
+    return false;
+  }
+  const nextOldLine = next?.oldLine ?? null;
+  return nextOldLine !== null && nextOldLine === row.oldLine + 1;
+}
+
+function normalizeAnchorProjectedRows(
+  rows: LineRow[],
+  anchorNormalized: string,
+  normalizeLine: (line: string) => string
+) {
+  if (!anchorNormalized) {
+    return rows;
+  }
+  return normalizeRowsAgainstAnchorLine(rows, anchorNormalized, normalizeLine);
+}
+
+function reconcileAnchorProjectedInsertRows(
+  rows: LineRow[],
+  oldText: string,
+  normalizeLine: (line: string) => string
+) {
+  if (rows.length < 3) {
+    return rows;
+  }
+
+  const oldLines = splitLines(oldText);
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (!row || row.oldLine == null) {
+      if (row) {
+        output.push(row);
+      }
+      continue;
+    }
+
+    output.push(row);
+
+    const { trailingRows, probe } = collectTrailingProjectedRows(rows, index);
+    if (!hasTrailingProjectedInsertRows(trailingRows)) {
+      continue;
+    }
+
+    if (!resumesOnNextOldLine(row, rows[probe])) {
+      output.push(...trailingRows);
+      index = probe - 1;
+      continue;
+    }
+
+    const anchorNormalized = normalizeLine(
+      oldLines[row.oldLine - 1] ?? ""
+    ).trim();
+    output.push(
+      ...normalizeAnchorProjectedRows(
+        trailingRows,
+        anchorNormalized,
+        normalizeLine
+      )
+    );
+    index = probe - 1;
+  }
+
+  return output;
+}
+
+function reconcileProjectedInsertRows(
+  rows: LineRow[],
+  oldText: string,
+  normalizeLine: (line: string) => string
+) {
+  return reconcileAnchorProjectedInsertRows(
+    reconcileInsertBlocksAgainstTrailingReplace(
+      reconcileAstProjectedInserts(rows, normalizeLine),
+      normalizeLine
+    ),
+    oldText,
+    normalizeLine
+  );
+}
+
 interface PendingTokenProjectionState {
   pendingDeletes: LineRow[];
   budget: Map<string, number>;
@@ -3620,6 +3952,15 @@ function tryConsumeProjectedInsert(
   return true;
 }
 
+function toProjectedEqualInsert(row: LineRow): LineRow {
+  return {
+    type: "equal",
+    oldLine: null,
+    newLine: row.newLine ?? null,
+    text: rowText(row),
+  };
+}
+
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: token projection matching is a state-machine.
 function filterAstProjectedRows(
   rows: LineRow[],
@@ -3660,6 +4001,7 @@ function filterAstProjectedRows(
       !isStructuralAnchorRow(row) &&
       tryConsumeProjectedInsert(row, state, newTokenByLine)
     ) {
+      output.push(toProjectedEqualInsert(row));
       continue;
     }
 
@@ -4389,13 +4731,19 @@ function renderLineView(
   if (!hasLineChanges(selectedRows)) {
     return "";
   }
-  const rows = expandLineDiscontinuities(
+  const expandedRows = expandLineDiscontinuities(
     context.lineLayout === "unified"
       ? annotateUnifiedAdjacentPairs(selectedRows)
       : selectedRows,
     oldText,
     newText
   );
+  const rows =
+    context.lineMode === "raw"
+      ? expandedRows
+      : reconcileProjectedInsertRows(expandedRows, oldText, (line) =>
+          normalizeLineForSemantic(line, semanticLanguage)
+        );
 
   const summaryHtml = context.summaryHtml;
 
