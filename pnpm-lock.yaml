@@ -375,6 +375,22 @@ importers:
         specifier: ^19.0.12
         version: 19.2.9
 
+  packages/react-ui:
+    dependencies:
+      '@semadiff/pr-client':
+        specifier: workspace:*
+        version: link:../pr-client
+      '@semadiff/react':
+        specifier: workspace:*
+        version: link:../react
+      react:
+        specifier: '>=19.0.0'
+        version: 19.2.3
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.12
+        version: 19.2.9
+
   packages/render-html:
     dependencies:
       '@semadiff/core':

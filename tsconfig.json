@@ -12,6 +12,7 @@
     { "path": "packages/pr-backend" },
     { "path": "packages/pr-client" },
     { "path": "packages/react" },
+    { "path": "packages/react-ui" },
     { "path": "packages/cli/tsconfig.build.json" },
     { "path": "packages/github-extension" },
     { "path": "packages/test-corpus" }
