@@ -66,9 +66,9 @@ importers:
       '@semadiff/pr-backend':
         specifier: workspace:*
         version: link:../../packages/pr-backend
-      '@semadiff/react':
+      '@semadiff/react-ui':
         specifier: workspace:*
-        version: link:../../packages/react
+        version: link:../../packages/react-ui
       '@semadiff/render-html':
         specifier: workspace:*
         version: link:../../packages/render-html

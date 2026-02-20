@@ -16,7 +16,7 @@
     "@semadiff/parser-tree-sitter-wasm": "workspace:*",
     "@semadiff/parsers": "workspace:*",
     "@semadiff/pr-backend": "workspace:*",
-    "@semadiff/react": "workspace:*",
+    "@semadiff/react-ui": "workspace:*",
     "@semadiff/render-html": "workspace:*",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",

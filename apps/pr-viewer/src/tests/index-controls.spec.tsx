@@ -1,28 +1,68 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import type { FileDiffPayload } from "../shared/types";
-
-vi.mock("@tanstack/react-router", () => ({
-  createFileRoute: () => () => ({}),
-  useNavigate: () => vi.fn(),
-}));
-
-vi.mock("../server/pr.server", () => ({
-  getAuthStatus: vi.fn(),
-  getFileDiff: vi.fn(),
-  getPrSummary: vi.fn(),
-}));
-
+import type {
+  FileDiffPayload,
+  PrDiffResult,
+  PrSummary,
+} from "@semadiff/pr-backend";
 import {
   ChangeTotals,
-  DiffPanelBody,
-  DiffPanelHeader,
   findFirstChangedLine,
   focusFirstDiffChange,
+  SemaDiffExplorer,
   scrollDiffDocumentToFirstChange,
-} from "../routes/index";
+} from "@semadiff/react-ui";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vitest";
+
+const SUMMARY_FIXTURE: PrSummary = {
+  pr: {
+    title: "Refactor checkout flow",
+    url: "https://github.com/NMIT-WR/new-engine/pull/237",
+    baseSha: "base-sha",
+    headSha: "head-sha",
+    additions: 34,
+    deletions: 254,
+    changedFiles: 1,
+  },
+  files: [
+    {
+      filename: "apps/n1/next.config.ts",
+      status: "modified",
+      additions: 1,
+      deletions: 1,
+      changes: 2,
+      sha: "abc123",
+    },
+  ],
+};
+
+const DIFF_FIXTURE: FileDiffPayload = {
+  file: {
+    filename: "apps/n1/next.config.ts",
+    status: "modified",
+    additions: 1,
+    deletions: 1,
+    changes: 2,
+    sha: "abc123",
+    warnings: [],
+  },
+  semanticHtml: "",
+  linesHtml: "<html><body><div>ok</div></body></html>",
+};
+
+const ok = <T,>(data: T): PrDiffResult<T> => ({ ok: true, data });
+
+const createClient = () => ({
+  getPrSummary: vi.fn(async () => ok(SUMMARY_FIXTURE)),
+  getFileDiff: vi.fn(async () => ok(DIFF_FIXTURE)),
+});
 
 const REVIEW_CARD_TEXT = /Review changes with/i;
 
@@ -30,22 +70,19 @@ afterEach(() => {
   cleanup();
 });
 
-describe("DiffPanelHeader", () => {
-  test("does not render removed controls", () => {
+describe("SemaDiffExplorer controls", () => {
+  test("does not render removed controls", async () => {
+    const client = createClient();
+
     render(
-      <DiffPanelHeader
-        compareMoves
-        hideComments={false}
-        lineLayout="unified"
-        onCompareMovesChange={vi.fn()}
-        onHideCommentsChange={vi.fn()}
-        onLineLayoutChange={vi.fn()}
-        onRefresh={vi.fn()}
-        selectedFile="apps/n1/next.config.ts"
-        selectedSummary={null}
-        summary={null}
+      <SemaDiffExplorer
+        client={client}
+        contextLines={-1}
+        prUrl="https://github.com/NMIT-WR/new-engine/pull/237"
       />
     );
+
+    await waitFor(() => expect(client.getPrSummary).toHaveBeenCalledTimes(1));
 
     expect(screen.queryByRole("button", { name: "Ops" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Lines" })).toBeNull();
@@ -54,27 +91,41 @@ describe("DiffPanelHeader", () => {
     expect(screen.queryByRole("button", { name: "Raw" })).toBeNull();
   });
 
-  test("keeps core diff controls visible", () => {
+  test("keeps core diff controls visible", async () => {
+    const client = createClient();
+
     render(
-      <DiffPanelHeader
-        compareMoves
-        hideComments={false}
-        lineLayout="split"
-        onCompareMovesChange={vi.fn()}
-        onHideCommentsChange={vi.fn()}
-        onLineLayoutChange={vi.fn()}
-        onRefresh={vi.fn()}
-        selectedFile="apps/n1/next.config.ts"
-        selectedSummary={null}
-        summary={null}
+      <SemaDiffExplorer
+        client={client}
+        contextLines={-1}
+        prUrl="https://github.com/NMIT-WR/new-engine/pull/237"
       />
     );
+
+    await waitFor(() => expect(client.getPrSummary).toHaveBeenCalledTimes(1));
 
     expect(screen.getAllByRole("button", { name: "Recompute" }).length).toBe(1);
     expect(screen.getAllByRole("button", { name: "Unified" }).length).toBe(1);
     expect(screen.getAllByRole("button", { name: "Split" }).length).toBe(1);
     expect(screen.getAllByRole("button", { name: "Show" }).length).toBe(1);
     expect(screen.getAllByRole("button", { name: "Hide" }).length).toBe(1);
+  });
+
+  test("does not render the legacy reduction card above iframe", async () => {
+    const client = createClient();
+
+    render(
+      <SemaDiffExplorer
+        client={client}
+        contextLines={-1}
+        prUrl="https://github.com/NMIT-WR/new-engine/pull/237"
+      />
+    );
+
+    await waitFor(() => expect(client.getFileDiff).toHaveBeenCalledTimes(1));
+
+    expect(screen.getByTitle("diff-apps/n1/next.config.ts")).toBeDefined();
+    expect(screen.queryByText(REVIEW_CARD_TEXT)).toBeNull();
   });
 });
 
@@ -87,37 +138,6 @@ describe("ChangeTotals", () => {
       "sd-count--add"
     );
     expect(within(totals).getByText("-3").className).toContain("sd-count--del");
-  });
-});
-
-describe("DiffPanelBody", () => {
-  test("does not render the legacy reduction card above iframe", () => {
-    const diffPayload = {
-      file: {
-        filename: "apps/n1/next.config.ts",
-        status: "modified",
-        additions: 1,
-        deletions: 1,
-        changes: 2,
-        sha: "abc123",
-        warnings: [],
-      },
-      semanticHtml: "",
-      linesHtml: "",
-    } as FileDiffPayload;
-
-    render(
-      <DiffPanelBody
-        diffData={diffPayload}
-        diffError={null}
-        diffHtml="<html><body><div>ok</div></body></html>"
-        diffLoading={false}
-        iframeRef={{ current: null }}
-      />
-    );
-
-    expect(screen.getByTitle("diff-apps/n1/next.config.ts")).toBeDefined();
-    expect(screen.queryByText(REVIEW_CARD_TEXT)).toBeNull();
   });
 });
 
