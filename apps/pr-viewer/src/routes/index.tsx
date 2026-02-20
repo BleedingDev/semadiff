@@ -2,9 +2,9 @@ import {
   SemaDiffExplorer,
   type SemaDiffExplorerProps,
 } from "@semadiff/react-ui";
+import "@semadiff/react-ui/styles.css";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import "../App.css";
 import { getFileDiff, getPrSummary } from "../server/pr.server";
 
 interface SearchParams {

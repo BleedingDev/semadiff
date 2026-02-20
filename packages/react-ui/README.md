@@ -10,5 +10,6 @@ Embeddable React UI component for browsing SemaDiff PR diffs.
 
 ## Notes
 
-- This package reuses the same `sd-*` CSS class contract as `apps/pr-viewer`.
-- Host apps should include compatible styles (currently provided by `apps/pr-viewer/src/App.css`).
+- Import the package stylesheet once in your host app:
+  - `import "@semadiff/react-ui/styles.css";`
+- The stylesheet scopes styles to the `.sd-app` root class used by `SemaDiffExplorer`.
