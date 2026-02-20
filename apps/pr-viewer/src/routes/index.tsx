@@ -1,3 +1,4 @@
+import { useSemaDiffExplorer } from "@semadiff/react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   type FormEvent,
@@ -15,7 +16,6 @@ import type {
   PrFileSummary,
   PrSummary,
   ServerError,
-  ServerResult,
 } from "../shared/types";
 
 interface SearchParams {
@@ -64,13 +64,6 @@ export const focusFirstDiffChange = (iframe: HTMLIFrameElement | null) => {
     iframe.contentDocument ?? iframe.contentWindow?.document ?? null
   );
 };
-
-interface PrefetchState {
-  active: boolean;
-  loaded: number;
-  total: number;
-  runId: number;
-}
 
 interface ToggleButtonProps {
   active?: boolean;
@@ -493,231 +486,56 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
-  const lineContextLines = -1;
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [summaryResult, setSummaryResult] =
-    useState<ServerResult<PrSummary> | null>(null);
-  const [summaryLoading, setSummaryLoading] = useState(false);
-
   const [input, setInput] = useState(search.pr ?? "");
-  const [fileFilter, setFileFilter] = useState("");
-  const [selectedFile, setSelectedFile] = useState<string | null>(null);
-  const [diffCache, setDiffCache] = useState<
-    Record<string, ServerResult<FileDiffPayload>>
-  >({});
-  const [prefetchState, setPrefetchState] = useState<PrefetchState>({
-    active: false,
-    loaded: 0,
-    total: 0,
-    runId: 0,
-  });
-  const [lineLayout, setLineLayout] = useState<"split" | "unified">("unified");
-  const [hideComments, setHideComments] = useState(false);
-  const [refreshToken, setRefreshToken] = useState(0);
-  const [compareMoves, setCompareMoves] = useState(true);
-
-  const summary = summaryResult?.ok ? summaryResult.data : null;
-  const summaryError =
-    summaryResult && !summaryResult.ok ? summaryResult.error : null;
-  const selectedSummary = summary?.files.find(
-    (file) => file.filename === selectedFile
+  const client = useMemo(
+    () => ({
+      getPrSummary: (payload: { prUrl: string }) =>
+        getPrSummary({ data: payload }),
+      getFileDiff: (
+        payload: {
+          prUrl: string;
+          filename: string;
+          contextLines?: number;
+          lineLayout?: "split" | "unified";
+          lineMode?: "semantic" | "raw";
+          hideComments?: boolean;
+          detectMoves?: boolean;
+        },
+        request?: { signal?: AbortSignal }
+      ) => getFileDiff({ data: payload, signal: request?.signal }),
+    }),
+    []
   );
 
-  const filteredFiles = useMemo(() => {
-    if (!summary) {
-      return [];
-    }
-    const query = fileFilter.trim().toLowerCase();
-    if (!query) {
-      return summary.files;
-    }
-    return summary.files.filter((file) => {
-      const filenameMatch = file.filename.toLowerCase().includes(query);
-      const previousMatch = file.previousFilename
-        ? file.previousFilename.toLowerCase().includes(query)
-        : false;
-      return filenameMatch || previousMatch;
-    });
-  }, [summary, fileFilter]);
-
-  useEffect(() => {
-    if (!search.pr) {
-      setSummaryResult(null);
-      setSummaryLoading(false);
-      return;
-    }
-    let active = true;
-    setSummaryLoading(true);
-    getPrSummary({ data: { prUrl: search.pr } })
-      .then((result) => {
-        if (active) {
-          setSummaryResult(result);
-        }
-      })
-      .finally(() => {
-        if (active) {
-          setSummaryLoading(false);
-        }
-      });
-    return () => {
-      active = false;
-    };
-  }, [search.pr]);
-
-  useEffect(() => {
-    if (!summary?.files.length) {
-      setSelectedFile(null);
-      return;
-    }
-    setSelectedFile((current) => {
-      if (current && summary.files.find((file) => file.filename === current)) {
-        return current;
-      }
-      return summary.files[0]?.filename ?? null;
-    });
-  }, [summary?.files]);
-
-  useEffect(() => {
-    if (!summary) {
-      return;
-    }
-    if (!fileFilter.trim()) {
-      return;
-    }
-    if (!filteredFiles.length) {
-      setSelectedFile(null);
-      return;
-    }
-    if (
-      selectedFile &&
-      filteredFiles.some((file) => file.filename === selectedFile)
-    ) {
-      return;
-    }
-    setSelectedFile(filteredFiles[0]?.filename ?? null);
-  }, [fileFilter, filteredFiles, selectedFile, summary]);
-
-  useEffect(() => {
-    if (!summary) {
-      setDiffCache({});
-      setPrefetchState({
-        active: false,
-        loaded: 0,
-        total: 0,
-        runId: refreshToken,
-      });
-      return;
-    }
-    if (!search.pr) {
-      setDiffCache({});
-      setPrefetchState({
-        active: false,
-        loaded: 0,
-        total: 0,
-        runId: refreshToken,
-      });
-      return;
-    }
-    const prUrl = search.pr;
-
-    let active = true;
-    const controllers = new Map<string, AbortController>();
-    const files = summary.files.map((file) => file.filename);
-    const total = files.length;
-    const concurrency = Math.max(1, files.length);
-    let index = 0;
-    let inFlight = 0;
-    let loaded = 0;
-    const runId = refreshToken;
-
-    setDiffCache({});
-    setPrefetchState({ active: true, loaded: 0, total, runId });
-
-    const runNext = () => {
-      if (!active) {
-        return;
-      }
-      while (inFlight < concurrency && index < files.length) {
-        const filename = files[index];
-        index += 1;
-        if (!filename) {
-          continue;
-        }
-        inFlight += 1;
-
-        const controller = new AbortController();
-        controllers.set(filename, controller);
-
-        getFileDiff({
-          data: {
-            prUrl,
-            filename,
-            contextLines: lineContextLines,
-            lineLayout,
-            lineMode: "semantic",
-            hideComments,
-            detectMoves: compareMoves,
-          },
-          signal: controller.signal,
-        })
-          .then((result) => {
-            if (!active) {
-              return;
-            }
-            setDiffCache((prev) => ({ ...prev, [filename]: result }));
-          })
-          .finally(() => {
-            if (!active) {
-              return;
-            }
-            loaded += 1;
-            inFlight -= 1;
-            setPrefetchState((prev) => ({
-              ...prev,
-              loaded,
-              active: loaded < total,
-              runId,
-            }));
-            if (index >= files.length && inFlight === 0) {
-              setPrefetchState((prev) => ({
-                ...prev,
-                active: false,
-                runId,
-              }));
-              return;
-            }
-            runNext();
-          });
-      }
-    };
-
-    runNext();
-
-    return () => {
-      active = false;
-      for (const controller of controllers.values()) {
-        controller.abort();
-      }
-      setPrefetchState((prev) => ({ ...prev, active: false, runId }));
-    };
-  }, [
+  const {
     summary,
-    search.pr,
+    summaryLoading,
+    summaryError,
+    selectedSummary,
+    filteredFiles,
+    fileFilter,
+    setFileFilter,
+    selectedFile,
+    setSelectedFile,
+    diffData,
+    diffError,
+    diffLoading,
+    diffHtml,
     lineLayout,
+    setLineLayout,
     hideComments,
-    refreshToken,
+    setHideComments,
     compareMoves,
-  ]);
-
-  const diffResult = selectedFile ? (diffCache[selectedFile] ?? null) : null;
-  const diffData = diffResult?.ok ? diffResult.data : null;
-  const diffError = diffResult && !diffResult.ok ? diffResult.error : null;
-  const diffLoading =
-    !!selectedFile &&
-    (!diffResult || (prefetchState.active && !diffCache[selectedFile]));
-  const diffHtml = diffData?.linesHtml ?? null;
+    setCompareMoves,
+    refresh,
+  } = useSemaDiffExplorer({
+    client,
+    prUrl: search.pr,
+    contextLines: -1,
+  });
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -759,7 +577,7 @@ function App() {
           onCompareMovesChange={(next) => setCompareMoves(next)}
           onHideCommentsChange={setHideComments}
           onLineLayoutChange={(next) => setLineLayout(next)}
-          onRefresh={() => setRefreshToken((value) => value + 1)}
+          onRefresh={refresh}
           selectedFile={selectedFile}
           selectedSummary={selectedSummary ?? null}
           summary={summary}

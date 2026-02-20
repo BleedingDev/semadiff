@@ -25,6 +25,7 @@ export type {
   PrDiffLineLayout,
   PrDiffLineMode,
   PrDiffResult,
+  PrFileSummary,
   PrSummary,
 } from "@semadiff/pr-backend";
 

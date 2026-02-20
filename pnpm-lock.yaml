@@ -66,6 +66,9 @@ importers:
       '@semadiff/pr-backend':
         specifier: workspace:*
         version: link:../../packages/pr-backend
+      '@semadiff/react':
+        specifier: workspace:*
+        version: link:../../packages/react
       '@semadiff/render-html':
         specifier: workspace:*
         version: link:../../packages/render-html
@@ -358,6 +361,19 @@ importers:
       effect:
         specifier: '>=4.0.0-beta.5 <5'
         version: 4.0.0-beta.5
+
+  packages/react:
+    dependencies:
+      '@semadiff/pr-client':
+        specifier: workspace:*
+        version: link:../pr-client
+      react:
+        specifier: '>=19.0.0'
+        version: 19.2.3
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.12
+        version: 19.2.9
 
   packages/render-html:
     dependencies:

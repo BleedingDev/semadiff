@@ -11,6 +11,7 @@
     { "path": "packages/render-html" },
     { "path": "packages/pr-backend" },
     { "path": "packages/pr-client" },
+    { "path": "packages/react" },
     { "path": "packages/cli/tsconfig.build.json" },
     { "path": "packages/github-extension" },
     { "path": "packages/test-corpus" }
