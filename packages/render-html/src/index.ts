@@ -3800,36 +3800,122 @@ function annotateUnifiedAdjacentPairs(rows: LineRow[]) {
   return output;
 }
 
-function addLineDiscontinuityGaps(rows: LineRow[]) {
+function buildSyntheticContextRow(
+  oldLine: number | null,
+  newLine: number | null,
+  oldLines: string[],
+  newLines: string[]
+): LineRow | null {
+  if (oldLine === null && newLine === null) {
+    return null;
+  }
+
+  if (oldLine !== null && newLine !== null) {
+    const oldText = oldLines[oldLine - 1] ?? "";
+    const newText = newLines[newLine - 1] ?? "";
+    if (oldText === newText) {
+      return { type: "equal", oldLine, newLine, text: newText };
+    }
+    return { type: "replace", oldLine, newLine, oldText, newText };
+  }
+
+  if (oldLine !== null) {
+    return {
+      type: "delete",
+      oldLine,
+      newLine: null,
+      text: oldLines[oldLine - 1] ?? "",
+    };
+  }
+
+  if (newLine === null) {
+    return null;
+  }
+
+  return {
+    type: "insert",
+    oldLine: null,
+    newLine,
+    text: newLines[newLine - 1] ?? "",
+  };
+}
+
+function computeLineGap(
+  currentLine: number | null,
+  previousLine: number | null
+): number {
+  if (currentLine === null || previousLine === null) {
+    return 0;
+  }
+  return currentLine - previousLine - 1;
+}
+
+function appendMissingContextRows(
+  output: LineRow[],
+  oldGap: number,
+  newGap: number,
+  lastOldLine: number | null,
+  lastNewLine: number | null,
+  oldLines: string[],
+  newLines: string[]
+) {
+  const missing = Math.max(oldGap, newGap, 0);
+  if (missing <= 0) {
+    return;
+  }
+
+  for (let offset = 1; offset <= missing; offset += 1) {
+    const missingOldLine =
+      oldGap >= offset && lastOldLine !== null ? lastOldLine + offset : null;
+    const missingNewLine =
+      newGap >= offset && lastNewLine !== null ? lastNewLine + offset : null;
+    const synthetic = buildSyntheticContextRow(
+      missingOldLine,
+      missingNewLine,
+      oldLines,
+      newLines
+    );
+    if (synthetic) {
+      output.push(synthetic);
+    }
+  }
+}
+
+function isContextSeparatorRow(row: LineRow) {
+  return row.type === "hunk" || row.type === "gap";
+}
+
+function expandLineDiscontinuities(
+  rows: LineRow[],
+  oldText: string,
+  newText: string
+) {
   if (rows.length === 0) {
     return rows;
   }
 
+  const oldLines = splitLines(oldText);
+  const newLines = splitLines(newText);
   const output: LineRow[] = [];
   let lastOldLine: number | null = null;
   let lastNewLine: number | null = null;
 
   for (const row of rows) {
-    if (row.type === "hunk" || row.type === "gap") {
-      output.push(row);
-      lastOldLine = null;
-      lastNewLine = null;
+    if (isContextSeparatorRow(row)) {
       continue;
     }
 
-    const oldGap =
-      row.oldLine != null && lastOldLine != null
-        ? row.oldLine - lastOldLine - 1
-        : 0;
-    const newGap =
-      row.newLine != null && lastNewLine != null
-        ? row.newLine - lastNewLine - 1
-        : 0;
-    const hidden = Math.max(oldGap, newGap, 0);
-
-    if (hidden > 0) {
-      output.push({ type: "gap", hidden });
-    }
+    const oldGap = computeLineGap(row.oldLine ?? null, lastOldLine);
+    const newGap = computeLineGap(row.newLine ?? null, lastNewLine);
+    appendMissingContextRows(
+      output,
+      oldGap,
+      newGap,
+      lastOldLine,
+      lastNewLine,
+      oldLines,
+      newLines
+    );
 
     output.push(row);
 
@@ -4303,10 +4389,12 @@ function renderLineView(
   if (!hasLineChanges(selectedRows)) {
     return "";
   }
-  const rows = addLineDiscontinuityGaps(
+  const rows = expandLineDiscontinuities(
     context.lineLayout === "unified"
       ? annotateUnifiedAdjacentPairs(selectedRows)
-      : selectedRows
+      : selectedRows,
+    oldText,
+    newText
   );
 
   const summaryHtml = context.summaryHtml;

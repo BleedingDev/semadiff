@@ -263,11 +263,17 @@ const withTokenRows = rowKinds(withTokens);
 const withoutTokenRows = rowKinds(withoutTokens);
 const hasStorefrontInsert = withTokens.includes("sd-line--insert") && withTokens.includes("@techsio/storefront-data");
 const hasAnchorInsert = withTokens.includes("transpilePackages: [");
+const hasUiContextLine = withTokens.includes("@new-engine/ui");
+const hasAnalyticsContextLine = withTokens.includes("@techsio/analytics");
+const hasClosingBracket = withTokens.includes("],");
 console.log(JSON.stringify({
   withTokenRows,
   withoutTokenRows,
   hasStorefrontInsert,
   hasAnchorInsert,
+  hasUiContextLine,
+  hasAnalyticsContextLine,
+  hasClosingBracket,
   hasFallbackWarning: withTokens.includes('Raw line diff is shown'),
   hasGapRows: withTokens.includes('<div class="sd-line sd-line--gap">'),
 }));`
@@ -278,16 +284,22 @@ console.log(JSON.stringify({
     withoutTokenRows: string[];
     hasStorefrontInsert: boolean;
     hasAnchorInsert: boolean;
+    hasUiContextLine: boolean;
+    hasAnalyticsContextLine: boolean;
+    hasClosingBracket: boolean;
     hasFallbackWarning: boolean;
     hasGapRows: boolean;
   }>(output);
 
-  expect(parsed.withTokenRows).toEqual(["equal", "insert", "insert", "equal"]);
+  expect(parsed.withTokenRows.length).toBeGreaterThan(4);
   expect(parsed.withoutTokenRows.length).toBeGreaterThan(
     parsed.withTokenRows.length
   );
   expect(parsed.hasStorefrontInsert).toBe(true);
   expect(parsed.hasAnchorInsert).toBe(true);
+  expect(parsed.hasUiContextLine).toBe(true);
+  expect(parsed.hasAnalyticsContextLine).toBe(true);
+  expect(parsed.hasClosingBracket).toBe(true);
   expect(parsed.hasFallbackWarning).toBe(false);
   expect(parsed.hasGapRows).toBe(false);
 });
