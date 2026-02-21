@@ -231,7 +231,7 @@ function FilePanel({
             </div>
           )}
         </div>
-        <div className="sd-panel-header-actions">
+        <div className="sd-panel-header-actions sd-panel-header-actions--search">
           <input
             className="sd-input sd-input--compact sd-input--search"
             onChange={(event) => onFileFilterChange(event.target.value)}

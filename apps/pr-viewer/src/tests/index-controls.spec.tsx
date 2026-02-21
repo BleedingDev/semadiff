@@ -111,6 +111,27 @@ describe("SemaDiffExplorer controls", () => {
     expect(screen.getAllByRole("button", { name: "Hide" }).length).toBe(1);
   });
 
+  test("renders file filter input in dedicated full-width search row", async () => {
+    const client = createClient();
+
+    const { container } = render(
+      <SemaDiffExplorer
+        client={client}
+        contextLines={-1}
+        prUrl="https://github.com/NMIT-WR/new-engine/pull/237"
+      />
+    );
+
+    await waitFor(() => expect(client.getPrSummary).toHaveBeenCalledTimes(1));
+
+    const fileFilter = screen.getByPlaceholderText("Filter files");
+    expect(fileFilter.className).toContain("sd-input--search");
+    const searchRow = container.querySelector(
+      ".sd-panel-header-actions--search"
+    );
+    expect(searchRow).not.toBeNull();
+  });
+
   test("does not render the legacy reduction card above iframe", async () => {
     const client = createClient();
 

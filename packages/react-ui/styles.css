@@ -102,12 +102,14 @@
 .sd-input--compact {
   flex: 0 0 auto;
   width: 72px;
+  min-width: 0;
   padding: 6px 8px;
   font-size: 12px;
 }
 
 .sd-input--search {
   width: 180px;
+  min-width: 0;
 }
 
 .sd-input::placeholder {
@@ -181,6 +183,17 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.sd-panel-header-actions--search {
+  margin-left: 0;
+  width: 100%;
+}
+
+.sd-panel-header-actions--search .sd-input--search {
+  width: 100%;
+  max-width: 100%;
+  flex: 1 1 auto;
 }
 
 .sd-panel-title {
