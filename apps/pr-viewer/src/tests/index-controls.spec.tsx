@@ -43,6 +43,28 @@ const SUMMARY_FIXTURE: PrSummary = {
   ],
 };
 
+const SUMMARY_TWO_FILES: PrSummary = {
+  ...SUMMARY_FIXTURE,
+  files: [
+    {
+      filename: "apps/n1/next.config.ts",
+      status: "modified",
+      additions: 1,
+      deletions: 1,
+      changes: 2,
+      sha: "abc123",
+    },
+    {
+      filename: "apps/n1/package.json",
+      status: "modified",
+      additions: 2,
+      deletions: 1,
+      changes: 3,
+      sha: "def456",
+    },
+  ],
+};
+
 const DIFF_FIXTURE: FileDiffPayload = {
   file: {
     filename: "apps/n1/next.config.ts",
@@ -64,7 +86,18 @@ const createClient = () => ({
   getFileDiff: vi.fn(async () => ok(DIFF_FIXTURE)),
 });
 
+const createTwoFileClient = () => ({
+  getPrSummary: vi.fn(async () => ok(SUMMARY_TWO_FILES)),
+  getFileDiff: vi.fn(async (input: { filename: string }) =>
+    ok({
+      ...DIFF_FIXTURE,
+      file: { ...DIFF_FIXTURE.file, filename: input.filename },
+    })
+  ),
+});
+
 const REVIEW_CARD_TEXT = /Review changes with/i;
+const PACKAGE_FILE_BUTTON_TEXT = /apps\/n1\/package\.json/i;
 
 afterEach(() => {
   cleanup();
@@ -147,6 +180,34 @@ describe("SemaDiffExplorer controls", () => {
 
     expect(screen.getByTitle("diff-apps/n1/next.config.ts")).toBeDefined();
     expect(screen.queryByText(REVIEW_CARD_TEXT)).toBeNull();
+  });
+
+  test("emits selected file changes for URL persistence", async () => {
+    const client = createTwoFileClient();
+    const onSelectedFileChange = vi.fn();
+
+    render(
+      <SemaDiffExplorer
+        client={client}
+        contextLines={-1}
+        onSelectedFileChange={onSelectedFileChange}
+        prUrl="https://github.com/NMIT-WR/new-engine/pull/237"
+      />
+    );
+
+    await waitFor(() =>
+      expect(onSelectedFileChange).toHaveBeenCalledWith(
+        "apps/n1/next.config.ts"
+      )
+    );
+
+    screen.getByRole("button", { name: PACKAGE_FILE_BUTTON_TEXT }).click();
+
+    await waitFor(() =>
+      expect(onSelectedFileChange).toHaveBeenLastCalledWith(
+        "apps/n1/package.json"
+      )
+    );
   });
 });
 

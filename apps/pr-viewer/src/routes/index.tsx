@@ -8,6 +8,7 @@ import { getFileDiff, getPrSummary } from "../server/pr.server";
 
 interface SearchParams {
   pr?: string;
+  file?: string;
 }
 
 const explorerClient: SemaDiffExplorerProps["client"] = {
@@ -19,6 +20,7 @@ const explorerClient: SemaDiffExplorerProps["client"] = {
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
     pr: typeof search.pr === "string" ? search.pr : undefined,
+    file: typeof search.file === "string" ? search.file : undefined,
   }),
   component: App,
 });
@@ -32,7 +34,17 @@ function App() {
     if (!next) {
       return;
     }
-    navigate({ search: { pr: next } });
+    navigate({
+      search: (previous) => ({ ...previous, pr: next, file: undefined }),
+    });
+  };
+
+  const handleSelectedFileChange = (filename: string | null) => {
+    const nextFile = filename ?? undefined;
+    navigate({
+      search: (previous) =>
+        previous.file === nextFile ? previous : { ...previous, file: nextFile },
+    });
   };
 
   return (
@@ -41,7 +53,9 @@ function App() {
       client={explorerClient}
       contextLines={-1}
       onPrUrlSubmit={handlePrUrlSubmit}
+      onSelectedFileChange={handleSelectedFileChange}
       prUrl={search.pr}
+      selectedFile={search.file}
     />
   );
 }

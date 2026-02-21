@@ -164,9 +164,9 @@
 .sd-panel-header {
   padding: 14px 18px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   justify-content: flex-start;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
   background: rgba(8, 14, 30, 0.45);
 }
@@ -174,15 +174,17 @@
 .sd-panel-header-main {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .sd-panel-header-actions {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-left: 0;
+  min-width: 0;
 }
 
 .sd-panel-header-actions--search {

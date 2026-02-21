@@ -121,6 +121,8 @@ export interface SemaDiffExplorerProps {
   client: SemaDiffSummaryClient & SemaDiffFileDiffClient;
   prUrl?: string;
   onPrUrlSubmit?: (prUrl: string) => void;
+  selectedFile?: string;
+  onSelectedFileChange?: (filename: string | null) => void;
   contextLines?: number;
   title?: string;
   inputPlaceholder?: string;
@@ -411,7 +413,7 @@ function DiffPanelBody({
       <div className="sd-warning">
         <div className="sd-warning-title">Semantic Warning</div>
         <div className="sd-warning-body">
-          {warnings.map((warning) => (
+          {warnings.map((warning: string) => (
             <div className="sd-warning-item" key={warning}>
               {warning}
             </div>
@@ -497,6 +499,8 @@ export function SemaDiffExplorer({
   client,
   prUrl,
   onPrUrlSubmit,
+  selectedFile: controlledSelectedFile,
+  onSelectedFileChange,
   contextLines = -1,
   title,
   inputPlaceholder,
@@ -542,6 +546,30 @@ export function SemaDiffExplorer({
     prUrl: effectivePrUrl,
     contextLines,
   });
+  const effectiveSelectedFile = controlledSelectedFile ?? selectedFile;
+
+  useEffect(() => {
+    if (controlledSelectedFile === undefined) {
+      return;
+    }
+    if (selectedFile === controlledSelectedFile) {
+      return;
+    }
+    setSelectedFile(controlledSelectedFile);
+  }, [controlledSelectedFile, selectedFile, setSelectedFile]);
+
+  useEffect(() => {
+    if (!(summary && onSelectedFileChange)) {
+      return;
+    }
+    if (
+      controlledSelectedFile !== undefined &&
+      selectedFile === controlledSelectedFile
+    ) {
+      return;
+    }
+    onSelectedFileChange(selectedFile);
+  }, [summary, onSelectedFileChange, controlledSelectedFile, selectedFile]);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -575,7 +603,7 @@ export function SemaDiffExplorer({
           filteredFiles={filteredFiles}
           onFileFilterChange={setFileFilter}
           onSelectFile={setSelectedFile}
-          selectedFile={selectedFile}
+          selectedFile={effectiveSelectedFile}
           summary={summary}
         />
         <DiffPanel
@@ -591,7 +619,7 @@ export function SemaDiffExplorer({
           onHideCommentsChange={setHideComments}
           onLineLayoutChange={setLineLayout}
           onRefresh={refresh}
-          selectedFile={selectedFile}
+          selectedFile={effectiveSelectedFile}
           selectedSummary={selectedSummary ?? null}
           summary={summary}
         />
