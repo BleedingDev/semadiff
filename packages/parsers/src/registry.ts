@@ -113,10 +113,14 @@ function selectLanguage(input: ParserInput): LanguageId {
     const ext = input.path.split(".").pop()?.toLowerCase();
     switch (ext) {
       case "ts":
+      case "mts":
+      case "cts":
         return "ts";
       case "tsx":
         return "tsx";
       case "js":
+      case "mjs":
+      case "cjs":
         return "js";
       case "jsx":
         return "jsx";

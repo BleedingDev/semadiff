@@ -457,7 +457,8 @@ body.sd-embed .sd-lines {
 `;
 
 const LINE_SPLIT_RE = /\r?\n/;
-const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
+const INLINE_TOKEN_RE =
+  /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|[A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
 const SEMANTIC_TOKEN_CONTENT_RE = /[A-Za-z0-9_$"']/;
 const PROJECTION_FRAGMENT_RE = /[^A-Za-z0-9@_./-]+/g;
 
@@ -880,24 +881,101 @@ function tokenizeInline(text: string) {
   return tokens;
 }
 
-function renderInlineDiff(oldText: string, newText: string) {
-  const oldTokens = tokenizeInline(oldText);
-  const newTokens = tokenizeInline(newText);
-  const edits = diffLines(oldTokens, newTokens, oldTokens, newTokens);
-  let oldHtml = "";
-  let newHtml = "";
-  for (const edit of edits) {
-    const token = escapeHtml(edit.line);
-    if (edit.type === "equal") {
-      oldHtml += token;
-      newHtml += token;
-    } else if (edit.type === "delete") {
-      oldHtml += `<span class="sd-inline-del">${token}</span>`;
-    } else {
-      newHtml += `<span class="sd-inline-add">${token}</span>`;
+function buildInlineComparableTokens(
+  tokens: string[],
+  language?: NormalizerLanguage
+) {
+  if (!language || language === "*" || language === "text") {
+    return tokens;
+  }
+  return tokens.map((token) => {
+    if (token.trim().length === 0) {
+      return token;
+    }
+    return normalizeTextForLanguage(token, defaultConfig.normalizers, language);
+  });
+}
+
+function buildInlineLcsMatrix(
+  oldComparable: string[],
+  newComparable: string[]
+) {
+  const oldLen = oldComparable.length;
+  const newLen = newComparable.length;
+  const lcs = Array.from({ length: oldLen + 1 }, () =>
+    new Array(newLen + 1).fill(0)
+  );
+  for (let i = oldLen - 1; i >= 0; i -= 1) {
+    const currentRow = lcs[i];
+    if (!currentRow) {
+      continue;
+    }
+    for (let j = newLen - 1; j >= 0; j -= 1) {
+      if (oldComparable[i] === newComparable[j]) {
+        currentRow[j] = (lcs[i + 1]?.[j + 1] ?? 0) + 1;
+      } else {
+        currentRow[j] = Math.max(lcs[i + 1]?.[j] ?? 0, currentRow[j + 1] ?? 0);
+      }
     }
   }
+  return lcs;
+}
+
+function renderInlineDiffFromComparable(
+  oldTokens: string[],
+  newTokens: string[],
+  oldComparable: string[],
+  newComparable: string[]
+) {
+  const lcs = buildInlineLcsMatrix(oldComparable, newComparable);
+  const oldLen = oldTokens.length;
+  const newLen = newTokens.length;
+  let oldHtml = "";
+  let newHtml = "";
+  let i = 0;
+  let j = 0;
+  while (i < oldLen && j < newLen) {
+    if (oldComparable[i] === newComparable[j]) {
+      oldHtml += escapeHtml(oldTokens[i] ?? "");
+      newHtml += escapeHtml(newTokens[j] ?? "");
+      i += 1;
+      j += 1;
+      continue;
+    }
+    if ((lcs[i + 1]?.[j] ?? 0) >= (lcs[i]?.[j + 1] ?? 0)) {
+      oldHtml += `<span class="sd-inline-del">${escapeHtml(oldTokens[i] ?? "")}</span>`;
+      i += 1;
+      continue;
+    }
+    newHtml += `<span class="sd-inline-add">${escapeHtml(newTokens[j] ?? "")}</span>`;
+    j += 1;
+  }
+  while (i < oldLen) {
+    oldHtml += `<span class="sd-inline-del">${escapeHtml(oldTokens[i] ?? "")}</span>`;
+    i += 1;
+  }
+  while (j < newLen) {
+    newHtml += `<span class="sd-inline-add">${escapeHtml(newTokens[j] ?? "")}</span>`;
+    j += 1;
+  }
   return { oldHtml, newHtml };
+}
+
+function renderInlineDiff(
+  oldText: string,
+  newText: string,
+  language?: NormalizerLanguage
+) {
+  const oldTokens = tokenizeInline(oldText);
+  const newTokens = tokenizeInline(newText);
+  const oldComparable = buildInlineComparableTokens(oldTokens, language);
+  const newComparable = buildInlineComparableTokens(newTokens, language);
+  return renderInlineDiffFromComparable(
+    oldTokens,
+    newTokens,
+    oldComparable,
+    newComparable
+  );
 }
 
 function renderInlineMarkedText(
@@ -3261,7 +3339,7 @@ function getUnifiedText(row: LineRow, oldText: string, newText: string) {
   return row.text ?? oldText;
 }
 
-function renderUnifiedRow(row: LineRow) {
+function renderUnifiedRow(row: LineRow, language?: NormalizerLanguage) {
   const oldNumber = row.oldLine?.toString() ?? "";
   const newNumber = row.newLine?.toString() ?? "";
   const oldText = row.oldText ?? row.text ?? "";
@@ -3272,18 +3350,18 @@ function renderUnifiedRow(row: LineRow) {
   let textHtml = escapeHtml(text);
   if (row.type === "insert") {
     if (row.oldText !== undefined && row.newText !== undefined) {
-      textHtml = renderInlineDiff(row.oldText, row.newText).newHtml;
+      textHtml = renderInlineDiff(row.oldText, row.newText, language).newHtml;
     } else {
       textHtml = renderInlineMarkedText(text, "sd-inline-add");
     }
   } else if (row.type === "delete") {
     if (row.oldText !== undefined && row.newText !== undefined) {
-      textHtml = renderInlineDiff(row.oldText, row.newText).oldHtml;
+      textHtml = renderInlineDiff(row.oldText, row.newText, language).oldHtml;
     } else {
       textHtml = renderInlineMarkedText(text, "sd-inline-del");
     }
   } else if (row.type === "replace") {
-    textHtml = renderInlineDiff(oldText, newText).newHtml;
+    textHtml = renderInlineDiff(oldText, newText, language).newHtml;
   }
   return `
     <div class="${rowClass}">
@@ -3295,7 +3373,7 @@ function renderUnifiedRow(row: LineRow) {
   `;
 }
 
-function renderSplitRow(row: LineRow) {
+function renderSplitRow(row: LineRow, language?: NormalizerLanguage) {
   const oldNumber = row.oldLine?.toString() ?? "";
   const newNumber = row.newLine?.toString() ?? "";
   const oldText = row.oldText ?? row.text ?? "";
@@ -3303,7 +3381,7 @@ function renderSplitRow(row: LineRow) {
   const rowClass = `sd-line sd-line--${row.type}`;
 
   if (row.type === "replace") {
-    const { oldHtml, newHtml } = renderInlineDiff(oldText, newText);
+    const { oldHtml, newHtml } = renderInlineDiff(oldText, newText, language);
     return `
       <div class="${rowClass}">
         <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
@@ -3352,7 +3430,11 @@ function renderSplitRow(row: LineRow) {
   `;
 }
 
-function renderLineRow(row: LineRow, lineLayout: "split" | "unified") {
+function renderLineRow(
+  row: LineRow,
+  lineLayout: "split" | "unified",
+  language?: NormalizerLanguage
+) {
   if (row.type === "hunk") {
     return renderHunkRow(row);
   }
@@ -3360,9 +3442,9 @@ function renderLineRow(row: LineRow, lineLayout: "split" | "unified") {
     return renderGapRow(row);
   }
   if (lineLayout === "unified") {
-    return renderUnifiedRow(row);
+    return renderUnifiedRow(row, language);
   }
-  return renderSplitRow(row);
+  return renderSplitRow(row, language);
 }
 
 const METRIC_TITLE = "Estimated vs raw line changes";
@@ -4347,7 +4429,9 @@ function expandLineDiscontinuities(
 
 function buildLineVirtualScript(
   batchSize: number,
-  lineLayout: "split" | "unified"
+  lineLayout: "split" | "unified",
+  language?: NormalizerLanguage,
+  semanticMode = false
 ) {
   return `
     const raw = globalThis.__SEMADIFF_DATA__;
@@ -4357,9 +4441,12 @@ function buildLineVirtualScript(
     const rows = Array.isArray(parsed.rows) ? parsed.rows : [];
     const batch = Number(parsed.batchSize || ${batchSize});
     const layout = parsed.lineLayout === "unified" ? "unified" : "split";
+    const semanticMode = ${semanticMode ? "true" : "false"};
+    const semanticLanguage = ${JSON.stringify(language ?? null)};
+    const QUOTE_NORMALIZE_LANGUAGES = new Set(["ts", "tsx", "js", "jsx"]);
     const container = document.getElementById("sd-ops");
     const status = document.getElementById("sd-status");
-    const INLINE_TOKEN_RE = /([A-Za-z0-9_]+|\\s+|[^A-Za-z0-9_\\s])/g;
+    const INLINE_TOKEN_RE = /("(?:[^"\\\\]|\\\\.)*"|'(?:[^'\\\\]|\\\\.)*'|\`(?:[^\`\\\\]|\\\\.)*\`|[A-Za-z0-9_]+|\\s+|[^A-Za-z0-9_\\s])/g;
     let rendered = 0;
 
     function escapeHtml(value) {
@@ -4380,6 +4467,23 @@ function buildLineVirtualScript(
       return tokens;
     }
 
+    function normalizeCompareToken(token) {
+      if (!semanticMode) {
+        return token;
+      }
+      if (!semanticLanguage || !QUOTE_NORMALIZE_LANGUAGES.has(semanticLanguage)) {
+        return token;
+      }
+      if (String(token).trim().length === 0) {
+        return token;
+      }
+      const value = String(token);
+      if (value.length >= 2 && value[0] === "'" && value[value.length - 1] === "'") {
+        return '"' + value.slice(1, -1) + '"';
+      }
+      return value;
+    }
+
     function renderInlineMarkedText(text, className) {
       const value = String(text ?? "");
       if (value.length === 0) {
@@ -4391,6 +4495,8 @@ function buildLineVirtualScript(
     function renderInlineDiffPair(oldText, newText) {
       const oldTokens = tokenizeInline(oldText);
       const newTokens = tokenizeInline(newText);
+      const oldComparable = oldTokens.map(normalizeCompareToken);
+      const newComparable = newTokens.map(normalizeCompareToken);
       const oldLen = oldTokens.length;
       const newLen = newTokens.length;
       const lcs = Array.from({ length: oldLen + 1 }, () =>
@@ -4398,7 +4504,7 @@ function buildLineVirtualScript(
       );
       for (let i = oldLen - 1; i >= 0; i -= 1) {
         for (let j = newLen - 1; j >= 0; j -= 1) {
-          if (oldTokens[i] === newTokens[j]) {
+          if (oldComparable[i] === newComparable[j]) {
             lcs[i][j] = lcs[i + 1][j + 1] + 1;
           } else {
             lcs[i][j] = Math.max(lcs[i + 1][j], lcs[i][j + 1]);
@@ -4411,10 +4517,9 @@ function buildLineVirtualScript(
       let oldHtml = "";
       let newHtml = "";
       while (i < oldLen && j < newLen) {
-        if (oldTokens[i] === newTokens[j]) {
-          const escaped = escapeHtml(oldTokens[i]);
-          oldHtml += escaped;
-          newHtml += escaped;
+        if (oldComparable[i] === newComparable[j]) {
+          oldHtml += escapeHtml(oldTokens[i]);
+          newHtml += escapeHtml(newTokens[j]);
           i += 1;
           j += 1;
           continue;
@@ -4825,7 +4930,13 @@ function renderLineView(
 
   if (!context.virtualize) {
     const body = rows
-      .map((row) => renderLineRow(row, context.lineLayout))
+      .map((row) =>
+        renderLineRow(
+          row,
+          context.lineLayout,
+          context.lineMode === "semantic" ? semanticLanguage : undefined
+        )
+      )
       .join("\n");
     const sectionHtml = `<section class="sd-lines">${body}</section>`;
     return buildHtmlShell({
@@ -4847,7 +4958,12 @@ function renderLineView(
   );
   const sectionHtml = `<section class="sd-lines" id="sd-ops"></section>`;
   const statusHtml = `<div id="sd-status"></div>`;
-  const script = buildLineVirtualScript(context.batchSize, context.lineLayout);
+  const script = buildLineVirtualScript(
+    context.batchSize,
+    context.lineLayout,
+    semanticLanguage,
+    context.lineMode === "semantic"
+  );
   return buildHtmlShell({
     title: context.title,
     layout: context.layout,
@@ -4930,4 +5046,5 @@ export function renderHtml(
 export const __testing = {
   chooseSemanticRowsWithFallback,
   hasMeaningfulRawLineChanges,
+  renderInlineDiff,
 };
