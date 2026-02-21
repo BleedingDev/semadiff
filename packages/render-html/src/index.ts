@@ -4227,29 +4227,37 @@ function hasMeaningfulReplaceRow(
   );
 }
 
-function hasMeaningfulInsertDeleteRow(
-  row: LineRow,
-  normalizeLine: (line: string) => string
-) {
-  if (row.type !== "insert" && row.type !== "delete") {
-    return false;
-  }
-  const normalized = normalizeLine(rowText(row)).trim();
-  return isMeaningfulNormalizedLine(normalized);
-}
-
 function hasMeaningfulRawLineChanges(
   rows: LineRow[],
   normalizeLine: (line: string) => string
 ) {
+  const insertDeleteDelta = new Map<string, number>();
   for (const row of rows) {
+    if (!row) {
+      continue;
+    }
     if (row.type === "move") {
       return true;
     }
     if (hasMeaningfulReplaceRow(row, normalizeLine)) {
       return true;
     }
-    if (hasMeaningfulInsertDeleteRow(row, normalizeLine)) {
+    if (row.type !== "insert" && row.type !== "delete") {
+      continue;
+    }
+    const normalized = normalizeLine(rowText(row)).trim();
+    if (!isMeaningfulNormalizedLine(normalized)) {
+      continue;
+    }
+    const delta = row.type === "insert" ? 1 : -1;
+    insertDeleteDelta.set(
+      normalized,
+      (insertDeleteDelta.get(normalized) ?? 0) + delta
+    );
+  }
+
+  for (const delta of insertDeleteDelta.values()) {
+    if (delta !== 0) {
       return true;
     }
   }
