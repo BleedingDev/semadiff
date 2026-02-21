@@ -109,6 +109,31 @@ interface UseSemaDiffExplorerStateInput {
 }
 ```
 
+## Embed Quickstart (React 19+)
+
+Use a module-level client instance and pass it directly to `SemaDiffExplorer`.
+This keeps examples React Compiler friendly (no manual `useMemo` required).
+
+```tsx
+import { createHttpPrDiffClient } from "@semadiff/pr-client";
+import { SemaDiffExplorer } from "@semadiff/react-ui";
+import "@semadiff/react-ui/styles.css";
+
+const client = createHttpPrDiffClient({
+  baseUrl: "https://your-app.example.com",
+});
+
+export function DiffScreen() {
+  return <SemaDiffExplorer className="sd-app" client={client} />;
+}
+```
+
+Expected backend endpoints for `createHttpPrDiffClient` default config:
+
+- `GET /api/semadiff/pr/summary`
+- `GET /api/semadiff/pr/file-diff`
+- `GET /api/semadiff/pr/file-diff-document`
+
 ## Migration Plates And Gates
 
 1. Plate 1 (this one): contract and tests.

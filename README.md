@@ -48,7 +48,7 @@ curl -I http://127.0.0.1:3000/
 - `packages/github-extension`: overlay UI/bridge
 - `apps/pr-viewer`: web app for PR summary and file diff inspection
 - `e2e`: Playwright end-to-end tests
-- `docs`: focused docs (`ARCHITECTURE.md`, `CONTRIBUTING.md`, `CONFIG.md`, `GIT_INTEGRATION.md`, `IMPLEMENTATION_PLAN.md`)
+- `docs`: focused docs (`ARCHITECTURE.md`, `CONTRIBUTING.md`, `CONFIG.md`, `EMBED_API.md`, `GIT_INTEGRATION.md`, `IMPLEMENTATION_PLAN.md`)
 
 ## Configuration
 

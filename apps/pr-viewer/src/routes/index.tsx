@@ -4,12 +4,17 @@ import {
 } from "@semadiff/react-ui";
 import "@semadiff/react-ui/styles.css";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
 import { getFileDiff, getPrSummary } from "../server/pr.server";
 
 interface SearchParams {
   pr?: string;
 }
+
+const explorerClient: SemaDiffExplorerProps["client"] = {
+  getPrSummary: (payload) => getPrSummary({ data: payload }),
+  getFileDiff: (payload, request) =>
+    getFileDiff({ data: payload, signal: request?.signal }),
+};
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
@@ -21,14 +26,6 @@ export const Route = createFileRoute("/")({
 function App() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const client = useMemo<SemaDiffExplorerProps["client"]>(
-    () => ({
-      getPrSummary: (payload) => getPrSummary({ data: payload }),
-      getFileDiff: (payload, request) =>
-        getFileDiff({ data: payload, signal: request?.signal }),
-    }),
-    []
-  );
 
   const handlePrUrlSubmit = (prUrl: string) => {
     const next = prUrl.trim();
@@ -41,7 +38,7 @@ function App() {
   return (
     <SemaDiffExplorer
       className="sd-app"
-      client={client}
+      client={explorerClient}
       contextLines={-1}
       onPrUrlSubmit={handlePrUrlSubmit}
       prUrl={search.pr}
