@@ -7,9 +7,11 @@ import { lightningCssParsers } from "@semadiff/parser-lightningcss";
 import { swcParsers } from "@semadiff/parser-swc";
 import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
 import {
+  type LanguageId,
   makeRegistry,
   ParserRegistry,
   type ParserRegistryService,
+  type TokenRange,
 } from "@semadiff/parsers";
 import { renderHtml } from "@semadiff/render-html";
 import { Effect, Layer, Option, Schema, ServiceMap } from "effect";
@@ -96,7 +98,7 @@ const PR_CACHE_TTL_MS = 5 * 60 * 1000;
 const FILE_CACHE_TTL_MS = 5 * 60 * 1000;
 const SUMMARY_CACHE_TTL_MS = 60 * 60 * 1000;
 const DIFF_CACHE_TTL_MS = 60 * 60 * 1000;
-const CACHE_VERSION = "v12";
+const CACHE_VERSION = "v13";
 const SEMANTIC_CONTEXT_LINES = 0;
 
 interface CachedPrData {
@@ -468,6 +470,82 @@ const buildFileDiffDocument = Effect.fn("PrDiff.buildFileDiffDocument")(
   }
 );
 
+interface RenderFileDiffHtmlInput {
+  filename: string;
+  diff: DiffDocument;
+  language: LanguageId;
+  oldText: string;
+  newText: string;
+  oldTokens: readonly TokenRange[] | undefined;
+  newTokens: readonly TokenRange[] | undefined;
+  contextLines: number;
+  lineLayout: "split" | "unified";
+  lineMode: "semantic" | "raw";
+  hideComments: boolean;
+}
+
+export function renderFileDiffHtml({
+  filename,
+  diff,
+  language,
+  oldText,
+  newText,
+  oldTokens,
+  newTokens,
+  contextLines,
+  lineLayout,
+  lineMode,
+  hideComments,
+}: RenderFileDiffHtmlInput) {
+  const semanticTokensOption =
+    oldTokens || newTokens
+      ? {
+          semanticTokens: {
+            ...(oldTokens ? { old: oldTokens } : {}),
+            ...(newTokens ? { new: newTokens } : {}),
+          },
+        }
+      : {};
+
+  const semanticHtml = renderHtml(diff, {
+    title: `SemaDiff · ${filename}`,
+    filePath: filename,
+    view: "semantic",
+    hideComments,
+    oldText,
+    newText,
+    contextLines: SEMANTIC_CONTEXT_LINES,
+    lineLayout,
+    language,
+    showBanner: false,
+    showSummary: false,
+    showFilePath: false,
+    layout: "embed",
+    ...semanticTokensOption,
+  });
+
+  const linesHtml = renderHtml(diff, {
+    title: `SemaDiff · ${filename}`,
+    filePath: filename,
+    view: "lines",
+    lineMode,
+    hideComments,
+    oldText,
+    newText,
+    contextLines,
+    lineLayout,
+    language,
+    virtualize: false,
+    showBanner: false,
+    showSummary: false,
+    showFilePath: false,
+    layout: "embed",
+    ...semanticTokensOption,
+  });
+
+  return { semanticHtml, linesHtml };
+}
+
 const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
   getFileText: GitHubClientService["getFileText"],
   registry: ParserRegistryService,
@@ -503,48 +581,18 @@ const buildFileDiff = Effect.fn("PrDiff.buildFileDiff")(function* (
     };
   }
 
-  const semanticTokensOption =
-    oldTokens || newTokens
-      ? {
-          semanticTokens: {
-            ...(oldTokens ? { old: oldTokens } : {}),
-            ...(newTokens ? { new: newTokens } : {}),
-          },
-        }
-      : {};
-
-  const semanticHtml = renderHtml(diff, {
-    title: `SemaDiff · ${summary.filename}`,
-    filePath: summary.filename,
-    view: "semantic",
-    hideComments,
-    oldText,
-    newText,
-    contextLines: SEMANTIC_CONTEXT_LINES,
-    lineLayout,
+  const { semanticHtml, linesHtml } = renderFileDiffHtml({
+    filename: summary.filename,
+    diff,
     language,
-    showBanner: false,
-    showSummary: false,
-    showFilePath: false,
-    layout: "embed",
-    ...semanticTokensOption,
-  });
-  const linesHtml = renderHtml(diff, {
-    title: `SemaDiff · ${summary.filename}`,
-    filePath: summary.filename,
-    view: "lines",
-    lineMode,
-    hideComments,
     oldText,
     newText,
+    oldTokens,
+    newTokens,
     contextLines,
     lineLayout,
-    virtualize: false,
-    showBanner: false,
-    showSummary: false,
-    showFilePath: false,
-    layout: "embed",
-    ...semanticTokensOption,
+    lineMode,
+    hideComments,
   });
 
   return { file: summary, semanticHtml, linesHtml };
