@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-pnpm-pnpm-10897",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10897: fix: improve global install output to show clean summary",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10897,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10897",
+    "baseSha": "5d999f2ceb0916ead451cda6a5c3e8dbc2d9f482",
+    "headSha": "2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+    "selectedFiles": [
+      "cli/default-reporter/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:25:08.252Z"
+  },
+  "files": [
+    {
+      "id": "cli/default-reporter/src/index.ts",
+      "oldPath": "cli/default-reporter/src/index.ts",
+      "newPath": "cli/default-reporter/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "cli/default-reporter/src/index.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 278,
+          "endLine": 278
+        },
+        "newRange": {
+          "startLine": 278,
+          "endLine": 278
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

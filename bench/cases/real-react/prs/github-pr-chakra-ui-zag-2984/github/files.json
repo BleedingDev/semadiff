@@ -1,0 +1,50 @@
+[
+  {
+    "sha": "51ce7f2cb49a57cdd5ebbd90e8f3fba91c8a747b",
+    "filename": ".changeset/major-chicken-bow.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/.changeset%2Fmajor-chicken-bow.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/.changeset%2Fmajor-chicken-bow.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Fmajor-chicken-bow.md?ref=f5b47b9c466e807a7b6eddb82b6147b93cb4e168",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@zag-js/vanilla\": patch\n+---\n+\n+Updated vanilla mergeProps function to make sure the style prop is always a string"
+  },
+  {
+    "sha": "f9766e4c717570a09622e5c14949a23ac097c9a1",
+    "filename": "packages/frameworks/vanilla/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/packages%2Fframeworks%2Fvanilla%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/packages%2Fframeworks%2Fvanilla%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fvanilla%2Fsrc%2Findex.ts?ref=f5b47b9c466e807a7b6eddb82b6147b93cb4e168",
+    "patch": "@@ -1,4 +1,4 @@\n-export { mergeProps } from \"@zag-js/core\"\n+export { mergeProps } from \"./merge-props\"\n export { normalizeProps } from \"./normalize-props\"\n export { spreadProps, type Attrs } from \"./spread-props\"\n export { VanillaMachine } from \"./machine\""
+  },
+  {
+    "sha": "8e39ef00e6e615c2c580ca7735e8616303e4f104",
+    "filename": "packages/frameworks/vanilla/src/merge-props.ts",
+    "status": "added",
+    "additions": 12,
+    "deletions": 0,
+    "changes": 12,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/packages%2Fframeworks%2Fvanilla%2Fsrc%2Fmerge-props.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/packages%2Fframeworks%2Fvanilla%2Fsrc%2Fmerge-props.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fvanilla%2Fsrc%2Fmerge-props.ts?ref=f5b47b9c466e807a7b6eddb82b6147b93cb4e168",
+    "patch": "@@ -0,0 +1,12 @@\n+import { mergeProps as zagMergeProps } from \"@zag-js/core\"\n+import { toStyleString } from \"./normalize-props\"\n+\n+export function mergeProps(...args: Record<string | symbol, any>[]) {\n+  const merged = zagMergeProps(...args)\n+\n+  if (\"style\" in merged && typeof merged.style === \"object\") {\n+    merged.style = toStyleString(merged.style)\n+  }\n+\n+  return merged\n+}"
+  },
+  {
+    "sha": "279b0fb4c0da7a0e71b661405c005d67740e0115",
+    "filename": "packages/frameworks/vanilla/src/normalize-props.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/packages%2Fframeworks%2Fvanilla%2Fsrc%2Fnormalize-props.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/f5b47b9c466e807a7b6eddb82b6147b93cb4e168/packages%2Fframeworks%2Fvanilla%2Fsrc%2Fnormalize-props.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fvanilla%2Fsrc%2Fnormalize-props.ts?ref=f5b47b9c466e807a7b6eddb82b6147b93cb4e168",
+    "patch": "@@ -18,7 +18,7 @@ export const propMap: AttrMap = {\n // SVG attributes that should preserve their case\n const caseSensitiveSvgAttrs = new Set<string>([\"viewBox\", \"preserveAspectRatio\"])\n \n-const toStyleString = (style: any) => {\n+export const toStyleString = (style: any) => {\n   let string = \"\"\n   for (let key in style) {\n     const value = style[key]"
+  }
+]

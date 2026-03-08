@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2FAsyncBoundaryPlugin.ts&old_oid=0207a56ed64e7f4e37a71fbb01b5a68de60e66f4&old_mode=33188&new_filename=packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2FAsyncBoundaryPlugin.ts&new_oid=81933a45981ecae283ca48bf9c92ca18debc90ac&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+      "oid": "0207a56ed64e7f4e37a71fbb01b5a68de60e66f4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+      "oid": "81933a45981ecae283ca48bf9c92ca18debc90ac",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c4862184df89a33fdf0436e404e9c3953da43195bf350662bc0d72013c77715b"
+  }
+]

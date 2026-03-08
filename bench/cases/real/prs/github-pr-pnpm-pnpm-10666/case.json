@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-pnpm-pnpm-10666",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10666: refactor(env): `pnpm env` use now delegates to `pnpm add --global`",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10666,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10666",
+    "baseSha": "9065f491f0159bf3081dc14f72587d0d51a49b8e",
+    "headSha": "9127351488dd4c3df066f411c453955a7cc82ab0",
+    "selectedFiles": [
+      "fetching/binary-fetcher/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:26:56.210Z"
+  },
+  "files": [
+    {
+      "id": "fetching/binary-fetcher/src/index.ts",
+      "oldPath": "fetching/binary-fetcher/src/index.ts",
+      "newPath": "fetching/binary-fetcher/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "fetching/binary-fetcher/src/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 55,
+          "endLine": 55
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

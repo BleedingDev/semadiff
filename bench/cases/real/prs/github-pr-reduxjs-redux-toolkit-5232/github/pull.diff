@@ -1,0 +1,761 @@
+diff --git a/packages/toolkit/src/dynamicMiddleware/tests/index.test.ts b/packages/toolkit/src/dynamicMiddleware/tests/index.test.ts
+index 5c97d834d3..7cc57f782d 100644
+--- a/packages/toolkit/src/dynamicMiddleware/tests/index.test.ts
++++ b/packages/toolkit/src/dynamicMiddleware/tests/index.test.ts
+@@ -1,14 +1,18 @@
+-import type { Middleware } from 'redux'
+-import { createDynamicMiddleware } from '../index'
+-import { configureStore } from '../../configureStore'
+-import type { BaseActionCreator, PayloadAction } from '../../createAction'
+-import { createAction } from '../../createAction'
+-import { isAllOf } from '../../matchers'
++import type { Middleware, PayloadAction } from '@reduxjs/toolkit'
++import {
++  configureStore,
++  createAction,
++  createDynamicMiddleware,
++  isAllOf,
++} from '@reduxjs/toolkit'
++import type { BaseActionCreator } from '../../createAction'
+ 
+ const probeType = 'probeableMW/probe'
+ 
+-export interface ProbeMiddleware
+-  extends BaseActionCreator<number, typeof probeType> {
++export interface ProbeMiddleware extends BaseActionCreator<
++  number,
++  typeof probeType
++> {
+   <Id extends number>(id: Id): PayloadAction<Id, typeof probeType>
+ }
+ 
+diff --git a/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts b/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts
+index 9061d88bdd..4f5d54b753 100644
+--- a/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts
++++ b/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts
+@@ -3,7 +3,7 @@ import type {
+   Middleware,
+   ThunkDispatch,
+   UnknownAction,
+-} from '@reduxjs/toolkit'
++} from '@reduxjs/toolkit/react'
+ import { createDynamicMiddleware } from '@reduxjs/toolkit/react'
+ import type { Context } from 'react'
+ import type { ReactReduxContextValue } from 'react-redux'
+diff --git a/packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx b/packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx
+index 91fb579567..72cc58aa11 100644
+--- a/packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx
++++ b/packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx
+@@ -1,11 +1,10 @@
+-import * as React from 'react'
+-import { createDynamicMiddleware } from '../react'
+-import { configureStore } from '../../configureStore'
+-import { makeProbeableMiddleware, probeMiddleware } from './index.test'
++import type { Dispatch } from '@reduxjs/toolkit/react'
++import { configureStore, createDynamicMiddleware } from '@reduxjs/toolkit/react'
+ import { render } from '@testing-library/react'
+-import type { Dispatch } from 'redux'
++import * as React from 'react'
+ import type { ReactReduxContextValue } from 'react-redux'
+ import { Provider } from 'react-redux'
++import { makeProbeableMiddleware, probeMiddleware } from './index.test'
+ 
+ const staticMiddleware = makeProbeableMiddleware(1)
+ 
+diff --git a/packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts b/packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts
+index f6b0c7bd22..c15e75da6e 100644
+--- a/packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts
++++ b/packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts
+@@ -1,11 +1,13 @@
+-import { createEntityAdapter, createSlice } from '../..'
+ import type {
++  EntityId,
++  EntityState,
++  IdSelector,
+   PayloadAction,
+   Slice,
+   SliceCaseReducers,
+   UnknownAction,
+-} from '../..'
+-import type { EntityId, EntityState, IdSelector } from '../models'
++} from '@reduxjs/toolkit'
++import { createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+ import type { BookModel } from './fixtures/book'
+ 
+ describe('Entity Slice Enhancer', () => {
+diff --git a/packages/toolkit/src/entities/tests/entity_state.test.ts b/packages/toolkit/src/entities/tests/entity_state.test.ts
+index 999ee502b9..b65a4daf5e 100644
+--- a/packages/toolkit/src/entities/tests/entity_state.test.ts
++++ b/packages/toolkit/src/entities/tests/entity_state.test.ts
+@@ -1,8 +1,9 @@
+-import type { EntityAdapter } from '../index'
+-import { createEntityAdapter } from '../index'
+-import type { PayloadAction } from '../../createAction'
+-import { createAction } from '../../createAction'
+-import { createSlice } from '../../createSlice'
++import type { EntityAdapter, PayloadAction } from '@reduxjs/toolkit'
++import {
++  createAction,
++  createEntityAdapter,
++  createSlice,
++} from '@reduxjs/toolkit'
+ import type { BookModel } from './fixtures/book'
+ 
+ describe('Entity State', () => {
+diff --git a/packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts b/packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts
+index 4361f9d973..addb21171c 100644
+--- a/packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts
++++ b/packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts
+@@ -1,13 +1,16 @@
+-import type { PayloadAction } from '@reduxjs/toolkit'
++import type {
++  EntityAdapter,
++  EntityState,
++  PayloadAction,
++} from '@reduxjs/toolkit'
+ import {
+   configureStore,
+   createAction,
++  createEntityAdapter,
++  createNextState,
+   createSlice,
+   nanoid,
+ } from '@reduxjs/toolkit'
+-import { createNextState } from '../..'
+-import { createEntityAdapter } from '../create_adapter'
+-import type { EntityAdapter, EntityState } from '../models'
+ import type { BookModel } from './fixtures/book'
+ import {
+   AClockworkOrange,
+@@ -515,7 +518,9 @@ describe('Sorted State Adapter', () => {
+     const withMany = adapter.setAll(state, [AClockworkOrange])
+ 
+     const withUpserts = adapter.upsertMany(withMany, [
+-      {...TheGreatGatsby}, { ...TheGreatGatsby, ...firstChange }, {...TheGreatGatsby, ...secondChange}
++      { ...TheGreatGatsby },
++      { ...TheGreatGatsby, ...firstChange },
++      { ...TheGreatGatsby, ...secondChange },
+     ])
+ 
+     expect(withUpserts).toEqual({
+@@ -590,40 +595,44 @@ describe('Sorted State Adapter', () => {
+ 
+   it('should work consistent with Unsorted State Adapter adding duplicate ids', () => {
+     const unsortedAdaptor = createEntityAdapter({
+-      selectId: (book: BookModel) => book.id
+-    });
++      selectId: (book: BookModel) => book.id,
++    })
+ 
+-    const firstEntry = {id: AClockworkOrange.id, author: TheHobbit.author }
+-    const secondEntry = {id: AClockworkOrange.id, title: 'Zack' }
+-    const withNothingSorted = adapter.setAll(state, []);
+-    const withNothingUnsorted = unsortedAdaptor.setAll(state, []);
++    const firstEntry = { id: AClockworkOrange.id, author: TheHobbit.author }
++    const secondEntry = { id: AClockworkOrange.id, title: 'Zack' }
++    const withNothingSorted = adapter.setAll(state, [])
++    const withNothingUnsorted = unsortedAdaptor.setAll(state, [])
+     const withOneSorted = adapter.addMany(withNothingSorted, [
+-      { ...AClockworkOrange, ...firstEntry }, {...AClockworkOrange, ...secondEntry}
++      { ...AClockworkOrange, ...firstEntry },
++      { ...AClockworkOrange, ...secondEntry },
+     ])
+     const withOneUnsorted = adapter.addMany(withNothingUnsorted, [
+-      { ...AClockworkOrange, ...firstEntry }, {...AClockworkOrange, ...secondEntry}
++      { ...AClockworkOrange, ...firstEntry },
++      { ...AClockworkOrange, ...secondEntry },
+     ])
+ 
+-    expect(withOneSorted).toEqual(withOneUnsorted);
++    expect(withOneSorted).toEqual(withOneUnsorted)
+   })
+ 
+   it('should work consistent with Unsorted State Adapter adding duplicate ids', () => {
+     const unsortedAdaptor = createEntityAdapter({
+-      selectId: (book: BookModel) => book.id
+-    });
++      selectId: (book: BookModel) => book.id,
++    })
+ 
+-    const firstEntry = {id: AClockworkOrange.id, author: TheHobbit.author }
+-    const secondEntry = {id: AClockworkOrange.id, title: 'Zack' }
+-    const withNothingSorted = adapter.setAll(state, [TheHobbit]);
+-    const withNothingUnsorted = unsortedAdaptor.setAll(state, [TheHobbit]);
++    const firstEntry = { id: AClockworkOrange.id, author: TheHobbit.author }
++    const secondEntry = { id: AClockworkOrange.id, title: 'Zack' }
++    const withNothingSorted = adapter.setAll(state, [TheHobbit])
++    const withNothingUnsorted = unsortedAdaptor.setAll(state, [TheHobbit])
+     const withOneSorted = adapter.setMany(withNothingSorted, [
+-      { ...AClockworkOrange, ...firstEntry, id: 'th' }, {...AClockworkOrange, ...secondEntry, id: 'th'}
++      { ...AClockworkOrange, ...firstEntry, id: 'th' },
++      { ...AClockworkOrange, ...secondEntry, id: 'th' },
+     ])
+     const withOneUnsorted = unsortedAdaptor.setMany(withNothingUnsorted, [
+-      { ...AClockworkOrange, ...firstEntry, id: 'th' }, {...AClockworkOrange, ...secondEntry, id: 'th'}
++      { ...AClockworkOrange, ...firstEntry, id: 'th' },
++      { ...AClockworkOrange, ...secondEntry, id: 'th' },
+     ])
+ 
+-    expect(withOneSorted).toEqual(withOneUnsorted);
++    expect(withOneSorted).toEqual(withOneUnsorted)
+   })
+ 
+   it('should let you set many entities in the state when passing in a dictionary', () => {
+diff --git a/packages/toolkit/src/entities/tests/state_adapter.test.ts b/packages/toolkit/src/entities/tests/state_adapter.test.ts
+index a05b715ff9..6807ebbafc 100644
+--- a/packages/toolkit/src/entities/tests/state_adapter.test.ts
++++ b/packages/toolkit/src/entities/tests/state_adapter.test.ts
+@@ -1,8 +1,9 @@
+-import type { EntityAdapter } from '../index'
+-import { createEntityAdapter } from '../index'
+-import type { PayloadAction } from '../../createAction'
+-import { configureStore } from '../../configureStore'
+-import { createSlice } from '../../createSlice'
++import type { EntityAdapter, PayloadAction } from '@reduxjs/toolkit'
++import {
++  configureStore,
++  createEntityAdapter,
++  createSlice,
++} from '@reduxjs/toolkit'
+ import type { BookModel } from './fixtures/book'
+ 
+ describe('createStateOperator', () => {
+diff --git a/packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts b/packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts
+index 6249f5706d..98838a316a 100644
+--- a/packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts
++++ b/packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts
+@@ -1,13 +1,12 @@
+-import type { EntityAdapter, EntityState } from '../models'
+-import { createEntityAdapter } from '../create_adapter'
++import type { EntityAdapter, EntityState } from '@reduxjs/toolkit'
++import { createEntityAdapter, createNextState } from '@reduxjs/toolkit'
+ import type { BookModel } from './fixtures/book'
+ import {
+-  TheGreatGatsby,
+   AClockworkOrange,
+   AnimalFarm,
++  TheGreatGatsby,
+   TheHobbit,
+ } from './fixtures/book'
+-import { createNextState } from '../..'
+ 
+ describe('Unsorted State Adapter', () => {
+   let adapter: EntityAdapter<BookModel, string>
+@@ -90,11 +89,12 @@ describe('Unsorted State Adapter', () => {
+   })
+ 
+   it('should let you add the only first occurrence for duplicate ids', () => {
+-    const firstEntry = {id: AClockworkOrange.id, author: TheHobbit.author }
+-    const secondEntry = {id: AClockworkOrange.id, title: 'Zack' }
++    const firstEntry = { id: AClockworkOrange.id, author: TheHobbit.author }
++    const secondEntry = { id: AClockworkOrange.id, title: 'Zack' }
+     const withOne = adapter.setAll(state, [TheGreatGatsby])
+     const withMany = adapter.addMany(withOne, [
+-      { ...AClockworkOrange, ...firstEntry }, {...AClockworkOrange, ...secondEntry}
++      { ...AClockworkOrange, ...firstEntry },
++      { ...AClockworkOrange, ...secondEntry },
+     ])
+ 
+     expect(withMany).toEqual({
+@@ -292,9 +292,9 @@ describe('Unsorted State Adapter', () => {
+         entities: { b: { id: 'b', title: 'First' }, c: { id: 'c' } }
+       }
+       We now expect that only 'c' will be left:
+-      { 
+-        ids: [ 'c' ], 
+-        entities: { c: { id: 'c', title: 'First' } } 
++      {
++        ids: [ 'c' ],
++        entities: { c: { id: 'c', title: 'First' } }
+       }
+     */
+     expect(ids.length).toBe(1)
+@@ -381,7 +381,9 @@ describe('Unsorted State Adapter', () => {
+     const withMany = adapter.setAll(state, [TheGreatGatsby])
+ 
+     const withUpserts = adapter.upsertMany(withMany, [
+-      {...AClockworkOrange}, { ...AClockworkOrange, ...firstChange }, {...AClockworkOrange, ...secondChange}
++      { ...AClockworkOrange },
++      { ...AClockworkOrange, ...firstChange },
++      { ...AClockworkOrange, ...secondChange },
+     ])
+ 
+     expect(withUpserts).toEqual({
+diff --git a/packages/toolkit/src/listenerMiddleware/tests/fork.test.ts b/packages/toolkit/src/listenerMiddleware/tests/fork.test.ts
+index 7172e5c13d..8ad909e229 100644
+--- a/packages/toolkit/src/listenerMiddleware/tests/fork.test.ts
++++ b/packages/toolkit/src/listenerMiddleware/tests/fork.test.ts
+@@ -1,9 +1,15 @@
+-import type { EnhancedStore } from '@reduxjs/toolkit'
+-import { configureStore, createSlice, createAction } from '@reduxjs/toolkit'
+-
+-import type { PayloadAction } from '@reduxjs/toolkit'
+-import type { ForkedTaskExecutor, TaskResult } from '../types'
+-import { createListenerMiddleware, TaskAbortError } from '../index'
++import type {
++  ForkedTaskExecutor,
++  PayloadAction,
++  TaskResult,
++} from '@reduxjs/toolkit'
++import {
++  configureStore,
++  createAction,
++  createListenerMiddleware,
++  createSlice,
++  TaskAbortError,
++} from '@reduxjs/toolkit'
+ import {
+   listenerCancelled,
+   listenerCompleted,
+diff --git a/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts b/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts
+index 8d9da271f8..3c9d83b452 100644
+--- a/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts
++++ b/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts
+@@ -1,10 +1,12 @@
+-import type { Action } from 'redux'
+-import type { ThunkAction } from 'redux-thunk'
+-import { describe, expect, test } from 'vitest'
+-import { configureStore } from '../../configureStore'
+-import { createAsyncThunk } from '../../createAsyncThunk'
+-import { createSlice } from '../../createSlice'
+-import { addListener, createListenerMiddleware, removeListener } from '../index'
++import type { Action, ThunkAction } from '@reduxjs/toolkit'
++import {
++  addListener,
++  configureStore,
++  createAsyncThunk,
++  createListenerMiddleware,
++  createSlice,
++  removeListener,
++} from '@reduxjs/toolkit'
+ 
+ export interface CounterState {
+   counter: number
+@@ -71,9 +73,17 @@ const stopAppListening = listenerMiddleware.stopListening.withTypes<
+   ExtraArgument
+ >()
+ 
+-const addAppListener = addListener.withTypes<RootState, AppDispatch, ExtraArgument>()
++const addAppListener = addListener.withTypes<
++  RootState,
++  AppDispatch,
++  ExtraArgument
++>()
+ 
+-const removeAppListener = removeListener.withTypes<RootState, AppDispatch, ExtraArgument>()
++const removeAppListener = removeListener.withTypes<
++  RootState,
++  AppDispatch,
++  ExtraArgument
++>()
+ 
+ describe('startAppListening.withTypes', () => {
+   test('should return startListening', () => {
+diff --git a/packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts b/packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts
+index 7517f9071d..d7960e94ac 100644
+--- a/packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts
++++ b/packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts
+@@ -1,17 +1,12 @@
++import type { PayloadAction } from '@reduxjs/toolkit'
+ import {
+   configureStore,
+   createAction,
++  createListenerMiddleware,
+   createSlice,
+-  isAnyOf,
++  TaskAbortError,
+ } from '@reduxjs/toolkit'
+ 
+-import type { PayloadAction } from '@reduxjs/toolkit'
+-
+-import { createListenerMiddleware } from '../index'
+-
+-import type { TypedAddListener } from '../index'
+-import { TaskAbortError } from '../exceptions'
+-
+ interface CounterState {
+   value: number
+ }
+diff --git a/packages/toolkit/src/query/tests/buildHooks.test.tsx b/packages/toolkit/src/query/tests/buildHooks.test.tsx
+index f97951756b..5dbfa130cc 100644
+--- a/packages/toolkit/src/query/tests/buildHooks.test.tsx
++++ b/packages/toolkit/src/query/tests/buildHooks.test.tsx
+@@ -1,5 +1,4 @@
+ import { noop } from '@internal/listenerMiddleware/utils'
+-import type { SubscriptionOptions } from '@internal/query/core/apiState'
+ import type { SubscriptionSelectors } from '@internal/query/core/buildMiddleware/types'
+ import { server } from '@internal/query/tests/mocks/server'
+ import { countObjectKeys } from '@internal/query/utils/countObjectKeys'
+@@ -17,6 +16,7 @@ import {
+   createListenerMiddleware,
+   createSlice,
+ } from '@reduxjs/toolkit'
++import type { SubscriptionOptions } from '@reduxjs/toolkit/query/react'
+ import {
+   QueryStatus,
+   createApi,
+@@ -31,10 +31,10 @@ import {
+   screen,
+   waitFor,
+ } from '@testing-library/react'
+-import { userEvent } from '@testing-library/user-event'
+ import type { SyncScreen } from '@testing-library/react-render-stream/pure'
+ import { createRenderStream } from '@testing-library/react-render-stream/pure'
+-import { HttpResponse, http, delay } from 'msw'
++import { userEvent } from '@testing-library/user-event'
++import { HttpResponse, delay, http } from 'msw'
+ import { useEffect, useMemo, useRef, useState } from 'react'
+ import type { InfiniteQueryResultFlags } from '../core/buildSelectors'
+ 
+@@ -1765,6 +1765,10 @@ describe('hooks tests', () => {
+     })
+ 
+     test('useLazyQuery trigger promise returns the correctly updated data', async () => {
++      const consoleErrorSpy = vi
++        .spyOn(console, 'error')
++        .mockImplementation(noop)
++
+       const user = userEvent.setup()
+ 
+       const LazyUnwrapUseEffect = () => {
+@@ -1786,7 +1790,7 @@ describe('hooks tests', () => {
+ 
+             setDataFromTrigger(res) // adding client side state here will cause stale data
+           } catch (error) {
+-            console.error('Error handling increment trigger', error)
++            consoleErrorSpy('Error handling increment trigger', error)
+           }
+         }
+ 
+@@ -1796,7 +1800,7 @@ describe('hooks tests', () => {
+             // Force the lazy trigger to refetch
+             await handleLoad()
+           } catch (error) {
+-            console.error('Error handling mutate trigger', error)
++            consoleErrorSpy('Error handling mutate trigger', error)
+           }
+         }
+ 
+@@ -1853,6 +1857,8 @@ describe('hooks tests', () => {
+         expect(screen.getByText('useEffect data: 2')).toBeTruthy()
+         expect(screen.getByText('Unwrap data: 2')).toBeTruthy()
+       })
++
++      consoleErrorSpy.mockRestore()
+     })
+ 
+     test('`reset` sets state back to original state', async () => {
+diff --git a/packages/toolkit/src/query/tests/buildInitiate.test.tsx b/packages/toolkit/src/query/tests/buildInitiate.test.tsx
+index 54d1b42bf8..7d491b2340 100644
+--- a/packages/toolkit/src/query/tests/buildInitiate.test.tsx
++++ b/packages/toolkit/src/query/tests/buildInitiate.test.tsx
+@@ -1,8 +1,7 @@
+ import { setupApiStore } from '@internal/tests/utils/helpers'
+-import { createApi } from '../core'
+-import type { SubscriptionSelectors } from '../core/buildMiddleware/types'
+-import { fakeBaseQuery } from '../fakeBaseQuery'
+ import { delay } from '@internal/utils'
++import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query'
++import type { SubscriptionSelectors } from '../core/buildMiddleware/types'
+ 
+ let calls = 0
+ const api = createApi({
+diff --git a/packages/toolkit/src/query/tests/buildThunks.test.tsx b/packages/toolkit/src/query/tests/buildThunks.test.tsx
+index 66eca2795b..fa60e51b8e 100644
+--- a/packages/toolkit/src/query/tests/buildThunks.test.tsx
++++ b/packages/toolkit/src/query/tests/buildThunks.test.tsx
+@@ -1,4 +1,5 @@
+ import { configureStore } from '@reduxjs/toolkit'
++import type { BaseQueryApi } from '@reduxjs/toolkit/query/react'
+ import { createApi } from '@reduxjs/toolkit/query/react'
+ import { renderHook, waitFor } from '@testing-library/react'
+ import {
+@@ -6,7 +7,6 @@ import {
+   setupApiStore,
+   withProvider,
+ } from '../../tests/utils/helpers'
+-import type { BaseQueryApi } from '../baseQueryTypes'
+ 
+ describe('baseline thunk behavior', () => {
+   test('handles a non-async baseQuery without error', async () => {
+diff --git a/packages/toolkit/src/query/tests/cacheCollection.test.ts b/packages/toolkit/src/query/tests/cacheCollection.test.ts
+index 9905e32e49..9ebb03e90c 100644
+--- a/packages/toolkit/src/query/tests/cacheCollection.test.ts
++++ b/packages/toolkit/src/query/tests/cacheCollection.test.ts
+@@ -1,12 +1,11 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
++import type { Middleware, Reducer } from '@reduxjs/toolkit'
+ import { configureStore } from '@reduxjs/toolkit'
+-import { vi } from 'vitest'
+-import type { Middleware, Reducer } from 'redux'
++import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
+ import {
+   THIRTY_TWO_BIT_MAX_INT,
+   THIRTY_TWO_BIT_MAX_TIMER_SECONDS,
+ } from '../core/buildMiddleware/cacheCollection'
+-import { countObjectKeys } from '../utils/countObjectKeys'
++import { countObjectKeys } from '../utils/index'
+ 
+ beforeAll(() => {
+   vi.useFakeTimers()
+@@ -87,8 +86,8 @@ test(`query: handles large keepUnuseDataFor values over 32-bit ms`, async () =>
+   expect(onCleanup).not.toHaveBeenCalled()
+ 
+   // _Should_ be called _wayyyy_ in the future (like 24.8 days from now)
+-  vi.advanceTimersByTime(THIRTY_TWO_BIT_MAX_TIMER_SECONDS * 1000),
+-    expect(onCleanup).toHaveBeenCalled()
++  vi.advanceTimersByTime(THIRTY_TWO_BIT_MAX_TIMER_SECONDS * 1000)
++  expect(onCleanup).toHaveBeenCalled()
+ })
+ 
+ describe(`query: await cleanup, keepUnusedDataFor set`, () => {
+diff --git a/packages/toolkit/src/query/tests/createApi.test.ts b/packages/toolkit/src/query/tests/createApi.test.ts
+index a45316fab5..5824d85fe3 100644
+--- a/packages/toolkit/src/query/tests/createApi.test.ts
++++ b/packages/toolkit/src/query/tests/createApi.test.ts
+@@ -12,6 +12,7 @@ import type {
+   FetchBaseQueryMeta,
+   OverrideResultType,
+   SchemaFailureConverter,
++  SchemaFailureHandler,
+   SchemaType,
+   SerializeQueryArgs,
+   TagTypesFromApi,
+@@ -21,10 +22,9 @@ import {
+   fetchBaseQuery,
+   NamedSchemaError,
+ } from '@reduxjs/toolkit/query'
+-import { HttpResponse, delay, http } from 'msw'
++import { delay, http, HttpResponse } from 'msw'
+ import nodeFetch from 'node-fetch'
+ import * as v from 'valibot'
+-import type { SchemaFailureHandler } from '../endpointDefinitions'
+ 
+ beforeAll(() => {
+   vi.stubEnv('NODE_ENV', 'development')
+diff --git a/packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts b/packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts
+index 13b8ae1067..a6dd2d628b 100644
+--- a/packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts
++++ b/packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts
+@@ -1,4 +1,4 @@
+-import { defaultSerializeQueryArgs } from '@internal/query/defaultSerializeQueryArgs'
++import { defaultSerializeQueryArgs } from '@reduxjs/toolkit/query'
+ 
+ const endpointDefinition: any = {}
+ const endpointName = 'test'
+diff --git a/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx b/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx
+index c96a07c32a..56414bb9dd 100644
+--- a/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx
++++ b/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx
+@@ -1,5 +1,5 @@
+ import { createSlice } from '@reduxjs/toolkit'
+-import type { FetchArgs } from '@reduxjs/toolkit/query'
++import type { BaseQueryApi, FetchArgs } from '@reduxjs/toolkit/query'
+ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
+ import { headersToObject } from 'headers-polyfill'
+ import { HttpResponse, delay, http } from 'msw'
+@@ -7,7 +7,6 @@ import nodeFetch from 'node-fetch'
+ import queryString from 'query-string'
+ import { vi } from 'vitest'
+ import { setupApiStore } from '../../tests/utils/helpers'
+-import type { BaseQueryApi } from '../baseQueryTypes'
+ import { server } from './mocks/server'
+ 
+ const defaultHeaders: Record<string, string> = {
+diff --git a/packages/toolkit/src/query/tests/injectEndpoints.test.tsx b/packages/toolkit/src/query/tests/injectEndpoints.test.tsx
+index 2f00e37cec..6ec5a0de7d 100644
+--- a/packages/toolkit/src/query/tests/injectEndpoints.test.tsx
++++ b/packages/toolkit/src/query/tests/injectEndpoints.test.tsx
+@@ -1,5 +1,5 @@
+ import { noop } from '@internal/listenerMiddleware/utils'
+-import { configureStore } from '@internal/configureStore'
++import { configureStore } from '@reduxjs/toolkit'
+ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
+ 
+ const api = createApi({
+diff --git a/packages/toolkit/src/query/tests/invalidation.test.tsx b/packages/toolkit/src/query/tests/invalidation.test.tsx
+index 03a7638663..22d6c34062 100644
+--- a/packages/toolkit/src/query/tests/invalidation.test.tsx
++++ b/packages/toolkit/src/query/tests/invalidation.test.tsx
+@@ -14,7 +14,7 @@ const tagTypes = [
+   'giraffe',
+ ] as const
+ type TagTypes = (typeof tagTypes)[number]
+-type ProvidedTags = TagDescription<TagTypes>[] 
++type ProvidedTags = TagDescription<TagTypes>[]
+ type InvalidatesTags = (ProvidedTags[number] | null | undefined)[]
+ /** providesTags, invalidatesTags, shouldInvalidate */
+ const caseMatrix: [ProvidedTags, InvalidatesTags, boolean][] = [
+diff --git a/packages/toolkit/src/query/tests/queryFn.test.tsx b/packages/toolkit/src/query/tests/queryFn.test.tsx
+index ceba81ff1a..3105404a04 100644
+--- a/packages/toolkit/src/query/tests/queryFn.test.tsx
++++ b/packages/toolkit/src/query/tests/queryFn.test.tsx
+@@ -1,11 +1,14 @@
+ import { noop } from '@internal/listenerMiddleware/utils'
+-import type { QuerySubState } from '@internal/query/core/apiState'
+ import type { Post } from '@internal/query/tests/mocks/handlers'
+ import { posts } from '@internal/query/tests/mocks/handlers'
+ import { actionsReducer, setupApiStore } from '@internal/tests/utils/helpers'
+ import type { SerializedError } from '@reduxjs/toolkit'
+ import { configureStore } from '@reduxjs/toolkit'
+-import type { BaseQueryFn, FetchBaseQueryError } from '@reduxjs/toolkit/query'
++import type {
++  BaseQueryFn,
++  FetchBaseQueryError,
++  QuerySubState,
++} from '@reduxjs/toolkit/query'
+ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query'
+ 
+ describe('queryFn base implementation tests', () => {
+diff --git a/packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx b/packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx
+index 5a8bacbd12..ab269ffcf2 100644
+--- a/packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx
++++ b/packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx
+@@ -133,8 +133,8 @@ describe('refetchOnFocus tests', () => {
+ 
+     function UserWithRefetchTrue() {
+       ;({ data, isFetching, isLoading } =
+-      defaultApi.endpoints.getIncrementedAmount.useQuery(undefined, {
+-        refetchOnFocus: true,
++        defaultApi.endpoints.getIncrementedAmount.useQuery(undefined, {
++          refetchOnFocus: true,
+         }))
+       return <div />
+     }
+diff --git a/packages/toolkit/src/query/tests/retry.test-d.ts b/packages/toolkit/src/query/tests/retry.test-d.ts
+index 72c859aefd..4c8d116881 100644
+--- a/packages/toolkit/src/query/tests/retry.test-d.ts
++++ b/packages/toolkit/src/query/tests/retry.test-d.ts
+@@ -2,8 +2,8 @@ import type {
+   FetchBaseQueryError,
+   FetchBaseQueryMeta,
+   RetryOptions,
+-} from '@reduxjs/toolkit/query/react'
+-import { fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react'
++} from '@reduxjs/toolkit/query'
++import { fetchBaseQuery, retry } from '@reduxjs/toolkit/query'
+ 
+ describe('type tests', () => {
+   test('RetryOptions only accepts one of maxRetries or retryCondition', () => {
+diff --git a/packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts b/packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts
+index 25d5df9568..568c55fbf0 100644
+--- a/packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts
++++ b/packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts
+@@ -1,8 +1,12 @@
+-import type { ActionCreatorInvariantMiddlewareOptions } from '@internal/actionCreatorInvariantMiddleware'
+ import { getMessage } from '@internal/actionCreatorInvariantMiddleware'
+-import { createActionCreatorInvariantMiddleware } from '@internal/actionCreatorInvariantMiddleware'
+-import type { MiddlewareAPI } from '@reduxjs/toolkit'
+-import { createAction } from '@reduxjs/toolkit'
++import type {
++  ActionCreatorInvariantMiddlewareOptions,
++  MiddlewareAPI,
++} from '@reduxjs/toolkit'
++import {
++  createAction,
++  createActionCreatorInvariantMiddleware,
++} from '@reduxjs/toolkit'
+ 
+ describe('createActionCreatorInvariantMiddleware', () => {
+   const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+diff --git a/packages/toolkit/src/tests/autoBatchEnhancer.test.ts b/packages/toolkit/src/tests/autoBatchEnhancer.test.ts
+index e1b820c908..cc18b047b8 100644
+--- a/packages/toolkit/src/tests/autoBatchEnhancer.test.ts
++++ b/packages/toolkit/src/tests/autoBatchEnhancer.test.ts
+@@ -1,9 +1,11 @@
+-import { configureStore } from '../configureStore'
+-import { createSlice } from '../createSlice'
+-import type { AutoBatchOptions } from '../autoBatchEnhancer'
+-import { autoBatchEnhancer, prepareAutoBatched } from '../autoBatchEnhancer'
+-import { delay } from '../utils'
++import type { AutoBatchOptions } from '@reduxjs/toolkit'
++import {
++  configureStore,
++  createSlice,
++  prepareAutoBatched,
++} from '@reduxjs/toolkit'
+ import { debounce } from 'lodash'
++import { delay } from '../utils'
+ 
+ interface CounterState {
+   value: number
+diff --git a/packages/toolkit/src/tests/combinedTest.test.ts b/packages/toolkit/src/tests/combinedTest.test.ts
+index a130df7a1d..eabf8b8c52 100644
+--- a/packages/toolkit/src/tests/combinedTest.test.ts
++++ b/packages/toolkit/src/tests/combinedTest.test.ts
+@@ -1,13 +1,12 @@
+-import type { PayloadAction } from '@reduxjs/toolkit'
++import type { BookModel } from '@internal/entities/tests/fixtures/book'
++import type { EntityAdapter, PayloadAction } from '@reduxjs/toolkit'
+ import {
+-  createAsyncThunk,
+-  createAction,
+-  createSlice,
+   configureStore,
++  createAction,
++  createAsyncThunk,
+   createEntityAdapter,
++  createSlice,
+ } from '@reduxjs/toolkit'
+-import type { EntityAdapter } from '@internal/entities/models'
+-import type { BookModel } from '@internal/entities/tests/fixtures/book'
+ 
+ describe('Combined entity slice', () => {
+   let adapter: EntityAdapter<BookModel, string>
+diff --git a/packages/toolkit/src/tests/createDraftSafeSelector.test.ts b/packages/toolkit/src/tests/createDraftSafeSelector.test.ts
+index e25ac95d5e..4bd5f62a7a 100644
+--- a/packages/toolkit/src/tests/createDraftSafeSelector.test.ts
++++ b/packages/toolkit/src/tests/createDraftSafeSelector.test.ts
+@@ -1,5 +1,8 @@
+-import { createDraftSafeSelector, createSelector } from '@reduxjs/toolkit'
+-import { produce } from 'immer'
++import {
++  createDraftSafeSelector,
++  createSelector,
++  createNextState as produce,
++} from '@reduxjs/toolkit'
+ 
+ type State = { value: number }
+ const selectSelf = (state: State) => state
+diff --git a/packages/toolkit/src/tests/createReducer.test.ts b/packages/toolkit/src/tests/createReducer.test.ts
+index 114096c069..d54bcc30a2 100644
+--- a/packages/toolkit/src/tests/createReducer.test.ts
++++ b/packages/toolkit/src/tests/createReducer.test.ts
+@@ -12,7 +12,6 @@ import {
+   createReducer,
+   isPlainObject,
+ } from '@reduxjs/toolkit'
+-import { waitMs } from './utils/helpers'
+ 
+ interface Todo {
+   text: string
+diff --git a/packages/toolkit/src/tests/getDefaultMiddleware.test.ts b/packages/toolkit/src/tests/getDefaultMiddleware.test.ts
+index 74e5e7b499..48b6999a72 100644
+--- a/packages/toolkit/src/tests/getDefaultMiddleware.test.ts
++++ b/packages/toolkit/src/tests/getDefaultMiddleware.test.ts
+@@ -1,3 +1,4 @@
++import { buildGetDefaultMiddleware } from '@internal/getDefaultMiddleware'
+ import { Tuple } from '@internal/utils'
+ import type {
+   Action,
+@@ -9,8 +10,6 @@ import { configureStore } from '@reduxjs/toolkit'
+ import { thunk } from 'redux-thunk'
+ import { vi } from 'vitest'
+ 
+-import { buildGetDefaultMiddleware } from '@internal/getDefaultMiddleware'
+-
+ const getDefaultMiddleware = buildGetDefaultMiddleware()
+ 
+ describe('getDefaultMiddleware', () => {
+@@ -27,9 +26,8 @@ describe('getDefaultMiddleware', () => {
+       vi.stubEnv('NODE_ENV', 'production')
+ 
+       const { thunk } = await import('redux-thunk')
+-      const { buildGetDefaultMiddleware } = await import(
+-        '@internal/getDefaultMiddleware'
+-      )
++      const { buildGetDefaultMiddleware } =
++        await import('@internal/getDefaultMiddleware')
+ 
+       const middleware = buildGetDefaultMiddleware()()
+       expect(middleware).toContain(thunk)

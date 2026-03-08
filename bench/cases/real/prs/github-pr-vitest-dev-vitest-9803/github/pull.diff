@@ -1,0 +1,65 @@
+diff --git a/packages/browser/src/node/plugin.ts b/packages/browser/src/node/plugin.ts
+index 6d04d71c253f..cec8f16a0f13 100644
+--- a/packages/browser/src/node/plugin.ts
++++ b/packages/browser/src/node/plugin.ts
+@@ -355,7 +355,9 @@ export default (parentServer: ParentBrowserProject, base = '/'): Plugin[] => {
+       enforce: 'post',
+       async config(viteConfig) {
+         // Enables using ignore hint for coverage providers with @preserve keyword
+-        if (viteConfig.esbuild !== false) {
++        // Only set esbuild options when not using rolldown-vite (Vite 8+),
++        // which uses oxc for transformation instead of esbuild
++        if (!rolldownVersion && viteConfig.esbuild !== false) {
+           viteConfig.esbuild ||= {}
+           viteConfig.esbuild.legalComments = 'inline'
+         }
+diff --git a/test/cli/test/oxc.test.ts b/test/cli/test/oxc.test.ts
+new file mode 100644
+index 000000000000..35f197ccfb93
+--- /dev/null
++++ b/test/cli/test/oxc.test.ts
+@@ -0,0 +1,44 @@
++import { runInlineTests } from '#test-utils'
++import { expect, test } from 'vitest'
++
++test('oxc config on browser', async () => {
++  const result = await runInlineTests({
++    // needs a config file to reproduce
++    // https://github.com/vitest-dev/vitest/issues/9800
++    'vitest.config.ts': `
++import { playwright } from '@vitest/browser-playwright'
++import { defineConfig } from 'vite'
++
++export default defineConfig({
++  test: {
++    browser: {
++      enabled: true,
++      headless: true,
++      provider: playwright(),
++      instances: [
++        { browser: 'chromium' },
++      ],
++    },
++  },
++  oxc: {
++    jsx: {
++      refresh: false,
++    }
++  }
++})
++`,
++    'basic.test.ts': `
++import { test } from "vitest";
++test('basic', () => {});
++`,
++  })
++
++  expect(result.stderr).toMatchInlineSnapshot(`""`)
++  expect(result.errorTree()).toMatchInlineSnapshot(`
++    {
++      "basic.test.ts": {
++        "basic": "passed",
++      },
++    }
++  `)
++})

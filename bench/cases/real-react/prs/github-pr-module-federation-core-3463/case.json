@@ -1,0 +1,80 @@
+{
+  "id": "github-pr-module-federation-core-3463",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3463: fix(sdk): createLink hook error dom attr rel",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3463,
+    "prUrl": "https://github.com/module-federation/core/pull/3463",
+    "baseSha": "578aa43370e62a79204f74fadd0c51478084d279",
+    "headSha": "7e47cf1148d27f2ade06b8f1f0fb365e67c122ba",
+    "selectedFiles": [
+      "packages/sdk/src/dom.ts"
+    ],
+    "collectedAt": "2026-03-08T04:14:59.796Z"
+  },
+  "files": [
+    {
+      "id": "packages/sdk/src/dom.ts",
+      "oldPath": "packages/sdk/src/dom.ts",
+      "newPath": "packages/sdk/src/dom.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/sdk/src/dom.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 1
+        },
+        "newRange": {
+          "startLine": 1,
+          "endLine": 1
+        }
+      },
+      {
+        "fileId": "packages/sdk/src/dom.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 158,
+          "endLine": 158
+        },
+        "newRange": {
+          "startLine": 158,
+          "endLine": 158
+        }
+      },
+      {
+        "fileId": "packages/sdk/src/dom.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 162,
+          "endLine": 162
+        },
+        "newRange": {
+          "startLine": 162,
+          "endLine": 162
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

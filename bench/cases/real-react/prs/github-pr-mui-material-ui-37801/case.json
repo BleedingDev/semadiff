@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-mui-material-ui-37801",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/material-ui#37801: [docs] Rename product to productId",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 37801,
+    "prUrl": "https://github.com/mui/material-ui/pull/37801",
+    "baseSha": "08d33a4734728f6cd8c7e9bfbf9259ac63a1fffa",
+    "headSha": "62542f93f11fe37a0e97ae43b4d5dfaba66b10c1",
+    "selectedFiles": [
+      "docs/src/modules/sandbox/CodeSandbox.ts"
+    ],
+    "collectedAt": "2026-03-08T03:41:30.234Z"
+  },
+  "files": [
+    {
+      "id": "docs/src/modules/sandbox/CodeSandbox.ts",
+      "oldPath": "docs/src/modules/sandbox/CodeSandbox.ts",
+      "newPath": "docs/src/modules/sandbox/CodeSandbox.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/src/modules/sandbox/CodeSandbox.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 42,
+          "endLine": 42
+        },
+        "newRange": {
+          "startLine": 42,
+          "endLine": 42
+        }
+      },
+      {
+        "fileId": "docs/src/modules/sandbox/CodeSandbox.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 53,
+          "endLine": 53
+        },
+        "newRange": {
+          "startLine": 53,
+          "endLine": 53
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

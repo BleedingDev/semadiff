@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "930d19e770fa2d05b7df97fc7f8893e72f3d5253",
+    "filename": ".changeset/metal-falcons-boil.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/69ee3aacba43a23f548ac792d06c58bcd8278f27/.changeset%2Fmetal-falcons-boil.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/69ee3aacba43a23f548ac792d06c58bcd8278f27/.changeset%2Fmetal-falcons-boil.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Fmetal-falcons-boil.md?ref=69ee3aacba43a23f548ac792d06c58bcd8278f27",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@zag-js/store\": minor\n+---\n+\n+Improve reliability in web runtime by wrapping the process.env check in a function"
+  },
+  {
+    "sha": "f02a66f88e63a2121d4224574d569d7947f58f7b",
+    "filename": "packages/store/src/proxy.ts",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 5,
+    "changes": 10,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/69ee3aacba43a23f548ac792d06c58bcd8278f27/packages%2Fstore%2Fsrc%2Fproxy.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/69ee3aacba43a23f548ac792d06c58bcd8278f27/packages%2Fstore%2Fsrc%2Fproxy.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fstore%2Fsrc%2Fproxy.ts?ref=69ee3aacba43a23f548ac792d06c58bcd8278f27",
+    "patch": "@@ -3,7 +3,7 @@\n import { getUntracked, markToTrack } from \"proxy-compare\"\n import { makeGlobal } from \"./global\"\n \n-const isDev = process.env.NODE_ENV !== \"production\"\n+const isDev = () => process.env.NODE_ENV !== \"production\"\n const isObject = (x: unknown): x is object => typeof x === \"object\" && x !== null\n \n type AsRef = { $$valtioRef: true }\n@@ -161,7 +161,7 @@ const buildProxyFunction = (\n       }\n     const propProxyStates = new Map<string | symbol, readonly [ProxyState, RemoveListener?]>()\n     const addPropListener = (prop: string | symbol, propProxyState: ProxyState) => {\n-      if (isDev && propProxyStates.has(prop)) {\n+      if (isDev() && propProxyStates.has(prop)) {\n         throw new Error(\"prop listener already exists\")\n       }\n       if (listeners.size) {\n@@ -182,7 +182,7 @@ const buildProxyFunction = (\n       listeners.add(listener)\n       if (listeners.size === 1) {\n         propProxyStates.forEach(([propProxyState, prevRemove], prop) => {\n-          if (isDev && prevRemove) {\n+          if (isDev() && prevRemove) {\n             throw new Error(\"remove already exists\")\n           }\n           const remove = propProxyState[3](createPropListener(prop))\n@@ -302,7 +302,7 @@ export function subscribe<T extends object>(\n   notifyInSync?: boolean,\n ): () => void {\n   const proxyState = proxyStateMap.get(proxyObject as object)\n-  if (isDev && !proxyState) {\n+  if (isDev() && !proxyState) {\n     console.warn(\"Please use proxy object\")\n   }\n   let promise: Promise<void> | undefined\n@@ -334,7 +334,7 @@ export function subscribe<T extends object>(\n \n export function snapshot<T extends object>(proxyObject: T, handlePromise?: HandlePromise): Snapshot<T> {\n   const proxyState = proxyStateMap.get(proxyObject as object)\n-  if (isDev && !proxyState) {\n+  if (isDev() && !proxyState) {\n     console.warn(\"Please use proxy object\")\n   }\n   const [target, ensureVersion, createSnapshot] = proxyState as ProxyState"
+  }
+]

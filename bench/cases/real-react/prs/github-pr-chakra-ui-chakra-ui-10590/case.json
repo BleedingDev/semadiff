@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10590",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10590: feat(marquee): Marquee component",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10590,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10590",
+    "baseSha": "b52aa55dcaa665a2c2aad1ca273ad25a1d953075",
+    "headSha": "666d81478673b27cc634bbc05b62e88e4614baf5",
+    "selectedFiles": [
+      "packages/react/src/anatomy.ts"
+    ],
+    "collectedAt": "2026-03-08T03:59:11.188Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/anatomy.ts",
+      "oldPath": "packages/react/src/anatomy.ts",
+      "newPath": "packages/react/src/anatomy.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/anatomy.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 278,
+          "endLine": 278
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "0f28cb399f8773f91db5ed279a686e080239761f",
+    "filename": "packages/create-vite/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/vitejs/vite/blob/bc89ce7efd2dff00ebd2332db814a7a11b9ab423/packages%2Fcreate-vite%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/bc89ce7efd2dff00ebd2332db814a7a11b9ab423/packages%2Fcreate-vite%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fcreate-vite%2Fsrc%2Findex.ts?ref=bc89ce7efd2dff00ebd2332db814a7a11b9ab423",
+    "patch": "@@ -792,7 +792,7 @@ function setupReactCompiler(root: string, isTs: boolean) {\n         `  plugins: [\n     react({\n       babel: {\n-        plugins: [['babel-plugin-react-compiler']],\n+        plugins: ['babel-plugin-react-compiler'],\n       },\n     }),\n   ],`,"
+  }
+]

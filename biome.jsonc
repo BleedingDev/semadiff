@@ -55,10 +55,14 @@
     {
       "includes": [
         "packages/test-corpus/fixtures/**",
+        "bench/cases/**",
         "**/__fixtures__/**",
         "**/*.snap*"
       ],
       "formatter": {
+        "enabled": false
+      },
+      "assist": {
         "enabled": false
       },
       "linter": {

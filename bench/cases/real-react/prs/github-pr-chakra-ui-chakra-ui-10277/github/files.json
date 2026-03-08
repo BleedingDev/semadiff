@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "3b653811a6aea3ba0a1122acc3fbceb05e689669",
+    "filename": "packages/react/src/components/pagination/index.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 0,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/af686a8627b63804477e184c6a24bf222d287a42/packages%2Freact%2Fsrc%2Fcomponents%2Fpagination%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/af686a8627b63804477e184c6a24bf222d287a42/packages%2Freact%2Fsrc%2Fcomponents%2Fpagination%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fcomponents%2Fpagination%2Findex.ts?ref=af686a8627b63804477e184c6a24bf222d287a42",
+    "patch": "@@ -19,6 +19,8 @@ export type {\n   PaginationNextTriggerProps,\n   PaginationEllipsisProps,\n   PaginationItemProps,\n+  PaginationPageChangeDetails,\n+  PaginationPageSizeChangeDetails,\n   PaginationPageTextProps,\n   PaginationItemsProps,\n } from \"./pagination\""
+  }
+]

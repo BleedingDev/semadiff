@@ -1,0 +1,3952 @@
+diff --git a/packages/zod/src/v4/classic/schemas.ts b/packages/zod/src/v4/classic/schemas.ts
+index ae7b766191..f5e489e367 100644
+--- a/packages/zod/src/v4/classic/schemas.ts
++++ b/packages/zod/src/v4/classic/schemas.ts
+@@ -2306,9 +2306,7 @@ type ZodInstanceOfParams = core.Params<
+ >;
+ function _instanceof<T extends typeof util.Class>(
+   cls: T,
+-  params: ZodInstanceOfParams = {
+-    error: `Input not instance of ${cls.name}`,
+-  }
++  params: ZodInstanceOfParams = {}
+ ): ZodCustom<InstanceType<T>, InstanceType<T>> {
+   const inst = new ZodCustom({
+     type: "custom",
+@@ -2318,6 +2316,18 @@ function _instanceof<T extends typeof util.Class>(
+     ...(util.normalizeParams(params) as any),
+   });
+   inst._zod.bag.Class = cls;
++  // Override check to emit invalid_type instead of custom
++  inst._zod.check = (payload) => {
++    if (!(payload.value instanceof cls)) {
++      payload.issues.push({
++        code: "invalid_type",
++        expected: cls.name,
++        input: payload.value,
++        inst,
++        path: [...(inst._zod.def.path ?? [])],
++      });
++    }
++  };
+   return inst as any;
+ }
+ export { _instanceof as instanceof };
+diff --git a/packages/zod/src/v4/classic/tests/instanceof.test.ts b/packages/zod/src/v4/classic/tests/instanceof.test.ts
+index 37671034b4..8a8fcf96f7 100644
+--- a/packages/zod/src/v4/classic/tests/instanceof.test.ts
++++ b/packages/zod/src/v4/classic/tests/instanceof.test.ts
+@@ -32,3 +32,29 @@ test("instanceof fatal", () => {
+   const res = schema.safeParse(null);
+   expect(res.success).toBe(false);
+ });
++
++test("instanceof respects customError", () => {
++  class Test {
++    name!: string;
++  }
++
++  z.config({
++    customError: () => {
++      return "This is invalid!";
++    },
++  });
++
++  const TestSchema = z.instanceof(Test);
++  const result = TestSchema.safeParse("whatever");
++  expect(result.success).toBe(false);
++  if (!result.success) {
++    const issue = result.error.issues[0];
++    expect(issue.code).toBe("invalid_type");
++    if (issue.code === "invalid_type") {
++      expect(issue.expected).toBe("Test");
++    }
++    expect(issue.message).toBe("This is invalid!");
++  }
++
++  z.config({ customError: undefined });
++});
+diff --git a/packages/zod/src/v4/core/errors.ts b/packages/zod/src/v4/core/errors.ts
+index 19fe1f2453..455a301e9a 100644
+--- a/packages/zod/src/v4/core/errors.ts
++++ b/packages/zod/src/v4/core/errors.ts
+@@ -17,9 +17,33 @@ export interface $ZodIssueBase {
+ ////////////////////////////////
+ ////     issue subtypes     ////
+ ////////////////////////////////
++export type $ZodInvalidTypeExpected =
++  | "string"
++  | "number"
++  | "int"
++  | "boolean"
++  | "bigint"
++  | "symbol"
++  | "undefined"
++  | "null"
++  | "never"
++  | "void"
++  | "date"
++  | "array"
++  | "object"
++  | "tuple"
++  | "record"
++  | "map"
++  | "set"
++  | "file"
++  | "nonoptional"
++  | "nan"
++  | "function"
++  | (string & {}); // class names for instanceof
++
+ export interface $ZodIssueInvalidType<Input = unknown> extends $ZodIssueBase {
+   readonly code: "invalid_type";
+-  readonly expected: $ZodType["_zod"]["def"]["type"];
++  readonly expected: $ZodInvalidTypeExpected;
+   readonly input?: Input;
+ }
+ 
+diff --git a/packages/zod/src/v4/core/schemas.ts b/packages/zod/src/v4/core/schemas.ts
+index 9102970cbf..4868fcfc84 100644
+--- a/packages/zod/src/v4/core/schemas.ts
++++ b/packages/zod/src/v4/core/schemas.ts
+@@ -4010,7 +4010,7 @@ export const $ZodTemplateLiteral: core.$constructor<$ZodTemplateLiteral> = /*@__
+         payload.issues.push({
+           input: payload.value,
+           inst,
+-          expected: "template_literal",
++          expected: "string",
+           code: "invalid_type",
+         });
+         return payload;
+diff --git a/packages/zod/src/v4/core/tests/locales/en.test.ts b/packages/zod/src/v4/core/tests/locales/en.test.ts
+index 4b3732e1fb..75fcaeaf91 100644
+--- a/packages/zod/src/v4/core/tests/locales/en.test.ts
++++ b/packages/zod/src/v4/core/tests/locales/en.test.ts
+@@ -1,5 +1,5 @@
+ import { expect, test } from "vitest";
+-import { parsedType } from "../../../locales/en.js";
++import { parsedType } from "../../util.js";
+ 
+ test("parsedType", () => {
+   expect(parsedType("string")).toBe("string");
+diff --git a/packages/zod/src/v4/core/tests/locales/tr.test.ts b/packages/zod/src/v4/core/tests/locales/tr.test.ts
+index c669de94df..bc46bf41e9 100644
+--- a/packages/zod/src/v4/core/tests/locales/tr.test.ts
++++ b/packages/zod/src/v4/core/tests/locales/tr.test.ts
+@@ -1,6 +1,6 @@
+ import { expect, test } from "vitest";
+ import * as z from "zod/v4";
+-import { parsedType } from "../../../locales/tr.js";
++import { parsedType } from "../../util.js";
+ 
+ test("parsedType", () => {
+   expect(parsedType("string")).toBe("string");
+@@ -21,7 +21,7 @@ test("parsedType", () => {
+   const doubleNullPrototype = Object.create(Object.create(null));
+   expect(parsedType(doubleNullPrototype)).toBe("object");
+ 
+-  expect(parsedType(Number.NaN)).toBe("NaN");
++  expect(parsedType(Number.NaN)).toBe("nan");
+ });
+ 
+ test("locales - tr", () => {
+diff --git a/packages/zod/src/v4/core/tests/locales/uz.test.ts b/packages/zod/src/v4/core/tests/locales/uz.test.ts
+index 625910d0b3..db2005eb2d 100644
+--- a/packages/zod/src/v4/core/tests/locales/uz.test.ts
++++ b/packages/zod/src/v4/core/tests/locales/uz.test.ts
+@@ -1,35 +1,12 @@
+ import { expect, test } from "vitest";
+ import * as z from "zod/v4";
+-import { parsedType } from "../../../locales/uz.js";
+-
+-test("parsedType", () => {
+-  expect(parsedType("string")).toBe("string");
+-  expect(parsedType(1)).toBe("raqam");
+-  expect(parsedType(true)).toBe("boolean");
+-  expect(parsedType(null)).toBe("null");
+-  expect(parsedType(undefined)).toBe("undefined");
+-  expect(parsedType([])).toBe("massiv");
+-  expect(parsedType({})).toBe("object");
+-  expect(parsedType(new Date())).toBe("Date");
+-  expect(parsedType(new Map())).toBe("Map");
+-  expect(parsedType(new Set())).toBe("Set");
+-  expect(parsedType(new Error())).toBe("Error");
+-
+-  const nullPrototype = Object.create(null);
+-  expect(parsedType(nullPrototype)).toBe("object");
+-
+-  const doubleNullPrototype = Object.create(Object.create(null));
+-  expect(parsedType(doubleNullPrototype)).toBe("object");
+-
+-  expect(parsedType(Number.NaN)).toBe("NaN");
+-});
+ 
+ test("locales - uz", () => {
+   z.config(z.locales.uz());
+ 
+   const invalidType = z.number().safeParse("a");
+   expect(invalidType.error!.issues[0].code).toBe("invalid_type");
+-  expect(invalidType.error!.issues[0].message).toBe("Noto‘g‘ri kirish: kutilgan number, qabul qilingan string");
++  expect(invalidType.error!.issues[0].message).toBe("Noto‘g‘ri kirish: kutilgan raqam, qabul qilingan string");
+ 
+   const invalidType2 = z.string().safeParse(1);
+   expect(invalidType2.error!.issues[0].code).toBe("invalid_type");
+diff --git a/packages/zod/src/v4/core/util.ts b/packages/zod/src/v4/core/util.ts
+index 5b1e76b650..0edee1ad00 100644
+--- a/packages/zod/src/v4/core/util.ts
++++ b/packages/zod/src/v4/core/util.ts
+@@ -859,6 +859,29 @@ export function getLengthableOrigin(input: any): "array" | "string" | "unknown"
+   return "unknown";
+ }
+ 
++export function parsedType(data: unknown): errors.$ZodInvalidTypeExpected {
++  const t = typeof data;
++  switch (t) {
++    case "number": {
++      return Number.isNaN(data) ? "nan" : "number";
++    }
++    case "object": {
++      if (data === null) {
++        return "null";
++      }
++      if (Array.isArray(data)) {
++        return "array";
++      }
++
++      const obj = data as object;
++      if (obj && Object.getPrototypeOf(obj) !== Object.prototype && "constructor" in obj && obj.constructor) {
++        return (obj.constructor as { name: string }).name;
++      }
++    }
++  }
++  return t;
++}
++
+ //////////    REFINES     //////////
+ export function issue(_iss: string, input: any, inst: any): errors.$ZodRawIssue;
+ export function issue(_iss: errors.$ZodRawIssue): errors.$ZodRawIssue;
+diff --git a/packages/zod/src/v4/locales/ar.ts b/packages/zod/src/v4/locales/ar.ts
+index b9c4058ef9..f28bde9907 100644
+--- a/packages/zod/src/v4/locales/ar.ts
++++ b/packages/zod/src/v4/locales/ar.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "مدخل",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "مدخل",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `مدخلات غير مقبولة: يفترض إدخال ${issue.expected}، ولكن تم إدخال ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `مدخلات غير مقبولة: يفترض إدخال instanceof ${issue.expected}، ولكن تم إدخال ${received}`;
++        }
++        return `مدخلات غير مقبولة: يفترض إدخال ${expected}، ولكن تم إدخال ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `مدخلات غير مقبولة: يفترض إدخال ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -100,7 +90,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `نَص غير مقبول: يجب أن ينتهي بـ "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `نَص غير مقبول: يجب أن يتضمَّن "${_issue.includes}"`;
+         if (_issue.format === "regex") return `نَص غير مقبول: يجب أن يطابق النمط ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} غير مقبول`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} غير مقبول`;
+       }
+       case "not_multiple_of":
+         return `رقم غير مقبول: يجب أن يكون من مضاعفات ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/az.ts b/packages/zod/src/v4/locales/az.ts
+index cee08e3e0d..d6ae91fb1a 100644
+--- a/packages/zod/src/v4/locales/az.ts
++++ b/packages/zod/src/v4/locales/az.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Yanlış dəyər: gözlənilən ${issue.expected}, daxil olan ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Yanlış dəyər: gözlənilən instanceof ${issue.expected}, daxil olan ${received}`;
++        }
++        return `Yanlış dəyər: gözlənilən ${expected}, daxil olan ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Yanlış dəyər: gözlənilən ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Yanlış seçim: aşağıdakılardan biri olmalıdır: ${util.joinValues(issue.values, "|")}`;
+@@ -96,7 +86,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Yanlış mətn: "${_issue.suffix}" ilə bitməlidir`;
+         if (_issue.format === "includes") return `Yanlış mətn: "${_issue.includes}" daxil olmalıdır`;
+         if (_issue.format === "regex") return `Yanlış mətn: ${_issue.pattern} şablonuna uyğun olmalıdır`;
+-        return `Yanlış ${Nouns[_issue.format] ?? issue.format}`;
++        return `Yanlış ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Yanlış ədəd: ${issue.divisor} ilə bölünə bilən olmalıdır`;
+diff --git a/packages/zod/src/v4/locales/be.ts b/packages/zod/src/v4/locales/be.ts
+index e2920147bd..e8a7bad9cb 100644
+--- a/packages/zod/src/v4/locales/be.ts
++++ b/packages/zod/src/v4/locales/be.ts
+@@ -70,30 +70,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "лік";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "масіў";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "увод",
+@@ -126,10 +103,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "увод",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "лік",
++    array: "масіў",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Няправільны ўвод: чакаўся ${issue.expected}, атрымана ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Няправільны ўвод: чакаўся instanceof ${issue.expected}, атрымана ${received}`;
++        }
++        return `Няправільны ўвод: чакаўся ${expected}, атрымана ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Няправільны ўвод: чакалася ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Няправільны варыянт: чакаўся адзін з ${util.joinValues(issue.values, "|")}`;
+@@ -159,7 +151,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Няправільны радок: павінен заканчвацца на "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Няправільны радок: павінен змяшчаць "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Няправільны радок: павінен адпавядаць шаблону ${_issue.pattern}`;
+-        return `Няправільны ${Nouns[_issue.format] ?? issue.format}`;
++        return `Няправільны ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Няправільны лік: павінен быць кратным ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/bg.ts b/packages/zod/src/v4/locales/bg.ts
+index 8efba3ca2f..f103d48fa8 100644
+--- a/packages/zod/src/v4/locales/bg.ts
++++ b/packages/zod/src/v4/locales/bg.ts
+@@ -2,29 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "число";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "масив";
+-      }
+-      if (data === null) {
+-        return "null";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-  return t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "символа", verb: "да съдържа" },
+@@ -37,7 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "вход",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "вход",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "число",
++    array: "масив",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Невалиден вход: очакван ${issue.expected}, получен ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Невалиден вход: очакван instanceof ${issue.expected}, получен ${received}`;
++        }
++        return `Невалиден вход: очакван ${expected}, получен ${received}`;
++      }
+ 
+       case "invalid_value":
+         if (issue.values.length === 1) return `Невалиден вход: очакван ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -111,7 +103,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "time") invalid_adj = "Невалидно";
+         if (_issue.format === "duration") invalid_adj = "Невалидна";
+ 
+-        return `${invalid_adj} ${Nouns[_issue.format] ?? issue.format}`;
++        return `${invalid_adj} ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Невалидно число: трябва да бъде кратно на ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ca.ts b/packages/zod/src/v4/locales/ca.ts
+index 392b48569b..13d38b6531 100644
+--- a/packages/zod/src/v4/locales/ca.ts
++++ b/packages/zod/src/v4/locales/ca.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "entrada",
+@@ -70,11 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "entrada",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Tipus invàlid: s'esperava ${issue.expected}, s'ha rebut ${parsedType(issue.input)}`;
+-      // return `Tipus invàlid: s'esperava ${issue.expected}, s'ha rebut ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Tipus invàlid: s'esperava instanceof ${issue.expected}, s'ha rebut ${received}`;
++        }
++        return `Tipus invàlid: s'esperava ${expected}, s'ha rebut ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Valor invàlid: s'esperava ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Opció invàlida: s'esperava una de ${util.joinValues(issue.values, " o ")}`;
+@@ -102,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Format invàlid: ha d'acabar amb "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Format invàlid: ha d'incloure "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Format invàlid: ha de coincidir amb el patró ${_issue.pattern}`;
+-        return `Format invàlid per a ${Nouns[_issue.format] ?? issue.format}`;
++        return `Format invàlid per a ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Número invàlid: ha de ser múltiple de ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/cs.ts b/packages/zod/src/v4/locales/cs.ts
+index 724398ad93..75d5971414 100644
+--- a/packages/zod/src/v4/locales/cs.ts
++++ b/packages/zod/src/v4/locales/cs.ts
+@@ -14,48 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "číslo";
+-      }
+-      case "string": {
+-        return "řetězec";
+-      }
+-      case "boolean": {
+-        return "boolean";
+-      }
+-      case "bigint": {
+-        return "bigint";
+-      }
+-      case "function": {
+-        return "funkce";
+-      }
+-      case "symbol": {
+-        return "symbol";
+-      }
+-      case "undefined": {
+-        return "undefined";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "pole";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "regulární výraz",
+@@ -88,10 +47,27 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "vstup",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "číslo",
++    string: "řetězec",
++    function: "funkce",
++    array: "pole",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Neplatný vstup: očekáváno ${issue.expected}, obdrženo ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Neplatný vstup: očekáváno instanceof ${issue.expected}, obdrženo ${received}`;
++        }
++        return `Neplatný vstup: očekáváno ${expected}, obdrženo ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Neplatný vstup: očekáváno ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Neplatná možnost: očekávána jedna z hodnot ${util.joinValues(issue.values, "|")}`;
+@@ -117,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Neplatný řetězec: musí končit na "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Neplatný řetězec: musí obsahovat "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Neplatný řetězec: musí odpovídat vzoru ${_issue.pattern}`;
+-        return `Neplatný formát ${Nouns[_issue.format] ?? issue.format}`;
++        return `Neplatný formát ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Neplatné číslo: musí být násobkem ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/da.ts b/packages/zod/src/v4/locales/da.ts
+index 793c8c376f..e28062a43d 100644
+--- a/packages/zod/src/v4/locales/da.ts
++++ b/packages/zod/src/v4/locales/da.ts
+@@ -10,49 +10,11 @@ const error: () => errors.$ZodErrorMap = () => {
+     set: { unit: "elementer", verb: "indeholdt" },
+   };
+ 
+-  const TypeNames: Record<string, string> = {
+-    string: "streng",
+-    number: "tal",
+-    boolean: "boolean",
+-    array: "liste",
+-    object: "objekt",
+-    set: "sæt",
+-    file: "fil",
+-  };
+-
+   function getSizing(origin: string): { unit: string; verb: string } | null {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  function getTypeName(type: string): string {
+-    return TypeNames[type] ?? type;
+-  }
+-
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "tal";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "liste";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-        return "objekt";
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -85,17 +47,37 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    string: "streng",
++    number: "tal",
++    boolean: "boolean",
++    array: "liste",
++    object: "objekt",
++    set: "sæt",
++    file: "fil",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Ugyldigt input: forventede ${getTypeName(issue.expected)}, fik ${getTypeName(parsedType(issue.input))}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Ugyldigt input: forventede instanceof ${issue.expected}, fik ${received}`;
++        }
++        return `Ugyldigt input: forventede ${expected}, fik ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Ugyldig værdi: forventede ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Ugyldigt valg: forventede en af følgende ${util.joinValues(issue.values, "|")}`;
+       case "too_big": {
+         const adj = issue.inclusive ? "<=" : "<";
+         const sizing = getSizing(issue.origin);
+-        const origin = getTypeName(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         if (sizing)
+           return `For stor: forventede ${origin ?? "value"} ${sizing.verb} ${adj} ${issue.maximum.toString()} ${sizing.unit ?? "elementer"}`;
+         return `For stor: forventede ${origin ?? "value"} havde ${adj} ${issue.maximum.toString()}`;
+@@ -103,7 +85,7 @@ const error: () => errors.$ZodErrorMap = () => {
+       case "too_small": {
+         const adj = issue.inclusive ? ">=" : ">";
+         const sizing = getSizing(issue.origin);
+-        const origin = getTypeName(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         if (sizing) {
+           return `For lille: forventede ${origin} ${sizing.verb} ${adj} ${issue.minimum.toString()} ${sizing.unit}`;
+         }
+@@ -116,7 +98,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ugyldig streng: skal ende med "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Ugyldig streng: skal indeholde "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Ugyldig streng: skal matche mønsteret ${_issue.pattern}`;
+-        return `Ugyldig ${Nouns[_issue.format] ?? issue.format}`;
++        return `Ugyldig ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Ugyldigt tal: skal være deleligt med ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/de.ts b/packages/zod/src/v4/locales/de.ts
+index d71a8169ca..dbcae388a3 100644
+--- a/packages/zod/src/v4/locales/de.ts
++++ b/packages/zod/src/v4/locales/de.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "Zahl";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "Array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "Eingabe",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "Eingabe",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "Zahl",
++    array: "Array",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Ungültige Eingabe: erwartet ${issue.expected}, erhalten ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Ungültige Eingabe: erwartet instanceof ${issue.expected}, erhalten ${received}`;
++        }
++        return `Ungültige Eingabe: erwartet ${expected}, erhalten ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Ungültige Eingabe: erwartet ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Ungültige Option: erwartet eine von ${util.joinValues(issue.values, "|")}`;
+@@ -99,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ungültiger String: muss mit "${_issue.suffix}" enden`;
+         if (_issue.format === "includes") return `Ungültiger String: muss "${_issue.includes}" enthalten`;
+         if (_issue.format === "regex") return `Ungültiger String: muss dem Muster ${_issue.pattern} entsprechen`;
+-        return `Ungültig: ${Nouns[_issue.format] ?? issue.format}`;
++        return `Ungültig: ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Ungültige Zahl: muss ein Vielfaches von ${issue.divisor} sein`;
+diff --git a/packages/zod/src/v4/locales/en.ts b/packages/zod/src/v4/locales/en.ts
+index 7edcbe026a..7b234817cb 100644
+--- a/packages/zod/src/v4/locales/en.ts
++++ b/packages/zod/src/v4/locales/en.ts
+@@ -2,29 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "number";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "array";
+-      }
+-      if (data === null) {
+-        return "null";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-  return t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "characters", verb: "to have" },
+@@ -38,7 +15,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -72,10 +49,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  // type names: missing keys = do not translate (use raw value via ?? fallback)
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    // Compatibility: "nan" -> "NaN" for display
++    nan: "NaN",
++    // All other type names omitted - they fall back to raw values via ?? operator
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Invalid input: expected ${issue.expected}, received ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Invalid input: expected instanceof ${issue.expected}, received ${received}`;
++        }
++        return `Invalid input: expected ${expected}, received ${received}`;
++      }
+ 
+       case "invalid_value":
+         if (issue.values.length === 1) return `Invalid input: expected ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -104,7 +97,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Invalid string: must end with "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Invalid string: must include "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Invalid string: must match pattern ${_issue.pattern}`;
+-        return `Invalid ${Nouns[_issue.format] ?? issue.format}`;
++        return `Invalid ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Invalid number: must be a multiple of ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/eo.ts b/packages/zod/src/v4/locales/eo.ts
+index 9331a3cf3b..f848cc65a0 100644
+--- a/packages/zod/src/v4/locales/eo.ts
++++ b/packages/zod/src/v4/locales/eo.ts
+@@ -2,29 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "nombro";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "tabelo";
+-      }
+-      if (data === null) {
+-        return "senvalora";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-  return t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "karaktrojn", verb: "havi" },
+@@ -37,7 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "enigo",
+@@ -70,10 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "enigo",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "nombro",
++    array: "tabelo",
++    null: "senvalora",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Nevalida enigo: atendiĝis ${issue.expected}, riceviĝis ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Nevalida enigo: atendiĝis instanceof ${issue.expected}, riceviĝis ${received}`;
++        }
++        return `Nevalida enigo: atendiĝis ${expected}, riceviĝis ${received}`;
++      }
+ 
+       case "invalid_value":
+         if (issue.values.length === 1) return `Nevalida enigo: atendiĝis ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -100,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Nevalida karaktraro: devas finiĝi per "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Nevalida karaktraro: devas inkluzivi "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Nevalida karaktraro: devas kongrui kun la modelo ${_issue.pattern}`;
+-        return `Nevalida ${Nouns[_issue.format] ?? issue.format}`;
++        return `Nevalida ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Nevalida nombro: devas esti oblo de ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/es.ts b/packages/zod/src/v4/locales/es.ts
+index a7c009c75e..7b890a6952 100644
+--- a/packages/zod/src/v4/locales/es.ts
++++ b/packages/zod/src/v4/locales/es.ts
+@@ -10,65 +10,11 @@ const error: () => errors.$ZodErrorMap = () => {
+     set: { unit: "elementos", verb: "tener" },
+   };
+ 
+-  const TypeNames: Record<string, string> = {
+-    string: "texto",
+-    number: "número",
+-    boolean: "booleano",
+-    array: "arreglo",
+-    object: "objeto",
+-    set: "conjunto",
+-    file: "archivo",
+-    date: "fecha",
+-    bigint: "número grande",
+-    symbol: "símbolo",
+-    undefined: "indefinido",
+-    null: "nulo",
+-    function: "función",
+-    map: "mapa",
+-    record: "registro",
+-    tuple: "tupla",
+-    enum: "enumeración",
+-    union: "unión",
+-    literal: "literal",
+-    promise: "promesa",
+-    void: "vacío",
+-    never: "nunca",
+-    unknown: "desconocido",
+-    any: "cualquiera",
+-  };
+-
+   function getSizing(origin: string): { unit: string; verb: string } | null {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  function getTypeName(type: string): string {
+-    return TypeNames[type] ?? type;
+-  }
+-
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-        if (Object.getPrototypeOf(data) !== Object.prototype) {
+-          return data.constructor.name;
+-        }
+-        return "object";
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "entrada",
+@@ -101,11 +47,47 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "entrada",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    string: "texto",
++    number: "número",
++    boolean: "booleano",
++    array: "arreglo",
++    object: "objeto",
++    set: "conjunto",
++    file: "archivo",
++    date: "fecha",
++    bigint: "número grande",
++    symbol: "símbolo",
++    undefined: "indefinido",
++    null: "nulo",
++    function: "función",
++    map: "mapa",
++    record: "registro",
++    tuple: "tupla",
++    enum: "enumeración",
++    union: "unión",
++    literal: "literal",
++    promise: "promesa",
++    void: "vacío",
++    never: "nunca",
++    unknown: "desconocido",
++    any: "cualquiera",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Entrada inválida: se esperaba ${getTypeName(issue.expected)}, recibido ${getTypeName(parsedType(issue.input))}`;
+-      // return `Entrada inválida: se esperaba ${issue.expected}, recibido ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Entrada inválida: se esperaba instanceof ${issue.expected}, recibido ${received}`;
++        }
++        return `Entrada inválida: se esperaba ${expected}, recibido ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Entrada inválida: se esperaba ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -113,7 +95,7 @@ const error: () => errors.$ZodErrorMap = () => {
+       case "too_big": {
+         const adj = issue.inclusive ? "<=" : "<";
+         const sizing = getSizing(issue.origin);
+-        const origin = getTypeName(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         if (sizing)
+           return `Demasiado grande: se esperaba que ${origin ?? "valor"} tuviera ${adj}${issue.maximum.toString()} ${sizing.unit ?? "elementos"}`;
+         return `Demasiado grande: se esperaba que ${origin ?? "valor"} fuera ${adj}${issue.maximum.toString()}`;
+@@ -121,7 +103,7 @@ const error: () => errors.$ZodErrorMap = () => {
+       case "too_small": {
+         const adj = issue.inclusive ? ">=" : ">";
+         const sizing = getSizing(issue.origin);
+-        const origin = getTypeName(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         if (sizing) {
+           return `Demasiado pequeño: se esperaba que ${origin} tuviera ${adj}${issue.minimum.toString()} ${sizing.unit}`;
+         }
+@@ -134,18 +116,18 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Cadena inválida: debe terminar en "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Cadena inválida: debe incluir "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Cadena inválida: debe coincidir con el patrón ${_issue.pattern}`;
+-        return `Inválido ${Nouns[_issue.format] ?? issue.format}`;
++        return `Inválido ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Número inválido: debe ser múltiplo de ${issue.divisor}`;
+       case "unrecognized_keys":
+         return `Llave${issue.keys.length > 1 ? "s" : ""} desconocida${issue.keys.length > 1 ? "s" : ""}: ${util.joinValues(issue.keys, ", ")}`;
+       case "invalid_key":
+-        return `Llave inválida en ${getTypeName(issue.origin)}`;
++        return `Llave inválida en ${TypeDictionary[issue.origin] ?? issue.origin}`;
+       case "invalid_union":
+         return "Entrada inválida";
+       case "invalid_element":
+-        return `Valor inválido en ${getTypeName(issue.origin)}`;
++        return `Valor inválido en ${TypeDictionary[issue.origin] ?? issue.origin}`;
+       default:
+         return `Entrada inválida`;
+     }
+diff --git a/packages/zod/src/v4/locales/fa.ts b/packages/zod/src/v4/locales/fa.ts
+index 1fed29ad9e..524894a4e0 100644
+--- a/packages/zod/src/v4/locales/fa.ts
++++ b/packages/zod/src/v4/locales/fa.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "عدد";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "آرایه";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ورودی",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ورودی",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "عدد",
++    array: "آرایه",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `ورودی نامعتبر: می‌بایست ${issue.expected} می‌بود، ${parsedType(issue.input)} دریافت شد`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `ورودی نامعتبر: می‌بایست instanceof ${issue.expected} می‌بود، ${received} دریافت شد`;
++        }
++        return `ورودی نامعتبر: می‌بایست ${expected} می‌بود، ${received} دریافت شد`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) {
+           return `ورودی نامعتبر: می‌بایست ${util.stringifyPrimitive(issue.values[0])} می‌بود`;
+@@ -109,7 +101,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "regex") {
+           return `رشته نامعتبر: باید با الگوی ${_issue.pattern} مطابقت داشته باشد`;
+         }
+-        return `${Nouns[_issue.format] ?? issue.format} نامعتبر`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} نامعتبر`;
+       }
+       case "not_multiple_of":
+         return `عدد نامعتبر: باید مضرب ${issue.divisor} باشد`;
+diff --git a/packages/zod/src/v4/locales/fi.ts b/packages/zod/src/v4/locales/fi.ts
+index aff9f88608..c6e8a982b7 100644
+--- a/packages/zod/src/v4/locales/fi.ts
++++ b/packages/zod/src/v4/locales/fi.ts
+@@ -18,30 +18,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "säännöllinen lauseke",
+@@ -74,10 +51,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "templaattimerkkijono",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Virheellinen tyyppi: odotettiin ${issue.expected}, oli ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Virheellinen tyyppi: odotettiin instanceof ${issue.expected}, oli ${received}`;
++        }
++        return `Virheellinen tyyppi: odotettiin ${expected}, oli ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Virheellinen syöte: täytyy olla ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -106,7 +96,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "regex") {
+           return `Virheellinen syöte: täytyy vastata säännöllistä lauseketta ${_issue.pattern}`;
+         }
+-        return `Virheellinen ${Nouns[_issue.format] ?? issue.format}`;
++        return `Virheellinen ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Virheellinen luku: täytyy olla luvun ${issue.divisor} monikerta`;
+diff --git a/packages/zod/src/v4/locales/fr-CA.ts b/packages/zod/src/v4/locales/fr-CA.ts
+index cdb18181e0..91406077e9 100644
+--- a/packages/zod/src/v4/locales/fr-CA.ts
++++ b/packages/zod/src/v4/locales/fr-CA.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "entrée",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "entrée",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Entrée invalide : attendu ${issue.expected}, reçu ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Entrée invalide : attendu instanceof ${issue.expected}, reçu ${received}`;
++        }
++        return `Entrée invalide : attendu ${expected}, reçu ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Entrée invalide : attendu ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Option invalide : attendu l'une des valeurs suivantes ${util.joinValues(issue.values, "|")}`;
+@@ -101,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Chaîne invalide : doit se terminer par "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Chaîne invalide : doit inclure "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Chaîne invalide : doit correspondre au motif ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} invalide`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} invalide`;
+       }
+       case "not_multiple_of":
+         return `Nombre invalide : doit être un multiple de ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/fr.ts b/packages/zod/src/v4/locales/fr.ts
+index f8ef0442a6..dd129d6227 100644
+--- a/packages/zod/src/v4/locales/fr.ts
++++ b/packages/zod/src/v4/locales/fr.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "nombre";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "tableau";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "entrée",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "entrée",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "nombre",
++    array: "tableau",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Entrée invalide : ${issue.expected} attendu, ${parsedType(issue.input)} reçu`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Entrée invalide : instanceof ${issue.expected} attendu, ${received} reçu`;
++        }
++        return `Entrée invalide : ${expected} attendu, ${received} reçu`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Entrée invalide : ${util.stringifyPrimitive(issue.values[0])} attendu`;
+         return `Option invalide : une valeur parmi ${util.joinValues(issue.values, "|")} attendue`;
+@@ -99,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Chaîne invalide : doit se terminer par "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Chaîne invalide : doit inclure "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Chaîne invalide : doit correspondre au modèle ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} invalide`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} invalide`;
+       }
+       case "not_multiple_of":
+         return `Nombre invalide : doit être un multiple de ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/he.ts b/packages/zod/src/v4/locales/he.ts
+index 42c0d6f178..fd85db333c 100644
+--- a/packages/zod/src/v4/locales/he.ts
++++ b/packages/zod/src/v4/locales/he.ts
+@@ -57,26 +57,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   };
+ 
+-  // Robust type parser for "received" — returns a key we understand or a constructor name
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-    switch (t) {
+-      case "number":
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      case "object": {
+-        if (Array.isArray(data)) return "array";
+-        if (data === null) return "null";
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name; // keep as-is (e.g., "Date")
+-        }
+-        return "object";
+-      }
+-      default:
+-        return t;
+-    }
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats]: { label: string; gender: "m" | "f" };
+   } = {
+     regex: { label: "קלט", gender: "m" },
+@@ -111,15 +92,24 @@ const error: () => errors.$ZodErrorMap = () => {
+     uppercase: { label: "קלט", gender: "m" },
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+       case "invalid_type": {
+         // Expected type: show without definite article for clearer Hebrew
+         const expectedKey = issue.expected as string | undefined;
+-        const expected = typeLabel(expectedKey);
++        const expected = TypeDictionary[expectedKey ?? ""] ?? typeLabel(expectedKey);
+         // Received: show localized label if known, otherwise constructor/raw
+-        const receivedKey = parsedType(issue.input);
+-        const received = TypeNames[receivedKey]?.label ?? receivedKey;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? TypeNames[receivedType]?.label ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `קלט לא תקין: צריך להיות instanceof ${issue.expected}, התקבל ${received}`;
++        }
+         return `קלט לא תקין: צריך להיות ${expected}, התקבל ${received}`;
+       }
+ 
+@@ -218,7 +208,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "regex") return `המחרוזת חייבת להתאים לתבנית ${_issue.pattern}`;
+ 
+         // Handle gender agreement for formats
+-        const nounEntry = Nouns[_issue.format];
++        const nounEntry = FormatDictionary[_issue.format];
+         const noun = nounEntry?.label ?? _issue.format;
+         const gender = nounEntry?.gender ?? "m";
+         const adjective = gender === "f" ? "תקינה" : "תקין";
+diff --git a/packages/zod/src/v4/locales/hu.ts b/packages/zod/src/v4/locales/hu.ts
+index d86123232e..5ea46a9d38 100644
+--- a/packages/zod/src/v4/locales/hu.ts
++++ b/packages/zod/src/v4/locales/hu.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "szám";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "tömb";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "bemenet",
+@@ -70,11 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "bemenet",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "szám",
++    array: "tömb",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Érvénytelen bemenet: a várt érték ${issue.expected}, a kapott érték ${parsedType(issue.input)}`;
+-      // return `Invalid input: expected ${issue.expected}, received ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Érvénytelen bemenet: a várt érték instanceof ${issue.expected}, a kapott érték ${received}`;
++        }
++        return `Érvénytelen bemenet: a várt érték ${expected}, a kapott érték ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Érvénytelen bemenet: a várt érték ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -101,7 +92,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Érvénytelen string: "${_issue.suffix}" értékkel kell végződnie`;
+         if (_issue.format === "includes") return `Érvénytelen string: "${_issue.includes}" értéket kell tartalmaznia`;
+         if (_issue.format === "regex") return `Érvénytelen string: ${_issue.pattern} mintának kell megfelelnie`;
+-        return `Érvénytelen ${Nouns[_issue.format] ?? issue.format}`;
++        return `Érvénytelen ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Érvénytelen szám: ${issue.divisor} többszörösének kell lennie`;
+diff --git a/packages/zod/src/v4/locales/hy.ts b/packages/zod/src/v4/locales/hy.ts
+index d9caa0e360..8635804d60 100644
+--- a/packages/zod/src/v4/locales/hy.ts
++++ b/packages/zod/src/v4/locales/hy.ts
+@@ -57,30 +57,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "թիվ";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "զանգված";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "մուտք",
+@@ -113,10 +90,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "մուտք",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "թիվ",
++    array: "զանգված",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Սխալ մուտքագրում․ սպասվում էր ${issue.expected}, ստացվել է ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Սխալ մուտքագրում․ սպասվում էր instanceof ${issue.expected}, ստացվել է ${received}`;
++        }
++        return `Սխալ մուտքագրում․ սպասվում էր ${expected}, ստացվել է ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Սխալ մուտքագրում․ սպասվում էր ${util.stringifyPrimitive(issue.values[1])}`;
+@@ -147,7 +139,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Սխալ տող․ պետք է ավարտվի "${_issue.suffix}"-ով`;
+         if (_issue.format === "includes") return `Սխալ տող․ պետք է պարունակի "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Սխալ տող․ պետք է համապատասխանի ${_issue.pattern} ձևաչափին`;
+-        return `Սխալ ${Nouns[_issue.format] ?? issue.format}`;
++        return `Սխալ ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Սխալ թիվ․ պետք է բազմապատիկ լինի ${issue.divisor}-ի`;
+diff --git a/packages/zod/src/v4/locales/id.ts b/packages/zod/src/v4/locales/id.ts
+index 3e42a19c1f..72ca305799 100644
+--- a/packages/zod/src/v4/locales/id.ts
++++ b/packages/zod/src/v4/locales/id.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Input tidak valid: diharapkan ${issue.expected}, diterima ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Input tidak valid: diharapkan instanceof ${issue.expected}, diterima ${received}`;
++        }
++        return `Input tidak valid: diharapkan ${expected}, diterima ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Input tidak valid: diharapkan ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -100,7 +90,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `String tidak valid: harus berakhir dengan "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `String tidak valid: harus menyertakan "${_issue.includes}"`;
+         if (_issue.format === "regex") return `String tidak valid: harus sesuai pola ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} tidak valid`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} tidak valid`;
+       }
+       case "not_multiple_of":
+         return `Angka tidak valid: harus kelipatan dari ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/is.ts b/packages/zod/src/v4/locales/is.ts
+index 57e0b68ea3..7b3e9f775b 100644
+--- a/packages/zod/src/v4/locales/is.ts
++++ b/packages/zod/src/v4/locales/is.ts
+@@ -2,29 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "númer";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "fylki";
+-      }
+-      if (data === null) {
+-        return "null";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-  return t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "stafi", verb: "að hafa" },
+@@ -37,7 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "gildi",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "gildi",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "númer",
++    array: "fylki",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Rangt gildi: Þú slóst inn ${parsedType(issue.input)} þar sem á að vera ${issue.expected}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Rangt gildi: Þú slóst inn ${received} þar sem á að vera instanceof ${issue.expected}`;
++        }
++        return `Rangt gildi: Þú slóst inn ${received} þar sem á að vera ${expected}`;
++      }
+ 
+       case "invalid_value":
+         if (issue.values.length === 1) return `Rangt gildi: gert ráð fyrir ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -102,7 +94,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ógildur strengur: verður að enda á "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Ógildur strengur: verður að innihalda "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Ógildur strengur: verður að fylgja mynstri ${_issue.pattern}`;
+-        return `Rangt ${Nouns[_issue.format] ?? issue.format}`;
++        return `Rangt ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Röng tala: verður að vera margfeldi af ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/it.ts b/packages/zod/src/v4/locales/it.ts
+index 573bf73912..ffe82f6b69 100644
+--- a/packages/zod/src/v4/locales/it.ts
++++ b/packages/zod/src/v4/locales/it.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "numero";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "vettore";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -70,11 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "numero",
++    array: "vettore",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Input non valido: atteso ${issue.expected}, ricevuto ${parsedType(issue.input)}`;
+-      // return `Input non valido: atteso ${issue.expected}, ricevuto ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Input non valido: atteso instanceof ${issue.expected}, ricevuto ${received}`;
++        }
++        return `Input non valido: atteso ${expected}, ricevuto ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Input non valido: atteso ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Opzione non valida: atteso uno tra ${util.joinValues(issue.values, "|")}`;
+@@ -100,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Stringa non valida: deve terminare con "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Stringa non valida: deve includere "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Stringa non valida: deve corrispondere al pattern ${_issue.pattern}`;
+-        return `Invalid ${Nouns[_issue.format] ?? issue.format}`;
++        return `Invalid ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Numero non valido: deve essere un multiplo di ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ja.ts b/packages/zod/src/v4/locales/ja.ts
+index 3a602c9613..0cb3c5c805 100644
+--- a/packages/zod/src/v4/locales/ja.ts
++++ b/packages/zod/src/v4/locales/ja.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "数値";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "配列";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "入力値",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "入力値",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "数値",
++    array: "配列",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `無効な入力: ${issue.expected}が期待されましたが、${parsedType(issue.input)}が入力されました`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `無効な入力: instanceof ${issue.expected}が期待されましたが、${received}が入力されました`;
++        }
++        return `無効な入力: ${expected}が期待されましたが、${received}が入力されました`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `無効な入力: ${util.stringifyPrimitive(issue.values[0])}が期待されました`;
+         return `無効な選択: ${util.joinValues(issue.values, "、")}のいずれかである必要があります`;
+@@ -97,7 +89,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `無効な文字列: "${_issue.suffix}"で終わる必要があります`;
+         if (_issue.format === "includes") return `無効な文字列: "${_issue.includes}"を含む必要があります`;
+         if (_issue.format === "regex") return `無効な文字列: パターン${_issue.pattern}に一致する必要があります`;
+-        return `無効な${Nouns[_issue.format] ?? issue.format}`;
++        return `無効な${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `無効な数値: ${issue.divisor}の倍数である必要があります`;
+diff --git a/packages/zod/src/v4/locales/ka.ts b/packages/zod/src/v4/locales/ka.ts
+index 2f1f9bacfb..29a3f22f5b 100644
+--- a/packages/zod/src/v4/locales/ka.ts
++++ b/packages/zod/src/v4/locales/ka.ts
+@@ -2,39 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "რიცხვი";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "მასივი";
+-      }
+-      if (data === null) {
+-        return "null";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-
+-  const typeMap: Record<string, string> = {
+-    string: "სტრინგი",
+-    boolean: "ბულეანი",
+-    undefined: "undefined",
+-    bigint: "bigint",
+-    symbol: "symbol",
+-    function: "ფუნქცია",
+-  };
+-
+-  return typeMap[t] ?? t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "სიმბოლო", verb: "უნდა შეიცავდეს" },
+@@ -47,7 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "შეყვანა",
+@@ -80,10 +47,28 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "შეყვანა",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "რიცხვი",
++    string: "სტრინგი",
++    boolean: "ბულეანი",
++    function: "ფუნქცია",
++    array: "მასივი",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `არასწორი შეყვანა: მოსალოდნელი ${issue.expected}, მიღებული ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `არასწორი შეყვანა: მოსალოდნელი instanceof ${issue.expected}, მიღებული ${received}`;
++        }
++        return `არასწორი შეყვანა: მოსალოდნელი ${expected}, მიღებული ${received}`;
++      }
+ 
+       case "invalid_value":
+         if (issue.values.length === 1)
+@@ -113,7 +98,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `არასწორი სტრინგი: უნდა მთავრდებოდეს "${_issue.suffix}"-ით`;
+         if (_issue.format === "includes") return `არასწორი სტრინგი: უნდა შეიცავდეს "${_issue.includes}"-ს`;
+         if (_issue.format === "regex") return `არასწორი სტრინგი: უნდა შეესაბამებოდეს შაბლონს ${_issue.pattern}`;
+-        return `არასწორი ${Nouns[_issue.format] ?? issue.format}`;
++        return `არასწორი ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `არასწორი რიცხვი: უნდა იყოს ${issue.divisor}-ის ჯერადი`;
+diff --git a/packages/zod/src/v4/locales/km.ts b/packages/zod/src/v4/locales/km.ts
+index 0731f81a2b..9988eadc8f 100644
+--- a/packages/zod/src/v4/locales/km.ts
++++ b/packages/zod/src/v4/locales/km.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "មិនមែនជាលេខ (NaN)" : "លេខ";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "អារេ (Array)";
+-        }
+-        if (data === null) {
+-          return "គ្មានតម្លៃ (null)";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ទិន្នន័យបញ្ចូល",
+@@ -70,10 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ទិន្នន័យបញ្ចូល",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "លេខ",
++    array: "អារេ (Array)",
++    null: "គ្មានតម្លៃ (null)",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `ទិន្នន័យបញ្ចូលមិនត្រឹមត្រូវ៖ ត្រូវការ ${issue.expected} ប៉ុន្តែទទួលបាន ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `ទិន្នន័យបញ្ចូលមិនត្រឹមត្រូវ៖ ត្រូវការ instanceof ${issue.expected} ប៉ុន្តែទទួលបាន ${received}`;
++        }
++        return `ទិន្នន័យបញ្ចូលមិនត្រឹមត្រូវ៖ ត្រូវការ ${expected} ប៉ុន្តែទទួលបាន ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `ទិន្នន័យបញ្ចូលមិនត្រឹមត្រូវ៖ ត្រូវការ ${util.stringifyPrimitive(issue.values[0])}`;
+         return `ជម្រើសមិនត្រឹមត្រូវ៖ ត្រូវជាមួយក្នុងចំណោម ${util.joinValues(issue.values, "|")}`;
+@@ -101,7 +94,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `ខ្សែអក្សរមិនត្រឹមត្រូវ៖ ត្រូវបញ្ចប់ដោយ "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `ខ្សែអក្សរមិនត្រឹមត្រូវ៖ ត្រូវមាន "${_issue.includes}"`;
+         if (_issue.format === "regex") return `ខ្សែអក្សរមិនត្រឹមត្រូវ៖ ត្រូវតែផ្គូផ្គងនឹងទម្រង់ដែលបានកំណត់ ${_issue.pattern}`;
+-        return `មិនត្រឹមត្រូវ៖ ${Nouns[_issue.format] ?? issue.format}`;
++        return `មិនត្រឹមត្រូវ៖ ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `លេខមិនត្រឹមត្រូវ៖ ត្រូវតែជាពហុគុណនៃ ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ko.ts b/packages/zod/src/v4/locales/ko.ts
+index a63176b2b1..fb55b0d6d4 100644
+--- a/packages/zod/src/v4/locales/ko.ts
++++ b/packages/zod/src/v4/locales/ko.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "입력",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "입력",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `잘못된 입력: 예상 타입은 ${issue.expected}, 받은 타입은 ${parsedType(issue.input)}입니다`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `잘못된 입력: 예상 타입은 instanceof ${issue.expected}, 받은 타입은 ${received}입니다`;
++        }
++        return `잘못된 입력: 예상 타입은 ${expected}, 받은 타입은 ${received}입니다`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `잘못된 입력: 값은 ${util.stringifyPrimitive(issue.values[0])} 이어야 합니다`;
+@@ -106,7 +96,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `잘못된 문자열: "${_issue.suffix}"(으)로 끝나야 합니다`;
+         if (_issue.format === "includes") return `잘못된 문자열: "${_issue.includes}"을(를) 포함해야 합니다`;
+         if (_issue.format === "regex") return `잘못된 문자열: 정규식 ${_issue.pattern} 패턴과 일치해야 합니다`;
+-        return `잘못된 ${Nouns[_issue.format] ?? issue.format}`;
++        return `잘못된 ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `잘못된 숫자: ${issue.divisor}의 배수여야 합니다`;
+diff --git a/packages/zod/src/v4/locales/lt.ts b/packages/zod/src/v4/locales/lt.ts
+index 7fdaf55c48..f4d4e17713 100644
+--- a/packages/zod/src/v4/locales/lt.ts
++++ b/packages/zod/src/v4/locales/lt.ts
+@@ -2,55 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-  return parsedTypeFromType(t, data);
+-};
+-
+-const parsedTypeFromType = (t: string, data: any = undefined): string => {
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "skaičius";
+-    }
+-    case "bigint": {
+-      return "sveikasis skaičius";
+-    }
+-    case "string": {
+-      return "eilutė";
+-    }
+-    case "boolean": {
+-      return "loginė reikšmė";
+-    }
+-    case "undefined":
+-    case "void": {
+-      return "neapibrėžta reikšmė";
+-    }
+-    case "function": {
+-      return "funkcija";
+-    }
+-    case "symbol": {
+-      return "simbolis";
+-    }
+-    case "object": {
+-      if (data === undefined) return "nežinomas objektas";
+-      if (data === null) return "nulinė reikšmė";
+-
+-      if (Array.isArray(data)) return "masyvas";
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-
+-      return "objektas";
+-    }
+-    //Zod types below
+-    case "null": {
+-      return "nulinė reikšmė";
+-    }
+-  }
+-
+-  return t;
+-};
+-
+ const capitalizeFirstCharacter = (text: string): string => {
+   return text.charAt(0).toUpperCase() + text.slice(1);
+ };
+@@ -164,7 +115,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     };
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "įvestis",
+@@ -197,15 +148,38 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "įvestis",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "skaičius",
++    bigint: "sveikasis skaičius",
++    string: "eilutė",
++    boolean: "loginė reikšmė",
++    undefined: "neapibrėžta reikšmė",
++    function: "funkcija",
++    symbol: "simbolis",
++    array: "masyvas",
++    object: "objektas",
++    null: "nulinė reikšmė",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Gautas tipas ${parsedType(issue.input)}, o tikėtasi - ${parsedTypeFromType(issue.expected)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Gautas tipas ${received}, o tikėtasi - instanceof ${issue.expected}`;
++        }
++        return `Gautas tipas ${received}, o tikėtasi - ${expected}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Privalo būti ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Privalo būti vienas iš ${util.joinValues(issue.values, "|")} pasirinkimų`;
+       case "too_big": {
+-        const origin = parsedTypeFromType(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         const sizing = getSizing(
+           issue.origin,
+           getUnitTypeFromNumber(Number(issue.maximum)),
+@@ -218,7 +192,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         return `${capitalizeFirstCharacter(origin ?? issue.origin ?? "reikšmė")} turi būti ${adj} ${issue.maximum.toString()} ${sizing?.unit}`;
+       }
+       case "too_small": {
+-        const origin = parsedTypeFromType(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         const sizing = getSizing(
+           issue.origin,
+           getUnitTypeFromNumber(Number(issue.minimum)),
+@@ -238,7 +212,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Eilutė privalo pasibaigti "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Eilutė privalo įtraukti "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Eilutė privalo atitikti ${_issue.pattern}`;
+-        return `Neteisingas ${Nouns[_issue.format] ?? issue.format}`;
++        return `Neteisingas ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Skaičius privalo būti ${issue.divisor} kartotinis.`;
+@@ -249,7 +223,7 @@ const error: () => errors.$ZodErrorMap = () => {
+       case "invalid_union":
+         return "Klaidinga įvestis";
+       case "invalid_element": {
+-        const origin = parsedTypeFromType(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
+         return `${capitalizeFirstCharacter(origin ?? issue.origin ?? "reikšmė")} turi klaidingą įvestį`;
+       }
+       default:
+diff --git a/packages/zod/src/v4/locales/mk.ts b/packages/zod/src/v4/locales/mk.ts
+index b940364d6e..f320fa83ae 100644
+--- a/packages/zod/src/v4/locales/mk.ts
++++ b/packages/zod/src/v4/locales/mk.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "број";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "низа";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "внес",
+@@ -70,11 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "внес",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "број",
++    array: "низа",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Грешен внес: се очекува ${issue.expected}, примено ${parsedType(issue.input)}`;
+-      // return `Invalid input: expected ${issue.expected}, received ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Грешен внес: се очекува instanceof ${issue.expected}, примено ${received}`;
++        }
++        return `Грешен внес: се очекува ${expected}, примено ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Invalid input: expected ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Грешана опција: се очекува една ${util.joinValues(issue.values, "|")}`;
+@@ -102,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Неважечка низа: мора да завршува со "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Неважечка низа: мора да вклучува "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Неважечка низа: мора да одгоара на патернот ${_issue.pattern}`;
+-        return `Invalid ${Nouns[_issue.format] ?? issue.format}`;
++        return `Invalid ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Грешен број: мора да биде делив со ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ms.ts b/packages/zod/src/v4/locales/ms.ts
+index 2c54761664..8ead32da42 100644
+--- a/packages/zod/src/v4/locales/ms.ts
++++ b/packages/zod/src/v4/locales/ms.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "nombor";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -70,10 +47,24 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "nombor",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Input tidak sah: dijangka ${issue.expected}, diterima ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Input tidak sah: dijangka instanceof ${issue.expected}, diterima ${received}`;
++        }
++        return `Input tidak sah: dijangka ${expected}, diterima ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Input tidak sah: dijangka ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Pilihan tidak sah: dijangka salah satu daripada ${util.joinValues(issue.values, "|")}`;
+@@ -99,7 +90,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `String tidak sah: mesti berakhir dengan "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `String tidak sah: mesti mengandungi "${_issue.includes}"`;
+         if (_issue.format === "regex") return `String tidak sah: mesti sepadan dengan corak ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} tidak sah`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} tidak sah`;
+       }
+       case "not_multiple_of":
+         return `Nombor tidak sah: perlu gandaan ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/nl.ts b/packages/zod/src/v4/locales/nl.ts
+index 38fcba21be..3ed3099e5e 100644
+--- a/packages/zod/src/v4/locales/nl.ts
++++ b/packages/zod/src/v4/locales/nl.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "getal";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "invoer",
+@@ -70,10 +47,24 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "invoer",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "getal",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Ongeldige invoer: verwacht ${issue.expected}, ontving ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Ongeldige invoer: verwacht instanceof ${issue.expected}, ontving ${received}`;
++        }
++        return `Ongeldige invoer: verwacht ${expected}, ontving ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Ongeldige invoer: verwacht ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Ongeldige optie: verwacht één van ${util.joinValues(issue.values, "|")}`;
+@@ -105,7 +96,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ongeldige tekst: moet op "${_issue.suffix}" eindigen`;
+         if (_issue.format === "includes") return `Ongeldige tekst: moet "${_issue.includes}" bevatten`;
+         if (_issue.format === "regex") return `Ongeldige tekst: moet overeenkomen met patroon ${_issue.pattern}`;
+-        return `Ongeldig: ${Nouns[_issue.format] ?? issue.format}`;
++        return `Ongeldig: ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Ongeldig getal: moet een veelvoud van ${issue.divisor} zijn`;
+diff --git a/packages/zod/src/v4/locales/no.ts b/packages/zod/src/v4/locales/no.ts
+index 9b4e608299..ca3028eb2a 100644
+--- a/packages/zod/src/v4/locales/no.ts
++++ b/packages/zod/src/v4/locales/no.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "tall";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "liste";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "input",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "tall",
++    array: "liste",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Ugyldig input: forventet ${issue.expected}, fikk ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Ugyldig input: forventet instanceof ${issue.expected}, fikk ${received}`;
++        }
++        return `Ugyldig input: forventet ${expected}, fikk ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Ugyldig verdi: forventet ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Ugyldig valg: forventet en av ${util.joinValues(issue.values, "|")}`;
+@@ -99,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ugyldig streng: må ende med "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Ugyldig streng: må inneholde "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Ugyldig streng: må matche mønsteret ${_issue.pattern}`;
+-        return `Ugyldig ${Nouns[_issue.format] ?? issue.format}`;
++        return `Ugyldig ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Ugyldig tall: må være et multiplum av ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ota.ts b/packages/zod/src/v4/locales/ota.ts
+index 23ec00104c..d157d864db 100644
+--- a/packages/zod/src/v4/locales/ota.ts
++++ b/packages/zod/src/v4/locales/ota.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "numara";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "saf";
+-        }
+-        if (data === null) {
+-          return "gayb";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "giren",
+@@ -70,11 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "giren",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "numara",
++    array: "saf",
++    null: "gayb",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Fâsit giren: umulan ${issue.expected}, alınan ${parsedType(issue.input)}`;
+-      // return `Fâsit giren: umulan ${issue.expected}, alınan ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Fâsit giren: umulan instanceof ${issue.expected}, alınan ${received}`;
++        }
++        return `Fâsit giren: umulan ${expected}, alınan ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Fâsit giren: umulan ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Fâsit tercih: mûteberler ${util.joinValues(issue.values, "|")}`;
+@@ -100,7 +92,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Fâsit metin: "${_issue.suffix}" ile bitmeli.`;
+         if (_issue.format === "includes") return `Fâsit metin: "${_issue.includes}" ihtivâ etmeli.`;
+         if (_issue.format === "regex") return `Fâsit metin: ${_issue.pattern} nakşına uymalı.`;
+-        return `Fâsit ${Nouns[_issue.format] ?? issue.format}`;
++        return `Fâsit ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Fâsit sayı: ${issue.divisor} katı olmalıydı.`;
+diff --git a/packages/zod/src/v4/locales/pl.ts b/packages/zod/src/v4/locales/pl.ts
+index c29d0d49a2..df7a7c60ca 100644
+--- a/packages/zod/src/v4/locales/pl.ts
++++ b/packages/zod/src/v4/locales/pl.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "liczba";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "tablica";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "wyrażenie",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "wejście",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "liczba",
++    array: "tablica",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Nieprawidłowe dane wejściowe: oczekiwano ${issue.expected}, otrzymano ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Nieprawidłowe dane wejściowe: oczekiwano instanceof ${issue.expected}, otrzymano ${received}`;
++        }
++        return `Nieprawidłowe dane wejściowe: oczekiwano ${expected}, otrzymano ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Nieprawidłowe dane wejściowe: oczekiwano ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -101,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Nieprawidłowy ciąg znaków: musi kończyć się na "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Nieprawidłowy ciąg znaków: musi zawierać "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Nieprawidłowy ciąg znaków: musi odpowiadać wzorcowi ${_issue.pattern}`;
+-        return `Nieprawidłow(y/a/e) ${Nouns[_issue.format] ?? issue.format}`;
++        return `Nieprawidłow(y/a/e) ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Nieprawidłowa liczba: musi być wielokrotnością ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ps.ts b/packages/zod/src/v4/locales/ps.ts
+index ba3a62ebc9..dc60fdd503 100644
+--- a/packages/zod/src/v4/locales/ps.ts
++++ b/packages/zod/src/v4/locales/ps.ts
+@@ -14,29 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "عدد";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "ارې";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ورودي",
+@@ -69,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ورودي",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "عدد",
++    array: "ارې",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `ناسم ورودي: باید ${issue.expected} وای, مګر ${parsedType(issue.input)} ترلاسه شو`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `ناسم ورودي: باید instanceof ${issue.expected} وای, مګر ${received} ترلاسه شو`;
++        }
++        return `ناسم ورودي: باید ${expected} وای, مګر ${received} ترلاسه شو`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) {
+           return `ناسم ورودي: باید ${util.stringifyPrimitive(issue.values[0])} وای`;
+@@ -108,7 +101,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "regex") {
+           return `ناسم متن: باید د ${_issue.pattern} سره مطابقت ولري`;
+         }
+-        return `${Nouns[_issue.format] ?? issue.format} ناسم دی`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} ناسم دی`;
+       }
+       case "not_multiple_of":
+         return `ناسم عدد: باید د ${issue.divisor} مضرب وي`;
+diff --git a/packages/zod/src/v4/locales/pt.ts b/packages/zod/src/v4/locales/pt.ts
+index 47aebe0cc9..9ded285b58 100644
+--- a/packages/zod/src/v4/locales/pt.ts
++++ b/packages/zod/src/v4/locales/pt.ts
+@@ -14,29 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "número";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "nulo";
+-        }
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "padrão",
+@@ -69,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "entrada",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "número",
++    null: "nulo",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Tipo inválido: esperado ${issue.expected}, recebido ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Tipo inválido: esperado instanceof ${issue.expected}, recebido ${received}`;
++        }
++        return `Tipo inválido: esperado ${expected}, recebido ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Entrada inválida: esperado ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Opção inválida: esperada uma das ${util.joinValues(issue.values, "|")}`;
+@@ -98,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Texto inválido: deve terminar com "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Texto inválido: deve incluir "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Texto inválido: deve corresponder ao padrão ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} inválido`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} inválido`;
+       }
+       case "not_multiple_of":
+         return `Número inválido: deve ser múltiplo de ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ru.ts b/packages/zod/src/v4/locales/ru.ts
+index 7e5e376551..cf223db405 100644
+--- a/packages/zod/src/v4/locales/ru.ts
++++ b/packages/zod/src/v4/locales/ru.ts
+@@ -70,30 +70,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "число";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "массив";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ввод",
+@@ -126,10 +103,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ввод",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "число",
++    array: "массив",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Неверный ввод: ожидалось ${issue.expected}, получено ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Неверный ввод: ожидалось instanceof ${issue.expected}, получено ${received}`;
++        }
++        return `Неверный ввод: ожидалось ${expected}, получено ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Неверный ввод: ожидалось ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Неверный вариант: ожидалось одно из ${util.joinValues(issue.values, "|")}`;
+@@ -159,7 +151,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Неверная строка: должна заканчиваться на "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Неверная строка: должна содержать "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Неверная строка: должна соответствовать шаблону ${_issue.pattern}`;
+-        return `Неверный ${Nouns[_issue.format] ?? issue.format}`;
++        return `Неверный ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Неверное число: должно быть кратным ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/sl.ts b/packages/zod/src/v4/locales/sl.ts
+index d31d681c0a..1b83c44349 100644
+--- a/packages/zod/src/v4/locales/sl.ts
++++ b/packages/zod/src/v4/locales/sl.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "število";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "tabela";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "vnos",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "vnos",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "število",
++    array: "tabela",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Neveljaven vnos: pričakovano ${issue.expected}, prejeto ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Neveljaven vnos: pričakovano instanceof ${issue.expected}, prejeto ${received}`;
++        }
++        return `Neveljaven vnos: pričakovano ${expected}, prejeto ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Neveljaven vnos: pričakovano ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -101,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Neveljaven niz: mora se končati z "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Neveljaven niz: mora vsebovati "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Neveljaven niz: mora ustrezati vzorcu ${_issue.pattern}`;
+-        return `Neveljaven ${Nouns[_issue.format] ?? issue.format}`;
++        return `Neveljaven ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Neveljavno število: mora biti večkratnik ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/sv.ts b/packages/zod/src/v4/locales/sv.ts
+index c291fd8461..a25aed8f23 100644
+--- a/packages/zod/src/v4/locales/sv.ts
++++ b/packages/zod/src/v4/locales/sv.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "antal";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "lista";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "reguljärt uttryck",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "mall-literal",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "antal",
++    array: "lista",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Ogiltig inmatning: förväntat ${issue.expected}, fick ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Ogiltig inmatning: förväntat instanceof ${issue.expected}, fick ${received}`;
++        }
++        return `Ogiltig inmatning: förväntat ${expected}, fick ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Ogiltig inmatning: förväntat ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -102,7 +94,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ogiltig sträng: måste sluta med "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Ogiltig sträng: måste innehålla "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Ogiltig sträng: måste matcha mönstret "${_issue.pattern}"`;
+-        return `Ogiltig(t) ${Nouns[_issue.format] ?? issue.format}`;
++        return `Ogiltig(t) ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Ogiltigt tal: måste vara en multipel av ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ta.ts b/packages/zod/src/v4/locales/ta.ts
+index 367dcf645f..ea83f8b7aa 100644
+--- a/packages/zod/src/v4/locales/ta.ts
++++ b/packages/zod/src/v4/locales/ta.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "எண் அல்லாதது" : "எண்";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "அணி";
+-        }
+-        if (data === null) {
+-          return "வெறுமை";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "உள்ளீடு",
+@@ -70,10 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "input",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "எண்",
++    array: "அணி",
++    null: "வெறுமை",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `தவறான உள்ளீடு: எதிர்பார்க்கப்பட்டது ${issue.expected}, பெறப்பட்டது ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `தவறான உள்ளீடு: எதிர்பார்க்கப்பட்டது instanceof ${issue.expected}, பெறப்பட்டது ${received}`;
++        }
++        return `தவறான உள்ளீடு: எதிர்பார்க்கப்பட்டது ${expected}, பெறப்பட்டது ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `தவறான உள்ளீடு: எதிர்பார்க்கப்பட்டது ${util.stringifyPrimitive(issue.values[0])}`;
+         return `தவறான விருப்பம்: எதிர்பார்க்கப்பட்டது ${util.joinValues(issue.values, "|")} இல் ஒன்று`;
+@@ -100,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `தவறான சரம்: "${_issue.suffix}" இல் முடிவடைய வேண்டும்`;
+         if (_issue.format === "includes") return `தவறான சரம்: "${_issue.includes}" ஐ உள்ளடக்க வேண்டும்`;
+         if (_issue.format === "regex") return `தவறான சரம்: ${_issue.pattern} முறைபாட்டுடன் பொருந்த வேண்டும்`;
+-        return `தவறான ${Nouns[_issue.format] ?? issue.format}`;
++        return `தவறான ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `தவறான எண்: ${issue.divisor} இன் பலமாக இருக்க வேண்டும்`;
+diff --git a/packages/zod/src/v4/locales/th.ts b/packages/zod/src/v4/locales/th.ts
+index 463fc1f19c..47f435154b 100644
+--- a/packages/zod/src/v4/locales/th.ts
++++ b/packages/zod/src/v4/locales/th.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "ไม่ใช่ตัวเลข (NaN)" : "ตัวเลข";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "อาร์เรย์ (Array)";
+-        }
+-        if (data === null) {
+-          return "ไม่มีค่า (null)";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ข้อมูลที่ป้อน",
+@@ -70,10 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ข้อมูลที่ป้อน",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "ตัวเลข",
++    array: "อาร์เรย์ (Array)",
++    null: "ไม่มีค่า (null)",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `ประเภทข้อมูลไม่ถูกต้อง: ควรเป็น ${issue.expected} แต่ได้รับ ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `ประเภทข้อมูลไม่ถูกต้อง: ควรเป็น instanceof ${issue.expected} แต่ได้รับ ${received}`;
++        }
++        return `ประเภทข้อมูลไม่ถูกต้อง: ควรเป็น ${expected} แต่ได้รับ ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `ค่าไม่ถูกต้อง: ควรเป็น ${util.stringifyPrimitive(issue.values[0])}`;
+         return `ตัวเลือกไม่ถูกต้อง: ควรเป็นหนึ่งใน ${util.joinValues(issue.values, "|")}`;
+@@ -101,7 +94,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `รูปแบบไม่ถูกต้อง: ข้อความต้องลงท้ายด้วย "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `รูปแบบไม่ถูกต้อง: ข้อความต้องมี "${_issue.includes}" อยู่ในข้อความ`;
+         if (_issue.format === "regex") return `รูปแบบไม่ถูกต้อง: ต้องตรงกับรูปแบบที่กำหนด ${_issue.pattern}`;
+-        return `รูปแบบไม่ถูกต้อง: ${Nouns[_issue.format] ?? issue.format}`;
++        return `รูปแบบไม่ถูกต้อง: ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `ตัวเลขไม่ถูกต้อง: ต้องเป็นจำนวนที่หารด้วย ${issue.divisor} ได้ลงตัว`;
+diff --git a/packages/zod/src/v4/locales/tr.ts b/packages/zod/src/v4/locales/tr.ts
+index 204825eb6a..2bc578d7b2 100644
+--- a/packages/zod/src/v4/locales/tr.ts
++++ b/packages/zod/src/v4/locales/tr.ts
+@@ -2,29 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "number";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "array";
+-      }
+-      if (data === null) {
+-        return "null";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-  return t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "karakter", verb: "olmalı" },
+@@ -37,7 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "girdi",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "Şablon dizesi",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Geçersiz değer: beklenen ${issue.expected}, alınan ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Geçersiz değer: beklenen instanceof ${issue.expected}, alınan ${received}`;
++        }
++        return `Geçersiz değer: beklenen ${expected}, alınan ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Geçersiz değer: beklenen ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Geçersiz seçenek: aşağıdakilerden biri olmalı: ${util.joinValues(issue.values, "|")}`;
+@@ -96,7 +86,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Geçersiz metin: "${_issue.suffix}" ile bitmeli`;
+         if (_issue.format === "includes") return `Geçersiz metin: "${_issue.includes}" içermeli`;
+         if (_issue.format === "regex") return `Geçersiz metin: ${_issue.pattern} desenine uymalı`;
+-        return `Geçersiz ${Nouns[_issue.format] ?? issue.format}`;
++        return `Geçersiz ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Geçersiz sayı: ${issue.divisor} ile tam bölünebilmeli`;
+diff --git a/packages/zod/src/v4/locales/uk.ts b/packages/zod/src/v4/locales/uk.ts
+index 77441d2d1e..424e2f3b2f 100644
+--- a/packages/zod/src/v4/locales/uk.ts
++++ b/packages/zod/src/v4/locales/uk.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "число";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "масив";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "вхідні дані",
+@@ -70,11 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "вхідні дані",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "число",
++    array: "масив",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Неправильні вхідні дані: очікується ${issue.expected}, отримано ${parsedType(issue.input)}`;
+-      // return `Неправильні вхідні дані: очікується ${issue.expected}, отримано ${util.getParsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Неправильні вхідні дані: очікується instanceof ${issue.expected}, отримано ${received}`;
++        }
++        return `Неправильні вхідні дані: очікується ${expected}, отримано ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Неправильні вхідні дані: очікується ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -101,7 +92,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Неправильний рядок: повинен закінчуватися на "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Неправильний рядок: повинен містити "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Неправильний рядок: повинен відповідати шаблону ${_issue.pattern}`;
+-        return `Неправильний ${Nouns[_issue.format] ?? issue.format}`;
++        return `Неправильний ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Неправильне число: повинно бути кратним ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/ur.ts b/packages/zod/src/v4/locales/ur.ts
+index 7cbd7bc5c1..86f4cb2022 100644
+--- a/packages/zod/src/v4/locales/ur.ts
++++ b/packages/zod/src/v4/locales/ur.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "نمبر";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "آرے";
+-        }
+-        if (data === null) {
+-          return "نل";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ان پٹ",
+@@ -70,10 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ان پٹ",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "نمبر",
++    array: "آرے",
++    null: "نل",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `غلط ان پٹ: ${issue.expected} متوقع تھا، ${parsedType(issue.input)} موصول ہوا`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `غلط ان پٹ: instanceof ${issue.expected} متوقع تھا، ${received} موصول ہوا`;
++        }
++        return `غلط ان پٹ: ${expected} متوقع تھا، ${received} موصول ہوا`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `غلط ان پٹ: ${util.stringifyPrimitive(issue.values[0])} متوقع تھا`;
+         return `غلط آپشن: ${util.joinValues(issue.values, "|")} میں سے ایک متوقع تھا`;
+@@ -101,7 +94,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `غلط سٹرنگ: "${_issue.suffix}" پر ختم ہونا چاہیے`;
+         if (_issue.format === "includes") return `غلط سٹرنگ: "${_issue.includes}" شامل ہونا چاہیے`;
+         if (_issue.format === "regex") return `غلط سٹرنگ: پیٹرن ${_issue.pattern} سے میچ ہونا چاہیے`;
+-        return `غلط ${Nouns[_issue.format] ?? issue.format}`;
++        return `غلط ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `غلط نمبر: ${issue.divisor} کا مضاعف ہونا چاہیے`;
+diff --git a/packages/zod/src/v4/locales/uz.ts b/packages/zod/src/v4/locales/uz.ts
+index bb11d63cb7..a3b325e16b 100644
+--- a/packages/zod/src/v4/locales/uz.ts
++++ b/packages/zod/src/v4/locales/uz.ts
+@@ -2,29 +2,6 @@ import type { $ZodStringFormats } from "../core/checks.js";
+ import type * as errors from "../core/errors.js";
+ import * as util from "../core/util.js";
+ 
+-export const parsedType = (data: any): string => {
+-  const t = typeof data;
+-
+-  switch (t) {
+-    case "number": {
+-      return Number.isNaN(data) ? "NaN" : "raqam";
+-    }
+-    case "object": {
+-      if (Array.isArray(data)) {
+-        return "massiv";
+-      }
+-      if (data === null) {
+-        return "null";
+-      }
+-
+-      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-        return data.constructor.name;
+-      }
+-    }
+-  }
+-  return t;
+-};
+-
+ const error: () => errors.$ZodErrorMap = () => {
+   const Sizable: Record<string, { unit: string; verb: string }> = {
+     string: { unit: "belgi", verb: "bo‘lishi kerak" },
+@@ -37,7 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "kirish",
+@@ -71,10 +48,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "kirish",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "raqam",
++    array: "massiv",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Noto‘g‘ri kirish: kutilgan ${issue.expected}, qabul qilingan ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Noto‘g‘ri kirish: kutilgan instanceof ${issue.expected}, qabul qilingan ${received}`;
++        }
++        return `Noto‘g‘ri kirish: kutilgan ${expected}, qabul qilingan ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `Noto‘g‘ri kirish: kutilgan ${util.stringifyPrimitive(issue.values[0])}`;
+         return `Noto‘g‘ri variant: quyidagilardan biri kutilgan ${util.joinValues(issue.values, "|")}`;
+@@ -99,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Noto‘g‘ri satr: "${_issue.suffix}" bilan tugashi kerak`;
+         if (_issue.format === "includes") return `Noto‘g‘ri satr: "${_issue.includes}" ni o‘z ichiga olishi kerak`;
+         if (_issue.format === "regex") return `Noto‘g‘ri satr: ${_issue.pattern} shabloniga mos kelishi kerak`;
+-        return `Noto'g'ri ${Nouns[_issue.format] ?? issue.format}`;
++        return `Noto‘g‘ri ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `Noto‘g‘ri raqam: ${issue.divisor} ning karralisi bo‘lishi kerak`;
+diff --git a/packages/zod/src/v4/locales/vi.ts b/packages/zod/src/v4/locales/vi.ts
+index e7cfac02a7..673594d1a8 100644
+--- a/packages/zod/src/v4/locales/vi.ts
++++ b/packages/zod/src/v4/locales/vi.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "số";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "mảng";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "đầu vào",
+@@ -70,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "đầu vào",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "số",
++    array: "mảng",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Đầu vào không hợp lệ: mong đợi ${issue.expected}, nhận được ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Đầu vào không hợp lệ: mong đợi instanceof ${issue.expected}, nhận được ${received}`;
++        }
++        return `Đầu vào không hợp lệ: mong đợi ${expected}, nhận được ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1)
+           return `Đầu vào không hợp lệ: mong đợi ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -100,7 +92,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Chuỗi không hợp lệ: phải kết thúc bằng "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Chuỗi không hợp lệ: phải bao gồm "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Chuỗi không hợp lệ: phải khớp với mẫu ${_issue.pattern}`;
+-        return `${Nouns[_issue.format] ?? issue.format} không hợp lệ`;
++        return `${FormatDictionary[_issue.format] ?? issue.format} không hợp lệ`;
+       }
+       case "not_multiple_of":
+         return `Số không hợp lệ: phải là bội số của ${issue.divisor}`;
+diff --git a/packages/zod/src/v4/locales/yo.ts b/packages/zod/src/v4/locales/yo.ts
+index b7e6f94dd5..c821d229c9 100644
+--- a/packages/zod/src/v4/locales/yo.ts
++++ b/packages/zod/src/v4/locales/yo.ts
+@@ -14,29 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "nọ́mbà";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "akopọ";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "ẹ̀rọ ìbáwọlé",
+@@ -69,10 +47,25 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "ẹ̀rọ ìbáwọlé",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "nọ́mbà",
++    array: "akopọ",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `Ìbáwọlé aṣìṣe: a ní láti fi ${issue.expected}, àmọ̀ a rí ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Ìbáwọlé aṣìṣe: a ní láti fi instanceof ${issue.expected}, àmọ̀ a rí ${received}`;
++        }
++        return `Ìbáwọlé aṣìṣe: a ní láti fi ${expected}, àmọ̀ a rí ${received}`;
++      }
+ 
+       case "invalid_value":
+         if (issue.values.length === 1) return `Ìbáwọlé aṣìṣe: a ní láti fi ${util.stringifyPrimitive(issue.values[0])}`;
+@@ -100,7 +93,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `Ọ̀rọ̀ aṣìṣe: gbọ́dọ̀ parí pẹ̀lú "${_issue.suffix}"`;
+         if (_issue.format === "includes") return `Ọ̀rọ̀ aṣìṣe: gbọ́dọ̀ ní "${_issue.includes}"`;
+         if (_issue.format === "regex") return `Ọ̀rọ̀ aṣìṣe: gbọ́dọ̀ bá àpẹẹrẹ mu ${_issue.pattern}`;
+-        return `Aṣìṣe: ${Nouns[_issue.format] ?? issue.format}`;
++        return `Aṣìṣe: ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+ 
+       case "not_multiple_of":
+diff --git a/packages/zod/src/v4/locales/zh-CN.ts b/packages/zod/src/v4/locales/zh-CN.ts
+index acdaf4b72f..728759ad8a 100644
+--- a/packages/zod/src/v4/locales/zh-CN.ts
++++ b/packages/zod/src/v4/locales/zh-CN.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "非数字(NaN)" : "数字";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "数组";
+-        }
+-        if (data === null) {
+-          return "空值(null)";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "输入",
+@@ -70,10 +47,26 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "输入",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    number: "数字",
++    array: "数组",
++    null: "空值(null)",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `无效输入：期望 ${issue.expected}，实际接收 ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `无效输入：期望 instanceof ${issue.expected}，实际接收 ${received}`;
++        }
++        return `无效输入：期望 ${expected}，实际接收 ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `无效输入：期望 ${util.stringifyPrimitive(issue.values[0])}`;
+         return `无效选项：期望以下之一 ${util.joinValues(issue.values, "|")}`;
+@@ -98,7 +91,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `无效字符串：必须以 "${_issue.suffix}" 结尾`;
+         if (_issue.format === "includes") return `无效字符串：必须包含 "${_issue.includes}"`;
+         if (_issue.format === "regex") return `无效字符串：必须满足正则表达式 ${_issue.pattern}`;
+-        return `无效${Nouns[_issue.format] ?? issue.format}`;
++        return `无效${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `无效数字：必须是 ${issue.divisor} 的倍数`;
+diff --git a/packages/zod/src/v4/locales/zh-TW.ts b/packages/zod/src/v4/locales/zh-TW.ts
+index 3a11d799b8..62a02defb2 100644
+--- a/packages/zod/src/v4/locales/zh-TW.ts
++++ b/packages/zod/src/v4/locales/zh-TW.ts
+@@ -14,30 +14,7 @@ const error: () => errors.$ZodErrorMap = () => {
+     return Sizable[origin] ?? null;
+   }
+ 
+-  const parsedType = (data: any): string => {
+-    const t = typeof data;
+-
+-    switch (t) {
+-      case "number": {
+-        return Number.isNaN(data) ? "NaN" : "number";
+-      }
+-      case "object": {
+-        if (Array.isArray(data)) {
+-          return "array";
+-        }
+-        if (data === null) {
+-          return "null";
+-        }
+-
+-        if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {
+-          return data.constructor.name;
+-        }
+-      }
+-    }
+-    return t;
+-  };
+-
+-  const Nouns: {
++  const FormatDictionary: {
+     [k in $ZodStringFormats | (string & {})]?: string;
+   } = {
+     regex: "輸入",
+@@ -70,10 +47,23 @@ const error: () => errors.$ZodErrorMap = () => {
+     template_literal: "輸入",
+   };
+ 
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++  };
++
+   return (issue) => {
+     switch (issue.code) {
+-      case "invalid_type":
+-        return `無效的輸入值：預期為 ${issue.expected}，但收到 ${parsedType(issue.input)}`;
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `無效的輸入值：預期為 instanceof ${issue.expected}，但收到 ${received}`;
++        }
++        return `無效的輸入值：預期為 ${expected}，但收到 ${received}`;
++      }
+       case "invalid_value":
+         if (issue.values.length === 1) return `無效的輸入值：預期為 ${util.stringifyPrimitive(issue.values[0])}`;
+         return `無效的選項：預期為以下其中之一 ${util.joinValues(issue.values, "|")}`;
+@@ -100,7 +90,7 @@ const error: () => errors.$ZodErrorMap = () => {
+         if (_issue.format === "ends_with") return `無效的字串：必須以 "${_issue.suffix}" 結尾`;
+         if (_issue.format === "includes") return `無效的字串：必須包含 "${_issue.includes}"`;
+         if (_issue.format === "regex") return `無效的字串：必須符合格式 ${_issue.pattern}`;
+-        return `無效的 ${Nouns[_issue.format] ?? issue.format}`;
++        return `無效的 ${FormatDictionary[_issue.format] ?? issue.format}`;
+       }
+       case "not_multiple_of":
+         return `無效的數字：必須為 ${issue.divisor} 的倍數`;
+diff --git a/packages/zod/src/v4/mini/schemas.ts b/packages/zod/src/v4/mini/schemas.ts
+index 06732d01ae..be8442a03f 100644
+--- a/packages/zod/src/v4/mini/schemas.ts
++++ b/packages/zod/src/v4/mini/schemas.ts
+@@ -1765,12 +1765,22 @@ abstract class Class {
+ // @__NO_SIDE_EFFECTS__
+ function _instanceof<T extends typeof Class>(
+   cls: T,
+-  params: core.$ZodCustomParams = {
+-    error: `Input not instance of ${cls.name}`,
+-  }
++  params: core.$ZodCustomParams = {}
+ ): ZodMiniCustom<InstanceType<T>, InstanceType<T>> {
+   const inst = custom((data) => data instanceof cls, params);
+   inst._zod.bag.Class = cls;
++  // Override check to emit invalid_type instead of custom
++  inst._zod.check = (payload) => {
++    if (!(payload.value instanceof cls)) {
++      payload.issues.push({
++        code: "invalid_type",
++        expected: cls.name,
++        input: payload.value,
++        inst,
++        path: [...(inst._zod.def.path ?? [])],
++      });
++    }
++  };
+   return inst as any;
+ }
+ export { _instanceof as instanceof };

@@ -1,0 +1,5767 @@
+diff --git a/.changeset/clean-ears-do.md b/.changeset/clean-ears-do.md
+new file mode 100644
+index 0000000000..1522297bb8
+--- /dev/null
++++ b/.changeset/clean-ears-do.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/splitter": patch
++---
++
++Add `data-orientation` attribute to splitter panel part
+diff --git a/.changeset/giant-ties-notice.md b/.changeset/giant-ties-notice.md
+new file mode 100644
+index 0000000000..85231f69b4
+--- /dev/null
++++ b/.changeset/giant-ties-notice.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/tabs": patch
++---
++
++Tabs: Rename `tablist` part to `list` to match naming convention
+diff --git a/examples/next-ts/pages/tabs.tsx b/examples/next-ts/pages/tabs.tsx
+index cc2f815c6f..aabd158a59 100644
+--- a/examples/next-ts/pages/tabs.tsx
++++ b/examples/next-ts/pages/tabs.tsx
+@@ -26,7 +26,7 @@ export default function Page() {
+       <main className="tabs">
+         <div {...api.rootProps}>
+           <div {...api.indicatorProps} />
+-          <div {...api.tablistProps}>
++          <div {...api.listProps}>
+             {tabsData.map((data) => (
+               <button {...api.getTriggerProps({ value: data.id })} key={data.id} data-testid={`${data.id}-tab`}>
+                 {data.label}
+diff --git a/examples/nuxt-ts/pages/tabs.vue b/examples/nuxt-ts/pages/tabs.vue
+index 84ef722c28..328c576479 100644
+--- a/examples/nuxt-ts/pages/tabs.vue
++++ b/examples/nuxt-ts/pages/tabs.vue
+@@ -16,7 +16,7 @@ const api = computed(() => tabs.connect(state.value, send, normalizeProps))
+   <main class="tabs">
+     <div v-bind="api.rootProps">
+       <div v-bind="api.indicatorProps" />
+-      <div v-bind="api.tablistProps">
++      <div v-bind="api.listProps">
+         <button
+           v-for="data in tabsData"
+           v-bind="api.getTriggerProps({ value: data.id })"
+diff --git a/examples/solid-ts/src/pages/tabs.tsx b/examples/solid-ts/src/pages/tabs.tsx
+index 559aae6a85..dddf0ee3b2 100644
+--- a/examples/solid-ts/src/pages/tabs.tsx
++++ b/examples/solid-ts/src/pages/tabs.tsx
+@@ -21,7 +21,7 @@ export default function Page() {
+         <div {...api().rootProps}>
+           <div {...api().indicatorProps} />
+ 
+-          <div {...api().tablistProps}>
++          <div {...api().listProps}>
+             <For each={tabsData}>
+               {(item) => (
+                 <button data-testid={`${item.id}-tab`} {...api().getTriggerProps({ value: item.id })}>
+diff --git a/examples/vue-ts/src/pages/tabs.tsx b/examples/vue-ts/src/pages/tabs.tsx
+index fac40c42f4..2e0d56fbc2 100644
+--- a/examples/vue-ts/src/pages/tabs.tsx
++++ b/examples/vue-ts/src/pages/tabs.tsx
+@@ -25,7 +25,7 @@ export default defineComponent({
+           <main class="tabs">
+             <div {...api.rootProps}>
+               <div {...api.indicatorProps} />
+-              <div {...api.tablistProps}>
++              <div {...api.listProps}>
+                 {tabsData.map((data) => (
+                   <button {...api.getTriggerProps({ value: data.id })} key={data.id} data-testid={`${data.id}-tab`}>
+                     {data.label}
+diff --git a/packages/docs/data/api.json b/packages/docs/data/api.json
+index 2b4d5f7e05..06bdcf0ab1 100644
+--- a/packages/docs/data/api.json
++++ b/packages/docs/data/api.json
+@@ -2860,7 +2860,7 @@
+     },
+     "context": {
+       "ids": {
+-        "type": "Partial<{ root: string; trigger: string; tablist: string; content: string; indicator: string; }>",
++        "type": "Partial<{ root: string; trigger: string; list: string; content: string; indicator: string; }>",
+         "description": "The ids of the elements in the tabs. Useful for composition."
+       },
+       "translations": {
+@@ -3484,4 +3484,4 @@
+       }
+     }
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/packages/machines/splitter/src/splitter.connect.ts b/packages/machines/splitter/src/splitter.connect.ts
+index 2fb5b4c1d3..c75cf94216 100644
+--- a/packages/machines/splitter/src/splitter.connect.ts
++++ b/packages/machines/splitter/src/splitter.connect.ts
+@@ -63,6 +63,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+       const { id } = props
+       return normalize.element({
+         ...parts.panel.attrs,
++        "data-orientation": state.context.orientation,
+         dir: state.context.dir,
+         id: dom.getPanelId(state.context, id),
+         "data-ownedby": dom.getRootId(state.context),
+diff --git a/packages/machines/tabs/src/tabs.connect.ts b/packages/machines/tabs/src/tabs.connect.ts
+index 05153f7b5d..bfa69bba43 100644
+--- a/packages/machines/tabs/src/tabs.connect.ts
++++ b/packages/machines/tabs/src/tabs.connect.ts
+@@ -40,15 +40,15 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+       dir: state.context.dir,
+     }),
+ 
+-    tablistProps: normalize.element({
++    listProps: normalize.element({
+       ...parts.list.attrs,
+-      id: dom.getTablistId(state.context),
++      id: dom.getListId(state.context),
+       role: "tablist",
+       dir: state.context.dir,
+       "data-focus": dataAttr(isFocused),
+       "aria-orientation": state.context.orientation,
+       "data-orientation": state.context.orientation,
+-      "aria-label": translations.tablistLabel,
++      "aria-label": translations.listLabel,
+       onKeyDown(event) {
+         if (!isSelfEvent(event)) return
+ 
+@@ -104,7 +104,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         "data-selected": dataAttr(triggerState.isSelected),
+         "data-focus": dataAttr(triggerState.isFocused),
+         "aria-controls": dom.getContentId(state.context, value),
+-        "data-ownedby": dom.getTablistId(state.context),
++        "data-ownedby": dom.getListId(state.context),
+         id: dom.getTriggerId(state.context, value),
+         tabIndex: triggerState.isSelected ? 0 : -1,
+         onFocus() {
+@@ -136,7 +136,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         tabIndex: 0,
+         "aria-labelledby": dom.getTriggerId(state.context, value),
+         role: "tabpanel",
+-        "data-ownedby": dom.getTablistId(state.context),
++        "data-ownedby": dom.getListId(state.context),
+         "data-selected": dataAttr(selected),
+         "data-orientation": state.context.orientation,
+         hidden: !selected,
+diff --git a/packages/machines/tabs/src/tabs.dom.ts b/packages/machines/tabs/src/tabs.dom.ts
+index c298db3caf..22b2bbeb33 100644
+--- a/packages/machines/tabs/src/tabs.dom.ts
++++ b/packages/machines/tabs/src/tabs.dom.ts
+@@ -4,20 +4,20 @@ import type { MachineContext as Ctx } from "./tabs.types"
+ 
+ export const dom = createScope({
+   getRootId: (ctx: Ctx) => ctx.ids?.root ?? `tabs:${ctx.id}`,
+-  getTablistId: (ctx: Ctx) => ctx.ids?.tablist ?? `tabs:${ctx.id}:list`,
++  getListId: (ctx: Ctx) => ctx.ids?.list ?? `tabs:${ctx.id}:list`,
+   getContentId: (ctx: Ctx, id: string) => ctx.ids?.content ?? `tabs:${ctx.id}:content-${id}`,
+   getTriggerId: (ctx: Ctx, id: string) => ctx.ids?.trigger ?? `tabs:${ctx.id}:trigger-${id}`,
+   getIndicatorId: (ctx: Ctx) => ctx.ids?.indicator ?? `tabs:${ctx.id}:indicator`,
+ 
+-  getTablistEl: (ctx: Ctx) => dom.getById(ctx, dom.getTablistId(ctx)),
++  getListEl: (ctx: Ctx) => dom.getById(ctx, dom.getListId(ctx)),
+   getContentEl: (ctx: Ctx, id: string) => dom.getById(ctx, dom.getContentId(ctx, id)),
+   getTriggerEl: (ctx: Ctx, id: string) => dom.getById(ctx, dom.getTriggerId(ctx, id)),
+   getIndicatorEl: (ctx: Ctx) => dom.getById(ctx, dom.getIndicatorId(ctx)),
+ 
+   getElements: (ctx: Ctx) => {
+-    const ownerId = CSS.escape(dom.getTablistId(ctx))
++    const ownerId = CSS.escape(dom.getListId(ctx))
+     const selector = `[role=tab][data-ownedby='${ownerId}']:not([disabled])`
+-    return queryAll(dom.getTablistEl(ctx), selector)
++    return queryAll(dom.getListEl(ctx), selector)
+   },
+ 
+   getFirstEl: (ctx: Ctx) => first(dom.getElements(ctx)),
+diff --git a/packages/machines/tabs/src/tabs.types.ts b/packages/machines/tabs/src/tabs.types.ts
+index c099bc2ddc..b2bd151c14 100644
+--- a/packages/machines/tabs/src/tabs.types.ts
++++ b/packages/machines/tabs/src/tabs.types.ts
+@@ -18,13 +18,13 @@ export interface FocusChangeDetails {
+  * -----------------------------------------------------------------------------*/
+ 
+ export interface IntlTranslations {
+-  tablistLabel?: string
++  listLabel?: string
+ }
+ 
+ export type ElementIds = Partial<{
+   root: string
+   trigger: string
+-  tablist: string
++  list: string
+   content: string
+   indicator: string
+ }>
+@@ -170,7 +170,7 @@ export interface MachineApi<T extends PropTypes = PropTypes> {
+   getTriggerState(props: TriggerProps): TriggerState
+ 
+   rootProps: T["element"]
+-  tablistProps: T["element"]
++  listProps: T["element"]
+   getTriggerProps(props: TriggerProps): T["button"]
+   getContentProps(props: ContentProps): T["element"]
+   indicatorProps: T["element"]
+diff --git a/shared/src/style.css b/shared/src/style.css
+index 8232a492de..bacdad8644 100644
+--- a/shared/src/style.css
++++ b/shared/src/style.css
+@@ -1108,7 +1108,7 @@ main [data-testid="scrubber"] {
+   display: flex;
+ }
+ 
+-[data-scope="tabs"][data-part="tablist"] {
++[data-scope="tabs"][data-part="list"] {
+   margin: 0 0 -0.1em;
+   overflow: visible;
+ }
+diff --git a/website/.eslintrc.json b/website/.eslintrc.json
+index d2a18faf89..ac1144b5ac 100644
+--- a/website/.eslintrc.json
++++ b/website/.eslintrc.json
+@@ -1,6 +1,7 @@
+ {
+   "extends": "next/core-web-vitals",
+   "rules": {
+-    "react/no-unescaped-entities": "off"
++    "react/no-unescaped-entities": "off",
++    "@next/next/no-img-element": "off"
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/website/components/machines/accordion.tsx b/website/components/machines/accordion.tsx
+index 559b877e66..8cd11c6acb 100644
+--- a/website/components/machines/accordion.tsx
++++ b/website/components/machines/accordion.tsx
+@@ -1,5 +1,3 @@
+-import { Box } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as accordion from "@zag-js/accordion"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -40,43 +38,20 @@ export function Accordion(props: AccordionProps) {
+   const api = accordion.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Box width="400px" {...api.rootProps}>
++    <div {...api.rootProps}>
+       {items.map((item) => (
+-        <Box
+-          bg="bg-subtle"
+-          borderWidth="1px"
+-          fontSize="sm"
+-          key={item.title}
+-          {...api.getItemProps({ value: item.title })}
+-        >
++        <div key={item.title} {...api.getItemProps({ value: item.title })}>
+           <h3>
+-            <chakra.button
+-              width="full"
+-              py="2"
+-              px="3"
+-              textAlign="start"
+-              cursor="pointer"
+-              {...api.getItemTriggerProps({ value: item.title })}
+-              _focusVisible={{
+-                outline: "2px solid #0070f3",
+-              }}
+-            >
+-              <Box fontWeight="semibold">{item.title}</Box>
+-              <Box fontSize="xs" color="text-subtle">
+-                {item.desc}
+-              </Box>
+-            </chakra.button>
++            <button {...api.getItemTriggerProps({ value: item.title })}>
++              <div>{item.title}</div>
++              <div>{item.desc}</div>
++            </button>
+           </h3>
+-          <Box
+-            width="full"
+-            py="2"
+-            px="3"
+-            {...api.getItemContentProps({ value: item.title })}
+-          >
++          <div {...api.getItemContentProps({ value: item.title })}>
+             {item.content}
+-          </Box>
+-        </Box>
++          </div>
++        </div>
+       ))}
+-    </Box>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/avatar.tsx b/website/components/machines/avatar.tsx
+index 5e7635f5d3..51e8bb5387 100644
+--- a/website/components/machines/avatar.tsx
++++ b/website/components/machines/avatar.tsx
+@@ -1,6 +1,3 @@
+-/* eslint-disable @next/next/no-img-element */
+-import { chakra } from "@chakra-ui/system"
+-import { Center, Circle } from "@chakra-ui/layout"
+ import * as avatar from "@zag-js/avatar"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -19,32 +16,17 @@ export function Avatar(props: { controls: { src: string; name: string } }) {
+   return (
+     <>
+       <main className="avatar">
+-        <Circle size="80px" overflow="hidden" {...api.rootProps}>
+-          <chakra.div
+-            width="80px"
+-            height="80px"
+-            fontSize="sm"
+-            lineHeight="1"
+-            fontWeight="semibold"
+-            color="white"
+-            bg="gray.500"
+-            {...api.fallbackProps}
+-          >
+-            <Center width="full" height="full">
+-              {initial}
+-            </Center>
+-          </chakra.div>
+-          <chakra.img
+-            width="80px"
+-            height="80px"
+-            objectFit="cover"
+-            borderRadius="9999px"
++        <div {...api.rootProps}>
++          <div {...api.fallbackProps}>
++            <div>{initial}</div>
++          </div>
++          <img
+             alt={name}
+             referrerPolicy="no-referrer"
+             src={src}
+             {...api.imageProps}
+           />
+-        </Circle>
++        </div>
+       </main>
+     </>
+   )
+diff --git a/website/components/machines/carousel.tsx b/website/components/machines/carousel.tsx
+index c9ae70b846..c2be44bc44 100644
+--- a/website/components/machines/carousel.tsx
++++ b/website/components/machines/carousel.tsx
+@@ -1,5 +1,3 @@
+-/* eslint-disable @next/next/no-img-element */
+-import { chakra } from "@chakra-ui/system"
+ import * as carousel from "@zag-js/carousel"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -23,77 +21,36 @@ export function Carousel(props: any) {
+   return (
+     <>
+       <main className="carousel">
+-        <chakra.div
+-          width="400px"
+-          borderWidth="2px"
+-          borderColor="border-subtle"
+-          {...api.rootProps}
+-        >
+-          <chakra.div overflowX="hidden" {...api.viewportProps}>
+-            <chakra.div {...api.itemGroupProps}>
++        <div {...api.rootProps}>
++          <div {...api.viewportProps}>
++            <div {...api.itemGroupProps}>
+               {items.map((image, index) => (
+-                <chakra.div {...api.getItemProps({ index })} key={index}>
+-                  <chakra.img
+-                    src={image}
+-                    alt={`Slide Image ${index}`}
+-                    height="250px"
+-                    width="100%"
+-                    objectFit="cover"
+-                  />
+-                </chakra.div>
++                <div {...api.getItemProps({ index })} key={index}>
++                  <img src={image} alt={`Slide Image ${index}`} />
++                </div>
+               ))}
+-            </chakra.div>
+-            <chakra.div
+-              borderWidth="1px"
+-              borderColor="border-subtle"
+-              bg="bg-subtle"
+-              p="2"
+-              gap="2"
+-              display="flex"
+-              alignItems="center"
+-              position="absolute"
+-              left="40%"
+-            >
+-              <chakra.button
+-                aria-label="Previous Slide"
+-                _disabled={{ opacity: 0.5 }}
+-                {...api.prevTriggerProps}
+-              >
++            </div>
++
++            <div data-scope="carousel" data-part="control">
++              <button aria-label="Previous Slide" {...api.prevTriggerProps}>
+                 <HiChevronLeft />
+-              </chakra.button>
+-              <chakra.div display="flex" gap="3" {...api.indicatorGroupProps}>
++              </button>
++              <div {...api.indicatorGroupProps}>
+                 {items.map((_, index) => (
+-                  <chakra.button
++                  <button
+                     key={index}
+-                    width="2.5"
+-                    height="2.5"
+-                    borderRadius="full"
+-                    background="gray"
+-                    cursor="pointer"
+                     aria-label={`Goto slide ${index + 1}`}
+                     {...api.getIndicatorProps({ index })}
+                   />
+                 ))}
+-              </chakra.div>
+-              <chakra.button
+-                aria-label="Previous Slide"
+-                _disabled={{ opacity: 0.5 }}
+-                {...api.nextTriggerProps}
+-              >
++              </div>
++              <button aria-label="Previous Slide" {...api.nextTriggerProps}>
+                 <HiChevronRight />
+-              </chakra.button>
+-            </chakra.div>
+-          </chakra.div>
+-        </chakra.div>
++              </button>
++            </div>
++          </div>
++        </div>
+       </main>
+-
+-      <style suppressHydrationWarning>
+-        {`
+-        [data-scope="carousel"][data-part="indicator"][data-current] {
+-          background: var(--colors-bg-primary-bold);
+-        }
+-      `}
+-      </style>
+     </>
+   )
+ }
+diff --git a/website/components/machines/checkbox.tsx b/website/components/machines/checkbox.tsx
+index 5b0e8d936f..574dfa76b4 100644
+--- a/website/components/machines/checkbox.tsx
++++ b/website/components/machines/checkbox.tsx
+@@ -1,88 +1,43 @@
+-import { chakra } from "@chakra-ui/system"
+ import * as checkbox from "@zag-js/checkbox"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+ 
+ type CheckboxProps = {
+   controls: {
+-    indeterminate: boolean
+     disabled: boolean
+-    readOnly: boolean
++    indeterminate: boolean
+   }
+ }
+ 
+ export function Checkbox(props: CheckboxProps) {
++  const { disabled, indeterminate } = props.controls
+   const [state, send] = useMachine(checkbox.machine({ id: useId() }), {
+-    context: props.controls,
++    context: Object.assign(
++      { disabled },
++      { checked: (indeterminate ? "indeterminate" : false) as any },
++    ),
+   })
+ 
+   const api = checkbox.connect(state, send, normalizeProps)
+ 
+   return (
+     <div>
+-      <chakra.label
+-        display="flex"
+-        flexDirection="row-reverse"
+-        gap="2"
+-        userSelect="none"
+-        cursor="pointer"
+-        fontSize="18"
+-        _disabled={{
+-          cursor: "not-allowed",
+-          opacity: 0.4,
+-        }}
+-        _readOnly={{
+-          cursor: "default",
+-        }}
+-        {...api.rootProps}
+-      >
++      <label {...api.rootProps}>
+         <span {...api.labelProps}>Checkbox Input</span>
+         <input data-peer {...api.hiddenInputProps} />
+-        <chakra.div
+-          boxSize="25px"
+-          rounded="md"
+-          border="solid 2px"
+-          borderColor="gray.400"
+-          color="white"
+-          _hover={{ bg: "bg-bold" }}
+-          _peerFocusVisible={{ outline: "2px solid royalblue" }}
+-          sx={{
+-            "&[data-disabled]": {
+-              bg: "gray.400",
+-              borderColor: "gray.400",
+-            },
+-            "&[data-state=indeterminate]": {
+-              backgroundColor: "white",
+-              borderColor: "grey",
+-              color: "grey",
+-            },
+-            "&[data-state=checked]:not([data-disabled])": {
+-              bg: "blue.500",
+-              borderColor: "blue.500",
+-            },
+-          }}
+-          {...api.controlProps}
+-        >
++        <div {...api.controlProps}>
+           {api.checkedState === true && (
+-            <chakra.svg
+-              viewBox="0 0 24 24"
+-              fill="currentcolor"
+-              transform="scale(0.7)"
+-            >
++            <svg viewBox="0 0 24 24" fill="currentcolor" transform="scale(0.7)">
+               <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" />
+-            </chakra.svg>
++            </svg>
+           )}
+           {api.checkedState === "indeterminate" && (
+-            <chakra.svg
+-              viewBox="0 0 24 24"
+-              stroke="currentColor"
+-              strokeWidth="4"
+-            >
++            <svg viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
+               <line x1="21" x2="3" y1="12" y2="12" />
+-            </chakra.svg>
++            </svg>
+           )}
+-        </chakra.div>
+-      </chakra.label>
++        </div>
++      </label>
+     </div>
+   )
+ }
+diff --git a/website/components/machines/circular-progress.tsx b/website/components/machines/circular-progress.tsx
+deleted file mode 100644
+index dbb596db0a..0000000000
+--- a/website/components/machines/circular-progress.tsx
++++ /dev/null
+@@ -1,92 +0,0 @@
+-import { HStack, VStack } from "@chakra-ui/layout"
+-import { chakra, keyframes } from "@chakra-ui/system"
+-import * as progress from "@zag-js/progress"
+-import { normalizeProps, useMachine } from "@zag-js/react"
+-import { Button } from "components/button"
+-import { useId } from "react"
+-
+-const spin = keyframes({
+-  from: { transform: "rotate(0deg)" },
+-  to: { transform: "rotate(360deg)" },
+-})
+-
+-const circleAnimation = keyframes({
+-  "0%": {
+-    strokeDasharray: "1, 400",
+-    strokeDashoffset: "0",
+-  },
+-  "100%": {
+-    strokeDasharray: "400, 400",
+-    strokeDashoffset: "-260",
+-  },
+-})
+-
+-const Circle = chakra("svg", {
+-  baseStyle: {
+-    "--size": "120px",
+-    "--thickness": "12px",
+-    "&[data-state=indeterminate]": {
+-      animation: `${spin} 2s linear infinite`,
+-    },
+-  },
+-})
+-
+-const CircleTrack = chakra("circle", {
+-  baseStyle: {
+-    stroke: "bg-subtle",
+-  },
+-})
+-
+-const CircleRange = chakra("circle", {
+-  baseStyle: {
+-    stroke: "green.500",
+-    transitionProperty: "stroke-dasharray, stroke",
+-    transitionDuration: "0.6s",
+-    "&[data-state=indeterminate]": {
+-      animation: `${circleAnimation} 1.5s ease-in-out infinite`,
+-    },
+-  },
+-})
+-
+-export function CircularProgress(props: any) {
+-  const [state, send] = useMachine(progress.machine({ id: useId() }), {
+-    context: props.controls,
+-  })
+-
+-  const api = progress.connect(state, send, normalizeProps)
+-
+-  return (
+-    <div>
+-      <VStack mb="4" spacing="5" {...api.rootProps}>
+-        <div {...api.labelProps}>Upload progress</div>
+-        <Circle {...(api.circleProps as any)}>
+-          <CircleTrack {...(api.circleTrackProps as any)} />
+-          <CircleRange {...(api.circleRangeProps as any)} />
+-        </Circle>
+-        <div {...api.valueTextProps}>{api.valueAsString}</div>
+-      </VStack>
+-
+-      <HStack>
+-        <Button
+-          size="sm"
+-          variant="outline"
+-          onClick={() => api.setValue((api.value ?? 0) - 20)}
+-        >
+-          Decrease
+-        </Button>
+-
+-        <Button
+-          size="sm"
+-          variant="outline"
+-          onClick={() => api.setValue((api.value ?? 0) + 20)}
+-        >
+-          Increase
+-        </Button>
+-
+-        <Button size="sm" variant="outline" onClick={() => api.setValue(null)}>
+-          Indeterminate
+-        </Button>
+-      </HStack>
+-    </div>
+-  )
+-}
+diff --git a/website/components/machines/clipboard.tsx b/website/components/machines/clipboard.tsx
+index d27b32d8c8..1194f6e0e1 100644
+--- a/website/components/machines/clipboard.tsx
++++ b/website/components/machines/clipboard.tsx
+@@ -1,8 +1,5 @@
+-import { HStack, Stack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as clipboard from "@zag-js/clipboard"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ import { HiCheck, HiOutlineClipboard } from "react-icons/hi"
+ 
+@@ -21,30 +18,14 @@ export function Clipboard(props: Props) {
+   const api = clipboard.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Stack spacing="1" {...api.rootProps}>
+-      <chakra.label fontSize="sm" fontWeight="medium" {...api.labelProps}>
+-        Copy this link
+-      </chakra.label>
+-      <HStack align="stretch" {...api.controlProps}>
+-        <chakra.input
+-          borderWidth="1px"
+-          height="10"
+-          pr="5"
+-          pl="3"
+-          bg="bg-subtle"
+-          borderColor="border-subtle"
+-          {...api.inputProps}
+-        />
+-        <Button
+-          borderWidth="1px"
+-          px="3"
+-          size="sm"
+-          variant="outline"
+-          {...api.triggerProps}
+-        >
++    <div {...api.rootProps}>
++      <label {...api.labelProps}>Copy this link</label>
++      <div {...api.controlProps}>
++        <input {...api.inputProps} />
++        <button {...api.triggerProps}>
+           {api.isCopied ? <HiCheck /> : <HiOutlineClipboard />}
+-        </Button>
+-      </HStack>
+-    </Stack>
++        </button>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/collapsible.tsx b/website/components/machines/collapsible.tsx
+index 3bbb9d125f..028ff17464 100644
+--- a/website/components/machines/collapsible.tsx
++++ b/website/components/machines/collapsible.tsx
+@@ -1,8 +1,5 @@
+-import { Stack } from "@chakra-ui/layout"
+-import { keyframes } from "@emotion/react"
+ import * as collapsible from "@zag-js/collapsible"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ 
+ type CollapsibleProps = {
+@@ -12,28 +9,6 @@ type CollapsibleProps = {
+   }
+ }
+ 
+-const slideDown = keyframes({
+-  from: {
+-    height: 0,
+-    opacity: 0.01,
+-  },
+-  to: {
+-    height: "var(--height)",
+-    opacity: 1,
+-  },
+-})
+-
+-const slideUp = keyframes({
+-  from: {
+-    height: "var(--height)",
+-    opacity: 1,
+-  },
+-  to: {
+-    height: 0,
+-    opacity: 0.01,
+-  },
+-})
+-
+ export function Collapsible(props: CollapsibleProps) {
+   const [state, send] = useMachine(collapsible.machine({ id: useId() }), {
+     context: props.controls,
+@@ -42,22 +17,9 @@ export function Collapsible(props: CollapsibleProps) {
+   const api = collapsible.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Stack width="400px" align="start" {...api.rootProps}>
+-      <Button size="sm" variant="green" {...api.triggerProps}>
+-        Click to Toggle
+-      </Button>
+-      <Stack
+-        overflow="hidden"
+-        {...api.contentProps}
+-        css={{
+-          "&[data-state=open]": {
+-            animation: `${slideDown} 110ms cubic-bezier(0, 0, 0.38, 0.9)`,
+-          },
+-          "&[data-state=closed]": {
+-            animation: `${slideUp} 110ms cubic-bezier(0, 0, 0.38, 0.9)`,
+-          },
+-        }}
+-      >
++    <div {...api.rootProps}>
++      <button {...api.triggerProps}>Click to Toggle</button>
++      <div {...api.contentProps}>
+         <p>
+           Lorem dfd dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+           tempor incididunt ut labore et dolore magna sfsd. Ut enim ad minimdfd
+@@ -66,7 +28,7 @@ export function Collapsible(props: CollapsibleProps) {
+           sunt in culpa qui officia deserunt mollit anim id est laborum.{" "}
+           <a href="#">Some Link</a>
+         </p>
+-      </Stack>
+-    </Stack>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/color-picker.tsx b/website/components/machines/color-picker.tsx
+index fde35630bb..11693a4c1f 100644
+--- a/website/components/machines/color-picker.tsx
++++ b/website/components/machines/color-picker.tsx
+@@ -1,5 +1,3 @@
+-import { Divider, Flex, Stack, VStack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as colorPicker from "@zag-js/color-picker"
+ import { Portal, normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -9,6 +7,7 @@ type Props = {
+     disabled: boolean
+     readOnly: boolean
+     closeOnSelect: boolean
++    format: "rgba" | "hsla" | "hsba"
+   }
+ }
+ 
+@@ -33,69 +32,6 @@ const EyeDropIcon = () => (
+   </svg>
+ )
+ 
+-const Swatch = chakra("div", {
+-  baseStyle: {
+-    width: "5",
+-    height: "5",
+-    flexShrink: "0",
+-  },
+-})
+-
+-const TransparentGrid = chakra("div", {
+-  baseStyle: {
+-    borderRadius: "4px",
+-  },
+-})
+-
+-const ChannelInput = chakra("input", {
+-  baseStyle: {
+-    borderRadius: "4px",
+-    width: "100%",
+-    borderWidth: "1px",
+-    paddingX: "2",
+-    bg: "bg-subtle",
+-    fontSize: "sm",
+-    minHeight: "32px",
+-  },
+-})
+-
+-const SliderTrack = chakra("div", {
+-  baseStyle: {
+-    height: "3",
+-    rounded: "4px",
+-  },
+-})
+-
+-const Thumb = chakra("div", {
+-  baseStyle: {
+-    border: "2px solid white",
+-    borderRadius: "full",
+-    transform: "translate(-50%, -50%)",
+-    shadow: "black 0px 0px 0px 1px, black 0px 0px 0px 1px inset",
+-    width: "4",
+-    height: "4",
+-  },
+-})
+-
+-const ChannelLabel = chakra("span", {
+-  baseStyle: {
+-    fontSize: "sm",
+-    fontWeight: "medium",
+-  },
+-})
+-
+-const EyeDropButton = chakra("button", {
+-  baseStyle: {
+-    width: "40px",
+-    height: "40px",
+-    display: "flex",
+-    flexDirection: "column",
+-    alignItems: "center",
+-    justifyContent: "center",
+-    borderWidth: "1px",
+-  },
+-})
+-
+ export function ColorPicker(props: Props) {
+   const [state, send] = useMachine(
+     colorPicker.machine({
+@@ -111,208 +47,153 @@ export function ColorPicker(props: Props) {
+ 
+   return (
+     <div {...api.rootProps}>
+-      <chakra.label
+-        fontSize="sm"
+-        display="block"
+-        mb="2"
+-        _disabled={{ opacity: "0.6" }}
+-        {...api.labelProps}
+-      >
+-        <span>
+-          <chakra.span fontWeight="medium">Color</chakra.span>:{" "}
+-          {api.valueAsString}
+-        </span>
+-      </chakra.label>
+-
+-      <chakra.div
+-        display="flex"
+-        alignItems="flex-start"
+-        gap="2"
+-        {...api.controlProps}
+-      >
+-        <Flex
+-          align="center"
+-          justify="center"
+-          p="1"
+-          bg="bg-subtle"
+-          borderWidth="1px"
+-        >
+-          <chakra.button bg="bg-subtle" {...api.triggerProps}>
+-            <TransparentGrid
+-              {...api.getTransparencyGridProps({ size: "10px" })}
+-            />
+-            <Swatch {...api.getSwatchProps({ value: api.value })} />
+-          </chakra.button>
+-        </Flex>
+-        <ChannelInput {...api.getChannelInputProps({ channel: "hex" })} />
+-        <ChannelInput
+-          maxWidth="64px"
+-          {...api.getChannelInputProps({ channel: "alpha" })}
+-        />
+-      </chakra.div>
++      <label {...api.labelProps}>
++        <span>Color</span>: {api.valueAsString}
++      </label>
++
++      <div {...api.controlProps}>
++        <div>
++          <button {...api.triggerProps}>
++            <div {...api.getTransparencyGridProps({ size: "10px" })} />
++            <div {...api.getSwatchProps({ value: api.value })} />
++          </button>
++        </div>
++        <input {...api.getChannelInputProps({ channel: "hex" })} />
++        <input {...api.getChannelInputProps({ channel: "alpha" })} />
++      </div>
+ 
+       <Portal>
+         <div {...api.positionerProps}>
+-          <chakra.div
+-            shadow="base"
+-            isolation="isolate"
+-            padding="4"
+-            bg="bg-subtle"
+-            {...api.contentProps}
+-          >
+-            <chakra.div display="flex" flexDir="column" gap="2">
+-              <chakra.div
+-                height="200px"
+-                rounded="4px"
+-                borderWidth="1px"
+-                {...api.getAreaProps()}
+-              >
+-                <chakra.div
+-                  height="inherit"
+-                  rounded="inherit"
+-                  {...api.getAreaBackgroundProps()}
+-                />
+-                <Thumb {...api.getAreaThumbProps()} />
+-              </chakra.div>
++          <div {...api.contentProps}>
++            <div>
++              <div {...api.getAreaProps()}>
++                <div {...api.getAreaBackgroundProps()} />
++                <div {...api.getAreaThumbProps()} />
++              </div>
+ 
+-              <Flex gap="20px" my="2">
+-                <Stack flex="1">
++              <div>
++                <div>
+                   <div {...api.getChannelSliderProps({ channel: "hue" })}>
+-                    <SliderTrack
++                    <div
+                       {...api.getChannelSliderTrackProps({ channel: "hue" })}
+                     />
+-                    <Thumb
++                    <div
+                       {...api.getChannelSliderThumbProps({ channel: "hue" })}
+                     />
+                   </div>
+ 
+                   <div {...api.getChannelSliderProps({ channel: "alpha" })}>
+-                    <TransparentGrid
+-                      {...api.getTransparencyGridProps({ size: "12px" })}
+-                    />
+-                    <SliderTrack
++                    <div {...api.getTransparencyGridProps({ size: "12px" })} />
++                    <div
+                       {...api.getChannelSliderTrackProps({ channel: "alpha" })}
+                     />
+-                    <Thumb
++                    <div
+                       {...api.getChannelSliderThumbProps({ channel: "alpha" })}
+                     />
+                   </div>
+-                </Stack>
+-                <EyeDropButton {...api.eyeDropperTriggerProps}>
++                </div>
++                <button {...api.eyeDropperTriggerProps}>
+                   <EyeDropIcon />
+-                </EyeDropButton>
+-              </Flex>
++                </button>
++              </div>
+ 
+               <Show when={api.format.startsWith("hsl")}>
+-                <Flex width="100%" gap="0.5">
+-                  <VStack>
+-                    <ChannelInput
+-                      {...api.getChannelInputProps({ channel: "hue" })}
+-                    />
+-                    <ChannelLabel>H</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                <div>
++                  <div>
++                    <input {...api.getChannelInputProps({ channel: "hue" })} />
++                    <span>H</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "saturation" })}
+                     />
+-                    <ChannelLabel>S</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                    <span>S</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "lightness" })}
+                     />
+-                    <ChannelLabel>L</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                    <span>L</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "alpha" })}
+                     />
+-                    <ChannelLabel>A</ChannelLabel>
+-                  </VStack>
+-                </Flex>
++                    <span>A</span>
++                  </div>
++                </div>
+               </Show>
+ 
+               <Show when={api.format.startsWith("rgb")}>
+-                <Flex width="100%" gap="0.5">
+-                  <VStack>
+-                    <ChannelInput
+-                      {...api.getChannelInputProps({ channel: "red" })}
+-                    />
+-                    <ChannelLabel>R</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                <div>
++                  <div>
++                    <input {...api.getChannelInputProps({ channel: "red" })} />
++                    <span>R</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "green" })}
+                     />
+-                    <ChannelLabel>G</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
+-                      {...api.getChannelInputProps({ channel: "blue" })}
+-                    />
+-                    <ChannelLabel>B</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                    <span>G</span>
++                  </div>
++                  <div>
++                    <input {...api.getChannelInputProps({ channel: "blue" })} />
++                    <span>B</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "alpha" })}
+                     />
+-                    <ChannelLabel>A</ChannelLabel>
+-                  </VStack>
+-                </Flex>
++                    <span>A</span>
++                  </div>
++                </div>
+               </Show>
+ 
+               <Show when={api.format.startsWith("hsb")}>
+-                <Flex width="100%" gap="0.5">
+-                  <VStack>
+-                    <ChannelInput
+-                      {...api.getChannelInputProps({ channel: "hue" })}
+-                    />
+-                    <ChannelLabel>H</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                <div>
++                  <div>
++                    <input {...api.getChannelInputProps({ channel: "hue" })} />
++                    <span>H</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "saturation" })}
+                     />
+-                    <ChannelLabel>S</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                    <span>S</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "brightness" })}
+                     />
+-                    <ChannelLabel>B</ChannelLabel>
+-                  </VStack>
+-                  <VStack>
+-                    <ChannelInput
++                    <span>B</span>
++                  </div>
++                  <div>
++                    <input
+                       {...api.getChannelInputProps({ channel: "alpha" })}
+                     />
+-                    <ChannelLabel>A</ChannelLabel>
+-                  </VStack>
+-                </Flex>
++                    <span>A</span>
++                  </div>
++                </div>
+               </Show>
+ 
+-              <Divider borderWidth="1px" />
++              <hr />
+ 
+-              <div
+-                {...api.swatchGroupProps}
+-                style={{ display: "flex", gap: "10px" }}
+-              >
++              <div {...api.swatchGroupProps}>
+                 <p>Swatches</p>
+                 {presets.map((preset) => (
+                   <button
+                     key={preset}
+                     {...api.getSwatchTriggerProps({ value: preset })}
+                   >
+-                    <div style={{ position: "relative" }}>
+-                      <TransparentGrid
+-                        {...api.getTransparencyGridProps({ size: "4px" })}
+-                      />
+-                      <Swatch {...api.getSwatchProps({ value: preset })} />
++                    <div>
++                      <div {...api.getTransparencyGridProps({ size: "4px" })} />
++                      <div {...api.getSwatchProps({ value: preset })} />
+                     </div>
+                   </button>
+                 ))}
+               </div>
+-            </chakra.div>
+-          </chakra.div>
++            </div>
++          </div>
+         </div>
+       </Portal>
+     </div>
+diff --git a/website/components/machines/combobox.tsx b/website/components/machines/combobox.tsx
+index 44d606d0a9..f52452fb33 100644
+--- a/website/components/machines/combobox.tsx
++++ b/website/components/machines/combobox.tsx
+@@ -1,4 +1,3 @@
+-import { chakra } from "@chakra-ui/system"
+ import * as combobox from "@zag-js/combobox"
+ import { Portal, normalizeProps, useMachine } from "@zag-js/react"
+ import { useId, useMemo, useState } from "react"
+@@ -93,79 +92,28 @@ export function Combobox(props: ComboboxProps) {
+ 
+   return (
+     <div>
+-      <chakra.div
+-        display="flex"
+-        flexDirection="column"
+-        gap="1"
+-        {...api.rootProps}
+-      >
+-        <chakra.label
+-          fontSize="lg"
+-          _disabled={{
+-            opacity: 0.6,
+-          }}
+-          {...api.labelProps}
+-        >
+-          Nationality
+-        </chakra.label>
+-        <chakra.div
+-          display="inline-flex"
+-          width="300px"
+-          className="focus-outline"
+-          bg="bg-subtle"
+-          borderWidth="1px"
+-          _disabled={{
+-            opacity: 0.6,
+-          }}
+-          py="1"
+-          px="3"
+-          {...api.controlProps}
+-        >
+-          <chakra.input
+-            bg="bg-subtle"
+-            _focus={{ outline: "0" }}
+-            flex="1"
+-            p="1"
+-            {...api.inputProps}
+-          />
++      <div {...api.rootProps}>
++        <label {...api.labelProps}>Nationality</label>
++        <div {...api.controlProps}>
++          <input {...api.inputProps} />
+           <button {...api.triggerProps}>
+             <CaretIcon />
+           </button>
+-        </chakra.div>
+-      </chakra.div>
++        </div>
++      </div>
+       <Portal>
+         <div {...api.positionerProps}>
+           {options.length > 0 && (
+-            <chakra.ul
+-              listStyleType="none"
+-              m="0"
+-              maxH="56"
+-              overflow="auto"
+-              shadow="base"
+-              isolation="isolate"
+-              p="2"
+-              bg="bg-subtle"
+-              {...api.contentProps}
+-            >
++            <ul {...api.contentProps}>
+               {options.map((item, index) => (
+-                <chakra.li
+-                  px="2"
+-                  py="1"
+-                  display="flex"
+-                  alignItems="center"
+-                  cursor="pointer"
+-                  _highlighted={{ bg: "bg-primary-subtle", color: "white" }}
+-                  _disabled={{
+-                    opacity: 0.5,
+-                    cursor: "unset",
+-                  }}
++                <li
+                   key={`${item.code}:${index}`}
+                   {...api.getItemProps({ item })}
+                 >
+                   {item.label}
+-                </chakra.li>
++                </li>
+               ))}
+-            </chakra.ul>
++            </ul>
+           )}
+         </div>
+       </Portal>
+diff --git a/website/components/machines/context-menu.tsx b/website/components/machines/context-menu.tsx
+index ff117b0d2a..265c7c8ce9 100644
+--- a/website/components/machines/context-menu.tsx
++++ b/website/components/machines/context-menu.tsx
+@@ -1,6 +1,5 @@
+ import * as menu from "@zag-js/menu"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+ import { useId } from "react"
+ 
+ const data = [
+@@ -23,42 +22,17 @@ export function ContextMenu(props: ContextMenuProps) {
+ 
+   return (
+     <div>
+-      <chakra.div
+-        bg="bg-subtle"
+-        p="4"
+-        borderWidth="2px"
+-        borderStyle="dashed"
+-        {...api.contextTriggerProps}
+-      >
++      <div {...api.contextTriggerProps}>
+         <div>Open context menu</div>
+-      </chakra.div>
++      </div>
+       <div {...api.positionerProps}>
+-        <chakra.ul
+-          bg="bg-subtle"
+-          width="240px"
+-          padding="2"
+-          isolation="isolate"
+-          listStyleType="none"
+-          shadow="base"
+-          className="focus-outline"
+-          {...api.contentProps}
+-        >
++        <ul {...api.contentProps}>
+           {data.map((item) => (
+-            <chakra.li
+-              px="2"
+-              py="1"
+-              cursor="pointer"
+-              key={item.value}
+-              _highlighted={{
+-                bg: "bg-primary-bold",
+-                color: "white",
+-              }}
+-              {...api.getItemProps({ id: item.value })}
+-            >
++            <li key={item.value} {...api.getItemProps({ id: item.value })}>
+               {item.label}
+-            </chakra.li>
++            </li>
+           ))}
+-        </chakra.ul>
++        </ul>
+       </div>
+     </div>
+   )
+diff --git a/website/components/machines/dialog.tsx b/website/components/machines/dialog.tsx
+index bf01f2a4b6..a0c1b93620 100644
+--- a/website/components/machines/dialog.tsx
++++ b/website/components/machines/dialog.tsx
+@@ -1,9 +1,5 @@
+-import { Icon } from "@chakra-ui/icon"
+-import { Center, HStack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as dialog from "@zag-js/dialog"
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+-import { Button } from "components/button"
+ import { HiX } from "react-icons/hi"
+ import { useId } from "react"
+ 
+@@ -16,73 +12,30 @@ export function Dialog(props: { controls: any }) {
+ 
+   return (
+     <>
+-      <Button size="sm" variant="green" {...api.triggerProps}>
++      <button className="dialog" {...api.triggerProps}>
+         Open Dialog
+-      </Button>
+-      {api.isOpen && (
+-        <Portal>
+-          <chakra.div
+-            position="fixed"
+-            inset="0"
+-            bg="blackAlpha.600"
+-            zIndex="modal"
+-          />
+-          <Center
+-            height="100vh"
+-            width="100vw"
+-            position="fixed"
+-            zIndex="modal"
+-            inset="0"
+-            {...api.positionerProps}
+-          >
+-            <chakra.div
+-              width="full"
+-              maxW="400px"
+-              rounded="md"
+-              bg="bg-subtle"
+-              padding="5"
+-              position="relative"
+-              pointerEvents="auto"
+-              {...api.contentProps}
+-            >
+-              <chakra.h2
+-                fontWeight="semibold"
+-                fontSize="lg"
+-                mb="2"
+-                {...api.titleProps}
+-              >
+-                Edit profile
+-              </chakra.h2>
+-              <chakra.p fontSize="sm" mb="3" {...api.descriptionProps}>
+-                Make changes to your profile here. Click save when you are done.
+-              </chakra.p>
++      </button>
++      <Portal>
++        <div className="dialog" {...api.backdropProps} />
++        <div className="dialog" {...api.positionerProps}>
++          <div className="dialog" {...api.contentProps}>
++            <h2 className="dialog" {...api.titleProps}>
++              Edit profile
++            </h2>
++            <p className="dialog" {...api.descriptionProps}>
++              Make changes to your profile here. Click save when you are done.
++            </p>
+ 
+-              <HStack>
+-                <chakra.input
+-                  flex="1"
+-                  fontSize="sm"
+-                  borderWidth="1px"
+-                  px="2"
+-                  py="1"
+-                  placeholder="Enter name..."
+-                />
+-                <Button variant="green" size="sm">
+-                  Save
+-                </Button>
+-              </HStack>
+-              <chakra.button
+-                display="flex"
+-                position="absolute"
+-                top="3"
+-                right="3"
+-                {...api.closeTriggerProps}
+-              >
+-                <Icon as={HiX} />
+-              </chakra.button>
+-            </chakra.div>
+-          </Center>
+-        </Portal>
+-      )}
++            <div>
++              <input placeholder="Enter name..." />
++              <button>Save</button>
++            </div>
++            <button className="dialog" {...api.closeTriggerProps}>
++              <HiX />
++            </button>
++          </div>
++        </div>
++      </Portal>
+     </>
+   )
+ }
+diff --git a/website/components/machines/editable.tsx b/website/components/machines/editable.tsx
+index 3898e9e3fc..82c37b4260 100644
+--- a/website/components/machines/editable.tsx
++++ b/website/components/machines/editable.tsx
+@@ -1,8 +1,5 @@
+ import * as editable from "@zag-js/editable"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+-import { HStack } from "@chakra-ui/layout"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ 
+ export function Editable(props: any) {
+@@ -13,39 +10,21 @@ export function Editable(props: any) {
+   const api = editable.connect(state, send, normalizeProps)
+ 
+   return (
+-    <chakra.div width="300px" {...api.rootProps}>
+-      <chakra.div mb="3" {...api.areaProps}>
+-        <chakra.input
+-          className="focus-outline"
+-          bg="transparent"
+-          {...api.inputProps}
+-        />
++    <div {...api.rootProps}>
++      <div {...api.areaProps}>
++        <input {...api.inputProps} />
+         <span {...api.previewProps} />
+-      </chakra.div>
++      </div>
+ 
+       <div>
+-        {!api.isEditing && (
+-          <Button
+-            size="sm"
+-            variant="outline"
+-            bg="bg-subtle"
+-            {...api.editTriggerProps}
+-          >
+-            Edit
+-          </Button>
+-        )}
++        {!api.isEditing && <button {...api.editTriggerProps}>Edit</button>}
+         {api.isEditing && (
+-          <HStack>
+-            <Button size="sm" variant="green" {...api.submitTriggerProps}>
+-              Save
+-            </Button>
+-            <Button size="sm" variant="outline" {...api.cancelTriggerProps}>
+-              Cancel
+-            </Button>
+-            Button
+-          </HStack>
++          <div>
++            <button {...api.submitTriggerProps}>Save</button>
++            <button {...api.cancelTriggerProps}>Cancel</button>
++          </div>
+         )}
+       </div>
+-    </chakra.div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/file-upload.tsx b/website/components/machines/file-upload.tsx
+index 6a870ab1da..5c3ac17f80 100644
+--- a/website/components/machines/file-upload.tsx
++++ b/website/components/machines/file-upload.tsx
+@@ -1,8 +1,5 @@
+-import { HStack, Stack, VStack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as fileUpload from "@zag-js/file-upload"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ import { HiX } from "react-icons/hi"
+ 
+@@ -17,44 +14,25 @@ export function FileUpload(props: { controls: any }) {
+   const api = fileUpload.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Stack width="80%" {...api.rootProps}>
+-      <VStack
+-        borderWidth="2px"
+-        borderStyle="dashed"
+-        py="8"
+-        px="2"
+-        _focus={{ shadow: "outline" }}
+-        sx={{
+-          "&[data-dragging]": { bg: "bg-bold" },
+-        }}
+-        {...api.dropzoneProps}
+-      >
++    <div {...api.rootProps}>
++      <div {...api.dropzoneProps}>
+         <input {...api.hiddenInputProps} />
+         <span>Drag your files here</span>
+-        <Button size="sm" variant="green" {...api.triggerProps}>
+-          Open Dialog
+-        </Button>
+-      </VStack>
++        <button {...api.triggerProps}>Open Dialog</button>
++      </div>
+ 
+-      <Stack>
++      <div>
+         {api.files.map((file) => (
+-          <HStack
+-            {...api.getItemProps({ file })}
+-            key={file.name}
+-            px="3"
+-            py="2"
+-            bg="bg-subtle"
+-            borderWidth="1px"
+-          >
+-            <chakra.div flex="1" fontSize="sm">
++          <div {...api.getItemProps({ file })} key={file.name}>
++            <div>
+               {file.name} {api.getFileSize(file)}
+-            </chakra.div>
++            </div>
+             <button {...api.getItemDeleteTriggerProps({ file })}>
+               <HiX />
+             </button>
+-          </HStack>
++          </div>
+         ))}
+-      </Stack>
+-    </Stack>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/hover-card.tsx b/website/components/machines/hover-card.tsx
+index 0ca890bd41..263d1fafab 100644
+--- a/website/components/machines/hover-card.tsx
++++ b/website/components/machines/hover-card.tsx
+@@ -1,5 +1,3 @@
+-import { Flex, Stack, Text } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as hoverCard from "@zag-js/hover-card"
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+ import { useId } from "react"
+@@ -20,79 +18,56 @@ export function HoverCard(props: HoverCardProps) {
+ 
+   return (
+     <div>
+-      <chakra.a
++      <a
+         href="https://twitter.com/zag_js"
+         target="_blank"
+         rel="noreferrer noopener"
+         {...api.triggerProps}
+       >
+-        <chakra.img
+-          alt="Twitter"
+-          src="/favicon/apple-touch-icon.png"
+-          boxSize="12"
+-          shadow="xl"
+-        />
+-      </chakra.a>
++        <img alt="Twitter" src="/favicon/apple-touch-icon.png" />
++      </a>
+ 
+       {api.isOpen && (
+         <Portal>
+           <div {...api.positionerProps}>
+-            <chakra.div
+-              bg="bg-subtle"
+-              padding="4"
+-              borderWidth="1px"
+-              filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 15%))"
+-              zIndex="50"
+-              position="relative"
+-              maxW="min(calc(100vw - 16px), 360px)"
+-              width="full"
+-              {...api.contentProps}
+-            >
+-              <chakra.div
+-                sx={{
+-                  "--arrow-background": "bg-subtle",
+-                  "--arrow-size": "8px",
+-                }}
+-                {...api.arrowProps}
+-              >
+-                <chakra.div rounded="sm" {...api.arrowTipProps} />
+-              </chakra.div>
+-              <Stack spacing="3">
+-                <chakra.img
++            <div {...api.contentProps}>
++              <div {...api.arrowProps}>
++                <div {...api.arrowTipProps} />
++              </div>
++              <div className="card-wrapper">
++                <img
+                   alt="Twitter"
+                   src="/favicon/apple-touch-icon.png"
+-                  boxSize="14"
++                  className="avatar"
+                 />
+-                <Stack spacing="4">
+-                  <Text>
+-                    <Text fontWeight="bold">Zag JS</Text>
+-                    <Text color="gray.500"> @zag_js</Text>
+-                  </Text>
+-                  <Text>
+-                    <Text>UI components powered by Finite State Machines.</Text>
++
++                <div className="card-content">
++                  <p className="header">
++                    <p>Zag JS</p>
++                    <p> @zag_js</p>
++                  </p>
++                  <p>
++                    <p>UI components powered by Finite State Machines.</p>
+                     Created by{" "}
+-                    <chakra.a
++                    <a
+                       href="https://twitter.com/thesegunadebayo"
+                       target="_blank"
+                       rel="noreferrer noopener"
+-                      color="royalblue"
+                     >
+                       @thesegunadebayo
+-                    </chakra.a>
+-                  </Text>
+-                  <Flex gap="4">
+-                    <Flex gap="1.5">
+-                      <Text fontWeight="bold">2</Text>{" "}
+-                      <Text color="gray.500">Following</Text>
+-                    </Flex>
+-                    <Flex gap="1.5">
+-                      <Text fontWeight="bold">4,000</Text>{" "}
+-                      <Text color="gray.500">Followers</Text>
+-                    </Flex>
+-                  </Flex>
+-                </Stack>
+-              </Stack>
+-            </chakra.div>
++                    </a>
++                  </p>
++                  <div className="stats">
++                    <div>
++                      <p>2</p> <p>Following</p>
++                    </div>
++                    <div>
++                      <p>4,000</p> <p>Followers</p>
++                    </div>
++                  </div>
++                </div>
++              </div>
++            </div>
+           </div>
+         </Portal>
+       )}
+diff --git a/website/components/machines/linear-progress.tsx b/website/components/machines/linear-progress.tsx
+deleted file mode 100644
+index a10aa8853a..0000000000
+--- a/website/components/machines/linear-progress.tsx
++++ /dev/null
+@@ -1,79 +0,0 @@
+-import { HStack, Stack } from "@chakra-ui/layout"
+-import { chakra, keyframes } from "@chakra-ui/system"
+-import * as progress from "@zag-js/progress"
+-import { normalizeProps, useMachine } from "@zag-js/react"
+-import { Button } from "components/button"
+-import { useId } from "react"
+-
+-const Track = chakra("div", {
+-  baseStyle: {
+-    borderWidth: "1px",
+-    height: "20px",
+-    rounded: "sm",
+-    bg: "bg-subtle",
+-    overflow: "hidden",
+-  },
+-})
+-
+-const animation = keyframes({
+-  from: { transform: "scaleX(1) translateX(var(--translate-x))" },
+-  to: { transform: "scaleX(0) translateX(var(--translate-x))" },
+-})
+-
+-const Range = chakra("div", {
+-  baseStyle: {
+-    "--translate-x": "-100%",
+-    height: "100%",
+-    transition: "width 0.2s ease-in-out",
+-    bg: "green.500",
+-    "&[dir=rtl]": {
+-      "--translate-x": "100%",
+-    },
+-    "&[data-state=indeterminate]": {
+-      width: "210%",
+-      animation: `1s cubic-bezier(0.694, 0.0482, 0.335, 1) 0s infinite normal none running ${animation}`,
+-    },
+-  },
+-})
+-
+-export function LinearProgress(props: any) {
+-  const [state, send] = useMachine(progress.machine({ id: useId() }), {
+-    context: props.controls,
+-  })
+-
+-  const api = progress.connect(state, send, normalizeProps)
+-
+-  return (
+-    <div>
+-      <Stack mb="4" {...api.rootProps}>
+-        <div {...api.labelProps}>Upload progress</div>
+-        <Track {...api.trackProps}>
+-          <Range {...api.rangeProps} />
+-        </Track>
+-        <div {...api.valueTextProps}>{api.valueAsString}</div>
+-      </Stack>
+-
+-      <HStack>
+-        <Button
+-          size="sm"
+-          variant="outline"
+-          onClick={() => api.setValue((api.value ?? 0) - 20)}
+-        >
+-          Decrease
+-        </Button>
+-
+-        <Button
+-          size="sm"
+-          variant="outline"
+-          onClick={() => api.setValue((api.value ?? 0) + 20)}
+-        >
+-          Increase
+-        </Button>
+-
+-        <Button size="sm" variant="outline" onClick={() => api.setValue(null)}>
+-          Indeterminate
+-        </Button>
+-      </HStack>
+-    </div>
+-  )
+-}
+diff --git a/website/components/machines/menu.tsx b/website/components/machines/menu.tsx
+index 6fa1bc262a..24f77e83c1 100644
+--- a/website/components/machines/menu.tsx
++++ b/website/components/machines/menu.tsx
+@@ -1,7 +1,5 @@
+ import * as menu from "@zag-js/menu"
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ 
+ const data = [
+@@ -23,40 +21,18 @@ export function Menu(props: MenuProps) {
+ 
+   return (
+     <div>
+-      <Button size="sm" variant="green" {...api.triggerProps}>
+-        Actions{" "}
+-        <chakra.span ml="2" {...api.indicatorProps}>
+-          ▾
+-        </chakra.span>
+-      </Button>
++      <button {...api.triggerProps}>
++        Actions <span {...api.indicatorProps}>▾</span>
++      </button>
+       <Portal>
+         <div {...api.positionerProps}>
+-          <chakra.ul
+-            bg="bg-subtle"
+-            width="240px"
+-            padding="2"
+-            isolation="isolate"
+-            listStyleType="none"
+-            shadow="base"
+-            className="focus-outline"
+-            {...api.contentProps}
+-          >
++          <ul {...api.contentProps}>
+             {data.map((item) => (
+-              <chakra.li
+-                px="2"
+-                py="1"
+-                cursor="pointer"
+-                key={item.value}
+-                _highlighted={{
+-                  bg: "bg-primary-bold",
+-                  color: "white",
+-                }}
+-                {...api.getItemProps({ id: item.value })}
+-              >
++              <li key={item.value} {...api.getItemProps({ id: item.value })}>
+                 {item.label}
+-              </chakra.li>
++              </li>
+             ))}
+-          </chakra.ul>
++          </ul>
+         </div>
+       </Portal>
+     </div>
+diff --git a/website/components/machines/nested-menu.tsx b/website/components/machines/nested-menu.tsx
+index b00b3f85df..f62aa9b5c1 100644
+--- a/website/components/machines/nested-menu.tsx
++++ b/website/components/machines/nested-menu.tsx
+@@ -1,7 +1,5 @@
+ import * as menu from "@zag-js/menu"
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+-import { Button } from "components/button"
+ import { useEffect } from "react"
+ 
+ const data = [
+@@ -45,87 +43,42 @@ export function NestedMenu() {
+ 
+   return (
+     <div>
+-      <Button size="sm" variant="green" {...fileMenu.triggerProps}>
++      <button {...fileMenu.triggerProps}>
+         Click me
+-        <chakra.span ml="2" {...fileMenu.indicatorProps}>
+-          ▾
+-        </chakra.span>
+-      </Button>
++        <span {...fileMenu.indicatorProps}>▾</span>
++      </button>
+ 
+       <Portal>
+         <div {...fileMenu.positionerProps}>
+-          <chakra.ul
+-            bg="bg-subtle"
+-            width="240px"
+-            padding="2"
+-            isolation="isolate"
+-            listStyleType="none"
+-            shadow="base"
+-            className="focus-outline"
+-            {...fileMenu.contentProps}
+-          >
++          <ul {...fileMenu.contentProps}>
+             {data.map((item) => (
+-              <chakra.li
+-                px="2"
+-                py="1"
+-                cursor="pointer"
++              <li
+                 key={item.value}
+-                _highlighted={{
+-                  bg: "bg-primary-bold",
+-                  color: "white",
+-                }}
+                 {...fileMenu.getItemProps({ id: item.value })}
+               >
+                 {item.label}
+-              </chakra.li>
++              </li>
+             ))}
+-            <chakra.li
+-              px="2"
+-              py="1"
+-              cursor="pointer"
+-              _highlighted={{
+-                bg: "bg-primary-bold",
+-                color: "white",
+-              }}
+-              {...shareMenuTriggerProps}
+-            >
++            <li {...shareMenuTriggerProps}>
+               Share
+-              <chakra.span ml="2" {...shareMenu.indicatorProps}>
+-                »
+-              </chakra.span>
+-            </chakra.li>
+-          </chakra.ul>
++              <span {...shareMenu.indicatorProps}>»</span>
++            </li>
++          </ul>
+         </div>
+       </Portal>
+ 
+       <Portal>
+         <div {...shareMenu.positionerProps}>
+-          <chakra.ul
+-            bg="bg-subtle"
+-            width="240px"
+-            padding="2"
+-            isolation="isolate"
+-            listStyleType="none"
+-            shadow="base"
+-            className="focus-outline"
+-            {...shareMenu.contentProps}
+-          >
++          <ul {...shareMenu.contentProps}>
+             {shareMenuData.map((item) => (
+-              <chakra.li
+-                px="2"
+-                py="1"
+-                cursor="pointer"
++              <li
+                 key={item.value}
+-                _highlighted={{
+-                  bg: "bg-primary-bold",
+-                  color: "white",
+-                }}
+                 {...shareMenu.getItemProps({ id: item.value })}
+               >
+                 {item.label}
+-              </chakra.li>
++              </li>
+             ))}
+-          </chakra.ul>
++          </ul>
+         </div>
+       </Portal>
+     </div>
+diff --git a/website/components/machines/number-input.tsx b/website/components/machines/number-input.tsx
+index e1f85f16de..15478d3902 100644
+--- a/website/components/machines/number-input.tsx
++++ b/website/components/machines/number-input.tsx
+@@ -1,6 +1,5 @@
+ import * as numberInput from "@zag-js/number-input"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+ import { BiChevronDown, BiChevronUp } from "react-icons/bi"
+ import { useId } from "react"
+ 
+@@ -17,49 +16,17 @@ export function NumberInput(props: any) {
+   return (
+     <div {...api.rootProps}>
+       <label {...api.labelProps}>Enter number:</label>
+-      <br />
+-      <chakra.div position="relative" display="inline-block">
+-        <chakra.input
+-          borderWidth="1px"
+-          height="10"
+-          pr="5"
+-          pl="3"
+-          bg="bg-subtle"
+-          borderColor="border-subtle"
+-          {...api.inputProps}
+-        />
+-        <chakra.div
+-          display="flex"
+-          flexDirection="column"
+-          alignItems="center"
+-          position="absolute"
+-          width="6"
+-          right="3px"
+-          top="3px"
+-        >
+-          <chakra.button
+-            width="full"
+-            bg="bg-bold"
+-            display="flex"
+-            justifyContent="center"
+-            _disabled={{ opacity: 0.5 }}
+-            {...api.incrementTriggerProps}
+-          >
++      <div>
++        <input {...api.inputProps} />
++        <div>
++          <button {...api.incrementTriggerProps}>
+             <BiChevronUp />
+-          </chakra.button>
+-          <chakra.button
+-            mt="2px"
+-            width="full"
+-            bg="bg-bold"
+-            display="flex"
+-            justifyContent="center"
+-            _disabled={{ opacity: 0.5 }}
+-            {...api.decrementTriggerProps}
+-          >
++          </button>
++          <button {...api.decrementTriggerProps}>
+             <BiChevronDown />
+-          </chakra.button>
+-        </chakra.div>
+-      </chakra.div>
++          </button>
++        </div>
++      </div>
+     </div>
+   )
+ }
+diff --git a/website/components/machines/pagination.tsx b/website/components/machines/pagination.tsx
+index 4b484119b1..00431232b1 100644
+--- a/website/components/machines/pagination.tsx
++++ b/website/components/machines/pagination.tsx
+@@ -1,4 +1,3 @@
+-import { chakra } from "@chakra-ui/system"
+ import * as pagination from "@zag-js/pagination"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -25,94 +24,39 @@ export function Pagination(props: PaginationProps) {
+   const api = pagination.connect(state, send, normalizeProps)
+ 
+   return (
+-    <chakra.div px="2" w="full" display="flex" justifyContent="center">
++    <>
+       {api.totalPages > 1 && (
+         <nav {...api.rootProps}>
+-          <chakra.ul
+-            display="flex"
+-            flexWrap={{ base: "wrap", md: "nowrap" }}
+-            gap="1"
+-            pl="0 !important"
+-            listStyleType="none"
+-          >
++          <ul role="pagination">
+             <li>
+-              <PaginationLink href="#previous" {...api.prevTriggerProps}>
+-                &lt; <chakra.span srOnly>Previous Page</chakra.span>
+-              </PaginationLink>
++              <a href="#previous" {...api.prevTriggerProps}>
++                &lt; <span>Previous Page</span>
++              </a>
+             </li>
+             {api.pages.map((page, i) => {
+               if (page.type === "page")
+                 return (
+                   <li key={page.value}>
+-                    <PaginationLink
+-                      href={`#${page.value}`}
+-                      {...api.getItemProps(page)}
+-                    >
++                    <a href={`#${page.value}`} {...api.getItemProps(page)}>
+                       {page.value}
+-                    </PaginationLink>
++                    </a>
+                   </li>
+                 )
+               else
+                 return (
+                   <li key={`ellipsis-${i}`}>
+-                    <chakra.span
+-                      cursor="default"
+-                      {...api.getEllipsisProps({ index: i })}
+-                    >
+-                      &#8230;
+-                    </chakra.span>
++                    <span {...api.getEllipsisProps({ index: i })}>&#8230;</span>
+                   </li>
+                 )
+             })}
+             <li>
+-              <PaginationLink href="#next" {...api.nextTriggerProps}>
+-                &gt; <chakra.span srOnly>Next Page</chakra.span>
+-              </PaginationLink>
++              <a href="#next" {...api.nextTriggerProps}>
++                &gt; <span>Next Page</span>
++              </a>
+             </li>
+-          </chakra.ul>
++          </ul>
+         </nav>
+       )}
+-    </chakra.div>
++    </>
+   )
+ }
+-
+-const PaginationLink = chakra("a", {
+-  baseStyle: {
+-    px: 3,
+-    h: 8,
+-    textAlign: "center",
+-    m: "auto 4px",
+-    color: "text-bold",
+-    display: "flex",
+-    boxSizing: "border-box",
+-    alignItems: "center",
+-    letterSpacing: "0.01071em",
+-    lineHeight: 1.43,
+-    fontSize: "13px",
+-    userSelect: "none",
+-    textDecoration: "none",
+-    border: "solid 1px",
+-    borderColor: "border-bold",
+-    bg: "bg-subtle",
+-
+-    _hover: {
+-      bg: "bg-bold",
+-      cursor: "pointer",
+-    },
+-    _focus: {
+-      outline: "2px solid royalblue",
+-      outlineOffset: "1px",
+-    },
+-
+-    _disabled: {
+-      opacity: 0.6,
+-      cursor: "not-allowed",
+-      background: "none",
+-    },
+-
+-    _selected: {
+-      bg: "green.500",
+-      color: "white",
+-    },
+-  },
+-})
+diff --git a/website/components/machines/pin-input.tsx b/website/components/machines/pin-input.tsx
+index 86af7276ec..ed4f978a97 100644
+--- a/website/components/machines/pin-input.tsx
++++ b/website/components/machines/pin-input.tsx
+@@ -1,8 +1,5 @@
+-import { HStack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as pinInput from "@zag-js/pin-input"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ 
+ export function PinInput(props: any) {
+@@ -14,29 +11,12 @@ export function PinInput(props: any) {
+ 
+   return (
+     <div>
+-      <HStack mb="4" {...api.rootProps}>
++      <div {...api.rootProps}>
+         {[1, 2, 3].map((_, index) => (
+-          <chakra.input
+-            bg="bg-subtle"
+-            borderWidth="1px"
+-            width="50px"
+-            height="50px"
+-            fontSize="lg"
+-            textAlign="center"
+-            key={index}
+-            {...api.getInputProps({ index })}
+-          />
++          <input key={index} {...api.getInputProps({ index })} />
+         ))}
+-      </HStack>
+-      <Button
+-        borderWidth="1px"
+-        px="2"
+-        size="sm"
+-        variant="outline"
+-        onClick={api.clearValue}
+-      >
+-        Clear
+-      </Button>
++      </div>
++      <button onClick={api.clearValue}>Clear</button>
+     </div>
+   )
+ }
+diff --git a/website/components/machines/popover.tsx b/website/components/machines/popover.tsx
+index 1ad7b804a7..531eca66a2 100644
+--- a/website/components/machines/popover.tsx
++++ b/website/components/machines/popover.tsx
+@@ -1,10 +1,7 @@
+ import * as popover from "@zag-js/popover"
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+ import * as React from "react"
+-import { chakra } from "@chakra-ui/system"
+-import { Stack } from "@chakra-ui/layout"
+ import { HiX } from "react-icons/hi"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ 
+ export function Popover(props: any) {
+@@ -18,34 +15,15 @@ export function Popover(props: any) {
+ 
+   return (
+     <div>
+-      <Button size="sm" variant="green" {...api.triggerProps}>
+-        Click me
+-      </Button>
++      <button {...api.triggerProps}>Click me</button>
+       <Wrapper>
+         <div {...api.positionerProps}>
+-          <chakra.div
+-            className="focus-outline"
+-            bg="bg-subtle"
+-            padding="4"
+-            borderWidth="1px"
+-            filter="drop-shadow(0 4px 6px rgba(0, 0, 0, 15%))"
+-            zIndex="50"
+-            position="relative"
+-            maxW="min(calc(100vw - 16px), 320px)"
+-            width="full"
+-            {...api.contentProps}
+-          >
+-            <chakra.div
+-              sx={{
+-                "--arrow-background": "bg-subtle",
+-                "--arrow-size": "8px",
+-              }}
+-              {...api.arrowProps}
+-            >
+-              <chakra.div rounded="sm" {...api.arrowTipProps} />
+-            </chakra.div>
++          <div {...api.contentProps}>
++            <div {...api.arrowProps}>
++              <div {...api.arrowTipProps} />
++            </div>
+ 
+-            <Stack>
++            <div>
+               <div {...api.titleProps}>
+                 <b>About Tabs</b>
+               </div>
+@@ -53,26 +31,12 @@ export function Popover(props: any) {
+                 Tabs are used to organize and group content into sections that
+                 the user can navigate between.
+               </div>
+-              <chakra.button
+-                className="focus-outline"
+-                bg="bg-subtle"
+-                px="4"
+-                py="2"
+-                borderWidth="1px"
+-              >
+-                Action Button
+-              </chakra.button>
+-            </Stack>
+-            <chakra.button
+-              position="absolute"
+-              top="3"
+-              right="3"
+-              padding="2"
+-              {...api.closeTriggerProps}
+-            >
++              <button>Action Button</button>
++            </div>
++            <button {...api.closeTriggerProps}>
+               <HiX />
+-            </chakra.button>
+-          </chakra.div>
++            </button>
++          </div>
+         </div>
+       </Wrapper>
+     </div>
+diff --git a/website/components/machines/progress-circular.tsx b/website/components/machines/progress-circular.tsx
+new file mode 100644
+index 0000000000..870cdcb04f
+--- /dev/null
++++ b/website/components/machines/progress-circular.tsx
+@@ -0,0 +1,36 @@
++import * as progress from "@zag-js/progress"
++import { normalizeProps, useMachine } from "@zag-js/react"
++import { useId } from "react"
++
++export function CircularProgress(props: any) {
++  const [state, send] = useMachine(progress.machine({ id: useId() }), {
++    context: props.controls,
++  })
++
++  const api = progress.connect(state, send, normalizeProps)
++
++  return (
++    <div>
++      <div className="centre" {...api.rootProps}>
++        <div {...api.labelProps}>Upload progress</div>
++        <svg {...(api.circleProps as any)}>
++          <circle {...(api.circleTrackProps as any)} />
++          <circle {...(api.circleRangeProps as any)} />
++        </svg>
++        <div {...api.valueTextProps}>{api.valueAsString}</div>
++      </div>
++
++      <div>
++        <button onClick={() => api.setValue((api.value ?? 0) - 20)}>
++          Decrease
++        </button>
++
++        <button onClick={() => api.setValue((api.value ?? 0) + 20)}>
++          Increase
++        </button>
++
++        <button onClick={() => api.setValue(null)}>Indeterminate</button>
++      </div>
++    </div>
++  )
++}
+diff --git a/website/components/machines/progress-linear.tsx b/website/components/machines/progress-linear.tsx
+new file mode 100644
+index 0000000000..d809bf18a6
+--- /dev/null
++++ b/website/components/machines/progress-linear.tsx
+@@ -0,0 +1,35 @@
++import * as progress from "@zag-js/progress"
++import { normalizeProps, useMachine } from "@zag-js/react"
++import { useId } from "react"
++
++export function LinearProgress(props: any) {
++  const [state, send] = useMachine(progress.machine({ id: useId() }), {
++    context: props.controls,
++  })
++
++  const api = progress.connect(state, send, normalizeProps)
++
++  return (
++    <div>
++      <div {...api.rootProps}>
++        <div {...api.labelProps}>Upload progress</div>
++        <div {...api.trackProps}>
++          <div {...api.rangeProps} />
++        </div>
++        <div {...api.valueTextProps}>{api.valueAsString}</div>
++      </div>
++
++      <div>
++        <button onClick={() => api.setValue((api.value ?? 0) - 20)}>
++          Decrease
++        </button>
++
++        <button onClick={() => api.setValue((api.value ?? 0) + 20)}>
++          Increase
++        </button>
++
++        <button onClick={() => api.setValue(null)}>Indeterminate</button>
++      </div>
++    </div>
++  )
++}
+diff --git a/website/components/machines/radio.tsx b/website/components/machines/radio.tsx
+index d5f81d2a0f..29977f06eb 100644
+--- a/website/components/machines/radio.tsx
++++ b/website/components/machines/radio.tsx
+@@ -1,5 +1,3 @@
+-import { Stack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as radio from "@zag-js/radio-group"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -28,70 +26,34 @@ export function Radio(props: RadioProps) {
+   const api = radio.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Stack gap="3" {...api.rootProps}>
+-      <h2 {...api.labelProps}>Fruits</h2>
+-      <Stack gap="2">
+-        {items.map((opt) => (
+-          <chakra.label
+-            display="flex"
+-            gap="2"
+-            userSelect="none"
+-            cursor="pointer"
+-            fontSize="16"
+-            _disabled={{
+-              cursor: "not-allowed",
+-              opacity: 0.4,
+-            }}
+-            key={opt.id}
+-            {...api.getItemProps({ value: opt.id })}
+-          >
+-            <chakra.span order="2" {...api.getItemTextProps({ value: opt.id })}>
+-              {opt.label}
+-            </chakra.span>
+-            <input
+-              data-peer
+-              {...api.getItemHiddenInputProps({ value: opt.id })}
+-            />
+-            <chakra.div
+-              order="1"
+-              data-testid={`control-${opt.id}`}
+-              boxSize="25px"
+-              rounded="full"
+-              border="solid 2px"
+-              borderColor="gray.400"
+-              color="white"
+-              p="px"
+-              _hover={{
+-                bg: "bg-subtle",
+-              }}
+-              _disabled={{
+-                bg: "gray.400",
+-                borderColor: "gray.400",
+-              }}
+-              _peerFocusVisible={{
+-                outline: "2px solid royalblue",
+-              }}
+-              sx={{
+-                "&[data-state=checked]:not([data-disabled])": {
+-                  bg: "blue.500",
+-                  borderColor: "blue.500",
+-                },
+-              }}
+-              {...api.getItemControlProps({ value: opt.id })}
+-            >
+-              {api.value === opt.id && (
+-                <chakra.svg
+-                  viewBox="0 0 24 24"
+-                  fill="currentcolor"
+-                  transform="scale(0.7)"
+-                >
+-                  <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" />
+-                </chakra.svg>
+-              )}
+-            </chakra.div>
+-          </chakra.label>
+-        ))}
+-      </Stack>
+-    </Stack>
++    <div className="radio">
++      <div {...api.rootProps}>
++        <h2 {...api.labelProps}>Fruits</h2>
++        <div>
++          {items.map((opt) => (
++            <label key={opt.id} {...api.getItemProps({ value: opt.id })}>
++              <span {...api.getItemTextProps({ value: opt.id })}>
++                {opt.label}
++              </span>
++              <input
++                data-peer=""
++                {...api.getItemHiddenInputProps({ value: opt.id })}
++              />
++              <div {...api.getItemControlProps({ value: opt.id })}>
++                {api.value === opt.id && (
++                  <svg
++                    viewBox="0 0 24 24"
++                    fill="currentcolor"
++                    transform="scale(0.7)"
++                  >
++                    <path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z" />
++                  </svg>
++                )}
++              </div>
++            </label>
++          ))}
++        </div>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/range-slider.tsx b/website/components/machines/range-slider.tsx
+index 756c928316..0fd681e960 100644
+--- a/website/components/machines/range-slider.tsx
++++ b/website/components/machines/range-slider.tsx
+@@ -1,7 +1,5 @@
+ import * as slider from "@zag-js/slider"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+-import { Center, Flex } from "@chakra-ui/layout"
+ import { useId } from "react"
+ 
+ export function RangeSlider(props: any) {
+@@ -17,53 +15,24 @@ export function RangeSlider(props: any) {
+   const api = slider.connect(state, send, normalizeProps)
+ 
+   return (
+-    <chakra.div width="200px" {...api.rootProps}>
+-      <Flex justify="space-between">
+-        <chakra.label mr="2" {...api.labelProps}>
+-          Quantity
+-        </chakra.label>
++    <div {...api.rootProps}>
++      <div>
++        <label {...api.labelProps}>Quantity</label>
+         <output {...api.valueTextProps}>
+           <b>{api.value.join(" - ")}</b>
+         </output>
+-      </Flex>
++      </div>
+ 
+-      <Flex
+-        mt="5"
+-        align="center"
+-        position="relative"
+-        py="2.5"
+-        {...api.controlProps}
+-      >
+-        <chakra.div
+-          height="4px"
+-          rounded="full"
+-          flex="1"
+-          bg="bg-bold"
+-          {...api.trackProps}
+-        >
+-          <chakra.div
+-            height="100%"
+-            bg="green.500"
+-            rounded="inherit"
+-            _disabled={{ bg: "green.200" }}
+-            {...api.rangeProps}
+-          />
+-        </chakra.div>
++      <div {...api.controlProps}>
++        <div {...api.trackProps}>
++          <div {...api.rangeProps} />
++        </div>
+         {api.value.map((_, index) => (
+-          <Center
+-            className="focus-outline"
+-            boxSize="20px"
+-            rounded="full"
+-            bg="white"
+-            shadow="base"
+-            _disabled={{ bg: "gray.200" }}
+-            key={index}
+-            {...api.getThumbProps({ index })}
+-          >
++          <div key={index} {...api.getThumbProps({ index })}>
+             <input {...api.getHiddenInputProps({ index })} />
+-          </Center>
++          </div>
+         ))}
+-      </Flex>
+-    </chakra.div>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/rating.tsx b/website/components/machines/rating.tsx
+index dbf185c304..22fc68b175 100644
+--- a/website/components/machines/rating.tsx
++++ b/website/components/machines/rating.tsx
+@@ -1,5 +1,3 @@
+-import { Stack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as rating from "@zag-js/rating-group"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -59,47 +57,20 @@ export function Rating(props: RadioProps) {
+ 
+   return (
+     <div>
+-      <Stack
+-        {...api.rootProps}
+-        _rtl={{
+-          '& [data-half] [data-part="star"]': {
+-            transform: "scale(-1, 1)",
+-          },
+-        }}
+-      >
++      <div {...api.rootProps}>
+         <label {...api.labelProps}>Rate Us:</label>
+-        <chakra.div {...api.controlProps} display="inline-flex">
++        <div {...api.controlProps}>
+           {api.items.map((index) => {
+             const state = api.getItemState({ index })
+             return (
+-              <chakra.span
+-                key={index}
+-                {...api.getItemProps({ index })}
+-                boxSize="8"
+-                p="1"
+-                sx={{
+-                  '[data-part="star"]': {
+-                    color: "#bdbdbd",
+-                  },
+-                }}
+-                _highlighted={{
+-                  '[data-part="star"]': {
+-                    color: "#ffb400",
+-                  },
+-                  _disabled: {
+-                    '[data-part="star"]': {
+-                      color: "#a1a1a1",
+-                    },
+-                  },
+-                }}
+-              >
++              <span key={index} {...api.getItemProps({ index })}>
+                 {state.isHalf ? <HalfStar /> : <Star />}
+-              </chakra.span>
++              </span>
+             )
+           })}
+-        </chakra.div>
++        </div>
+         <input {...api.hiddenInputProps} />
+-      </Stack>
++      </div>
+     </div>
+   )
+ }
+diff --git a/website/components/machines/segmented-control.tsx b/website/components/machines/segmented-control.tsx
+index 8c7618a39b..2544afa819 100644
+--- a/website/components/machines/segmented-control.tsx
++++ b/website/components/machines/segmented-control.tsx
+@@ -1,5 +1,3 @@
+-import { Flex } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import * as radio from "@zag-js/radio-group"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -13,7 +11,6 @@ const items = [
+ type SegmentedControlProps = {
+   controls: {
+     disabled: boolean
+-    readonly: boolean
+   }
+ }
+ 
+@@ -28,58 +25,18 @@ export function SegmentedControl(props: SegmentedControlProps) {
+   const api = radio.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Flex
+-      align="center"
+-      pos="relative"
+-      bg="blackAlpha.200"
+-      _dark={{
+-        bg: "blackAlpha.400",
+-      }}
+-      p="1.5"
+-      rounded="md"
+-      {...api.rootProps}
+-    >
+-      <chakra.div
+-        bg="bg-subtle"
+-        zIndex="1"
+-        rounded="md"
+-        shadow="base"
+-        height="var(--height)"
+-        width="var(--width)"
+-        {...api.indicatorProps}
+-      />
+-      {items.map((opt) => (
+-        <chakra.label
+-          display="flex"
+-          gap="2"
+-          userSelect="none"
+-          cursor="pointer"
+-          fontSize="16"
+-          px="3"
+-          py="1"
+-          zIndex="2"
+-          _disabled={{
+-            cursor: "not-allowed",
+-            opacity: 0.4,
+-          }}
+-          _readOnly={{
+-            cursor: "default",
+-          }}
+-          key={opt.value}
+-          {...api.getItemProps({ value: opt.value })}
+-        >
+-          <chakra.span
+-            order="2"
+-            {...api.getItemTextProps({ value: opt.value })}
+-          >
+-            {opt.label}
+-          </chakra.span>
+-          <input
+-            data-peer
+-            {...api.getItemHiddenInputProps({ value: opt.value })}
+-          />
+-        </chakra.label>
+-      ))}
+-    </Flex>
++    <div className="segmented-control">
++      <div {...api.rootProps}>
++        <div {...api.indicatorProps} />
++        {items.map((opt) => (
++          <label key={opt.value} {...api.getItemProps({ value: opt.value })}>
++            <span {...api.getItemTextProps({ value: opt.value })}>
++              {opt.label}
++            </span>
++            <input {...api.getItemHiddenInputProps({ value: opt.value })} />
++          </label>
++        ))}
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/select.tsx b/website/components/machines/select.tsx
+index a2e9f07581..913106c95a 100644
+--- a/website/components/machines/select.tsx
++++ b/website/components/machines/select.tsx
+@@ -1,7 +1,5 @@
+ import * as select from "@zag-js/select"
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ import { MdCheck } from "react-icons/md"
+ 
+@@ -47,66 +45,26 @@ export function Select(props: SelectProps) {
+   const api = select.connect(state, send, normalizeProps)
+ 
+   return (
+-    <div>
+-      <chakra.div display="flex" flexDir="column" gap="1">
+-        <chakra.label
+-          fontSize="lg"
+-          _disabled={{
+-            opacity: 0.6,
+-          }}
+-          {...api.labelProps}
+-        >
+-          Label
+-        </chakra.label>
+-        <Button
+-          minW="200px"
+-          size="sm"
+-          className="focus-outline"
+-          bg="bg-subtle"
+-          _disabled={{
+-            opacity: 0.6,
+-          }}
+-          {...api.triggerProps}
+-        >
+-          <chakra.span p="1" flex="1">
+-            {api.valueAsString || "Select option"}
+-          </chakra.span>
++    <div {...api.rootProps}>
++      <label {...api.labelProps}>Label</label>
++      <div {...api.controlProps}>
++        <button {...api.triggerProps}>
++          <span>{api.valueAsString || "Select option"}</span>
+           <CaretIcon />
+-        </Button>
+-      </chakra.div>
++        </button>
++      </div>
+       <Portal>
+         <div {...api.positionerProps}>
+-          <chakra.ul
+-            bg="bg-subtle"
+-            width="240px"
+-            maxHeight="min(var(--available-height), 400px)"
+-            padding="2"
+-            isolation="isolate"
+-            listStyleType="none"
+-            shadow="base"
+-            className="focus-outline"
+-            {...api.contentProps}
+-          >
++          <ul {...api.contentProps}>
+             {data.map((item) => (
+-              <chakra.li
+-                px="2"
+-                py="1"
+-                display="flex"
+-                alignItems="center"
+-                cursor="pointer"
+-                _highlighted={{ bg: "bg-primary-subtle", color: "white" }}
+-                key={item.value}
+-                {...api.getItemProps({ item })}
+-              >
+-                <chakra.span flex={1} {...api.getItemTextProps({ item })}>
+-                  {item.label}
+-                </chakra.span>
++              <li key={item.value} {...api.getItemProps({ item })}>
++                <span {...api.getItemTextProps({ item })}>{item.label}</span>
+                 <span {...api.getItemIndicatorProps({ item })}>
+                   <MdCheck />
+                 </span>
+-              </chakra.li>
++              </li>
+             ))}
+-          </chakra.ul>
++          </ul>
+         </div>
+       </Portal>
+     </div>
+diff --git a/website/components/machines/slider.tsx b/website/components/machines/slider.tsx
+index a68148beea..c432f04a82 100644
+--- a/website/components/machines/slider.tsx
++++ b/website/components/machines/slider.tsx
+@@ -1,7 +1,5 @@
+ import * as slider from "@zag-js/slider"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+-import { Center, Flex } from "@chakra-ui/layout"
+ import { useId } from "react"
+ 
+ export function Slider(props: any) {
+@@ -13,53 +11,24 @@ export function Slider(props: any) {
+   const api = slider.connect(state, send, normalizeProps)
+ 
+   return (
+-    <chakra.div width="240px" {...api.rootProps}>
+-      <Flex justify="space-between">
+-        <chakra.label mr="2" {...api.labelProps}>
+-          Quantity
+-        </chakra.label>
++    <div {...api.rootProps}>
++      <div>
++        <label {...api.labelProps}>Quantity</label>
+         <output {...api.valueTextProps}>
+           <b>{api.value.at(0)}</b>
+         </output>
+-      </Flex>
++      </div>
+ 
+-      <Flex
+-        mt="5"
+-        align="center"
+-        position="relative"
+-        py="2.5"
+-        {...api.controlProps}
+-      >
+-        <chakra.div
+-          height="4px"
+-          rounded="full"
+-          flex="1"
+-          bg="bg-bold"
+-          {...api.trackProps}
+-        >
+-          <chakra.div
+-            height="100%"
+-            bg="green.500"
+-            rounded="inherit"
+-            _disabled={{ bg: "green.200" }}
+-            {...api.rangeProps}
+-          />
+-        </chakra.div>
++      <div {...api.controlProps}>
++        <div {...api.trackProps}>
++          <div {...api.rangeProps} />
++        </div>
+         {api.value.map((_, index) => (
+-          <Center
+-            className="focus-outline"
+-            boxSize="20px"
+-            rounded="full"
+-            bg="white"
+-            shadow="base"
+-            _disabled={{ bg: "gray.200" }}
+-            key={index}
+-            {...api.getThumbProps({ index })}
+-          >
++          <div key={index} {...api.getThumbProps({ index })}>
+             <input {...api.getHiddenInputProps({ index })} />
+-          </Center>
++          </div>
+         ))}
+-      </Flex>
+-    </chakra.div>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/splitter.tsx b/website/components/machines/splitter.tsx
+index aa302311c5..057cc3f46c 100644
+--- a/website/components/machines/splitter.tsx
++++ b/website/components/machines/splitter.tsx
+@@ -1,4 +1,3 @@
+-import { Flex } from "@chakra-ui/layout"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import * as splitter from "@zag-js/splitter"
+ import { useId } from "react"
+@@ -16,42 +15,17 @@ export function Splitter(props: any) {
+     { context },
+   )
+ 
+-  const isHorizontal = context.orientation === "horizontal"
+-
+   const api = splitter.connect(state, send, normalizeProps)
+ 
+   return (
+-    <Flex align="center" justify="center" padding={10} {...api.rootProps}>
+-      <Flex
+-        bg="bg-subtle"
+-        borderWidth="1px"
+-        align="center"
+-        justify="center"
+-        h="full"
+-        w={isHorizontal ? "auto" : "full"}
+-        {...api.getPanelProps({ id: "a" })}
+-      >
++    <div {...api.rootProps}>
++      <div {...api.getPanelProps({ id: "a" })}>
+         <p>A</p>
+-      </Flex>
+-      <Flex
+-        bg="gray.300"
+-        rounded={4}
+-        m={2}
+-        w={isHorizontal ? 2 : 64}
+-        h={isHorizontal ? 24 : 2}
+-        {...api.getResizeTriggerProps({ id: "a:b" })}
+-      />
+-      <Flex
+-        bg="bg-subtle"
+-        borderWidth="1px"
+-        align="center"
+-        justify="center"
+-        h="full"
+-        w={isHorizontal ? "auto" : "full"}
+-        {...api.getPanelProps({ id: "b" })}
+-      >
++      </div>
++      <div {...api.getResizeTriggerProps({ id: "a:b" })} />
++      <div {...api.getPanelProps({ id: "b" })}>
+         <p>B</p>
+-      </Flex>
+-    </Flex>
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/switch.tsx b/website/components/machines/switch.tsx
+index c84f413ac0..2378187177 100644
+--- a/website/components/machines/switch.tsx
++++ b/website/components/machines/switch.tsx
+@@ -1,4 +1,3 @@
+-import { chakra } from "@chakra-ui/system"
+ import * as zagSwitch from "@zag-js/switch"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import { useId } from "react"
+@@ -18,89 +17,13 @@ export function Switch(props: SwitchProps) {
+ 
+   return (
+     <div>
+-      <chakra.label
+-        {...api.rootProps}
+-        display="flex"
+-        alignItems="center"
+-        position="relative"
+-        lineHeight={0}
+-        width="fit-content"
+-        sx={{
+-          "--switch-track-diff":
+-            "calc(var(--switch-track-width) - var(--switch-track-height))",
+-          "--switch-thumb-x": "var(--switch-track-diff)",
+-          "--switch-track-width": "2.7rem",
+-          "--switch-track-height": "1.5rem",
+-        }}
+-      >
++      <label {...api.rootProps}>
+         <input {...api.hiddenInputProps} />
+-        <chakra.span
+-          {...api.controlProps}
+-          display="inline-flex"
+-          flexShrink="0"
+-          justifyContent="flex-start"
+-          boxSizing="content-box"
+-          cursor="pointer"
+-          borderRadius="9999px"
+-          padding="0.125rem"
+-          width="var(--switch-track-width)"
+-          height="var(--switch-track-height)"
+-          transitionProperty="background-color, border-color, color, fill, stroke, opacity, box-shadow, transform"
+-          transitionDuration="150ms"
+-          background="var(--switch-bg)"
+-          sx={{
+-            "--switch-bg": "#cbd5e0",
+-            WebkitBoxPack: "start",
+-            "&[data-state=checked]": {
+-              "--switch-bg": "#2AB26B",
+-            },
+-            _focus: {
+-              boxShadow: "0 0 0 2px rgba(66, 153, 225, 0.6)",
+-            },
+-            _disabled: {
+-              opacity: "0.4",
+-              cursor: "not-allowed",
+-            },
+-          }}
+-        >
+-          <chakra.span
+-            {...api.thumbProps}
+-            background="white"
+-            transitionProperty="transform"
+-            transitionDuration="200ms"
+-            borderRadius="inherit"
+-            width="var(--switch-track-height)"
+-            height="var(--switch-track-height)"
+-            position="relative"
+-            _before={{
+-              transition: "background-color 0.2s ease-in-out",
+-              position: "absolute",
+-              "--thumb-size": "calc(var(--switch-track-height) + 0.7rem)",
+-              height: "var(--thumb-size)",
+-              width: "var(--thumb-size)",
+-              backgroundColor: "transparent",
+-              content: '""',
+-              zIndex: 1,
+-              top: "50%",
+-              left: "50%",
+-              transform: "translate(-50%, -50%)",
+-              borderRadius: "inherit",
+-            }}
+-            sx={{
+-              "&[data-state=checked]": {
+-                transform: "translateX(var(--switch-thumb-x))",
+-              },
+-            }}
+-          />
+-        </chakra.span>
+-        <chakra.span
+-          {...api.labelProps}
+-          userSelect="none"
+-          marginInlineStart="0.5rem"
+-        >
+-          {api.isChecked ? "On" : "Off"}
+-        </chakra.span>
+-      </chakra.label>
++        <span {...api.controlProps}>
++          <span {...api.thumbProps} />
++        </span>
++        <span {...api.labelProps}>{api.isChecked ? "On" : "Off"}</span>
++      </label>
+     </div>
+   )
+ }
+diff --git a/website/components/machines/tabs.tsx b/website/components/machines/tabs.tsx
+index 19232a2dd6..ac85570848 100644
+--- a/website/components/machines/tabs.tsx
++++ b/website/components/machines/tabs.tsx
+@@ -1,6 +1,5 @@
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import * as tabs from "@zag-js/tabs"
+-import { chakra } from "@chakra-ui/system"
+ import { useId } from "react"
+ 
+ const data = [
+@@ -20,36 +19,22 @@ export function Tabs(props: any) {
+   const api = tabs.connect(state, send, normalizeProps)
+ 
+   return (
+-    <chakra.div width="full" maxW="400px" borderWidth="1px" fontSize="sm">
+-      <chakra.div bg="bg-subtle" borderBottomWidth="1px" {...api.tablistProps}>
++    <div>
++      <div {...api.listProps}>
+         {data.map((item) => (
+-          <chakra.button
+-            py="2"
+-            px="4"
+-            borderBottomWidth="2px"
+-            borderBottomColor="transparent"
+-            _selected={{
+-              color: "text-primary-bold",
+-              borderBottomColor: "border-primary-subtle",
+-            }}
++          <button
+             {...api.getTriggerProps({ value: item.value })}
+             key={item.value}
+           >
+             {item.label}
+-          </chakra.button>
++          </button>
+         ))}
+-      </chakra.div>
++      </div>
+       {data.map((item) => (
+-        <chakra.div
+-          padding="4"
+-          bg="bg-subtle"
+-          minHeight="20"
+-          {...api.getContentProps({ value: item.value })}
+-          key={item.value}
+-        >
++        <div {...api.getContentProps({ value: item.value })} key={item.value}>
+           <p>{item.content}</p>
+-        </chakra.div>
++        </div>
+       ))}
+-    </chakra.div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/tags-input.tsx b/website/components/machines/tags-input.tsx
+index 515f53d88e..e78a113bda 100644
+--- a/website/components/machines/tags-input.tsx
++++ b/website/components/machines/tags-input.tsx
+@@ -1,6 +1,5 @@
+ import * as tagsInput from "@zag-js/tags-input"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+-import { chakra } from "@chakra-ui/system"
+ import { useId } from "react"
+ 
+ export function TagsInput(props: any) {
+@@ -15,55 +14,25 @@ export function TagsInput(props: any) {
+   const api = tagsInput.connect(state, send, normalizeProps)
+ 
+   return (
+-    <chakra.div width="400px">
+-      <chakra.div {...api.rootProps}>
+-        <label {...api.labelProps}>Enter frameworks:</label>
+-        <chakra.div
+-          className="focus-outline"
+-          bg="bg-subtle"
+-          borderWidth="1px"
+-          mt="2"
+-          py="2px"
+-          px="1"
+-          {...api.controlProps}
+-        >
+-          {api.value.map((value, index) => {
+-            const opt = { index, value }
+-            return (
+-              <span key={index} {...api.getItemProps(opt)}>
+-                <chakra.div
+-                  bg="bg-bold"
+-                  px="2"
+-                  display="inline-block"
+-                  margin="4px"
+-                  _highlighted={{ bg: "bg-primary-bold", color: "white" }}
+-                  _disabled={{ opacity: 0.6 }}
+-                  {...api.getItemPreviewProps(opt)}
+-                >
+-                  <span>{value}</span>
+-                  <chakra.button ml="1" {...api.getItemDeleteTriggerProps(opt)}>
+-                    &#x2715;
+-                  </chakra.button>
+-                </chakra.div>
+-                <chakra.input
+-                  px="2"
+-                  width="10"
+-                  outline="0"
+-                  {...api.getItemInputProps(opt)}
+-                />
+-              </span>
+-            )
+-          })}
+-          <chakra.input
+-            margin="4px"
+-            px="2"
+-            placeholder="Add tag..."
+-            _focus={{ outline: "0" }}
+-            bg="bg-subtle"
+-            {...api.inputProps}
+-          />
+-        </chakra.div>
+-      </chakra.div>
+-    </chakra.div>
++    <div {...api.rootProps}>
++      <label {...api.labelProps}>Enter frameworks:</label>
++      <div {...api.controlProps}>
++        {api.value.map((value, index) => {
++          const opt = { index, value }
++          return (
++            <span key={index} {...api.getItemProps(opt)}>
++              <div {...api.getItemPreviewProps(opt)}>
++                <span>{value}</span>
++                <button {...api.getItemDeleteTriggerProps(opt)}>
++                  &#x2715;
++                </button>
++              </div>
++              <input {...api.getItemInputProps(opt)} />
++            </span>
++          )
++        })}
++        <input placeholder="Add tag..." {...api.inputProps} />
++      </div>
++    </div>
+   )
+ }
+diff --git a/website/components/machines/toast.tsx b/website/components/machines/toast.tsx
+index ef10864d70..8cb2a71e55 100644
+--- a/website/components/machines/toast.tsx
++++ b/website/components/machines/toast.tsx
+@@ -1,52 +1,21 @@
+ import { normalizeProps, useActor, useMachine } from "@zag-js/react"
+ import * as toast from "@zag-js/toast"
+ import { useId, useRef } from "react"
+-import { chakra } from "@chakra-ui/system"
+ import { HiX } from "react-icons/hi"
+-import { Button } from "components/button"
+ 
+ function Toast({ actor }: { actor: toast.Service }) {
+   const [state, send] = useActor(actor)
+   const api = toast.connect(state, send, normalizeProps)
+-  const changed = api.type === "info"
+   return (
+-    <chakra.div
+-      sx={{
+-        width: "400px",
+-        position: "relative",
+-        bg: changed ? "gray.600" : "green.500",
+-        color: "white",
+-        rounded: "sm",
+-        padding: "6",
+-        shadow: "rgba(0, 0, 0, 0.12) 0px 5px 10px 0px",
+-        animationFillMode: "forwards",
+-        "&[data-state=open]": {
+-          animationName: "toast-in",
+-          animationDuration: "0.35s",
+-          animationTimingFunction: "cubic-bezier(.21,1.02,.73,1)",
+-        },
+-        "&[data-state=closed]": {
+-          animationName: "toast-out",
+-          animationDuration: "0.4s",
+-          animationTimingFunction: "cubic-bezier(.06,.71,.55,1)",
+-        },
+-      }}
+-      {...api.rootProps}
+-    >
++    <div {...api.rootProps}>
+       <p {...api.titleProps}>
+         [{api.type}] {api.title}
+       </p>
+ 
+-      <chakra.button
+-        display="flex"
+-        position="absolute"
+-        top="3"
+-        right="3"
+-        onClick={api.dismiss}
+-      >
++      <button {...api.closeTriggerProps}>
+         <HiX />
+-      </chakra.button>
+-    </chakra.div>
++      </button>
++    </div>
+   )
+ }
+ 
+@@ -64,11 +33,14 @@ export function ToastGroup(props: any) {
+ 
+   return (
+     <>
+-      <div style={{ display: "flex", gap: "16px" }}>
+-        <Button
+-          size="sm"
+-          variant="outline"
+-          bg="bg-subtle"
++      <div {...api.getGroupProps({ placement: "bottom-end" })}>
++        {api.toasts.map((actor) => (
++          <Toast key={actor.id} actor={actor} />
++        ))}
++      </div>
++
++      <div>
++        <button
+           onClick={() => {
+             id.current = api.create({
+               title: "The Evil Rabbit jumped over the fence.",
+@@ -78,12 +50,9 @@ export function ToastGroup(props: any) {
+           }}
+         >
+           Show toast
+-        </Button>
++        </button>
+ 
+-        <Button
+-          size="sm"
+-          variant="outline"
+-          bg="bg-subtle"
++        <button
+           onClick={() => {
+             if (!id.current) return
+             api.update(id.current, {
+@@ -93,16 +62,8 @@ export function ToastGroup(props: any) {
+           }}
+         >
+           Update
+-        </Button>
++        </button>
+       </div>
+-      <chakra.div
+-        maxWidth="420px"
+-        {...api.getGroupProps({ placement: "bottom-end" })}
+-      >
+-        {api.toasts.map((actor) => (
+-          <Toast key={actor.id} actor={actor} />
+-        ))}
+-      </chakra.div>
+     </>
+   )
+ }
+diff --git a/website/components/machines/toggle-group.tsx b/website/components/machines/toggle-group.tsx
+index e14db461e7..5846d9c4dc 100644
+--- a/website/components/machines/toggle-group.tsx
++++ b/website/components/machines/toggle-group.tsx
+@@ -1,5 +1,3 @@
+-import { HStack } from "@chakra-ui/layout"
+-import { chakra } from "@chakra-ui/system"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ import * as toggle from "@zag-js/toggle-group"
+ import { useId } from "react"
+@@ -12,27 +10,6 @@ type Props = {
+   }
+ }
+ 
+-const Button = chakra("button", {
+-  baseStyle: {
+-    width: "10",
+-    height: "10",
+-    display: "flex",
+-    alignItems: "center",
+-    justifyContent: "center",
+-    bg: "bg-subtle",
+-    borderWidth: "1px",
+-    fontSize: "xl",
+-    "&[data-state=on]": {
+-      bg: "bg-primary-bold",
+-      color: "text-inverse",
+-    },
+-    "&[data-disabled]": {
+-      opacity: 0.5,
+-      cursor: "not-allowed",
+-    },
+-  },
+-})
+-
+ export function ToggleGroup(props: Props) {
+   const [state, send] = useMachine(toggle.machine({ id: useId() }), {
+     context: props.controls,
+@@ -42,17 +19,17 @@ export function ToggleGroup(props: Props) {
+ 
+   return (
+     <div>
+-      <HStack spacing="0" mt="10" {...api.rootProps}>
+-        <Button {...api.getItemProps({ value: "bold" })}>
++      <div {...api.rootProps}>
++        <button {...api.getItemProps({ value: "bold" })}>
+           <RxFontBold />
+-        </Button>
+-        <Button {...api.getItemProps({ value: "italic" })}>
++        </button>
++        <button {...api.getItemProps({ value: "italic" })}>
+           <RxFontItalic />
+-        </Button>
+-        <Button {...api.getItemProps({ value: "underline" })}>
++        </button>
++        <button {...api.getItemProps({ value: "underline" })}>
+           <RxUnderline />
+-        </Button>
+-      </HStack>
++        </button>
++      </div>
+     </div>
+   )
+ }
+diff --git a/website/components/machines/tooltip.tsx b/website/components/machines/tooltip.tsx
+index ac11ee12c8..e3ed35315e 100644
+--- a/website/components/machines/tooltip.tsx
++++ b/website/components/machines/tooltip.tsx
+@@ -1,7 +1,5 @@
+ import { normalizeProps, useMachine, Portal } from "@zag-js/react"
+ import * as tooltip from "@zag-js/tooltip"
+-import { chakra } from "@chakra-ui/system"
+-import { Button } from "components/button"
+ import { useId } from "react"
+ 
+ type TooltipProps = {
+@@ -16,22 +14,16 @@ export function Tooltip(props: TooltipProps) {
+ 
+   return (
+     <>
+-      <Button variant="green" size="sm" {...api.triggerProps}>
+-        Hover me
+-      </Button>
++      <button {...api.triggerProps}>Hover me</button>
+       <Portal>
+         {api.isOpen && (
+           <div {...api.positionerProps}>
+-            <chakra.div
+-              px="2"
+-              py="1"
+-              fontSize="sm"
+-              bg="gray.700"
+-              color="white"
+-              {...api.contentProps}
+-            >
++            <div {...api.contentProps}>
++              <div {...api.arrowProps}>
++                <div {...api.arrowTipProps} />
++              </div>
+               Tooltip
+-            </chakra.div>
++            </div>
+           </div>
+         )}
+       </Portal>
+diff --git a/website/components/mdx-components.tsx b/website/components/mdx-components.tsx
+index ca4c2fefc7..8286e8fe48 100644
+--- a/website/components/mdx-components.tsx
++++ b/website/components/mdx-components.tsx
+@@ -160,7 +160,7 @@ const components: Record<string, FC<any>> = {
+         rounded="6px"
+         {...api.rootProps}
+       >
+-        <Box {...api.tablistProps}>
++        <Box {...api.listProps}>
+           {FRAMEWORKS.map((framework) => (
+             <chakra.button
+               py="2"
+diff --git a/website/components/mutli-framework.tsx b/website/components/mutli-framework.tsx
+index 3e9aeedb29..5f727645f4 100644
+--- a/website/components/mutli-framework.tsx
++++ b/website/components/mutli-framework.tsx
+@@ -32,7 +32,7 @@ export function MultiframeworkTabs() {
+   const api = tabs.connect(state, send, normalizeProps)
+   return (
+     <Box {...api.rootProps}>
+-      <HStack {...api.tablistProps}>
++      <HStack {...api.listProps}>
+         <FrameworkButton {...api.getTriggerProps({ value: "react" })}>
+           <VStack>
+             <ReactIcon />
+diff --git a/website/components/playground.tsx b/website/components/playground.tsx
+index feec15683c..547e49fcca 100644
+--- a/website/components/playground.tsx
++++ b/website/components/playground.tsx
+@@ -20,7 +20,10 @@ type PlaygroundProps = {
+   defaultContext?: Record<string, any>
+   defaultProps?: Record<
+     string,
+-    string | number | boolean | { options: string[]; default: string }
++    | string
++    | number
++    | boolean
++    | { options: string[]; default: string; required?: boolean }
+   >
+   hideControls?: boolean
+   debug?: boolean
+@@ -165,7 +168,7 @@ export function Playground(props: PlaygroundProps) {
+                     setState((s) => ({ ...s, [key]: e.target.value }))
+                   }}
+                 >
+-                  <option>-----</option>
++                  {!type.required && <option>-----</option>}
+                   {type.options.map((option) => (
+                     <option key={option} value={option}>
+                       {option}
+diff --git a/website/components/showcase.tsx b/website/components/showcase.tsx
+index b8b5757f38..ea96484462 100644
+--- a/website/components/showcase.tsx
++++ b/website/components/showcase.tsx
+@@ -2,7 +2,7 @@ import { Accordion } from "./machines/accordion"
+ import { Avatar } from "./machines/avatar"
+ import { Carousel } from "./machines/carousel"
+ import { Checkbox } from "./machines/checkbox"
+-import { CircularProgress } from "./machines/circular-progress"
++import { CircularProgress } from "./machines/progress-circular"
+ import { Clipboard } from "./machines/clipboard"
+ import { Collapsible } from "./machines/collapsible"
+ import { ColorPicker } from "./machines/color-picker"
+@@ -12,7 +12,7 @@ import { Dialog } from "./machines/dialog"
+ import { Editable } from "./machines/editable"
+ import { FileUpload } from "./machines/file-upload"
+ import { HoverCard } from "./machines/hover-card"
+-import { LinearProgress } from "./machines/linear-progress"
++import { LinearProgress } from "./machines/progress-linear"
+ import { Menu } from "./machines/menu"
+ import { NestedMenu } from "./machines/nested-menu"
+ import { NumberInput } from "./machines/number-input"
+@@ -72,6 +72,7 @@ const components = {
+       component={Checkbox}
+       defaultProps={{
+         disabled: false,
++        indeterminate: false,
+       }}
+     />
+   ),
+@@ -91,6 +92,11 @@ const components = {
+         disabled: false,
+         readOnly: false,
+         closeOnSelect: false,
++        format: {
++          default: "rgba",
++          options: ["rgba", "hsla", "hsba"],
++          required: true,
++        },
+       }}
+     />
+   ),
+diff --git a/website/data/components/file-upload.mdx b/website/data/components/file-upload.mdx
+index 230e5dfd66..da9a760b0e 100644
+--- a/website/data/components/file-upload.mdx
++++ b/website/data/components/file-upload.mdx
+@@ -192,10 +192,14 @@ added to them to select and style them in the DOM.
+ ### Dragging State
+ 
+ When the user drags a file over the file upload, the `data-dragging` attribute
+-is added to the root element.
++is added to the `root` and `dropzone` parts.
+ 
+ ```css
+-[data-part="dropzone"] [data-dragging] {
++[data-part="root"][data-dragging] {
++  /* styles for when the user is dragging a file over the file upload */
++}
++
++[data-part="dropzone"][data-dragging] {
+   /* styles for when the user is dragging a file over the file upload */
+ }
+ ```
+@@ -203,23 +207,23 @@ is added to the root element.
+ ### Disabled State
+ 
+ When the file upload is disabled, the `data-disabled` attribute is added to the
+-root element.
++component parts.
+ 
+ ```css
+-[data-part="root"] [data-disabled] {
++[data-part="root"][data-disabled] {
+   /* styles for when the file upload is disabled */
+ }
+ 
+-[data-part="dropzone"] [data-disabled] {
++[data-part="dropzone"][data-disabled] {
+   /* styles for when the file upload is disabled */
+ }
+ 
+-[data-part="trigger"] [data-disabled] {
+-  /* styles for when the file upload trigger is disabled */
++[data-part="trigger"][data-disabled] {
++  /* styles for when the file upload is disabled */
+ }
+ 
+-[data-part="label"] [data-disabled] {
+-  /* styles for when the file upload label is disabled */
++[data-part="label"][data-disabled] {
++  /* styles for when the file upload is disabled */
+ }
+ ```
+ 
+diff --git a/website/data/components/tabs.mdx b/website/data/components/tabs.mdx
+index 269bc3ce05..f8122ced05 100644
+--- a/website/data/components/tabs.mdx
++++ b/website/data/components/tabs.mdx
+@@ -204,7 +204,7 @@ style it.
+ }
+ ```
+ 
+-When any tab is focused, the tablist is given a `data-focus` attribute.
++When any tab is focused, the list is given a `data-focus` attribute.
+ 
+ ```css
+ [data-part="list"][data-focus] {
+@@ -231,7 +231,7 @@ use this to set the style for the horizontal or vertical tabs.
+ }
+ 
+ [data-part="list"][data-orientation="(horizontal|vertical)"] {
+-  /* Styles for horizontal/vertical tablist */
++  /* Styles for horizontal/vertical list */
+ }
+ ```
+ 
+diff --git a/website/data/snippets/react/tabs/usage.mdx b/website/data/snippets/react/tabs/usage.mdx
+index 45c16aa5a1..12b21849ff 100644
+--- a/website/data/snippets/react/tabs/usage.mdx
++++ b/website/data/snippets/react/tabs/usage.mdx
+@@ -15,7 +15,7 @@ export function Tabs() {
+ 
+   return (
+     <div {...api.rootProps}>
+-      <div {...api.tablistProps}>
++      <div {...api.listProps}>
+         {data.map((item) => (
+           <button
+             {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/react/tabs/with-indicator.mdx b/website/data/snippets/react/tabs/with-indicator.mdx
+index 8676d0b0de..906523152f 100644
+--- a/website/data/snippets/react/tabs/with-indicator.mdx
++++ b/website/data/snippets/react/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ return (
+   <div {...api.rootProps}>
+-    <div {...api.tablistProps}>
++    <div {...api.listProps}>
+       {data.map((item) => (
+         <button
+           {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/solid/tabs/usage.mdx b/website/data/snippets/solid/tabs/usage.mdx
+index 2eb5facc09..6552ae3c22 100644
+--- a/website/data/snippets/solid/tabs/usage.mdx
++++ b/website/data/snippets/solid/tabs/usage.mdx
+@@ -10,13 +10,15 @@ const data = [
+ ]
+ 
+ export function Tabs() {
+-  const [state, send] = useMachine(tabs.machine({ id: createUniqueId(), value: "item-1" }))
++  const [state, send] = useMachine(
++    tabs.machine({ id: createUniqueId(), value: "item-1" }),
++  )
+ 
+   const api = createMemo(() => tabs.connect(state, send, normalizeProps))
+ 
+   return (
+     <div {...api().rootProps}>
+-      <div {...api().tablistProps}>
++      <div {...api().listProps}>
+         <For each={data}>
+           {(item) => (
+             <button {...api().getTriggerProps({ value: item.value })}>
+diff --git a/website/data/snippets/solid/tabs/with-indicator.mdx b/website/data/snippets/solid/tabs/with-indicator.mdx
+index 69c9be4e9e..28e3a6d6f9 100644
+--- a/website/data/snippets/solid/tabs/with-indicator.mdx
++++ b/website/data/snippets/solid/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ return (
+   <div {...api().rootProps}>
+-    <div {...api().tablistProps}>
++    <div {...api().listProps}>
+       {data.map((item) => (
+         <button
+           {...api().getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/vue-jsx/tabs/usage.mdx b/website/data/snippets/vue-jsx/tabs/usage.mdx
+index a6b804ac98..bdb5c46e6e 100644
+--- a/website/data/snippets/vue-jsx/tabs/usage.mdx
++++ b/website/data/snippets/vue-jsx/tabs/usage.mdx
+@@ -12,8 +12,10 @@ const data = [
+ export default defineComponent({
+   name: "Tabs",
+   setup() {
+-    const [state, send] = useMachine(tabs.machine({ id: "tabs", value: "item-1" }))
+-    
++    const [state, send] = useMachine(
++      tabs.machine({ id: "tabs", value: "item-1" }),
++    )
++
+     const apiRef = computed(() =>
+       tabs.connect(state.value, send, normalizeProps),
+     )
+@@ -22,7 +24,7 @@ export default defineComponent({
+       const api = apiRef.value
+       return (
+         <div {...api.rootProps}>
+-          <div {...api.tablistProps}>
++          <div {...api.listProps}>
+             {data.map((item) => (
+               <button
+                 {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/vue-jsx/tabs/with-indicator.mdx b/website/data/snippets/vue-jsx/tabs/with-indicator.mdx
+index 8676d0b0de..906523152f 100644
+--- a/website/data/snippets/vue-jsx/tabs/with-indicator.mdx
++++ b/website/data/snippets/vue-jsx/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ return (
+   <div {...api.rootProps}>
+-    <div {...api.tablistProps}>
++    <div {...api.listProps}>
+       {data.map((item) => (
+         <button
+           {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/vue-sfc/tabs/usage.mdx b/website/data/snippets/vue-sfc/tabs/usage.mdx
+index ddba98c42a..a27633170d 100644
+--- a/website/data/snippets/vue-sfc/tabs/usage.mdx
++++ b/website/data/snippets/vue-sfc/tabs/usage.mdx
+@@ -16,7 +16,7 @@ const api = computed(() => tabs.connect(state.value, send, normalizeProps));
+ 
+ <template>
+   <div ref="ref" v-bind="api.rootProps">
+-    <div v-bind="api.tablistProps">
++    <div v-bind="api.listProps">
+       <button
+         v-for="item in data"
+         v-bind="api.getTriggerProps({ value: item.value })"
+diff --git a/website/data/snippets/vue-sfc/tabs/with-indicator.mdx b/website/data/snippets/vue-sfc/tabs/with-indicator.mdx
+index 4183817c93..62fa1db9d1 100644
+--- a/website/data/snippets/vue-sfc/tabs/with-indicator.mdx
++++ b/website/data/snippets/vue-sfc/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ 
+ <div ref="ref" v-bind="api.rootProps">
+-  <div v-bind="api.tablistProps">
++  <div v-bind="api.listProps">
+     <button
+       v-for="item in data"
+       v-bind="api.getTriggerProps({ value: item.value })"
+diff --git a/website/pages/_app.tsx b/website/pages/_app.tsx
+index dacaa7f791..88e029ce35 100644
+--- a/website/pages/_app.tsx
++++ b/website/pages/_app.tsx
+@@ -2,6 +2,7 @@ import { ChakraProvider } from "@chakra-ui/provider"
+ import { DefaultSeo } from "next-seo"
+ import siteConfig from "site.config"
+ import "../styles/other.css"
++import "../styles/machines/index.css"
+ import "../styles/prism.css"
+ import theme from "../theme"
+ 
+diff --git a/website/sidebar.config.ts b/website/sidebar.config.ts
+index ddaf8e9981..2eeb6ae222 100644
+--- a/website/sidebar.config.ts
++++ b/website/sidebar.config.ts
+@@ -80,6 +80,7 @@ const sidebar: Record<"docs", SidebarItem[]> = {
+         { type: "doc", label: "Number Input", id: "number-input" },
+         { type: "doc", label: "Pagination", id: "pagination" },
+         { type: "doc", label: "Pin Input", id: "pin-input" },
++        { type: "doc", label: "Popover", id: "popover" },
+         {
+           type: "doc",
+           label: "Progress - Linear",
+@@ -90,7 +91,6 @@ const sidebar: Record<"docs", SidebarItem[]> = {
+           label: "Progress - Circular",
+           id: "circular-progress",
+         },
+-        { type: "doc", label: "Popover", id: "popover" },
+         { type: "doc", label: "Radio Group", id: "radio-group" },
+         { type: "doc", label: "Segmented Control", id: "segmented-control" },
+         { type: "doc", label: "Range Slider", id: "range-slider" },
+diff --git a/website/styles/machines/accordion.css b/website/styles/machines/accordion.css
+new file mode 100644
+index 0000000000..e5028349a7
+--- /dev/null
++++ b/website/styles/machines/accordion.css
+@@ -0,0 +1,34 @@
++[data-scope="accordion"][data-part="root"] {
++  width: 400px;
++}
++
++[data-scope="accordion"][data-part="item"] {
++  border-width: 1px;
++  font-size: 0.875rem;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="accordion"][data-part="item-trigger"] {
++  width: 100%;
++  padding: 0.5rem 0.75rem;
++  text-align: start;
++  cursor: pointer;
++}
++
++[data-scope="accordion"][data-part="item-trigger"] div:nth-child(1) {
++  font-weight: 600;
++}
++
++[data-scope="accordion"][data-part="item-trigger"] div:nth-child(2) {
++  font-size: 0.75rem;
++  color: var(--colors-text-subtle);
++}
++
++[data-scope="accordion"][data-part="item-trigger"]:focus-visible {
++  outline: 2px solid #0070f3;
++}
++
++[data-scope="accordion"][data-part="item-content"] {
++  width: 100%;
++  padding: 0.5rem 0.75rem;
++}
+diff --git a/website/styles/machines/avatar.css b/website/styles/machines/avatar.css
+new file mode 100644
+index 0000000000..04d0dedcf0
+--- /dev/null
++++ b/website/styles/machines/avatar.css
+@@ -0,0 +1,36 @@
++[data-scope="avatar"][data-part="root"] {
++  align-items: center;
++  justify-content: center;
++  width: 80px;
++  height: 80px;
++  border-radius: 9999px;
++}
++
++[data-scope="avatar"][data-part="fallback"] {
++  width: 80px;
++  height: 80px;
++  font-size: 0.875rem;
++  line-height: 1;
++  font-weight: 600;
++  color: #ffffff;
++  background: #718096;
++}
++
++[data-scope="avatar"][data-part="fallback"] > div {
++  align-items: center;
++  justify-content: center;
++  width: 100%;
++  height: 100%;
++  border-radius: 9999px;
++}
++
++[data-scope="avatar"][data-part="image"] {
++  width: 80px;
++  height: 80px;
++  object-fit: cover;
++  border-radius: 9999px;
++}
++
++[hidden] {
++  display: none !important;
++}
+diff --git a/website/styles/machines/carousel.css b/website/styles/machines/carousel.css
+new file mode 100644
+index 0000000000..d181baeb60
+--- /dev/null
++++ b/website/styles/machines/carousel.css
+@@ -0,0 +1,54 @@
++[data-scope="carousel"][data-part="root"] {
++  width: 400px;
++  border-width: 2px;
++  border-color: var(--colors-border-subtle);
++}
++
++[data-scope="carousel"][data-part="viewport"] {
++  overflow-x: hidden;
++  position: relative;
++}
++
++[data-scope="carousel"][data-part="item"] > img {
++  height: 250px;
++  width: 100%;
++  object-fit: cover;
++}
++
++[data-scope="carousel"][data-part="control"] {
++  border-width: 1px;
++  border-color: var(--colors-border-subtle);
++  background: var(--colors-bg-subtle);
++  padding: 0.5rem;
++  gap: 0.5rem;
++  display: flex;
++  align-items: center;
++  position: absolute;
++  left: 50%;
++  transform: translateX(-50%);
++  bottom: 1rem;
++}
++
++[data-scope="carousel"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"]
++  ):disabled {
++  opacity: 0.5;
++}
++
++[data-scope="carousel"][data-part="indicator-group"] {
++  display: flex;
++  gap: 0.75rem;
++}
++
++[data-scope="carousel"][data-part="indicator"] {
++  width: 0.625rem;
++  height: 0.625rem;
++  border-radius: 9999px;
++  background: gray;
++  cursor: pointer;
++}
++
++[data-scope="carousel"][data-part="indicator"][data-current] {
++  background: var(--colors-bg-primary-bold);
++}
+diff --git a/website/styles/machines/checkbox.css b/website/styles/machines/checkbox.css
+new file mode 100644
+index 0000000000..2d7dbc8fc4
+--- /dev/null
++++ b/website/styles/machines/checkbox.css
+@@ -0,0 +1,48 @@
++[data-scope="checkbox"][data-part="root"] {
++  display: flex;
++  flex-direction: row-reverse;
++  gap: 0.5rem;
++  user-select: none;
++  cursor: pointer;
++  font-size: 18px;
++}
++
++[data-scope="checkbox"][data-part="root"]:disabled {
++  cursor: not-allowed;
++  opacity: 0.4;
++}
++
++[data-scope="checkbox"][data-part="control"] {
++  width: 25px;
++  height: 25px;
++  border-radius: 0.375rem;
++  border: solid 2px;
++  border-color: #a0aec0;
++  color: #ffffff;
++}
++
++[data-scope="checkbox"][data-part="control"]:hover {
++  background: var(--colors-bg-bold);
++}
++
++[data-peer]:focus-visible ~ [data-scope="checkbox"][data-part="control"] {
++  outline: 2px solid royalblue;
++}
++
++[data-scope="checkbox"][data-part="control"][data-disabled] {
++  background: #a0aec0;
++  border-color: #a0aec0;
++}
++
++[data-scope="checkbox"][data-part="control"][data-state="indeterminate"] {
++  background: #ffffff;
++  border-color: grey;
++  color: grey;
++}
++
++[data-scope="checkbox"][data-part="control"][data-state="checked"]:not(
++    [data-disabled]
++  ) {
++  background: #3182ce;
++  border-color: #3182ce;
++}
+diff --git a/website/styles/machines/clipboard.css b/website/styles/machines/clipboard.css
+new file mode 100644
+index 0000000000..62e33adf36
+--- /dev/null
++++ b/website/styles/machines/clipboard.css
+@@ -0,0 +1,43 @@
++[data-scope="clipboard"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.25rem;
++}
++
++[data-scope="clipboard"][data-part="label"] {
++  font-size: 0.875rem;
++  font-weight: 500;
++}
++
++[data-scope="clipboard"][data-part="control"] {
++  display: flex;
++  align-items: stretch;
++  flex-direction: row;
++  gap: 0.5rem;
++}
++
++[data-scope="clipboard"][data-part="input"] {
++  border-width: 1px;
++  height: 2.5rem;
++  padding-right: 1.25rem;
++  padding-left: 0.75rem;
++  background: var(--colors-bg-subtle);
++  border-color: var(--colors-border-subtle);
++}
++
++[data-scope="clipboard"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  padding-inline: 0.75rem;
++}
++
++[data-scope="clipboard"][data-part="trigger"]:hover {
++  background: var(--colors-bg-bold);
++}
+diff --git a/website/styles/machines/collapsible.css b/website/styles/machines/collapsible.css
+new file mode 100644
+index 0000000000..a36fa24bbc
+--- /dev/null
++++ b/website/styles/machines/collapsible.css
+@@ -0,0 +1,61 @@
++[data-scope="collapsible"][data-part="root"] {
++  display: flex;
++  align-items: start;
++  flex-direction: column;
++  gap: 0.5rem;
++  width: 400px;
++}
++
++[data-scope="collapsible"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="collapsible"][data-part="trigger"]:hover {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="collapsible"][data-part="content"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++  overflow: hidden;
++}
++
++[data-scope="collapsible"][data-part="content"][data-state="open"] {
++  animation: open 110ms cubic-bezier(0, 0, 0.38, 0.9);
++}
++
++[data-scope="collapsible"][data-part="content"][data-state="closed"] {
++  animation: close 110ms cubic-bezier(0, 0, 0.38, 0.9);
++}
++
++@keyframes open {
++  from {
++    height: 0;
++    opacity: 0.01;
++  }
++  to {
++    height: var(--height);
++    opacity: 1;
++  }
++}
++
++@keyframes close {
++  from {
++    height: var(--height);
++    opacity: 1;
++  }
++  to {
++    height: 0;
++    opacity: 0.01;
++  }
++}
+diff --git a/website/styles/machines/color-picker.css b/website/styles/machines/color-picker.css
+new file mode 100644
+index 0000000000..1caed52ddf
+--- /dev/null
++++ b/website/styles/machines/color-picker.css
+@@ -0,0 +1,155 @@
++[data-scope="color-picker"][data-part="label"] {
++  font-size: 0.875rem;
++  display: block;
++  margin-bottom: 0.5rem;
++}
++
++[data-scope="color-picker"][data-part="label"][data-disabled] {
++  opacity: 0.6;
++}
++
++[data-scope="color-picker"][data-part="label"] > span:first-child {
++  font-weight: 500;
++}
++
++[data-scope="color-picker"][data-part="control"] {
++  display: flex;
++  align-items: flex-start;
++  gap: 0.5rem;
++}
++
++[data-scope="color-picker"][data-part="control"]
++  > *:has(> [data-part="trigger"]) {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  padding: 0.25rem;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++}
++
++[data-scope="color-picker"][data-part="control"] > input:last-child {
++  max-width: 64px;
++}
++
++[data-scope="color-picker"][data-part="trigger"] {
++  display: flex;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="color-picker"][data-part="transparency-grid"] {
++  border-radius: 4px;
++}
++
++[data-scope="color-picker"][data-part="swatch"] {
++  width: 1.25rem;
++  height: 1.25rem;
++  flex-shrink: 0;
++}
++
++div:has(> [data-scope="color-picker"][data-part="channel-input"] ~ span) {
++  display: flex;
++  align-items: center;
++  flex-direction: column;
++  gap: 0.5rem;
++}
++
++[data-scope="color-picker"][data-part="channel-input"] {
++  border-radius: 4px;
++  width: 100%;
++  border-width: 1px;
++  padding-inline: 0.5rem;
++  background: var(--colors-bg-subtle);
++  font-size: 0.875rem;
++  min-height: 32px;
++}
++
++[data-scope="color-picker"][data-part="channel-input"] ~ span {
++  font-size: 0.875rem;
++  font-weight: 500;
++}
++
++[data-scope="color-picker"][data-part="content"] {
++  box-shadow:
++    0 1px 3px 0 rgba(0, 0, 0, 0.1),
++    0 1px 2px 0 rgba(0, 0, 0, 0.06);
++  isolation: isolate;
++  padding: 1rem;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="color-picker"][data-part="area"]
++  ~ div:not(:nth-child(2)):not([data-part="swatch-group"]) {
++  display: flex;
++  width: 100%;
++  gap: 0.125rem;
++}
++
++[data-scope="color-picker"][data-part="content"] > div {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++}
++
++[data-scope="color-picker"][data-part="area"] {
++  height: 200px;
++  border-radius: 4px;
++  border-width: 1px;
++}
++
++[data-scope="color-picker"][data-part="area-background"] {
++  height: inherit;
++  border-radius: inherit;
++}
++
++[data-scope="color-picker"][data-part="area-thumb"] {
++  border: 2px solid white;
++  border-radius: 99999px;
++  transform: translate(-50%, -50%);
++  box-shadow: "black 0px 0px 0px 1px, black 0px 0px 0px 1px inset";
++  width: 1rem;
++  height: 1rem;
++}
++
++[data-scope="color-picker"][data-part="area"] + div {
++  display: flex;
++  gap: 20px;
++  margin-block: 0.5rem;
++}
++
++[data-scope="color-picker"][data-part="area"] + div > div {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++  flex: 1;
++}
++
++[data-scope="color-picker"][data-part="channel-slider-track"] {
++  height: 0.75rem;
++  border-radius: 4px;
++}
++
++[data-scope="color-picker"][data-part="eye-dropper-trigger"] {
++  width: 40px;
++  height: 40px;
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  justify-content: center;
++  border-width: 1px;
++}
++
++hr:has(+ [data-scope="color-picker"][data-part="swatch-group"]) {
++  width: 100%;
++  border-width: 1px;
++  border-color: var(--colors-border-subtle);
++}
++
++[data-scope="color-picker"][data-part="swatch-group"] {
++  display: flex;
++  gap: 10px;
++}
++
++[data-scope="color-picker"][data-part="swatch-trigger"] > div {
++  position: relative;
++}
+diff --git a/website/styles/machines/combobox.css b/website/styles/machines/combobox.css
+new file mode 100644
+index 0000000000..80fa9b8310
+--- /dev/null
++++ b/website/styles/machines/combobox.css
+@@ -0,0 +1,71 @@
++[data-scope="combobox"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.25rem;
++}
++
++[data-scope="combobox"][data-part="label"] {
++  font-size: 1.125rem;
++}
++
++[data-scope="combobox"][data-part="label"][data-disabled] {
++  opacity: 0.6;
++}
++
++[data-scope="combobox"][data-part="control"] {
++  display: inline-flex;
++  width: 300px;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  padding-block: 0.25rem;
++  padding-inline: 0.75rem;
++}
++
++[data-scope="combobox"][data-part="control"][data-disabled] {
++  opacity: 0.6;
++}
++
++[data-scope="combobox"][data-part="input"] {
++  background: var(--colors-bg-subtle);
++  flex: 1;
++  padding: 0.25rem;
++}
++
++[data-scope="combobox"][data-part="input"]:focus {
++  outline: 0;
++}
++
++[data-scope="combobox"][data-part="content"] {
++  list-style-type: none;
++  margin: 0px;
++  max-height: 14rem;
++  overflow: auto;
++  box-shadow:
++    0 1px 3px 0 rgba(0, 0, 0, 0.1),
++    0 1px 2px 0 rgba(0, 0, 0, 0.06);
++  isolation: isolate;
++  padding: 0.5rem;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="combobox"][data-part="item"] {
++  padding-inline: 0.5rem;
++  padding-block: 0.25rem;
++  display: flex;
++  align-items: center;
++  cursor: pointer;
++}
++
++[data-scope="combobox"][data-part="item"][data-highlighted] {
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="combobox"][data-part="item"][data-highlighted]:hover {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="combobox"][data-part="item"][data-disabled] {
++  opacity: 0.5;
++  cursor: unset;
++}
+diff --git a/website/styles/machines/dialog.css b/website/styles/machines/dialog.css
+new file mode 100644
+index 0000000000..9c526cd6a5
+--- /dev/null
++++ b/website/styles/machines/dialog.css
+@@ -0,0 +1,80 @@
++.dialog {
++  &[data-scope="dialog"][data-part="trigger"],
++  &[data-scope="dialog"][data-part="description"] + div > button {
++    display: inline-flex;
++    align-items: center;
++    justify-content: center;
++    text-align: start;
++    cursor: pointer;
++    font-weight: 500;
++    padding-inline: 1rem;
++    padding-block: 0.25rem;
++    background: var(--colors-bg-primary-subtle);
++    color: #ffffff;
++  }
++
++  &[data-scope="dialog"][data-part="description"] + div > button:hover {
++    background: var(--colors-bg-primary-bold);
++  }
++
++  &[data-scope="dialog"][data-part="backdrop"] {
++    position: fixed;
++    inset: 0px;
++    background: rgba(0, 0, 0, 0.48);
++    z-index: 1400;
++  }
++
++  &[data-scope="dialog"][data-part="positioner"] {
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    height: 100vh;
++    width: 100vw;
++    position: fixed;
++    z-index: 1400;
++    inset: 0px;
++  }
++
++  &[data-scope="dialog"][data-part="content"] {
++    width: 100%;
++    max-width: 400px;
++    border-radius: 0.375rem;
++    background: var(--colors-bg-subtle);
++    padding: 1.25rem;
++    position: relative;
++    pointer-events: auto;
++  }
++
++  &[data-scope="dialog"][data-part="title"] {
++    font-weight: 500;
++    font-size: 1.125rem;
++    margin-bottom: 0.5rem;
++  }
++
++  &[data-scope="dialog"][data-part="description"] {
++    font-size: 0.875rem;
++    margin-bottom: 0.75rem;
++  }
++
++  &[data-scope="dialog"][data-part="description"] + div {
++    display: flex;
++    align-items: center;
++    flex-direction: row;
++    gap: 0.5rem;
++  }
++
++  &[data-scope="dialog"][data-part="description"] + div > input {
++    flex: 1;
++    font-size: 0.875rem;
++    border-width: 1px;
++    padding-inline: 0.5rem;
++    padding-block: 0.25rem;
++  }
++
++  &[data-scope="dialog"][data-part="close-trigger"] {
++    display: flex;
++    position: absolute;
++    top: 0.75rem;
++    right: 0.75rem;
++  }
++}
+diff --git a/website/styles/machines/editable.css b/website/styles/machines/editable.css
+new file mode 100644
+index 0000000000..6bcd3a4685
+--- /dev/null
++++ b/website/styles/machines/editable.css
+@@ -0,0 +1,61 @@
++[data-scope="editable"][data-part="root"] {
++  width: 300px;
++}
++
++[data-scope="editable"][data-part="area"] {
++  margin-bottom: 0.75rem;
++}
++
++[data-scope="editable"][data-part="input"] {
++  background: transparent;
++}
++
++[data-scope="editable"][data-part="input"]:focus {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="editable"]:is(
++    [data-part="edit-trigger"],
++    [data-part="submit-trigger"],
++    [data-part="cancel-trigger"]
++  ) {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++}
++
++[data-scope="editable"]:is(
++    [data-part="edit-trigger"],
++    [data-part="cancel-trigger"]
++  ) {
++  border-width: 1px;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="editable"]:is(
++    [data-part="edit-trigger"],
++    [data-part="cancel-trigger"]
++  ):hover {
++  background: var(--colors-bg-bold);
++}
++
++div:has(> [data-scope="editable"][data-part="submit-trigger"]) {
++  display: flex;
++  align-items: center;
++  flex-direction: row;
++  gap: 0.5rem;
++}
++
++[data-scope="editable"][data-part="submit-trigger"] {
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="editable"][data-part="submit-trigger"]:hover {
++  background: var(--colors-bg-primary-bold);
++}
+diff --git a/website/styles/machines/file-upload.css b/website/styles/machines/file-upload.css
+new file mode 100644
+index 0000000000..24fc4bf983
+--- /dev/null
++++ b/website/styles/machines/file-upload.css
+@@ -0,0 +1,60 @@
++[data-scope="file-upload"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++  width: 80%;
++}
++
++[data-scope="file-upload"][data-part="dropzone"] {
++  display: flex;
++  align-items: center;
++  flex-direction: column;
++  gap: 0.5rem;
++  border-width: 2px;
++  border-style: dashed;
++  padding-block: 2rem;
++  padding-inline: 0.5rem;
++}
++
++[data-scope="file-upload"][data-part="dropzone"][data-dragging] {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="file-upload"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="file-upload"][data-part="trigger"]:hover {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="file-upload"][data-part="dropzone"] + div {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++}
++
++[data-scope="file-upload"][data-part="item"] {
++  display: flex;
++  align-items: center;
++  flex-direction: row;
++  gap: 0.5rem;
++  padding-inline: 0.75rem;
++  padding-block: 0.5rem;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++}
++
++[data-scope="file-upload"][data-part="item"] > div {
++  flex: 1;
++  font-size: 0.875rem;
++}
+diff --git a/website/styles/machines/hover-card.css b/website/styles/machines/hover-card.css
+new file mode 100644
+index 0000000000..4d32d4dbb0
+--- /dev/null
++++ b/website/styles/machines/hover-card.css
+@@ -0,0 +1,72 @@
++[data-scope="hover-card"][data-part="trigger"] > img {
++  width: 3rem;
++  height: 3rem;
++  border-radius: 999999px;
++  box-shadow:
++    0 20px 25px -5px rgba(0, 0, 0, 0.1),
++    0 10px 10px -5px rgba(0, 0, 0, 0.04);
++}
++
++[data-scope="hover-card"][data-part="content"] {
++  --background: var(--colors-bg-subtle);
++  background: var(--background);
++  padding: 1rem;
++  border-width: 1px;
++  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 15%));
++  z-index: 50;
++  position: relative;
++  max-width: min(calc(100vw - 16px), 360px);
++  width: 100%;
++}
++
++[data-scope="hover-card"][data-part="arrow"] {
++  --arrow-background: var(--background);
++  --arrow-size: 8px;
++}
++
++[data-scope="hover-card"][data-part="arrow-tip"] {
++  border-radius: 0.125rem;
++}
++
++/* Card content */
++
++.card-wrapper,
++.card-content {
++  display: flex;
++  flex-direction: column;
++  gap: 0.75rem;
++}
++
++.card-content {
++  gap: 1rem;
++}
++
++.card-content a {
++  color: royalblue;
++}
++
++.avatar {
++  width: 3.5rem;
++  height: 3.5rem;
++}
++
++.header p:first-child,
++.stats > div p:first-child {
++  font-weight: 700;
++}
++
++.header p:nth-child(2),
++.stats > div p:nth-child(2) {
++  color: #718096;
++}
++
++.stats,
++.stats > div {
++  display: flex;
++  gap: 1rem;
++  align-items: center;
++}
++
++.stats > div {
++  gap: 0.375rem;
++}
+diff --git a/website/styles/machines/index.css b/website/styles/machines/index.css
+new file mode 100644
+index 0000000000..9fdb3baabf
+--- /dev/null
++++ b/website/styles/machines/index.css
+@@ -0,0 +1,59 @@
++@import url(./accordion.css);
++@import url(./avatar.css);
++@import url(./carousel.css);
++@import url(./checkbox.css);
++@import url(./clipboard.css);
++@import url(./collapsible.css);
++@import url(./color-picker.css);
++@import url(./combobox.css);
++@import url(./dialog.css);
++@import url(./editable.css);
++@import url(./file-upload.css);
++@import url(./hover-card.css);
++@import url(./menu.css);
++@import url(./number-input.css);
++@import url(./pagination.css);
++@import url(./pin-input.css);
++@import url(./popover.css);
++@import url(./progress.css);
++@import url(./radio.css);
++@import url(./rating-group.css);
++@import url(./segmented-control.css);
++@import url(./select.css);
++@import url(./slider.css);
++@import url(./splitter.css);
++@import url(./switch.css);
++@import url(./tabs.css);
++@import url(./tags-input.css);
++@import url(./toast.css);
++@import url(./toggle-group.css);
++@import url(./tooltip.css);
++
++* {
++  border-color: var(--colors-border-bold);
++  border-style: solid;
++}
++
++/* Variables */
++:where(:root, :host) {
++  --colors-text-inverse: #ffffff;
++  --colors-text-subtle: #4a5568;
++  --colors-text-bold: #171923;
++  --colors-border-subtle: #edf2f7;
++  --colors-border-bold: #e2e8f0;
++  --colors-bg-subtle: #ffffff;
++  --colors-bg-bold: #edf2f7;
++  --colors-bg-primary-subtle: #38a169;
++  --colors-bg-primary-bold: #2f855a;
++}
++
++.chakra-ui-dark {
++  --colors-text-inverse: #1a202c;
++  --colors-text-subtle: #a0aec0;
++  --colors-text-bold: #f7fafc;
++  --colors-border-subtle: #2d3748;
++  --colors-border-bold: #2d3748;
++  --colors-bg-subtle: #1a202c;
++  --colors-bg-bold: #2d3748;
++  --colors-bg-primary-bold: #48bb78;
++}
+diff --git a/website/styles/machines/menu.css b/website/styles/machines/menu.css
+new file mode 100644
+index 0000000000..c0a91a3c54
+--- /dev/null
++++ b/website/styles/machines/menu.css
+@@ -0,0 +1,56 @@
++[data-scope="menu"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="menu"][data-part="trigger"]:hover {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="menu"][data-part="context-trigger"] {
++  background: var(--colors-bg-subtle);
++  padding: 1rem;
++  border-width: 2px;
++  border-style: dashed;
++}
++
++[data-scope="menu"][data-part="indicator"] {
++  margin-left: 0.5rem;
++}
++
++[data-scope="menu"][data-part="content"] {
++  background: var(--colors-bg-subtle);
++  width: 240px;
++  padding: 0.5rem;
++  isolation: isolate;
++  list-style-type: none;
++  box-shadow:
++    0 1px 3px 0 rgba(0, 0, 0, 0.1),
++    0 1px 2px 0 rgba(0, 0, 0, 0.06);
++}
++
++[data-scope="menu"][data-part="content"]:is(:focus, [data-focus]) {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="menu"]:is([data-part="item"], [data-part="trigger-item"]) {
++  padding-inline: 0.5rem;
++  padding-block: 0.25rem;
++  cursor: pointer;
++}
++
++[data-scope="menu"]:is(
++    [data-part="item"],
++    [data-part="trigger-item"]
++  )[data-highlighted] {
++  background: var(--colors-bg-primary-bold);
++  color: #ffffff;
++}
+diff --git a/website/styles/machines/number-input.css b/website/styles/machines/number-input.css
+new file mode 100644
+index 0000000000..b271b0cf4a
+--- /dev/null
++++ b/website/styles/machines/number-input.css
+@@ -0,0 +1,46 @@
++[data-scope="number-input"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++}
++
++[data-scope="number-input"][data-part="label"] + div {
++  position: relative;
++  display: inline-block;
++}
++
++[data-scope="number-input"][data-part="input"] {
++  border-width: 1px;
++  height: 2.5rem;
++  padding-right: 1.25rem;
++  padding-left: 0.75rem;
++  background: var(--colors-bg-subtle);
++  border-color: var(--colors-border-subtle);
++}
++
++[data-scope="number-input"][data-part="input"] + div {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  position: absolute;
++  width: 1.5rem;
++  right: 3px;
++  top: 3px;
++}
++
++[data-scope="number-input"]:is(
++    [data-part="increment-trigger"],
++    [data-part="decrement-trigger"]
++  ) {
++  width: 100%;
++  background: var(--colors-bg-bold);
++  display: flex;
++  justify-content: center;
++}
++
++[data-scope="number-input"]:is(
++    [data-part="increment-trigger"],
++    [data-part="decrement-trigger"]
++  )[data-disabled] {
++  opacity: 0.5;
++}
+diff --git a/website/styles/machines/pagination.css b/website/styles/machines/pagination.css
+new file mode 100644
+index 0000000000..a772c8e8c7
+--- /dev/null
++++ b/website/styles/machines/pagination.css
+@@ -0,0 +1,87 @@
++[data-scope="pagination"][data-part="root"] > ul {
++  display: flex;
++  flex-wrap: wrap;
++  gap: 0.25rem;
++  list-style-type: none;
++}
++
++[data-scope="pagination"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"],
++    [data-part="item"],
++
++  ) {
++  padding-inline: 0.75rem;
++  height: 2rem;
++  text-align: center;
++  margin: auto 4px;
++  color: var(--colors-text-bold);
++  display: flex;
++  box-sizing: border-box;
++  align-items: center;
++  letter-spacing: 0.01071em;
++  line-height: 1.43;
++  font-size: 13px;
++  user-select: none;
++  text-decoration: none;
++  border: solid 1px;
++  border-color: var(--colors-border-bold);
++  background: var(--colors-bg-subtle);
++  cursor: pointer;
++}
++
++[data-scope="pagination"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"],
++    [data-part="item"]
++  ):hover {
++  background: var(--colors-bg-bold);
++}
++
++[data-scope="pagination"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"],
++    [data-part="item"]
++  ):focus {
++  outline: 2px solid royalblue;
++  outline-offset: 1px;
++}
++
++[data-scope="pagination"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"],
++    [data-part="item"]
++  )[data-selected] {
++  background: #38a169;
++  color: #ffffff;
++}
++
++[data-scope="pagination"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"],
++    [data-part="item"]
++  )[data-disabled] {
++  opacity: 0.6;
++  cursor: not-allowed;
++  background: none;
++}
++
++[data-scope="pagination"][data-part="ellipsis"] {
++  cursor: default;
++}
++
++[data-scope="pagination"]:is(
++    [data-part="prev-trigger"],
++    [data-part="next-trigger"]
++  )
++  span {
++  border: 0px;
++  clip: rect(0, 0, 0, 0);
++  width: 1px;
++  height: 1px;
++  margin: -1px;
++  padding: 0px;
++  overflow: hidden;
++  white-space: nowrap;
++  position: absolute;
++}
+diff --git a/website/styles/machines/pin-input.css b/website/styles/machines/pin-input.css
+new file mode 100644
+index 0000000000..a586e22159
+--- /dev/null
++++ b/website/styles/machines/pin-input.css
+@@ -0,0 +1,29 @@
++[data-scope="pin-input"][data-part="root"] {
++  display: flex;
++  align-items: center;
++  flex-direction: row;
++  gap: 0.5rem;
++  margin-bottom: 1rem;
++}
++
++[data-scope="pin-input"][data-part="input"] {
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  width: 50px;
++  height: 50px;
++  font-size: 1.125rem;
++  text-align: center;
++}
++
++[data-scope="pin-input"][data-part="root"] + button {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  padding-inline: 0.5rem;
++}
+diff --git a/website/styles/machines/popover.css b/website/styles/machines/popover.css
+new file mode 100644
+index 0000000000..080efaefe6
+--- /dev/null
++++ b/website/styles/machines/popover.css
+@@ -0,0 +1,65 @@
++[data-scope="popover"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="popover"][data-part="trigger"]:hover {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="popover"][data-part="content"] {
++  --background: var(--colors-bg-subtle);
++  background: var(--background);
++  padding: 1rem;
++  border-width: 1px;
++  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 15%));
++  z-index: 50;
++  position: relative;
++  max-width: min(calc(100vw - 16px), 320px);
++  width: 100%;
++}
++
++[data-scope="popover"][data-part="content"]:is(:focus, [data-focus]) {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="popover"][data-part="arrow"] {
++  --arrow-background: var(--background);
++  --arrow-size: 8px;
++}
++
++[data-scope="popover"][data-part="arrow-tip"] {
++  border-radius: 0.125rem;
++}
++
++[data-scope="popover"][data-part="arrow"] + div {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++}
++
++[data-scope="popover"][data-part="description"] + button {
++  background: var(--colors-bg-subtle);
++  padding-inline: 1rem;
++  padding-block: 0.5rem;
++  border-width: 1px;
++}
++
++[data-scope="popover"][data-part="description"] + button:focus {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="popover"][data-part="close-trigger"] {
++  position: absolute;
++  top: 0.75rem;
++  right: 0.75rem;
++  padding: 0.5rem;
++}
+diff --git a/website/styles/machines/progress.css b/website/styles/machines/progress.css
+new file mode 100644
+index 0000000000..f61bff9aa7
+--- /dev/null
++++ b/website/styles/machines/progress.css
+@@ -0,0 +1,109 @@
++[data-scope="progress"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.5rem;
++  margin-bottom: 1rem;
++}
++
++.centre[data-scope="progress"][data-part="root"] {
++  align-items: center;
++}
++
++[data-scope="progress"][data-part="track"] {
++  border-width: 1px;
++  height: 20px;
++  border-radius: 0.125rem;
++  background: var(--colors-bg-subtle);
++  overflow: hidden;
++}
++
++[data-scope="progress"][data-part="range"] {
++  --translate-x: -100%;
++  height: 100%;
++  transition: width 0.2s ease-in-out;
++  background: #38a169;
++}
++
++[data-scope="progress"][data-part="range"][dir="rtl"] {
++  --translate-x: 100%;
++}
++
++[data-scope="progress"][data-part="range"][data-state="indeterminate"] {
++  width: 210%;
++  animation: 1s cubic-bezier(0.694, 0.0482, 0.335, 1) 0s infinite normal none
++    running linear_range;
++}
++
++[data-scope="progress"][data-part="circle"] {
++  --size: 120px;
++  --thickness: 12px;
++}
++
++[data-scope="progress"][data-part="circle"][data-state="indeterminate"] {
++  animation: circle 2s linear infinite;
++}
++
++[data-scope="progress"][data-part="circle-range"] {
++  stroke: #38a169;
++  transition-property: stroke-dasharray, stroke;
++  transition-duration: 0.6s;
++}
++
++[data-scope="progress"][data-part="circle-range"][data-state="indeterminate"] {
++  animation: circle_range 1.5s ease-in-out infinite;
++}
++
++[data-scope="progress"][data-part="circle-track"] {
++  stroke: var(--colors-bg-subtle);
++}
++
++[data-scope="progress"][data-part="root"] + div {
++  display: flex;
++  gap: 0.5rem;
++}
++
++[data-scope="progress"][data-part="root"] + div > button {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++}
++
++[data-scope="progress"][data-part="root"] + div > button:hover {
++  background: var(--colors-bg-bold);
++}
++
++@keyframes linear_range {
++  from {
++    transform: scaleX(1) translateX(var(--translate-x));
++  }
++  to {
++    transform: scaleX(0) translateX(var(--translate-x));
++  }
++}
++
++@keyframes circle {
++  from {
++    transform: rotate(0deg);
++  }
++  to {
++    transform: rotate(360deg);
++  }
++}
++
++@keyframes circle_range {
++  0% {
++    stroke-dasharray: 1, 400;
++    stroke-dashoffset: 0;
++  }
++  100% {
++    stroke-dasharray: 400, 400;
++    stroke-dashoffset: -260;
++  }
++}
+diff --git a/website/styles/machines/radio.css b/website/styles/machines/radio.css
+new file mode 100644
+index 0000000000..f45aaefd97
+--- /dev/null
++++ b/website/styles/machines/radio.css
+@@ -0,0 +1,63 @@
++.radio {
++  [data-scope="radio-group"][data-part="root"] {
++    display: flex;
++    gap: 0.75rem;
++  }
++
++  [data-scope="radio-group"][data-part="root"][data-orientation="vertical"] {
++    flex-direction: column;
++  }
++
++  [data-scope="radio-group"][data-part="label"] + div {
++    display: flex;
++    flex-direction: column;
++    gap: 0.5rem;
++  }
++
++  [data-scope="radio-group"][data-part="item"] {
++    display: flex;
++    gap: 0.5rem;
++    user-select: none;
++    cursor: pointer;
++    font-size: 16px;
++  }
++
++  [data-scope="radio-group"][data-part="item"][data-disabled] {
++    cursor: not-allowed;
++    opacity: 0.4;
++  }
++
++  [data-scope="radio-group"][data-part="item-text"] {
++    order: 2;
++  }
++
++  [data-scope="radio-group"][data-part="item-control"] {
++    order: 1;
++    width: 25px;
++    height: 25px;
++    border-radius: 9999px;
++    border: solid 2px;
++    border-color: #a0aec0;
++    color: #ffffff;
++    padding: 1px;
++  }
++
++  [data-scope="radio-group"][data-part="item-control"]:hover {
++    background: var(--colors-bg-subtle);
++  }
++
++  [data-peer]:focus-visible
++    ~ [data-scope="radio-group"][data-part="item-control"] {
++    outline: 2px solid royalblue;
++  }
++
++  [data-scope="radio-group"][data-part="item-control"][data-state="checked"] {
++    background: #3182ce;
++    border-color: #3182ce;
++  }
++
++  [data-scope="radio-group"][data-part="item-control"][data-disabled] {
++    background: #a0aec0;
++    border-color: #a0aec0;
++  }
++}
+diff --git a/website/styles/machines/rating-group.css b/website/styles/machines/rating-group.css
+new file mode 100644
+index 0000000000..6b8739df9b
+--- /dev/null
++++ b/website/styles/machines/rating-group.css
+@@ -0,0 +1,35 @@
++[data-scope="rating-group"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 2.5rem;
++}
++
++[data-scope="rating-group"][data-part="root"][dir="rtl"]
++  [data-half]
++  [data-part="star"] {
++  transform: scale(-1, 1);
++}
++
++[data-scope="rating-group"][data-part="control"] {
++  display: inline-flex;
++}
++
++[data-scope="rating-group"][data-part="item"] {
++  width: 2rem;
++  height: 2rem;
++  padding: 0.25rem;
++}
++
++[data-scope="rating-group"][data-part="item"] [data-part="star"] {
++  color: #bdbdbd;
++}
++
++[data-scope="rating-group"][data-part="item"][data-highlighted]
++  [data-part="star"] {
++  color: #ffb400;
++}
++
++[data-scope="rating-group"][data-part="item"][data-highlighted][data-disabled]
++  [data-part="star"] {
++  color: #a1a1a1;
++}
+diff --git a/website/styles/machines/segmented-control.css b/website/styles/machines/segmented-control.css
+new file mode 100644
+index 0000000000..73dcfc1c4d
+--- /dev/null
++++ b/website/styles/machines/segmented-control.css
+@@ -0,0 +1,41 @@
++.segmented-control {
++  [data-scope="radio-group"][data-part="root"] {
++    display: flex;
++    gap: 0.75rem;
++    background-color: color-mix(in srgb, #000 24%, transparent);
++    position: relative;
++    padding: 0.375rem;
++    border-radius: 0.375rem;
++  }
++
++  [data-scope="radio-group"][data-part="root"][data-orientation="horizontal"] {
++    flex-direction: row;
++  }
++
++  [data-scope="radio-group"][data-part="indicator"] {
++    background: var(--colors-bg-subtle);
++    z-index: 1;
++    border-radius: 0.375rem;
++    box-shadow:
++      0 1px 3px 0 rgba(0, 0, 0, 0.1),
++      0 1px 2px 0 rgba(0, 0, 0, 0.06);
++    height: var(--height);
++    width: var(--width);
++  }
++
++  [data-scope="radio-group"][data-part="item"] {
++    display: flex;
++    gap: 0.5rem;
++    user-select: none;
++    cursor: pointer;
++    font-size: 16px;
++    padding-inline: 0.75rem;
++    padding-block: 0.25rem;
++    z-index: 2;
++  }
++
++  [data-scope="radio-group"][data-part="item"][data-disabled] {
++    cursor: not-allowed;
++    opacity: 0.4;
++  }
++}
+diff --git a/website/styles/machines/select.css b/website/styles/machines/select.css
+new file mode 100644
+index 0000000000..8f9ae09b4d
+--- /dev/null
++++ b/website/styles/machines/select.css
+@@ -0,0 +1,76 @@
++[data-scope="select"][data-part="root"] {
++  display: flex;
++  flex-direction: column;
++  gap: 0.25rem;
++}
++
++[data-scope="select"][data-part="label"] {
++  font-size: 1.125rem;
++}
++
++[data-scope="select"][data-part="label"][data-disabled] {
++  opacity: 0.6;
++}
++
++[data-scope="select"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  border-width: 1px;
++  min-width: 200px;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="select"][data-part="trigger"]:hover {
++  background: var(--colors-bg-bold);
++}
++
++[data-scope="select"][data-part="trigger"]:is(:focus, [data-focus]) {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="select"][data-part="trigger"][data-disabled] {
++  opacity: 0.6;
++}
++
++[data-scope="select"][data-part="trigger"] > span {
++  padding: 0.25rem;
++  flex: 1;
++}
++
++[data-scope="select"][data-part="content"] {
++  background: var(--colors-bg-subtle);
++  width: 240px;
++  padding: 0.5rem;
++  isolation: isolate;
++  list-style-type: none;
++  box-shadow:
++    0 1px 3px 0 rgba(0, 0, 0, 0.1),
++    0 1px 2px 0 rgba(0, 0, 0, 0.06);
++}
++
++[data-scope="select"][data-part="content"]:is(:focus, [data-focus]) {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="select"][data-part="item"] {
++  padding-inline: 0.5rem;
++  padding-block: 0.25rem;
++  cursor: pointer;
++  display: flex;
++  align-items: center;
++}
++
++[data-scope="select"][data-part="item-text"] {
++  flex: 1;
++}
++
++[data-scope="select"][data-part="item"][data-highlighted] {
++  background: var(--colors-bg-primary-bold);
++  color: #ffffff;
++}
+diff --git a/website/styles/machines/slider.css b/website/styles/machines/slider.css
+new file mode 100644
+index 0000000000..ad351a0700
+--- /dev/null
++++ b/website/styles/machines/slider.css
+@@ -0,0 +1,58 @@
++[data-scope="slider"][data-part="root"] {
++  width: 200px;
++}
++
++[data-scope="slider"][data-part="root"] > div:first-child {
++  display: flex;
++  justify-content: space-between;
++}
++
++[data-scope="slider"][data-part="label"] {
++  margin-right: 0.5rem;
++}
++
++[data-scope="slider"][data-part="control"] {
++  display: flex;
++  align-items: center;
++  margin-top: 1.25rem;
++  position: relative;
++  padding-block: 0.625rem;
++}
++
++[data-scope="slider"][data-part="track"] {
++  height: 4px;
++  border-radius: 9999px;
++  flex: 1;
++  background: var(--colors-bg-bold);
++}
++
++[data-scope="slider"][data-part="range"] {
++  height: 100%;
++  border-radius: inherit;
++  background: #38a169;
++}
++
++[data-scope="slider"][data-part="range"][data-disabled] {
++  background: #9ae6b4;
++}
++
++[data-scope="slider"][data-part="thumb"] {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  width: 20px;
++  height: 20px;
++  border-radius: 9999px;
++  background: #ffffff;
++  box-shadow:
++    0 1px 3px 0 rgba(0, 0, 0, 0.1),
++    0 1px 2px 0 rgba(0, 0, 0, 0.06);
++}
++
++[data-scope="slider"][data-part="thumb"]:is(:focus, [data-focus]) {
++  outline: 2px solid hsl(204, 100%, 40%);
++}
++
++[data-scope="slider"][data-part="thumb"][data-disabled] {
++  background: #e2e8f0;
++}
+diff --git a/website/styles/machines/splitter.css b/website/styles/machines/splitter.css
+new file mode 100644
+index 0000000000..ab2cfb7f67
+--- /dev/null
++++ b/website/styles/machines/splitter.css
+@@ -0,0 +1,40 @@
++[data-scope="splitter"][data-part="root"] {
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  padding: 2.5rem;
++}
++
++[data-scope="splitter"][data-part="panel"] {
++  display: flex;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  align-items: center;
++  justify-content: center;
++  height: 100%;
++}
++
++[data-scope="splitter"][data-part="panel"][data-orientation="horizontal"] {
++  width: auto;
++}
++
++[data-scope="splitter"][data-part="panel"][data-orientation="vertical"] {
++  width: 100%;
++}
++
++[data-scope="splitter"][data-part="resize-trigger"] {
++  background: #cbd5e0;
++  border-radius: 4px;
++  margin: 0.5rem;
++  display: flex;
++}
++
++[data-scope="splitter"][data-part="resize-trigger"][data-orientation="horizontal"] {
++  height: 6rem;
++  width: 0.5rem;
++}
++
++[data-scope="splitter"][data-part="resize-trigger"][data-orientation="vertical"] {
++  height: 0.5rem;
++  width: 16rem;
++}
+diff --git a/website/styles/machines/switch.css b/website/styles/machines/switch.css
+new file mode 100644
+index 0000000000..b5ae970194
+--- /dev/null
++++ b/website/styles/machines/switch.css
+@@ -0,0 +1,86 @@
++[data-scope="switch"][data-part="root"] {
++  display: -webkit-box;
++  display: -webkit-flex;
++  display: -ms-flexbox;
++  display: flex;
++  -webkit-align-items: center;
++  -webkit-box-align: center;
++  -ms-flex-align: center;
++  align-items: center;
++  position: relative;
++  line-height: 0;
++  width: -webkit-fit-content;
++  width: -moz-fit-content;
++  width: fit-content;
++  --switch-track-diff: calc(
++    var(--switch-track-width) - var(--switch-track-height)
++  );
++  --switch-thumb-x: var(--switch-track-diff);
++  --switch-track-width: 2.7rem;
++  --switch-track-height: 1.5rem;
++}
++
++[data-scope="switch"][data-part="control"] {
++  display: inline-flex;
++  flex-shrink: 0;
++  justify-content: flex-start;
++  box-sizing: content-box;
++  cursor: pointer;
++  border-radius: 9999px;
++  padding: 0.125rem;
++  width: var(--switch-track-width);
++  height: var(--switch-track-height);
++  transition-property: background-color, border-color, color, fill, stroke,
++    opacity, box-shadow, transform;
++  transition-duration: 150ms;
++  background: #cbd5e0;
++  -webkit-box-pack: start;
++}
++
++[data-scope="switch"][data-part="control"][data-state="checked"] {
++  background: #2ab26b;
++}
++
++[data-scope="switch"][data-part="control"][data-focus] {
++  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.6);
++}
++
++[data-scope="switch"][data-part="control"][data-disabled] {
++  opacity: 0.4;
++  cursor: not-allowed;
++}
++
++[data-scope="switch"][data-part="thumb"] {
++  background: #ffffff;
++  transition-property: transform;
++  transition-duration: 200ms;
++  border-radius: inherit;
++  width: var(--switch-track-height);
++  height: var(--switch-track-height);
++  position: relative;
++}
++
++[data-scope="switch"][data-part="thumb"]::before {
++  -webkit-transition: background-color 0.2s ease-in-out;
++  transition: background-color 0.2s ease-in-out;
++  position: absolute;
++  --thumb-size: calc(var(--switch-track-height) + 0.7rem);
++  height: var(--thumb-size);
++  width: var(--thumb-size);
++  background: transparent;
++  content: "";
++  z-index: 1;
++  top: 50%;
++  left: 50%;
++  transform: translate(-50%, -50%);
++  border-radius: inherit;
++}
++
++[data-scope="switch"][data-part="thumb"][data-state="checked"] {
++  transform: translateX(var(--switch-thumb-x));
++}
++
++[data-scope="switch"][data-part="label"] {
++  user-select: none;
++  margin-inline-start: 0.5rem;
++}
+diff --git a/website/styles/machines/tabs.css b/website/styles/machines/tabs.css
+new file mode 100644
+index 0000000000..df22dd1523
+--- /dev/null
++++ b/website/styles/machines/tabs.css
+@@ -0,0 +1,29 @@
++div:has(> [data-scope="tabs"][data-part="list"]) {
++  width: 100%;
++  max-width: 400px;
++  border-width: 1px;
++  font-size: 0.875rem;
++}
++
++[data-scope="tabs"][data-part="list"] {
++  background: var(--colors-bg-subtle);
++  border-bottom-width: 1px;
++}
++
++[data-scope="tabs"][data-part="trigger"] {
++  padding-inline: 1rem;
++  padding-block: 0.5rem;
++  border-bottom-width: 2px;
++  border-bottom-color: transparent;
++}
++
++[data-scope="tabs"][data-part="trigger"][data-selected] {
++  color: var(--colors-text-primary-bold);
++  border-bottom-color: var(--colors-border-primary-subtle);
++}
++
++[data-scope="tabs"][data-part="content"] {
++  padding: 1rem;
++  background: var(--colors-bg-subtle);
++  min-height: 20px;
++}
+diff --git a/website/styles/machines/tags-input.css b/website/styles/machines/tags-input.css
+new file mode 100644
+index 0000000000..38d9e76189
+--- /dev/null
++++ b/website/styles/machines/tags-input.css
+@@ -0,0 +1,51 @@
++[data-scope="tags-input"][data-part="root"] {
++  width: 400px;
++}
++
++[data-scope="tags-input"][data-part="control"] {
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  margin-top: 0.5rem;
++  padding-block: 2px;
++  padding-inline: 0.25rem;
++}
++
++[data-scope="tags-input"][data-part="control"][data-focus] {
++  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.6);
++}
++
++[data-scope="tags-input"][data-part="item-preview"] {
++  background: var(--colors-bg-bold);
++  padding-inline: 0.5rem;
++  display: inline-block;
++  margin: 4px;
++}
++
++[data-scope="tags-input"][data-part="item-preview"][data-highlighted] {
++  background: var(--colors-bg-primary-bold);
++  color: #ffffff;
++}
++
++[data-scope="tags-input"][data-part="item-preview"][data-disabled] {
++  opacity: 0.6;
++}
++
++[data-scope="tags-input"][data-part="item-delete-trigger"] {
++  margin-left: 0.25rem;
++}
++
++[data-scope="tags-input"][data-part="item-input"] {
++  padding-inline: 0.5rem;
++  width: 2.5rem;
++  outline: 0;
++}
++
++[data-scope="tags-input"][data-part="input"] {
++  background: var(--colors-bg-subtle);
++  padding-inline: 0.5rem;
++  margin: 4px;
++}
++
++[data-scope="tags-input"][data-part="input"]:focus {
++  outline: 0;
++}
+diff --git a/website/styles/machines/toast.css b/website/styles/machines/toast.css
+new file mode 100644
+index 0000000000..dcc24ee1e0
+--- /dev/null
++++ b/website/styles/machines/toast.css
+@@ -0,0 +1,83 @@
++[data-scope="toast"][data-part="group"] {
++  max-width: 420px;
++}
++
++[data-scope="toast"][data-part="root"] {
++  width: 400px;
++  position: relative;
++  color: #ffffff;
++  border-radius: 0.375rem;
++  padding: 1.5rem;
++  box-shadow: rgba(0, 0, 0, 0.12) 0px 5px 10px 0px;
++  animation-fill-mode: forwards;
++  background: #38a169;
++}
++
++[data-scope="toast"][data-part="root"][data-type="info"] {
++  background: #4a5568;
++}
++
++[data-scope="toast"][data-part="root"][data-state="open"] {
++  animation-name: toast-in;
++  animation-duration: 0.35s;
++  animation-timing-function: cubic-bezier(0.21, 1.02, 0.73, 1);
++}
++
++[data-scope="toast"][data-part="root"][data-state="closed"] {
++  animation-name: toast-out;
++  animation-duration: 0.4s;
++  animation-timing-function: cubic-bezier(0.06, 0.71, 0.55, 1);
++}
++
++[data-scope="toast"][data-part="close-trigger"] {
++  display: flex;
++  position: absolute;
++  top: 0.75rem;
++  right: 0.75rem;
++}
++
++/* Toast trigger buttons */
++
++[data-scope="toast"][data-part="group"] + div {
++  display: flex;
++  gap: 16px;
++}
++
++[data-scope="toast"][data-part="group"] + div > button {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  border-width: 1px;
++  background: var(--colors-bg-subtle);
++}
++
++[data-scope="toast"][data-part="group"] + div > button:hover {
++  background: var(--colors-bg-bold);
++}
++
++@keyframes toast-in {
++  from {
++    transform: translate3d(0, 200%, 0) scale(0.6);
++    opacity: 0.5;
++  }
++  to {
++    transform: translate3d(0, 0, 0) scale(1);
++    opacity: 1;
++  }
++}
++
++@keyframes toast-out {
++  from {
++    transform: translate3d(0, 0, -1px) scale(1);
++    opacity: 1;
++  }
++  to {
++    transform: translate3d(0, 150%, -1px) scale(0.6);
++    opacity: 0;
++  }
++}
+diff --git a/website/styles/machines/toggle-group.css b/website/styles/machines/toggle-group.css
+new file mode 100644
+index 0000000000..7d10c48882
+--- /dev/null
++++ b/website/styles/machines/toggle-group.css
+@@ -0,0 +1,32 @@
++[data-scope="toggle-group"][data-part="root"] {
++  display: flex;
++  align-items: center;
++  flex-direction: row;
++  gap: 0px;
++  margin-top: 2.5rem;
++}
++
++[data-scope="toggle-group"][data-part="item"] {
++  width: 2.5rem;
++  height: 2.5rem;
++  display: flex;
++  align-items: center;
++  justify-content: center;
++  background: var(--colors-bg-subtle);
++  border-width: 1px;
++  font-size: 1.25rem;
++}
++
++[data-scope="toggle-group"][data-part="item"]:hover {
++  background: var(--colors-bg-bold);
++}
++
++[data-scope="toggle-group"][data-part="item"][data-state="on"] {
++  background: var(--colors-bg-primary-bold);
++  color: var(--colors-text-inverse);
++}
++
++[data-scope="toggle-group"][data-part="item"][data-disabled] {
++  opacity: 0.5;
++  cursor: not-allowed;
++}
+diff --git a/website/styles/machines/tooltip.css b/website/styles/machines/tooltip.css
+new file mode 100644
+index 0000000000..eb7a84b345
+--- /dev/null
++++ b/website/styles/machines/tooltip.css
+@@ -0,0 +1,34 @@
++[data-scope="tooltip"][data-part="trigger"] {
++  display: inline-flex;
++  align-items: center;
++  justify-content: center;
++  text-align: start;
++  cursor: pointer;
++  font-weight: 500;
++  padding-inline: 1rem;
++  padding-block: 0.25rem;
++  background: var(--colors-bg-primary-subtle);
++  color: #ffffff;
++}
++
++[data-scope="tooltip"][data-part="trigger"]:hover {
++  background: var(--colors-bg-primary-bold);
++}
++
++[data-scope="tooltip"][data-part="content"] {
++  padding-inline: 0.5rem;
++  padding-block: 0.25rem;
++  font-size: 0.875rem;
++  --background: #2d3748;
++  background: var(--background);
++  color: #ffffff;
++}
++
++[data-scope="tooltip"][data-part="arrow"] {
++  --arrow-background: var(--background);
++  --arrow-size: 8px;
++}
++
++[data-scope="tooltip"][data-part="arrow-tip"] {
++  border-radius: 0.125rem;
++}

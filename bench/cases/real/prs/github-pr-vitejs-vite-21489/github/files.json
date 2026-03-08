@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "9071672bae91bdc8269d7e7929af0169878ffd65",
+    "filename": "packages/vite/CHANGELOG.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/vitejs/vite/blob/7cfef8801c53f4c9ff9079d985f38b2e1fd437fd/packages%2Fvite%2FCHANGELOG.md",
+    "raw_url": "https://github.com/vitejs/vite/raw/7cfef8801c53f4c9ff9079d985f38b2e1fd437fd/packages%2Fvite%2FCHANGELOG.md",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2FCHANGELOG.md?ref=7cfef8801c53f4c9ff9079d985f38b2e1fd437fd",
+    "patch": "@@ -792,7 +792,7 @@ See [7.0.0-beta.0 changelog](https://github.com/vitejs/vite/blob/v7.0.0-beta.0/p\n * **assets:** ensure ?no-inline is not included in the asset url in the production environment ([#19496](https://github.com/vitejs/vite/issues/19496)) ([16a73c0](https://github.com/vitejs/vite/commit/16a73c05d35daa34117a173784895546212db5f4))\n * **css:** resolve relative imports in sass properly on Windows ([#19920](https://github.com/vitejs/vite/issues/19920)) ([ffab442](https://github.com/vitejs/vite/commit/ffab44270488f54ae344801024474b597249071b))\n * **deps:** update all non-major dependencies ([#19899](https://github.com/vitejs/vite/issues/19899)) ([a4b500e](https://github.com/vitejs/vite/commit/a4b500ef9ccc9b19a2882156a9ba8397e69bc6b2))\n-* ignore malformed uris in tranform middleware ([#19853](https://github.com/vitejs/vite/issues/19853)) ([e4d5201](https://github.com/vitejs/vite/commit/e4d520141bcd83ad61f16767348b4a813bf9340a))\n+* ignore malformed uris in transform middleware ([#19853](https://github.com/vitejs/vite/issues/19853)) ([e4d5201](https://github.com/vitejs/vite/commit/e4d520141bcd83ad61f16767348b4a813bf9340a))\n * **ssr:** fix execution order of re-export ([#19841](https://github.com/vitejs/vite/issues/19841)) ([ed29dee](https://github.com/vitejs/vite/commit/ed29dee2eb2e3573b2bc337e1a9124c65222a1e5))\n * **ssr:** fix live binding of default export declaration and hoist exports getter ([#19842](https://github.com/vitejs/vite/issues/19842)) ([80a91ff](https://github.com/vitejs/vite/commit/80a91ff82426a4c88d54b9f5ec9a4205cb13899b))\n "
+  },
+  {
+    "sha": "8c8cd4ffe74f3da67bcb8db24fc37c82de5cbc5c",
+    "filename": "playground/assets/__tests__/assets.spec.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/vitejs/vite/blob/7cfef8801c53f4c9ff9079d985f38b2e1fd437fd/playground%2Fassets%2F__tests__%2Fassets.spec.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/7cfef8801c53f4c9ff9079d985f38b2e1fd437fd/playground%2Fassets%2F__tests__%2Fassets.spec.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/playground%2Fassets%2F__tests__%2Fassets.spec.ts?ref=7cfef8801c53f4c9ff9079d985f38b2e1fd437fd",
+    "patch": "@@ -67,7 +67,7 @@ test('should get a 404 when using incorrect case', async () => {\n   expect(barResult.status).toBe(200)\n })\n \n-test('should fallback to index.html when accessing non-existant html file', async () => {\n+test('should fallback to index.html when accessing non-existent html file', async () => {\n   expect((await fetchPath('doesnt-exist.html')).status).toBe(200)\n })\n "
+  }
+]

@@ -1,0 +1,2488 @@
+diff --git a/.changeset/fresh-bikes-eat.md b/.changeset/fresh-bikes-eat.md
+new file mode 100644
+index 00000000000..e92b2ef2dae
+--- /dev/null
++++ b/.changeset/fresh-bikes-eat.md
+@@ -0,0 +1,6 @@
++---
++"@chakra-ui/panda-preset": minor
++"@chakra-ui/react": minor
++---
++
++feat: add tags-input
+diff --git a/apps/compositions/src/examples/segmented-control-with-color-palette.tsx b/apps/compositions/src/examples/segmented-control-with-color-palette.tsx
+new file mode 100644
+index 00000000000..4c67800f162
+--- /dev/null
++++ b/apps/compositions/src/examples/segmented-control-with-color-palette.tsx
+@@ -0,0 +1,27 @@
++import { Center, For, SegmentGroup } from "@chakra-ui/react"
++
++export const SegmentedControlWithColorPalette = () => {
++  return (
++    <Center minH="dvh">
++      <SegmentGroup.Root
++        bg="colorPalette.50"
++        colorPalette="orange"
++        defaultValue="Monthly"
++      >
++        <SegmentGroup.Indicator />
++        <For each={["Monthly", "Yearly"]}>
++          {(item) => (
++            <SegmentGroup.Item key={item} value={item}>
++              <SegmentGroup.ItemText
++                _checked={{ color: "colorPalette.fg", fontWeight: "medium" }}
++              >
++                {item}
++              </SegmentGroup.ItemText>
++              <SegmentGroup.ItemHiddenInput />
++            </SegmentGroup.Item>
++          )}
++        </For>
++      </SegmentGroup.Root>
++    </Center>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-basic.tsx b/apps/compositions/src/examples/tags-input-basic.tsx
+new file mode 100644
+index 00000000000..84f44ebb21c
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-basic.tsx
+@@ -0,0 +1,29 @@
++"use client"
++
++import { Span, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputBasic = () => {
++  return (
++    <TagsInput.Root defaultValue={["React", "Chakra", "TypeScript"]}>
++      <TagsInput.Label>Tags</TagsInput.Label>
++      <TagsInput.Control>
++        <TagsInput.Context>
++          {({ value }) =>
++            value.map((tag, index) => (
++              <TagsInput.Item key={index} index={index} value={tag}>
++                <TagsInput.ItemPreview>
++                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                  <TagsInput.ItemDeleteTrigger />
++                </TagsInput.ItemPreview>
++              </TagsInput.Item>
++            ))
++          }
++        </TagsInput.Context>
++        <TagsInput.Input placeholder="Add tag..." />
++      </TagsInput.Control>
++      <Span textStyle="xs" color="fg.muted" ms="auto">
++        Press Enter or Return to add tag
++      </Span>
++    </TagsInput.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-controlled.tsx b/apps/compositions/src/examples/tags-input-controlled.tsx
+new file mode 100644
+index 00000000000..96a939c9aa4
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-controlled.tsx
+@@ -0,0 +1,33 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++import { useState } from "react"
++
++export const TagsInputControlled = () => {
++  const [tags, setTags] = useState<string[]>(["React", "Chakra"])
++
++  return (
++    <TagsInput.Root
++      value={tags}
++      onValueChange={(details) => setTags(details.value)}
++    >
++      <TagsInput.Label>Tags</TagsInput.Label>
++      <TagsInput.Control>
++        <TagsInput.Context>
++          {({ value }) =>
++            value.map((tag, index) => (
++              <TagsInput.Item key={index} index={index} value={tag}>
++                <TagsInput.ItemPreview>
++                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                  <TagsInput.ItemDeleteTrigger />
++                </TagsInput.ItemPreview>
++                <TagsInput.ItemInput />
++              </TagsInput.Item>
++            ))
++          }
++        </TagsInput.Context>
++        <TagsInput.Input placeholder="Add tag..." />
++      </TagsInput.Control>
++    </TagsInput.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-disabled.tsx b/apps/compositions/src/examples/tags-input-disabled.tsx
+new file mode 100644
+index 00000000000..9220ef021d9
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-disabled.tsx
+@@ -0,0 +1,29 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++export const TagsInputDisabled = () => (
++  <TagsInput.Root disabled defaultValue={["React", "Chakra"]}>
++    <TagsInput.Label>Disabled Tags</TagsInput.Label>
++
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Can't type here" />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-editable.tsx b/apps/compositions/src/examples/tags-input-editable.tsx
+new file mode 100644
+index 00000000000..43e149274d2
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-editable.tsx
+@@ -0,0 +1,33 @@
++"use client"
++
++import { Span, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputEditable = () => (
++  <TagsInput.Root editable defaultValue={["React", "Chakra"]}>
++    <TagsInput.Label>Edit Tags Inline</TagsInput.Label>
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Add or edit tags..." />
++      <TagsInput.ClearTrigger />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++
++    <Span textStyle="xs" color="fg.muted" ms="auto">
++      Use the arrow keys to navigate and press Enter to edit
++    </Span>
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-explorer.tsx b/apps/compositions/src/examples/tags-input-explorer.tsx
+new file mode 100644
+index 00000000000..81454e58d24
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-explorer.tsx
+@@ -0,0 +1,34 @@
++"use client"
++
++import { Stack, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputExplorer = () => {
++  return (
++    <Stack gap="4" maxW="400px" p="4">
++      <TagsInput.Root defaultValue={["React", "Chakra"]}>
++        <TagsInput.Label>Add Tags</TagsInput.Label>
++
++        <TagsInput.Control>
++          <TagsInput.Context>
++            {({ value }) =>
++              value.map((tag, index) => (
++                <TagsInput.Item key={index} index={index} value={tag}>
++                  <TagsInput.ItemPreview>
++                    <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                    <TagsInput.ItemDeleteTrigger />
++                  </TagsInput.ItemPreview>
++                  <TagsInput.ItemInput />
++                </TagsInput.Item>
++              ))
++            }
++          </TagsInput.Context>
++
++          <TagsInput.Input placeholder="Add tag..." />
++          <TagsInput.ClearTrigger />
++        </TagsInput.Control>
++
++        <TagsInput.HiddenInput />
++      </TagsInput.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-invalid.tsx b/apps/compositions/src/examples/tags-input-invalid.tsx
+new file mode 100644
+index 00000000000..637a41979a8
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-invalid.tsx
+@@ -0,0 +1,31 @@
++"use client"
++
++import { Field, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputInvalid = () => (
++  <Field.Root invalid>
++    <TagsInput.Root defaultValue={["React", "Chakra"]}>
++      <TagsInput.Label>Invalid Tags</TagsInput.Label>
++      <TagsInput.Control>
++        <TagsInput.Context>
++          {({ value }) =>
++            value.map((tag, index) => (
++              <TagsInput.Item key={index} index={index} value={tag}>
++                <TagsInput.ItemPreview>
++                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                  <TagsInput.ItemDeleteTrigger />
++                </TagsInput.ItemPreview>
++                <TagsInput.ItemInput />
++              </TagsInput.Item>
++            ))
++          }
++        </TagsInput.Context>
++
++        <TagsInput.Input placeholder="Add tags..." />
++      </TagsInput.Control>
++
++      <TagsInput.HiddenInput />
++    </TagsInput.Root>
++    <Field.ErrorText>This is an error</Field.ErrorText>
++  </Field.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-read-only.tsx b/apps/compositions/src/examples/tags-input-read-only.tsx
+new file mode 100644
+index 00000000000..52362c6608a
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-read-only.tsx
+@@ -0,0 +1,28 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++export const TagsInputReadOnly = () => (
++  <TagsInput.Root readOnly defaultValue={["React", "Chakra"]}>
++    <TagsInput.Label>Read Only Tags</TagsInput.Label>
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Read-only..." />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-validation.tsx b/apps/compositions/src/examples/tags-input-validation.tsx
+new file mode 100644
+index 00000000000..0df0a6fbff1
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-validation.tsx
+@@ -0,0 +1,32 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++export const TagsInputValidation = () => (
++  <TagsInput.Root
++    defaultValue={["React", "Chakra"]}
++    validate={(e) => e.inputValue.length >= 3}
++  >
++    <TagsInput.Label>Tags (min 3 chars)</TagsInput.Label>
++
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Add a tag..." />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-with-blur-behavior.tsx b/apps/compositions/src/examples/tags-input-with-blur-behavior.tsx
+new file mode 100644
+index 00000000000..24e0f224c96
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-blur-behavior.tsx
+@@ -0,0 +1,29 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithBlurBehavior = () => (
++  <TagsInput.Root blurBehavior="add">
++    <TagsInput.Label>Create Tag on Blur</TagsInput.Label>
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Type and blur to create tag..." />
++      <TagsInput.ClearTrigger />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-with-colors.tsx b/apps/compositions/src/examples/tags-input-with-colors.tsx
+new file mode 100644
+index 00000000000..e3bf1975c77
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-colors.tsx
+@@ -0,0 +1,47 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithColors = () => (
++  <TagsInput.Root defaultValue={["React", "Chakra", "TypeScript"]}>
++    <TagsInput.Label>Colored Tags</TagsInput.Label>
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview
++                style={{ backgroundColor: randomColor(tag) }}
++                _highlighted={{ filter: "brightness(0.9)" }}
++              >
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Add tag..." />
++      <TagsInput.ClearTrigger />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
++
++const randomColor = (str: string) => {
++  // Simple hash from string
++  let hash = 0
++  for (let i = 0; i < str.length; i++) {
++    hash = str.charCodeAt(i) + ((hash << 5) - hash)
++  }
++
++  // Generate light HSL color (H: 0-359, S: 60-80%, L: 85-94%)
++  const h = Math.abs(hash) % 360
++  const s = 60 + (Math.abs(hash) % 20) // 60% - 79%
++  const l = 85 + (Math.abs(hash) % 10) // 85% - 94%
++
++  return `hsl(${h},${s}%,${l}%)`
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-combobox.tsx b/apps/compositions/src/examples/tags-input-with-combobox.tsx
+new file mode 100644
+index 00000000000..e48dd020870
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-combobox.tsx
+@@ -0,0 +1,86 @@
++"use client"
++
++import {
++  Combobox,
++  TagsInput,
++  useCombobox,
++  useFilter,
++  useListCollection,
++  useTagsInput,
++} from "@chakra-ui/react"
++import { useId, useRef } from "react"
++
++export const TagsInputWithCombobox = () => {
++  const { contains } = useFilter({ sensitivity: "base" })
++
++  const { collection, filter } = useListCollection({
++    initialItems: [
++      "React",
++      "Chakra",
++      "TypeScript",
++      "Next.js",
++      "Ark UI",
++      "Zag.js",
++    ],
++    filter: contains,
++  })
++
++  const inputId = useId()
++  const controlRef = useRef<HTMLDivElement | null>(null)
++
++  const tags = useTagsInput({
++    ids: { input: inputId },
++  })
++
++  const comobobox = useCombobox({
++    ids: { input: inputId },
++    collection,
++    onInputValueChange(e) {
++      filter(e.inputValue)
++    },
++    positioning: {
++      getAnchorRect() {
++        return controlRef.current!.getBoundingClientRect()
++      },
++    },
++    value: [],
++    allowCustomValue: true,
++    onValueChange: (e) => tags.addValue(e.value[0]),
++    selectionBehavior: "clear",
++  })
++
++  return (
++    <Combobox.RootProvider value={comobobox}>
++      <TagsInput.RootProvider value={tags}>
++        <TagsInput.Label>Tags</TagsInput.Label>
++
++        <TagsInput.Control ref={controlRef}>
++          {tags.value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++            </TagsInput.Item>
++          ))}
++
++          <Combobox.Input unstyled asChild>
++            <TagsInput.Input placeholder="Add tag..." />
++          </Combobox.Input>
++        </TagsInput.Control>
++
++        <Combobox.Positioner>
++          <Combobox.Content>
++            <Combobox.Empty>No tags found</Combobox.Empty>
++            {collection.items.map((item) => (
++              <Combobox.Item item={item} key={item}>
++                <Combobox.ItemText>{item}</Combobox.ItemText>
++                <Combobox.ItemIndicator />
++              </Combobox.Item>
++            ))}
++          </Combobox.Content>
++        </Combobox.Positioner>
++      </TagsInput.RootProvider>
++    </Combobox.RootProvider>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-delimiter.tsx b/apps/compositions/src/examples/tags-input-with-delimiter.tsx
+new file mode 100644
+index 00000000000..c050dc33c0d
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-delimiter.tsx
+@@ -0,0 +1,31 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++const SPLIT_REGEX = /[;,]/
++
++export const TagsInputWithDelimiter = () => (
++  <TagsInput.Root delimiter={SPLIT_REGEX}>
++    <TagsInput.Label>Custom Delimiters (; ,)</TagsInput.Label>
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Type and use ; or , to create tag..." />
++      <TagsInput.ClearTrigger />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-with-field.tsx b/apps/compositions/src/examples/tags-input-with-field.tsx
+new file mode 100644
+index 00000000000..a5921ecb95b
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-field.tsx
+@@ -0,0 +1,29 @@
++"use client"
++
++import { Field, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithField = () => {
++  return (
++    <Field.Root>
++      <TagsInput.Root defaultValue={["React", "Chakra", "TypeScript"]}>
++        <TagsInput.Label>Enter tags</TagsInput.Label>
++        <TagsInput.Control>
++          <TagsInput.Context>
++            {({ value }) =>
++              value.map((tag, index) => (
++                <TagsInput.Item key={index} index={index} value={tag}>
++                  <TagsInput.ItemPreview>
++                    <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                    <TagsInput.ItemDeleteTrigger />
++                  </TagsInput.ItemPreview>
++                </TagsInput.Item>
++              ))
++            }
++          </TagsInput.Context>
++          <TagsInput.Input placeholder="Add tag..." />
++        </TagsInput.Control>
++      </TagsInput.Root>
++      <Field.HelperText>Add emails separated by commas</Field.HelperText>
++    </Field.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-form.tsx b/apps/compositions/src/examples/tags-input-with-form.tsx
+new file mode 100644
+index 00000000000..eb5a2684bee
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-form.tsx
+@@ -0,0 +1,55 @@
++"use client"
++
++import { Button, Field, Input, Stack, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithForm = () => {
++  return (
++    <form
++      onSubmit={(e) => {
++        e.preventDefault()
++        const formData = new FormData(e.currentTarget)
++        const title = formData.get("title")
++        const categories = formData.get("categories")
++        console.log("Submitted formData:", { title, categories })
++      }}
++    >
++      <Stack gap="4">
++        <Field.Root>
++          <Field.Label>Title</Field.Label>
++          <Input name="title" />
++        </Field.Root>
++
++        <Field.Root>
++          <TagsInput.Root name="categories">
++            <TagsInput.Label>Categories</TagsInput.Label>
++            <TagsInput.Control>
++              <TagsInput.Context>
++                {({ value }) =>
++                  value.map((tag, index) => (
++                    <TagsInput.Item key={index} index={index} value={tag}>
++                      <TagsInput.ItemPreview>
++                        <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                        <TagsInput.ItemDeleteTrigger />
++                      </TagsInput.ItemPreview>
++                      <TagsInput.HiddenInput />
++                    </TagsInput.Item>
++                  ))
++                }
++              </TagsInput.Context>
++              <TagsInput.Input placeholder="Add tag..." />
++            </TagsInput.Control>
++
++            <TagsInput.HiddenInput />
++          </TagsInput.Root>
++          <Field.HelperText>
++            Add frameworks and libraries you use
++          </Field.HelperText>
++        </Field.Root>
++
++        <Button type="submit" variant="solid" mt="3">
++          Submit
++        </Button>
++      </Stack>
++    </form>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-max.tsx b/apps/compositions/src/examples/tags-input-with-max.tsx
+new file mode 100644
+index 00000000000..a8621f759f0
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-max.tsx
+@@ -0,0 +1,48 @@
++"use client"
++
++import { Badge, Button, HStack, Span, TagsInput } from "@chakra-ui/react"
++
++const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
++const isValidEmail = (value: string) => EMAIL_REGEX.test(value)
++
++export const TagsInputWithMax = () => {
++  return (
++    <TagsInput.Root
++      max={3}
++      validate={(e) => isValidEmail(e.inputValue)}
++      defaultValue={["sage@company.com"]}
++    >
++      <TagsInput.Label>Invite guests (max 3)</TagsInput.Label>
++
++      <TagsInput.Control>
++        <TagsInput.Context>
++          {({ value }) =>
++            value.map((tag, index) => (
++              <TagsInput.Item key={index} index={index} value={tag}>
++                <TagsInput.ItemPreview>
++                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                  <TagsInput.ItemDeleteTrigger />
++                </TagsInput.ItemPreview>
++                <TagsInput.ItemInput />
++              </TagsInput.Item>
++            ))
++          }
++        </TagsInput.Context>
++
++        <TagsInput.Input placeholder="Add guests" />
++      </TagsInput.Control>
++
++      <TagsInput.Context>
++        {({ value }) => (
++          <HStack justify="space-between" hidden={value.length === 0} mt="2.5">
++            <Span>
++              You've invited <Badge>{value.length} / 3 guests</Badge> to your
++              event
++            </Span>
++            <Button size="sm">Invite</Button>
++          </HStack>
++        )}
++      </TagsInput.Context>
++    </TagsInput.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-paste.tsx b/apps/compositions/src/examples/tags-input-with-paste.tsx
+new file mode 100644
+index 00000000000..33f10894451
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-paste.tsx
+@@ -0,0 +1,29 @@
++"use client"
++
++import { TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithPaste = () => (
++  <TagsInput.Root addOnPaste delimiter=",">
++    <TagsInput.Label>Paste Tags</TagsInput.Label>
++    <TagsInput.Control>
++      <TagsInput.Context>
++        {({ value }) =>
++          value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))
++        }
++      </TagsInput.Context>
++
++      <TagsInput.Input placeholder="Paste comma-separated tags..." />
++      <TagsInput.ClearTrigger />
++    </TagsInput.Control>
++
++    <TagsInput.HiddenInput />
++  </TagsInput.Root>
++)
+diff --git a/apps/compositions/src/examples/tags-input-with-sizes.tsx b/apps/compositions/src/examples/tags-input-with-sizes.tsx
+new file mode 100644
+index 00000000000..71434d8550f
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-sizes.tsx
+@@ -0,0 +1,40 @@
++"use client"
++
++import { For, Span, Stack, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithSizes = () => {
++  return (
++    <Stack>
++      <For each={["xs", "sm", "md", "lg"]}>
++        {(size) => (
++          <TagsInput.Root
++            key={size}
++            size={size}
++            readOnly
++            defaultValue={["React", "Chakra", "TypeScript"]}
++          >
++            <TagsInput.Label>Tags (size={size})</TagsInput.Label>
++            <TagsInput.Control>
++              <TagsInput.Context>
++                {({ value }) =>
++                  value.map((tag, index) => (
++                    <TagsInput.Item key={index} index={index} value={tag}>
++                      <TagsInput.ItemPreview>
++                        <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                        <TagsInput.ItemDeleteTrigger />
++                      </TagsInput.ItemPreview>
++                    </TagsInput.Item>
++                  ))
++                }
++              </TagsInput.Context>
++              <TagsInput.Input placeholder="Add tag..." />
++            </TagsInput.Control>
++            <Span textStyle="xs" color="fg.muted" ms="auto">
++              Press Enter or Return to add tag
++            </Span>
++          </TagsInput.Root>
++        )}
++      </For>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-store.tsx b/apps/compositions/src/examples/tags-input-with-store.tsx
+new file mode 100644
+index 00000000000..072dac9eebe
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-store.tsx
+@@ -0,0 +1,32 @@
++"use client"
++
++import { Button, Stack, TagsInput } from "@chakra-ui/react"
++import { useTagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithStore = () => {
++  const tags = useTagsInput()
++
++  return (
++    <Stack align="flex-start" gap="4">
++      <TagsInput.RootProvider value={tags}>
++        <TagsInput.Label>Tags: {JSON.stringify(tags.value)}</TagsInput.Label>
++        <TagsInput.Control>
++          {tags.value.map((tag, index) => (
++            <TagsInput.Item key={index} index={index} value={tag}>
++              <TagsInput.ItemPreview>
++                <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                <TagsInput.ItemDeleteTrigger />
++              </TagsInput.ItemPreview>
++              <TagsInput.ItemInput />
++            </TagsInput.Item>
++          ))}
++          <TagsInput.Input placeholder="Add tag..." />
++        </TagsInput.Control>
++      </TagsInput.RootProvider>
++
++      <Button variant="outline" size="sm" onClick={() => tags.clearValue()}>
++        Clear All
++      </Button>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/tags-input-with-variants.tsx b/apps/compositions/src/examples/tags-input-with-variants.tsx
+new file mode 100644
+index 00000000000..9d45cb8cdb0
+--- /dev/null
++++ b/apps/compositions/src/examples/tags-input-with-variants.tsx
+@@ -0,0 +1,40 @@
++"use client"
++
++import { For, Span, Stack, TagsInput } from "@chakra-ui/react"
++
++export const TagsInputWithVariants = () => {
++  return (
++    <Stack>
++      <For each={["outline", "subtle", "flushed"]}>
++        {(variant) => (
++          <TagsInput.Root
++            key={variant}
++            variant={variant}
++            readOnly
++            defaultValue={["React", "Chakra", "TypeScript"]}
++          >
++            <TagsInput.Label>Tags (variant={variant})</TagsInput.Label>
++            <TagsInput.Control>
++              <TagsInput.Context>
++                {({ value }) =>
++                  value.map((tag, index) => (
++                    <TagsInput.Item key={index} index={index} value={tag}>
++                      <TagsInput.ItemPreview>
++                        <TagsInput.ItemText>{tag}</TagsInput.ItemText>
++                        <TagsInput.ItemDeleteTrigger />
++                      </TagsInput.ItemPreview>
++                    </TagsInput.Item>
++                  ))
++                }
++              </TagsInput.Context>
++              <TagsInput.Input placeholder="Add tag..." />
++            </TagsInput.Control>
++            <Span textStyle="xs" color="fg.muted" ms="auto">
++              Press Enter or Return to add tag
++            </Span>
++          </TagsInput.Root>
++        )}
++      </For>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/ui/tags-input.tsx b/apps/compositions/src/ui/tags-input.tsx
+new file mode 100644
+index 00000000000..68630afc7f8
+--- /dev/null
++++ b/apps/compositions/src/ui/tags-input.tsx
+@@ -0,0 +1,78 @@
++"use client"
++
++import { TagsInput as ChakraTagsInput } from "@chakra-ui/react"
++import { CloseButton } from "compositions/ui/close-button"
++import * as React from "react"
++
++interface TagsInputControlProps extends ChakraTagsInput.ControlProps {
++  clearable?: boolean
++}
++
++export const TagsInputControl = React.forwardRef<
++  HTMLDivElement,
++  TagsInputControlProps
++>(function TagsInputControl(props, ref) {
++  const { children, clearable, ...rest } = props
++  return (
++    <ChakraTagsInput.Control {...rest} ref={ref}>
++      {children}
++      {clearable && <TagsInputClearTrigger />}
++    </ChakraTagsInput.Control>
++  )
++})
++
++const TagsInputClearTrigger = React.forwardRef<
++  HTMLButtonElement,
++  ChakraTagsInput.ClearTriggerProps
++>(function TagsInputClearTrigger(props, ref) {
++  return (
++    <ChakraTagsInput.ClearTrigger asChild {...props} ref={ref}>
++      <CloseButton
++        size="xs"
++        variant="plain"
++        focusVisibleRing="inside"
++        focusRingWidth="2px"
++        pointerEvents="auto"
++      />
++    </ChakraTagsInput.ClearTrigger>
++  )
++})
++
++export const TagsInputItem = React.forwardRef<
++  HTMLDivElement,
++  ChakraTagsInput.ItemProps
++>(function TagsInputItem(props, ref) {
++  const { children, ...rest } = props
++  return (
++    <ChakraTagsInput.Item {...rest} ref={ref}>
++      <ChakraTagsInput.ItemText>{children}</ChakraTagsInput.ItemText>
++      <ChakraTagsInput.ItemDeleteTrigger asChild>
++        <CloseButton
++          size="2xs"
++          variant="plain"
++          focusVisibleRing="inside"
++          focusRingWidth="2px"
++          pointerEvents="auto"
++        />
++      </ChakraTagsInput.ItemDeleteTrigger>
++    </ChakraTagsInput.Item>
++  )
++})
++
++export const TagsInputRoot = React.forwardRef<
++  HTMLDivElement,
++  ChakraTagsInput.RootProps
++>(function TagsInputRoot(props, ref) {
++  return <ChakraTagsInput.Root {...props} ref={ref} />
++}) as ChakraTagsInput.RootProps
++
++export const TagsInputItemText = ChakraTagsInput.ItemText
++export const TagsInputItemPreview = ChakraTagsInput.ItemPreview
++export const TagsInputItemInput = ChakraTagsInput.ItemInput
++export const TagsInputItemContext = ChakraTagsInput.ItemContext
++export const TagsInputRootProvider = ChakraTagsInput.RootProvider
++export const TagsInputPropsProvider = ChakraTagsInput.PropsProvider
++export const TagsInputLabel = ChakraTagsInput.Label
++export const TagsInputInput = ChakraTagsInput.Input
++export const TagsInputContext = ChakraTagsInput.Context
++export const TagsInputHiddenInput = ChakraTagsInput.HiddenInput
+diff --git a/apps/www/content/docs/components/segmented-control.mdx b/apps/www/content/docs/components/segmented-control.mdx
+index ce3d4a7fefd..19d56c98626 100644
+--- a/apps/www/content/docs/components/segmented-control.mdx
++++ b/apps/www/content/docs/components/segmented-control.mdx
+@@ -93,6 +93,14 @@ Use the `disabled` prop on the item to disable it.
+ 
+ <ExampleTabs name="segmented-control-with-disabled-item" />
+ 
++### Color Palette
++
++By default, the segment control doesn't support changing the design via the
++`colorPalette` prop. This example shows how to customize the segmented control
++to make the `colorPalette` prop work.
++
++<ExampleTabs name="segmented-control-with-color-palette" />
++
+ ### Icon
+ 
+ Render the `label` as a `ReactNode` to render an icon.
+diff --git a/apps/www/content/docs/components/tags-input.mdx b/apps/www/content/docs/components/tags-input.mdx
+new file mode 100644
+index 00000000000..89bb4ac7bf7
+--- /dev/null
++++ b/apps/www/content/docs/components/tags-input.mdx
+@@ -0,0 +1,170 @@
++---
++title: Tags Input
++description:
++  Used to enter multiple values as tags with features like tag creation,
++  deletion, and keyboard navigation.
++links:
++  source: components/tags-input
++  storybook: components-tags-input--basic
++  recipe: tags-input
++  ark: https://ark-ui.com/docs/components/tags-input
++---
++
++<ExampleTabs name="tags-input-basic" />
++
++## Usage
++
++```jsx
++import { TagsInput } from "@chakra-ui/react"
++```
++
++```jsx
++<TagsInput.Root>
++  <TagsInput.Label />
++  <TagsInput.Control>
++    <TagsInput.Item>
++      <TagsInput.ItemPreview>
++        <TagsInput.ItemText />
++        <TagsInput.ItemDeleteTrigger />
++      </TagsInput.ItemPreview>
++      <TagsInput.ItemInput />
++    </TagsInput.Item>
++    <TagsInput.Input />
++    <TagsInput.ClearTrigger />
++  </TagsInput.Control>
++  <TagsInput.HiddenInput />
++</TagsInput.Root>
++```
++
++## Examples
++
++### Sizes
++
++Use the `size` prop to adjust the size of the tags input.
++
++<ExampleTabs name="tags-input-with-sizes" />
++
++### Variants
++
++Use the `variant` prop to change the visual style of the tags input.
++
++<ExampleTabs name="tags-input-with-variants" />
++
++### Controlled
++
++Use the `value` and `onValueChange` props to programmatically control the tags.
++
++<ExampleTabs name="tags-input-controlled" />
++
++### Store
++
++An alternative way to control the tags input is to use the `RootProvider`
++component and the `useTagsInput` store hook.
++
++This way you can access the tags input state and methods from outside the
++component.
++
++> Use `RootProvider + useTagsInput` or `Root`, not both.
++
++<ExampleTabs name="tags-input-with-store" />
++
++### Max Tags
++
++Pass the `max` prop to the `TagsInput.Root` component to limit the number of
++tags that can be added.
++
++<ExampleTabs name="tags-input-with-max" />
++
++### Editable Tags
++
++Use the `editable` prop to enable inline editing of existing tags by clicking on
++them, allowing users to quickly update tag values.
++
++<ExampleTabs name="tags-input-editable" />
++
++### Validate Tag
++
++Use the `validate` prop to implement custom validation rules. Tags will be added
++when the validation passes.
++
++<ExampleTabs name="tags-input-validation" />
++
++### Disabled
++
++Use the `disabled` prop to disable the tags input to prevent user interaction.
++
++<ExampleTabs name="tags-input-disabled" />
++
++### Readonly
++
++Use the `readOnly` prop to make the tags input read-only. Tags input can be
++focused but can't be modified.
++
++<ExampleTabs name="tags-input-read-only" />
++
++### Invalid
++
++Pass the `invalid` prop to the `TagsInput.Root` component to display the tags
++input in an invalid state with error messages.
++
++<ExampleTabs name="tags-input-invalid" />
++
++### Field
++
++Here's an example that composes the `TagsInput.Root` with the `Field` component
++to add labels, helper text, and error messages.
++
++<ExampleTabs name="tags-input-with-field" />
++
++### Form
++
++Here's an example that composes the `TagsInput.Root` with a `form` to collect
++structured data and handle submissions.
++
++<ExampleTabs name="tags-input-with-form" />
++
++### Paste
++
++Pass the `addOnPaste` prop to the `TagsInput.Root` component to allow users to
++paste multiple values at once, automatically splitting them into individual tags
++based on a delimiter.
++
++<ExampleTabs name="tags-input-with-paste" />
++
++### Blur Behavior
++
++Use the `blurBehavior` prop to configure how the input behaves when it loses
++focus, such as automatically creating a tag from the current input value.
++
++<ExampleTabs name="tags-input-with-blur-behavior" />
++
++### Custom Delimiter
++
++Use the `delimiter` prop to use custom delimiters like commas, semicolons, or
++spaces to create new tags as users type.
++
++<ExampleTabs name="tags-input-with-delimiter" />
++
++### Colors
++
++Here's an example that assigns rather color scheme to the tags based on the tag
++value.
++
++<ExampleTabs name="tags-input-with-colors" />
++
++### Combobox
++
++Here's an example that composes the `TagsInput` component with the `Combobox`
++component to create a tags input that allows users to select from a list of
++predefined tags.
++
++<ExampleTabs name="tags-input-with-combobox" />
++
++## Props
++
++## Explorer
++
++Explore the `TagsInput` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="tags-input-explorer" />
+diff --git a/apps/www/docs.config.ts b/apps/www/docs.config.ts
+index e74eff3720d..c6aa581e42a 100644
+--- a/apps/www/docs.config.ts
++++ b/apps/www/docs.config.ts
+@@ -151,6 +151,7 @@ const docsLinks: NavItem = {
+             { title: "Listbox", url: "listbox", status: "new" },
+             { title: "Select", url: "select" },
+             { title: "Tree View", url: "tree-view", status: "beta" },
++            // { title: "Tags Input", url: "tags-input", status: "beta" },
+           ],
+         },
+         {
+diff --git a/apps/www/public/compositions/index.json b/apps/www/public/compositions/index.json
+index a841668dba6..beb6bddd51d 100644
+--- a/apps/www/public/compositions/index.json
++++ b/apps/www/public/compositions/index.json
+@@ -420,6 +420,16 @@
+     "npmDependencies": [],
+     "fileDependencies": []
+   },
++  {
++    "type": "composition",
++    "id": "tags-input",
++    "file": "tags-input.tsx",
++    "component": "TagsInput",
++    "npmDependencies": [],
++    "fileDependencies": [
++      "compositions/ui/close-button"
++    ]
++  },
+   {
+     "type": "composition",
+     "id": "timeline",
+diff --git a/apps/www/public/compositions/tags-input.json b/apps/www/public/compositions/tags-input.json
+new file mode 100644
+index 00000000000..ed38144c11e
+--- /dev/null
++++ b/apps/www/public/compositions/tags-input.json
+@@ -0,0 +1,13 @@
++{
++  "type": "composition",
++  "npmDependencies": [],
++  "fileDependencies": [
++    "compositions/ui/close-button"
++  ],
++  "id": "tags-input",
++  "file": {
++    "name": "tags-input.tsx",
++    "content": "\"use client\"\n\nimport { TagsInput as ChakraTagsInput } from \"@chakra-ui/react\"\nimport { CloseButton } from \"./close-button\"\nimport * as React from \"react\"\n\ninterface TagsInputControlProps extends ChakraTagsInput.ControlProps {\n  clearable?: boolean\n}\n\nexport const TagsInputControl = React.forwardRef<\n  HTMLDivElement,\n  TagsInputControlProps\n>(function TagsInputControl(props, ref) {\n  const { children, clearable, ...rest } = props\n  return (\n    <ChakraTagsInput.Control {...rest} ref={ref}>\n      {children}\n      {clearable && <TagsInputClearTrigger />}\n    </ChakraTagsInput.Control>\n  )\n})\n\nconst TagsInputClearTrigger = React.forwardRef<\n  HTMLButtonElement,\n  ChakraTagsInput.ClearTriggerProps\n>(function TagsInputClearTrigger(props, ref) {\n  return (\n    <ChakraTagsInput.ClearTrigger asChild {...props} ref={ref}>\n      <CloseButton\n        size=\"xs\"\n        variant=\"plain\"\n        focusVisibleRing=\"inside\"\n        focusRingWidth=\"2px\"\n        pointerEvents=\"auto\"\n      />\n    </ChakraTagsInput.ClearTrigger>\n  )\n})\n\nexport const TagsInputItem = React.forwardRef<\n  HTMLDivElement,\n  ChakraTagsInput.ItemProps\n>(function TagsInputItem(props, ref) {\n  const { children, ...rest } = props\n  return (\n    <ChakraTagsInput.Item {...rest} ref={ref}>\n      <ChakraTagsInput.ItemText>{children}</ChakraTagsInput.ItemText>\n      <ChakraTagsInput.ItemDeleteTrigger asChild>\n        <CloseButton\n          size=\"2xs\"\n          variant=\"plain\"\n          focusVisibleRing=\"inside\"\n          focusRingWidth=\"2px\"\n          pointerEvents=\"auto\"\n        />\n      </ChakraTagsInput.ItemDeleteTrigger>\n    </ChakraTagsInput.Item>\n  )\n})\n\nexport const TagsInputRoot = React.forwardRef<\n  HTMLDivElement,\n  ChakraTagsInput.RootProps\n>(function TagsInputRoot(props, ref) {\n  return <ChakraTagsInput.Root {...props} ref={ref} />\n}) as ChakraTagsInput.RootProps\n\nexport const TagsInputItemText = ChakraTagsInput.ItemText\nexport const TagsInputItemPreview = ChakraTagsInput.ItemPreview\nexport const TagsInputItemInput = ChakraTagsInput.ItemInput\nexport const TagsInputItemContext = ChakraTagsInput.ItemContext\nexport const TagsInputRootProvider = ChakraTagsInput.RootProvider\nexport const TagsInputPropsProvider = ChakraTagsInput.PropsProvider\nexport const TagsInputLabel = ChakraTagsInput.Label\nexport const TagsInputInput = ChakraTagsInput.Input\nexport const TagsInputContext = ChakraTagsInput.Context\nexport const TagsInputHiddenInput = ChakraTagsInput.HiddenInput\n"
++  },
++  "component": "TagsInput"
++}
+\ No newline at end of file
+diff --git a/apps/www/public/r/examples/listbox.json b/apps/www/public/r/examples/listbox.json
+new file mode 100644
+index 00000000000..f5ba031a795
+--- /dev/null
++++ b/apps/www/public/r/examples/listbox.json
+@@ -0,0 +1,220 @@
++{
++  "name": "listbox",
++  "snippet": null,
++  "examples": [
++    {
++      "name": "listbox-basic",
++      "content": "\"use client\"\nexport const ListboxBasic = () => {\n  return (\n    <Listbox.Root collection={frameworks} width=\"320px\">\n      <Listbox.Label>Select framework</Listbox.Label>\n      <Listbox.Content>\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Listbox, createListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-controlled",
++      "content": "\"use client\"\nexport const ListboxControlled = () => {\n  const [value, setValue] = useState<string[]>([])\n\n  return (\n    <Stack maxWidth=\"320px\" width=\"full\" gap=\"4\">\n      <Listbox.Root\n        collection={frameworks}\n        value={value}\n        onValueChange={(details) => setValue(details.value)}\n      >\n        <Listbox.Label>Select framework</Listbox.Label>\n        <Listbox.Content>\n          {frameworks.items.map((framework) => (\n            <Listbox.Item item={framework} key={framework.value}>\n              <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n              <Listbox.ItemIndicator />\n            </Listbox.Item>\n          ))}\n        </Listbox.Content>\n      </Listbox.Root>\n\n      <Code alignSelf=\"flex-start\">\n        Selected: {JSON.stringify(value, null, 2)}\n      </Code>\n    </Stack>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Code, Listbox, Stack, createListCollection } from \"@chakra-ui/react\"",
++        "import { useState } from \"react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-disabled-item",
++      "content": "\"use client\"\nexport const ListboxDisabledItem = () => {\n  return (\n    <Listbox.Root collection={frameworks} width=\"320px\">\n      <Listbox.Label>Select framework</Listbox.Label>\n      <Listbox.Content>\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\", disabled: true },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\", disabled: true },\n    { label: \"Next.js\", value: \"nextjs\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Listbox, createListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-explorer",
++      "content": "\"use client\"\nexport const ListboxExplorer = () => {\n  const { contains } = useFilter({ sensitivity: \"base\" })\n\n  const initialItems = [\n    {\n      label: \"React.js\",\n      value: \"react\",\n      icon: <LuAtom size={16} />,\n      category: \"JavaScript\",\n    },\n    {\n      label: \"Vue.js\",\n      value: \"vue\",\n      icon: <LuPalette size={16} />,\n      category: \"JavaScript\",\n    },\n    {\n      label: \"Angular\",\n      value: \"angular\",\n      icon: <LuGlobe size={16} />,\n      category: \"JavaScript\",\n    },\n    {\n      label: \"Svelte\",\n      value: \"svelte\",\n      icon: <LuZap size={16} />,\n      category: \"JavaScript\",\n    },\n    { label: \"Naruto\", value: \"naruto\", category: \"Anime\" },\n    { label: \"One Piece\", value: \"one-piece\", category: \"Anime\" },\n    { label: \"The Godfather\", value: \"godfather\", category: \"Movies\" },\n    { label: \"The Dark Knight\", value: \"dark-knight\", category: \"Movies\" },\n  ]\n\n  const { collection, filter } = useListCollection({\n    initialItems,\n    filter: contains,\n    groupBy: (item) => item.category,\n  })\n\n  return (\n    <Listbox.Root\n      maxW=\"320px\"\n      collection={collection}\n      defaultValue={[collection.items[0].value]}\n    >\n      <Listbox.Label>Select item</Listbox.Label>\n\n      <Listbox.Input\n        as={Input}\n        placeholder=\"Type to filter...\"\n        onChange={(e) => filter(e.target.value)}\n      />\n\n      <Listbox.Content maxH=\"240px\" divideY=\"1px\">\n        {collection.group().map(([category, items]) => (\n          <Listbox.ItemGroup key={category}>\n            <Listbox.ItemGroupLabel>{category}</Listbox.ItemGroupLabel>\n            {items.map((item) => (\n              <Listbox.Item item={item} key={item.value}>\n                <Box display=\"flex\" alignItems=\"center\" gap=\"3\" flex=\"1\">\n                  {item.icon && (\n                    <Box color=\"fg.muted\" flexShrink=\"0\">\n                      {item.icon}\n                    </Box>\n                  )}\n                  <Listbox.ItemText>{item.label}</Listbox.ItemText>\n                </Box>\n                <Listbox.ItemIndicator />\n              </Listbox.Item>\n            ))}\n          </Listbox.ItemGroup>\n        ))}\n        <Listbox.Empty>No results found</Listbox.Empty>\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Box,\n  Input,\n  Listbox,\n  useFilter,\n  useListCollection,\n} from \"@chakra-ui/react\"",
++        "import { LuAtom, LuGlobe, LuPalette, LuZap } from \"react-icons/lu\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\"",
++      "npmDependencies": [
++        "react-icons"
++      ]
++    },
++    {
++      "name": "listbox-extended-select",
++      "content": "\"use client\"\nexport const ListboxExtendedSelect = () => {\n  return (\n    <Listbox.Root collection={frameworks} selectionMode=\"extended\">\n      <Listbox.Label>\n        Select frameworks (hold <Kbd>⌘</Kbd> or <Kbd>^</Kbd> to select multiple)\n      </Listbox.Label>\n      <Listbox.Content maxW=\"320px\">\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Kbd, Listbox, createListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-grouped",
++      "content": "\"use client\"\nexport const ListboxGrouped = () => {\n  return (\n    <Listbox.Root collection={collection} width=\"320px\">\n      <Listbox.Label>Select media</Listbox.Label>\n      <Listbox.Content divideY=\"1px\">\n        {collection.group().map(([category, items]) => (\n          <Listbox.ItemGroup key={category}>\n            <Listbox.ItemGroupLabel>{category}</Listbox.ItemGroupLabel>\n            {items.map((item) => (\n              <Listbox.Item item={item} key={item.value}>\n                <Listbox.ItemText>{item.label}</Listbox.ItemText>\n                <Listbox.ItemIndicator />\n              </Listbox.Item>\n            ))}\n          </Listbox.ItemGroup>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst collection = createListCollection({\n  items: [\n    { label: \"Naruto\", value: \"naruto\", category: \"Anime\" },\n    { label: \"One Piece\", value: \"one-piece\", category: \"Anime\" },\n    { label: \"Dragon Ball\", value: \"dragon-ball\", category: \"Anime\" },\n    {\n      label: \"The Shawshank Redemption\",\n      value: \"the-shawshank-redemption\",\n      category: \"Movies\",\n    },\n    { label: \"The Godfather\", value: \"the-godfather\", category: \"Movies\" },\n    { label: \"The Dark Knight\", value: \"the-dark-knight\", category: \"Movies\" },\n  ],\n  groupBy: (item) => item.category,\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Listbox, createListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-horizontal",
++      "content": "\"use client\"\nexport const ListboxHorizontal = () => {\n  return (\n    <Listbox.Root\n      collection={musicAlbums}\n      orientation=\"horizontal\"\n      maxW=\"640px\"\n    >\n      <Listbox.Label>Select Album</Listbox.Label>\n      <Listbox.Content>\n        {musicAlbums.items.map((album) => (\n          <Listbox.Item\n            item={album}\n            key={album.value}\n            flexDirection=\"column\"\n            alignItems=\"flex-start\"\n            gap=\"2\"\n            position=\"relative\"\n          >\n            <Image\n              src={album.image}\n              alt={album.title}\n              bg=\"bg.subtle\"\n              objectFit=\"cover\"\n              aspectRatio=\"1\"\n              borderRadius=\"l2\"\n              flexShrink=\"0\"\n              height=\"150px\"\n              minWidth=\"150px\"\n            />\n            <Stack gap=\"0\">\n              <Text fontSize=\"sm\" fontWeight=\"medium\" whiteSpace=\"nowrap\">\n                {album.title}\n              </Text>\n              <Text fontSize=\"xs\">{album.artist}</Text>\n            </Stack>\n            <Listbox.ItemIndicator\n              position=\"absolute\"\n              top=\"4\"\n              right=\"4\"\n              layerStyle=\"fill.solid\"\n              borderWidth=\"2px\"\n              borderColor=\"fg.inverted\"\n            />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst musicAlbums = createListCollection({\n  items: [\n    {\n      value: \"euphoric-echoes\",\n      title: \"Euphoric Echoes\",\n      artist: \"Luna Solstice\",\n      image:\n        \"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=160&h=160&fit=crop\",\n    },\n    {\n      value: \"neon-dreamscape\",\n      title: \"Neon Dreamscape\",\n      artist: \"Electra Skyline\",\n      image:\n        \"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=160&h=160&fit=crop\",\n    },\n    {\n      value: \"cosmic-serenade\",\n      title: \"Cosmic Serenade\",\n      artist: \"Orion's Symphony\",\n      image:\n        \"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=160&h=160&fit=crop\",\n    },\n    {\n      value: \"melancholy-melodies\",\n      title: \"Melancholy Melodies\",\n      artist: \"Violet Mistral\",\n      image:\n        \"https://images.unsplash.com/photo-1571330735066-03aaa9429d89?w=160&h=160&fit=crop\",\n    },\n    {\n      value: \"rhythmic-illusions\",\n      title: \"Rhythmic Illusions\",\n      artist: \"Mirage Beats\",\n      image:\n        \"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=160&h=160&fit=crop\",\n    },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Image,\n  Listbox,\n  Stack,\n  Text,\n  createListCollection,\n} from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-image-explorer",
++      "content": "\"use client\"\nexport const ListboxImageExplorer = () => {\n  const [selectedImage, setSelectedImage] = useState<string>(\"mountains\")\n\n  const handleSelectionChange = (details: any) => {\n    if (details.value.length > 0) {\n      setSelectedImage(details.value[0])\n    }\n  }\n\n  const currentImage = images.items.find((img) => img.value === selectedImage)\n\n  return (\n    <Flex gap=\"6\" maxW=\"800px\">\n      <Listbox.Root\n        maxW=\"2xs\"\n        collection={images}\n        value={[selectedImage]}\n        onValueChange={handleSelectionChange}\n        variant=\"solid\"\n      >\n        <Listbox.Content border=\"0\">\n          {images.items.map((image) => (\n            <Listbox.Item item={image} key={image.value}>\n              <Listbox.ItemText>{image.label}</Listbox.ItemText>\n              <Listbox.ItemIndicator />\n            </Listbox.Item>\n          ))}\n        </Listbox.Content>\n      </Listbox.Root>\n\n      <Box flex=\"1\">\n        {currentImage && (\n          <Box>\n            <Text fontSize=\"lg\" fontWeight=\"semibold\" mb=\"3\">\n              {currentImage.label}\n            </Text>\n            <Image\n              src={currentImage.url}\n              alt={currentImage.label}\n              borderRadius=\"md\"\n              maxH=\"400px\"\n              width=\"full\"\n              objectFit=\"cover\"\n            />\n            <Text fontSize=\"sm\" color=\"fg.muted\" mt=\"2\">\n              {currentImage.description}\n            </Text>\n          </Box>\n        )}\n      </Box>\n    </Flex>\n  )\n}\n\nconst images = createListCollection({\n  items: [\n    {\n      label: \"Mountain Landscape\",\n      value: \"mountains\",\n      description: \"Scenic mountain view\",\n      url: \"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop\",\n    },\n    {\n      label: \"Ocean Waves\",\n      value: \"ocean\",\n      description: \"Peaceful ocean scene\",\n      url: \"https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=400&h=300&fit=crop\",\n    },\n    {\n      label: \"Forest Path\",\n      value: \"forest\",\n      description: \"Tranquil forest trail\",\n      url: \"https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop\",\n    },\n    {\n      label: \"City Skyline\",\n      value: \"city\",\n      description: \"Urban cityscape at night\",\n      url: \"https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop\",\n    },\n    {\n      label: \"Desert Dunes\",\n      value: \"desert\",\n      description: \"Golden sand dunes\",\n      url: \"https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=400&h=300&fit=crop\",\n    },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Box,\n  Flex,\n  Image,\n  Listbox,\n  Text,\n  createListCollection,\n} from \"@chakra-ui/react\"",
++        "import { useState } from \"react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-multiselect",
++      "content": "\"use client\"\nexport const ListboxMultiselect = () => {\n  return (\n    <Listbox.Root collection={frameworks} selectionMode=\"multiple\" maxW=\"320px\">\n      <Listbox.Label>Select frameworks (multiple)</Listbox.Label>\n      <Listbox.Content>\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n    { label: \"Next.js\", value: \"nextjs\" },\n    { label: \"Nuxt.js\", value: \"nuxtjs\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Listbox, createListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-select-all",
++      "content": "\"use client\"\nexport const ListboxSelectAll = () => {\n  return (\n    <Box maxW=\"320px\">\n      <Listbox.Root collection={frameworks} selectionMode=\"multiple\" gap=\"0\">\n        <ListboxHeader />\n        <Listbox.Content maxH=\"300px\" roundedTop=\"0\">\n          {frameworks.items.map((framework) => (\n            <Listbox.Item item={framework} key={framework.value}>\n              <ListboxItemCheckmark />\n              <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            </Listbox.Item>\n          ))}\n        </Listbox.Content>\n      </Listbox.Root>\n    </Box>\n  )\n}\n\nconst ListboxHeader = (props: FlexProps) => {\n  const listbox = useListboxContext()\n  const isAllSelected = listbox.value.length === frameworks.items.length\n  const isSomeSelected =\n    listbox.value.length > 0 && listbox.value.length < frameworks.items.length\n\n  const handleSelectAll = () => {\n    if (isAllSelected) {\n      listbox.setValue([])\n    } else {\n      listbox.setValue(frameworks.items.map((item) => item.value))\n    }\n  }\n\n  return (\n    <Flex\n      as=\"button\"\n      onClick={handleSelectAll}\n      px=\"3\"\n      gap=\"2\"\n      align=\"center\"\n      cursor=\"pointer\"\n      borderWidth=\"1px\"\n      minH=\"10\"\n      roundedTop=\"l2\"\n      mb=\"-1px\"\n      {...props}\n    >\n      <Checkmark\n        filled\n        size=\"sm\"\n        checked={isAllSelected}\n        indeterminate={isSomeSelected}\n      />\n      <Listbox.Label>Select Frameworks</Listbox.Label>\n    </Flex>\n  )\n}\n\nconst ListboxItemCheckmark = (props: CheckmarkProps) => {\n  const itemState = useListboxItemContext()\n  return (\n    <Checkmark\n      filled\n      size=\"sm\"\n      checked={itemState.selected}\n      disabled={itemState.disabled}\n      {...props}\n    />\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n    { label: \"Next.js\", value: \"nextjs\" },\n    { label: \"Nuxt.js\", value: \"nuxtjs\" },\n    { label: \"Remix\", value: \"remix\" },\n    { label: \"Gatsby\", value: \"gatsby\" },\n    { label: \"Ember.js\", value: \"ember\" },\n    { label: \"Preact\", value: \"preact\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import type { CheckmarkProps, FlexProps } from \"@chakra-ui/react\"",
++        "import {\n  Box,\n  Checkmark,\n  Flex,\n  Listbox,\n  createListCollection,\n  useListboxContext,\n  useListboxItemContext,\n} from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-transfer-list",
++      "content": "\"use client\"\n\ninterface ListboxRenderProps<T> extends Listbox.RootProps<T> {\n  contentRef: React.RefObject<HTMLDivElement | null>\n}\n\nfunction ListboxRender<T>(props: ListboxRenderProps<T>) {\n  const { collection, contentRef, ...rest } = props\n  return (\n    <Listbox.Root {...rest} collection={collection} selectionMode=\"multiple\">\n      <Listbox.Content minH=\"96\" ref={contentRef}>\n        {collection.items.length > 0 ? (\n          collection.items.map((item) => {\n            const itemValue = collection.getItemValue(item)\n            const itemLabel = collection.stringifyItem(item)\n            return (\n              <Listbox.Item item={item} key={itemValue} flex=\"0\">\n                <Listbox.ItemText>{itemLabel}</Listbox.ItemText>\n                <Listbox.ItemIndicator />\n              </Listbox.Item>\n            )\n          })\n        ) : (\n          <Center boxSize=\"full\" p=\"4\" color=\"fg.muted\" textStyle=\"sm\">\n            No items available\n          </Center>\n        )}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nexport const ListboxTransferList = () => {\n  const state = useTransferListState<Item>({ items: animeCharacters })\n\n  return (\n    <Flex gap=\"4\" maxW=\"600px\" align=\"stretch\">\n      <ListboxRender\n        contentRef={state.sourceContentRef}\n        collection={state.source}\n        value={state.selectedSource.map((item) => item.value)}\n        onValueChange={(e) => state.setSelectedSource(e.items)}\n      />\n      <VStack justify=\"center\" gap=\"2\" py=\"8\">\n        <IconButton\n          size=\"xs\"\n          variant=\"subtle\"\n          disabled={state.selectedSource.length === 0}\n          onClick={() => {\n            state.moveToTarget(state.selectedSource)\n          }}\n        >\n          <LuChevronRight />\n        </IconButton>\n        <IconButton\n          size=\"xs\"\n          variant=\"subtle\"\n          disabled={state.selectedTarget.length === 0}\n          onClick={() => {\n            state.moveToSource(state.selectedTarget)\n          }}\n        >\n          <LuChevronLeft />\n        </IconButton>\n      </VStack>\n      <ListboxRender\n        contentRef={state.targetContentRef}\n        collection={state.target}\n        value={state.selectedTarget.map((item) => item.value)}\n        onValueChange={(e) => state.setSelectedTarget(e.items)}\n      />\n    </Flex>\n  )\n}\n\nfunction useTransferListState<T>(options: CollectionOptions<T>) {\n  const sourceContentRef = useRef<HTMLDivElement | null>(null)\n  const targetContentRef = useRef<HTMLDivElement | null>(null)\n\n  const [source, setSource] = useState(createListCollection<T>(options))\n  const [target, setTarget] = useState(\n    createListCollection<T>({ ...options, items: [] }),\n  )\n  const [selectedSource, setSelectedSource] = useState<T[]>([])\n  const [selectedTarget, setSelectedTarget] = useState<T[]>([])\n\n  const scrollToItem = (container: HTMLDivElement | null, item: T) => {\n    if (!container) return\n    requestAnimationFrame(() => {\n      const itemValue = target.getItemValue(item)\n      const itemElement = container.querySelector(`[data-value=\"${itemValue}\"]`)\n      itemElement?.scrollIntoView({ block: \"nearest\" })\n    })\n  }\n\n  const moveToTarget = (items: T[]) => {\n    setSource(source.remove(...items))\n    setTarget(target.append(...items))\n    setSelectedSource([])\n    scrollToItem(targetContentRef.current, items[items.length - 1])\n  }\n\n  const moveToSource = (items: T[]) => {\n    setSource(source.append(...items))\n    setTarget(target.remove(...items))\n    setSelectedTarget([])\n    scrollToItem(sourceContentRef.current, items[items.length - 1])\n  }\n\n  return {\n    source,\n    target,\n    selectedSource,\n    selectedTarget,\n    setSelectedSource,\n    setSelectedTarget,\n    moveToTarget,\n    moveToSource,\n    sourceContentRef,\n    targetContentRef,\n  }\n}\n\ninterface Item {\n  label: string\n  value: string\n}\n\nconst animeCharacters = [\n  { label: \"Naruto\", value: \"naruto\" },\n  { label: \"Sasuke\", value: \"sasuke\" },\n  { label: \"Sakura\", value: \"sakura\" },\n  { label: \"Kakashi\", value: \"kakashi\" },\n  { label: \"Shisui\", value: \"shisui\" },\n  { label: \"Itachi\", value: \"itachi\" },\n  { label: \"Gaara\", value: \"gaara\" },\n  { label: \"Rock Lee\", value: \"rock-lee\" },\n  { label: \"Neji\", value: \"neji\" },\n  { label: \"Tenten\", value: \"tenten\" },\n  { label: \"Hinata\", value: \"hinata\" },\n  { label: \"Kiba\", value: \"kiba\" },\n  { label: \"Shino\", value: \"shino\" },\n  { label: \"Choji\", value: \"choji\" },\n  { label: \"Ino\", value: \"ino\" },\n]\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Center,\n  type CollectionOptions,\n  Flex,\n  IconButton,\n  Listbox,\n  VStack,\n  createListCollection,\n} from \"@chakra-ui/react\"",
++        "import { useRef, useState } from \"react\"",
++        "import { LuChevronLeft, LuChevronRight } from \"react-icons/lu\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\"",
++      "npmDependencies": [
++        "react-icons"
++      ]
++    },
++    {
++      "name": "listbox-virtualized",
++      "content": "\"use client\"\nexport const ListboxVirtualized = () => {\n  const virtual = useListboxVirtualizer({\n    count: countries.length,\n  })\n\n  const collection = useMemo(\n    () => createListCollection({ items: countries }),\n    [],\n  )\n\n  return (\n    <Listbox.Root\n      maxW=\"sm\"\n      collection={collection}\n      scrollToIndexFn={virtual.scrollToIndexFn}\n    >\n      <Listbox.Label>Select Country ({countries.length} items)</Listbox.Label>\n      <Listbox.Content ref={virtual.scrollRef} maxH=\"300px\">\n        <div {...virtual.getViewportProps()}>\n          {virtual.virtualItems.map((virtualItem) => {\n            const item = countries[virtualItem.index]\n            return (\n              <Listbox.Item\n                key={item.value}\n                item={item}\n                {...virtual.getItemProps({ virtualItem })}\n              >\n                <Listbox.ItemText>{item.label}</Listbox.ItemText>\n                <Listbox.ItemIndicator />\n              </Listbox.Item>\n            )\n          })}\n        </div>\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\ninterface ScrollToIndexDetails {\n  index: number\n  getElement: () => HTMLElement | null\n  immediate?: boolean\n}\n\nfunction useListboxVirtualizer(props: { count: number }) {\n  const scrollRef = useRef<HTMLDivElement | null>(null)\n  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)\n\n  const clearScrollTimeout = () => {\n    if (scrollTimeoutRef.current) {\n      clearTimeout(scrollTimeoutRef.current)\n      scrollTimeoutRef.current = null\n    }\n  }\n\n  const virtualizer = useVirtualizer({\n    count: props.count,\n    getScrollElement: () => scrollRef.current,\n    estimateSize: () => 32,\n    overscan: 10,\n  })\n\n  const virtualizerRef = useLiveRef(virtualizer)\n\n  const scrollToIndexFn = (details: ScrollToIndexDetails) => {\n    clearScrollTimeout()\n\n    const scrollToIndex = () => {\n      const virtualizer = virtualizerRef.current\n      const virtualItems = virtualizer.getVirtualItems()\n      const virtualItem = virtualItems.find(\n        (item) => item.index === details.index,\n      )\n\n      if (virtualItem) {\n        const element = details.getElement()\n        element?.scrollIntoView({ block: \"nearest\" })\n        clearScrollTimeout()\n        return\n      }\n\n      // Scroll towards the target index\n      virtualizer.scrollToIndex(details.index)\n\n      // Continue scrolling in intervals until we reach the target\n      if (!details.immediate) {\n        scrollTimeoutRef.current = setTimeout(scrollToIndex, 16) // ~60fps\n      }\n    }\n\n    scrollToIndex()\n  }\n\n  // Cleanup timeout on unmount\n  useEffect(() => clearScrollTimeout, [])\n\n  const totalSize = virtualizer.getTotalSize()\n\n  return {\n    scrollRef,\n    scrollToIndexFn,\n    totalSize,\n    virtualItems: virtualizer.getVirtualItems(),\n    getViewportProps(\n      props: React.ComponentProps<\"div\"> = {},\n    ): React.ComponentProps<\"div\"> {\n      return {\n        ...props,\n        style: {\n          ...props.style,\n          height: `${totalSize}px`,\n          width: \"100%\",\n          position: \"relative\",\n        },\n      }\n    },\n    getItemProps(\n      props: React.ComponentProps<\"div\"> & { virtualItem: VirtualItem },\n    ): React.ComponentProps<\"div\"> {\n      const { virtualItem, ...rest } = props\n      return {\n        ...rest,\n        \"aria-posinset\": virtualItem.index + 1,\n        \"aria-setsize\": totalSize,\n        style: {\n          position: \"absolute\",\n          top: 0,\n          left: 0,\n          width: \"100%\",\n          whiteSpace: \"nowrap\",\n          overflow: \"hidden\",\n          textOverflow: \"ellipsis\",\n          ...rest.style,\n          height: `${virtualItem.size}px`,\n          transform: `translateY(${virtualItem.start}px)`,\n        },\n      }\n    },\n  }\n}\n\nexport const countries = [\n  { value: \"AD\", label: \"Andorra\" },\n  { value: \"AE\", label: \"United Arab Emirates\" },\n  { value: \"AF\", label: \"Afghanistan\" },\n  { value: \"AG\", label: \"Antigua and Barbuda\" },\n  { value: \"AI\", label: \"Anguilla\" },\n  { value: \"AL\", label: \"Albania\" },\n  { value: \"AM\", label: \"Armenia\" },\n  { value: \"AO\", label: \"Angola\" },\n  { value: \"AQ\", label: \"Antarctica\" },\n  { value: \"AR\", label: \"Argentina\" },\n  { value: \"AS\", label: \"American Samoa\" },\n  { value: \"AT\", label: \"Austria\" },\n  { value: \"AU\", label: \"Australia\" },\n  { value: \"AW\", label: \"Aruba\" },\n  { value: \"AX\", label: \"Åland Islands\" },\n  { value: \"AZ\", label: \"Azerbaijan\" },\n  { value: \"BA\", label: \"Bosnia and Herzegovina\" },\n  { value: \"BB\", label: \"Barbados\" },\n  { value: \"BD\", label: \"Bangladesh\" },\n  { value: \"BE\", label: \"Belgium\" },\n  { value: \"BF\", label: \"Burkina Faso\" },\n  { value: \"BG\", label: \"Bulgaria\" },\n  { value: \"BH\", label: \"Bahrain\" },\n  { value: \"BI\", label: \"Burundi\" },\n  { value: \"BJ\", label: \"Benin\" },\n  { value: \"BL\", label: \"Saint Barthélemy\" },\n  { value: \"BM\", label: \"Bermuda\" },\n  { value: \"BN\", label: \"Brunei Darussalam\" },\n  { value: \"BO\", label: \"Bolivia, Plurinational State of\" },\n  { value: \"BQ\", label: \"Bonaire, Sint Eustatius and Saba\" },\n  { value: \"BR\", label: \"Brazil\" },\n  { value: \"BS\", label: \"Bahamas\" },\n  { value: \"BT\", label: \"Bhutan\" },\n  { value: \"BV\", label: \"Bouvet Island\" },\n  { value: \"BW\", label: \"Botswana\" },\n  { value: \"BY\", label: \"Belarus\" },\n  { value: \"BZ\", label: \"Belize\" },\n  { value: \"CA\", label: \"Canada\" },\n  { value: \"CC\", label: \"Cocos (Keeling) Islands\" },\n  { value: \"CD\", label: \"Congo, Democratic Republic of the\" },\n  { value: \"CF\", label: \"Central African Republic\" },\n  { value: \"CG\", label: \"Congo\" },\n  { value: \"CH\", label: \"Switzerland\" },\n  { value: \"CI\", label: \"Côte d'Ivoire\" },\n  { value: \"CK\", label: \"Cook Islands\" },\n  { value: \"CL\", label: \"Chile\" },\n  { value: \"CM\", label: \"Cameroon\" },\n  { value: \"CN\", label: \"China\" },\n  { value: \"CO\", label: \"Colombia\" },\n  { value: \"CR\", label: \"Costa Rica\" },\n  { value: \"CU\", label: \"Cuba\" },\n  { value: \"CV\", label: \"Cabo Verde\" },\n  { value: \"CW\", label: \"Curaçao\" },\n  { value: \"CX\", label: \"Christmas Island\" },\n  { value: \"CY\", label: \"Cyprus\" },\n  { value: \"CZ\", label: \"Czechia\" },\n  { value: \"DE\", label: \"Germany\" },\n  { value: \"DJ\", label: \"Djibouti\" },\n  { value: \"DK\", label: \"Denmark\" },\n  { value: \"DM\", label: \"Dominica\" },\n  { value: \"DO\", label: \"Dominican Republic\" },\n  { value: \"DZ\", label: \"Algeria\" },\n  { value: \"EC\", label: \"Ecuador\" },\n  { value: \"EE\", label: \"Estonia\" },\n  { value: \"EG\", label: \"Egypt\" },\n  { value: \"EH\", label: \"Western Sahara\" },\n  { value: \"ER\", label: \"Eritrea\" },\n  { value: \"ES\", label: \"Spain\" },\n  { value: \"ET\", label: \"Ethiopia\" },\n  { value: \"FI\", label: \"Finland\" },\n  { value: \"FJ\", label: \"Fiji\" },\n  { value: \"FK\", label: \"Falkland Islands (Malvinas)\" },\n  { value: \"FM\", label: \"Micronesia, Federated States of\" },\n  { value: \"FO\", label: \"Faroe Islands\" },\n  { value: \"FR\", label: \"France\" },\n  { value: \"GA\", label: \"Gabon\" },\n  {\n    value: \"GB\",\n    label: \"United Kingdom of Great Britain and Northern Ireland\",\n  },\n  { value: \"GD\", label: \"Grenada\" },\n  { value: \"GE\", label: \"Georgia\" },\n  { value: \"GF\", label: \"French Guiana\" },\n  { value: \"GG\", label: \"Guernsey\" },\n  { value: \"GH\", label: \"Ghana\" },\n  { value: \"GI\", label: \"Gibraltar\" },\n  { value: \"GL\", label: \"Greenland\" },\n  { value: \"GM\", label: \"Gambia\" },\n  { value: \"GN\", label: \"Guinea\" },\n  { value: \"GP\", label: \"Guadeloupe\" },\n  { value: \"GQ\", label: \"Equatorial Guinea\" },\n  { value: \"GR\", label: \"Greece\" },\n  { value: \"GS\", label: \"South Georgia and the South Sandwich Islands\" },\n  { value: \"GT\", label: \"Guatemala\" },\n  { value: \"GU\", label: \"Guam\" },\n  { value: \"GW\", label: \"Guinea-Bissau\" },\n  { value: \"GY\", label: \"Guyana\" },\n  { value: \"HK\", label: \"Hong Kong\" },\n  { value: \"HM\", label: \"Heard Island and McDonald Islands\" },\n  { value: \"HN\", label: \"Honduras\" },\n  { value: \"HR\", label: \"Croatia\" },\n  { value: \"HT\", label: \"Haiti\" },\n  { value: \"HU\", label: \"Hungary\" },\n  { value: \"ID\", label: \"Indonesia\" },\n  { value: \"IE\", label: \"Ireland\" },\n  { value: \"IL\", label: \"Israel\" },\n  { value: \"IM\", label: \"Isle of Man\" },\n  { value: \"IN\", label: \"India\" },\n  { value: \"IO\", label: \"British Indian Ocean Territory\" },\n  { value: \"IQ\", label: \"Iraq\" },\n  { value: \"IR\", label: \"Iran, Islamic Republic of\" },\n  { value: \"IS\", label: \"Iceland\" },\n  { value: \"IT\", label: \"Italy\" },\n  { value: \"JE\", label: \"Jersey\" },\n  { value: \"JM\", label: \"Jamaica\" },\n  { value: \"JO\", label: \"Jordan\" },\n  { value: \"JP\", label: \"Japan\" },\n  { value: \"KE\", label: \"Kenya\" },\n  { value: \"KG\", label: \"Kyrgyzstan\" },\n  { value: \"KH\", label: \"Cambodia\" },\n  { value: \"KI\", label: \"Kiribati\" },\n  { value: \"KM\", label: \"Comoros\" },\n  { value: \"KN\", label: \"Saint Kitts and Nevis\" },\n  { value: \"KP\", label: \"Korea, Democratic People's Republic of\" },\n  { value: \"KR\", label: \"Korea, Republic of\" },\n  { value: \"KW\", label: \"Kuwait\" },\n  { value: \"KY\", label: \"Cayman Islands\" },\n  { value: \"KZ\", label: \"Kazakhstan\" },\n  { value: \"LA\", label: \"Lao People's Democratic Republic\" },\n  { value: \"LB\", label: \"Lebanon\" },\n  { value: \"LC\", label: \"Saint Lucia\" },\n  { value: \"LI\", label: \"Liechtenstein\" },\n  { value: \"LK\", label: \"Sri Lanka\" },\n  { value: \"LR\", label: \"Liberia\" },\n  { value: \"LS\", label: \"Lesotho\" },\n  { value: \"LT\", label: \"Lithuania\" },\n  { value: \"LU\", label: \"Luxembourg\" },\n  { value: \"LV\", label: \"Latvia\" },\n  { value: \"LY\", label: \"Libya\" },\n  { value: \"MA\", label: \"Morocco\" },\n  { value: \"MC\", label: \"Monaco\" },\n  { value: \"MD\", label: \"Moldova, Republic of\" },\n  { value: \"ME\", label: \"Montenegro\" },\n  { value: \"MF\", label: \"Saint Martin, (French part)\" },\n  { value: \"MG\", label: \"Madagascar\" },\n  { value: \"MH\", label: \"Marshall Islands\" },\n  { value: \"MK\", label: \"North Macedonia\" },\n  { value: \"ML\", label: \"Mali\" },\n  { value: \"MM\", label: \"Myanmar\" },\n  { value: \"MN\", label: \"Mongolia\" },\n  { value: \"MO\", label: \"Macao\" },\n  { value: \"MP\", label: \"Northern Mariana Islands\" },\n  { value: \"MQ\", label: \"Martinique\" },\n  { value: \"MR\", label: \"Mauritania\" },\n  { value: \"MS\", label: \"Montserrat\" },\n  { value: \"MT\", label: \"Malta\" },\n  { value: \"MU\", label: \"Mauritius\" },\n  { value: \"MV\", label: \"Maldives\" },\n  { value: \"MW\", label: \"Malawi\" },\n  { value: \"MX\", label: \"Mexico\" },\n  { value: \"MY\", label: \"Malaysia\" },\n  { value: \"MZ\", label: \"Mozambique\" },\n  { value: \"NA\", label: \"Namibia\" },\n  { value: \"NC\", label: \"New Caledonia\" },\n  { value: \"NE\", label: \"Niger\" },\n  { value: \"NF\", label: \"Norfolk Island\" },\n  { value: \"NG\", label: \"Nigeria\" },\n  { value: \"NI\", label: \"Nicaragua\" },\n  { value: \"NL\", label: \"Netherlands\" },\n  { value: \"NO\", label: \"Norway\" },\n  { value: \"NP\", label: \"Nepal\" },\n  { value: \"NR\", label: \"Nauru\" },\n  { value: \"NU\", label: \"Niue\" },\n  { value: \"NZ\", label: \"New Zealand\" },\n  { value: \"OM\", label: \"Oman\" },\n  { value: \"PA\", label: \"Panama\" },\n  { value: \"PE\", label: \"Peru\" },\n  { value: \"PF\", label: \"French Polynesia\" },\n  { value: \"PG\", label: \"Papua New Guinea\" },\n  { value: \"PH\", label: \"Philippines\" },\n  { value: \"PK\", label: \"Pakistan\" },\n  { value: \"PL\", label: \"Poland\" },\n  { value: \"PM\", label: \"Saint Pierre and Miquelon\" },\n  { value: \"PN\", label: \"Pitcairn\" },\n  { value: \"PR\", label: \"Puerto Rico\" },\n  { value: \"PS\", label: \"Palestine, State of\" },\n  { value: \"PT\", label: \"Portugal\" },\n  { value: \"PW\", label: \"Palau\" },\n  { value: \"PY\", label: \"Paraguay\" },\n  { value: \"QA\", label: \"Qatar\" },\n  { value: \"RE\", label: \"Réunion\" },\n  { value: \"RO\", label: \"Romania\" },\n  { value: \"RS\", label: \"Serbia\" },\n  { value: \"RU\", label: \"Russian Federation\" },\n  { value: \"RW\", label: \"Rwanda\" },\n  { value: \"SA\", label: \"Saudi Arabia\" },\n  { value: \"SB\", label: \"Solomon Islands\" },\n  { value: \"SC\", label: \"Seychelles\" },\n  { value: \"SD\", label: \"Sudan\" },\n  { value: \"SE\", label: \"Sweden\" },\n  { value: \"SG\", label: \"Singapore\" },\n  { value: \"SH\", label: \"Saint Helena, Ascension and Tristan da Cunha\" },\n  { value: \"SI\", label: \"Slovenia\" },\n  { value: \"SJ\", label: \"Svalbard and Jan Mayen\" },\n  { value: \"SK\", label: \"Slovakia\" },\n  { value: \"SL\", label: \"Sierra Leone\" },\n  { value: \"SM\", label: \"San Marino\" },\n  { value: \"SN\", label: \"Senegal\" },\n  { value: \"SO\", label: \"Somalia\" },\n  { value: \"SR\", label: \"Suriname\" },\n  { value: \"SS\", label: \"South Sudan\" },\n  { value: \"ST\", label: \"Sao Tome and Principe\" },\n  { value: \"SV\", label: \"El Salvador\" },\n  { value: \"SX\", label: \"Sint Maarten, (Dutch part)\" },\n  { value: \"SY\", label: \"Syrian Arab Republic\" },\n  { value: \"SZ\", label: \"Eswatini\" },\n  { value: \"TC\", label: \"Turks and Caicos Islands\" },\n  { value: \"TD\", label: \"Chad\" },\n  { value: \"TF\", label: \"French Southern Territories\" },\n  { value: \"TG\", label: \"Togo\" },\n  { value: \"TH\", label: \"Thailand\" },\n  { value: \"TJ\", label: \"Tajikistan\" },\n  { value: \"TK\", label: \"Tokelau\" },\n  { value: \"TL\", label: \"Timor-Leste\" },\n  { value: \"TM\", label: \"Turkmenistan\" },\n  { value: \"TN\", label: \"Tunisia\" },\n  { value: \"TO\", label: \"Tonga\" },\n  { value: \"TR\", label: \"Türkiye\" },\n  { value: \"TT\", label: \"Trinidad and Tobago\" },\n  { value: \"TV\", label: \"Tuvalu\" },\n  { value: \"TW\", label: \"Taiwan, Province of China\" },\n  { value: \"TZ\", label: \"Tanzania, United Republic of\" },\n  { value: \"UA\", label: \"Ukraine\" },\n  { value: \"UG\", label: \"Uganda\" },\n  { value: \"UM\", label: \"United States Minor Outlying Islands\" },\n  { value: \"US\", label: \"United States of America\" },\n  { value: \"UY\", label: \"Uruguay\" },\n  { value: \"UZ\", label: \"Uzbekistan\" },\n  { value: \"VA\", label: \"Holy See\" },\n  { value: \"VC\", label: \"Saint Vincent and the Grenadines\" },\n  { value: \"VE\", label: \"Venezuela, Bolivarian Republic of\" },\n  { value: \"VG\", label: \"Virgin Islands, British\" },\n  { value: \"VI\", label: \"Virgin Islands, U.S.\" },\n  { value: \"VN\", label: \"Viet Nam\" },\n  { value: \"VU\", label: \"Vanuatu\" },\n  { value: \"WF\", label: \"Wallis and Futuna\" },\n  { value: \"WS\", label: \"Samoa\" },\n  { value: \"YE\", label: \"Yemen\" },\n  { value: \"YT\", label: \"Mayotte\" },\n  { value: \"ZA\", label: \"South Africa\" },\n  { value: \"ZM\", label: \"Zambia\" },\n  { value: \"ZW\", label: \"Zimbabwe\" },\n]\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Listbox, createListCollection, useLiveRef } from \"@chakra-ui/react\"",
++        "import { type VirtualItem, useVirtualizer } from \"@tanstack/react-virtual\"",
++        "import React, { useEffect, useMemo, useRef } from \"react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\"",
++      "npmDependencies": [
++        "@tanstack/react-virtual"
++      ]
++    },
++    {
++      "name": "listbox-with-checkmark",
++      "content": "\"use client\"\nconst ListboxItemCheckmark = () => {\n  const itemState = useListboxItemContext()\n  return (\n    <Checkmark\n      filled\n      size=\"sm\"\n      checked={itemState.selected}\n      disabled={itemState.disabled}\n    />\n  )\n}\n\nexport const ListboxWithCheckmark = () => {\n  return (\n    <Listbox.Root collection={frameworks} selectionMode=\"multiple\" maxW=\"320px\">\n      <Listbox.Label>Select frameworks (with checkmarks)</Listbox.Label>\n      <Listbox.Content>\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <ListboxItemCheckmark />\n            <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n    { label: \"Next.js\", value: \"nextjs\" },\n    { label: \"Nuxt.js\", value: \"nuxtjs\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Checkmark,\n  Listbox,\n  createListCollection,\n  useListboxItemContext,\n} from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-with-description",
++      "content": "\"use client\"\nexport const ListboxWithDescription = () => {\n  return (\n    <Listbox.Root collection={frameworks} maxW=\"400px\">\n      <Listbox.Label>Select framework</Listbox.Label>\n      <Listbox.Content>\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Box flex=\"1\">\n              <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n              <Text fontSize=\"xs\" color=\"fg.muted\" mt=\"1\">\n                {framework.description}\n              </Text>\n            </Box>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    {\n      label: \"React.js\",\n      value: \"react\",\n      description: \"A JavaScript library for building user interfaces\",\n    },\n    {\n      label: \"Vue.js\",\n      value: \"vue\",\n      description: \"The progressive JavaScript framework\",\n    },\n    {\n      label: \"Angular\",\n      value: \"angular\",\n      description: \"Platform for building mobile and desktop web applications\",\n    },\n    {\n      label: \"Svelte\",\n      value: \"svelte\",\n      description: \"Cybernetically enhanced web apps\",\n    },\n    {\n      label: \"Next.js\",\n      value: \"nextjs\",\n      description: \"The React framework for production\",\n    },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Box, Listbox, Text, createListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-with-dialog",
++      "content": "\"use client\"\nexport const ListboxWithDialog = () => {\n  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([])\n  const [isOpen, setIsOpen] = useState(false)\n\n  const { contains } = useFilter({ sensitivity: \"base\" })\n\n  const { collection, filter } = useListCollection({\n    initialItems: [\n      { label: \"Linear.app\", value: \"linear\", type: \"applications\" },\n      { label: \"Notion\", value: \"notion\", type: \"applications\" },\n      { label: \"Figma\", value: \"figma\", type: \"applications\" },\n      { label: \"Slack\", value: \"slack\", type: \"applications\" },\n      { label: \"Cursor\", value: \"cursor\", type: \"applications\" },\n\n      { label: \"Open Terminal\", value: \"terminal\", type: \"commands\" },\n      { label: \"Search Files\", value: \"search\", type: \"commands\" },\n      { label: \"Git Status\", value: \"git-status\", type: \"commands\" },\n      { label: \"Run Tests\", value: \"run-tests\", type: \"commands\" },\n      { label: \"Deploy App\", value: \"deploy\", type: \"commands\" },\n    ],\n    filter: contains,\n    groupBy: (item) => item.type,\n    groupSort: [\"applications\", \"commands\"],\n  })\n\n  const handleSelectionChange = (details: any) => {\n    setSelectedFrameworks(details.value)\n    setIsOpen(false)\n    filter(\"\")\n  }\n\n  return (\n    <>\n      <Dialog.Root open={isOpen} onOpenChange={(e) => setIsOpen(e.open)}>\n        <Dialog.Trigger asChild>\n          <Button variant=\"outline\">Open Search</Button>\n        </Dialog.Trigger>\n\n        <Portal>\n          <Dialog.Backdrop />\n          <Dialog.Positioner>\n            <Dialog.Content>\n              <Listbox.Root\n                collection={collection}\n                value={selectedFrameworks}\n                onValueChange={handleSelectionChange}\n                variant=\"plain\"\n              >\n                <Dialog.Header>\n                  <Listbox.Input\n                    placeholder=\"Search for apps or command...\"\n                    minH=\"6\"\n                    outline=\"0\"\n                    width=\"full\"\n                    onChange={(e) => filter(e.currentTarget.value)}\n                  />\n                </Dialog.Header>\n\n                <Listbox.Content px=\"3\" maxH=\"300px\">\n                  {collection.group().map(([group, items]) => (\n                    <Listbox.ItemGroup key={group}>\n                      <Listbox.ItemGroupLabel textTransform=\"capitalize\">\n                        {group}\n                      </Listbox.ItemGroupLabel>\n                      {items.map((item) => (\n                        <Listbox.Item\n                          item={item}\n                          key={item.value}\n                          justifyContent=\"space-between\"\n                        >\n                          <Listbox.ItemText>{item.label}</Listbox.ItemText>\n                          <Span fontSize=\"xs\" color=\"fg.muted\">\n                            {item.type}\n                          </Span>\n                        </Listbox.Item>\n                      ))}\n                    </Listbox.ItemGroup>\n                  ))}\n                </Listbox.Content>\n\n                <Dialog.Footer textStyle=\"xs\" borderTopWidth=\"1px\">\n                  <CommandItem label=\"Press Esc to close\" keys={[\"Esc\"]} />\n                  <CommandItem label=\"Open Application\" keys={[\"⏎\"]} />\n                  <CommandItem label=\"Actions\" keys={[\"⌘\", \"K\"]} />\n                </Dialog.Footer>\n              </Listbox.Root>\n            </Dialog.Content>\n          </Dialog.Positioner>\n        </Portal>\n      </Dialog.Root>\n\n      {selectedFrameworks.length > 0 && (\n        <Text mt=\"3\" textStyle=\"sm\">\n          Selected: {JSON.stringify(selectedFrameworks, null, 2)}\n        </Text>\n      )}\n    </>\n  )\n}\n\nconst CommandItem = (props: { label: string; keys: string[] }) => {\n  return (\n    <HStack>\n      {props.label} <Kbd size=\"sm\">{props.keys.join(\" \")}</Kbd>\n    </HStack>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Button,\n  Dialog,\n  HStack,\n  Kbd,\n  Listbox,\n  Portal,\n  Span,\n  Text,\n  useFilter,\n  useListCollection,\n} from \"@chakra-ui/react\"",
++        "import { useState } from \"react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-with-emoji-grid",
++      "content": "\"use client\"\ntype Emoji = (typeof emojibase)[number]\nconst emojis = emojibase\n  .filter((e) => !e.label.startsWith(\"regional indicator\"))\n  .slice(0, 200) as Emoji[]\n\nexport const ListboxWithEmojiGrid = () => {\n  const { contains } = useFilter({ sensitivity: \"base\" })\n\n  const [items, setItems] = useState(emojis)\n\n  const collection = useMemo(\n    () =>\n      createGridCollection({\n        columnCount: 8,\n        items: items,\n        itemToString(item) {\n          return `${item.label} (${item.shortcodes})`\n        },\n        itemToValue(item) {\n          return item.hexcode\n        },\n      }),\n    [items],\n  )\n\n  const filter = useCallback(\n    (value: string) => {\n      setItems(emojis.filter((e) => contains(e.label, value)))\n    },\n    [contains],\n  )\n\n  return (\n    <Listbox.Root collection={collection} maxW=\"min-content\">\n      <SelectedEmoji />\n      <Listbox.Input\n        as={Input}\n        placeholder=\"Type to filter frameworks...\"\n        onChange={(e) => filter(e.target.value)}\n      />\n      <Listbox.Content\n        w=\"374px\"\n        display=\"grid\"\n        gridTemplateColumns=\"repeat(8, 1fr)\"\n        gap=\"1\"\n      >\n        {collection.items.map((item, index) => (\n          <Listbox.Item\n            item={item}\n            key={index}\n            css={{\n              width: \"40px\",\n              height: \"40px\",\n              display: \"flex\",\n              alignItems: \"center\",\n              justifyContent: \"center\",\n              borderRadius: \"md\",\n              fontSize: \"22px\",\n            }}\n          >\n            {item.unicode}\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst SelectedEmoji = () => {\n  const listbox = useListboxContext()\n  const [item] = listbox.selectedItems as Emoji[]\n  return (\n    <Square size=\"40px\" bg=\"bg.muted\" rounded=\"sm\" textStyle=\"lg\">\n      {item ? item.unicode : <LuSmile />}\n    </Square>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Input,\n  Listbox,\n  Square,\n  createGridCollection,\n  useFilter,\n  useListboxContext,\n} from \"@chakra-ui/react\"",
++        "import emojibase from \"emojibase-data/en/compact.json\"",
++        "import { useCallback, useMemo, useState } from \"react\"",
++        "import { LuSmile } from \"react-icons/lu\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\"",
++      "npmDependencies": [
++        "emojibase-data",
++        "react-icons"
++      ]
++    },
++    {
++      "name": "listbox-with-icon",
++      "content": "\"use client\"\nexport const ListboxWithIcon = () => {\n  return (\n    <Listbox.Root collection={frameworks} maxW=\"320px\">\n      <Listbox.Label>Select framework</Listbox.Label>\n      <Listbox.Content>\n        {frameworks.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Box display=\"flex\" alignItems=\"center\" gap=\"3\" flex=\"1\">\n              <Box color=\"fg.muted\" flexShrink=\"0\">\n                {framework.icon}\n              </Box>\n              <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            </Box>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\", icon: <LuAtom size={16} /> },\n    { label: \"Vue.js\", value: \"vue\", icon: <LuPalette size={16} /> },\n    { label: \"Angular\", value: \"angular\", icon: <LuGlobe size={16} /> },\n    { label: \"Svelte\", value: \"svelte\", icon: <LuZap size={16} /> },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Box, Listbox, createListCollection } from \"@chakra-ui/react\"",
++        "import { LuAtom, LuGlobe, LuPalette, LuZap } from \"react-icons/lu\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\"",
++      "npmDependencies": [
++        "react-icons"
++      ]
++    },
++    {
++      "name": "listbox-with-input",
++      "content": "\"use client\"\nexport const ListboxWithInput = () => {\n  const { contains } = useFilter({ sensitivity: \"base\" })\n\n  const { collection, filter } = useListCollection({\n    initialItems: [\n      { label: \"React.js\", value: \"react\" },\n      { label: \"Vue.js\", value: \"vue\" },\n      { label: \"Angular\", value: \"angular\" },\n      { label: \"Svelte\", value: \"svelte\" },\n      { label: \"Next.js\", value: \"nextjs\" },\n      { label: \"Nuxt.js\", value: \"nuxtjs\" },\n      { label: \"Remix\", value: \"remix\" },\n      { label: \"Gatsby\", value: \"gatsby\" },\n      { label: \"Ember.js\", value: \"ember\" },\n      { label: \"Preact\", value: \"preact\" },\n    ],\n    filter: contains,\n  })\n\n  return (\n    <Listbox.Root maxW=\"320px\" collection={collection}>\n      <Listbox.Label>Select Framework</Listbox.Label>\n      <Listbox.Input\n        as={Input}\n        placeholder=\"Type to filter frameworks...\"\n        onChange={(e) => filter(e.target.value)}\n      />\n      <Listbox.Content maxH=\"200px\">\n        {collection.items.map((framework) => (\n          <Listbox.Item item={framework} key={framework.value}>\n            <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n            <Listbox.ItemIndicator />\n          </Listbox.Item>\n        ))}\n\n        <Listbox.Empty>No frameworks found</Listbox.Empty>\n      </Listbox.Content>\n    </Listbox.Root>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Input, Listbox, useFilter, useListCollection } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "listbox-with-popover",
++      "content": "\"use client\"\nexport const ListboxWithPopover = () => {\n  const [inputValue, setInputValue] = useState(\"\")\n  const [open, setOpen] = useState(false)\n\n  const { contains } = useFilter({ sensitivity: \"base\" })\n  const triggerRef = useRef<HTMLButtonElement | null>(null)\n\n  const { collection, filter } = useListCollection({\n    initialItems: [\n      { label: \"React.js\", value: \"react\" },\n      { label: \"Vue.js\", value: \"vue\" },\n      { label: \"Angular\", value: \"angular\" },\n      { label: \"Svelte\", value: \"svelte\" },\n      { label: \"Next.js\", value: \"nextjs\" },\n      { label: \"Nuxt.js\", value: \"nuxtjs\" },\n    ],\n    filter: contains,\n  })\n\n  const listbox = useListbox({\n    collection,\n    onValueChange() {\n      setOpen(false)\n      setInputValueFn(\"\")\n      triggerRef.current?.focus()\n    },\n  })\n\n  const setInputValueFn = (value: string) => {\n    setInputValue(value)\n    filter(value)\n  }\n\n  const selectedItem = listbox.selectedItems[0]\n\n  return (\n    <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)}>\n      <Popover.Trigger asChild>\n        <Button size=\"sm\" ref={triggerRef} variant=\"outline\">\n          {selectedItem ? selectedItem.label : \"Select\"} <LuChevronDown />\n        </Button>\n      </Popover.Trigger>\n\n      <Portal>\n        <Popover.Positioner>\n          <Popover.Content _closed={{ animation: \"none\" }}>\n            <Popover.Body p=\"0\">\n              <Listbox.RootProvider value={listbox} gap=\"0\" overflow=\"hidden\">\n                <Listbox.Input\n                  minH=\"10\"\n                  px=\"3\"\n                  roundedTop=\"l2\"\n                  bg=\"transparent\"\n                  outline=\"0\"\n                  value={inputValue}\n                  onChange={(e) => setInputValueFn(e.currentTarget.value)}\n                />\n                <Listbox.Content\n                  borderWidth=\"0\"\n                  borderTopWidth=\"1px\"\n                  roundedTop=\"0\"\n                  gap=\"0\"\n                >\n                  {collection.items.map((framework) => (\n                    <Listbox.Item item={framework} key={framework.value}>\n                      <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n                      <Listbox.ItemIndicator />\n                    </Listbox.Item>\n                  ))}\n                </Listbox.Content>\n              </Listbox.RootProvider>\n            </Popover.Body>\n          </Popover.Content>\n        </Popover.Positioner>\n      </Portal>\n    </Popover.Root>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Button,\n  Listbox,\n  Popover,\n  Portal,\n  useFilter,\n  useListCollection,\n  useListbox,\n} from \"@chakra-ui/react\"",
++        "import { useRef, useState } from \"react\"",
++        "import { LuChevronDown } from \"react-icons/lu\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\"",
++      "npmDependencies": [
++        "react-icons"
++      ]
++    },
++    {
++      "name": "listbox-with-store",
++      "content": "\"use client\"\nexport const ListboxWithStore = () => {\n  const listbox = useListbox({ collection: frameworks })\n\n  return (\n    <Stack maxWidth=\"320px\" width=\"full\" gap=\"4\">\n      <Listbox.RootProvider value={listbox}>\n        <Listbox.Label>Select framework</Listbox.Label>\n        <Listbox.Content>\n          {frameworks.items.map((framework) => (\n            <Listbox.Item item={framework} key={framework.value}>\n              <Listbox.ItemText>{framework.label}</Listbox.ItemText>\n              <Listbox.ItemIndicator />\n            </Listbox.Item>\n          ))}\n        </Listbox.Content>\n      </Listbox.RootProvider>\n\n      <Code alignSelf=\"flex-start\">\n        Selected: {JSON.stringify(listbox.value, null, 2)}\n      </Code>\n    </Stack>\n  )\n}\n\nconst frameworks = createListCollection({\n  items: [\n    { label: \"React.js\", value: \"react\" },\n    { label: \"Vue.js\", value: \"vue\" },\n    { label: \"Angular\", value: \"angular\" },\n    { label: \"Svelte\", value: \"svelte\" },\n  ],\n})\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import {\n  Code,\n  Listbox,\n  Stack,\n  createListCollection,\n  useListbox,\n} from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { Listbox } from \"@chakra-ui/react\""
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/apps/www/public/r/examples/tags-input.json b/apps/www/public/r/examples/tags-input.json
+new file mode 100644
+index 00000000000..ccd157e80fb
+--- /dev/null
++++ b/apps/www/public/r/examples/tags-input.json
+@@ -0,0 +1,127 @@
++{
++  "name": "tags-input",
++  "file": "compositions/ui/tags-input",
++  "snippet": "\"use client\"\n\nimport { TagsInput as ChakraTagsInput } from \"@chakra-ui/react\"\nimport { CloseButton } from \"@/components/ui/close-button\"\nimport * as React from \"react\"\n\ninterface TagsInputControlProps extends ChakraTagsInput.ControlProps {\n  clearable?: boolean\n}\n\nexport const TagsInputControl = React.forwardRef<\n  HTMLDivElement,\n  TagsInputControlProps\n>(function TagsInputControl(props, ref) {\n  const { children, clearable, ...rest } = props\n  return (\n    <ChakraTagsInput.Control {...rest} ref={ref}>\n      {children}\n      {clearable && <TagsInputClearTrigger />}\n    </ChakraTagsInput.Control>\n  )\n})\n\nconst TagsInputClearTrigger = React.forwardRef<\n  HTMLButtonElement,\n  ChakraTagsInput.ClearTriggerProps\n>(function TagsInputClearTrigger(props, ref) {\n  return (\n    <ChakraTagsInput.ClearTrigger asChild {...props} ref={ref}>\n      <CloseButton\n        size=\"xs\"\n        variant=\"plain\"\n        focusVisibleRing=\"inside\"\n        focusRingWidth=\"2px\"\n        pointerEvents=\"auto\"\n      />\n    </ChakraTagsInput.ClearTrigger>\n  )\n})\n\nexport const TagsInputItem = React.forwardRef<\n  HTMLDivElement,\n  ChakraTagsInput.ItemProps\n>(function TagsInputItem(props, ref) {\n  const { children, ...rest } = props\n  return (\n    <ChakraTagsInput.Item {...rest} ref={ref}>\n      <ChakraTagsInput.ItemText>{children}</ChakraTagsInput.ItemText>\n      <ChakraTagsInput.ItemDeleteTrigger asChild>\n        <CloseButton\n          size=\"2xs\"\n          variant=\"plain\"\n          focusVisibleRing=\"inside\"\n          focusRingWidth=\"2px\"\n          pointerEvents=\"auto\"\n        />\n      </ChakraTagsInput.ItemDeleteTrigger>\n    </ChakraTagsInput.Item>\n  )\n})\n\nexport const TagsInputRoot = React.forwardRef<\n  HTMLDivElement,\n  ChakraTagsInput.RootProps\n>(function TagsInputRoot(props, ref) {\n  return <ChakraTagsInput.Root {...props} ref={ref} />\n}) as ChakraTagsInput.RootProps\n\nexport const TagsInputItemText = ChakraTagsInput.ItemText\nexport const TagsInputItemPreview = ChakraTagsInput.ItemPreview\nexport const TagsInputItemInput = ChakraTagsInput.ItemInput\nexport const TagsInputItemContext = ChakraTagsInput.ItemContext\nexport const TagsInputRootProvider = ChakraTagsInput.RootProvider\nexport const TagsInputPropsProvider = ChakraTagsInput.PropsProvider\nexport const TagsInputLabel = ChakraTagsInput.Label\nexport const TagsInputInput = ChakraTagsInput.Input\nexport const TagsInputContext = ChakraTagsInput.Context\nexport const TagsInputHiddenInput = ChakraTagsInput.HiddenInput\n",
++  "examples": [
++    {
++      "name": "tags-input-basic",
++      "content": "\"use client\"\nexport const TagsInputBasic = () => {\n  return (\n    <TagsInput.Root defaultValue={[\"React\", \"Chakra\", \"TypeScript\"]}>\n      <TagsInput.Label>Tags</TagsInput.Label>\n      <TagsInput.Control>\n        <TagsInput.Context>\n          {({ value }) =>\n            value.map((tag, index) => (\n              <TagsInput.Item key={index} index={index} value={tag}>\n                <TagsInput.ItemPreview>\n                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                  <TagsInput.ItemDeleteTrigger />\n                </TagsInput.ItemPreview>\n                <TagsInput.ItemInput />\n              </TagsInput.Item>\n            ))\n          }\n        </TagsInput.Context>\n        <TagsInput.Input placeholder=\"Add tag...\" />\n      </TagsInput.Control>\n    </TagsInput.Root>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-controlled",
++      "content": "\"use client\"\nexport const TagsInputControlled = () => {\n  const [tags, setTags] = useState<string[]>([\"React\", \"Chakra\"])\n\n  return (\n    <Stack maxW=\"320px\" width=\"full\" gap=\"4\">\n      <TagsInput.Root\n        value={tags}\n        onValueChange={(details) => setTags(details.value)}\n      >\n        <TagsInput.Label>Tags</TagsInput.Label>\n        <TagsInput.Control>\n          <TagsInput.Context>\n            {({ value }) =>\n              value.map((tag, index) => (\n                <TagsInput.Item key={index} index={index} value={tag}>\n                  <TagsInput.ItemPreview>\n                    <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                    <TagsInput.ItemDeleteTrigger />\n                  </TagsInput.ItemPreview>\n                  <TagsInput.ItemInput />\n                </TagsInput.Item>\n              ))\n            }\n          </TagsInput.Context>\n          <TagsInput.Input placeholder=\"Add tag...\" />\n        </TagsInput.Control>\n      </TagsInput.Root>\n    </Stack>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { Stack, TagsInput } from \"@chakra-ui/react\"",
++        "import { useState } from \"react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-disabled",
++      "content": "\"use client\"\nexport const TagsInputDisabled = () => (\n  <TagsInput.Root disabled defaultValue={[\"React\", \"Chakra\"]}>\n    <TagsInput.Label>Disabled Tags</TagsInput.Label>\n\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Can't type here\" disabled />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-editable",
++      "content": "\"use client\"\nexport const TagsInputEditable = () => (\n  <TagsInput.Root editable>\n    <TagsInput.Label>Edit Tags Inline</TagsInput.Label>\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Add or edit tags...\" />\n      <TagsInput.ClearTrigger />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-explorer",
++      "content": "\"use client\"\nexport const TagsInputExplorer = () => {\n  return (\n    <Stack gap={4} maxW=\"400px\" p={4}>\n      <TagsInput.Root defaultValue={[\"React\", \"Chakra\"]}>\n        <TagsInput.Label>Add Tags</TagsInput.Label>\n\n        <TagsInput.Control>\n          <TagsInput.Context>\n            {({ value }) =>\n              value.map((tag, index) => (\n                <TagsInput.Item key={index} index={index} value={tag}>\n                  <TagsInput.ItemPreview>\n                    <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                    <TagsInput.ItemDeleteTrigger />\n                  </TagsInput.ItemPreview>\n                  <TagsInput.ItemInput />\n                </TagsInput.Item>\n              ))\n            }\n          </TagsInput.Context>\n\n          <TagsInput.Input placeholder=\"Add tag...\" />\n          <TagsInput.ClearTrigger />\n        </TagsInput.Control>\n\n        <TagsInput.HiddenInput />\n      </TagsInput.Root>\n    </Stack>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\"",
++        "import { Stack } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-max-tags",
++      "content": "\"use client\"\nexport const TagsInputMaxTags = () => {\n  return (\n    <TagsInput.Root max={3}>\n      <TagsInput.Label>Tags (max 3)</TagsInput.Label>\n\n      <TagsInput.Control>\n        <TagsInput.Context>\n          {({ value }) =>\n            value.map((tag, index) => (\n              <TagsInput.Item key={index} index={index} value={tag}>\n                <TagsInput.ItemPreview>\n                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                  <TagsInput.ItemDeleteTrigger />\n                </TagsInput.ItemPreview>\n                <TagsInput.ItemInput />\n              </TagsInput.Item>\n            ))\n          }\n        </TagsInput.Context>\n\n        <TagsInput.Input placeholder=\"Add up to 3 tags...\" />\n      </TagsInput.Control>\n    </TagsInput.Root>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-read-only",
++      "content": "\"use client\"\nexport const TagsInputReadOnly = () => (\n  <TagsInput.Root readOnly defaultValue={[\"React\", \"Chakra\"]}>\n    <TagsInput.Label>Read Only Tags</TagsInput.Label>\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Read-only...\" disabled />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-validation",
++      "content": "\"use client\"\nexport const TagsInputValidation = () => (\n  <TagsInput.Root\n    defaultValue={[\"React\", \"Chakra\"]}\n    validate={({ value }) => value.length >= 3}\n  >\n    <TagsInput.Label>Tags (min 3 chars)</TagsInput.Label>\n\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Add a tag...\" />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-with-blur",
++      "content": "\"use client\"\nexport const TagsInputWithBlur = () => (\n  <TagsInput.Root blurBehavior=\"add\">\n    <TagsInput.Label>Create Tag on Blur</TagsInput.Label>\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Type and blur to create tag...\" />\n      <TagsInput.ClearTrigger />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-with-colors",
++      "content": "\"use client\"\nexport const TagsInputWithColors = () => (\n  <TagsInput.Root defaultValue={[\"React\", \"Chakra\", \"TypeScript\"]}>\n    <TagsInput.Label>Colored Tags</TagsInput.Label>\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => {\n            const backgroundColor =\n              index % 3 === 0\n                ? \"#4FD1C5\"\n                : index % 3 === 1\n                  ? \"#63B3ED\"\n                  : \"#F6AD55\"\n            const textColor = \"#fff\"\n\n            return (\n              <TagsInput.Item key={index} index={index} value={tag}>\n                <TagsInput.ItemPreview\n                  style={{\n                    backgroundColor,\n                    color: textColor,\n                    display: \"flex\",\n                    alignItems: \"center\",\n                    gap: \"0.5rem\",\n                    padding: \"0.25rem 0.5rem\",\n                    borderRadius: \"0.375rem\",\n                  }}\n                >\n                  <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                  <TagsInput.ItemDeleteTrigger style={{ color: textColor }} />\n                </TagsInput.ItemPreview>\n                <TagsInput.ItemInput />\n              </TagsInput.Item>\n            )\n          })\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Add tag...\" />\n      <TagsInput.ClearTrigger />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-with-delimiter",
++      "content": "\"use client\"\nexport const TagsInputWithDelimiter = () => (\n  <TagsInput.Root delimiter={/[;,]/}>\n    <TagsInput.Label>Custom Delimiters (; ,)</TagsInput.Label>\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Type and use ; or , to create tag...\" />\n      <TagsInput.ClearTrigger />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-with-paste",
++      "content": "\"use client\"\nexport const TagsInputWithPaste = () => (\n  <TagsInput.Root addOnPaste delimiter=\",\">\n    <TagsInput.Label>Paste Tags</TagsInput.Label>\n    <TagsInput.Control>\n      <TagsInput.Context>\n        {({ value }) =>\n          value.map((tag, index) => (\n            <TagsInput.Item key={index} index={index} value={tag}>\n              <TagsInput.ItemPreview>\n                <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                <TagsInput.ItemDeleteTrigger />\n              </TagsInput.ItemPreview>\n              <TagsInput.ItemInput />\n            </TagsInput.Item>\n          ))\n        }\n      </TagsInput.Context>\n\n      <TagsInput.Input placeholder=\"Paste comma-separated tags...\" />\n      <TagsInput.ClearTrigger />\n    </TagsInput.Control>\n\n    <TagsInput.HiddenInput />\n  </TagsInput.Root>\n)\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    },
++    {
++      "name": "tags-input-with-store",
++      "content": "\"use client\"\nexport const TagsInputWithStore = () => {\n  const tagsStore = useTagsInput()\n\n  return (\n    <div>\n      <TagsInput.RootProvider value={tagsStore}>\n        <TagsInput.Control>\n          <TagsInput.Context>\n            {({ value }) =>\n              value.map((tag, index) => (\n                <TagsInput.Item key={index} index={index} value={tag}>\n                  <TagsInput.ItemPreview>\n                    <TagsInput.ItemText>{tag}</TagsInput.ItemText>\n                    <TagsInput.ItemDeleteTrigger />\n                  </TagsInput.ItemPreview>\n                  <TagsInput.ItemInput />\n                </TagsInput.Item>\n              ))\n            }\n          </TagsInput.Context>\n\n          <TagsInput.Input placeholder=\"Add tag...\" />\n        </TagsInput.Control>\n      </TagsInput.RootProvider>\n\n      <button onClick={() => tagsStore.setValue([])}>Clear All</button>\n    </div>\n  )\n}\n",
++      "hasSnippet": false,
++      "importPaths": [
++        "import { TagsInput } from \"@chakra-ui/react\"",
++        "import { useTagsInput } from \"@chakra-ui/react\""
++      ],
++      "importPath": "import { TagsInput } from \"@chakra-ui/react\""
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/packages/panda-preset/src/slot-recipes/index.ts b/packages/panda-preset/src/slot-recipes/index.ts
+index fbf46a61e4e..cc042add5ba 100644
+--- a/packages/panda-preset/src/slot-recipes/index.ts
++++ b/packages/panda-preset/src/slot-recipes/index.ts
+@@ -41,6 +41,7 @@ import { switchSlotRecipe } from "./switch"
+ import { tableSlotRecipe } from "./table"
+ import { tabsSlotRecipe } from "./tabs"
+ import { tagSlotRecipe } from "./tag"
++import { tagsInputSlotRecipe } from "./tags-input"
+ import { timelineSlotRecipe } from "./timeline"
+ import { toastSlotRecipe } from "./toast"
+ import { tooltipSlotRecipe } from "./tooltip"
+@@ -86,6 +87,7 @@ export const slotRecipes = {
+   switch: switchSlotRecipe,
+   table: tableSlotRecipe,
+   tabs: tabsSlotRecipe,
++  tagsInput: tagsInputSlotRecipe,
+   tag: tagSlotRecipe,
+   toast: toastSlotRecipe,
+   tooltip: tooltipSlotRecipe,
+diff --git a/packages/panda-preset/src/slot-recipes/tags-input.ts b/packages/panda-preset/src/slot-recipes/tags-input.ts
+new file mode 100644
+index 00000000000..3078d9910ea
+--- /dev/null
++++ b/packages/panda-preset/src/slot-recipes/tags-input.ts
+@@ -0,0 +1,241 @@
++import { defineSlotRecipe } from "../def"
++
++export const tagsInputSlotRecipe = defineSlotRecipe({
++  slots: [
++    "root",
++    "control",
++    "input",
++    "item",
++    "itemText",
++    "itemDeleteTrigger",
++    "itemInput",
++    "itemPreview",
++    "label",
++    "clearTrigger",
++  ],
++  className: "tags-input",
++  base: {
++    root: {
++      display: "flex",
++      flexDirection: "column",
++      gap: "1.5",
++    },
++    label: {
++      fontWeight: "medium",
++      color: "fg",
++      _disabled: {
++        opacity: "0.5",
++      },
++    },
++    control: {
++      display: "flex",
++      flexWrap: "wrap",
++      alignItems: "center",
++      gap: "1.5",
++      px: "3",
++      py: "2",
++      borderRadius: "l2",
++      borderWidth: "1px",
++      borderColor: "border",
++      bg: "bg",
++      transitionProperty: "border-color, box-shadow",
++      transitionDuration: "normal",
++      _focusWithin: {
++        borderColor: "colorPalette.solid",
++        boxShadow: "0 0 0 1px var(--colors-color-palette-solid)",
++      },
++      _disabled: {
++        opacity: "0.5",
++        cursor: "not-allowed",
++      },
++      _invalid: {
++        borderColor: "border.error",
++        _focusWithin: {
++          borderColor: "border.error",
++          boxShadow: "0 0 0 1px var(--colors-border-error)",
++        },
++      },
++    },
++    input: {
++      flex: "1",
++      minWidth: "20",
++      outline: "none",
++      bg: "transparent",
++      color: "fg",
++      placeholder: "fg.muted",
++      _disabled: {
++        cursor: "not-allowed",
++      },
++    },
++    item: {
++      display: "inline-flex",
++      alignItems: "center",
++      gap: "1",
++      px: "2",
++      py: "0.5",
++      borderRadius: "l1",
++      bg: "colorPalette.subtle",
++      color: "colorPalette.fg",
++      fontSize: "sm",
++      maxWidth: "full",
++      _disabled: {
++        opacity: "0.5",
++      },
++      _highlighted: {
++        bg: "colorPalette.muted",
++      },
++    },
++    itemText: {
++      userSelect: "none",
++      lineClamp: "1",
++    },
++    itemInput: {
++      outline: "none",
++      bg: "transparent",
++      minWidth: "2ch",
++      color: "inherit",
++    },
++    itemPreview: {
++      userSelect: "none",
++      lineClamp: "1",
++      display: "inline-flex",
++      alignItems: "center",
++      gap: "1",
++      maxWidth: "full",
++    },
++    itemDeleteTrigger: {
++      display: "flex",
++      alignItems: "center",
++      justifyContent: "center",
++      width: "4",
++      height: "4",
++      borderRadius: "l1",
++      color: "fg.muted",
++      cursor: "pointer",
++      flexShrink: "0",
++      _hover: {
++        bg: "bg.muted",
++        color: "fg",
++      },
++      _disabled: {
++        opacity: "0.5",
++        cursor: "not-allowed",
++      },
++    },
++    clearTrigger: {
++      display: "flex",
++      alignItems: "center",
++      justifyContent: "center",
++      color: "fg.muted",
++      cursor: "pointer",
++      flexShrink: "0",
++      _hover: {
++        color: "fg",
++      },
++      _disabled: {
++        opacity: "0.5",
++        cursor: "not-allowed",
++      },
++    },
++  },
++  variants: {
++    size: {
++      sm: {
++        control: {
++          minHeight: "8",
++          px: "2.5",
++          py: "1.5",
++          gap: "1",
++        },
++        input: {
++          fontSize: "sm",
++        },
++        label: {
++          fontSize: "sm",
++        },
++        item: {
++          px: "1.5",
++          py: "0.5",
++          fontSize: "xs",
++        },
++        itemDeleteTrigger: {
++          width: "3",
++          height: "3",
++        },
++      },
++      md: {
++        control: {
++          minHeight: "10",
++          px: "3",
++          py: "2",
++          gap: "1.5",
++        },
++        input: {
++          fontSize: "sm",
++        },
++        label: {
++          fontSize: "sm",
++        },
++        item: {
++          px: "2",
++          py: "0.5",
++          fontSize: "sm",
++        },
++        itemDeleteTrigger: {
++          width: "4",
++          height: "4",
++        },
++      },
++      lg: {
++        control: {
++          minHeight: "12",
++          px: "4",
++          py: "2.5",
++          gap: "2",
++        },
++        input: {
++          fontSize: "md",
++        },
++        label: {
++          fontSize: "md",
++        },
++        item: {
++          px: "2.5",
++          py: "1",
++          fontSize: "sm",
++        },
++        itemDeleteTrigger: {
++          width: "5",
++          height: "5",
++        },
++      },
++    },
++    variant: {
++      outline: {
++        control: {
++          borderColor: "border",
++          bg: "bg",
++        },
++      },
++      filled: {
++        control: {
++          borderColor: "transparent",
++          bg: "bg.muted",
++        },
++      },
++      flushed: {
++        control: {
++          borderColor: "transparent",
++          borderBottomColor: "border",
++          borderRadius: "0",
++          px: "0",
++          bg: "transparent",
++        },
++      },
++    },
++  },
++  defaultVariants: {
++    size: "md",
++    variant: "outline",
++  },
++})
+diff --git a/packages/react/__stories__/segment-group.stories.tsx b/packages/react/__stories__/segment-group.stories.tsx
+index 367d9bce526..98489beb8a1 100644
+--- a/packages/react/__stories__/segment-group.stories.tsx
++++ b/packages/react/__stories__/segment-group.stories.tsx
+@@ -14,6 +14,7 @@ export default {
+ 
+ export { SegmentedControlBasic as Basic } from "compositions/examples/segmented-control-basic"
+ export { SegmentedControlControlled as Controlled } from "compositions/examples/segmented-control-controlled"
++export { SegmentedControlWithColorPalette as ColorPalette } from "compositions/examples/segmented-control-with-color-palette"
+ export { SegmentedControlInCard as Card } from "compositions/examples/segmented-control-in-card"
+ export { SegmentedControlVertical as Vertical } from "compositions/examples/segmented-control-vertical"
+ export { SegmentedControlWithDisabled as Disabled } from "compositions/examples/segmented-control-with-disabled"
+diff --git a/packages/react/__stories__/tags-input.stories.tsx b/packages/react/__stories__/tags-input.stories.tsx
+new file mode 100644
+index 00000000000..c89e987aafc
+--- /dev/null
++++ b/packages/react/__stories__/tags-input.stories.tsx
+@@ -0,0 +1,33 @@
++import type { Meta } from "@storybook/react-vite"
++import { Box } from "../src"
++
++export default {
++  title: "Components / Tags Input",
++  decorators: [
++    (Story) => (
++      <Box p="10">
++        <Story />
++      </Box>
++    ),
++  ],
++} satisfies Meta
++
++export { TagsInputBasic as Basic } from "compositions/examples/tags-input-basic"
++export { TagsInputControlled as Controlled } from "compositions/examples/tags-input-controlled"
++export { TagsInputDisabled as Disabled } from "compositions/examples/tags-input-disabled"
++export { TagsInputEditable as Editable } from "compositions/examples/tags-input-editable"
++export { TagsInputExplorer as Explorer } from "compositions/examples/tags-input-explorer"
++export { TagsInputInvalid as Invalid } from "compositions/examples/tags-input-invalid"
++export { TagsInputReadOnly as ReadOnly } from "compositions/examples/tags-input-read-only"
++export { TagsInputValidation as Validation } from "compositions/examples/tags-input-validation"
++export { TagsInputWithBlurBehavior as BlurBehavior } from "compositions/examples/tags-input-with-blur-behavior"
++export { TagsInputWithColors as Colors } from "compositions/examples/tags-input-with-colors"
++export { TagsInputWithCombobox as Combobox } from "compositions/examples/tags-input-with-combobox"
++export { TagsInputWithDelimiter as Delimiter } from "compositions/examples/tags-input-with-delimiter"
++export { TagsInputWithField as Field } from "compositions/examples/tags-input-with-field"
++export { TagsInputWithForm as Form } from "compositions/examples/tags-input-with-form"
++export { TagsInputWithMax as Max } from "compositions/examples/tags-input-with-max"
++export { TagsInputWithPaste as Paste } from "compositions/examples/tags-input-with-paste"
++export { TagsInputWithSizes as Sizes } from "compositions/examples/tags-input-with-sizes"
++export { TagsInputWithStore as Store } from "compositions/examples/tags-input-with-store"
++export { TagsInputWithVariants as Variants } from "compositions/examples/tags-input-with-variants"
+diff --git a/packages/react/src/anatomy.ts b/packages/react/src/anatomy.ts
+index 7f65a432f46..14b8e18c2a1 100644
+--- a/packages/react/src/anatomy.ts
++++ b/packages/react/src/anatomy.ts
+@@ -262,6 +262,7 @@ export { qrCodeAnatomy } from "@ark-ui/react/qr-code"
+ export { scrollAreaAnatomy } from "@ark-ui/react/scroll-area"
+ export { segmentGroupAnatomy } from "@ark-ui/react/segment-group"
+ export { tooltipAnatomy } from "@ark-ui/react/tooltip"
++export { tagsInputAnatomy } from "@ark-ui/react/tags-input"
+ 
+ export const clipboardAnatomy = arkClipboardAnatomy.extendWith("valueText")
+ export const listboxAnatomy = arkListboxAnatomy
+diff --git a/packages/react/src/components/index.ts b/packages/react/src/components/index.ts
+index a90cc385042..3ebc1a09b35 100644
+--- a/packages/react/src/components/index.ts
++++ b/packages/react/src/components/index.ts
+@@ -98,6 +98,7 @@ export * from "./switch"
+ export * from "./table"
+ export * from "./tabs"
+ export * from "./tag"
++export * from "./tags-input"
+ export * from "./text"
+ export * from "./textarea"
+ export * from "./theme"
+diff --git a/packages/react/src/components/tags-input/index.ts b/packages/react/src/components/tags-input/index.ts
+new file mode 100644
+index 00000000000..722f61d9397
+--- /dev/null
++++ b/packages/react/src/components/tags-input/index.ts
+@@ -0,0 +1,45 @@
++export {
++  TagsInputControl,
++  TagsInputInput,
++  TagsInputItem,
++  TagsInputItemText,
++  TagsInputItemDeleteTrigger,
++  TagsInputLabel,
++  TagsInputRoot,
++  TagsInputRootProvider,
++  TagsInputPropsProvider,
++  TagsInputContext,
++  TagsInputHiddenInput,
++  TagsInputItemContext,
++  TagsInputClearTrigger,
++  useTagsInputStyles,
++} from "./tags-input"
++
++export type {
++  TagsInputControlProps,
++  TagsInputInputProps,
++  TagsInputItemProps,
++  TagsInputItemTextProps,
++  TagsInputItemDeleteTriggerProps,
++  TagsInputLabelProps,
++  TagsInputRootProps,
++  TagsInputRootProviderProps,
++  TagsInputClearTriggerProps,
++  TagsInputValueChangeDetails,
++  TagsInputValidityChangeDetails,
++} from "./tags-input"
++
++export {
++  useTagsInput,
++  useTagsInputContext,
++  useTagsInputItemContext,
++} from "@ark-ui/react/tags-input"
++
++export type {
++  UseTagsInputProps,
++  UseTagsInputReturn,
++  UseTagsInputContext,
++  UseTagsInputItemContext,
++} from "@ark-ui/react/tags-input"
++
++export * as TagsInput from "./namespace"
+diff --git a/packages/react/src/components/tags-input/namespace.ts b/packages/react/src/components/tags-input/namespace.ts
+new file mode 100644
+index 00000000000..e0501d41ab4
+--- /dev/null
++++ b/packages/react/src/components/tags-input/namespace.ts
+@@ -0,0 +1,33 @@
++export {
++  TagsInputContext as Context,
++  TagsInputControl as Control,
++  TagsInputInput as Input,
++  TagsInputItem as Item,
++  TagsInputItemText as ItemText,
++  TagsInputItemDeleteTrigger as ItemDeleteTrigger,
++  TagsInputItemContext as ItemContext,
++  TagsInputLabel as Label,
++  TagsInputPropsProvider as PropsProvider,
++  TagsInputRoot as Root,
++  TagsInputRootProvider as RootProvider,
++  TagsInputHiddenInput as HiddenInput,
++  TagsInputClearTrigger as ClearTrigger,
++  TagsInputItemInput as ItemInput,
++  TagsInputItemPreview as ItemPreview,
++} from "./tags-input"
++
++export type {
++  TagsInputRootProviderProps as RootProviderProps,
++  TagsInputControlProps as ControlProps,
++  TagsInputInputProps as InputProps,
++  TagsInputItemProps as ItemProps,
++  TagsInputItemTextProps as ItemTextProps,
++  TagsInputItemDeleteTriggerProps as ItemDeleteTriggerProps,
++  TagsInputLabelProps as LabelProps,
++  TagsInputRootProps as RootProps,
++  TagsInputClearTriggerProps as ClearTriggerProps,
++  TagsInputValueChangeDetails as ValueChangeDetails,
++  TagsInputValidityChangeDetails as ValidityChangeDetails,
++  TagsInputItemInputProps as ItemInputProps,
++  TagsInputItemPreviewProps as ItemPreviewProps,
++} from "./tags-input"
+diff --git a/packages/react/src/components/tags-input/tags-input.tsx b/packages/react/src/components/tags-input/tags-input.tsx
+new file mode 100644
+index 00000000000..bdbceb6e78f
+--- /dev/null
++++ b/packages/react/src/components/tags-input/tags-input.tsx
+@@ -0,0 +1,175 @@
++"use client"
++
++import type { Assign } from "@ark-ui/react"
++import { TagsInput as ArkTagsInput } from "@ark-ui/react/tags-input"
++import {
++  type HTMLChakraProps,
++  type SlotRecipeProps,
++  type UnstyledProp,
++  createSlotRecipeContext,
++} from "../../styled-system"
++import { CloseIcon } from "../icons"
++
++////////////////////////////////////////////////////////////////////////////////////
++
++const {
++  withProvider,
++  withContext,
++  useStyles: useTagsInputStyles,
++  PropsProvider,
++} = createSlotRecipeContext({ key: "tagsInput" })
++
++export { useTagsInputStyles }
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputRootProviderBaseProps
++  extends Assign<
++      ArkTagsInput.RootProviderBaseProps,
++      SlotRecipeProps<"tagsInput">
++    >,
++    UnstyledProp {}
++
++export interface TagsInputRootProviderProps
++  extends HTMLChakraProps<"div", TagsInputRootProviderBaseProps> {}
++
++export const TagsInputRootProvider = withProvider<
++  HTMLDivElement,
++  TagsInputRootProviderProps
++>(ArkTagsInput.RootProvider, "root", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputRootBaseProps
++  extends Assign<ArkTagsInput.RootBaseProps, SlotRecipeProps<"tagsInput">>,
++    UnstyledProp {}
++
++export interface TagsInputRootProps
++  extends HTMLChakraProps<"div", TagsInputRootBaseProps> {}
++
++export const TagsInputRoot = withProvider<HTMLDivElement, TagsInputRootProps>(
++  ArkTagsInput.Root,
++  "root",
++  { forwardAsChild: true, defaultProps: { editable: false } },
++)
++
++export const TagsInputPropsProvider =
++  PropsProvider as React.Provider<TagsInputRootBaseProps>
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputLabelProps
++  extends HTMLChakraProps<"label", ArkTagsInput.LabelBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputLabel = withContext<
++  HTMLLabelElement,
++  TagsInputLabelProps
++>(ArkTagsInput.Label, "label", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputControlProps
++  extends HTMLChakraProps<"div", ArkTagsInput.ControlBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputControl = withContext<
++  HTMLDivElement,
++  TagsInputControlProps
++>(ArkTagsInput.Control, "control", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputInputProps
++  extends HTMLChakraProps<"input", ArkTagsInput.InputBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputInput = withContext<
++  HTMLInputElement,
++  TagsInputInputProps
++>(ArkTagsInput.Input, "input", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputItemProps
++  extends HTMLChakraProps<"div", ArkTagsInput.ItemBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputItem = withContext<HTMLDivElement, TagsInputItemProps>(
++  ArkTagsInput.Item,
++  "item",
++  { forwardAsChild: true },
++)
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputItemTextProps
++  extends HTMLChakraProps<"span", ArkTagsInput.ItemTextBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputItemText = withContext<
++  HTMLSpanElement,
++  TagsInputItemTextProps
++>(ArkTagsInput.ItemText, "itemText", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputItemDeleteTriggerProps
++  extends HTMLChakraProps<"button", ArkTagsInput.ItemDeleteTriggerBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputItemDeleteTrigger = withContext<
++  HTMLButtonElement,
++  TagsInputItemDeleteTriggerProps
++>(ArkTagsInput.ItemDeleteTrigger, "itemDeleteTrigger", {
++  forwardAsChild: true,
++  defaultProps: { children: <CloseIcon /> },
++})
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputItemPreviewProps
++  extends HTMLChakraProps<"div", ArkTagsInput.ItemPreviewBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputItemPreview = withContext<
++  HTMLDivElement,
++  HTMLChakraProps<"div", ArkTagsInput.ItemPreviewBaseProps> & UnstyledProp
++>(ArkTagsInput.ItemPreview, "itemPreview", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputItemInputProps
++  extends HTMLChakraProps<"input", ArkTagsInput.ItemInputBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputItemInput = withContext<
++  HTMLInputElement,
++  TagsInputItemInputProps
++>(ArkTagsInput.ItemInput, "itemInput", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface TagsInputClearTriggerProps
++  extends HTMLChakraProps<"button", ArkTagsInput.ClearTriggerBaseProps>,
++    UnstyledProp {}
++
++export const TagsInputClearTrigger = withContext<
++  HTMLButtonElement,
++  TagsInputClearTriggerProps
++>(ArkTagsInput.ClearTrigger, "clearTrigger", {
++  forwardAsChild: true,
++  defaultProps: { children: <CloseIcon /> },
++})
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export const TagsInputContext = ArkTagsInput.Context
++export const TagsInputHiddenInput = ArkTagsInput.HiddenInput
++export const TagsInputItemContext = ArkTagsInput.ItemContext
++
++export interface TagsInputValueChangeDetails
++  extends ArkTagsInput.ValueChangeDetails {}
++
++export interface TagsInputValidityChangeDetails
++  extends ArkTagsInput.ValidityChangeDetails {}
+diff --git a/packages/react/src/styled-system/generated/recipes.gen.ts b/packages/react/src/styled-system/generated/recipes.gen.ts
+index 72d9966166f..e272ca17f3a 100644
+--- a/packages/react/src/styled-system/generated/recipes.gen.ts
++++ b/packages/react/src/styled-system/generated/recipes.gen.ts
+@@ -1266,6 +1266,25 @@ export type TagVariantMap = {
+   [K in keyof TagVariant]: Array<TagVariant[K]>
+ }
+ 
++// TagsInput
++
++export type TagsInputSlot = "root" | "label" | "control" | "input" | "clearTrigger" | "item" | "itemPreview" | "itemInput" | "itemText" | "itemDeleteTrigger"
++
++export interface TagsInputVariant {
++  /** @default "md" */
++  size?: "xs" | "sm" | "md" | "lg" | undefined
++  /** @default "outline" */
++  variant?: "outline" | "subtle" | "flushed" | undefined
++}
++
++export type TagsInputVariantProps = {
++  [K in keyof TagsInputVariant]?: ConditionalValue<TagsInputVariant[K]> | undefined
++}
++
++export type TagsInputVariantMap = {
++  [K in keyof TagsInputVariant]: Array<TagsInputVariant[K]>
++}
++
+ // Toast
+ 
+ export type ToastSlot = "root" | "title" | "description" | "indicator" | "closeTrigger" | "actionTrigger"
+@@ -1472,6 +1491,7 @@ export interface ConfigSlotRecipes {
+   table: SystemSlotRecipeFn<TableSlot, TableVariantProps, TableVariantMap>
+   tabs: SystemSlotRecipeFn<TabsSlot, TabsVariantProps, TabsVariantMap>
+   tag: SystemSlotRecipeFn<TagSlot, TagVariantProps, TagVariantMap>
++  tagsInput: SystemSlotRecipeFn<TagsInputSlot, TagsInputVariantProps, TagsInputVariantMap>
+   toast: SystemSlotRecipeFn<ToastSlot, ToastVariantProps, ToastVariantMap>
+   tooltip: SystemSlotRecipeFn<TooltipSlot, TooltipVariantProps, TooltipVariantMap>
+   status: SystemSlotRecipeFn<StatusSlot, StatusVariantProps, StatusVariantMap>
+@@ -1525,6 +1545,7 @@ export interface ConfigRecipeSlots {
+   table: TableSlot
+   tabs: TabsSlot
+   tag: TagSlot
++  tagsInput: TagsInputSlot
+   toast: ToastSlot
+   tooltip: TooltipSlot
+   status: StatusSlot
+diff --git a/packages/react/src/theme/recipes/tags-input.ts b/packages/react/src/theme/recipes/tags-input.ts
+new file mode 100644
+index 00000000000..66e92fd75a0
+--- /dev/null
++++ b/packages/react/src/theme/recipes/tags-input.ts
+@@ -0,0 +1,224 @@
++import { tagsInputAnatomy } from "../../anatomy"
++import { defineSlotRecipe } from "../../styled-system"
++
++export const tagsInputSlotRecipe = defineSlotRecipe({
++  slots: tagsInputAnatomy.keys(),
++  className: "tags-input",
++  base: {
++    root: {
++      display: "flex",
++      flexDirection: "column",
++      gap: "1.5",
++      width: "full",
++    },
++
++    label: {
++      fontWeight: "medium",
++      textStyle: "sm",
++      _disabled: {
++        opacity: "0.5",
++      },
++    },
++
++    control: {
++      "--focus-color": "colors.colorPalette.focusRing",
++      "--error-color": "colors.border.error",
++      minH: "var(--tags-input-height)",
++      px: "var(--tags-input-px)",
++      py: "var(--tags-input-py)",
++      gap: "var(--tags-input-gap)",
++      display: "flex",
++      flexWrap: "wrap",
++      alignItems: "center",
++      borderRadius: "l2",
++
++      transitionProperty: "border-color, box-shadow",
++      transitionDuration: "normal",
++
++      _disabled: {
++        opacity: "0.5",
++      },
++      _invalid: {
++        borderColor: "var(--error-color)",
++      },
++    },
++
++    input: {
++      flex: "1",
++      minWidth: "20",
++      outline: "none",
++      bg: "transparent",
++      color: "fg",
++      px: "calc(var(--tags-input-item-px) / 1.25)",
++      height: "var(--tags-input-item-height)",
++      _readOnly: {
++        display: "none",
++      },
++    },
++
++    itemText: {
++      lineClamp: "1",
++    },
++
++    itemInput: {
++      outline: "none",
++      bg: "transparent",
++      minWidth: "2ch",
++      color: "inherit",
++      px: "var(--tags-input-item-px)",
++      height: "var(--tags-input-item-height)",
++    },
++
++    itemPreview: {
++      height: "var(--tags-input-item-height)",
++      userSelect: "none",
++      display: "inline-flex",
++      alignItems: "center",
++      gap: "1",
++      rounded: "l1",
++      px: "var(--tags-input-item-px)",
++    },
++
++    itemDeleteTrigger: {
++      display: "flex",
++      alignItems: "center",
++      justifyContent: "center",
++      boxSize: "calc(var(--tags-input-item-height) / 1.5)",
++      cursor: { base: "button", _disabled: "initial" },
++      me: "-1",
++      opacity: "0.4",
++      _hover: {
++        opacity: "1",
++      },
++      "[data-highlighted] &": {
++        opacity: "1",
++      },
++      _icon: {
++        boxSize: "80%",
++      },
++    },
++  },
++
++  variants: {
++    size: {
++      xs: {
++        root: {
++          "--tags-input-height": "sizes.8",
++          "--tags-input-px": "spacing.1.5",
++          "--tags-input-py": "spacing.1",
++          "--tags-input-gap": "spacing.1",
++          "--tags-input-item-height": "sizes.6",
++          "--tags-input-item-px": "spacing.2",
++          textStyle: "xs",
++        },
++      },
++      sm: {
++        root: {
++          "--tags-input-height": "sizes.9",
++          "--tags-input-px": "spacing.1.5",
++          "--tags-input-py": "spacing.1",
++          "--tags-input-gap": "spacing.1",
++          "--tags-input-item-height": "sizes.6",
++          "--tags-input-item-px": "spacing.2",
++          textStyle: "sm",
++        },
++      },
++      md: {
++        root: {
++          "--tags-input-height": "sizes.10",
++          "--tags-input-px": "spacing.1.5",
++          "--tags-input-py": "spacing.1",
++          "--tags-input-gap": "spacing.1",
++          "--tags-input-item-height": "sizes.7",
++          "--tags-input-item-px": "spacing.2",
++          textStyle: "sm",
++        },
++      },
++      lg: {
++        root: {
++          "--tags-input-height": "sizes.11",
++          "--tags-input-px": "spacing.1.5",
++          "--tags-input-py": "spacing.1",
++          "--tags-input-gap": "spacing.1",
++          "--tags-input-item-height": "sizes.8",
++          "--tags-input-item-px": "spacing.2",
++          textStyle: "md",
++        },
++      },
++    },
++
++    variant: {
++      outline: {
++        control: {
++          borderWidth: "1px",
++          bg: "bg",
++          _focusWithin: {
++            outlineWidth: "1px",
++            outlineStyle: "solid",
++            outlineColor: "var(--focus-color)",
++            borderColor: "var(--focus-color)",
++            _invalid: {
++              outlineColor: "var(--error-color)",
++              borderColor: "var(--error-color)",
++            },
++          },
++        },
++        itemPreview: {
++          bg: "colorPalette.subtle",
++          _highlighted: {
++            bg: "colorPalette.muted",
++          },
++        },
++      },
++      subtle: {
++        control: {
++          bg: "bg.muted",
++          borderWidth: "1px",
++          borderColor: "transparent",
++          _focusWithin: {
++            outlineWidth: "1px",
++            outlineStyle: "solid",
++            outlineColor: "var(--focus-color)",
++            borderColor: "var(--focus-color)",
++            _invalid: {
++              outlineColor: "var(--error-color)",
++              borderColor: "var(--error-color)",
++            },
++          },
++        },
++        itemPreview: {
++          bg: "bg",
++          borderWidth: "1px",
++          _highlighted: {
++            bg: "colorPalette.subtle",
++            borderColor: "colorPalette.emphasized",
++          },
++        },
++      },
++      flushed: {
++        control: {
++          borderRadius: "0",
++          px: "0",
++          bg: "transparent",
++          borderBottomWidth: "1px",
++          borderBottomColor: "border",
++          _focusWithin: {
++            borderColor: "var(--focus-color)",
++            boxShadow: "0px 1px 0px 0px var(--focus-color)",
++          },
++        },
++        itemPreview: {
++          bg: "colorPalette.subtle",
++          _highlighted: {
++            bg: "colorPalette.muted",
++          },
++        },
++      },
++    },
++  },
++
++  defaultVariants: {
++    size: "md",
++    variant: "outline",
++  },
++})
+diff --git a/packages/react/src/theme/slot-recipes.export.ts b/packages/react/src/theme/slot-recipes.export.ts
+index 6838e386536..42a59210f0c 100644
+--- a/packages/react/src/theme/slot-recipes.export.ts
++++ b/packages/react/src/theme/slot-recipes.export.ts
+@@ -43,6 +43,7 @@ export { switchSlotRecipe } from "./recipes/switch"
+ export { tableSlotRecipe } from "./recipes/table"
+ export { tabsSlotRecipe } from "./recipes/tabs"
+ export { tagSlotRecipe } from "./recipes/tag"
++export { tagsInputSlotRecipe } from "./recipes/tags-input"
+ export { timelineSlotRecipe } from "./recipes/timeline"
+ export { toastSlotRecipe } from "./recipes/toast"
+ export { tooltipSlotRecipe } from "./recipes/tooltip"
+diff --git a/packages/react/src/theme/slot-recipes.ts b/packages/react/src/theme/slot-recipes.ts
+index a07f1c4f3d7..22e7b3cb74f 100644
+--- a/packages/react/src/theme/slot-recipes.ts
++++ b/packages/react/src/theme/slot-recipes.ts
+@@ -44,6 +44,7 @@ import { switchSlotRecipe } from "./recipes/switch"
+ import { tableSlotRecipe } from "./recipes/table"
+ import { tabsSlotRecipe } from "./recipes/tabs"
+ import { tagSlotRecipe } from "./recipes/tag"
++import { tagsInputSlotRecipe } from "./recipes/tags-input"
+ import { timelineSlotRecipe } from "./recipes/timeline"
+ import { toastSlotRecipe } from "./recipes/toast"
+ import { tooltipSlotRecipe } from "./recipes/tooltip"
+@@ -93,6 +94,7 @@ export const slotRecipes = {
+   table: tableSlotRecipe,
+   tabs: tabsSlotRecipe,
+   tag: tagSlotRecipe,
++  tagsInput: tagsInputSlotRecipe,
+   toast: toastSlotRecipe,
+   tooltip: tooltipSlotRecipe,
+   status: statusSlotRecipe,

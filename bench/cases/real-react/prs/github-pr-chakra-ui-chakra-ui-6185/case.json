@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-6185",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#6185: test: update test packages and cleanup tests",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 6185,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/6185",
+    "baseSha": "7f11b0cd2299ec57b98399fc61314202919adbce",
+    "headSha": "cf24167365781e5a131e08d0d17726a3a39839b0",
+    "selectedFiles": [
+      "tooling/test-utils/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T03:57:36.266Z"
+  },
+  "files": [
+    {
+      "id": "tooling/test-utils/src/index.ts",
+      "oldPath": "tooling/test-utils/src/index.ts",
+      "newPath": "tooling/test-utils/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "tooling/test-utils/src/index.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 7,
+          "endLine": 7
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

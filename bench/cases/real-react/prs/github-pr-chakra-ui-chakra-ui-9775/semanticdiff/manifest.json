@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/react/__stories__/number-input.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2F__stories__%2Fnumber-input.stories.tsx&old_oid=b6ad1d7dc3326b79999b8e014f8c55258d44f71d&old_mode=33188&new_filename=packages%2Freact%2F__stories__%2Fnumber-input.stories.tsx&new_oid=8897311f4b2683ff4120ac652e82a843028a798f&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/react/__stories__/number-input.stories.tsx",
+      "oid": "b6ad1d7dc3326b79999b8e014f8c55258d44f71d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/__stories__/number-input.stories.tsx",
+      "oid": "8897311f4b2683ff4120ac652e82a843028a798f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "208ce54203c94e048a9dea75fca9b83360c9836686c9e8f91687bf35514a0762"
+  }
+]

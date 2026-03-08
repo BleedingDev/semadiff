@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/bridge/bridge-react/vite.config.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fbridge%2Fbridge-react%2Fvite.config.ts&old_oid=be2badcdafdbd81b633fd4a2b32d744eb694e794&old_mode=33188&new_filename=packages%2Fbridge%2Fbridge-react%2Fvite.config.ts&new_oid=2e3b5cfc2438227c7ff0300efc3f2c4d80894490&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/bridge/bridge-react/vite.config.ts",
+      "oid": "be2badcdafdbd81b633fd4a2b32d744eb694e794",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/bridge/bridge-react/vite.config.ts",
+      "oid": "2e3b5cfc2438227c7ff0300efc3f2c4d80894490",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1fa2da6c47356720a697cf2878a6e7a30ae83a0e426d732df634f61c0ba5aedb"
+  }
+]

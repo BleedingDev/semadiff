@@ -1,0 +1,293 @@
+diff --git a/package.json b/package.json
+index bf5270f5c52..11a288f827a 100644
+--- a/package.json
++++ b/package.json
+@@ -19,7 +19,7 @@
+   "dependencies": {
+     "@module-federation/nextjs-mf": "link:./dist/packages/nextjs-mf",
+     "@module-federation/node": "link:./dist/packages/node",
+-    "@module-federation/utils": "link:./dist/packages/utils",
++    "@module-federation/utilities": "link:./dist/packages/utilities",
+     "@swc/helpers": "~0.3.3",
+     "core-js": "^3.6.5",
+     "fast-glob": "^3.2.12",
+@@ -70,7 +70,7 @@
+   },
+   "resolutions": {
+     "@module-federation/nextjs-mf": "link:./dist/packages/nextjs-mf",
+-    "@module-federation/utils": "link:./dist/packages/utils",
++    "@module-federation/utilities": "link:./dist/packages/utilities",
+     "@module-federation/node": "link:./dist/packages/node"
+   },
+   "workspaces": {
+diff --git a/packages/nextjs-mf/client/RemoteContainer.ts b/packages/nextjs-mf/client/RemoteContainer.ts
+index f0db296cbfc..1ff7f8d49d5 100644
+--- a/packages/nextjs-mf/client/RemoteContainer.ts
++++ b/packages/nextjs-mf/client/RemoteContainer.ts
+@@ -3,7 +3,7 @@ import type {
+   EventTypes,
+   RemoteData,
+   PageMap,
+-} from '@module-federation/utils';
++} from '@module-federation/utilities';
+ 
+ import EventEmitter from 'eventemitter3';
+ 
+diff --git a/packages/nextjs-mf/client/RemotePages.ts b/packages/nextjs-mf/client/RemotePages.ts
+index 68fefd0d858..99005d657a4 100644
+--- a/packages/nextjs-mf/client/RemotePages.ts
++++ b/packages/nextjs-mf/client/RemotePages.ts
+@@ -1,4 +1,4 @@
+-import type { PageMap } from '@module-federation/utils';
++import type { PageMap } from '@module-federation/utilities';
+ 
+ import * as React from 'react';
+ 
+diff --git a/packages/nextjs-mf/src/internal.ts b/packages/nextjs-mf/src/internal.ts
+index e9a3b71c501..0ec3f2f0c99 100644
+--- a/packages/nextjs-mf/src/internal.ts
++++ b/packages/nextjs-mf/src/internal.ts
+@@ -4,13 +4,13 @@ import type {
+   Shared,
+   SharedConfig,
+   SharedObject,
+-} from '@module-federation/utils';
++} from '@module-federation/utilities';
+ 
+ import path from 'path';
+ import { parseOptions } from 'webpack/lib/container/options';
+ import { isRequiredVersion } from 'webpack/lib/sharing/utils';
+ 
+-import { extractUrlAndGlobal } from '@module-federation/utils';
++import { extractUrlAndGlobal } from '@module-federation/utilities';
+ 
+ // the share scope we attach by default
+ // in hosts we re-key them to prevent webpack moving the modules into their own chunks (cause eager error)
+diff --git a/packages/nextjs-mf/src/loaders/helpers.ts b/packages/nextjs-mf/src/loaders/helpers.ts
+index a19c409032f..f9b36b2de43 100644
+--- a/packages/nextjs-mf/src/loaders/helpers.ts
++++ b/packages/nextjs-mf/src/loaders/helpers.ts
+@@ -1,4 +1,4 @@
+-import type { RuleSetRuleUnion, Loader } from '@module-federation/utils';
++import type { RuleSetRuleUnion, Loader } from '@module-federation/utilities';
+ 
+ /**
+  * Inject a loader into the current module rule.
+diff --git a/packages/nextjs-mf/src/plugins/ChildFederationPlugin.ts b/packages/nextjs-mf/src/plugins/ChildFederationPlugin.ts
+index 0c4d1879822..cdd77023aed 100644
+--- a/packages/nextjs-mf/src/plugins/ChildFederationPlugin.ts
++++ b/packages/nextjs-mf/src/plugins/ChildFederationPlugin.ts
+@@ -2,7 +2,7 @@ import type { Compiler, WebpackError, WebpackPluginInstance } from 'webpack';
+ import type {
+   ModuleFederationPluginOptions,
+   NextFederationPluginExtraOptions,
+-} from '@module-federation/utils';
++} from '@module-federation/utilities';
+ 
+ import path from 'path';
+ import fs from 'fs';
+@@ -20,7 +20,7 @@ import {
+   computeRemoteFilename,
+   createRuntimeVariables,
+   toDisplayErrors,
+-} from '@module-federation/utils';
++} from '@module-federation/utilities';
+ 
+ import ChildFriendlyModuleFederationPlugin from './ModuleFederationPlugin';
+ import RemoveRRRuntimePlugin from './RemoveRRRuntimePlugin';
+diff --git a/packages/nextjs-mf/src/plugins/ModuleFederationPlugin.ts b/packages/nextjs-mf/src/plugins/ModuleFederationPlugin.ts
+index ac72d4aaf62..9e38419106b 100644
+--- a/packages/nextjs-mf/src/plugins/ModuleFederationPlugin.ts
++++ b/packages/nextjs-mf/src/plugins/ModuleFederationPlugin.ts
+@@ -1,5 +1,5 @@
+ import type { Compiler } from 'webpack';
+-import type { ModuleFederationPluginOptions, ExternalsType } from '@module-federation/utils';
++import type { ModuleFederationPluginOptions, ExternalsType } from '@module-federation/utilities';
+ 
+ export default class ModuleFederationPlugin {
+   private _options!: ModuleFederationPluginOptions;
+diff --git a/packages/nextjs-mf/src/plugins/NextFederationPlugin.ts b/packages/nextjs-mf/src/plugins/NextFederationPlugin.ts
+index 7bcb62e3e39..0c8e901c53c 100644
+--- a/packages/nextjs-mf/src/plugins/NextFederationPlugin.ts
++++ b/packages/nextjs-mf/src/plugins/NextFederationPlugin.ts
+@@ -8,8 +8,8 @@ import type {
+   ModuleFederationPluginOptions,
+   NextFederationPluginExtraOptions,
+   NextFederationPluginOptions,
+-} from '@module-federation/utils';
+-import { createRuntimeVariables } from '@module-federation/utils';
++} from '@module-federation/utilities';
++import { createRuntimeVariables } from '@module-federation/utilities';
+ 
+ import path from 'path';
+ import type { Compiler } from 'webpack';
+diff --git a/packages/nextjs-mf/utils/build-utils.ts b/packages/nextjs-mf/utils/build-utils.ts
+index 2c6a1d56724..2f0b8ad9465 100644
+--- a/packages/nextjs-mf/utils/build-utils.ts
++++ b/packages/nextjs-mf/utils/build-utils.ts
+@@ -1,6 +1,6 @@
+ import Template from './Template';
+ import { parseRemoteSyntax } from '../src/internal';
+-import { WebpackRemoteContainer } from '@module-federation/utils';
++import { WebpackRemoteContainer } from '@module-federation/utilities';
+ 
+ const swc = require('@swc/core');
+ 
+@@ -85,6 +85,7 @@ const remoteTemplate = function () {
+   }).then(function () {
+     const proxy: WebpackRemoteContainer = {
+       get: remoteGlobal.get,
++      //@ts-ignore
+       init: function (shareScope) {
+         const handler: ProxyHandler<typeof __webpack_share_scopes__> = {
+           get(target, prop: string) {
+diff --git a/packages/nextjs-mf/utils/index.ts b/packages/nextjs-mf/utils/index.ts
+index de414301831..9df29e22313 100644
+--- a/packages/nextjs-mf/utils/index.ts
++++ b/packages/nextjs-mf/utils/index.ts
+@@ -1 +1 @@
+-export { extractUrlAndGlobal, injectScript } from '@module-federation/utils';
++export { extractUrlAndGlobal, injectScript } from '@module-federation/utilities';
+diff --git a/packages/utils/.babelrc b/packages/utilities/.babelrc
+similarity index 100%
+rename from packages/utils/.babelrc
+rename to packages/utilities/.babelrc
+diff --git a/packages/utils/.eslintrc.json b/packages/utilities/.eslintrc.json
+similarity index 100%
+rename from packages/utils/.eslintrc.json
+rename to packages/utilities/.eslintrc.json
+diff --git a/packages/utils/README.md b/packages/utilities/README.md
+similarity index 100%
+rename from packages/utils/README.md
+rename to packages/utilities/README.md
+diff --git a/packages/utils/jest.config.ts b/packages/utilities/jest.config.ts
+similarity index 100%
+rename from packages/utils/jest.config.ts
+rename to packages/utilities/jest.config.ts
+diff --git a/packages/utils/package.json b/packages/utilities/package.json
+similarity index 70%
+rename from packages/utils/package.json
+rename to packages/utilities/package.json
+index a05e728dcf3..cd444d1e7bd 100644
+--- a/packages/utils/package.json
++++ b/packages/utilities/package.json
+@@ -1,5 +1,5 @@
+ {
+-  "name": "@module-federation/utils",
++  "name": "@module-federation/utilities",
+   "version": "0.0.2",
+   "type": "commonjs",
+   "main": "src/index.js",
+diff --git a/packages/utils/project.json b/packages/utilities/project.json
+similarity index 65%
+rename from packages/utils/project.json
+rename to packages/utilities/project.json
+index 22fff2734a5..342e17144ce 100644
+--- a/packages/utils/project.json
++++ b/packages/utilities/project.json
+@@ -1,16 +1,16 @@
+ {
+   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+-  "sourceRoot": "packages/utils/src",
++  "sourceRoot": "packages/utilities/src",
+   "projectType": "library",
+   "targets": {
+     "build": {
+       "executor": "@nrwl/js:tsc",
+       "outputs": ["{options.outputPath}"],
+       "options": {
+-        "outputPath": "dist/packages/utils",
+-        "main": "packages/utils/src/index.ts",
+-        "tsConfig": "packages/utils/tsconfig.lib.json",
+-        "assets": ["packages/utils/*.md"]
++        "outputPath": "dist/packages/utilities",
++        "main": "packages/utilities/src/index.ts",
++        "tsConfig": "packages/utilities/tsconfig.lib.json",
++        "assets": ["packages/utilities/*.md"]
+       }
+     },
+     "publish": {
+@@ -29,14 +29,14 @@
+       "executor": "@nrwl/linter:eslint",
+       "outputs": ["{options.outputFile}"],
+       "options": {
+-        "lintFilePatterns": ["packages/utils/**/*.ts"]
++        "lintFilePatterns": ["packages/utilities/**/*.ts"]
+       }
+     },
+     "test": {
+       "executor": "@nrwl/jest:jest",
+-      "outputs": ["coverage/packages/utils"],
++      "outputs": ["coverage/packages/utilities"],
+       "options": {
+-        "jestConfig": "packages/utils/jest.config.ts",
++        "jestConfig": "packages/utilities/jest.config.ts",
+         "passWithNoTests": true
+       }
+     }
+diff --git a/packages/utils/src/index.ts b/packages/utilities/src/index.ts
+similarity index 100%
+rename from packages/utils/src/index.ts
+rename to packages/utilities/src/index.ts
+diff --git a/packages/utils/src/types/index.ts b/packages/utilities/src/types/index.ts
+similarity index 100%
+rename from packages/utils/src/types/index.ts
+rename to packages/utilities/src/types/index.ts
+diff --git a/packages/utils/src/utils/common.ts b/packages/utilities/src/utils/common.ts
+similarity index 100%
+rename from packages/utils/src/utils/common.ts
+rename to packages/utilities/src/utils/common.ts
+diff --git a/packages/utils/tsconfig.json b/packages/utilities/tsconfig.json
+similarity index 100%
+rename from packages/utils/tsconfig.json
+rename to packages/utilities/tsconfig.json
+diff --git a/packages/utils/tsconfig.lib.json b/packages/utilities/tsconfig.lib.json
+similarity index 100%
+rename from packages/utils/tsconfig.lib.json
+rename to packages/utilities/tsconfig.lib.json
+diff --git a/packages/utils/tsconfig.spec.json b/packages/utilities/tsconfig.spec.json
+similarity index 100%
+rename from packages/utils/tsconfig.spec.json
+rename to packages/utilities/tsconfig.spec.json
+diff --git a/tsconfig.base.json b/tsconfig.base.json
+index 8b69a535f46..fa4e68ef2cf 100644
+--- a/tsconfig.base.json
++++ b/tsconfig.base.json
+@@ -18,7 +18,7 @@
+     "paths": {
+       "@module-federation/nextjs-mf": ["packages/nextjs-mf/src/index.ts"],
+       "@module-federation/node": ["packages/node/src/index.js"],
+-      "@module-federation/utils": ["packages/utils/src/index.ts"]
++      "@module-federation/utilities": ["packages/utilities/src/index.ts"]
+     }
+   },
+   "exclude": ["node_modules", "tmp"]
+diff --git a/workspace.json b/workspace.json
+index 5966020c04e..b980493edd5 100644
+--- a/workspace.json
++++ b/workspace.json
+@@ -7,6 +7,6 @@
+     "3002-checkout": "apps/3002-checkout",
+     "nextjs-mf": "packages/nextjs-mf",
+     "node": "packages/node",
+-    "utils": "packages/utils"
++    "utils": "packages/utilities"
+   }
+ }
+diff --git a/yarn.lock b/yarn.lock
+index 109f62fa539..a27e8b82d7a 100644
+--- a/yarn.lock
++++ b/yarn.lock
+@@ -1484,11 +1484,7 @@
+   version "0.0.0"
+   uid ""
+ 
+-"@module-federation/utils@0.0.1":
+-  version "0.0.0"
+-  uid ""
+-
+-"@module-federation/utils@link:./dist/packages/utils":
++"@module-federation/utilities@link:./dist/packages/utilities":
+   version "0.0.0"
+   uid ""
+ 

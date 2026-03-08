@@ -1,0 +1,539 @@
+diff --git a/.changeset/config.json b/.changeset/config.json
+index 154b7db6745..ae8ca80cc82 100644
+--- a/.changeset/config.json
++++ b/.changeset/config.json
+@@ -6,7 +6,7 @@
+     [
+       "@module-federation/runtime",
+       "@module-federation/enhanced",
+-      "@module-federation/enhanced-rspack",
++      "@module-federation/rspack",
+       "@module-federation/webpack-bundler-runtime",
+       "@module-federation/sdk",
+       "@module-federation/runtime-tools",
+diff --git a/.changeset/late-mice-hope.md b/.changeset/late-mice-hope.md
+index c7fdacf444a..bc1f48370f7 100644
+--- a/.changeset/late-mice-hope.md
++++ b/.changeset/late-mice-hope.md
+@@ -1,7 +1,7 @@
+ ---
+ '@module-federation/native-federation-typescript': patch
+ '@module-federation/third-party-dts-extractor': patch
+-'@module-federation/enhanced-rspack': patch
++'@module-federation/rspack': patch
+ '@module-federation/dts-plugin': patch
+ '@module-federation/enhanced': patch
+ '@module-federation/manifest': patch
+diff --git a/.changeset/late-poets-fetch.md b/.changeset/late-poets-fetch.md
+new file mode 100644
+index 00000000000..93ae12645c5
+--- /dev/null
++++ b/.changeset/late-poets-fetch.md
+@@ -0,0 +1,6 @@
++---
++'@module-federation/enhanced': patch
++'@module-federation/rspack': patch
++---
++
++chore: rename @module-federation/enhanced-rspack to @module-federation/rspack
+diff --git a/.changeset/lemon-pigs-fetch.md b/.changeset/lemon-pigs-fetch.md
+new file mode 100644
+index 00000000000..0002a01f680
+--- /dev/null
++++ b/.changeset/lemon-pigs-fetch.md
+@@ -0,0 +1,7 @@
++---
++'@module-federation/nextjs-mf': patch
++'@module-federation/enhanced': patch
++'@module-federation/node': patch
++---
++
++chore: enhanced export runtime
+diff --git a/apps/manifest-demo/3008-webpack-host/webpack.config.js b/apps/manifest-demo/3008-webpack-host/webpack.config.js
+index b3d7efda37a..368352999bf 100644
+--- a/apps/manifest-demo/3008-webpack-host/webpack.config.js
++++ b/apps/manifest-demo/3008-webpack-host/webpack.config.js
+@@ -1,7 +1,9 @@
+ const path = require('path');
+ const { registerPluginTSTranspiler } = require('nx/src/utils/nx-plugin.js');
+ registerPluginTSTranspiler();
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ const { composePlugins, withNx } = require('@nx/webpack');
+ const { withReact } = require('@nx/react');
+ 
+diff --git a/apps/manifest-demo/3009-webpack-provider/webpack.config.js b/apps/manifest-demo/3009-webpack-provider/webpack.config.js
+index 979da10a0c7..ee8fba49cdd 100644
+--- a/apps/manifest-demo/3009-webpack-provider/webpack.config.js
++++ b/apps/manifest-demo/3009-webpack-provider/webpack.config.js
+@@ -4,7 +4,9 @@ registerPluginTSTranspiler();
+ const { composePlugins, withNx } = require('@nx/webpack');
+ const { withReact } = require('@nx/react');
+ 
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ 
+ module.exports = composePlugins(
+   withNx(),
+diff --git a/apps/react-ts-host/webpack.config.js b/apps/react-ts-host/webpack.config.js
+index f06acdab511..bca49a70f93 100644
+--- a/apps/react-ts-host/webpack.config.js
++++ b/apps/react-ts-host/webpack.config.js
+@@ -1,7 +1,9 @@
+ const { registerPluginTSTranspiler } = require('nx/src/utils/nx-plugin.js');
+ 
+ registerPluginTSTranspiler();
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ const { composePlugins, withNx } = require('@nx/webpack');
+ const { withReact } = require('@nx/react');
+ process.env.FEDERATION_DEBUG = true;
+diff --git a/apps/react-ts-nested-remote/webpack.config.js b/apps/react-ts-nested-remote/webpack.config.js
+index 2107a067034..64e93b1613a 100644
+--- a/apps/react-ts-nested-remote/webpack.config.js
++++ b/apps/react-ts-nested-remote/webpack.config.js
+@@ -1,7 +1,9 @@
+ const { registerPluginTSTranspiler } = require('nx/src/utils/nx-plugin.js');
+ 
+ registerPluginTSTranspiler();
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ const { composePlugins, withNx } = require('@nx/webpack');
+ const { withReact } = require('@nx/react');
+ process.env.FEDERATION_DEBUG = true;
+diff --git a/apps/react-ts-remote/webpack.config.js b/apps/react-ts-remote/webpack.config.js
+index 3c5ae4cfad9..f1585c76ad2 100644
+--- a/apps/react-ts-remote/webpack.config.js
++++ b/apps/react-ts-remote/webpack.config.js
+@@ -1,7 +1,9 @@
+ const { registerPluginTSTranspiler } = require('nx/src/utils/nx-plugin.js');
+ 
+ registerPluginTSTranspiler();
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ const { composePlugins, withNx } = require('@nx/webpack');
+ const { withReact } = require('@nx/react');
+ process.env.FEDERATION_DEBUG = true;
+diff --git a/apps/runtime-demo/3005-runtime-host/webpack.config.js b/apps/runtime-demo/3005-runtime-host/webpack.config.js
+index 46fc6a1bec2..12451713f3b 100644
+--- a/apps/runtime-demo/3005-runtime-host/webpack.config.js
++++ b/apps/runtime-demo/3005-runtime-host/webpack.config.js
+@@ -1,7 +1,9 @@
+ const path = require('path');
+ const { registerPluginTSTranspiler } = require('nx/src/utils/nx-plugin.js');
+ registerPluginTSTranspiler();
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ const { composePlugins, withNx } = require('@nx/webpack');
+ const { withReact } = require('@nx/react');
+ 
+diff --git a/apps/runtime-demo/3006-runtime-remote/webpack.config.js b/apps/runtime-demo/3006-runtime-remote/webpack.config.js
+index 0299193351b..f9a24478c28 100644
+--- a/apps/runtime-demo/3006-runtime-remote/webpack.config.js
++++ b/apps/runtime-demo/3006-runtime-remote/webpack.config.js
+@@ -6,7 +6,9 @@ const { withReact } = require('@nx/react');
+ 
+ const path = require('path');
+ // const { withModuleFederation } = require('@nx/react/module-federation');
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ 
+ module.exports = composePlugins(
+   withNx(),
+diff --git a/apps/runtime-demo/3007-runtime-remote/webpack.config.js b/apps/runtime-demo/3007-runtime-remote/webpack.config.js
+index 91fd1f240e2..4c28745a2f1 100644
+--- a/apps/runtime-demo/3007-runtime-remote/webpack.config.js
++++ b/apps/runtime-demo/3007-runtime-remote/webpack.config.js
+@@ -6,7 +6,9 @@ const { withReact } = require('@nx/react');
+ 
+ const path = require('path');
+ // const { withModuleFederation } = require('@nx/react/module-federation');
+-const { ModuleFederationPlugin } = require('@module-federation/enhanced');
++const {
++  ModuleFederationPlugin,
++} = require('@module-federation/enhanced/webpack');
+ 
+ module.exports = composePlugins(
+   withNx(),
+diff --git a/packages/enhanced-rspack/README.md b/packages/enhanced-rspack/README.md
+deleted file mode 100644
+index 418173c3cf6..00000000000
+--- a/packages/enhanced-rspack/README.md
++++ /dev/null
+@@ -1 +0,0 @@
+-# `@module-federation/enhanced-rspack` Documentation
+diff --git a/packages/enhanced/package.json b/packages/enhanced/package.json
+index 187fea0dcb0..a9da54a7c4c 100644
+--- a/packages/enhanced/package.json
++++ b/packages/enhanced/package.json
+@@ -60,7 +60,7 @@
+     "@module-federation/manifest": "workspace:*",
+     "@module-federation/managers": "workspace:*",
+     "@module-federation/dts-plugin": "workspace:*",
+-    "@module-federation/enhanced-rspack": "workspace:*",
++    "@module-federation/rspack": "workspace:*",
+     "upath": "2.0.1"
+   }
+ }
+diff --git a/packages/enhanced/src/rspack.ts b/packages/enhanced/src/rspack.ts
+index 29494058064..7e5f44c7e6d 100644
+--- a/packages/enhanced/src/rspack.ts
++++ b/packages/enhanced/src/rspack.ts
+@@ -1 +1 @@
+-export { ModuleFederationPlugin } from '@module-federation/enhanced-rspack';
++export { ModuleFederationPlugin } from '@module-federation/rspack';
+diff --git a/packages/nextjs-mf/src/internal.ts b/packages/nextjs-mf/src/internal.ts
+index af1b4ac9a77..8403e818f60 100644
+--- a/packages/nextjs-mf/src/internal.ts
++++ b/packages/nextjs-mf/src/internal.ts
+@@ -1,9 +1,4 @@
+-import type {
+-  ModuleFederationPluginOptions,
+-  SharedConfig,
+-  SharedObject,
+-} from '@module-federation/utilities';
+-import { isRequiredVersion, parseOptions } from '@module-federation/enhanced';
++import type { SharedConfig, SharedObject } from '@module-federation/utilities';
+ 
+ /**
+  * @typedef SharedObject
+diff --git a/packages/nextjs-mf/src/plugins/NextFederationPlugin/apply-server-plugins.ts b/packages/nextjs-mf/src/plugins/NextFederationPlugin/apply-server-plugins.ts
+index 96e20d092c5..a787a1275b5 100644
+--- a/packages/nextjs-mf/src/plugins/NextFederationPlugin/apply-server-plugins.ts
++++ b/packages/nextjs-mf/src/plugins/NextFederationPlugin/apply-server-plugins.ts
+@@ -2,7 +2,7 @@ import type { Compiler } from 'webpack';
+ import { ModuleFederationPluginOptions } from '@module-federation/utilities';
+ import path from 'path';
+ import InvertedContainerPlugin from '../container/InvertedContainerPlugin';
+-import { ModuleFederationPlugin } from '@module-federation/enhanced';
++import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
+ /**
+  * This function applies server-specific plugins to the webpack compiler.
+  *
+diff --git a/packages/nextjs-mf/src/plugins/NextFederationPlugin/index.ts b/packages/nextjs-mf/src/plugins/NextFederationPlugin/index.ts
+index 5634dd20041..243a34f9068 100644
+--- a/packages/nextjs-mf/src/plugins/NextFederationPlugin/index.ts
++++ b/packages/nextjs-mf/src/plugins/NextFederationPlugin/index.ts
+@@ -27,7 +27,7 @@ import {
+   handleServerExternals,
+ } from './apply-server-plugins';
+ import { applyClientPlugins } from './apply-client-plugins';
+-import { ModuleFederationPlugin } from '@module-federation/enhanced';
++import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
+ import type { moduleFederationPlugin } from '@module-federation/sdk';
+ 
+ import path from 'path';
+diff --git a/packages/node/src/plugins/UniversalFederationPlugin.ts b/packages/node/src/plugins/UniversalFederationPlugin.ts
+index 584003a45bf..4c14a9393c6 100644
+--- a/packages/node/src/plugins/UniversalFederationPlugin.ts
++++ b/packages/node/src/plugins/UniversalFederationPlugin.ts
+@@ -3,7 +3,7 @@
+  */
+ import StreamingTargetPlugin from './StreamingTargetPlugin';
+ import NodeFederationPlugin from './NodeFederationPlugin';
+-import { ModuleFederationPlugin } from '@module-federation/enhanced';
++import { ModuleFederationPlugin } from '@module-federation/enhanced/webpack';
+ import { ModuleFederationPluginOptions } from '../types';
+ import type { Compiler, container } from 'webpack';
+ import { getWebpackPath } from '@module-federation/sdk/normalize-webpack-path';
+diff --git a/packages/enhanced-rspack/CHANGELOG.md b/packages/rspack/CHANGELOG.md
+similarity index 94%
+rename from packages/enhanced-rspack/CHANGELOG.md
+rename to packages/rspack/CHANGELOG.md
+index f559228b26b..5d6790901ce 100644
+--- a/packages/enhanced-rspack/CHANGELOG.md
++++ b/packages/rspack/CHANGELOG.md
+@@ -1,4 +1,4 @@
+-# @module-federation/enhanced-rspack
++# @module-federation/rspack
+ 
+ ## 0.1.1
+ 
+@@ -46,7 +46,7 @@
+ ### Patch Changes
+ 
+ - ba5bedd: feat: support manifest
+-- ba5bedd: feat: add enhanced-rspack
++- ba5bedd: feat: add rspack
+ - Updated dependencies [3a45d99]
+ - Updated dependencies [ba5bedd]
+   - @module-federation/sdk@0.0.15
+diff --git a/packages/enhanced-rspack/LICENSE b/packages/rspack/LICENSE
+similarity index 100%
+rename from packages/enhanced-rspack/LICENSE
+rename to packages/rspack/LICENSE
+diff --git a/packages/rspack/README.md b/packages/rspack/README.md
+new file mode 100644
+index 00000000000..1c2426f44f1
+--- /dev/null
++++ b/packages/rspack/README.md
+@@ -0,0 +1 @@
++# `@module-federation/rspack` Documentation
+diff --git a/packages/enhanced-rspack/jest.config.js b/packages/rspack/jest.config.js
+similarity index 100%
+rename from packages/enhanced-rspack/jest.config.js
+rename to packages/rspack/jest.config.js
+diff --git a/packages/enhanced-rspack/package.json b/packages/rspack/package.json
+similarity index 95%
+rename from packages/enhanced-rspack/package.json
+rename to packages/rspack/package.json
+index a3eb4f47858..fb266b86115 100644
+--- a/packages/enhanced-rspack/package.json
++++ b/packages/rspack/package.json
+@@ -1,5 +1,5 @@
+ {
+-  "name": "@module-federation/enhanced-rspack",
++  "name": "@module-federation/rspack",
+   "version": "0.1.1",
+   "license": "MIT",
+   "keywords": [
+diff --git a/packages/enhanced-rspack/project.json b/packages/rspack/project.json
+similarity index 63%
+rename from packages/enhanced-rspack/project.json
+rename to packages/rspack/project.json
+index 98069b95d21..b08c9d59309 100644
+--- a/packages/enhanced-rspack/project.json
++++ b/packages/rspack/project.json
+@@ -1,20 +1,20 @@
+ {
+-  "name": "enhanced-rspack",
++  "name": "rspack",
+   "$schema": "../../node_modules/nx/schemas/project-schema.json",
+-  "sourceRoot": "packages/enhanced-rspack/src",
++  "sourceRoot": "packages/rspack/src",
+   "projectType": "library",
+   "targets": {
+     "build": {
+       "executor": "@nx/rollup:rollup",
+       "outputs": ["{options.outputPath}"],
+       "options": {
+-        "outputPath": "packages/enhanced-rspack/dist",
+-        "main": "packages/enhanced-rspack/src/index.ts",
+-        "tsConfig": "packages/enhanced-rspack/tsconfig.lib.json",
++        "outputPath": "packages/rspack/dist",
++        "main": "packages/rspack/src/index.ts",
++        "tsConfig": "packages/rspack/tsconfig.lib.json",
+         "assets": [],
+         "external": ["@module-federation/*"],
+-        "project": "packages/enhanced-rspack/package.json",
+-        "rollupConfig": "packages/enhanced-rspack/rollup.config.js",
++        "project": "packages/rspack/package.json",
++        "rollupConfig": "packages/rspack/rollup.config.js",
+         "compiler": "swc",
+         "format": ["cjs", "esm"]
+       }
+@@ -24,8 +24,8 @@
+       "outputs": ["{options.outputFile}"],
+       "options": {
+         "lintFilePatterns": [
+-          "packages/enhanced-rspack/**/*.ts",
+-          "packages/enhanced-rspack/package.json"
++          "packages/rspack/**/*.ts",
++          "packages/rspack/package.json"
+         ]
+       }
+     },
+@@ -33,7 +33,7 @@
+       "executor": "@nx/jest:jest",
+       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+       "options": {
+-        "jestConfig": "packages/enhanced-rspack/jest.config.js",
++        "jestConfig": "packages/rspack/jest.config.js",
+         "passWithNoTests": true
+       },
+       "configurations": {
+@@ -49,11 +49,11 @@
+         "parallel": false,
+         "commands": [
+           {
+-            "command": "nx run enhanced-rspack:test",
++            "command": "nx run rspack:test",
+             "forwardAllArgs": false
+           },
+           {
+-            "command": "nx run enhanced-rspack:build",
++            "command": "nx run rspack:build",
+             "forwardAllArgs": false
+           }
+         ]
+diff --git a/packages/enhanced-rspack/rollup.config.js b/packages/rspack/rollup.config.js
+similarity index 80%
+rename from packages/enhanced-rspack/rollup.config.js
+rename to packages/rspack/rollup.config.js
+index c954514c462..a0d1ecc0ff8 100644
+--- a/packages/enhanced-rspack/rollup.config.js
++++ b/packages/rspack/rollup.config.js
+@@ -12,8 +12,8 @@ module.exports = (rollupConfig, projectOptions) => {
+     copy({
+       targets: [
+         {
+-          src: 'packages/enhanced-rspack/LICENSE',
+-          dest: 'packages/enhanced-rspack/dist',
++          src: 'packages/rspack/LICENSE',
++          dest: 'packages/rspack/dist',
+         },
+       ],
+     }),
+diff --git a/packages/enhanced-rspack/src/ModuleFederationPlugin.ts b/packages/rspack/src/ModuleFederationPlugin.ts
+similarity index 100%
+rename from packages/enhanced-rspack/src/ModuleFederationPlugin.ts
+rename to packages/rspack/src/ModuleFederationPlugin.ts
+diff --git a/packages/enhanced-rspack/src/index.ts b/packages/rspack/src/index.ts
+similarity index 100%
+rename from packages/enhanced-rspack/src/index.ts
+rename to packages/rspack/src/index.ts
+diff --git a/packages/enhanced-rspack/src/utils.ts b/packages/rspack/src/utils.ts
+similarity index 100%
+rename from packages/enhanced-rspack/src/utils.ts
+rename to packages/rspack/src/utils.ts
+diff --git a/packages/enhanced-rspack/tsconfig.json b/packages/rspack/tsconfig.json
+similarity index 100%
+rename from packages/enhanced-rspack/tsconfig.json
+rename to packages/rspack/tsconfig.json
+diff --git a/packages/enhanced-rspack/tsconfig.lib.json b/packages/rspack/tsconfig.lib.json
+similarity index 100%
+rename from packages/enhanced-rspack/tsconfig.lib.json
+rename to packages/rspack/tsconfig.lib.json
+diff --git a/packages/enhanced-rspack/tsconfig.spec.json b/packages/rspack/tsconfig.spec.json
+similarity index 100%
+rename from packages/enhanced-rspack/tsconfig.spec.json
+rename to packages/rspack/tsconfig.spec.json
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index b3595e20261..6116c08e3ac 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -1285,15 +1285,15 @@ importers:
+       '@module-federation/dts-plugin':
+         specifier: workspace:*
+         version: link:../dts-plugin
+-      '@module-federation/enhanced-rspack':
+-        specifier: workspace:*
+-        version: link:../enhanced-rspack
+       '@module-federation/managers':
+         specifier: workspace:*
+         version: link:../managers
+       '@module-federation/manifest':
+         specifier: workspace:*
+         version: link:../manifest
++      '@module-federation/rspack':
++        specifier: workspace:*
++        version: link:../rspack
+       '@module-federation/runtime-tools':
+         specifier: workspace:*
+         version: link:../runtime-tools
+@@ -1311,28 +1311,6 @@ importers:
+         specifier: workspace:*
+         version: link:../webpack-bundler-runtime
+ 
+-  packages/enhanced-rspack:
+-    dependencies:
+-      '@module-federation/dts-plugin':
+-        specifier: workspace:*
+-        version: link:../dts-plugin
+-      '@module-federation/managers':
+-        specifier: workspace:*
+-        version: link:../managers
+-      '@module-federation/manifest':
+-        specifier: workspace:*
+-        version: link:../manifest
+-      '@module-federation/runtime-tools':
+-        specifier: workspace:*
+-        version: link:../runtime-tools
+-      '@module-federation/sdk':
+-        specifier: workspace:*
+-        version: link:../sdk
+-    devDependencies:
+-      '@rspack/core':
+-        specifier: 0.5.0
+-        version: 0.5.0(@swc/helpers@0.5.3)
+-
+   packages/managers:
+     dependencies:
+       '@module-federation/sdk':
+@@ -1505,6 +1483,28 @@ importers:
+         specifier: ^5.40.0
+         version: 5.89.0(@swc/core@1.3.102)(esbuild@0.20.2)
+ 
++  packages/rspack:
++    dependencies:
++      '@module-federation/dts-plugin':
++        specifier: workspace:*
++        version: link:../dts-plugin
++      '@module-federation/managers':
++        specifier: workspace:*
++        version: link:../managers
++      '@module-federation/manifest':
++        specifier: workspace:*
++        version: link:../manifest
++      '@module-federation/runtime-tools':
++        specifier: workspace:*
++        version: link:../runtime-tools
++      '@module-federation/sdk':
++        specifier: workspace:*
++        version: link:../sdk
++    devDependencies:
++      '@rspack/core':
++        specifier: 0.5.0
++        version: 0.5.0(@swc/helpers@0.5.3)
++
+   packages/runtime:
+     dependencies:
+       '@module-federation/sdk':
+@@ -16195,7 +16195,7 @@ packages:
+     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
+     hasBin: true
+     dependencies:
+-      caniuse-lite: 1.0.30001599
++      caniuse-lite: 1.0.30001600
+       electron-to-chromium: 1.4.695
+       node-releases: 2.0.14
+       update-browserslist-db: 1.0.13(browserslist@4.23.0)
+@@ -16446,6 +16446,7 @@ packages:
+ 
+   /caniuse-lite@1.0.30001599:
+     resolution: {integrity: sha512-LRAQHZ4yT1+f9LemSMeqdMpMxZcc4RMWdj4tiFe3G8tNkWK+E58g+/tzotb5cU6TbcVJLr4fySiAW7XmxQvZQA==}
++    dev: true
+ 
+   /caniuse-lite@1.0.30001600:
+     resolution: {integrity: sha512-+2S9/2JFhYmYaDpZvo0lKkfvuKIglrx68MwOBqMGHhQsNkLjB5xtc/TGoEPs+MxjSyN/72qer2g97nzR641mOQ==}
+@@ -26953,7 +26954,7 @@ packages:
+     dependencies:
+       '@babel/code-frame': 7.23.5
+       index-to-position: 0.1.2
+-      type-fest: 4.13.1
++      type-fest: 4.14.0
+     dev: true
+ 
+   /parse-node-version@1.0.1:
+@@ -29789,7 +29790,7 @@ packages:
+     dependencies:
+       find-up: 6.3.0
+       read-pkg: 8.1.0
+-      type-fest: 4.13.1
++      type-fest: 4.14.0
+     dev: true
+ 
+   /read-pkg-up@11.0.0:
+@@ -29828,7 +29829,7 @@ packages:
+       '@types/normalize-package-data': 2.4.4
+       normalize-package-data: 6.0.0
+       parse-json: 7.1.1
+-      type-fest: 4.13.1
++      type-fest: 4.14.0
+     dev: true
+ 
+   /read-pkg@9.0.1:

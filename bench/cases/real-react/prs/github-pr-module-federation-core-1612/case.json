@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-1612",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#1612: fix(enhanced): rename plugin took tap",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 1612,
+    "prUrl": "https://github.com/module-federation/core/pull/1612",
+    "baseSha": "315af24e14cd817e7d62e50b5354c79bb7ba6677",
+    "headSha": "1faae38d3bb0eefa3066ed0ffa0f2f4a2a46c43a",
+    "selectedFiles": [
+      "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:46.948Z"
+  },
+  "files": [
+    {
+      "id": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+      "oldPath": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+      "newPath": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 34,
+          "endLine": 34
+        },
+        "newRange": {
+          "startLine": 34,
+          "endLine": 34
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

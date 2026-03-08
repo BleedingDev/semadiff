@@ -1,0 +1,26 @@
+diff --git a/packages/mui-base/src/InputUnstyled/InputUnstyled.tsx b/packages/mui-base/src/InputUnstyled/InputUnstyled.tsx
+index 25e38709294400..4b0e9c50439b2c 100644
+--- a/packages/mui-base/src/InputUnstyled/InputUnstyled.tsx
++++ b/packages/mui-base/src/InputUnstyled/InputUnstyled.tsx
+@@ -145,7 +145,7 @@ const InputUnstyled = React.forwardRef(function InputUnstyled(
+       if (process.env.NODE_ENV !== 'production') {
+         if (minRows || maxRows) {
+           console.warn(
+-            'Material-UI: You can not use the `minRows` or `maxRows` props when the input `rows` prop is set.',
++            'MUI: You can not use the `minRows` or `maxRows` props when the input `rows` prop is set.',
+           );
+         }
+       }
+diff --git a/packages/mui-material-next/src/Button/Button.js b/packages/mui-material-next/src/Button/Button.js
+index d99c0455311c68..548c275982f863 100644
+--- a/packages/mui-material-next/src/Button/Button.js
++++ b/packages/mui-material-next/src/Button/Button.js
+@@ -404,7 +404,7 @@ const Button = React.forwardRef(function Button(inProps, ref) {
+       if (enableTouchRipple && !rippleRef.current) {
+         console.error(
+           [
+-            'Material-UI: The `component` prop provided to Button is invalid.',
++            'MUI: The `component` prop provided to Button is invalid.',
+             'Please make sure the children prop is rendered in this custom component.',
+           ].join('\n'),
+         );

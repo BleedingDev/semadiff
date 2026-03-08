@@ -1,0 +1,1990 @@
+diff --git a/.changeset/rude-seals-cover.md b/.changeset/rude-seals-cover.md
+new file mode 100644
+index 0000000000..59f1ee1fb4
+--- /dev/null
++++ b/.changeset/rude-seals-cover.md
+@@ -0,0 +1,6 @@
++---
++"@zag-js/vanilla": patch
++---
++
++- Fix issue where vanilla machines do not have the option to change their props during runtime.
++- Fix issue where some `aria-` attributes were toggled as boolean attributes and not as attributes with value strings.
+diff --git a/examples/vanilla-ts/src/accordion.ts b/examples/vanilla-ts/src/accordion.ts
+index 608bc053d1..bfc04d5878 100644
+--- a/examples/vanilla-ts/src/accordion.ts
++++ b/examples/vanilla-ts/src/accordion.ts
+@@ -1,5 +1,5 @@
+ import * as accordion from "@zag-js/accordion"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ import { Component } from "./component"
+ 
+ export class Accordion extends Component<accordion.Props, accordion.Api> {
+@@ -12,7 +12,7 @@ export class Accordion extends Component<accordion.Props, accordion.Api> {
+   }
+ 
+   render = () => {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+     this.items.forEach((itemEl) => {
+       this.renderItem(itemEl)
+     })
+@@ -29,8 +29,8 @@ export class Accordion extends Component<accordion.Props, accordion.Api> {
+     const itemContentEl = itemEl.querySelector<HTMLElement>(".accordion-content")
+     if (!itemTriggerEl) throw new Error("Expected triggerEl to be defined")
+     if (!itemContentEl) throw new Error("Expected contentEl to be defined")
+-    spreadProps(itemEl, this.api.getItemProps({ value }))
+-    spreadProps(itemTriggerEl, this.api.getItemTriggerProps({ value }))
+-    spreadProps(itemContentEl, this.api.getItemContentProps({ value }))
++    this.spreadProps(itemEl, this.api.getItemProps({ value }))
++    this.spreadProps(itemTriggerEl, this.api.getItemTriggerProps({ value }))
++    this.spreadProps(itemContentEl, this.api.getItemContentProps({ value }))
+   }
+ }
+diff --git a/examples/vanilla-ts/src/angle-slider.ts b/examples/vanilla-ts/src/angle-slider.ts
+index 9006a976aa..b8a5ff4a6d 100644
+--- a/examples/vanilla-ts/src/angle-slider.ts
++++ b/examples/vanilla-ts/src/angle-slider.ts
+@@ -1,6 +1,6 @@
+ import * as angleSlider from "@zag-js/angle-slider"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class AngleSlider extends Component<angleSlider.Props, angleSlider.Api> {
+   initMachine(props: angleSlider.Props) {
+@@ -36,33 +36,33 @@ export class AngleSlider extends Component<angleSlider.Props, angleSlider.Api> {
+         markerGroup.appendChild(markerEl)
+       }
+ 
+-      spreadProps(markerEl, this.api.getMarkerProps({ value }))
++      this.spreadProps(markerEl, this.api.getMarkerProps({ value }))
+     })
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".angle-slider-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const valueText = this.rootEl.querySelector<HTMLElement>(".angle-slider-value-text")
+     if (valueText) {
+-      spreadProps(valueText, this.api.getValueTextProps())
++      this.spreadProps(valueText, this.api.getValueTextProps())
+       valueText.textContent = this.api.valueAsDegree
+     }
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".angle-slider-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const thumb = this.rootEl.querySelector<HTMLElement>(".angle-slider-thumb")
+-    if (thumb) spreadProps(thumb, this.api.getThumbProps())
++    if (thumb) this.spreadProps(thumb, this.api.getThumbProps())
+ 
+     const markerGroup = this.rootEl.querySelector<HTMLElement>(".angle-slider-marker-group")
+-    if (markerGroup) spreadProps(markerGroup, this.api.getMarkerGroupProps())
++    if (markerGroup) this.spreadProps(markerGroup, this.api.getMarkerGroupProps())
+ 
+     const hiddenInput = this.rootEl.querySelector<HTMLInputElement>(".angle-slider-hidden-input")
+-    if (hiddenInput) spreadProps(hiddenInput, this.api.getHiddenInputProps())
++    if (hiddenInput) this.spreadProps(hiddenInput, this.api.getHiddenInputProps())
+ 
+     // Sync markers
+     this.syncMarkers()
+diff --git a/examples/vanilla-ts/src/avatar.ts b/examples/vanilla-ts/src/avatar.ts
+index 34f584f03d..894d6f2966 100644
+--- a/examples/vanilla-ts/src/avatar.ts
++++ b/examples/vanilla-ts/src/avatar.ts
+@@ -1,5 +1,5 @@
+ import * as avatar from "@zag-js/avatar"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ import { Component } from "./component"
+ 
+ export class Avatar extends Component<avatar.Props, avatar.Api> {
+@@ -13,10 +13,10 @@ export class Avatar extends Component<avatar.Props, avatar.Api> {
+ 
+   render = () => {
+     const rootEl = this.rootEl
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+     const imageEl = rootEl.querySelector<HTMLElement>(".avatar-image")
+-    if (imageEl) spreadProps(imageEl, this.api.getImageProps())
++    if (imageEl) this.spreadProps(imageEl, this.api.getImageProps())
+     const fallbackEl = rootEl.querySelector<HTMLElement>(".avatar-fallback")
+-    if (fallbackEl) spreadProps(fallbackEl, this.api.getFallbackProps())
++    if (fallbackEl) this.spreadProps(fallbackEl, this.api.getFallbackProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/carousel.ts b/examples/vanilla-ts/src/carousel.ts
+index 7cf3e53161..2f8a6f7c9c 100644
+--- a/examples/vanilla-ts/src/carousel.ts
++++ b/examples/vanilla-ts/src/carousel.ts
+@@ -1,6 +1,6 @@
+ import * as carousel from "@zag-js/carousel"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Carousel extends Component<carousel.Props, carousel.Api> {
+   images: string[] = []
+@@ -52,7 +52,7 @@ export class Carousel extends Component<carousel.Props, carousel.Api> {
+       }
+ 
+       // Update props
+-      spreadProps(itemEl, this.api.getItemProps({ index }))
++      this.spreadProps(itemEl, this.api.getItemProps({ index }))
+ 
+       const img = itemEl.querySelector("img")
+       if (img) img.src = image
+@@ -83,33 +83,33 @@ export class Carousel extends Component<carousel.Props, carousel.Api> {
+       }
+ 
+       // Update props
+-      spreadProps(indicatorEl, this.api.getIndicatorProps({ index }))
++      this.spreadProps(indicatorEl, this.api.getIndicatorProps({ index }))
+     })
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".carousel-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const autoplayBtn = this.rootEl.querySelector<HTMLElement>(".carousel-autoplay")
+     if (autoplayBtn) {
+-      spreadProps(autoplayBtn, this.api.getAutoplayTriggerProps())
++      this.spreadProps(autoplayBtn, this.api.getAutoplayTriggerProps())
+       autoplayBtn.textContent = this.api.isPlaying ? "Stop" : "Play"
+     }
+ 
+     const prevBtn = this.rootEl.querySelector<HTMLElement>(".carousel-prev")
+-    if (prevBtn) spreadProps(prevBtn, this.api.getPrevTriggerProps())
++    if (prevBtn) this.spreadProps(prevBtn, this.api.getPrevTriggerProps())
+ 
+     const nextBtn = this.rootEl.querySelector<HTMLElement>(".carousel-next")
+-    if (nextBtn) spreadProps(nextBtn, this.api.getNextTriggerProps())
++    if (nextBtn) this.spreadProps(nextBtn, this.api.getNextTriggerProps())
+ 
+     const itemGroup = this.rootEl.querySelector<HTMLElement>(".carousel-item-group")
+-    if (itemGroup) spreadProps(itemGroup, this.api.getItemGroupProps())
++    if (itemGroup) this.spreadProps(itemGroup, this.api.getItemGroupProps())
+ 
+     const indicatorGroup = this.rootEl.querySelector<HTMLElement>(".carousel-indicator-group")
+-    if (indicatorGroup) spreadProps(indicatorGroup, this.api.getIndicatorGroupProps())
++    if (indicatorGroup) this.spreadProps(indicatorGroup, this.api.getIndicatorGroupProps())
+ 
+     // Sync items and indicators
+     this.syncItems()
+diff --git a/examples/vanilla-ts/src/checkbox.ts b/examples/vanilla-ts/src/checkbox.ts
+index 5a2164ea7c..9e56f83e36 100644
+--- a/examples/vanilla-ts/src/checkbox.ts
++++ b/examples/vanilla-ts/src/checkbox.ts
+@@ -1,5 +1,5 @@
+ import * as checkbox from "@zag-js/checkbox"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ import { Component } from "./component"
+ 
+ export class Checkbox extends Component<checkbox.Props, checkbox.Api> {
+@@ -13,12 +13,12 @@ export class Checkbox extends Component<checkbox.Props, checkbox.Api> {
+ 
+   render = () => {
+     const rootEl = this.rootEl
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+     const controlEl = rootEl.querySelector<HTMLElement>(".checkbox-control")
+-    if (controlEl) spreadProps(controlEl, this.api.getControlProps())
++    if (controlEl) this.spreadProps(controlEl, this.api.getControlProps())
+     const labelEl = rootEl.querySelector<HTMLElement>(".checkbox-label")
+-    if (labelEl) spreadProps(labelEl, this.api.getLabelProps())
++    if (labelEl) this.spreadProps(labelEl, this.api.getLabelProps())
+     const inputEl = rootEl.querySelector<HTMLInputElement>(".checkbox-input")
+-    if (inputEl) spreadProps(inputEl, this.api.getHiddenInputProps())
++    if (inputEl) this.spreadProps(inputEl, this.api.getHiddenInputProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/clipboard.ts b/examples/vanilla-ts/src/clipboard.ts
+index cdff57b0c0..dcd20546eb 100644
+--- a/examples/vanilla-ts/src/clipboard.ts
++++ b/examples/vanilla-ts/src/clipboard.ts
+@@ -1,6 +1,6 @@
+ import * as clipboard from "@zag-js/clipboard"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Clipboard extends Component<clipboard.Props, clipboard.Api> {
+   initMachine(props: clipboard.Props) {
+@@ -14,34 +14,34 @@ export class Clipboard extends Component<clipboard.Props, clipboard.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".clipboard-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".clipboard-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const input = this.rootEl.querySelector<HTMLInputElement>(".clipboard-input")
+     if (input) {
+-      spreadProps(input, this.api.getInputProps())
++      this.spreadProps(input, this.api.getInputProps())
+     }
+ 
+     const trigger = this.rootEl.querySelector<HTMLButtonElement>(".clipboard-trigger")
+     if (trigger) {
+-      spreadProps(trigger, this.api.getTriggerProps())
++      this.spreadProps(trigger, this.api.getTriggerProps())
+       // Update button text based on copy state
+       trigger.textContent = this.api.copied ? "Copied!" : "Copy"
+     }
+ 
+     const copiedIndicator = this.rootEl.querySelector<HTMLElement>(".clipboard-copied-indicator")
+     if (copiedIndicator) {
+-      spreadProps(copiedIndicator, this.api.getIndicatorProps({ copied: true }))
++      this.spreadProps(copiedIndicator, this.api.getIndicatorProps({ copied: true }))
+     }
+ 
+     const idleIndicator = this.rootEl.querySelector<HTMLElement>(".clipboard-idle-indicator")
+     if (idleIndicator) {
+-      spreadProps(idleIndicator, this.api.getIndicatorProps({ copied: false }))
++      this.spreadProps(idleIndicator, this.api.getIndicatorProps({ copied: false }))
+     }
+   }
+ }
+diff --git a/examples/vanilla-ts/src/collapsible.ts b/examples/vanilla-ts/src/collapsible.ts
+index 245543665c..bbda4b36b7 100644
+--- a/examples/vanilla-ts/src/collapsible.ts
++++ b/examples/vanilla-ts/src/collapsible.ts
+@@ -1,6 +1,6 @@
+ import * as collapsible from "@zag-js/collapsible"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Collapsible extends Component<collapsible.Props, collapsible.Api> {
+   initMachine(props: collapsible.Props) {
+@@ -14,16 +14,16 @@ export class Collapsible extends Component<collapsible.Props, collapsible.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const trigger = this.rootEl.querySelector<HTMLElement>(".collapsible-trigger")
+-    if (trigger) spreadProps(trigger, this.api.getTriggerProps())
++    if (trigger) this.spreadProps(trigger, this.api.getTriggerProps())
+ 
+     const indicator = this.rootEl.querySelector<HTMLElement>(".collapsible-indicator")
+-    if (indicator) spreadProps(indicator, this.api.getIndicatorProps())
++    if (indicator) this.spreadProps(indicator, this.api.getIndicatorProps())
+ 
+     const content = this.rootEl.querySelector<HTMLElement>(".collapsible-content")
+-    if (content) spreadProps(content, this.api.getContentProps())
++    if (content) this.spreadProps(content, this.api.getContentProps())
+ 
+     // Control buttons (query from document since they're outside root)
+     const openBtn = this.doc.querySelector<HTMLElement>(".collapsible-open")
+diff --git a/examples/vanilla-ts/src/combobox.ts b/examples/vanilla-ts/src/combobox.ts
+index df6c4a3d90..7fde745b3a 100644
+--- a/examples/vanilla-ts/src/combobox.ts
++++ b/examples/vanilla-ts/src/combobox.ts
+@@ -2,7 +2,7 @@ import * as combobox from "@zag-js/combobox"
+ import { comboboxData } from "@zag-js/shared"
+ import { matchSorter } from "match-sorter"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ interface Item {
+   code: string
+@@ -65,27 +65,27 @@ export class Combobox extends Component<combobox.Props, combobox.Api> {
+       }
+ 
+       itemEl.innerText = item.label
+-      spreadProps(itemEl, this.api.getItemProps({ item }))
++      this.spreadProps(itemEl, this.api.getItemProps({ item }))
+     })
+   }
+ 
+   render = () => {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const inputEl = this.rootEl?.querySelector<HTMLElement>(".combobox-input")
+-    if (inputEl) spreadProps(inputEl, this.api.getInputProps())
++    if (inputEl) this.spreadProps(inputEl, this.api.getInputProps())
+ 
+     const triggerEl = this.rootEl?.querySelector<HTMLElement>(".combobox-trigger")
+-    if (triggerEl) spreadProps(triggerEl, this.api.getTriggerProps())
++    if (triggerEl) this.spreadProps(triggerEl, this.api.getTriggerProps())
+ 
+     const clearTriggerEl = this.rootEl?.querySelector<HTMLElement>(".combobox-clear-trigger")
+-    if (clearTriggerEl) spreadProps(clearTriggerEl, this.api.getClearTriggerProps())
++    if (clearTriggerEl) this.spreadProps(clearTriggerEl, this.api.getClearTriggerProps())
+ 
+     const controlEl = this.rootEl?.querySelector<HTMLElement>(".combobox-control")
+-    if (controlEl) spreadProps(controlEl, this.api.getControlProps())
++    if (controlEl) this.spreadProps(controlEl, this.api.getControlProps())
+ 
+     const contentEl = this.getOrCreateContentEl()
+-    spreadProps(contentEl, this.api.getContentProps())
++    this.spreadProps(contentEl, this.api.getContentProps())
+ 
+     this.renderItems()
+   }
+diff --git a/examples/vanilla-ts/src/component.ts b/examples/vanilla-ts/src/component.ts
+index e99c555923..3079cdabe5 100644
+--- a/examples/vanilla-ts/src/component.ts
++++ b/examples/vanilla-ts/src/component.ts
+@@ -1,4 +1,5 @@
+-import { VanillaMachine } from "@zag-js/vanilla"
++import { spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import type { Attrs } from "@zag-js/vanilla"
+ 
+ interface ComponentInterface<Api> {
+   rootEl: HTMLElement
+@@ -42,5 +43,13 @@ export abstract class Component<Props, Api> implements ComponentInterface<Api> {
+     this.machine.stop()
+   }
+ 
++  spreadProps = (node: HTMLElement, attrs: Attrs) => {
++    spreadProps(node, attrs, this.machine.scope.id)
++  }
++
++  updateProps = (newProps: Partial<Props>) => {
++    this.machine.updateProps(newProps)
++  }
++
+   abstract render(): void
+ }
+diff --git a/examples/vanilla-ts/src/context-menu.ts b/examples/vanilla-ts/src/context-menu.ts
+index e15bf45673..085c7e6f6a 100644
+--- a/examples/vanilla-ts/src/context-menu.ts
++++ b/examples/vanilla-ts/src/context-menu.ts
+@@ -1,6 +1,6 @@
+ import * as menu from "@zag-js/menu"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class ContextMenu extends Component<menu.Props, menu.Api> {
+   initMachine(props: menu.Props) {
+@@ -18,7 +18,7 @@ export class ContextMenu extends Component<menu.Props, menu.Api> {
+ 
+   render() {
+     const contextTrigger = this.rootEl.querySelector<HTMLElement>(".context-menu-trigger")
+-    if (contextTrigger) spreadProps(contextTrigger, this.api.getContextTriggerProps())
++    if (contextTrigger) this.spreadProps(contextTrigger, this.api.getContextTriggerProps())
+ 
+     const positioner = this.rootEl.querySelector<HTMLElement>(".context-menu-positioner")
+     const content = this.rootEl.querySelector<HTMLElement>(".context-menu-content")
+@@ -26,14 +26,14 @@ export class ContextMenu extends Component<menu.Props, menu.Api> {
+     if (positioner && content) {
+       if (this.api.open) {
+         positioner.hidden = false
+-        spreadProps(positioner, this.api.getPositionerProps())
+-        spreadProps(content, this.api.getContentProps())
++        this.spreadProps(positioner, this.api.getPositionerProps())
++        this.spreadProps(content, this.api.getContentProps())
+ 
+         const items = content.querySelectorAll<HTMLElement>(".context-menu-item")
+         items.forEach((item) => {
+           const value = item.dataset.value
+           if (value) {
+-            spreadProps(item, this.api.getItemProps({ value }))
++            this.spreadProps(item, this.api.getItemProps({ value }))
+           }
+         })
+       } else {
+diff --git a/examples/vanilla-ts/src/dialog.ts b/examples/vanilla-ts/src/dialog.ts
+index c29f7eed7a..20813aeebf 100644
+--- a/examples/vanilla-ts/src/dialog.ts
++++ b/examples/vanilla-ts/src/dialog.ts
+@@ -1,6 +1,6 @@
+ import * as dialog from "@zag-js/dialog"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Dialog extends Component<dialog.Props, dialog.Api> {
+   initMachine(props: dialog.Props) {
+@@ -17,7 +17,7 @@ export class Dialog extends Component<dialog.Props, dialog.Api> {
+     const triggerProps = this.api.getTriggerProps()
+ 
+     const trigger = this.rootEl.querySelector<HTMLElement>(".dialog-trigger")
+-    if (trigger) spreadProps(trigger, triggerProps)
++    if (trigger) this.spreadProps(trigger, triggerProps)
+ 
+     // Handle portal content
+     const backdrop = this.rootEl.querySelector<HTMLElement>(".dialog-backdrop")
+@@ -30,18 +30,18 @@ export class Dialog extends Component<dialog.Props, dialog.Api> {
+         positioner.hidden = false
+ 
+         // Apply props
+-        spreadProps(backdrop, this.api.getBackdropProps())
+-        spreadProps(positioner, this.api.getPositionerProps())
++        this.spreadProps(backdrop, this.api.getBackdropProps())
++        this.spreadProps(positioner, this.api.getPositionerProps())
+ 
+         const content = positioner.querySelector<HTMLElement>(".dialog-content")
+         const title = positioner.querySelector<HTMLElement>(".dialog-title")
+         const description = positioner.querySelector<HTMLElement>(".dialog-description")
+         const closeTrigger = positioner.querySelector<HTMLElement>(".dialog-close")
+ 
+-        if (content) spreadProps(content, this.api.getContentProps())
+-        if (title) spreadProps(title, this.api.getTitleProps())
+-        if (description) spreadProps(description, this.api.getDescriptionProps())
+-        if (closeTrigger) spreadProps(closeTrigger, this.api.getCloseTriggerProps())
++        if (content) this.spreadProps(content, this.api.getContentProps())
++        if (title) this.spreadProps(title, this.api.getTitleProps())
++        if (description) this.spreadProps(description, this.api.getDescriptionProps())
++        if (closeTrigger) this.spreadProps(closeTrigger, this.api.getCloseTriggerProps())
+       } else {
+         backdrop.hidden = true
+         positioner.hidden = true
+diff --git a/examples/vanilla-ts/src/editable.ts b/examples/vanilla-ts/src/editable.ts
+index 64bf4e93e8..2de4f44f07 100644
+--- a/examples/vanilla-ts/src/editable.ts
++++ b/examples/vanilla-ts/src/editable.ts
+@@ -1,6 +1,6 @@
+ import * as editable from "@zag-js/editable"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Editable extends Component<editable.Props, editable.Api> {
+   initMachine(props: editable.Props) {
+@@ -15,38 +15,38 @@ export class Editable extends Component<editable.Props, editable.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const area = this.rootEl.querySelector<HTMLElement>(".editable-area")
+-    if (area) spreadProps(area, this.api.getAreaProps())
++    if (area) this.spreadProps(area, this.api.getAreaProps())
+ 
+     const input = this.rootEl.querySelector<HTMLInputElement>(".editable-input")
+-    if (input) spreadProps(input, this.api.getInputProps())
++    if (input) this.spreadProps(input, this.api.getInputProps())
+ 
+     const preview = this.rootEl.querySelector<HTMLElement>(".editable-preview")
+     if (preview) {
+-      spreadProps(preview, this.api.getPreviewProps())
++      this.spreadProps(preview, this.api.getPreviewProps())
+       preview.textContent = this.api.value
+     }
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".editable-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const editBtn = this.rootEl.querySelector<HTMLElement>(".editable-edit")
+     if (editBtn) {
+-      spreadProps(editBtn, this.api.getEditTriggerProps())
++      this.spreadProps(editBtn, this.api.getEditTriggerProps())
+       editBtn.style.display = this.api.editing ? "none" : "inline-block"
+     }
+ 
+     const saveBtn = this.rootEl.querySelector<HTMLElement>(".editable-save")
+     if (saveBtn) {
+-      spreadProps(saveBtn, this.api.getSubmitTriggerProps())
++      this.spreadProps(saveBtn, this.api.getSubmitTriggerProps())
+       saveBtn.style.display = this.api.editing ? "inline-block" : "none"
+     }
+ 
+     const cancelBtn = this.rootEl.querySelector<HTMLElement>(".editable-cancel")
+     if (cancelBtn) {
+-      spreadProps(cancelBtn, this.api.getCancelTriggerProps())
++      this.spreadProps(cancelBtn, this.api.getCancelTriggerProps())
+       cancelBtn.style.display = this.api.editing ? "inline-block" : "none"
+     }
+   }
+diff --git a/examples/vanilla-ts/src/file-upload.ts b/examples/vanilla-ts/src/file-upload.ts
+index cb70d42cc8..e19fdf1873 100644
+--- a/examples/vanilla-ts/src/file-upload.ts
++++ b/examples/vanilla-ts/src/file-upload.ts
+@@ -1,6 +1,6 @@
+ import * as fileUpload from "@zag-js/file-upload"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class FileUpload extends Component<fileUpload.Props, fileUpload.Api> {
+   initMachine(props: fileUpload.Props) {
+@@ -55,17 +55,17 @@ export class FileUpload extends Component<fileUpload.Props, fileUpload.Api> {
+       }
+ 
+       // Always update props and content for all items (both new and existing)
+-      spreadProps(itemEl, this.api.getItemProps({ file }))
++      this.spreadProps(itemEl, this.api.getItemProps({ file }))
+ 
+       const nameEl = itemEl.querySelector<HTMLElement>(".file-upload-item-name")
+       if (nameEl) {
+-        spreadProps(nameEl, this.api.getItemNameProps({ file }))
++        this.spreadProps(nameEl, this.api.getItemNameProps({ file }))
+         nameEl.textContent = file.name
+       }
+ 
+       const sizeEl = itemEl.querySelector<HTMLElement>(".file-upload-item-size")
+       if (sizeEl) {
+-        spreadProps(sizeEl, this.api.getItemSizeTextProps({ file }))
++        this.spreadProps(sizeEl, this.api.getItemSizeTextProps({ file }))
+         sizeEl.textContent = this.api.getFileSize(file)
+       }
+ 
+@@ -73,30 +73,30 @@ export class FileUpload extends Component<fileUpload.Props, fileUpload.Api> {
+       if (typeEl) typeEl.textContent = file.type
+ 
+       const deleteBtn = itemEl.querySelector<HTMLElement>(".file-upload-item-delete")
+-      if (deleteBtn) spreadProps(deleteBtn, this.api.getItemDeleteTriggerProps({ file }))
++      if (deleteBtn) this.spreadProps(deleteBtn, this.api.getItemDeleteTriggerProps({ file }))
+     })
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".file-upload-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const dropzone = this.rootEl.querySelector<HTMLElement>(".file-upload-dropzone")
+-    if (dropzone) spreadProps(dropzone, this.api.getDropzoneProps())
++    if (dropzone) this.spreadProps(dropzone, this.api.getDropzoneProps())
+ 
+     const hiddenInput = this.rootEl.querySelector<HTMLInputElement>(".file-upload-hidden-input")
+-    if (hiddenInput) spreadProps(hiddenInput, this.api.getHiddenInputProps())
++    if (hiddenInput) this.spreadProps(hiddenInput, this.api.getHiddenInputProps())
+ 
+     const trigger = this.rootEl.querySelector<HTMLElement>(".file-upload-trigger")
+-    if (trigger) spreadProps(trigger, this.api.getTriggerProps())
++    if (trigger) this.spreadProps(trigger, this.api.getTriggerProps())
+ 
+     const itemGroup = this.rootEl.querySelector<HTMLElement>(".file-upload-item-group")
+-    if (itemGroup) spreadProps(itemGroup, this.api.getItemGroupProps())
++    if (itemGroup) this.spreadProps(itemGroup, this.api.getItemGroupProps())
+ 
+     const clearBtn = this.rootEl.querySelector<HTMLElement>(".file-upload-clear")
+-    if (clearBtn) spreadProps(clearBtn, this.api.getClearTriggerProps())
++    if (clearBtn) this.spreadProps(clearBtn, this.api.getClearTriggerProps())
+ 
+     // Sync files after all other props are set
+     this.syncFiles()
+diff --git a/examples/vanilla-ts/src/floating-panel.ts b/examples/vanilla-ts/src/floating-panel.ts
+index 6cc41bc910..4d1748b21b 100644
+--- a/examples/vanilla-ts/src/floating-panel.ts
++++ b/examples/vanilla-ts/src/floating-panel.ts
+@@ -1,6 +1,6 @@
+ import * as floating from "@zag-js/floating-panel"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class FloatingPanel extends Component<floating.Props, floating.Api> {
+   initMachine(props: floating.Props) {
+@@ -15,46 +15,46 @@ export class FloatingPanel extends Component<floating.Props, floating.Api> {
+ 
+   render() {
+     const trigger = this.doc.querySelector<HTMLElement>(".floating-panel-trigger")
+-    if (trigger) spreadProps(trigger, this.api.getTriggerProps())
++    if (trigger) this.spreadProps(trigger, this.api.getTriggerProps())
+ 
+     const positioner = this.doc.querySelector<HTMLElement>(".floating-panel-positioner")
+-    if (positioner) spreadProps(positioner, this.api.getPositionerProps())
++    if (positioner) this.spreadProps(positioner, this.api.getPositionerProps())
+ 
+     const content = this.doc.querySelector<HTMLElement>(".floating-panel-content")
+-    if (content) spreadProps(content, this.api.getContentProps())
++    if (content) this.spreadProps(content, this.api.getContentProps())
+ 
+     const dragTrigger = this.doc.querySelector<HTMLElement>(".floating-panel-drag-trigger")
+-    if (dragTrigger) spreadProps(dragTrigger, this.api.getDragTriggerProps())
++    if (dragTrigger) this.spreadProps(dragTrigger, this.api.getDragTriggerProps())
+ 
+     const header = this.doc.querySelector<HTMLElement>(".floating-panel-header")
+-    if (header) spreadProps(header, this.api.getHeaderProps())
++    if (header) this.spreadProps(header, this.api.getHeaderProps())
+ 
+     const title = this.doc.querySelector<HTMLElement>(".floating-panel-title")
+-    if (title) spreadProps(title, this.api.getTitleProps())
++    if (title) this.spreadProps(title, this.api.getTitleProps())
+ 
+     const control = this.doc.querySelector<HTMLElement>(".floating-panel-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const minimizeBtn = this.doc.querySelector<HTMLElement>(".floating-panel-minimize")
+-    if (minimizeBtn) spreadProps(minimizeBtn, this.api.getStageTriggerProps({ stage: "minimized" }))
++    if (minimizeBtn) this.spreadProps(minimizeBtn, this.api.getStageTriggerProps({ stage: "minimized" }))
+ 
+     const maximizeBtn = this.doc.querySelector<HTMLElement>(".floating-panel-maximize")
+-    if (maximizeBtn) spreadProps(maximizeBtn, this.api.getStageTriggerProps({ stage: "maximized" }))
++    if (maximizeBtn) this.spreadProps(maximizeBtn, this.api.getStageTriggerProps({ stage: "maximized" }))
+ 
+     const defaultBtn = this.doc.querySelector<HTMLElement>(".floating-panel-default")
+-    if (defaultBtn) spreadProps(defaultBtn, this.api.getStageTriggerProps({ stage: "default" }))
++    if (defaultBtn) this.spreadProps(defaultBtn, this.api.getStageTriggerProps({ stage: "default" }))
+ 
+     const closeBtn = this.doc.querySelector<HTMLElement>(".floating-panel-close")
+-    if (closeBtn) spreadProps(closeBtn, this.api.getCloseTriggerProps())
++    if (closeBtn) this.spreadProps(closeBtn, this.api.getCloseTriggerProps())
+ 
+     const body = this.doc.querySelector<HTMLElement>(".floating-panel-body")
+-    if (body) spreadProps(body, this.api.getBodyProps())
++    if (body) this.spreadProps(body, this.api.getBodyProps())
+ 
+     // Resize handles
+     const axes = ["n", "e", "w", "s", "ne", "se", "sw", "nw"] as const
+     axes.forEach((axis) => {
+       const handle = this.doc.querySelector<HTMLElement>(`.floating-panel-resize-${axis}`)
+-      if (handle) spreadProps(handle, this.api.getResizeTriggerProps({ axis }))
++      if (handle) this.spreadProps(handle, this.api.getResizeTriggerProps({ axis }))
+     })
+   }
+ }
+diff --git a/examples/vanilla-ts/src/hover-card.ts b/examples/vanilla-ts/src/hover-card.ts
+index d9b5acca0d..b465f9ca3a 100644
+--- a/examples/vanilla-ts/src/hover-card.ts
++++ b/examples/vanilla-ts/src/hover-card.ts
+@@ -1,6 +1,6 @@
+ import * as hoverCard from "@zag-js/hover-card"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class HoverCard extends Component<hoverCard.Props, hoverCard.Api> {
+   initMachine(props: hoverCard.Props) {
+@@ -15,7 +15,7 @@ export class HoverCard extends Component<hoverCard.Props, hoverCard.Api> {
+ 
+   render() {
+     const trigger = this.rootEl.querySelector<HTMLElement>(".hover-card-trigger")
+-    if (trigger) spreadProps(trigger, this.api.getTriggerProps())
++    if (trigger) this.spreadProps(trigger, this.api.getTriggerProps())
+ 
+     const positioner = this.rootEl.querySelector<HTMLElement>(".hover-card-positioner")
+     const content = this.rootEl.querySelector<HTMLElement>(".hover-card-content")
+@@ -25,11 +25,11 @@ export class HoverCard extends Component<hoverCard.Props, hoverCard.Api> {
+     if (positioner && content) {
+       if (this.api.open) {
+         positioner.hidden = false
+-        spreadProps(positioner, this.api.getPositionerProps())
+-        spreadProps(content, this.api.getContentProps())
++        this.spreadProps(positioner, this.api.getPositionerProps())
++        this.spreadProps(content, this.api.getContentProps())
+ 
+-        if (arrow) spreadProps(arrow, this.api.getArrowProps())
+-        if (arrowTip) spreadProps(arrowTip, this.api.getArrowTipProps())
++        if (arrow) this.spreadProps(arrow, this.api.getArrowProps())
++        if (arrowTip) this.spreadProps(arrowTip, this.api.getArrowTipProps())
+       } else {
+         positioner.hidden = true
+       }
+diff --git a/examples/vanilla-ts/src/image-cropper.ts b/examples/vanilla-ts/src/image-cropper.ts
+index 02f496bacc..0680d1fb46 100644
+--- a/examples/vanilla-ts/src/image-cropper.ts
++++ b/examples/vanilla-ts/src/image-cropper.ts
+@@ -1,6 +1,6 @@
+ import * as imageCropper from "@zag-js/image-cropper"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class ImageCropper extends Component<imageCropper.Props, imageCropper.Api> {
+   initMachine(props: imageCropper.Props) {
+@@ -41,7 +41,7 @@ export class ImageCropper extends Component<imageCropper.Props, imageCropper.Api
+         selection.appendChild(handleEl)
+       }
+ 
+-      spreadProps(handleEl, this.api.getHandleProps({ position }))
++      this.spreadProps(handleEl, this.api.getHandleProps({ position }))
+     })
+   }
+ 
+@@ -56,7 +56,7 @@ export class ImageCropper extends Component<imageCropper.Props, imageCropper.Api
+       horizontalGrid.className = "image-cropper-grid-horizontal"
+       selection.appendChild(horizontalGrid)
+     }
+-    spreadProps(horizontalGrid, this.api.getGridProps({ axis: "horizontal" }))
++    this.spreadProps(horizontalGrid, this.api.getGridProps({ axis: "horizontal" }))
+ 
+     // Vertical grid
+     let verticalGrid = selection.querySelector<HTMLElement>(".image-cropper-grid-vertical")
+@@ -65,20 +65,20 @@ export class ImageCropper extends Component<imageCropper.Props, imageCropper.Api
+       verticalGrid.className = "image-cropper-grid-vertical"
+       selection.appendChild(verticalGrid)
+     }
+-    spreadProps(verticalGrid, this.api.getGridProps({ axis: "vertical" }))
++    this.spreadProps(verticalGrid, this.api.getGridProps({ axis: "vertical" }))
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const viewport = this.rootEl.querySelector<HTMLElement>(".image-cropper-viewport")
+-    if (viewport) spreadProps(viewport, this.api.getViewportProps())
++    if (viewport) this.spreadProps(viewport, this.api.getViewportProps())
+ 
+     const image = this.rootEl.querySelector<HTMLElement>(".image-cropper-image")
+-    if (image) spreadProps(image, this.api.getImageProps())
++    if (image) this.spreadProps(image, this.api.getImageProps())
+ 
+     const selection = this.rootEl.querySelector<HTMLElement>(".image-cropper-selection")
+-    if (selection) spreadProps(selection, this.api.getSelectionProps())
++    if (selection) this.spreadProps(selection, this.api.getSelectionProps())
+ 
+     // Sync handles and grid
+     this.syncHandles()
+diff --git a/examples/vanilla-ts/src/listbox.ts b/examples/vanilla-ts/src/listbox.ts
+index 9018910719..d5768be50d 100644
+--- a/examples/vanilla-ts/src/listbox.ts
++++ b/examples/vanilla-ts/src/listbox.ts
+@@ -1,6 +1,6 @@
+ import * as listbox from "@zag-js/listbox"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ interface Item {
+   label: string
+@@ -76,29 +76,29 @@ export class Listbox extends Component<ListboxComponentProps, listbox.Api> {
+       }
+ 
+       // Always spread props
+-      spreadProps(itemEl, this.api.getItemProps({ item }))
++      this.spreadProps(itemEl, this.api.getItemProps({ item }))
+ 
+       const textEl = itemEl.querySelector<HTMLElement>(".listbox-item-text")
+       if (textEl) {
+-        spreadProps(textEl, this.api.getItemTextProps({ item }))
++        this.spreadProps(textEl, this.api.getItemTextProps({ item }))
+         textEl.textContent = item.label
+       }
+ 
+       const indicatorEl = itemEl.querySelector<HTMLElement>(".listbox-item-indicator")
+       if (indicatorEl) {
+-        spreadProps(indicatorEl, this.api.getItemIndicatorProps({ item }))
++        this.spreadProps(indicatorEl, this.api.getItemIndicatorProps({ item }))
+       }
+     })
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".listbox-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const content = this.rootEl.querySelector<HTMLElement>(".listbox-content")
+-    if (content) spreadProps(content, this.api.getContentProps())
++    if (content) this.spreadProps(content, this.api.getContentProps())
+ 
+     // Sync items after all other props are set
+     this.syncItems()
+diff --git a/examples/vanilla-ts/src/marquee.ts b/examples/vanilla-ts/src/marquee.ts
+index 4a818a7de2..f7844caeb3 100644
+--- a/examples/vanilla-ts/src/marquee.ts
++++ b/examples/vanilla-ts/src/marquee.ts
+@@ -1,6 +1,6 @@
+ import * as marquee from "@zag-js/marquee"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ const marqueeData = [
+   { name: "Apple", logo: "🍎" },
+@@ -61,7 +61,7 @@ export class Marquee extends Component<marquee.Props, marquee.Api> {
+       }
+ 
+       // Always spread props
+-      spreadProps(contentEl, this.api.getContentProps({ index }))
++      this.spreadProps(contentEl, this.api.getContentProps({ index }))
+ 
+       // Update items
+       const items = Array.from(contentEl.querySelectorAll<HTMLElement>(".marquee-item"))
+@@ -69,7 +69,7 @@ export class Marquee extends Component<marquee.Props, marquee.Api> {
+         const item = marqueeData[i]
+         if (!item) return
+ 
+-        spreadProps(itemEl, this.api.getItemProps())
++        this.spreadProps(itemEl, this.api.getItemProps())
+ 
+         const logoEl = itemEl.querySelector<HTMLElement>(".marquee-logo")
+         if (logoEl) logoEl.textContent = item.logo
+@@ -81,16 +81,16 @@ export class Marquee extends Component<marquee.Props, marquee.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const edgeStart = this.rootEl.querySelector<HTMLElement>(".marquee-edge-start")
+-    if (edgeStart) spreadProps(edgeStart, this.api.getEdgeProps({ side: "start" }))
++    if (edgeStart) this.spreadProps(edgeStart, this.api.getEdgeProps({ side: "start" }))
+ 
+     const viewport = this.rootEl.querySelector<HTMLElement>(".marquee-viewport")
+-    if (viewport) spreadProps(viewport, this.api.getViewportProps())
++    if (viewport) this.spreadProps(viewport, this.api.getViewportProps())
+ 
+     const edgeEnd = this.rootEl.querySelector<HTMLElement>(".marquee-edge-end")
+-    if (edgeEnd) spreadProps(edgeEnd, this.api.getEdgeProps({ side: "end" }))
++    if (edgeEnd) this.spreadProps(edgeEnd, this.api.getEdgeProps({ side: "end" }))
+ 
+     // Control buttons (query from document since they're outside root)
+     const pauseBtn = this.doc.querySelector<HTMLElement>(".marquee-pause")
+diff --git a/examples/vanilla-ts/src/menu.ts b/examples/vanilla-ts/src/menu.ts
+index 8aca4f1378..dfc22237c0 100644
+--- a/examples/vanilla-ts/src/menu.ts
++++ b/examples/vanilla-ts/src/menu.ts
+@@ -1,6 +1,6 @@
+ import * as menu from "@zag-js/menu"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Menu extends Component<menu.Props, menu.Api> {
+   initMachine(props: menu.Props) {
+@@ -15,7 +15,7 @@ export class Menu extends Component<menu.Props, menu.Api> {
+ 
+   render() {
+     const trigger = this.rootEl.querySelector<HTMLElement>(".menu-trigger")
+-    if (trigger) spreadProps(trigger, this.api.getTriggerProps())
++    if (trigger) this.spreadProps(trigger, this.api.getTriggerProps())
+ 
+     const positioner = this.rootEl.querySelector<HTMLElement>(".menu-positioner")
+     const content = this.rootEl.querySelector<HTMLElement>(".menu-content")
+@@ -23,14 +23,14 @@ export class Menu extends Component<menu.Props, menu.Api> {
+     if (positioner && content) {
+       if (this.api.open) {
+         positioner.hidden = false
+-        spreadProps(positioner, this.api.getPositionerProps())
+-        spreadProps(content, this.api.getContentProps())
++        this.spreadProps(positioner, this.api.getPositionerProps())
++        this.spreadProps(content, this.api.getContentProps())
+ 
+         const items = content.querySelectorAll<HTMLElement>(".menu-item")
+         items.forEach((item) => {
+           const value = item.dataset.value
+           if (value) {
+-            spreadProps(item, this.api.getItemProps({ value }))
++            this.spreadProps(item, this.api.getItemProps({ value }))
+           }
+         })
+       } else {
+diff --git a/examples/vanilla-ts/src/number-input.ts b/examples/vanilla-ts/src/number-input.ts
+index 18b4d52cf1..35876502a0 100644
+--- a/examples/vanilla-ts/src/number-input.ts
++++ b/examples/vanilla-ts/src/number-input.ts
+@@ -1,6 +1,6 @@
+ import * as numberInput from "@zag-js/number-input"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class NumberInput extends Component<numberInput.Props, numberInput.Api> {
+   initMachine(props: numberInput.Props) {
+@@ -14,21 +14,21 @@ export class NumberInput extends Component<numberInput.Props, numberInput.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".number-input-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const input = this.rootEl.querySelector<HTMLInputElement>(".number-input-input")
+-    if (input) spreadProps(input, this.api.getInputProps())
++    if (input) this.spreadProps(input, this.api.getInputProps())
+ 
+     const incrementBtn = this.rootEl.querySelector<HTMLElement>(".number-input-increment")
+-    if (incrementBtn) spreadProps(incrementBtn, this.api.getIncrementTriggerProps())
++    if (incrementBtn) this.spreadProps(incrementBtn, this.api.getIncrementTriggerProps())
+ 
+     const decrementBtn = this.rootEl.querySelector<HTMLElement>(".number-input-decrement")
+-    if (decrementBtn) spreadProps(decrementBtn, this.api.getDecrementTriggerProps())
++    if (decrementBtn) this.spreadProps(decrementBtn, this.api.getDecrementTriggerProps())
+ 
+     const scrubber = this.rootEl.querySelector<HTMLElement>(".number-input-scrubber")
+-    if (scrubber) spreadProps(scrubber, this.api.getScrubberProps())
++    if (scrubber) this.spreadProps(scrubber, this.api.getScrubberProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/pagination.ts b/examples/vanilla-ts/src/pagination.ts
+index a71c4d7549..89f261645b 100644
+--- a/examples/vanilla-ts/src/pagination.ts
++++ b/examples/vanilla-ts/src/pagination.ts
+@@ -1,6 +1,6 @@
+ import * as pagination from "@zag-js/pagination"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Pagination extends Component<pagination.Props, pagination.Api> {
+   initMachine(props: pagination.Props) {
+@@ -25,13 +25,13 @@ export class Pagination extends Component<pagination.Props, pagination.Api> {
+       if (page.type === "ellipsis") {
+         const ellipsis = this.doc.createElement("span")
+         ellipsis.className = "pagination-ellipsis"
+-        spreadProps(ellipsis, this.api.getEllipsisProps({ index }))
++        this.spreadProps(ellipsis, this.api.getEllipsisProps({ index }))
+         ellipsis.textContent = "..."
+         itemsContainer.appendChild(ellipsis)
+       } else {
+         const button = this.doc.createElement("button")
+         button.className = "pagination-item"
+-        spreadProps(button, this.api.getItemProps({ type: "page", value: page.value }))
++        this.spreadProps(button, this.api.getItemProps({ type: "page", value: page.value }))
+         button.textContent = String(page.value)
+         if (page.value === this.api.page) {
+           button.setAttribute("data-selected", "true")
+@@ -42,13 +42,13 @@ export class Pagination extends Component<pagination.Props, pagination.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const prevButton = this.rootEl.querySelector<HTMLElement>(".pagination-prev-trigger")
+-    if (prevButton) spreadProps(prevButton, this.api.getPrevTriggerProps())
++    if (prevButton) this.spreadProps(prevButton, this.api.getPrevTriggerProps())
+ 
+     const nextButton = this.rootEl.querySelector<HTMLElement>(".pagination-next-trigger")
+-    if (nextButton) spreadProps(nextButton, this.api.getNextTriggerProps())
++    if (nextButton) this.spreadProps(nextButton, this.api.getNextTriggerProps())
+ 
+     // Update page info
+     const pageInfo = this.rootEl.querySelector<HTMLElement>(".pagination-page-info")
+diff --git a/examples/vanilla-ts/src/password-input.ts b/examples/vanilla-ts/src/password-input.ts
+index b53c3cb141..223be1b0b6 100644
+--- a/examples/vanilla-ts/src/password-input.ts
++++ b/examples/vanilla-ts/src/password-input.ts
+@@ -1,6 +1,6 @@
+ import * as passwordInput from "@zag-js/password-input"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class PasswordInput extends Component<passwordInput.Props, passwordInput.Api> {
+   initMachine(props: passwordInput.Props) {
+@@ -14,24 +14,24 @@ export class PasswordInput extends Component<passwordInput.Props, passwordInput.
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".password-input-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".password-input-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const input = this.rootEl.querySelector<HTMLInputElement>(".password-input-input")
+-    if (input) spreadProps(input, this.api.getInputProps())
++    if (input) this.spreadProps(input, this.api.getInputProps())
+ 
+     const visibilityBtn = this.rootEl.querySelector<HTMLElement>(".password-input-visibility")
+     if (visibilityBtn) {
+-      spreadProps(visibilityBtn, this.api.getVisibilityTriggerProps())
++      this.spreadProps(visibilityBtn, this.api.getVisibilityTriggerProps())
+ 
+       const indicator = visibilityBtn.querySelector<HTMLElement>(".password-input-indicator")
+       if (indicator) {
+-        spreadProps(indicator, this.api.getIndicatorProps())
++        this.spreadProps(indicator, this.api.getIndicatorProps())
+         indicator.textContent = this.api.visible ? "Hide" : "Show"
+       }
+     }
+diff --git a/examples/vanilla-ts/src/pin-input.ts b/examples/vanilla-ts/src/pin-input.ts
+index 9a1bacd3cd..56036664be 100644
+--- a/examples/vanilla-ts/src/pin-input.ts
++++ b/examples/vanilla-ts/src/pin-input.ts
+@@ -1,6 +1,6 @@
+ import * as pinInput from "@zag-js/pin-input"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class PinInput extends Component<pinInput.Props, pinInput.Api> {
+   initMachine(props: pinInput.Props) {
+@@ -14,20 +14,20 @@ export class PinInput extends Component<pinInput.Props, pinInput.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".pin-input-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const inputs = this.rootEl.querySelectorAll<HTMLInputElement>(".pin-input-field")
+     inputs.forEach((input, index) => {
+-      spreadProps(input, this.api.getInputProps({ index }))
++      this.spreadProps(input, this.api.getInputProps({ index }))
+     })
+ 
+     const hiddenInput = this.rootEl.querySelector<HTMLInputElement>(".pin-input-hidden")
+-    if (hiddenInput) spreadProps(hiddenInput, this.api.getHiddenInputProps())
++    if (hiddenInput) this.spreadProps(hiddenInput, this.api.getHiddenInputProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".pin-input-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/popover.ts b/examples/vanilla-ts/src/popover.ts
+index 4f97e6c3d7..2cac018f64 100644
+--- a/examples/vanilla-ts/src/popover.ts
++++ b/examples/vanilla-ts/src/popover.ts
+@@ -1,5 +1,5 @@
+ import * as popover from "@zag-js/popover"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ import { Component } from "./component"
+ 
+ export class Popover extends Component<popover.Props, popover.Api> {
+@@ -14,10 +14,10 @@ export class Popover extends Component<popover.Props, popover.Api> {
+   render = () => {
+     const rootEl = this.rootEl
+     const triggerEl = rootEl.querySelector<HTMLElement>(".popover-trigger")
+-    if (triggerEl) spreadProps(triggerEl, this.api.getTriggerProps())
++    if (triggerEl) this.spreadProps(triggerEl, this.api.getTriggerProps())
+     const contentEl = rootEl.querySelector<HTMLElement>(".popover-content")
+-    if (contentEl) spreadProps(contentEl, this.api.getContentProps())
++    if (contentEl) this.spreadProps(contentEl, this.api.getContentProps())
+     const positionerEl = rootEl.querySelector<HTMLElement>(".popover-positioner")
+-    if (positionerEl) spreadProps(positionerEl, this.api.getPositionerProps())
++    if (positionerEl) this.spreadProps(positionerEl, this.api.getPositionerProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/progress.ts b/examples/vanilla-ts/src/progress.ts
+index 27f6dc6bb5..3147e16886 100644
+--- a/examples/vanilla-ts/src/progress.ts
++++ b/examples/vanilla-ts/src/progress.ts
+@@ -1,6 +1,6 @@
+ import * as progress from "@zag-js/progress"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Progress extends Component<progress.Props, progress.Api> {
+   initMachine(props: progress.Props) {
+@@ -14,30 +14,30 @@ export class Progress extends Component<progress.Props, progress.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".progress-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const track = this.rootEl.querySelector<HTMLElement>(".progress-track")
+-    if (track) spreadProps(track, this.api.getTrackProps())
++    if (track) this.spreadProps(track, this.api.getTrackProps())
+ 
+     const range = this.rootEl.querySelector<HTMLElement>(".progress-range")
+-    if (range) spreadProps(range, this.api.getRangeProps())
++    if (range) this.spreadProps(range, this.api.getRangeProps())
+ 
+     const valueText = this.rootEl.querySelector<HTMLElement>(".progress-value-text")
+     if (valueText) {
+-      spreadProps(valueText, this.api.getValueTextProps())
++      this.spreadProps(valueText, this.api.getValueTextProps())
+       valueText.textContent = this.api.valueAsString
+     }
+ 
+     const circle = this.rootEl.querySelector<SVGSVGElement>(".progress-circle")
+-    if (circle) spreadProps(circle, this.api.getCircleProps())
++    if (circle) this.spreadProps(circle, this.api.getCircleProps())
+ 
+     const circleTrack = this.rootEl.querySelector<SVGCircleElement>(".progress-circle-track")
+-    if (circleTrack) spreadProps(circleTrack, this.api.getCircleTrackProps())
++    if (circleTrack) this.spreadProps(circleTrack, this.api.getCircleTrackProps())
+ 
+     const circleRange = this.rootEl.querySelector<SVGCircleElement>(".progress-circle-range")
+-    if (circleRange) spreadProps(circleRange, this.api.getCircleRangeProps())
++    if (circleRange) this.spreadProps(circleRange, this.api.getCircleRangeProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/qr-code.ts b/examples/vanilla-ts/src/qr-code.ts
+index 4ccb783673..f720c3e865 100644
+--- a/examples/vanilla-ts/src/qr-code.ts
++++ b/examples/vanilla-ts/src/qr-code.ts
+@@ -1,6 +1,6 @@
+ import * as qrCode from "@zag-js/qr-code"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class QrCode extends Component<qrCode.Props, qrCode.Api> {
+   initMachine(props: qrCode.Props) {
+@@ -14,12 +14,12 @@ export class QrCode extends Component<qrCode.Props, qrCode.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const frame = this.rootEl.querySelector<HTMLElement>(".qr-code-frame")
+-    if (frame) spreadProps(frame, this.api.getFrameProps())
++    if (frame) this.spreadProps(frame, this.api.getFrameProps())
+ 
+     const pattern = this.rootEl.querySelector<HTMLElement>(".qr-code-pattern")
+-    if (pattern) spreadProps(pattern, this.api.getPatternProps())
++    if (pattern) this.spreadProps(pattern, this.api.getPatternProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/radio-group.ts b/examples/vanilla-ts/src/radio-group.ts
+index 84d194ab27..34599f6670 100644
+--- a/examples/vanilla-ts/src/radio-group.ts
++++ b/examples/vanilla-ts/src/radio-group.ts
+@@ -1,6 +1,6 @@
+ import * as radio from "@zag-js/radio-group"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class RadioGroup extends Component<radio.Props, radio.Api> {
+   initMachine(props: radio.Props) {
+@@ -14,26 +14,26 @@ export class RadioGroup extends Component<radio.Props, radio.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".radio-group-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const items = this.rootEl.querySelectorAll<HTMLElement>(".radio-item")
+     items.forEach((item) => {
+       const value = item.dataset.value
+       if (value) {
+         const itemProps = this.api.getItemProps({ value })
+-        spreadProps(item, itemProps)
++        this.spreadProps(item, itemProps)
+ 
+         const control = item.querySelector<HTMLElement>(".radio-control")
+-        if (control) spreadProps(control, this.api.getItemControlProps({ value }))
++        if (control) this.spreadProps(control, this.api.getItemControlProps({ value }))
+ 
+         const label = item.querySelector<HTMLElement>(".radio-label")
+-        if (label) spreadProps(label, this.api.getItemTextProps({ value }))
++        if (label) this.spreadProps(label, this.api.getItemTextProps({ value }))
+ 
+         const input = item.querySelector<HTMLInputElement>(".radio-input")
+-        if (input) spreadProps(input, this.api.getItemHiddenInputProps({ value }))
++        if (input) this.spreadProps(input, this.api.getItemHiddenInputProps({ value }))
+       }
+     })
+   }
+diff --git a/examples/vanilla-ts/src/scroll-area.ts b/examples/vanilla-ts/src/scroll-area.ts
+index 29bb83493e..261125595f 100644
+--- a/examples/vanilla-ts/src/scroll-area.ts
++++ b/examples/vanilla-ts/src/scroll-area.ts
+@@ -1,7 +1,7 @@
+ import * as scrollArea from "@zag-js/scroll-area"
+ import type { PropTypes } from "@zag-js/types"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class ScrollArea extends Component<scrollArea.Props, scrollArea.Api<PropTypes>> {
+   initMachine(props: scrollArea.Props) {
+@@ -15,13 +15,13 @@ export class ScrollArea extends Component<scrollArea.Props, scrollArea.Api<PropT
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const viewport = this.rootEl.querySelector<HTMLElement>(".scroll-area-viewport")
+-    if (viewport) spreadProps(viewport, this.api.getViewportProps())
++    if (viewport) this.spreadProps(viewport, this.api.getViewportProps())
+ 
+     const content = this.rootEl.querySelector<HTMLElement>(".scroll-area-content")
+-    if (content) spreadProps(content, this.api.getContentProps())
++    if (content) this.spreadProps(content, this.api.getContentProps())
+ 
+     const scrollbarY = this.rootEl.querySelector<HTMLElement>(".scroll-area-scrollbar-y")
+     const thumbY = this.rootEl.querySelector<HTMLElement>(".scroll-area-thumb-y")
+@@ -29,8 +29,8 @@ export class ScrollArea extends Component<scrollArea.Props, scrollArea.Api<PropT
+     if (scrollbarY && thumbY) {
+       if (this.api.hasOverflowY) {
+         scrollbarY.hidden = false
+-        spreadProps(scrollbarY, this.api.getScrollbarProps({ orientation: "vertical" }))
+-        spreadProps(thumbY, this.api.getThumbProps({ orientation: "vertical" }))
++        this.spreadProps(scrollbarY, this.api.getScrollbarProps({ orientation: "vertical" }))
++        this.spreadProps(thumbY, this.api.getThumbProps({ orientation: "vertical" }))
+       } else {
+         scrollbarY.hidden = true
+       }
+@@ -42,8 +42,8 @@ export class ScrollArea extends Component<scrollArea.Props, scrollArea.Api<PropT
+     if (scrollbarX && thumbX) {
+       if (this.api.hasOverflowX) {
+         scrollbarX.hidden = false
+-        spreadProps(scrollbarX, this.api.getScrollbarProps({ orientation: "horizontal" }))
+-        spreadProps(thumbX, this.api.getThumbProps({ orientation: "horizontal" }))
++        this.spreadProps(scrollbarX, this.api.getScrollbarProps({ orientation: "horizontal" }))
++        this.spreadProps(thumbX, this.api.getThumbProps({ orientation: "horizontal" }))
+       } else {
+         scrollbarX.hidden = true
+       }
+diff --git a/examples/vanilla-ts/src/select.ts b/examples/vanilla-ts/src/select.ts
+index 34aa4fddd1..3835445943 100644
+--- a/examples/vanilla-ts/src/select.ts
++++ b/examples/vanilla-ts/src/select.ts
+@@ -1,6 +1,6 @@
+ import * as select from "@zag-js/select"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ interface Item {
+   label: string
+@@ -75,17 +75,17 @@ export class Select extends Component<select.Props, select.Api> {
+       }
+ 
+       // Always spread props
+-      spreadProps(itemEl, this.api.getItemProps({ item }))
++      this.spreadProps(itemEl, this.api.getItemProps({ item }))
+ 
+       const textEl = itemEl.querySelector<HTMLElement>(".select-item-text")
+       if (textEl) {
+-        spreadProps(textEl, this.api.getItemTextProps({ item }))
++        this.spreadProps(textEl, this.api.getItemTextProps({ item }))
+         textEl.textContent = item.label
+       }
+ 
+       const indicatorEl = itemEl.querySelector<HTMLElement>(".select-item-indicator")
+       if (indicatorEl) {
+-        spreadProps(indicatorEl, this.api.getItemIndicatorProps({ item }))
++        this.spreadProps(indicatorEl, this.api.getItemIndicatorProps({ item }))
+       }
+     })
+ 
+@@ -124,16 +124,16 @@ export class Select extends Component<select.Props, select.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".select-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".select-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const trigger = this.rootEl.querySelector<HTMLElement>(".select-trigger")
+-    if (trigger) spreadProps(trigger, this.api.getTriggerProps())
++    if (trigger) this.spreadProps(trigger, this.api.getTriggerProps())
+ 
+     const valueText = this.rootEl.querySelector<HTMLElement>(".select-value-text")
+     if (valueText) {
+@@ -141,19 +141,19 @@ export class Select extends Component<select.Props, select.Api> {
+     }
+ 
+     const indicator = this.rootEl.querySelector<HTMLElement>(".select-indicator")
+-    if (indicator) spreadProps(indicator, this.api.getIndicatorProps())
++    if (indicator) this.spreadProps(indicator, this.api.getIndicatorProps())
+ 
+     const clearBtn = this.rootEl.querySelector<HTMLElement>(".select-clear")
+-    if (clearBtn) spreadProps(clearBtn, this.api.getClearTriggerProps())
++    if (clearBtn) this.spreadProps(clearBtn, this.api.getClearTriggerProps())
+ 
+     const hiddenSelect = this.rootEl.querySelector<HTMLSelectElement>(".select-hidden-select")
+-    if (hiddenSelect) spreadProps(hiddenSelect, this.api.getHiddenSelectProps())
++    if (hiddenSelect) this.spreadProps(hiddenSelect, this.api.getHiddenSelectProps())
+ 
+     const positioner = this.rootEl.querySelector<HTMLElement>(".select-positioner")
+-    if (positioner) spreadProps(positioner, this.api.getPositionerProps())
++    if (positioner) this.spreadProps(positioner, this.api.getPositionerProps())
+ 
+     const content = this.rootEl.querySelector<HTMLElement>(".select-content")
+-    if (content) spreadProps(content, this.api.getContentProps())
++    if (content) this.spreadProps(content, this.api.getContentProps())
+ 
+     // Sync items after all other props are set
+     this.syncItems()
+diff --git a/examples/vanilla-ts/src/signature-pad.ts b/examples/vanilla-ts/src/signature-pad.ts
+index 2cf348f880..cd21ab260e 100644
+--- a/examples/vanilla-ts/src/signature-pad.ts
++++ b/examples/vanilla-ts/src/signature-pad.ts
+@@ -1,6 +1,6 @@
+ import * as signaturePad from "@zag-js/signature-pad"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class SignaturePad extends Component<signaturePad.Props, signaturePad.Api> {
+   initMachine(props: signaturePad.Props) {
+@@ -40,7 +40,7 @@ export class SignaturePad extends Component<signaturePad.Props, signaturePad.Api
+         segment.appendChild(pathEl)
+       }
+ 
+-      spreadProps(pathEl, this.api.getSegmentPathProps({ path: pathData }))
++      this.spreadProps(pathEl, this.api.getSegmentPathProps({ path: pathData }))
+     })
+ 
+     // Handle current path
+@@ -54,7 +54,7 @@ export class SignaturePad extends Component<signaturePad.Props, signaturePad.Api
+         segment.appendChild(currentPathEl)
+       }
+ 
+-      spreadProps(currentPathEl, this.api.getSegmentPathProps({ path: this.api.currentPath }))
++      this.spreadProps(currentPathEl, this.api.getSegmentPathProps({ path: this.api.currentPath }))
+     } else {
+       // Remove current path element if it exists but there's no current path
+       const currentPathEl = segment.querySelector(".signature-pad-current-path")
+@@ -63,27 +63,27 @@ export class SignaturePad extends Component<signaturePad.Props, signaturePad.Api
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".signature-pad-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".signature-pad-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const segment = this.rootEl.querySelector<SVGSVGElement>(".signature-pad-segment")
+-    if (segment) spreadProps(segment, this.api.getSegmentProps())
++    if (segment) this.spreadProps(segment, this.api.getSegmentProps())
+ 
+     const guide = this.rootEl.querySelector<HTMLElement>(".signature-pad-guide")
+-    if (guide) spreadProps(guide, this.api.getGuideProps())
++    if (guide) this.spreadProps(guide, this.api.getGuideProps())
+ 
+     const clearBtn = this.rootEl.querySelector<HTMLElement>(".signature-pad-clear")
+-    if (clearBtn) spreadProps(clearBtn, this.api.getClearTriggerProps())
++    if (clearBtn) this.spreadProps(clearBtn, this.api.getClearTriggerProps())
+ 
+     const hiddenInput = this.rootEl.querySelector<HTMLInputElement>(".signature-pad-hidden-input")
+     if (hiddenInput) {
+       this.api.getDataUrl("image/png").then((url) => {
+-        spreadProps(hiddenInput, this.api.getHiddenInputProps({ value: url }))
++        this.spreadProps(hiddenInput, this.api.getHiddenInputProps({ value: url }))
+       })
+     }
+ 
+diff --git a/examples/vanilla-ts/src/slider.ts b/examples/vanilla-ts/src/slider.ts
+index 317b42f358..5dc19a3962 100644
+--- a/examples/vanilla-ts/src/slider.ts
++++ b/examples/vanilla-ts/src/slider.ts
+@@ -1,6 +1,6 @@
+ import * as slider from "@zag-js/slider"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Slider extends Component<slider.Props, slider.Api> {
+   initMachine(props: slider.Props) {
+@@ -14,30 +14,30 @@ export class Slider extends Component<slider.Props, slider.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".slider-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".slider-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const track = this.rootEl.querySelector<HTMLElement>(".slider-track")
+-    if (track) spreadProps(track, this.api.getTrackProps())
++    if (track) this.spreadProps(track, this.api.getTrackProps())
+ 
+     const range = this.rootEl.querySelector<HTMLElement>(".slider-range")
+-    if (range) spreadProps(range, this.api.getRangeProps())
++    if (range) this.spreadProps(range, this.api.getRangeProps())
+ 
+     const thumb = this.rootEl.querySelector<HTMLElement>(".slider-thumb")
+     if (thumb) {
+-      spreadProps(thumb, this.api.getThumbProps({ index: 0 }))
++      this.spreadProps(thumb, this.api.getThumbProps({ index: 0 }))
+       const input = thumb.querySelector<HTMLInputElement>("input")
+-      if (input) spreadProps(input, this.api.getHiddenInputProps({ index: 0 }))
++      if (input) this.spreadProps(input, this.api.getHiddenInputProps({ index: 0 }))
+     }
+ 
+     const output = this.rootEl.querySelector<HTMLElement>(".slider-output")
+     if (output) {
+-      spreadProps(output, this.api.getValueTextProps())
++      this.spreadProps(output, this.api.getValueTextProps())
+       output.textContent = this.api.value.join(", ")
+     }
+   }
+diff --git a/examples/vanilla-ts/src/steps.ts b/examples/vanilla-ts/src/steps.ts
+index 9b76e837c3..d9dfe3b6a1 100644
+--- a/examples/vanilla-ts/src/steps.ts
++++ b/examples/vanilla-ts/src/steps.ts
+@@ -1,6 +1,6 @@
+ import * as steps from "@zag-js/steps"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Steps extends Component<steps.Props, steps.Api> {
+   initMachine(props: steps.Props) {
+@@ -21,25 +21,25 @@ export class Steps extends Component<steps.Props, steps.Api> {
+ 
+     items.forEach((item, index) => {
+       const itemState = this.api.getItemState({ index })
+-      spreadProps(item, this.api.getItemProps({ index }))
++      this.spreadProps(item, this.api.getItemProps({ index }))
+ 
+       // Update indicator
+       const indicator = item.querySelector<HTMLElement>(".steps-indicator")
+       if (indicator) {
+-        spreadProps(indicator, this.api.getIndicatorProps({ index }))
++        this.spreadProps(indicator, this.api.getIndicatorProps({ index }))
+         indicator.textContent = String(index + 1)
+       }
+ 
+       // Update trigger
+       const trigger = item.querySelector<HTMLElement>(".steps-trigger")
+       if (trigger) {
+-        spreadProps(trigger, this.api.getTriggerProps({ index }))
++        this.spreadProps(trigger, this.api.getTriggerProps({ index }))
+       }
+ 
+       // Update separator
+       const separator = item.querySelector<HTMLElement>(".steps-separator")
+       if (separator) {
+-        spreadProps(separator, this.api.getSeparatorProps({ index }))
++        this.spreadProps(separator, this.api.getSeparatorProps({ index }))
+       }
+ 
+       // Update data attributes for styling
+@@ -53,24 +53,24 @@ export class Steps extends Component<steps.Props, steps.Api> {
+     const contents = Array.from(this.rootEl.querySelectorAll<HTMLElement>(".steps-content"))
+ 
+     contents.forEach((content, index) => {
+-      spreadProps(content, this.api.getContentProps({ index }))
++      this.spreadProps(content, this.api.getContentProps({ index }))
+     })
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const list = this.rootEl.querySelector<HTMLElement>(".steps-list")
+-    if (list) spreadProps(list, this.api.getListProps())
++    if (list) this.spreadProps(list, this.api.getListProps())
+ 
+     const progress = this.rootEl.querySelector<HTMLElement>(".steps-progress")
+-    if (progress) spreadProps(progress, this.api.getProgressProps())
++    if (progress) this.spreadProps(progress, this.api.getProgressProps())
+ 
+     const prevButton = this.rootEl.querySelector<HTMLButtonElement>(".steps-prev-trigger")
+-    if (prevButton) spreadProps(prevButton, this.api.getPrevTriggerProps())
++    if (prevButton) this.spreadProps(prevButton, this.api.getPrevTriggerProps())
+ 
+     const nextButton = this.rootEl.querySelector<HTMLButtonElement>(".steps-next-trigger")
+-    if (nextButton) spreadProps(nextButton, this.api.getNextTriggerProps())
++    if (nextButton) this.spreadProps(nextButton, this.api.getNextTriggerProps())
+ 
+     // Sync steps and contents
+     this.syncSteps()
+diff --git a/examples/vanilla-ts/src/switch.ts b/examples/vanilla-ts/src/switch.ts
+index 56dec767e4..5d559e6d1c 100644
+--- a/examples/vanilla-ts/src/switch.ts
++++ b/examples/vanilla-ts/src/switch.ts
+@@ -1,6 +1,6 @@
+ import * as switchMachine from "@zag-js/switch"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Switch extends Component<switchMachine.Props, switchMachine.Api> {
+   initMachine(props: switchMachine.Props) {
+@@ -14,18 +14,18 @@ export class Switch extends Component<switchMachine.Props, switchMachine.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".switch-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".switch-control")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const thumb = this.rootEl.querySelector<HTMLElement>(".switch-thumb")
+-    if (thumb) spreadProps(thumb, this.api.getThumbProps())
++    if (thumb) this.spreadProps(thumb, this.api.getThumbProps())
+ 
+     const input = this.rootEl.querySelector<HTMLInputElement>(".switch-input")
+-    if (input) spreadProps(input, this.api.getHiddenInputProps())
++    if (input) this.spreadProps(input, this.api.getHiddenInputProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/tabs.ts b/examples/vanilla-ts/src/tabs.ts
+index 683970a8d6..cd75bead78 100644
+--- a/examples/vanilla-ts/src/tabs.ts
++++ b/examples/vanilla-ts/src/tabs.ts
+@@ -1,6 +1,6 @@
+ import * as tabs from "@zag-js/tabs"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Tabs extends Component<tabs.Props, tabs.Api> {
+   initMachine(props: tabs.Props) {
+@@ -18,19 +18,19 @@ export class Tabs extends Component<tabs.Props, tabs.Api> {
+     const listProps = this.api.getListProps()
+     const indicatorProps = this.api.getIndicatorProps()
+ 
+-    spreadProps(this.rootEl, rootProps)
++    this.spreadProps(this.rootEl, rootProps)
+ 
+     const tablist = this.rootEl.querySelector<HTMLElement>(".tabs-list")
+-    if (tablist) spreadProps(tablist, listProps)
++    if (tablist) this.spreadProps(tablist, listProps)
+ 
+     const indicator = this.rootEl.querySelector<HTMLElement>(".tabs-indicator")
+-    if (indicator) spreadProps(indicator, indicatorProps)
++    if (indicator) this.spreadProps(indicator, indicatorProps)
+ 
+     const tabs = this.rootEl.querySelectorAll<HTMLElement>(".tabs-trigger")
+     tabs.forEach((tab) => {
+       const value = tab.dataset.value
+       if (value) {
+-        spreadProps(tab, this.api.getTriggerProps({ value }))
++        this.spreadProps(tab, this.api.getTriggerProps({ value }))
+       }
+     })
+ 
+@@ -38,7 +38,7 @@ export class Tabs extends Component<tabs.Props, tabs.Api> {
+     panels.forEach((panel) => {
+       const value = panel.dataset.value
+       if (value) {
+-        spreadProps(panel, this.api.getContentProps({ value }))
++        this.spreadProps(panel, this.api.getContentProps({ value }))
+       }
+     })
+   }
+diff --git a/examples/vanilla-ts/src/tags-input.ts b/examples/vanilla-ts/src/tags-input.ts
+index dee64f0fd9..829c73bf1d 100644
+--- a/examples/vanilla-ts/src/tags-input.ts
++++ b/examples/vanilla-ts/src/tags-input.ts
+@@ -1,6 +1,6 @@
+ import * as tagsInput from "@zag-js/tags-input"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class TagsInput extends Component<tagsInput.Props, tagsInput.Api> {
+   initMachine(props: tagsInput.Props) {
+@@ -66,34 +66,34 @@ export class TagsInput extends Component<tagsInput.Props, tagsInput.Api> {
+       }
+ 
+       // Always update props for item and its children (both new and existing)
+-      spreadProps(itemEl, this.api.getItemProps(itemProps))
++      this.spreadProps(itemEl, this.api.getItemProps(itemProps))
+ 
+       const itemPreview = itemEl.querySelector<HTMLElement>(".tags-input-item-preview")
+-      if (itemPreview) spreadProps(itemPreview, this.api.getItemPreviewProps(itemProps))
++      if (itemPreview) this.spreadProps(itemPreview, this.api.getItemPreviewProps(itemProps))
+ 
+       const itemText = itemEl.querySelector<HTMLElement>(".tags-input-item-text")
+       if (itemText) {
+-        spreadProps(itemText, this.api.getItemTextProps(itemProps))
++        this.spreadProps(itemText, this.api.getItemTextProps(itemProps))
+         itemText.textContent = value
+       }
+ 
+       const itemInput = itemEl.querySelector<HTMLInputElement>(".tags-input-item-input")
+-      if (itemInput) spreadProps(itemInput, this.api.getItemInputProps(itemProps))
++      if (itemInput) this.spreadProps(itemInput, this.api.getItemInputProps(itemProps))
+ 
+       const itemDeleteBtn = itemEl.querySelector<HTMLElement>(".tags-input-item-delete")
+-      if (itemDeleteBtn) spreadProps(itemDeleteBtn, this.api.getItemDeleteTriggerProps(itemProps))
++      if (itemDeleteBtn) this.spreadProps(itemDeleteBtn, this.api.getItemDeleteTriggerProps(itemProps))
+     })
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const label = this.rootEl.querySelector<HTMLElement>(".tags-input-label")
+-    if (label) spreadProps(label, this.api.getLabelProps())
++    if (label) this.spreadProps(label, this.api.getLabelProps())
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".tags-input-control")
+     if (control) {
+-      spreadProps(control, this.api.getControlProps())
++      this.spreadProps(control, this.api.getControlProps())
+ 
+       // Ensure input exists first (tags will be inserted before it)
+       let input = control.querySelector<HTMLInputElement>(".tags-input-input")
+@@ -114,13 +114,13 @@ export class TagsInput extends Component<tagsInput.Props, tagsInput.Api> {
+       this.syncItems()
+ 
+       // Update input props after items are synced
+-      spreadProps(input, this.api.getInputProps())
++      this.spreadProps(input, this.api.getInputProps())
+ 
+       // Update clear button props
+-      if (clearBtn) spreadProps(clearBtn, this.api.getClearTriggerProps())
++      if (clearBtn) this.spreadProps(clearBtn, this.api.getClearTriggerProps())
+     }
+ 
+     const hiddenInput = this.rootEl.querySelector<HTMLInputElement>(".tags-input-hidden")
+-    if (hiddenInput) spreadProps(hiddenInput, this.api.getHiddenInputProps())
++    if (hiddenInput) this.spreadProps(hiddenInput, this.api.getHiddenInputProps())
+   }
+ }
+diff --git a/examples/vanilla-ts/src/timer.ts b/examples/vanilla-ts/src/timer.ts
+index fcd7e40c84..978a3753a5 100644
+--- a/examples/vanilla-ts/src/timer.ts
++++ b/examples/vanilla-ts/src/timer.ts
+@@ -1,6 +1,6 @@
+ import * as timer from "@zag-js/timer"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Timer extends Component<timer.Props, timer.Api> {
+   initMachine(props: timer.Props) {
+@@ -14,62 +14,62 @@ export class Timer extends Component<timer.Props, timer.Api> {
+   }
+ 
+   render() {
+-    spreadProps(this.rootEl, this.api.getRootProps())
++    this.spreadProps(this.rootEl, this.api.getRootProps())
+ 
+     const area = this.rootEl.querySelector<HTMLElement>(".timer-area")
+-    if (area) spreadProps(area, this.api.getAreaProps())
++    if (area) this.spreadProps(area, this.api.getAreaProps())
+ 
+     const days = this.rootEl.querySelector<HTMLElement>(".timer-days")
+     if (days) {
+-      spreadProps(days, this.api.getItemProps({ type: "days" }))
++      this.spreadProps(days, this.api.getItemProps({ type: "days" }))
+       days.textContent = this.api.formattedTime.days
+     }
+ 
+     const hours = this.rootEl.querySelector<HTMLElement>(".timer-hours")
+     if (hours) {
+-      spreadProps(hours, this.api.getItemProps({ type: "hours" }))
++      this.spreadProps(hours, this.api.getItemProps({ type: "hours" }))
+       hours.textContent = this.api.formattedTime.hours
+     }
+ 
+     const minutes = this.rootEl.querySelector<HTMLElement>(".timer-minutes")
+     if (minutes) {
+-      spreadProps(minutes, this.api.getItemProps({ type: "minutes" }))
++      this.spreadProps(minutes, this.api.getItemProps({ type: "minutes" }))
+       minutes.textContent = this.api.formattedTime.minutes
+     }
+ 
+     const seconds = this.rootEl.querySelector<HTMLElement>(".timer-seconds")
+     if (seconds) {
+-      spreadProps(seconds, this.api.getItemProps({ type: "seconds" }))
++      this.spreadProps(seconds, this.api.getItemProps({ type: "seconds" }))
+       seconds.textContent = this.api.formattedTime.seconds
+     }
+ 
+     const separators = this.rootEl.querySelectorAll<HTMLElement>(".timer-separator")
+     separators.forEach((separator) => {
+-      spreadProps(separator, this.api.getSeparatorProps())
++      this.spreadProps(separator, this.api.getSeparatorProps())
+     })
+ 
+     const control = this.rootEl.querySelector<HTMLElement>(".timer-controls")
+-    if (control) spreadProps(control, this.api.getControlProps())
++    if (control) this.spreadProps(control, this.api.getControlProps())
+ 
+     const startBtn = this.rootEl.querySelector<HTMLElement>(".timer-start")
+     if (startBtn) {
+-      spreadProps(startBtn, this.api.getActionTriggerProps({ action: "start" }))
++      this.spreadProps(startBtn, this.api.getActionTriggerProps({ action: "start" }))
+       startBtn.style.display = this.api.running || this.api.paused ? "none" : "inline-block"
+     }
+ 
+     const pauseBtn = this.rootEl.querySelector<HTMLElement>(".timer-pause")
+     if (pauseBtn) {
+-      spreadProps(pauseBtn, this.api.getActionTriggerProps({ action: "pause" }))
++      this.spreadProps(pauseBtn, this.api.getActionTriggerProps({ action: "pause" }))
+       pauseBtn.style.display = this.api.running ? "inline-block" : "none"
+     }
+ 
+     const resumeBtn = this.rootEl.querySelector<HTMLElement>(".timer-resume")
+     if (resumeBtn) {
+-      spreadProps(resumeBtn, this.api.getActionTriggerProps({ action: "resume" }))
++      this.spreadProps(resumeBtn, this.api.getActionTriggerProps({ action: "resume" }))
+       resumeBtn.style.display = this.api.paused ? "inline-block" : "none"
+     }
+ 
+     const resetBtn = this.rootEl.querySelector<HTMLElement>(".timer-reset")
+-    if (resetBtn) spreadProps(resetBtn, this.api.getActionTriggerProps({ action: "reset" }))
++    if (resetBtn) this.spreadProps(resetBtn, this.api.getActionTriggerProps({ action: "reset" }))
+   }
+ }
+diff --git a/examples/vanilla-ts/src/toggle-group.ts b/examples/vanilla-ts/src/toggle-group.ts
+index 1326d0197a..d289add1b5 100644
+--- a/examples/vanilla-ts/src/toggle-group.ts
++++ b/examples/vanilla-ts/src/toggle-group.ts
+@@ -1,6 +1,6 @@
+ import * as toggleGroup from "@zag-js/toggle-group"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class ToggleGroup extends Component<toggleGroup.Props, toggleGroup.Api> {
+   initMachine(props: toggleGroup.Props) {
+@@ -16,13 +16,13 @@ export class ToggleGroup extends Component<toggleGroup.Props, toggleGroup.Api> {
+   render() {
+     const rootProps = this.api.getRootProps()
+ 
+-    spreadProps(this.rootEl, rootProps)
++    this.spreadProps(this.rootEl, rootProps)
+ 
+     const items = this.rootEl.querySelectorAll<HTMLElement>(".toggle-group-item")
+     items.forEach((item) => {
+       const value = item.dataset.value
+       if (value) {
+-        spreadProps(item, this.api.getItemProps({ value }))
++        this.spreadProps(item, this.api.getItemProps({ value }))
+       }
+     })
+   }
+diff --git a/examples/vanilla-ts/src/tooltip.ts b/examples/vanilla-ts/src/tooltip.ts
+index e0a11d2222..9694382b28 100644
+--- a/examples/vanilla-ts/src/tooltip.ts
++++ b/examples/vanilla-ts/src/tooltip.ts
+@@ -1,6 +1,6 @@
+ import * as tooltip from "@zag-js/tooltip"
+ import { Component } from "./component"
+-import { normalizeProps, spreadProps, VanillaMachine } from "@zag-js/vanilla"
++import { normalizeProps, VanillaMachine } from "@zag-js/vanilla"
+ 
+ export class Tooltip extends Component<tooltip.Props, tooltip.Api> {
+   initMachine(props: tooltip.Props) {
+@@ -22,8 +22,8 @@ export class Tooltip extends Component<tooltip.Props, tooltip.Api> {
+     const positioner = this.rootEl.querySelector<HTMLElement>(".tooltip-positioner")
+     const content = this.rootEl.querySelector<HTMLElement>(".tooltip-content")
+ 
+-    if (trigger) spreadProps(trigger, triggerProps)
+-    if (positioner) spreadProps(positioner, positionerProps)
+-    if (content) spreadProps(content, contentProps)
++    if (trigger) this.spreadProps(trigger, triggerProps)
++    if (positioner) this.spreadProps(positioner, positionerProps)
++    if (content) this.spreadProps(content, contentProps)
+   }
+ }
+diff --git a/packages/frameworks/vanilla/src/index.ts b/packages/frameworks/vanilla/src/index.ts
+index f23039a789..67a1f8f1f3 100644
+--- a/packages/frameworks/vanilla/src/index.ts
++++ b/packages/frameworks/vanilla/src/index.ts
+@@ -1,4 +1,4 @@
+ export { mergeProps } from "@zag-js/core"
+ export { normalizeProps } from "./normalize-props"
+-export { spreadProps } from "./spread-props"
++export { spreadProps, type Attrs } from "./spread-props"
+ export { VanillaMachine } from "./machine"
+diff --git a/packages/frameworks/vanilla/src/machine.ts b/packages/frameworks/vanilla/src/machine.ts
+index 693ff5ee93..59601bf786 100644
+--- a/packages/frameworks/vanilla/src/machine.ts
++++ b/packages/frameworks/vanilla/src/machine.ts
+@@ -20,6 +20,7 @@ import { subscribe } from "@zag-js/store"
+ import { compact, identity, isEqual, isFunction, isString, runIfFn, toArray, warn } from "@zag-js/utils"
+ import { bindable } from "./bindable"
+ import { createRefs } from "./refs"
++import { mergeMachineProps } from "./merge-machine-props"
+ 
+ export class VanillaMachine<T extends MachineSchema> {
+   scope: Scope
+@@ -38,6 +39,8 @@ export class VanillaMachine<T extends MachineSchema> {
+   private cleanups: VoidFunction[] = []
+   private subscriptions: Array<(service: Service<T>) => void> = []
+ 
++  private userPropsRef: { current: Partial<T["props"]> | (() => Partial<T["props"]>) }
++
+   private getEvent = () => ({
+     ...this.event,
+     current: () => this.event,
+@@ -66,13 +69,15 @@ export class VanillaMachine<T extends MachineSchema> {
+     private machine: Machine<T>,
+     userProps: Partial<T["props"]> | (() => Partial<T["props"]>) = {},
+   ) {
++    this.userPropsRef = { current: userProps }
++
+     // create scope
+     const { id, ids, getRootNode } = runIfFn(userProps) as any
+     this.scope = createScope({ id, ids, getRootNode })
+ 
+     // create prop
+     const prop: PropFn<T> = (key) => {
+-      const __props = runIfFn(userProps)
++      const __props = runIfFn(this.userPropsRef.current)
+       const props: any = machine.props?.({ props: compact(__props), scope: this.scope }) ?? __props
+       return props[key] as any
+     }
+@@ -181,6 +186,18 @@ export class VanillaMachine<T extends MachineSchema> {
+     this.cleanups.push(subscribe(this.state.ref, () => this.notify()))
+   }
+ 
++  updateProps(newProps: Partial<T["props"]> | (() => Partial<T["props"]>)) {
++    const prevSource = this.userPropsRef.current
++
++    this.userPropsRef.current = () => {
++      const prev = runIfFn(prevSource)
++      const next = runIfFn(newProps)
++      return mergeMachineProps(prev, next)
++    }
++
++    this.notify()
++  }
++
+   send = (event: T["event"]) => {
+     if (this.status !== MachineStatus.Started) return
+ 
+diff --git a/packages/frameworks/vanilla/src/merge-machine-props.ts b/packages/frameworks/vanilla/src/merge-machine-props.ts
+new file mode 100644
+index 0000000000..5b900bae83
+--- /dev/null
++++ b/packages/frameworks/vanilla/src/merge-machine-props.ts
+@@ -0,0 +1,27 @@
++import { isPlainObject } from "@zag-js/utils"
++
++export function mergeMachineProps<T>(prev: T, next: Partial<T>): T {
++  if (!isPlainObject(prev) || !isPlainObject(next)) {
++    return next === undefined ? prev : (next as T)
++  }
++
++  const result: any = { ...prev }
++
++  for (const key of Object.keys(next)) {
++    const nextValue = (next as any)[key]
++    const prevValue = (prev as any)[key]
++
++    // ignore undefined updates
++    if (nextValue === undefined) {
++      continue
++    }
++
++    if (isPlainObject(prevValue) && isPlainObject(nextValue)) {
++      result[key] = mergeMachineProps(prevValue, nextValue)
++    } else {
++      result[key] = nextValue
++    }
++  }
++
++  return result
++}
+diff --git a/packages/frameworks/vanilla/src/spread-props.ts b/packages/frameworks/vanilla/src/spread-props.ts
+index 35cb769ae3..7afa4839b0 100644
+--- a/packages/frameworks/vanilla/src/spread-props.ts
++++ b/packages/frameworks/vanilla/src/spread-props.ts
+@@ -2,7 +2,7 @@ export interface Attrs {
+   [key: string]: any
+ }
+ 
+-const prevAttrsMap = new WeakMap<Element, Attrs>()
++const prevAttrsMap = new WeakMap<Element, Map<string, Attrs>>()
+ 
+ const assignableProps = new Set<string>(["value", "checked", "selected"])
+ 
+@@ -32,8 +32,16 @@ const getAttributeName = (node: Element, attrName: string): string => {
+   return shouldPreserveCase ? attrName : attrName.toLowerCase()
+ }
+ 
+-export function spreadProps(node: Element, attrs: Attrs): () => void {
+-  const oldAttrs = prevAttrsMap.get(node) || {}
++export function spreadProps(node: Element, attrs: Attrs, machineId?: string): () => void {
++  const scopeKey = machineId || "default"
++
++  let machineMap = prevAttrsMap.get(node)
++  if (!machineMap) {
++    machineMap = new Map<string, Attrs>()
++    prevAttrsMap.set(node, machineMap)
++  }
++
++  const oldAttrs = machineMap.get(scopeKey) || {}
+ 
+   const attrKeys = Object.keys(attrs)
+ 
+@@ -70,11 +78,18 @@ export function spreadProps(node: Element, attrs: Attrs): () => void {
+     }
+ 
+     // Handle boolean attributes with toggleAttribute (for non-property booleans like disabled, hidden)
+-    if (typeof value === "boolean") {
++    // Also skip aria- attributes to preserve their string values
++    if (typeof value === "boolean" && !attrName.includes("aria-")) {
+       ;(node as HTMLElement).toggleAttribute(getAttributeName(node, attrName), value)
+       return
+     }
+ 
++    // Special handling for children attribute
++    if (attrName === "children") {
++      node.innerHTML = value
++      return
++    }
++
+     if (value != null) {
+       node.setAttribute(getAttributeName(node, attrName), value)
+       return
+@@ -104,9 +119,16 @@ export function spreadProps(node: Element, attrs: Attrs): () => void {
+   attrKeys.filter(onEvents).forEach(setup)
+   attrKeys.filter(others).forEach(apply)
+ 
+-  prevAttrsMap.set(node, attrs)
++  machineMap.set(scopeKey, attrs)
+ 
+   return function cleanup() {
+     attrKeys.filter(onEvents).forEach(teardown)
++    const currentMachineMap = prevAttrsMap.get(node)
++    if (currentMachineMap) {
++      currentMachineMap.delete(scopeKey)
++      if (currentMachineMap.size === 0) {
++        prevAttrsMap.delete(node)
++      }
++    }
+   }
+ }

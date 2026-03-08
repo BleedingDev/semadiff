@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "starters/react/app/collapsible/controlled/page.tsx",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=starters%2Freact%2Fapp%2Fcollapsible%2Fcontrolled%2Fpage.tsx&old_oid=b7c9effb74277781ec7cce4837d91f1013a95ec0&old_mode=33188&new_filename=starters%2Freact%2Fapp%2Fcollapsible%2Fcontrolled%2Fpage.tsx&new_oid=fcbf54b93d799ecf9e83fffdca03f6cf544a1982&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "starters/react/app/collapsible/controlled/page.tsx",
+      "oid": "b7c9effb74277781ec7cce4837d91f1013a95ec0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "starters/react/app/collapsible/controlled/page.tsx",
+      "oid": "fcbf54b93d799ecf9e83fffdca03f6cf544a1982",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "baded0b6e5957387fa5ae858055433c18f7eda073e6d8cc757284f7e14399c1e"
+  }
+]

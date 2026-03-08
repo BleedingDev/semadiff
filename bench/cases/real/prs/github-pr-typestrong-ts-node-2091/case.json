@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-typestrong-ts-node-2091",
+  "language": "ts",
+  "kind": "real",
+  "description": "typeStrong/ts-node#2091: fix: tsconfig not found with TS >= 5.3",
+  "source": {
+    "kind": "github-pr",
+    "repository": "typeStrong/ts-node",
+    "prNumber": 2091,
+    "prUrl": "https://github.com/TypeStrong/ts-node/pull/2091",
+    "baseSha": "c06cbe7d83b5585bb24f9963c42ce13eadd2202f",
+    "headSha": "9be593851d72e44cc8056963d00730ff3e15f748",
+    "selectedFiles": [
+      "src/ts-compiler-types.ts"
+    ],
+    "collectedAt": "2026-03-08T02:21:27.930Z"
+  },
+  "files": [
+    {
+      "id": "src/ts-compiler-types.ts",
+      "oldPath": "src/ts-compiler-types.ts",
+      "newPath": "src/ts-compiler-types.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "src/ts-compiler-types.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 93,
+          "endLine": 93
+        },
+        "newRange": {
+          "startLine": 93,
+          "endLine": 94
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

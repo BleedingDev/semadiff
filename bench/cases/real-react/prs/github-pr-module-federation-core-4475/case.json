@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-module-federation-core-4475",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4475: fix(dts-plugin): stabilize package test and typings build",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4475,
+    "prUrl": "https://github.com/module-federation/core/pull/4475",
+    "baseSha": "aacfe60f9bbddb3a4945ca5398c36cb0618295fc",
+    "headSha": "7c55349d62b822b2f39650d2c926a5b064e2d2a1",
+    "selectedFiles": [
+      "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:09:37.199Z"
+  },
+  "files": [
+    {
+      "id": "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts",
+      "oldPath": "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts",
+      "newPath": "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 175,
+          "endLine": 176
+        },
+        "newRange": {
+          "startLine": 175,
+          "endLine": 175
+        }
+      },
+      {
+        "fileId": "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 189,
+          "endLine": 190
+        },
+        "newRange": {
+          "startLine": 188,
+          "endLine": 188
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

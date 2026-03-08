@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/runtime/src/plugins/snapshot/index.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fruntime%2Fsrc%2Fplugins%2Fsnapshot%2Findex.ts&old_oid=9ebcfaa060eefc7eadd762e7b93bd7bda7d3159a&old_mode=33188&new_filename=packages%2Fruntime%2Fsrc%2Fplugins%2Fsnapshot%2Findex.ts&new_oid=43f74babf18f66743149fcf33bf262e1c81929b2&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/runtime/src/plugins/snapshot/index.ts",
+      "oid": "9ebcfaa060eefc7eadd762e7b93bd7bda7d3159a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/runtime/src/plugins/snapshot/index.ts",
+      "oid": "43f74babf18f66743149fcf33bf262e1c81929b2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "97d7d82f8b41a77bea9c6bbd5b1b244872063fecfc3795ac17ecca9f2d81f20f"
+  }
+]

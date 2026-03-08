@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "docs/data/charts/axis/FormatterDemo.tsx",
+    "diff": "/gh/mui/mui-x/diff?old_filename=docs%2Fdata%2Fcharts%2Faxis%2FFormatterDemoNoSnap.tsx&old_oid=13ecee9dcaabc5c07f593ff78c5547e1123c3a5e&old_mode=33188&new_filename=docs%2Fdata%2Fcharts%2Faxis%2FFormatterDemo.tsx&new_oid=17ea51afb2828ac43351533ebf95c378a648f0c2&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/data/charts/axis/FormatterDemoNoSnap.tsx",
+      "oid": "13ecee9dcaabc5c07f593ff78c5547e1123c3a5e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/data/charts/axis/FormatterDemo.tsx",
+      "oid": "17ea51afb2828ac43351533ebf95c378a648f0c2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0c517765f8e3c45a71f986fbf4874637e44f1b680ae470b7dd1b1e9d0a02fad7"
+  }
+]

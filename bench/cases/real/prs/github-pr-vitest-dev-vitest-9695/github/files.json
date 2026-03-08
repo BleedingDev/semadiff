@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "567f85e0025ae15957d2428f3fab722a9bc0a7cd",
+    "filename": "packages/vitest/src/node/types/benchmark.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/vitest-dev/vitest/blob/b5c28d7b24acd738be77502f944322fb85361fff/packages%2Fvitest%2Fsrc%2Fnode%2Ftypes%2Fbenchmark.ts",
+    "raw_url": "https://github.com/vitest-dev/vitest/raw/b5c28d7b24acd738be77502f944322fb85361fff/packages%2Fvitest%2Fsrc%2Fnode%2Ftypes%2Fbenchmark.ts",
+    "contents_url": "https://api.github.com/repos/vitest-dev/vitest/contents/packages%2Fvitest%2Fsrc%2Fnode%2Ftypes%2Fbenchmark.ts?ref=b5c28d7b24acd738be77502f944322fb85361fff",
+    "patch": "@@ -25,12 +25,12 @@ export interface BenchmarkUserOptions {\n   includeSource?: string[]\n \n   /**\n-   * Custom reporter for output. Can contain one or more built-in report names, reporter instances,\n-   * and/or paths to custom reporters\n+   * Custom reporters to use for output. Can contain one or more built-in reporter names, reporter instances,\n+   * and/or paths to custom reporter files to import.\n    *\n    * @default ['default']\n    */\n-  reporters?: Arrayable<BenchmarkBuiltinReporters | Reporter>\n+  reporters?: Arrayable<BenchmarkBuiltinReporters | Reporter | (string & {})>\n \n   /**\n    * @deprecated Use `benchmark.outputJson` instead"
+  }
+]

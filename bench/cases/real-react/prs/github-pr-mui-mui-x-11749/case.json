@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-mui-x-11749",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/mui-x#11749: [internal] Cleanup script and alias setup",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/mui-x",
+    "prNumber": 11749,
+    "prUrl": "https://github.com/mui/mui-x/pull/11749",
+    "baseSha": "447ab5fe897deeae6426bd0c67be68cfdf5bdd7e",
+    "headSha": "6e146cadba5f6b1886d1a65bba97ac4562cc17fb",
+    "selectedFiles": [
+      "docs/scripts/generateProptypes.ts"
+    ],
+    "collectedAt": "2026-03-08T03:48:34.641Z"
+  },
+  "files": [
+    {
+      "id": "docs/scripts/generateProptypes.ts",
+      "oldPath": "docs/scripts/generateProptypes.ts",
+      "newPath": "docs/scripts/generateProptypes.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/scripts/generateProptypes.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 9,
+          "endLine": 9
+        },
+        "newRange": {
+          "startLine": 9,
+          "endLine": 9
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

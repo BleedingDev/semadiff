@@ -1,0 +1,1189 @@
+diff --git a/apps/compositions/src/examples/radio-basic.tsx b/apps/compositions/src/examples/radio-basic.tsx
+index 94b25810213..d9a4c1af894 100644
+--- a/apps/compositions/src/examples/radio-basic.tsx
++++ b/apps/compositions/src/examples/radio-basic.tsx
+@@ -1,14 +1,23 @@
+-import { HStack } from "@chakra-ui/react"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
++import { HStack, RadioGroup } from "@chakra-ui/react"
+ 
+ export const RadioBasic = () => {
+   return (
+-    <RadioGroup defaultValue="1">
++    <RadioGroup.Root defaultValue="1">
+       <HStack gap="6">
+-        <Radio value="1">Option 1</Radio>
+-        <Radio value="2">Option 2</Radio>
+-        <Radio value="3">Option 3</Radio>
++        {items.map((item) => (
++          <RadioGroup.Item key={item.value} value={item.value}>
++            <RadioGroup.ItemHiddenInput />
++            <RadioGroup.ItemIndicator />
++            <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
++          </RadioGroup.Item>
++        ))}
+       </HStack>
+-    </RadioGroup>
++    </RadioGroup.Root>
+   )
+ }
++
++const items = [
++  { label: "Option 1", value: "1" },
++  { label: "Option 2", value: "2" },
++  { label: "Option 3", value: "3" },
++]
+diff --git a/apps/compositions/src/examples/radio-card-basic.tsx b/apps/compositions/src/examples/radio-card-basic.tsx
+index bb68f544455..2319324d9dc 100644
+--- a/apps/compositions/src/examples/radio-card-basic.tsx
++++ b/apps/compositions/src/examples/radio-card-basic.tsx
+@@ -1,30 +1,26 @@
+-import { HStack } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { HStack, RadioCard } from "@chakra-ui/react"
+ 
+ export const RadioCardBasic = () => {
+   return (
+-    <RadioCardRoot defaultValue="next">
+-      <RadioCardLabel>Select framework</RadioCardLabel>
++    <RadioCard.Root defaultValue="next">
++      <RadioCard.Label>Select framework</RadioCard.Label>
+       <HStack align="stretch">
+         {items.map((item) => (
+-          <RadioCardItem
+-            label={item.title}
+-            description={item.description}
+-            key={item.value}
+-            value={item.value}
+-          />
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
++              <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++              <RadioCard.ItemIndicator />
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
+         ))}
+       </HStack>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+ const items = [
+-  { value: "next", title: "Next.js", description: "Best for apps" },
+-  { value: "vite", title: "Vite", description: "Best for SPAs" },
+-  { value: "astro", title: "Astro", description: "Best for static sites" },
++  { value: "next", title: "Next.js" },
++  { value: "vite", title: "Vite" },
++  { value: "astro", title: "Astro" },
+ ]
+diff --git a/apps/compositions/src/examples/radio-card-centered.tsx b/apps/compositions/src/examples/radio-card-centered.tsx
+index 654436a7cc3..662246de5bb 100644
+--- a/apps/compositions/src/examples/radio-card-centered.tsx
++++ b/apps/compositions/src/examples/radio-card-centered.tsx
+@@ -1,30 +1,25 @@
+-import { HStack, Icon } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { HStack, Icon, RadioCard } from "@chakra-ui/react"
+ import { LuClock, LuDollarSign, LuTrendingUp } from "react-icons/lu"
+ 
+ export const RadioCardCentered = () => {
+   return (
+-    <RadioCardRoot orientation="vertical" align="center" defaultValue="next">
+-      <RadioCardLabel>Select contract type</RadioCardLabel>
++    <RadioCard.Root orientation="vertical" align="center" defaultValue="next">
++      <RadioCard.Label>Select contract type</RadioCard.Label>
+       <HStack align="stretch">
+         {items.map((item) => (
+-          <RadioCardItem
+-            icon={
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
+               <Icon fontSize="2xl" color="fg.muted" mb="2">
+                 {item.icon}
+               </Icon>
+-            }
+-            label={item.title}
+-            key={item.value}
+-            value={item.value}
+-          />
++              <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++              <RadioCard.ItemIndicator />
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
+         ))}
+       </HStack>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+diff --git a/apps/compositions/src/examples/radio-card-closed-component.tsx b/apps/compositions/src/examples/radio-card-closed-component.tsx
+new file mode 100644
+index 00000000000..d2fef428f16
+--- /dev/null
++++ b/apps/compositions/src/examples/radio-card-closed-component.tsx
+@@ -0,0 +1,58 @@
++import { RadioCard } from "@chakra-ui/react"
++import * as React from "react"
++
++interface RadioCardItemProps extends RadioCard.ItemProps {
++  icon?: React.ReactElement
++  label?: React.ReactNode
++  description?: React.ReactNode
++  addon?: React.ReactNode
++  indicator?: React.ReactNode | null
++  indicatorPlacement?: "start" | "end" | "inside"
++  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
++}
++
++export const RadioCardItem = React.forwardRef<
++  HTMLInputElement,
++  RadioCardItemProps
++>(function RadioCardItem(props, ref) {
++  const {
++    inputProps,
++    label,
++    description,
++    addon,
++    icon,
++    indicator = <RadioCard.ItemIndicator />,
++    indicatorPlacement = "end",
++    ...rest
++  } = props
++
++  const hasContent = label || description || icon
++  const ContentWrapper = indicator ? RadioCard.ItemContent : React.Fragment
++
++  return (
++    <RadioCard.Item {...rest}>
++      <RadioCard.ItemHiddenInput ref={ref} {...inputProps} />
++      <RadioCard.ItemControl>
++        {indicatorPlacement === "start" && indicator}
++        {hasContent && (
++          <ContentWrapper>
++            {icon}
++            {label && <RadioCard.ItemText>{label}</RadioCard.ItemText>}
++            {description && (
++              <RadioCard.ItemDescription>
++                {description}
++              </RadioCard.ItemDescription>
++            )}
++            {indicatorPlacement === "inside" && indicator}
++          </ContentWrapper>
++        )}
++        {indicatorPlacement === "end" && indicator}
++      </RadioCard.ItemControl>
++      {addon && <RadioCard.ItemAddon>{addon}</RadioCard.ItemAddon>}
++    </RadioCard.Item>
++  )
++})
++
++export const RadioCardRoot = RadioCard.Root
++export const RadioCardLabel = RadioCard.Label
++export const RadioCardItemIndicator = RadioCard.ItemIndicator
+diff --git a/apps/compositions/src/examples/radio-card-composition.tsx b/apps/compositions/src/examples/radio-card-composition.tsx
+index 7d2b64e0ee6..f3fd6885893 100644
+--- a/apps/compositions/src/examples/radio-card-composition.tsx
++++ b/apps/compositions/src/examples/radio-card-composition.tsx
+@@ -1,27 +1,26 @@
+-import { Group } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { Group, RadioCard } from "@chakra-ui/react"
+ 
+ export const RadioCardComposition = () => {
+   return (
+-    <RadioCardRoot defaultValue="next" gap="4" maxW="sm">
+-      <RadioCardLabel>How well do you know React?</RadioCardLabel>
++    <RadioCard.Root defaultValue="next" gap="4" maxW="sm">
++      <RadioCard.Label>How well do you know React?</RadioCard.Label>
+       <Group attached orientation="vertical">
+         {items.map((item) => (
+-          <RadioCardItem
+-            width="full"
+-            indicatorPlacement="start"
+-            label={item.title}
+-            description={item.description}
+-            key={item.value}
+-            value={item.value}
+-          />
++          <RadioCard.Item key={item.value} value={item.value} width="full">
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
++              <RadioCard.ItemIndicator />
++              <RadioCard.ItemContent>
++                <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                <RadioCard.ItemDescription>
++                  {item.description}
++                </RadioCard.ItemDescription>
++              </RadioCard.ItemContent>
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
+         ))}
+       </Group>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+diff --git a/apps/compositions/src/examples/radio-card-with-addon.tsx b/apps/compositions/src/examples/radio-card-with-addon.tsx
+index 538bdbf0b2e..87163b5354b 100644
+--- a/apps/compositions/src/examples/radio-card-with-addon.tsx
++++ b/apps/compositions/src/examples/radio-card-with-addon.tsx
+@@ -1,26 +1,27 @@
+-import { HStack } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { HStack, RadioCard } from "@chakra-ui/react"
+ 
+ export const RadioCardWithAddon = () => {
+   return (
+-    <RadioCardRoot defaultValue="next">
+-      <RadioCardLabel>Select framework</RadioCardLabel>
++    <RadioCard.Root defaultValue="next">
++      <RadioCard.Label>Select framework</RadioCard.Label>
+       <HStack align="stretch">
+         {items.map((item) => (
+-          <RadioCardItem
+-            label={item.title}
+-            description={item.description}
+-            key={item.value}
+-            value={item.value}
+-            addon="Some addon text"
+-          />
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
++              <RadioCard.ItemContent>
++                <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                <RadioCard.ItemDescription>
++                  {item.description}
++                </RadioCard.ItemDescription>
++              </RadioCard.ItemContent>
++              <RadioCard.ItemIndicator />
++            </RadioCard.ItemControl>
++            <RadioCard.ItemAddon>Some addon text</RadioCard.ItemAddon>
++          </RadioCard.Item>
+         ))}
+       </HStack>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+diff --git a/apps/compositions/src/examples/radio-card-with-colors.tsx b/apps/compositions/src/examples/radio-card-with-colors.tsx
+index 26f4961cff5..7e6ef7e5765 100644
+--- a/apps/compositions/src/examples/radio-card-with-colors.tsx
++++ b/apps/compositions/src/examples/radio-card-with-colors.tsx
+@@ -1,32 +1,29 @@
+-import { For, HStack, Stack } from "@chakra-ui/react"
++import { For, HStack, RadioCard, Stack } from "@chakra-ui/react"
+ import { colorPalettes } from "compositions/lib/color-palettes"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
+ 
+ export const RadioCardWithColors = () => {
+   return (
+     <Stack gap="8">
+       <For each={colorPalettes}>
+         {(colorPalette) => (
+-          <RadioCardRoot
++          <RadioCard.Root
+             key={colorPalette}
+             colorPalette={colorPalette}
+             defaultValue="next"
+           >
+-            <RadioCardLabel>Select Framework</RadioCardLabel>
++            <RadioCard.Label>Select Framework</RadioCard.Label>
+             <HStack align="stretch">
+               {items.map((item) => (
+-                <RadioCardItem
+-                  label={item.title}
+-                  key={item.value}
+-                  value={item.value}
+-                />
++                <RadioCard.Item key={item.value} value={item.value}>
++                  <RadioCard.ItemHiddenInput />
++                  <RadioCard.ItemControl>
++                    <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                    <RadioCard.ItemIndicator />
++                  </RadioCard.ItemControl>
++                </RadioCard.Item>
+               ))}
+             </HStack>
+-          </RadioCardRoot>
++          </RadioCard.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/compositions/src/examples/radio-card-with-description.tsx b/apps/compositions/src/examples/radio-card-with-description.tsx
+new file mode 100644
+index 00000000000..c4471884445
+--- /dev/null
++++ b/apps/compositions/src/examples/radio-card-with-description.tsx
+@@ -0,0 +1,31 @@
++import { HStack, RadioCard } from "@chakra-ui/react"
++
++export const RadioCardWithDescription = () => {
++  return (
++    <RadioCard.Root defaultValue="next">
++      <RadioCard.Label>Select framework</RadioCard.Label>
++      <HStack align="stretch">
++        {items.map((item) => (
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
++              <RadioCard.ItemContent>
++                <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                <RadioCard.ItemDescription>
++                  {item.description}
++                </RadioCard.ItemDescription>
++              </RadioCard.ItemContent>
++              <RadioCard.ItemIndicator />
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
++        ))}
++      </HStack>
++    </RadioCard.Root>
++  )
++}
++
++const items = [
++  { value: "next", title: "Next.js", description: "Best for apps" },
++  { value: "vite", title: "Vite", description: "Best for SPAs" },
++  { value: "astro", title: "Astro", description: "Best for static sites" },
++]
+diff --git a/apps/compositions/src/examples/radio-card-with-icon.tsx b/apps/compositions/src/examples/radio-card-with-icon.tsx
+index f2d326e9f2d..7d7bf6c11d2 100644
+--- a/apps/compositions/src/examples/radio-card-with-icon.tsx
++++ b/apps/compositions/src/examples/radio-card-with-icon.tsx
+@@ -1,31 +1,30 @@
+-import { HStack, Icon } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { HStack, Icon, RadioCard } from "@chakra-ui/react"
+ import { LuArrowRight, LuCircleOff, LuLock } from "react-icons/lu"
+ 
+ export const RadioCardWithIcon = () => {
+   return (
+-    <RadioCardRoot defaultValue="next">
+-      <RadioCardLabel>Select permission</RadioCardLabel>
++    <RadioCard.Root defaultValue="next">
++      <RadioCard.Label>Select permission</RadioCard.Label>
+       <HStack align="stretch">
+         {items.map((item) => (
+-          <RadioCardItem
+-            icon={
+-              <Icon fontSize="2xl" color="fg.muted" mb="2">
+-                {item.icon}
+-              </Icon>
+-            }
+-            label={item.title}
+-            description={item.description}
+-            key={item.value}
+-            value={item.value}
+-          />
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
++              <RadioCard.ItemContent>
++                <Icon fontSize="2xl" color="fg.muted" mb="2">
++                  {item.icon}
++                </Icon>
++                <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                <RadioCard.ItemDescription>
++                  {item.description}
++                </RadioCard.ItemDescription>
++              </RadioCard.ItemContent>
++              <RadioCard.ItemIndicator />
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
+         ))}
+       </HStack>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+diff --git a/apps/compositions/src/examples/radio-card-with-sizes.tsx b/apps/compositions/src/examples/radio-card-with-sizes.tsx
+index 89eb5796a7c..fd80f0e36f9 100644
+--- a/apps/compositions/src/examples/radio-card-with-sizes.tsx
++++ b/apps/compositions/src/examples/radio-card-with-sizes.tsx
+@@ -1,27 +1,24 @@
+-import { For, HStack, Stack } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { For, HStack, RadioCard, Stack } from "@chakra-ui/react"
+ 
+ export const RadioCardWithSizes = () => {
+   return (
+     <Stack gap="8">
+       <For each={["sm", "md", "lg"]}>
+         {(size) => (
+-          <RadioCardRoot key={size} size={size} defaultValue="next">
+-            <RadioCardLabel>size = ({size})</RadioCardLabel>
++          <RadioCard.Root key={size} size={size} defaultValue="next">
++            <RadioCard.Label>size = ({size})</RadioCard.Label>
+             <HStack align="stretch">
+               {items.map((item) => (
+-                <RadioCardItem
+-                  label={item.title}
+-                  key={item.value}
+-                  value={item.value}
+-                />
++                <RadioCard.Item key={item.value} value={item.value}>
++                  <RadioCard.ItemHiddenInput />
++                  <RadioCard.ItemControl>
++                    <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                    <RadioCard.ItemIndicator />
++                  </RadioCard.ItemControl>
++                </RadioCard.Item>
+               ))}
+             </HStack>
+-          </RadioCardRoot>
++          </RadioCard.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/compositions/src/examples/radio-card-with-variants.tsx b/apps/compositions/src/examples/radio-card-with-variants.tsx
+index c3494b3524e..0724f1656e6 100644
+--- a/apps/compositions/src/examples/radio-card-with-variants.tsx
++++ b/apps/compositions/src/examples/radio-card-with-variants.tsx
+@@ -1,32 +1,29 @@
+-import { For, HStack, Stack } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { For, HStack, RadioCard, Stack } from "@chakra-ui/react"
+ 
+ export const RadioCardWithVariants = () => {
+   return (
+     <Stack gap="8">
+       <For each={["surface", "subtle", "outline", "solid"]}>
+         {(variant) => (
+-          <RadioCardRoot
++          <RadioCard.Root
+             colorPalette="teal"
+             key={variant}
+             variant={variant}
+             defaultValue="next"
+           >
+-            <RadioCardLabel>variant = ({variant})</RadioCardLabel>
++            <RadioCard.Label>variant = ({variant})</RadioCard.Label>
+             <HStack align="stretch">
+               {items.map((item) => (
+-                <RadioCardItem
+-                  key={item.value}
+-                  value={item.value}
+-                  label={item.title}
+-                />
++                <RadioCard.Item key={item.value} value={item.value}>
++                  <RadioCard.ItemHiddenInput />
++                  <RadioCard.ItemControl>
++                    <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++                    <RadioCard.ItemIndicator />
++                  </RadioCard.ItemControl>
++                </RadioCard.Item>
+               ))}
+             </HStack>
+-          </RadioCardRoot>
++          </RadioCard.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/compositions/src/examples/radio-card-without-indicator-vertical.tsx b/apps/compositions/src/examples/radio-card-without-indicator-vertical.tsx
+index 4a1b51efeb4..e4e0f8d9d41 100644
+--- a/apps/compositions/src/examples/radio-card-without-indicator-vertical.tsx
++++ b/apps/compositions/src/examples/radio-card-without-indicator-vertical.tsx
+@@ -1,36 +1,29 @@
+-import { HStack, Icon } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { HStack, Icon, RadioCard } from "@chakra-ui/react"
+ import { RiAppleFill, RiBankCardFill, RiPaypalFill } from "react-icons/ri"
+ 
+ export const RadioCardWithoutIndicatorVertical = () => {
+   return (
+-    <RadioCardRoot
++    <RadioCard.Root
+       orientation="vertical"
+       align="center"
+       maxW="400px"
+       defaultValue="paypal"
+     >
+-      <RadioCardLabel>Payment method</RadioCardLabel>
++      <RadioCard.Label>Payment method</RadioCard.Label>
+       <HStack>
+         {items.map((item) => (
+-          <RadioCardItem
+-            label={item.title}
+-            icon={
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
+               <Icon fontSize="2xl" color="fg.muted">
+                 {item.icon}
+               </Icon>
+-            }
+-            indicator={false}
+-            key={item.value}
+-            value={item.value}
+-          />
++              <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
+         ))}
+       </HStack>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+diff --git a/apps/compositions/src/examples/radio-card-without-indicator.tsx b/apps/compositions/src/examples/radio-card-without-indicator.tsx
+index c47c1b5812b..3a4be99e2a9 100644
+--- a/apps/compositions/src/examples/radio-card-without-indicator.tsx
++++ b/apps/compositions/src/examples/radio-card-without-indicator.tsx
+@@ -1,37 +1,30 @@
+-import { HStack, Icon } from "@chakra-ui/react"
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "compositions/ui/radio-card"
++import { HStack, Icon, RadioCard } from "@chakra-ui/react"
+ import { RiAppleFill, RiBankCardFill, RiPaypalFill } from "react-icons/ri"
+ 
+ export const RadioCardWithoutIndicator = () => {
+   return (
+-    <RadioCardRoot
++    <RadioCard.Root
+       orientation="horizontal"
+       align="center"
+       justify="center"
+       maxW="lg"
+       defaultValue="paypal"
+     >
+-      <RadioCardLabel>Payment method</RadioCardLabel>
++      <RadioCard.Label>Payment method</RadioCard.Label>
+       <HStack align="stretch">
+         {items.map((item) => (
+-          <RadioCardItem
+-            label={item.title}
+-            icon={
++          <RadioCard.Item key={item.value} value={item.value}>
++            <RadioCard.ItemHiddenInput />
++            <RadioCard.ItemControl>
+               <Icon fontSize="2xl" color="fg.subtle">
+                 {item.icon}
+               </Icon>
+-            }
+-            indicator={false}
+-            key={item.value}
+-            value={item.value}
+-          />
++              <RadioCard.ItemText>{item.title}</RadioCard.ItemText>
++            </RadioCard.ItemControl>
++          </RadioCard.Item>
+         ))}
+       </HStack>
+-    </RadioCardRoot>
++    </RadioCard.Root>
+   )
+ }
+ 
+diff --git a/apps/compositions/src/examples/radio-closed-component.tsx b/apps/compositions/src/examples/radio-closed-component.tsx
+new file mode 100644
+index 00000000000..b3919d08c83
+--- /dev/null
++++ b/apps/compositions/src/examples/radio-closed-component.tsx
+@@ -0,0 +1,24 @@
++import { RadioGroup as ChakraRadioGroup } from "@chakra-ui/react"
++import * as React from "react"
++
++export interface RadioProps extends ChakraRadioGroup.ItemProps {
++  rootRef?: React.Ref<HTMLDivElement>
++  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
++}
++
++export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
++  function Radio(props, ref) {
++    const { children, inputProps, rootRef, ...rest } = props
++    return (
++      <ChakraRadioGroup.Item ref={rootRef} {...rest}>
++        <ChakraRadioGroup.ItemHiddenInput ref={ref} {...inputProps} />
++        <ChakraRadioGroup.ItemIndicator />
++        {children && (
++          <ChakraRadioGroup.ItemText>{children}</ChakraRadioGroup.ItemText>
++        )}
++      </ChakraRadioGroup.Item>
++    )
++  },
++)
++
++export const RadioGroup = ChakraRadioGroup.Root
+diff --git a/apps/compositions/src/examples/radio-controlled.tsx b/apps/compositions/src/examples/radio-controlled.tsx
+index 75fc5afa398..d05349fe70c 100644
+--- a/apps/compositions/src/examples/radio-controlled.tsx
++++ b/apps/compositions/src/examples/radio-controlled.tsx
+@@ -1,18 +1,27 @@
+ "use client"
+ 
+-import { HStack } from "@chakra-ui/react"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
++import { HStack, RadioGroup } from "@chakra-ui/react"
+ import { useState } from "react"
+ 
+ export const RadioControlled = () => {
+   const [value, setValue] = useState("1")
+   return (
+-    <RadioGroup value={value} onValueChange={(e) => setValue(e.value)}>
++    <RadioGroup.Root value={value} onValueChange={(e) => setValue(e.value)}>
+       <HStack gap="6">
+-        <Radio value="1">Option 1</Radio>
+-        <Radio value="2">Option 2</Radio>
+-        <Radio value="3">Option 3</Radio>
++        {items.map((item) => (
++          <RadioGroup.Item key={item.value} value={item.value}>
++            <RadioGroup.ItemHiddenInput />
++            <RadioGroup.ItemIndicator />
++            <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
++          </RadioGroup.Item>
++        ))}
+       </HStack>
+-    </RadioGroup>
++    </RadioGroup.Root>
+   )
+ }
++
++const items = [
++  { label: "Option 1", value: "1" },
++  { label: "Option 2", value: "2" },
++  { label: "Option 3", value: "3" },
++]
+diff --git a/apps/compositions/src/examples/radio-disabled.tsx b/apps/compositions/src/examples/radio-disabled.tsx
+index d085418a41e..c83efe46df2 100644
+--- a/apps/compositions/src/examples/radio-disabled.tsx
++++ b/apps/compositions/src/examples/radio-disabled.tsx
+@@ -1,16 +1,27 @@
+-import { HStack } from "@chakra-ui/react"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
++import { HStack, RadioGroup } from "@chakra-ui/react"
+ 
+ export const RadioDisabled = () => {
+   return (
+-    <RadioGroup defaultValue="2">
++    <RadioGroup.Root defaultValue="2">
+       <HStack gap="6">
+-        <Radio value="1" disabled>
+-          Option 1
+-        </Radio>
+-        <Radio value="2">Option 2</Radio>
+-        <Radio value="3">Option 3</Radio>
++        {items.map((item) => (
++          <RadioGroup.Item
++            key={item.value}
++            value={item.value}
++            disabled={item.disabled}
++          >
++            <RadioGroup.ItemHiddenInput />
++            <RadioGroup.ItemIndicator />
++            <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
++          </RadioGroup.Item>
++        ))}
+       </HStack>
+-    </RadioGroup>
++    </RadioGroup.Root>
+   )
+ }
++
++const items = [
++  { label: "Option 1", value: "1" },
++  { label: "Option 2", value: "2", disabled: true },
++  { label: "Option 3", value: "3" },
++]
+diff --git a/apps/compositions/src/examples/radio-with-colors.tsx b/apps/compositions/src/examples/radio-with-colors.tsx
+index 058faa2a5d2..7d03cd9434f 100644
+--- a/apps/compositions/src/examples/radio-with-colors.tsx
++++ b/apps/compositions/src/examples/radio-with-colors.tsx
+@@ -1,6 +1,5 @@
+-import { HStack, Stack, Text } from "@chakra-ui/react"
++import { HStack, RadioGroup, Stack, Text } from "@chakra-ui/react"
+ import { colorPalettes } from "compositions/lib/color-palettes"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
+ 
+ export const RadioWithColors = () => {
+   return (
+@@ -8,17 +7,28 @@ export const RadioWithColors = () => {
+       {colorPalettes.map((colorPalette) => (
+         <HStack key={colorPalette} gap="10" px="4">
+           <Text minW="8ch">{colorPalette}</Text>
+-          <RadioGroup
++
++          <RadioGroup.Root
+             colorPalette={colorPalette}
+             defaultValue="react"
+             spaceX="8"
+           >
+-            <Radio value="react">React</Radio>
+-            <Radio value="vue">Vue</Radio>
+-            <Radio value="solid">Solid</Radio>
+-          </RadioGroup>
++            {items.map((item) => (
++              <RadioGroup.Item key={item.value} value={item.value}>
++                <RadioGroup.ItemHiddenInput />
++                <RadioGroup.ItemIndicator />
++                <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
++              </RadioGroup.Item>
++            ))}
++          </RadioGroup.Root>
+         </HStack>
+       ))}
+     </Stack>
+   )
+ }
++
++const items = [
++  { label: "React", value: "react" },
++  { label: "Vue", value: "vue" },
++  { label: "Solid", value: "solid" },
++]
+diff --git a/apps/compositions/src/examples/radio-with-hook-form.tsx b/apps/compositions/src/examples/radio-with-hook-form.tsx
+index b75193cc660..ec204051d01 100644
+--- a/apps/compositions/src/examples/radio-with-hook-form.tsx
++++ b/apps/compositions/src/examples/radio-with-hook-form.tsx
+@@ -1,8 +1,7 @@
+ "use client"
+ 
+-import { Button, Fieldset, HStack } from "@chakra-ui/react"
++import { Button, Fieldset, HStack, RadioGroup } from "@chakra-ui/react"
+ import { zodResolver } from "@hookform/resolvers/zod"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
+ import { Controller, useForm } from "react-hook-form"
+ import { z } from "zod"
+ 
+@@ -37,7 +36,7 @@ export const RadioWithHookForm = () => {
+           name="value"
+           control={control}
+           render={({ field }) => (
+-            <RadioGroup
++            <RadioGroup.Root
+               name={field.name}
+               value={field.value}
+               onValueChange={({ value }) => {
+@@ -46,16 +45,14 @@ export const RadioWithHookForm = () => {
+             >
+               <HStack gap="6">
+                 {items.map((item) => (
+-                  <Radio
+-                    key={item.value}
+-                    value={item.value}
+-                    inputProps={{ onBlur: field.onBlur }}
+-                  >
+-                    {item.label}
+-                  </Radio>
++                  <RadioGroup.Item key={item.value} value={item.value}>
++                    <RadioGroup.ItemHiddenInput onBlur={field.onBlur} />
++                    <RadioGroup.ItemIndicator />
++                    <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
++                  </RadioGroup.Item>
+                 ))}
+               </HStack>
+-            </RadioGroup>
++            </RadioGroup.Root>
+           )}
+         />
+ 
+diff --git a/apps/compositions/src/examples/radio-with-sizes.tsx b/apps/compositions/src/examples/radio-with-sizes.tsx
+index 242d8e4b441..f8dab0c103f 100644
+--- a/apps/compositions/src/examples/radio-with-sizes.tsx
++++ b/apps/compositions/src/examples/radio-with-sizes.tsx
+@@ -1,18 +1,19 @@
+-import { HStack } from "@chakra-ui/react"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
++import { For, HStack, RadioGroup } from "@chakra-ui/react"
+ 
+ export const RadioWithSizes = () => {
+   return (
+     <HStack gap="4">
+-      <RadioGroup size="sm">
+-        <Radio value="react">Radio (sm)</Radio>
+-      </RadioGroup>
+-      <RadioGroup size="md">
+-        <Radio value="react">Radio (md)</Radio>
+-      </RadioGroup>
+-      <RadioGroup size="lg">
+-        <Radio value="react">Radio (lg)</Radio>
+-      </RadioGroup>
++      <For each={["sm", "md", "lg"]}>
++        {(size) => (
++          <RadioGroup.Root size={size} key={size}>
++            <RadioGroup.Item value="react">
++              <RadioGroup.ItemHiddenInput />
++              <RadioGroup.ItemIndicator />
++              <RadioGroup.ItemText>Radio ({size})</RadioGroup.ItemText>
++            </RadioGroup.Item>
++          </RadioGroup.Root>
++        )}
++      </For>
+     </HStack>
+   )
+ }
+diff --git a/apps/compositions/src/examples/radio-with-variants.tsx b/apps/compositions/src/examples/radio-with-variants.tsx
+index ca66450926a..33aa8b7b863 100644
+--- a/apps/compositions/src/examples/radio-with-variants.tsx
++++ b/apps/compositions/src/examples/radio-with-variants.tsx
+@@ -1,24 +1,30 @@
+-import { For, HStack, Stack } from "@chakra-ui/react"
+-import { Radio, RadioGroup } from "compositions/ui/radio"
++import { For, HStack, RadioGroup, Stack } from "@chakra-ui/react"
+ 
+ export const RadioWithVariants = () => {
+   return (
+     <Stack gap="4">
+       <For each={["solid", "outline", "subtle"]}>
+         {(variant) => (
+-          <RadioGroup
++          <RadioGroup.Root
+             key={variant}
+             variant={variant}
+             defaultValue="react"
+             colorPalette="teal"
+           >
+             <HStack gap="4">
+-              <Radio value="react" minW="120px">
+-                Radio ({variant})
+-              </Radio>
+-              <Radio value="vue">Vue ({variant})</Radio>
++              <RadioGroup.Item value="react" minW="120px">
++                <RadioGroup.ItemHiddenInput />
++                <RadioGroup.ItemIndicator />
++                <RadioGroup.ItemText>React ({variant})</RadioGroup.ItemText>
++              </RadioGroup.Item>
++
++              <RadioGroup.Item value="vue">
++                <RadioGroup.ItemHiddenInput />
++                <RadioGroup.ItemIndicator />
++                <RadioGroup.ItemText>Vue ({variant})</RadioGroup.ItemText>
++              </RadioGroup.Item>
+             </HStack>
+-          </RadioGroup>
++          </RadioGroup.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/www/content/docs/components/radio-card.mdx b/apps/www/content/docs/components/radio-card.mdx
+index 0bd3300c948..abe5bddb41c 100644
+--- a/apps/www/content/docs/components/radio-card.mdx
++++ b/apps/www/content/docs/components/radio-card.mdx
+@@ -10,76 +10,87 @@ links:
+ 
+ <ExampleTabs name="radio-card-basic" />
+ 
+-## Setup
++## Usage
+ 
+-If you don't already have the snippet, run the following command to add the
+-`radio-card` snippet
++```tsx
++import { RadioCard } from "@chakra-ui/react"
++```
+ 
+-```sh
+-npx @chakra-ui/cli snippet add radio-card
++```tsx
++<RadioCard.Root>
++  <RadioCard.Label />
++  <RadioCard.Item>
++    <RadioCard.ItemHiddenInput />
++    <RadioCard.ItemControl>
++      <RadioCard.ItemContent>
++        <RadioCard.ItemText />
++        <RadioCard.ItemDescription />
++      </RadioCard.ItemContent>
++      <RadioCard.ItemIndicator />
++    </RadioCard.ItemControl>
++  </RadioCard.Item>
++</RadioCard.Root>
+ ```
+ 
+-The snippet includes a closed component composition for the `RadioCard`
+-component.
++:::info
+ 
+-## Usage
++If you prefer a closed component composition, check out the
++[snippet below](#closed-component).
+ 
+-A RadioCard is a form element with a larger interaction surface represented as a
+-card.
++:::
+ 
+-```jsx
+-import {
+-  RadioCardItem,
+-  RadioCardLabel,
+-  RadioCardRoot,
+-} from "@/components/ui/radio-card"
+-```
++## Examples
+ 
+-```jsx
+-<RadioCardRoot>
+-  <RadioCardLabel />
+-  <RadioCardItem />
+-</RadioCardRoot>
+-```
++### Description
+ 
+-## Examples
++Here's an example of how to add some further description to the radio card.
++
++<ExampleTabs name="radio-card-with-description" />
+ 
+ ### Sizes
+ 
+-Use the `size` prop to change the size of the radio card.
++Pass the `size` prop to the `RadioCard.Root` component to change the size of the
++radio card.
+ 
+ <ExampleTabs name="radio-card-with-sizes" />
+ 
+ ### Colors
+ 
+-Use the `colorPalette` prop to change the color of the radio card.
++Pass the `colorPalette` prop to the `RadioCard.Root` component to change the
++color of the radio card.
+ 
+ <ExampleTabs name="radio-card-with-colors" />
+ 
++### Variants
++
++Pass the `variant` prop to the `RadioCard.Root` component to change the visual
++style of the radio card.
++
++<ExampleTabs name="radio-card-with-variants" />
++
+ ### Icon
+ 
+-Here's an example of using a label, description and icon within the
+-`RadioCardItem`.
++Render a custom icon inside the radio card by placing it within
++`RadioCard.ItemContent`.
+ 
+ <ExampleTabs name="radio-card-with-icon" />
+ 
+ ### No Indicator
+ 
+-Here's an example of setting the `indicator` prop to `null` to hide the
+-indicator.
++Here's an example of how to use the radio card without an indicator.
+ 
+ <ExampleTabs name="radio-card-without-indicator" />
+ 
+ ### No Indicator (Vertical)
+ 
+-Here's an example of a RadioCard with no indicator and content aligned
++Here's an example of a radio card with no indicator and content aligned
+ vertically.
+ 
+ <ExampleTabs name="radio-card-without-indicator-vertical" />
+ 
+ ### Centered
+ 
+-Here's an example of a RadioCard with centered text.
++Here's an example of a radio card with centered text.
+ 
+ <ExampleTabs name="radio-card-centered" />
+ 
+@@ -91,11 +102,32 @@ Here's an example of composing the RadioCard with the `Group` component.
+ 
+ ### Addon
+ 
+-Pass the `addon` prop to the `RadioCardItem` component to add metadata below the
+-item content.
++Use the `RadioCard.ItemAddon` component to add metadata to the radio card.
+ 
+ <ExampleTabs name="radio-card-with-addon" />
+ 
++### Closed Component
++
++Here's how to setup the Radio card for a closed component composition.
++
++<ExampleCode name="radio-card-closed-component" />
++
++If you want to automatically add the closed component to your project, run the
++command:
++
++```bash
++npx @chakra-ui/cli snippet add radio-card
++```
++
++#### Usage
++
++```tsx
++<RadioCardRoot>
++  <RadioCardLabel />
++  <RadioCardItem />
++</RadioCardRoot>
++```
++
+ ## Props
+ 
+ ### Root
+diff --git a/apps/www/content/docs/components/radio.mdx b/apps/www/content/docs/components/radio.mdx
+index 8981d76580d..89534f308e8 100644
+--- a/apps/www/content/docs/components/radio.mdx
++++ b/apps/www/content/docs/components/radio.mdx
+@@ -9,58 +9,63 @@ links:
+ 
+ <ExampleTabs name="radio-basic" />
+ 
+-## Setup
+-
+-If you don't already have the snippet, run the following command to add the
+-`radio` snippet
++## Usage
+ 
+-```sh
+-npx @chakra-ui/cli snippet add radio
++```tsx
++import { Radio, RadioGroup } from "@chakra-ui/react"
+ ```
+ 
+-The snippet includes a closed component composition for the `RadioGroup`
++```tsx
++<RadioGroup.Root>
++  <RadioGroup.Item>
++    <RadioGroup.ItemHiddenInput />
++    <RadioGroup.ItemIndicator />
++    <RadioGroup.ItemText />
++  </RadioGroup.Item>
++</RadioGroup.Root>
++```
+ 
+-## Usage
++:::info
+ 
+-```jsx
+-import { Radio, RadioGroup } from "@/components/ui/radio"
+-```
++If you prefer a closed component composition, check out the
++[snippet below](#closed-component).
+ 
+-```jsx
+-<RadioGroup>
+-  <Radio />
+-</RadioGroup>
+-```
++:::
+ 
+ ## Examples
+ 
+ ### Controlled
+ 
+-Use the `value` and `onValueChange` prop to control the selected radio button
++Pass the `value` and `onValueChange` prop to the `RadioGroup.Root` component to
++control the selected radio button.
+ 
+ <ExampleTabs name="radio-controlled" />
+ 
+ ### Colors
+ 
+-Use the `colorPalette` prop to change the color scheme of the component.
++Pass the `colorPalette` prop to the `RadioGroup.Root` component to change the
++color scheme of the component.
+ 
+ <ExampleTabs name="radio-with-colors" />
+ 
+ ### Sizes
+ 
+-Use the `size` prop to change the size of the radio component.
++Pass the `size` prop to the `RadioGroup.Root` component to change the size of
++the radio component.
+ 
+ <ExampleTabs name="radio-with-sizes" />
+ 
+ ### Variants
+ 
+-Use the `variant` prop to change the appearance of the radio component.
++Pass the `variant` prop to the `RadioGroup.Root` component to change the
++appearance of the radio component.
+ 
+ <ExampleTabs name="radio-with-variants" />
+ 
+ ### Disabled
+ 
+-Use the `disabled` prop to make the radio disabled.
++Pass the `disabled` prop to the `RadioGroup.Item` component to make the radio
++disabled.
+ 
+ <ExampleTabs name="radio-disabled" />
+ 
+@@ -71,6 +76,27 @@ withing a form
+ 
+ <ExampleTabs name="radio-with-hook-form" />
+ 
++### Closed Component
++
++Here's how to setup the Radio for a closed component composition.
++
++<ExampleCode name="radio-closed-component" />
++
++If you want to automatically add the closed component to your project, run the
++command:
++
++```bash
++npx @chakra-ui/cli snippet add radio
++```
++
++#### Usage
++
++```tsx
++<RadioGroup>
++  <Radio />
++</RadioGroup>
++```
++
+ ## Props
+ 
+ ### Root
+diff --git a/packages/react/__stories__/radio-card.stories.tsx b/packages/react/__stories__/radio-card.stories.tsx
+index 860c0ab1b36..68e1a2e52cf 100644
+--- a/packages/react/__stories__/radio-card.stories.tsx
++++ b/packages/react/__stories__/radio-card.stories.tsx
+@@ -23,3 +23,4 @@ export { RadioCardWithSizes as Sizes } from "compositions/examples/radio-card-wi
+ export { RadioCardWithVariants as Variants } from "compositions/examples/radio-card-with-variants"
+ export { RadioCardWithoutIndicator as WithoutIndicator } from "compositions/examples/radio-card-without-indicator"
+ export { RadioCardWithoutIndicatorVertical as WithoutIndicatorVertical } from "compositions/examples/radio-card-without-indicator-vertical"
++export { RadioCardWithDescription as Description } from "compositions/examples/radio-card-with-description"

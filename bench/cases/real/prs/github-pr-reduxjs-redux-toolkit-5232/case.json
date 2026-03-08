@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-5232",
+  "language": "ts",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#5232: chore(toolkit): update test imports to use public entry points",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 5232,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5232",
+    "baseSha": "8ed4a900c31d9780df31c68182974812b036dff0",
+    "headSha": "af1ba6aad2980b706707ce9802338f5ed3f10864",
+    "selectedFiles": [
+      "packages/toolkit/src/tests/createReducer.test.ts"
+    ],
+    "collectedAt": "2026-03-08T02:16:01.259Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/tests/createReducer.test.ts",
+      "oldPath": "packages/toolkit/src/tests/createReducer.test.ts",
+      "newPath": "packages/toolkit/src/tests/createReducer.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/tests/createReducer.test.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 15,
+          "endLine": 15
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

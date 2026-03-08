@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-3768",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3768: chore(dts-plugin): check types archive url and optimize the error msg",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3768,
+    "prUrl": "https://github.com/module-federation/core/pull/3768",
+    "baseSha": "2faa3a3e12dc219309027a65375d727c2001ddf9",
+    "headSha": "7210cefa1ec56382352842438e1156af055f7108",
+    "selectedFiles": [
+      "packages/dts-plugin/src/core/lib/archiveHandler.test.ts"
+    ],
+    "collectedAt": "2026-03-08T04:13:20.628Z"
+  },
+  "files": [
+    {
+      "id": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+      "oldPath": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+      "newPath": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 301,
+          "endLine": 301
+        },
+        "newRange": {
+          "startLine": 301,
+          "endLine": 301
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "tracking_name": "package.json",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=package.json&old_oid=aa7c9fcc6f750c6511cb69dbc9248fa9d33b3e84&old_mode=33188&new_filename=package.json&new_oid=53cf2eb379c4c33ed9101b7bdced3d485aca6c64&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "package.json",
+      "oid": "aa7c9fcc6f750c6511cb69dbc9248fa9d33b3e84",
+      "mode": 33188
+    },
+    "new": {
+      "name": "package.json",
+      "oid": "53cf2eb379c4c33ed9101b7bdced3d485aca6c64",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519"
+  },
+  {
+    "tracking_name": "packages/zod/vitest.config.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fvitest.config.ts&old_oid=1320a73b5cb1737931806e3204f1951ec0ace671&old_mode=33188&new_filename=packages%2Fzod%2Fvitest.config.ts&new_oid=54ef4b33039c61e563db7e7bd5035a23b27be8c6&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/zod/vitest.config.ts",
+      "oid": "1320a73b5cb1737931806e3204f1951ec0ace671",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/vitest.config.ts",
+      "oid": "54ef4b33039c61e563db7e7bd5035a23b27be8c6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b1faf55be85d68ad6c25bc24f25809b1a5288fc89fad28a09b0c0e349de1cf0a"
+  },
+  {
+    "tracking_name": "pnpm-lock.yaml",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=pnpm-lock.yaml&old_oid=fbaf394f4141dd5dd175d5197834ce9e3eb2e5b5&old_mode=33188&new_filename=pnpm-lock.yaml&new_oid=15a6496dd2fc7f3158884f21e25368828c27b9ac&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "pnpm-lock.yaml",
+      "oid": "fbaf394f4141dd5dd175d5197834ce9e3eb2e5b5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm-lock.yaml",
+      "oid": "15a6496dd2fc7f3158884f21e25368828c27b9ac",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "32824c984905bb02bc7ffcef96a77addd1f1602cff71a11fbbfdd7f53ee026bb"
+  },
+  {
+    "tracking_name": "vitest.config.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=vitest.root.mts&old_oid=344219d4d7c546160922948dfa02d89cf75ef562&old_mode=33188&new_filename=vitest.config.ts&new_oid=2f071b6cd4e07010cd7065cec7a9b1f2e35c82d7&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "vitest.root.mts",
+      "oid": "344219d4d7c546160922948dfa02d89cf75ef562",
+      "mode": 33188
+    },
+    "new": {
+      "name": "vitest.config.ts",
+      "oid": "2f071b6cd4e07010cd7065cec7a9b1f2e35c82d7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2ee894bf23aa44ff4ce12a3da8af19ab20180474ebf2176dbe5f2eea3f96dc92"
+  },
+  {
+    "tracking_name": "vitest.workspace.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=vitest.workspace.ts&old_oid=9105e996ccf4f6e29f9b93c7adb172a3b49dc847&old_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "vitest.workspace.ts",
+      "oid": "9105e996ccf4f6e29f9b93c7adb172a3b49dc847",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "f0ebedc84f6433817c79842f8de16366429ad939bd34d1cefdf6526fde4264f5"
+  }
+]

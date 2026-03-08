@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-5628",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5628: fix: typo in codec.test.ts file",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5628,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5628",
+    "baseSha": "9977fb0868432461de265a773319e80a90ba3e37",
+    "headSha": "bee037f43a14737ea9e3f1cc77b7f0624b3696ac",
+    "selectedFiles": [
+      "packages/zod/src/v4/classic/tests/codec.test.ts"
+    ],
+    "collectedAt": "2026-03-08T02:12:57.580Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/classic/tests/codec.test.ts",
+      "oldPath": "packages/zod/src/v4/classic/tests/codec.test.ts",
+      "newPath": "packages/zod/src/v4/classic/tests/codec.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/classic/tests/codec.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 506,
+          "endLine": 506
+        },
+        "newRange": {
+          "startLine": 506,
+          "endLine": 506
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

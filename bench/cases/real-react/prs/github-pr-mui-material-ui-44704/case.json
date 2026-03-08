@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-44704",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#44704: [internal] React 19 useRef cleanup",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 44704,
+    "prUrl": "https://github.com/mui/material-ui/pull/44704",
+    "baseSha": "6381e29960319605e0d7c24a42108f9128098ae2",
+    "headSha": "e60317412516a673933de8f44efdb168431b2827",
+    "selectedFiles": [
+      "docs/data/joy/components/button-group/SplitButton.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:40:21.681Z"
+  },
+  "files": [
+    {
+      "id": "docs/data/joy/components/button-group/SplitButton.tsx",
+      "oldPath": "docs/data/joy/components/button-group/SplitButton.tsx",
+      "newPath": "docs/data/joy/components/button-group/SplitButton.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/data/joy/components/button-group/SplitButton.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 13
+        },
+        "newRange": {
+          "startLine": 13,
+          "endLine": 13
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

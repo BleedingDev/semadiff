@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "website/pages/index.tsx",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=website%2Fpages%2Findex.tsx&old_oid=80088c14a2b67cc810eaa1dc1eeddace38545f94&old_mode=33188&new_filename=website%2Fpages%2Findex.tsx&new_oid=043bc3645e60b35e5dee4a545289d1a778c623a7&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "website/pages/index.tsx",
+      "oid": "80088c14a2b67cc810eaa1dc1eeddace38545f94",
+      "mode": 33188
+    },
+    "new": {
+      "name": "website/pages/index.tsx",
+      "oid": "043bc3645e60b35e5dee4a545289d1a778c623a7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8151871de6c31989e40fb0d7e8fe9e1980cedcec844bc01b2221906156cbe095"
+  }
+]

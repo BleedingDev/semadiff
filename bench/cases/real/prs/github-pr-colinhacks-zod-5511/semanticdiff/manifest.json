@@ -1,0 +1,31 @@
+[
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/fix-json-issue.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffix-json-issue.test.ts&new_oid=35a77cf8f608f741e81728ad841de2a50d65673c&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/fix-json-issue.test.ts",
+      "oid": "35a77cf8f608f741e81728ad841de2a50d65673c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "9d356d84b23048bc770ba73ca22f84c60dbca3a80d14849c5cf78e6e4312eb28"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/mini/schemas.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Fschemas.ts&old_oid=6f5ee30f428b94a6a9c7774e93f6997c786cbb0f&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Fschemas.ts&new_oid=19455cee61fa41b0a79fdb3ca83d4258e57bde70&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/zod/src/v4/mini/schemas.ts",
+      "oid": "6f5ee30f428b94a6a9c7774e93f6997c786cbb0f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/mini/schemas.ts",
+      "oid": "19455cee61fa41b0a79fdb3ca83d4258e57bde70",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c5c7d10b9297af96d9d0968b7e410c385f7ada545432c264db60ad80fe8ac976"
+  }
+]

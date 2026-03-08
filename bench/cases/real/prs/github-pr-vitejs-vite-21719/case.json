@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-vitejs-vite-21719",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitejs/vite#21719: refactor: use `ESTree` types from `rolldown/utils`",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitejs/vite",
+    "prNumber": 21719,
+    "prUrl": "https://github.com/vitejs/vite/pull/21719",
+    "baseSha": "37a65f8c31b5baeb4dadecfd4da98f81bae4202e",
+    "headSha": "c175294c2b6de2b547ef8d3308cc9b12a9926dec",
+    "selectedFiles": [
+      "packages/vite/src/node/server/pluginContainer.ts"
+    ],
+    "collectedAt": "2026-03-08T02:19:44.246Z"
+  },
+  "files": [
+    {
+      "id": "packages/vite/src/node/server/pluginContainer.ts",
+      "oldPath": "packages/vite/src/node/server/pluginContainer.ts",
+      "newPath": "packages/vite/src/node/server/pluginContainer.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/vite/src/node/server/pluginContainer.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 37,
+          "endLine": 37
+        },
+        "newRange": {
+          "startLine": 37,
+          "endLine": 37
+        }
+      },
+      {
+        "fileId": "packages/vite/src/node/server/pluginContainer.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 768,
+          "endLine": 768
+        },
+        "newRange": {
+          "startLine": 768,
+          "endLine": 768
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

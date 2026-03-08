@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-pnpm-pnpm-10846",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10846: fix(gvs): engine-agnostic hashes and build failure recovery",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10846,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10846",
+    "baseSha": "d5fcecac82d37b2f77324f2cddbfd96ce1c5e61c",
+    "headSha": "e9d06f0eeced5cb82e9f19995925ef2ea2966b1b",
+    "selectedFiles": [
+      "pkg-manager/modules-yaml/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:25:18.058Z"
+  },
+  "files": [
+    {
+      "id": "pkg-manager/modules-yaml/src/index.ts",
+      "oldPath": "pkg-manager/modules-yaml/src/index.ts",
+      "newPath": "pkg-manager/modules-yaml/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "pkg-manager/modules-yaml/src/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 42,
+          "endLine": 42
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

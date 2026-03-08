@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4061",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4061: refactor(enhanced): resolve alias-aware consumes in afterResolve with caching",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4061,
+    "prUrl": "https://github.com/module-federation/core/pull/4061",
+    "baseSha": "c7a0d1dc5bf1a9873efa162b7e2c9aac6f3abd44",
+    "headSha": "47fd166ba7f865fa6ec96703747fb20e4c2f60f6",
+    "selectedFiles": [
+      "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts"
+    ],
+    "collectedAt": "2026-03-08T04:11:33.001Z"
+  },
+  "files": [
+    {
+      "id": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+      "oldPath": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+      "newPath": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 92,
+          "endLine": 92
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

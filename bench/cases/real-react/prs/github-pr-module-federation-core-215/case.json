@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-215",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#215: rename utils package",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 215,
+    "prUrl": "https://github.com/module-federation/core/pull/215",
+    "baseSha": "d2a4dfac7fcdaa2b6a21e3d2973808d01649da61",
+    "headSha": "80f4fcf6d3c52accc90e4dc4e3ae35b9d33cb19d",
+    "selectedFiles": [
+      "packages/nextjs-mf/client/RemoteContainer.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:40.112Z"
+  },
+  "files": [
+    {
+      "id": "packages/nextjs-mf/client/RemoteContainer.ts",
+      "oldPath": "packages/nextjs-mf/client/RemoteContainer.ts",
+      "newPath": "packages/nextjs-mf/client/RemoteContainer.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/nextjs-mf/client/RemoteContainer.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 6,
+          "endLine": 6
+        },
+        "newRange": {
+          "startLine": 6,
+          "endLine": 6
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

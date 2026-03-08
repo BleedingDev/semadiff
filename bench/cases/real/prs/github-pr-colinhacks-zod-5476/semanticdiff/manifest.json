@@ -1,0 +1,36 @@
+[
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/function.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffunction.test.ts&old_oid=466ec6f5963a18f61c4fb738f118c4b3bf5f5f27&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffunction.test.ts&new_oid=c00cdd1542d71caa6c52bceeea53c4d88a2cb7ff&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/zod/src/v4/classic/tests/function.test.ts",
+      "oid": "466ec6f5963a18f61c4fb738f118c4b3bf5f5f27",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/function.test.ts",
+      "oid": "c00cdd1542d71caa6c52bceeea53c4d88a2cb7ff",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "46bc6b14a22324cfaa87960e8b35384d07e554206c40e47fbd7a35da217d2a4c"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/core/schemas.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts&old_oid=9b70022bb7b6829d26bbd7cd7d59b4d77348e236&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts&new_oid=83090832c7b88ea635292d4b7f54de6789628126&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/zod/src/v4/core/schemas.ts",
+      "oid": "9b70022bb7b6829d26bbd7cd7d59b4d77348e236",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/core/schemas.ts",
+      "oid": "83090832c7b88ea635292d4b7f54de6789628126",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f84405ad925758ccb224a20fe7ca8c6ee375d7faa88431059e008077550f8cd9"
+  }
+]

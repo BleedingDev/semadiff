@@ -1,0 +1,4402 @@
+diff --git a/docs/data/charts/axis/AxisCustomizationNoSnap.js b/docs/data/charts/axis/AxisCustomization.js
+similarity index 64%
+rename from docs/data/charts/axis/AxisCustomizationNoSnap.js
+rename to docs/data/charts/axis/AxisCustomization.js
+index f456a9f00e715..1612259c84b75 100644
+--- a/docs/data/charts/axis/AxisCustomizationNoSnap.js
++++ b/docs/data/charts/axis/AxisCustomization.js
+@@ -1,4 +1,3 @@
+-// @ts-check
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+@@ -19,20 +18,17 @@ const defaultXAxis = {
+   label: 'My axis',
+   tickSize: 6,
+ };
+-export default function AxisCustomizationNoSnap() {
++export default function AxisCustomization() {
+   return (
+     <ChartsUsageDemo
+       componentName="Alert"
+-      data={[
+-        { propName: 'disableLine', knob: 'switch', defaultValue: false },
+-        { propName: 'disableTicks', knob: 'switch', defaultValue: false },
+-        { propName: 'label', knob: 'input', defaultValue: 'my axis' },
+-        { propName: 'tickSize', knob: 'number', defaultValue: 6 },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ disableLine: boolean; disableTicks: boolean; label: string; tickSize: number; }} */
+-        props,
+-      ) => (
++      data={{
++        disableLine: { knob: 'switch', defaultValue: false },
++        disableTicks: { knob: 'switch', defaultValue: false },
++        label: { knob: 'input', defaultValue: 'my axis' },
++        tickSize: { knob: 'number', defaultValue: 6 },
++      }}
++      renderDemo={(props) => (
+         <Box sx={{ width: '100%', maxWidth: 400 }}>
+           <ScatterChart
+             series={[
+@@ -53,10 +49,9 @@ export default function AxisCustomizationNoSnap() {
+           />
+         </Box>
+       )}
+-      getCode={(
+-        /** @type {{props: { disableLine: boolean; disableTicks: boolean; label: string; tickSize: number; }}} */
+-        { props },
+-      ) => `import { ScatterChart } from '@mui/x-charts/ScatterChart';
++      getCode={({
++        props,
++      }) => `import { ScatterChart } from '@mui/x-charts/ScatterChart';
+ 
+ <ScatterChart
+   // ...
+diff --git a/docs/data/charts/axis/AxisCustomization.tsx b/docs/data/charts/axis/AxisCustomization.tsx
+new file mode 100644
+index 0000000000000..1612259c84b75
+--- /dev/null
++++ b/docs/data/charts/axis/AxisCustomization.tsx
+@@ -0,0 +1,68 @@
++import * as React from 'react';
++import Box from '@mui/material/Box';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { ScatterChart } from '@mui/x-charts/ScatterChart';
++import { Chance } from 'chance';
++
++const chance = new Chance(42);
++
++const data = Array.from({ length: 200 }, () => ({
++  x: chance.floating({ min: -25, max: 25 }),
++  y: chance.floating({ min: -25, max: 25 }),
++})).map((d, index) => ({ ...d, id: index }));
++
++const defaultXAxis = {
++  disableLine: false,
++  disableTicks: false,
++  fontSize: 12,
++  label: 'My axis',
++  tickSize: 6,
++};
++export default function AxisCustomization() {
++  return (
++    <ChartsUsageDemo
++      componentName="Alert"
++      data={{
++        disableLine: { knob: 'switch', defaultValue: false },
++        disableTicks: { knob: 'switch', defaultValue: false },
++        label: { knob: 'input', defaultValue: 'my axis' },
++        tickSize: { knob: 'number', defaultValue: 6 },
++      }}
++      renderDemo={(props) => (
++        <Box sx={{ width: '100%', maxWidth: 400 }}>
++          <ScatterChart
++            series={[
++              {
++                type: 'scatter',
++                id: 'linear',
++                data,
++              },
++            ]}
++            yAxis={[{ position: 'none' }]}
++            xAxis={[
++              {
++                ...defaultXAxis,
++                ...props,
++              },
++            ]}
++            height={300}
++          />
++        </Box>
++      )}
++      getCode={({
++        props,
++      }) => `import { ScatterChart } from '@mui/x-charts/ScatterChart';
++
++<ScatterChart
++  // ...
++  xAxis={{
++    disableLine: ${props.disableLine},
++    disableTicks: ${props.disableTicks},
++    label: "${props.label}",
++    tickSize: ${props.tickSize},
++  }}
++/>
++`}
++    />
++  );
++}
+diff --git a/docs/data/charts/axis/AxisTextCustomizationNoSnap.js b/docs/data/charts/axis/AxisTextCustomization.js
+similarity index 70%
+rename from docs/data/charts/axis/AxisTextCustomizationNoSnap.js
+rename to docs/data/charts/axis/AxisTextCustomization.js
+index 54b89fa50322b..e52ae4ac3bea5 100644
+--- a/docs/data/charts/axis/AxisTextCustomizationNoSnap.js
++++ b/docs/data/charts/axis/AxisTextCustomization.js
+@@ -1,4 +1,3 @@
+-// @ts-check
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+@@ -9,25 +8,21 @@ const chartSetting = {
+   height: 300,
+ };
+ 
+-export default function AxisTextCustomizationNoSnap() {
++export default function AxisTextCustomization() {
+   return (
+     <ChartsUsageDemo
+       componentName="Alert"
+-      data={[
+-        { propName: 'angle', knob: 'number', defaultValue: 45, min: -180, max: 180 },
+-        {
+-          propName: 'textAnchor',
++      data={{
++        angle: { knob: 'number', defaultValue: 45, min: -180, max: 180 },
++        textAnchor: {
+           knob: 'select',
+           defaultValue: 'start',
+           options: ['start', 'middle', 'end'],
+         },
+-        { propName: 'fontSize', knob: 'number', defaultValue: 12 },
+-        { propName: 'labelFontSize', knob: 'number', defaultValue: 14 },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ labelFontSize: number; angle: number; textAnchor: 'start'| 'middle'| 'end'; fontSize: number; }} */
+-        props,
+-      ) => (
++        fontSize: { knob: 'number', defaultValue: 12 },
++        labelFontSize: { knob: 'number', defaultValue: 14 },
++      }}
++      renderDemo={(props) => (
+         <Box sx={{ width: '100%', maxWidth: 400 }}>
+           <BarChart
+             dataset={dataset}
+@@ -59,10 +54,7 @@ export default function AxisTextCustomizationNoSnap() {
+           />
+         </Box>
+       )}
+-      getCode={(
+-        /** @type {{props: { labelFontSize: number; angle: number; textAnchor: 'start'| 'middle'| 'end'; fontSize: number; }}} */
+-        { props },
+-      ) => `import { BarChart } from '@mui/x-charts/BarChart';
++      getCode={({ props }) => `import { BarChart } from '@mui/x-charts/BarChart';
+ 
+ <ScatterChart
+   // ...
+diff --git a/docs/data/charts/axis/AxisTextCustomization.tsx b/docs/data/charts/axis/AxisTextCustomization.tsx
+new file mode 100644
+index 0000000000000..318403b9ddb0c
+--- /dev/null
++++ b/docs/data/charts/axis/AxisTextCustomization.tsx
+@@ -0,0 +1,78 @@
++import * as React from 'react';
++import Box from '@mui/material/Box';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { BarChart } from '@mui/x-charts/BarChart';
++import { dataset, valueFormatter } from '../dataset/weather';
++
++const chartSetting = {
++  height: 300,
++};
++
++export default function AxisTextCustomization() {
++  return (
++    <ChartsUsageDemo
++      componentName="Alert"
++      data={
++        {
++          angle: { knob: 'number', defaultValue: 45, min: -180, max: 180 },
++          textAnchor: {
++            knob: 'select',
++            defaultValue: 'start',
++            options: ['start', 'middle', 'end'],
++          },
++          fontSize: { knob: 'number', defaultValue: 12 },
++          labelFontSize: { knob: 'number', defaultValue: 14 },
++        } as const
++      }
++      renderDemo={(props) => (
++        <Box sx={{ width: '100%', maxWidth: 400 }}>
++          <BarChart
++            dataset={dataset}
++            xAxis={[
++              {
++                scaleType: 'band',
++                dataKey: 'month',
++                label: 'months',
++                height: 40,
++                labelStyle: {
++                  fontSize: props.labelFontSize,
++                  transform: `translateY(10px)`,
++                },
++                tickLabelStyle: {
++                  angle: props.angle,
++                  textAnchor: props.textAnchor,
++                  fontSize: props.fontSize,
++                },
++              },
++            ]}
++            series={[
++              { dataKey: 'london', label: 'London', valueFormatter },
++              { dataKey: 'paris', label: 'Paris', valueFormatter },
++              { dataKey: 'newYork', label: 'New York', valueFormatter },
++              { dataKey: 'seoul', label: 'Seoul', valueFormatter },
++            ]}
++            margin={{ bottom: 30 }}
++            {...chartSetting}
++          />
++        </Box>
++      )}
++      getCode={({ props }) => `import { BarChart } from '@mui/x-charts/BarChart';
++
++<ScatterChart
++  // ...
++  xAxis={[
++    {
++      labelStyle: {
++        fontSize: ${props.labelFontSize},
++      },
++      tickLabelStyle: {
++        angle: ${props.angle},
++        textAnchor: '${props.textAnchor}',
++        fontSize: ${props.fontSize},
++      },
++    },
++  ]}
++/>`}
++    />
++  );
++}
+diff --git a/docs/data/charts/axis/FormatterDemoNoSnap.js b/docs/data/charts/axis/FormatterDemo.js
+similarity index 97%
+rename from docs/data/charts/axis/FormatterDemoNoSnap.js
+rename to docs/data/charts/axis/FormatterDemo.js
+index 8deeeddfd4883..01a11d804ed83 100644
+--- a/docs/data/charts/axis/FormatterDemoNoSnap.js
++++ b/docs/data/charts/axis/FormatterDemo.js
+@@ -102,7 +102,7 @@ const dataset = [
+ 
+ const valueFormatter = (value) => `${value}mm`;
+ 
+-export default function FormatterDemoNoSnap() {
++export default function FormatterDemo() {
+   return (
+     <BarChart
+       dataset={dataset}
+diff --git a/docs/data/charts/axis/FormatterDemoNoSnap.tsx b/docs/data/charts/axis/FormatterDemo.tsx
+similarity index 97%
+rename from docs/data/charts/axis/FormatterDemoNoSnap.tsx
+rename to docs/data/charts/axis/FormatterDemo.tsx
+index 13ecee9dcaabc..17ea51afb2828 100644
+--- a/docs/data/charts/axis/FormatterDemoNoSnap.tsx
++++ b/docs/data/charts/axis/FormatterDemo.tsx
+@@ -102,7 +102,7 @@ const dataset = [
+ 
+ const valueFormatter = (value: number | null) => `${value}mm`;
+ 
+-export default function FormatterDemoNoSnap() {
++export default function FormatterDemo() {
+   return (
+     <BarChart
+       dataset={dataset}
+diff --git a/docs/data/charts/axis/FormatterDemoNoSnap.tsx.preview b/docs/data/charts/axis/FormatterDemo.tsx.preview
+similarity index 100%
+rename from docs/data/charts/axis/FormatterDemoNoSnap.tsx.preview
+rename to docs/data/charts/axis/FormatterDemo.tsx.preview
+diff --git a/docs/data/charts/axis/ReverseExampleNoSnap.js b/docs/data/charts/axis/ReverseExample.js
+similarity index 96%
+rename from docs/data/charts/axis/ReverseExampleNoSnap.js
+rename to docs/data/charts/axis/ReverseExample.js
+index e6d24740cdd8c..3d2ac1836987a 100644
+--- a/docs/data/charts/axis/ReverseExampleNoSnap.js
++++ b/docs/data/charts/axis/ReverseExample.js
+@@ -33,7 +33,7 @@ const series = [
+   { type: 'bar', dataKey: 'precip', color: '#bfdbf7', yAxisId: 'rightAxis' },
+ ];
+ 
+-export default function ReverseExampleNoSnap() {
++export default function ReverseExample() {
+   const [reverseX, setReverseX] = React.useState(false);
+   const [reverseLeft, setReverseLeft] = React.useState(false);
+   const [reverseRight, setReverseRight] = React.useState(false);
+@@ -88,9 +88,8 @@ export default function ReverseExampleNoSnap() {
+           <BarPlot />
+           <LinePlot />
+           <MarkPlot />
+-
+           <ChartsXAxis />
+-          <ChartsYAxis axisId="leftAxis" label="temerature (°C)" />
++          <ChartsYAxis axisId="leftAxis" label="temperature (°C)" />
+           <ChartsYAxis axisId="rightAxis" label="precipitation (mm)" />
+           <ChartsTooltip />
+         </ChartContainer>
+diff --git a/docs/data/charts/axis/ReverseExample.tsx b/docs/data/charts/axis/ReverseExample.tsx
+new file mode 100644
+index 0000000000000..c6f00d106c346
+--- /dev/null
++++ b/docs/data/charts/axis/ReverseExample.tsx
+@@ -0,0 +1,100 @@
++import * as React from 'react';
++import Box from '@mui/material/Box';
++import Stack from '@mui/material/Stack';
++import FormControlLabel from '@mui/material/FormControlLabel';
++import Checkbox from '@mui/material/Checkbox';
++
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
++import { LinePlot, MarkPlot } from '@mui/x-charts/LineChart';
++import { BarPlot } from '@mui/x-charts/BarChart';
++import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
++import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
++import { ChartsGrid } from '@mui/x-charts/ChartsGrid';
++import { ChartsTooltip } from '@mui/x-charts/ChartsTooltip';
++
++const dataset = [
++  { min: -12, max: -4, precip: 79, month: 'Jan' },
++  { min: -11, max: -3, precip: 66, month: 'Feb' },
++  { min: -6, max: 2, precip: 76, month: 'Mar' },
++  { min: 1, max: 9, precip: 106, month: 'Apr' },
++  { min: 8, max: 17, precip: 105, month: 'Mai' },
++  { min: 15, max: 24, precip: 114, month: 'Jun' },
++  { min: 18, max: 26, precip: 106, month: 'Jul' },
++  { min: 17, max: 26, precip: 105, month: 'Aug' },
++  { min: 13, max: 21, precip: 100, month: 'Sept' },
++  { min: 6, max: 13, precip: 116, month: 'Oct' },
++  { min: 0, max: 6, precip: 93, month: 'Nov' },
++  { min: -8, max: -1, precip: 93, month: 'Dec' },
++];
++
++const series = [
++  { type: 'line', dataKey: 'min', color: '#577399' },
++  { type: 'line', dataKey: 'max', color: '#fe5f55' },
++  { type: 'bar', dataKey: 'precip', color: '#bfdbf7', yAxisId: 'rightAxis' },
++] as const;
++
++export default function ReverseExample() {
++  const [reverseX, setReverseX] = React.useState(false);
++  const [reverseLeft, setReverseLeft] = React.useState(false);
++  const [reverseRight, setReverseRight] = React.useState(false);
++
++  return (
++    <Stack sx={{ width: '100%' }}>
++      <Stack direction="row">
++        <FormControlLabel
++          checked={reverseX}
++          control={
++            <Checkbox onChange={(event) => setReverseX(event.target.checked)} />
++          }
++          label="reverse x-axis"
++          labelPlacement="end"
++        />
++        <FormControlLabel
++          checked={reverseLeft}
++          control={
++            <Checkbox onChange={(event) => setReverseLeft(event.target.checked)} />
++          }
++          label="reverse left axis"
++          labelPlacement="end"
++        />
++        <FormControlLabel
++          checked={reverseRight}
++          control={
++            <Checkbox onChange={(event) => setReverseRight(event.target.checked)} />
++          }
++          label="reverse right axis"
++          labelPlacement="end"
++        />
++      </Stack>
++      <Box sx={{ width: '100%' }}>
++        <ChartContainer
++          series={series}
++          xAxis={[
++            {
++              scaleType: 'band',
++              dataKey: 'month',
++              label: 'Month',
++              reverse: reverseX,
++            },
++          ]}
++          yAxis={[
++            { id: 'leftAxis', reverse: reverseLeft },
++            { id: 'rightAxis', reverse: reverseRight, position: 'right' },
++          ]}
++          dataset={dataset}
++          height={400}
++        >
++          <ChartsGrid horizontal />
++          <BarPlot />
++          <LinePlot />
++          <MarkPlot />
++
++          <ChartsXAxis />
++          <ChartsYAxis axisId="leftAxis" label="temperature (°C)" />
++          <ChartsYAxis axisId="rightAxis" label="precipitation (mm)" />
++          <ChartsTooltip />
++        </ChartContainer>
++      </Box>
++    </Stack>
++  );
++}
+diff --git a/docs/data/charts/axis/axis.md b/docs/data/charts/axis/axis.md
+index f277957be16c6..8707fabe71c14 100644
+--- a/docs/data/charts/axis/axis.md
++++ b/docs/data/charts/axis/axis.md
+@@ -68,7 +68,7 @@ The second argument of `valueFormatter` provides some rendering context for adva
+ In the next demo, `valueFormatter` is used to shorten months and introduce a breaking space for ticks only.
+ To distinguish tick and tooltip, it uses the `context.location`.
+ 
+-{{"demo": "FormatterDemoNoSnap.js"}}
++{{"demo": "FormatterDemo.js"}}
+ 
+ #### Using the D3 formatter
+ 
+@@ -112,7 +112,7 @@ They always display the same data, going from -15 to 92, but with different `dom
+ By default, the axes' directions are left to right and bottom to top.
+ You can change this behavior with the property `reverse`.
+ 
+-{{"demo": "ReverseExampleNoSnap.js"}}
++{{"demo": "ReverseExample.js"}}
+ 
+ ## Grid
+ 
+@@ -241,13 +241,13 @@ The x-axis label placement is based on the axis configuration, and the y-axis is
+ 
+ Axes rendering can be further customized. Below is an interactive demonstration of the axis props.
+ 
+-{{"demo": "AxisCustomizationNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "AxisCustomization.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### Text customization
+ 
+ To customize the text elements (ticks label and the axis label) use the `tickLabelStyle` and `labelStyle` properties of the axis configuration.
+ 
+-{{"demo": "AxisTextCustomizationNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "AxisTextCustomization.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ## Composition
+ 
+diff --git a/docs/data/charts/bars/BarClickNoSnap.js b/docs/data/charts/bars/BarClick.js
+similarity index 96%
+rename from docs/data/charts/bars/BarClickNoSnap.js
+rename to docs/data/charts/bars/BarClick.js
+index 8f5dc6ad8bf56..0fc3080d8a463 100644
+--- a/docs/data/charts/bars/BarClickNoSnap.js
++++ b/docs/data/charts/bars/BarClick.js
+@@ -42,7 +42,7 @@ const barChartsParams = {
+   height: 400,
+ };
+ 
+-export default function BarClickNoSnap() {
++export default function BarClick() {
+   const [itemData, setItemData] = React.useState();
+   const [axisData, setAxisData] = React.useState();
+ 
+@@ -73,7 +73,7 @@ export default function BarClickNoSnap() {
+             aria-label="reset"
+             size="small"
+             onClick={() => {
+-              setItemData(null);
++              setItemData(undefined);
+               setAxisData(null);
+             }}
+           >
+diff --git a/docs/data/charts/bars/BarClick.tsx b/docs/data/charts/bars/BarClick.tsx
+new file mode 100644
+index 0000000000000..17f0e8123f963
+--- /dev/null
++++ b/docs/data/charts/bars/BarClick.tsx
+@@ -0,0 +1,97 @@
++import * as React from 'react';
++import Stack from '@mui/material/Stack';
++import Box from '@mui/material/Box';
++import Typography from '@mui/material/Typography';
++import IconButton from '@mui/material/IconButton';
++import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
++
++import { BarChart } from '@mui/x-charts/BarChart';
++
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
++import { BarItemIdentifier, ChartsAxisData } from '@mui/x-charts/models';
++
++const barChartsParams = {
++  series: [
++    {
++      id: 'series-1',
++      data: [3, 4, 1, 6, 5],
++      label: 'A',
++      stack: 'total',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++    {
++      id: 'series-2',
++      data: [4, 3, 1, 5, 8],
++      label: 'B',
++      stack: 'total',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++    {
++      id: 'series-3',
++      data: [4, 2, 5, 4, 1],
++      label: 'C',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++  ],
++  xAxis: [{ data: ['0', '3', '6', '9', '12'], scaleType: 'band', id: 'axis1' }],
++  height: 400,
++} as const;
++
++export default function BarClick() {
++  const [itemData, setItemData] = React.useState<BarItemIdentifier>();
++  const [axisData, setAxisData] = React.useState<ChartsAxisData | null>();
++
++  return (
++    <Stack
++      direction={{ xs: 'column', md: 'row' }}
++      spacing={{ xs: 0, md: 4 }}
++      sx={{ width: '100%' }}
++    >
++      <Box sx={{ flexGrow: 1 }}>
++        <BarChart
++          {...barChartsParams}
++          onItemClick={(event, d) => setItemData(d)}
++          onAxisClick={(event, d) => setAxisData(d)}
++        />
++      </Box>
++
++      <Stack direction="column" sx={{ width: { xs: '100%', md: '40%' } }}>
++        <Box
++          sx={{
++            display: 'flex',
++            justifyContent: 'space-between',
++            alignItems: 'center',
++          }}
++        >
++          <Typography>Click on the chart</Typography>
++          <IconButton
++            aria-label="reset"
++            size="small"
++            onClick={() => {
++              setItemData(undefined);
++              setAxisData(null);
++            }}
++          >
++            <UndoOutlinedIcon fontSize="small" />
++          </IconButton>
++        </Box>
++        <HighlightedCode
++          code={`// Data from item click
++${itemData ? JSON.stringify(itemData, null, 2) : '// The data will appear here'}
++
++// Data from axis click
++${axisData ? JSON.stringify(axisData, null, 2) : '// The data will appear here'}
++`}
++          language="json"
++          copyButtonHidden
++        />
++      </Stack>
++    </Stack>
++  );
++}
+diff --git a/docs/data/charts/bars/BarGapNoSnap.js b/docs/data/charts/bars/BarGap.js
+similarity index 66%
+rename from docs/data/charts/bars/BarGapNoSnap.js
+rename to docs/data/charts/bars/BarGap.js
+index 4f67aa6878ac1..11202cdbada5d 100644
+--- a/docs/data/charts/bars/BarGapNoSnap.js
++++ b/docs/data/charts/bars/BarGap.js
+@@ -9,28 +9,26 @@ const series = addLabels([
+   { dataKey: 'totEq', stack: 'passive' },
+ ]);
+ 
+-export default function BarGapNoSnap() {
++export default function BarGap() {
+   return (
+     <ChartsUsageDemo
+       componentName="Bar gap"
+-      data={[
+-        {
+-          propName: `categoryGapRatio`,
++      data={{
++        categoryGapRatio: {
+           knob: 'number',
+           defaultValue: 0.3,
+           step: 0.1,
+           min: 0,
+           max: 1,
+         },
+-        {
+-          propName: `barGapRatio`,
++        barGapRatio: {
+           knob: 'number',
+           defaultValue: 0.1,
+           step: 0.1,
+           min: -2,
+           max: 5,
+         },
+-      ]}
++      }}
+       renderDemo={(props) => (
+         <BarChart
+           dataset={balanceSheet}
+@@ -40,6 +38,7 @@ export default function BarGapNoSnap() {
+             {
+               scaleType: 'band',
+               dataKey: 'year',
++              // @ts-expect-error, issue with band scale types
+               categoryGapRatio: props.categoryGapRatio,
+               barGapRatio: props.barGapRatio,
+             },
+@@ -49,20 +48,19 @@ export default function BarGapNoSnap() {
+         />
+       )}
+       getCode={({ props }) => {
+-        return [
+-          `import { BarChart } from '@mui/x-charts/BarChart';`,
+-          '',
+-          `<BarChart`,
+-          `  // ...`,
+-          `  xAxis={[`,
+-          `    {`,
+-          `      scaleType: 'band'`,
+-          `      data: ['Page 1', 'Page 2', 'Page 3']`,
+-          `      categoryGapRatio: ${props.categoryGapRatio}`,
+-          `      barGapRatio: ${props.barGapRatio}`,
+-          `    }`,
+-          '/>',
+-        ].join('\n');
++        return `import { BarChart } from '@mui/x-charts/BarChart';
++
++<BarChart
++  // ...
++  xAxis={[
++    {
++      scaleType: 'band',
++      data: ['Page 1', 'Page 2', 'Page 3'],
++      categoryGapRatio: ${props.categoryGapRatio},
++      barGapRatio: ${props.barGapRatio},
++    },
++  ]}
++/>`;
+       }}
+     />
+   );
+diff --git a/docs/data/charts/bars/BarGap.tsx b/docs/data/charts/bars/BarGap.tsx
+new file mode 100644
+index 0000000000000..11202cdbada5d
+--- /dev/null
++++ b/docs/data/charts/bars/BarGap.tsx
+@@ -0,0 +1,67 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { BarChart } from '@mui/x-charts/BarChart';
++import { balanceSheet, addLabels } from './netflixsBalanceSheet';
++
++const series = addLabels([
++  { dataKey: 'totAss' },
++  { dataKey: 'totLia', stack: 'passive' },
++  { dataKey: 'totEq', stack: 'passive' },
++]);
++
++export default function BarGap() {
++  return (
++    <ChartsUsageDemo
++      componentName="Bar gap"
++      data={{
++        categoryGapRatio: {
++          knob: 'number',
++          defaultValue: 0.3,
++          step: 0.1,
++          min: 0,
++          max: 1,
++        },
++        barGapRatio: {
++          knob: 'number',
++          defaultValue: 0.1,
++          step: 0.1,
++          min: -2,
++          max: 5,
++        },
++      }}
++      renderDemo={(props) => (
++        <BarChart
++          dataset={balanceSheet}
++          series={series}
++          height={300}
++          xAxis={[
++            {
++              scaleType: 'band',
++              dataKey: 'year',
++              // @ts-expect-error, issue with band scale types
++              categoryGapRatio: props.categoryGapRatio,
++              barGapRatio: props.barGapRatio,
++            },
++          ]}
++          yAxis={[{ valueFormatter: (v) => `$ ${v / 1000000}B` }]}
++          hideLegend
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { BarChart } from '@mui/x-charts/BarChart';
++
++<BarChart
++  // ...
++  xAxis={[
++    {
++      scaleType: 'band',
++      data: ['Page 1', 'Page 2', 'Page 3'],
++      categoryGapRatio: ${props.categoryGapRatio},
++      barGapRatio: ${props.barGapRatio},
++    },
++  ]}
++/>`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/bars/bars.md b/docs/data/charts/bars/bars.md
+index 86610e55ead5c..acf66e9f2eb50 100644
+--- a/docs/data/charts/bars/bars.md
++++ b/docs/data/charts/bars/bars.md
+@@ -40,7 +40,7 @@ It's the size of the gap divided by the size of the bar.
+ So a value of `1` will result in a gap between bars equal to the bar width.
+ And a value of `-1` will make bars overlap on top of each other.
+ 
+-{{"demo": "BarGapNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "BarGap.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ## Stacking
+ 
+@@ -143,7 +143,7 @@ const clickHandler = (
+ ) => {};
+ ```
+ 
+-{{"demo": "BarClickNoSnap.js"}}
++{{"demo": "BarClick.js"}}
+ 
+ :::info
+ Their is a slight difference between the `event` of `onItemClick` and `onAxisClick`:
+diff --git a/docs/data/charts/gauge/ArcPlaygroundNoSnap.js b/docs/data/charts/gauge/ArcPlayground.js
+similarity index 67%
+rename from docs/data/charts/gauge/ArcPlaygroundNoSnap.js
+rename to docs/data/charts/gauge/ArcPlayground.js
+index f1bc45e892ba2..213970c7565b9 100644
+--- a/docs/data/charts/gauge/ArcPlaygroundNoSnap.js
++++ b/docs/data/charts/gauge/ArcPlayground.js
+@@ -3,52 +3,47 @@ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import Box from '@mui/material/Box';
+ import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
+ 
+-export default function ArcPlaygroundNoSnap() {
++export default function ArcPlayground() {
+   return (
+     <ChartsUsageDemo
+       componentName="Gauge"
+-      data={[
+-        {
+-          propName: `value`,
++      data={{
++        value: {
+           knob: 'number',
+           defaultValue: 75,
+           step: 1,
+           min: 0,
+           max: 100,
+         },
+-        {
+-          propName: `startAngle`,
++        startAngle: {
+           knob: 'number',
+           defaultValue: 0,
+           step: 1,
+           min: -360,
+           max: 360,
+         },
+-        {
+-          propName: `endAngle`,
++        endAngle: {
+           knob: 'number',
+           defaultValue: 360,
+           step: 1,
+           min: -360,
+           max: 360,
+         },
+-        {
+-          propName: `innerRadius`,
++        innerRadius: {
+           knob: 'number',
+           defaultValue: 80,
+           step: 1,
+           min: 0,
+           max: 100,
+         },
+-        {
+-          propName: `outerRadius`,
++        outerRadius: {
+           knob: 'number',
+           defaultValue: 100,
+           step: 1,
+           min: 0,
+           max: 100,
+         },
+-      ]}
++      }}
+       renderDemo={(props) => (
+         <Box
+           sx={{
+@@ -71,19 +66,18 @@ export default function ArcPlaygroundNoSnap() {
+       )}
+       getCode={({ props }) => {
+         const { innerRadius, outerRadius, ...numberProps } = props;
+-        return [
+-          `import { Gauge } from '@mui/x-charts/Gauge';`,
+-          '',
+-          `<Gauge`,
+-          ...Object.entries(numberProps).map(
+-            ([name, value]) => `  ${name}={${value}}`,
+-          ),
+-          ...Object.entries({ innerRadius, outerRadius }).map(
+-            ([name, value]) => `  ${name}="${value}%"`,
+-          ),
+-          `  // ...`,
+-          '/>',
+-        ].join('\n');
++        return `import { Gauge } from '@mui/x-charts/Gauge';
++
++<Gauge
++  ${Object.entries(numberProps)
++    .map(([name, value]) => `${name}={${value}}`)
++    .join('\n  ')}
++  ${Object.entries({ innerRadius, outerRadius })
++    .map(([name, value]) => `${name}="${value}%"`)
++    .join('\n  ')}
++  // ...
++/>
++`;
+       }}
+     />
+   );
+diff --git a/docs/data/charts/gauge/ArcPlayground.tsx b/docs/data/charts/gauge/ArcPlayground.tsx
+new file mode 100644
+index 0000000000000..213970c7565b9
+--- /dev/null
++++ b/docs/data/charts/gauge/ArcPlayground.tsx
+@@ -0,0 +1,84 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import Box from '@mui/material/Box';
++import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
++
++export default function ArcPlayground() {
++  return (
++    <ChartsUsageDemo
++      componentName="Gauge"
++      data={{
++        value: {
++          knob: 'number',
++          defaultValue: 75,
++          step: 1,
++          min: 0,
++          max: 100,
++        },
++        startAngle: {
++          knob: 'number',
++          defaultValue: 0,
++          step: 1,
++          min: -360,
++          max: 360,
++        },
++        endAngle: {
++          knob: 'number',
++          defaultValue: 360,
++          step: 1,
++          min: -360,
++          max: 360,
++        },
++        innerRadius: {
++          knob: 'number',
++          defaultValue: 80,
++          step: 1,
++          min: 0,
++          max: 100,
++        },
++        outerRadius: {
++          knob: 'number',
++          defaultValue: 100,
++          step: 1,
++          min: 0,
++          max: 100,
++        },
++      }}
++      renderDemo={(props) => (
++        <Box
++          sx={{
++            width: '100%',
++            height: 200,
++            margin: 'auto',
++          }}
++        >
++          <Gauge
++            sx={{
++              [`& .${gaugeClasses.valueText}`]: {
++                fontSize: 45,
++              },
++            }}
++            {...props}
++            innerRadius={`${props.innerRadius}%`}
++            outerRadius={`${props.outerRadius}%`}
++          />
++        </Box>
++      )}
++      getCode={({ props }) => {
++        const { innerRadius, outerRadius, ...numberProps } = props;
++        return `import { Gauge } from '@mui/x-charts/Gauge';
++
++<Gauge
++  ${Object.entries(numberProps)
++    .map(([name, value]) => `${name}={${value}}`)
++    .join('\n  ')}
++  ${Object.entries({ innerRadius, outerRadius })
++    .map(([name, value]) => `${name}="${value}%"`)
++    .join('\n  ')}
++  // ...
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/gauge/GaugeValueRangeNoSnap.js b/docs/data/charts/gauge/GaugeValueRange.js
+similarity index 87%
+rename from docs/data/charts/gauge/GaugeValueRangeNoSnap.js
+rename to docs/data/charts/gauge/GaugeValueRange.js
+index d6be879022e9b..8fe4f45bd2485 100644
+--- a/docs/data/charts/gauge/GaugeValueRangeNoSnap.js
++++ b/docs/data/charts/gauge/GaugeValueRange.js
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import Stack from '@mui/material/Stack';
+ import { Gauge } from '@mui/x-charts/Gauge';
+ 
+-export default function GaugeValueRangeNoSnap() {
++export default function GaugeValueRange() {
+   return (
+     <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 1, md: 3 }}>
+       <Gauge width={100} height={100} value={50} />
+diff --git a/docs/data/charts/gauge/GaugeValueRangeNoSnap.tsx b/docs/data/charts/gauge/GaugeValueRange.tsx
+similarity index 87%
+rename from docs/data/charts/gauge/GaugeValueRangeNoSnap.tsx
+rename to docs/data/charts/gauge/GaugeValueRange.tsx
+index d6be879022e9b..8fe4f45bd2485 100644
+--- a/docs/data/charts/gauge/GaugeValueRangeNoSnap.tsx
++++ b/docs/data/charts/gauge/GaugeValueRange.tsx
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import Stack from '@mui/material/Stack';
+ import { Gauge } from '@mui/x-charts/Gauge';
+ 
+-export default function GaugeValueRangeNoSnap() {
++export default function GaugeValueRange() {
+   return (
+     <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 1, md: 3 }}>
+       <Gauge width={100} height={100} value={50} />
+diff --git a/docs/data/charts/gauge/GaugeValueRangeNoSnap.tsx.preview b/docs/data/charts/gauge/GaugeValueRange.tsx.preview
+similarity index 100%
+rename from docs/data/charts/gauge/GaugeValueRangeNoSnap.tsx.preview
+rename to docs/data/charts/gauge/GaugeValueRange.tsx.preview
+diff --git a/docs/data/charts/gauge/TextPlaygroundNoSnap.js b/docs/data/charts/gauge/TextPlayground.js
+similarity index 58%
+rename from docs/data/charts/gauge/TextPlaygroundNoSnap.js
+rename to docs/data/charts/gauge/TextPlayground.js
+index 347be09681fae..07cacdeb17114 100644
+--- a/docs/data/charts/gauge/TextPlaygroundNoSnap.js
++++ b/docs/data/charts/gauge/TextPlayground.js
+@@ -3,44 +3,40 @@ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import Box from '@mui/material/Box';
+ import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
+ 
+-export default function TextPlaygroundNoSnap() {
++export default function TextPlayground() {
+   return (
+     <ChartsUsageDemo
+       componentName="Gauge"
+-      data={[
+-        {
+-          propName: `value`,
++      data={{
++        value: {
+           knob: 'number',
+           defaultValue: 75,
+           step: 1,
+           min: 0,
+           max: 100,
+         },
+-        {
+-          propName: `fontSize`,
++        fontSize: {
+           knob: 'number',
+           defaultValue: 40,
+           step: 1,
+           min: 5,
+           max: 50,
+         },
+-        {
+-          propName: `dx`,
++        dx: {
+           knob: 'number',
+           defaultValue: 0,
+           step: 1,
+           min: -100,
+           max: 100,
+         },
+-        {
+-          propName: `dy`,
++        dy: {
+           knob: 'number',
+           defaultValue: 0,
+           step: 1,
+           min: -100,
+           max: 100,
+         },
+-      ]}
++      }}
+       renderDemo={(props) => (
+         <Box
+           sx={{
+@@ -64,28 +60,23 @@ export default function TextPlaygroundNoSnap() {
+           />
+         </Box>
+       )}
+-      getCode={({ props }) => {
+-        return [
+-          `import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';`,
+-          '',
+-          `<Gauge`,
+-          `  value={${props.value}}`,
+-          `  startAngle={-110}`,
+-          `  endAngle={110}`,
+-          `  sx={{`,
+-          // eslint-disable-next-line no-template-curly-in-string
+-          '    [`& .${gaugeClasses.valueText}`]: {',
+-          `      fontSize: ${props.fontSize},`,
+-          `      transform: 'translate(${props.dx}px, ${props.dy}px)',`,
+-          `    },`,
+-          `  }}`,
+-          '  text={',
+-          // eslint-disable-next-line no-template-curly-in-string
+-          '     ({ value, valueMax }) => `${value} / ${valueMax}`',
+-          '  }',
+-          '/>',
+-        ].join('\n');
+-      }}
++      getCode={({
++        props,
++      }) => `import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
++
++<Gauge
++  value={${props.value}}
++  startAngle={-110}
++  endAngle={110}
++  sx={{
++    [& .${gaugeClasses.valueText}]: {
++      fontSize: ${props.fontSize},
++      transform: 'translate(${props.dx}px, ${props.dy}px)',
++    },
++  }}
++  text={({ value, valueMax }) => \`\${value} / \${valueMax}\`}
++/>
++`}
+     />
+   );
+ }
+diff --git a/docs/data/charts/gauge/TextPlayground.tsx b/docs/data/charts/gauge/TextPlayground.tsx
+new file mode 100644
+index 0000000000000..07cacdeb17114
+--- /dev/null
++++ b/docs/data/charts/gauge/TextPlayground.tsx
+@@ -0,0 +1,82 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import Box from '@mui/material/Box';
++import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
++
++export default function TextPlayground() {
++  return (
++    <ChartsUsageDemo
++      componentName="Gauge"
++      data={{
++        value: {
++          knob: 'number',
++          defaultValue: 75,
++          step: 1,
++          min: 0,
++          max: 100,
++        },
++        fontSize: {
++          knob: 'number',
++          defaultValue: 40,
++          step: 1,
++          min: 5,
++          max: 50,
++        },
++        dx: {
++          knob: 'number',
++          defaultValue: 0,
++          step: 1,
++          min: -100,
++          max: 100,
++        },
++        dy: {
++          knob: 'number',
++          defaultValue: 0,
++          step: 1,
++          min: -100,
++          max: 100,
++        },
++      }}
++      renderDemo={(props) => (
++        <Box
++          sx={{
++            width: '100%',
++            height: 200,
++            margin: 'auto',
++            mb: 4,
++          }}
++        >
++          <Gauge
++            startAngle={-110}
++            endAngle={110}
++            sx={{
++              [`& .${gaugeClasses.valueText}`]: {
++                fontSize: props.fontSize,
++                transform: `translate(${props.dx}px, ${props.dy}px)`,
++              },
++            }}
++            value={props.value}
++            text={({ value, valueMax }) => `${value} / ${valueMax}`}
++          />
++        </Box>
++      )}
++      getCode={({
++        props,
++      }) => `import { Gauge, gaugeClasses } from '@mui/x-charts/Gauge';
++
++<Gauge
++  value={${props.value}}
++  startAngle={-110}
++  endAngle={110}
++  sx={{
++    [& .${gaugeClasses.valueText}]: {
++      fontSize: ${props.fontSize},
++      transform: 'translate(${props.dx}px, ${props.dy}px)',
++    },
++  }}
++  text={({ value, valueMax }) => \`\${value} / \${valueMax}\`}
++/>
++`}
++    />
++  );
++}
+diff --git a/docs/data/charts/gauge/gauge.md b/docs/data/charts/gauge/gauge.md
+index 465560c8527d9..7dec68446af1f 100644
+--- a/docs/data/charts/gauge/gauge.md
++++ b/docs/data/charts/gauge/gauge.md
+@@ -24,7 +24,7 @@ The Gauge displays a numeric value that varies within a defined range.
+ The Gauge's value is provided through the `value` props, which accept a value range between 0 and 100.
+ To modify it, use the `valueMin` and `valueMax` props.
+ 
+-{{"demo": "GaugeValueRangeNoSnap.js"}}
++{{"demo": "GaugeValueRange.js"}}
+ 
+ ## Arcs configuration
+ 
+@@ -34,7 +34,7 @@ Modify the arc shape with the following props:
+ - `innerRadius` and `outerRadius`: The arc's radii. It can be a fixed number of pixels or a percentage string, which will be a percent of the maximal available radius
+ - `cornerRadius`: It can be a fixed number of pixels or a percentage string, which will be a percent of the maximal available radius
+ 
+-{{"demo": "ArcPlaygroundNoSnap.js", "bg": "playground", "hideToolbar": true }}
++{{"demo": "ArcPlayground.js", "bg": "playground", "hideToolbar": true }}
+ 
+ :::success
+ Notice that the arc position is computed to let the Gauge take as much space as possible in the drawing area.
+@@ -52,7 +52,7 @@ In the second case, the formatter argument contains the `value`, `valueMin` and
+ 
+ To modify the text's layout, use the `gaugeClasses.valueText` class name.
+ 
+-{{"demo": "TextPlaygroundNoSnap.js", "bg": "playground", "hideToolbar": true}}
++{{"demo": "TextPlayground.js", "bg": "playground", "hideToolbar": true}}
+ 
+ ## Arc design
+ 
+diff --git a/docs/data/charts/legend/ContinuousInteractiveDemoNoSnap.js b/docs/data/charts/legend/ContinuousInteractiveDemo.js
+similarity index 78%
+rename from docs/data/charts/legend/ContinuousInteractiveDemoNoSnap.js
+rename to docs/data/charts/legend/ContinuousInteractiveDemo.js
+index a9e7aa4bc4b58..ca63de1f4a197 100644
+--- a/docs/data/charts/legend/ContinuousInteractiveDemoNoSnap.js
++++ b/docs/data/charts/legend/ContinuousInteractiveDemo.js
+@@ -1,4 +1,3 @@
+-// @ts-check
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { interpolateRdYlBu } from 'd3-scale-chromatic';
+@@ -7,46 +6,38 @@ import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
+ import { ContinuousColorLegend } from '@mui/x-charts/ChartsLegend';
+ import { dataset } from './tempAnomaly';
+ 
+-export default function ContinuousInteractiveDemoNoSnap() {
++export default function ContinuousInteractiveDemo() {
+   return (
+     <ChartsUsageDemo
+       componentName="Legend"
+-      data={[
+-        {
+-          propName: 'direction',
++      data={{
++        direction: {
+           knob: 'select',
+           defaultValue: 'horizontal',
+           options: ['horizontal', 'vertical'],
+         },
+-        {
+-          propName: 'labelPosition',
++        labelPosition: {
+           knob: 'select',
+           defaultValue: 'end',
+           options: ['start', 'end', 'extremes'],
+         },
+-        {
+-          propName: 'length',
++        length: {
+           knob: 'number',
+           defaultValue: 50,
+           min: 10,
+         },
+-        {
+-          propName: 'thickness',
++        thickness: {
+           knob: 'number',
+           defaultValue: 12,
+           min: 1,
+           max: 20,
+         },
+-        {
+-          propName: 'reverse',
++        reverse: {
+           knob: 'switch',
+           defaultValue: false,
+         },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ direction: "horizontal" | "vertical"; length: number; thickness: number;  labelPosition:  'start' | 'end' | 'extremes'; reverse: boolean; }} */
+-        props,
+-      ) => (
++      }}
++      renderDemo={(props) => (
+         <LineChart
+           dataset={dataset}
+           series={[
+@@ -98,12 +89,8 @@ export default function ContinuousInteractiveDemoNoSnap() {
+           <ChartsReferenceLine y={0} />
+         </LineChart>
+       )}
+-      getCode={(
+-        /** @type {{props: { direction: "horizontal" | "vertical"; length: number; thickness: number;  labelPosition:  'start' | 'end' | 'extremes'; reverse: boolean; }}} */
+-        { props },
+-      ) => {
+-        return `
+-import { ContinuousColorLegend } from '@mui/x-charts/ChartsLegend';
++      getCode={({ props }) => {
++        return `import { ContinuousColorLegend } from '@mui/x-charts/ChartsLegend';
+ 
+ <LineChart
+   {/** ... */}
+diff --git a/docs/data/charts/legend/ContinuousInteractiveDemo.tsx b/docs/data/charts/legend/ContinuousInteractiveDemo.tsx
+new file mode 100644
+index 0000000000000..d12b49e2376fb
+--- /dev/null
++++ b/docs/data/charts/legend/ContinuousInteractiveDemo.tsx
+@@ -0,0 +1,115 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { interpolateRdYlBu } from 'd3-scale-chromatic';
++import { LineChart } from '@mui/x-charts/LineChart';
++import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
++import { ContinuousColorLegend } from '@mui/x-charts/ChartsLegend';
++import { dataset } from './tempAnomaly';
++
++export default function ContinuousInteractiveDemo() {
++  return (
++    <ChartsUsageDemo
++      componentName="Legend"
++      data={
++        {
++          direction: {
++            knob: 'select',
++            defaultValue: 'horizontal',
++            options: ['horizontal', 'vertical'],
++          },
++          labelPosition: {
++            knob: 'select',
++            defaultValue: 'end',
++            options: ['start', 'end', 'extremes'],
++          },
++          length: {
++            knob: 'number',
++            defaultValue: 50,
++            min: 10,
++          },
++          thickness: {
++            knob: 'number',
++            defaultValue: 12,
++            min: 1,
++            max: 20,
++          },
++          reverse: {
++            knob: 'switch',
++            defaultValue: false,
++          },
++        } as const
++      }
++      renderDemo={(props) => (
++        <LineChart
++          dataset={dataset}
++          series={[
++            {
++              label: 'Global temperature anomaly relative to 1961-1990',
++              dataKey: 'anomaly',
++              showMark: false,
++              valueFormatter: (value) => `${value?.toFixed(2)}°`,
++            },
++          ]}
++          xAxis={[
++            {
++              scaleType: 'time',
++              dataKey: 'year',
++              disableLine: true,
++              valueFormatter: (value) => value.getFullYear().toString(),
++            },
++          ]}
++          yAxis={[
++            {
++              disableLine: true,
++              disableTicks: true,
++              valueFormatter: (value) => `${value}°`,
++              colorMap: {
++                type: 'continuous',
++                min: -0.5,
++                max: 1.5,
++                color: (t) => interpolateRdYlBu(1 - t),
++              },
++            },
++          ]}
++          grid={{ horizontal: true }}
++          height={300}
++          slots={{ legend: ContinuousColorLegend }}
++          slotProps={{
++            legend: {
++              axisDirection: 'y',
++              direction: props.direction,
++              thickness: props.thickness,
++              labelPosition: props.labelPosition,
++              reverse: props.reverse,
++              sx: {
++                [props.direction === 'horizontal' ? 'width' : 'height']:
++                  `${props.length}${props.direction === 'horizontal' ? '%' : 'px'}`,
++              },
++            },
++          }}
++        >
++          <ChartsReferenceLine y={0} />
++        </LineChart>
++      )}
++      getCode={({ props }) => {
++        return `import { ContinuousColorLegend } from '@mui/x-charts/ChartsLegend';
++
++<LineChart
++  {/** ... */}
++  slots={{ legend: ContinuousColorLegend }}
++  slotProps={{
++    legend: {
++      axisDirection: 'y',
++      direction: '${props.direction}',
++      thickness: ${props.thickness},
++      labelPosition: '${props.labelPosition}',
++      reverse: ${props.reverse},
++      sx: { ${props.direction === 'horizontal' ? 'width' : 'height'}: '${props.length}${props.direction === 'horizontal' ? '%' : 'px'}' },
++    },
++  }}
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/legend/LegendClickNoSnap.js b/docs/data/charts/legend/LegendClick.js
+similarity index 86%
+rename from docs/data/charts/legend/LegendClickNoSnap.js
+rename to docs/data/charts/legend/LegendClick.js
+index 5cc59c83552e1..77acddc96f384 100644
+--- a/docs/data/charts/legend/LegendClickNoSnap.js
++++ b/docs/data/charts/legend/LegendClick.js
+@@ -1,5 +1,3 @@
+-// @ts-check
+-
+ import * as React from 'react';
+ import Stack from '@mui/material/Stack';
+ import Box from '@mui/material/Box';
+@@ -12,7 +10,6 @@ import { ChartsLegend, PiecewiseColorLegend } from '@mui/x-charts/ChartsLegend';
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
+ import { ChartDataProvider } from '@mui/x-charts/ChartDataProvider';
+ 
+-/** @type {import('@mui/x-charts/PieChart').PieChartProps['series']} */
+ const pieSeries = [
+   {
+     type: 'pie',
+@@ -24,7 +21,6 @@ const pieSeries = [
+   },
+ ];
+ 
+-/** @type {import('@mui/x-charts/BarChart').BarChartProps['series']} */
+ const barSeries = [
+   {
+     type: 'bar',
+@@ -40,7 +36,6 @@ const barSeries = [
+   },
+ ];
+ 
+-/** @type {import('@mui/x-charts/LineChart').LineChartProps['series']} */
+ const lineSeries = [
+   {
+     type: 'line',
+@@ -56,7 +51,7 @@ const lineSeries = [
+   },
+ ];
+ 
+-export default function LegendClickNoSnap() {
++export default function LegendClick() {
+   const [itemData, setItemData] = React.useState();
+ 
+   return (
+@@ -75,12 +70,7 @@ export default function LegendClickNoSnap() {
+         }}
+       >
+         <Typography>Chart Legend</Typography>
+-        <ChartDataProvider
+-          // @ts-ignore
+-          series={barSeries}
+-          width={400}
+-          height={60}
+-        >
++        <ChartDataProvider series={barSeries} width={400} height={60}>
+           <ChartsLegend
+             direction="horizontal"
+             // @ts-ignore
+@@ -88,15 +78,9 @@ export default function LegendClickNoSnap() {
+           />
+         </ChartDataProvider>
+         <Typography>Pie Chart Legend</Typography>
+-        <ChartDataProvider
+-          // @ts-ignore
+-          series={pieSeries}
+-          width={400}
+-          height={60}
+-        >
++        <ChartDataProvider series={pieSeries} width={400} height={60}>
+           <ChartsLegend
+             direction="horizontal"
+-            // @ts-ignore
+             onItemClick={(event, context, index) => setItemData([context, index])}
+           />
+         </ChartDataProvider>
+diff --git a/docs/data/charts/legend/LegendClick.tsx b/docs/data/charts/legend/LegendClick.tsx
+new file mode 100644
+index 0000000000000..214f2812303e7
+--- /dev/null
++++ b/docs/data/charts/legend/LegendClick.tsx
+@@ -0,0 +1,147 @@
++import * as React from 'react';
++import Stack from '@mui/material/Stack';
++import Box from '@mui/material/Box';
++import Typography from '@mui/material/Typography';
++import IconButton from '@mui/material/IconButton';
++import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
++
++import { ChartsLegend, PiecewiseColorLegend } from '@mui/x-charts/ChartsLegend';
++
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
++import { ChartDataProvider } from '@mui/x-charts/ChartDataProvider';
++
++const pieSeries = [
++  {
++    type: 'pie',
++    id: 'series-1',
++    data: [
++      { label: 'Pie A', id: 'P1-A', value: 400 },
++      { label: 'Pie B', id: 'P2-B', value: 300 },
++    ],
++  },
++] as const;
++
++const barSeries = [
++  {
++    type: 'bar',
++    id: 'series-1',
++    label: 'Series 1',
++    data: [0, 1, 2],
++  },
++  {
++    type: 'bar',
++    id: 'series-2',
++    label: 'Series 2',
++    data: [0, 1, 2],
++  },
++] as const;
++
++const lineSeries = [
++  {
++    type: 'line',
++    id: 'series-1',
++    label: 'Series 1',
++    data: [0, 1, 2],
++  },
++  {
++    type: 'line',
++    id: 'series-2',
++    label: 'Series 2',
++    data: [0, 1, 2],
++  },
++] as const;
++
++export default function LegendClick() {
++  const [itemData, setItemData] = React.useState<any>();
++
++  return (
++    <Stack
++      direction={{ xs: 'column', md: 'row' }}
++      spacing={{ xs: 0, md: 4 }}
++      sx={{ width: '100%' }}
++    >
++      <Box
++        sx={{
++          flexGrow: 1,
++          display: 'flex',
++          flexDirection: 'column',
++          justifyContent: 'start',
++          alignItems: 'start',
++        }}
++      >
++        <Typography>Chart Legend</Typography>
++        <ChartDataProvider series={barSeries} width={400} height={60}>
++          <ChartsLegend
++            direction="horizontal"
++            // @ts-ignore
++            onItemClick={(event, context, index) => setItemData([context, index])}
++          />
++        </ChartDataProvider>
++        <Typography>Pie Chart Legend</Typography>
++        <ChartDataProvider series={pieSeries} width={400} height={60}>
++          <ChartsLegend
++            direction="horizontal"
++            onItemClick={(event, context, index) => setItemData([context, index])}
++          />
++        </ChartDataProvider>
++        <Typography>Piecewise Color Legend</Typography>
++        <ChartDataProvider
++          // @ts-ignore
++          series={lineSeries}
++          width={400}
++          height={60}
++          xAxis={[
++            {
++              scaleType: 'linear',
++              data: [0, 1, 3],
++              disableLine: true,
++              colorMap: {
++                type: 'piecewise',
++                thresholds: [0, 2],
++                colors: ['blue', 'gray', 'red'],
++              },
++            },
++          ]}
++        >
++          <PiecewiseColorLegend
++            direction="horizontal"
++            axisDirection="x"
++            // @ts-ignore
++            onItemClick={(event, context, index) => setItemData([context, index])}
++          />
++        </ChartDataProvider>
++      </Box>
++
++      <Stack direction="column" sx={{ width: { xs: '100%', md: '40%' } }}>
++        <Box
++          sx={{
++            display: 'flex',
++            justifyContent: 'space-between',
++            alignItems: 'center',
++          }}
++        >
++          <Typography>Click on the chart</Typography>
++          <IconButton
++            aria-label="reset"
++            size="small"
++            onClick={() => {
++              // @ts-ignore
++              setItemData(null);
++            }}
++          >
++            <UndoOutlinedIcon fontSize="small" />
++          </IconButton>
++        </Box>
++        <HighlightedCode
++          code={`// Index from item click: ${itemData ? itemData[1] : ''}
++
++// Context from item click
++${itemData ? JSON.stringify(itemData[0], null, 2) : '// The data will appear here'}
++`}
++          language="json"
++          copyButtonHidden
++        />
++      </Stack>
++    </Stack>
++  );
++}
+diff --git a/docs/data/charts/legend/LegendDimensionNoSnap.js b/docs/data/charts/legend/LegendDimension.js
+similarity index 70%
+rename from docs/data/charts/legend/LegendDimensionNoSnap.js
+rename to docs/data/charts/legend/LegendDimension.js
+index f9dd92f87bb2c..6851590a1d669 100644
+--- a/docs/data/charts/legend/LegendDimensionNoSnap.js
++++ b/docs/data/charts/legend/LegendDimension.js
+@@ -1,5 +1,3 @@
+-// @ts-check
+-
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { PieChart } from '@mui/x-charts/PieChart';
+@@ -18,25 +16,21 @@ const data = [
+ 
+ const itemsNumber = 8;
+ 
+-export default function LegendDimensionNoSnap() {
++export default function LegendDimension() {
+   return (
+     <ChartsUsageDemo
+       componentName="Legend"
+-      data={[
+-        {
+-          propName: 'direction',
++      data={{
++        direction: {
+           knob: 'select',
+           defaultValue: 'horizontal',
+           options: ['horizontal', 'vertical'],
+         },
+-        { propName: 'markSize', knob: 'number', defaultValue: 15, min: 0 },
+-        { propName: 'markGap', knob: 'number', defaultValue: 8, min: 0 },
+-        { propName: 'itemGap', knob: 'number', defaultValue: 16, min: 0 },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ direction: "horizontal" | "vertical"; markSize: number; markGap: number; itemGap: number; scrollable: boolean;}} */
+-        props,
+-      ) => (
++        markSize: { knob: 'number', defaultValue: 15, min: 0 },
++        markGap: { knob: 'number', defaultValue: 8, min: 0 },
++        itemGap: { knob: 'number', defaultValue: 16, min: 0 },
++      }}
++      renderDemo={(props) => (
+         <PieChart
+           series={[
+             {
+@@ -62,12 +56,8 @@ export default function LegendDimensionNoSnap() {
+           width={200}
+         />
+       )}
+-      getCode={(
+-        /** @type {{ props: { direction: "horizontal" | "vertical"; markSize: number; markGap: number; itemGap: number; scrollable: boolean;}}} */
+-        { props },
+-      ) => {
+-        return `
+-import { PieChart } from '@mui/x-charts/PieChart';
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
+ import { legendClasses } from '@mui/x-charts/ChartsLegend';
+ 
+ <PieChart
+diff --git a/docs/data/charts/legend/LegendDimension.tsx b/docs/data/charts/legend/LegendDimension.tsx
+new file mode 100644
+index 0000000000000..081397402bc24
+--- /dev/null
++++ b/docs/data/charts/legend/LegendDimension.tsx
+@@ -0,0 +1,89 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { PieChart } from '@mui/x-charts/PieChart';
++import { legendClasses } from '@mui/x-charts/ChartsLegend';
++
++const data = [
++  { id: 0, value: 10, label: 'Series A' },
++  { id: 1, value: 15, label: 'Series B' },
++  { id: 2, value: 20, label: 'Series C' },
++  { id: 3, value: 10, label: 'Series D' },
++  { id: 4, value: 15, label: 'Series E' },
++  { id: 5, value: 20, label: 'Series F' },
++  { id: 6, value: 10, label: 'Series G' },
++  { id: 7, value: 15, label: 'Series H' },
++];
++
++const itemsNumber = 8;
++
++export default function LegendDimension() {
++  return (
++    <ChartsUsageDemo
++      componentName="Legend"
++      data={
++        {
++          direction: {
++            knob: 'select',
++            defaultValue: 'horizontal',
++            options: ['horizontal', 'vertical'],
++          },
++          markSize: { knob: 'number', defaultValue: 15, min: 0 },
++          markGap: { knob: 'number', defaultValue: 8, min: 0 },
++          itemGap: { knob: 'number', defaultValue: 16, min: 0 },
++        } as const
++      }
++      renderDemo={(props) => (
++        <PieChart
++          series={[
++            {
++              data: data.slice(0, itemsNumber),
++            },
++          ]}
++          slotProps={{
++            legend: {
++              direction: props.direction,
++              sx: {
++                gap: `${props.itemGap}px`,
++                [`.${legendClasses.mark}`]: {
++                  height: props.markSize,
++                  width: props.markSize,
++                },
++                [`.${legendClasses.series}`]: {
++                  gap: `${props.markGap}px`,
++                },
++              },
++            },
++          }}
++          height={200}
++          width={200}
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
++import { legendClasses } from '@mui/x-charts/ChartsLegend';
++
++<PieChart
++  {/** ... */}
++  slotProps={{
++    legend: {
++      direction: props.direction,
++      sx: {
++        gap: '${props.itemGap}px',
++        // CSS-in-JS
++        [\`.\${legendClasses.mark}\`]: {
++          height: ${props.markSize},
++          width: ${props.markSize},
++        },
++        // CSS class
++        ['.${legendClasses.series}']: {
++          gap: '${props.markGap}px',
++        },
++      },
++    },
++  }}
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/legend/LegendMarkTypeNoSnap.js b/docs/data/charts/legend/LegendMarkType.js
+similarity index 70%
+rename from docs/data/charts/legend/LegendMarkTypeNoSnap.js
+rename to docs/data/charts/legend/LegendMarkType.js
+index a73ca40fd4adf..22d69233f552d 100644
+--- a/docs/data/charts/legend/LegendMarkTypeNoSnap.js
++++ b/docs/data/charts/legend/LegendMarkType.js
+@@ -1,5 +1,3 @@
+-// @ts-check
+-
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { BarChart } from '@mui/x-charts/BarChart';
+@@ -11,22 +9,18 @@ const seriesConfig = [
+   { id: 3, data: [10], label: 'Series D' },
+ ];
+ 
+-export default function LegendMarkTypeNoSnap() {
++export default function LegendMarkType() {
+   return (
+     <ChartsUsageDemo
+       componentName="Legend"
+-      data={[
+-        {
+-          propName: 'markType',
++      data={{
++        markType: {
+           knob: 'select',
+           defaultValue: 'square',
+           options: ['square', 'circle', 'line'],
+         },
+-      ]}
+-      renderDemo={(
+-        /** @type {{  markType: "square" | "circle" | "line" }} */
+-        props,
+-      ) => (
++      }}
++      renderDemo={(props) => (
+         <BarChart
+           series={seriesConfig.map((seriesItem) => ({
+             ...seriesItem,
+@@ -41,12 +35,8 @@ export default function LegendMarkTypeNoSnap() {
+           height={200}
+         />
+       )}
+-      getCode={(
+-        /** @type {{props: { markType: "square" | "circle" | "line" }}} */
+-        { props },
+-      ) => {
+-        return `
+-import { BarChart } from '@mui/x-charts/BarChart';
++      getCode={({ props }) => {
++        return `import { BarChart } from '@mui/x-charts/BarChart';
+ 
+ <BarChart
+   {/** ... */}
+diff --git a/docs/data/charts/legend/LegendMarkType.tsx b/docs/data/charts/legend/LegendMarkType.tsx
+new file mode 100644
+index 0000000000000..c9640e5eca5f0
+--- /dev/null
++++ b/docs/data/charts/legend/LegendMarkType.tsx
+@@ -0,0 +1,56 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { BarChart } from '@mui/x-charts/BarChart';
++
++const seriesConfig = [
++  { id: 0, data: [10], label: 'Series A' },
++  { id: 1, data: [15], label: 'Series B' },
++  { id: 2, data: [20], label: 'Series C' },
++  { id: 3, data: [10], label: 'Series D' },
++];
++
++export default function LegendMarkType() {
++  return (
++    <ChartsUsageDemo
++      componentName="Legend"
++      data={
++        {
++          markType: {
++            knob: 'select',
++            defaultValue: 'square',
++            options: ['square', 'circle', 'line'],
++          },
++        } as const
++      }
++      renderDemo={(props) => (
++        <BarChart
++          series={seriesConfig.map((seriesItem) => ({
++            ...seriesItem,
++            labelMarkType: props.markType,
++          }))}
++          xAxis={[
++            {
++              scaleType: 'band',
++              data: ['A'],
++            },
++          ]}
++          height={200}
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { BarChart } from '@mui/x-charts/BarChart';
++
++<BarChart
++  {/** ... */}
++  series={
++    seriesConfig.map((seriesItem) => ({
++      ...seriesItem,
++      labelMarkType: '${props.markType}',
++    }))
++  }
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/legend/LegendPositionNoSnap.js b/docs/data/charts/legend/LegendPosition.js
+similarity index 71%
+rename from docs/data/charts/legend/LegendPositionNoSnap.js
+rename to docs/data/charts/legend/LegendPosition.js
+index dee0c15d3a658..6c6bf01192a0d 100644
+--- a/docs/data/charts/legend/LegendPositionNoSnap.js
++++ b/docs/data/charts/legend/LegendPosition.js
+@@ -1,5 +1,3 @@
+-// @ts-check
+-
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { PieChart } from '@mui/x-charts/PieChart';
+@@ -22,41 +20,34 @@ const data = [
+   { id: 14, value: 20, label: 'Series O' },
+ ];
+ 
+-export default function LegendPositionNoSnap() {
++export default function LegendPosition() {
+   return (
+     <ChartsUsageDemo
+       componentName="Legend"
+-      data={[
+-        {
+-          propName: 'direction',
++      data={{
++        direction: {
+           knob: 'select',
+           defaultValue: 'vertical',
+           options: ['horizontal', 'vertical'],
+         },
+-        {
+-          propName: 'vertical',
++        vertical: {
+           knob: 'select',
+           defaultValue: 'middle',
+           options: ['top', 'middle', 'bottom'],
+         },
+-        {
+-          propName: 'horizontal',
++        horizontal: {
+           knob: 'select',
+           defaultValue: 'center',
+           options: ['start', 'center', 'end'],
+         },
+-        {
+-          propName: 'itemsNumber',
++        itemsNumber: {
+           knob: 'number',
+           defaultValue: 3,
+           min: 1,
+           max: data.length,
+         },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ itemsNumber: number | undefined; direction: "horizontal" | "vertical";  vertical: "top" | "middle" | "bottom"; horizontal: "start" | "center" | "end"; }} */
+-        props,
+-      ) => (
++      }}
++      renderDemo={(props) => (
+         <PieChart
+           series={[
+             {
+@@ -73,12 +64,8 @@ export default function LegendPositionNoSnap() {
+           }}
+         />
+       )}
+-      getCode={(
+-        /** @type {{props:{ itemsNumber: number | undefined; direction: "horizontal" | "vertical";  vertical: "top" | "middle" | "bottom"; horizontal: "start" | "center" | "end";}}} */
+-        { props },
+-      ) => {
+-        return `
+-import { PieChart } from '@mui/x-charts/PieChart';
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
+ 
+ <PieChart
+   {/** ... */}
+diff --git a/docs/data/charts/legend/LegendPosition.tsx b/docs/data/charts/legend/LegendPosition.tsx
+new file mode 100644
+index 0000000000000..b485abc79a7ba
+--- /dev/null
++++ b/docs/data/charts/legend/LegendPosition.tsx
+@@ -0,0 +1,88 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { PieChart } from '@mui/x-charts/PieChart';
++
++const data = [
++  { id: 0, value: 10, label: 'Series A' },
++  { id: 1, value: 15, label: 'Series B' },
++  { id: 2, value: 20, label: 'Series C' },
++  { id: 3, value: 10, label: 'Series D' },
++  { id: 4, value: 15, label: 'Series E' },
++  { id: 5, value: 20, label: 'Series F' },
++  { id: 6, value: 10, label: 'Series G' },
++  { id: 7, value: 15, label: 'Series H' },
++  { id: 8, value: 20, label: 'Series I' },
++  { id: 9, value: 10, label: 'Series J' },
++  { id: 10, value: 15, label: 'Series K' },
++  { id: 11, value: 20, label: 'Series L' },
++  { id: 12, value: 10, label: 'Series M' },
++  { id: 13, value: 15, label: 'Series N' },
++  { id: 14, value: 20, label: 'Series O' },
++];
++
++export default function LegendPosition() {
++  return (
++    <ChartsUsageDemo
++      componentName="Legend"
++      data={
++        {
++          direction: {
++            knob: 'select',
++            defaultValue: 'vertical',
++            options: ['horizontal', 'vertical'],
++          },
++          vertical: {
++            knob: 'select',
++            defaultValue: 'middle',
++            options: ['top', 'middle', 'bottom'],
++          },
++          horizontal: {
++            knob: 'select',
++            defaultValue: 'center',
++            options: ['start', 'center', 'end'],
++          },
++          itemsNumber: {
++            knob: 'number',
++            defaultValue: 3,
++            min: 1,
++            max: data.length,
++          },
++        } as const
++      }
++      renderDemo={(props) => (
++        <PieChart
++          series={[
++            {
++              data: data.slice(0, props.itemsNumber),
++            },
++          ]}
++          height={200}
++          width={200}
++          slotProps={{
++            legend: {
++              direction: props.direction,
++              position: { vertical: props.vertical, horizontal: props.horizontal },
++            },
++          }}
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
++
++<PieChart
++  {/** ... */}
++  slotProps={{
++    legend: {
++      direction: '${props.direction}',
++      position: { 
++        vertical: '${props.vertical}',
++        horizontal: '${props.horizontal}'
++      }
++    }
++  }}
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/legend/LegendTextStylingNoSnap.js b/docs/data/charts/legend/LegendTextStyling.js
+similarity index 72%
+rename from docs/data/charts/legend/LegendTextStylingNoSnap.js
+rename to docs/data/charts/legend/LegendTextStyling.js
+index 1ffc7be8bd4a2..796aeb3103166 100644
+--- a/docs/data/charts/legend/LegendTextStylingNoSnap.js
++++ b/docs/data/charts/legend/LegendTextStyling.js
+@@ -1,5 +1,3 @@
+-// @ts-check
+-
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { PieChart } from '@mui/x-charts/PieChart';
+@@ -12,29 +10,24 @@ const data = [
+   { id: 3, value: 10, label: 'Series D' },
+ ];
+ 
+-export default function LegendTextStylingNoSnap() {
++export default function LegendTextStyling() {
+   return (
+     <ChartsUsageDemo
+       componentName="Legend"
+-      data={[
+-        { propName: 'fontSize', knob: 'number', defaultValue: 14 },
+-        {
+-          propName: 'color',
++      data={{
++        fontSize: { knob: 'number', defaultValue: 14 },
++        color: {
+           knob: 'select',
+           defaultValue: 'blue',
+           options: ['blue', 'red', 'green'],
+         },
+-        {
+-          propName: 'markColor',
++        markColor: {
+           knob: 'select',
+           defaultValue: 'blue',
+           options: ['blue', 'red', 'green'],
+         },
+-      ]}
+-      renderDemo={(
+-        /** @type {{  fontSize: number; color: string; markColor: string; }} */
+-        props,
+-      ) => (
++      }}
++      renderDemo={(props) => (
+         <PieChart
+           series={[
+             {
+@@ -56,12 +49,8 @@ export default function LegendTextStylingNoSnap() {
+           }}
+         />
+       )}
+-      getCode={(
+-        /** @type {{props: {  fontSize: number; color: string; markColor: string;  }}} */
+-        { props },
+-      ) => {
+-        return `
+-import { PieChart } from '@mui/x-charts/PieChart';
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
+ import { labelMarkClasses } from '@mui/x-charts/ChartsLabel';
+ 
+ <PieChart
+diff --git a/docs/data/charts/legend/LegendTextStyling.tsx b/docs/data/charts/legend/LegendTextStyling.tsx
+new file mode 100644
+index 0000000000000..796aeb3103166
+--- /dev/null
++++ b/docs/data/charts/legend/LegendTextStyling.tsx
+@@ -0,0 +1,74 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { PieChart } from '@mui/x-charts/PieChart';
++import { labelMarkClasses } from '@mui/x-charts/ChartsLabel';
++
++const data = [
++  { id: 0, value: 10, label: 'Series A' },
++  { id: 1, value: 15, label: 'Series B' },
++  { id: 2, value: 20, label: 'Series C' },
++  { id: 3, value: 10, label: 'Series D' },
++];
++
++export default function LegendTextStyling() {
++  return (
++    <ChartsUsageDemo
++      componentName="Legend"
++      data={{
++        fontSize: { knob: 'number', defaultValue: 14 },
++        color: {
++          knob: 'select',
++          defaultValue: 'blue',
++          options: ['blue', 'red', 'green'],
++        },
++        markColor: {
++          knob: 'select',
++          defaultValue: 'blue',
++          options: ['blue', 'red', 'green'],
++        },
++      }}
++      renderDemo={(props) => (
++        <PieChart
++          series={[
++            {
++              data,
++            },
++          ]}
++          height={200}
++          width={200}
++          slotProps={{
++            legend: {
++              sx: {
++                fontSize: props.fontSize,
++                color: props.color,
++                [`.${labelMarkClasses.fill}`]: {
++                  fill: props.markColor,
++                },
++              },
++            },
++          }}
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
++import { labelMarkClasses } from '@mui/x-charts/ChartsLabel';
++
++<PieChart
++  {/** ... */}
++  slotProps={{
++    legend: {
++      sx: {
++        fontSize: ${props.fontSize},
++        color: ${props.color},
++        [\`.\${labelMarkClasses.fill}\`]: {
++          fill: ${props.markColor},
++        },
++      },
++    },
++  }}
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/legend/PiecewiseInteractiveDemoNoSnap.js b/docs/data/charts/legend/PiecewiseInteractiveDemo.js
+similarity index 79%
+rename from docs/data/charts/legend/PiecewiseInteractiveDemoNoSnap.js
+rename to docs/data/charts/legend/PiecewiseInteractiveDemo.js
+index 8960663951e0f..7155de258daba 100644
+--- a/docs/data/charts/legend/PiecewiseInteractiveDemoNoSnap.js
++++ b/docs/data/charts/legend/PiecewiseInteractiveDemo.js
+@@ -1,4 +1,3 @@
+-// @ts-check
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { LineChart } from '@mui/x-charts/LineChart';
+@@ -9,44 +8,36 @@ import {
+ import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
+ import { dataset } from './tempAnomaly';
+ 
+-export default function PiecewiseInteractiveDemoNoSnap() {
++export default function PiecewiseInteractiveDemo() {
+   return (
+     <ChartsUsageDemo
+       componentName="Legend"
+-      data={[
+-        {
+-          propName: 'direction',
++      data={{
++        direction: {
+           knob: 'select',
+           defaultValue: 'horizontal',
+           options: ['horizontal', 'vertical'],
+         },
+-        {
+-          propName: 'labelPosition',
++        labelPosition: {
+           knob: 'select',
+           defaultValue: 'extremes',
+           options: ['start', 'end', 'extremes'],
+         },
+-        {
+-          propName: 'markType',
++        markType: {
+           knob: 'select',
+           defaultValue: 'square',
+           options: ['square', 'circle', 'line'],
+         },
+-        {
+-          propName: 'onlyShowExtremes',
++        onlyShowExtremes: {
+           knob: 'switch',
+           defaultValue: false,
+         },
+-        {
+-          propName: 'padding',
++        padding: {
+           knob: 'number',
+           defaultValue: 0,
+         },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ direction: "vertical" | "horizontal"; markType: 'square' | 'circle' | 'line'; labelPosition:  'start' | 'end' | 'extremes'; padding: number; onlyShowExtremes: boolean; }} */
+-        props,
+-      ) => (
++      }}
++      renderDemo={(props) => (
+         <LineChart
+           dataset={dataset}
+           series={[
+@@ -103,12 +94,8 @@ export default function PiecewiseInteractiveDemoNoSnap() {
+           <ChartsReferenceLine y={0} />
+         </LineChart>
+       )}
+-      getCode={(
+-        /** @type {{props:{ direction: "vertical" | "horizontal"; markType: 'square' | 'circle' | 'line'; labelPosition:  'start' | 'end' | 'extremes'; padding: number; onlyShowExtremes: boolean; }}} */
+-        { props },
+-      ) => {
+-        return `
+-import { 
++      getCode={({ props }) => {
++        return `import { 
+   PiecewiseColorLegend,
+   piecewiseColorDefaultLabelFormatter,
+ } from '@mui/x-charts/ChartsLegend';
+diff --git a/docs/data/charts/legend/PiecewiseInteractiveDemo.tsx b/docs/data/charts/legend/PiecewiseInteractiveDemo.tsx
+new file mode 100644
+index 0000000000000..66f0c733e32bd
+--- /dev/null
++++ b/docs/data/charts/legend/PiecewiseInteractiveDemo.tsx
+@@ -0,0 +1,122 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { LineChart } from '@mui/x-charts/LineChart';
++import {
++  piecewiseColorDefaultLabelFormatter,
++  PiecewiseColorLegend,
++} from '@mui/x-charts/ChartsLegend';
++import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
++import { dataset } from './tempAnomaly';
++
++export default function PiecewiseInteractiveDemo() {
++  return (
++    <ChartsUsageDemo
++      componentName="Legend"
++      data={
++        {
++          direction: {
++            knob: 'select',
++            defaultValue: 'horizontal',
++            options: ['horizontal', 'vertical'],
++          },
++          labelPosition: {
++            knob: 'select',
++            defaultValue: 'extremes',
++            options: ['start', 'end', 'extremes'],
++          },
++          markType: {
++            knob: 'select',
++            defaultValue: 'square',
++            options: ['square', 'circle', 'line'],
++          },
++          onlyShowExtremes: {
++            knob: 'switch',
++            defaultValue: false,
++          },
++          padding: {
++            knob: 'number',
++            defaultValue: 0,
++          },
++        } as const
++      }
++      renderDemo={(props) => (
++        <LineChart
++          dataset={dataset}
++          series={[
++            {
++              label: 'Global temperature anomaly relative to 1961-1990',
++              dataKey: 'anomaly',
++              showMark: false,
++              valueFormatter: (value) => `${value?.toFixed(2)}°`,
++            },
++          ]}
++          xAxis={[
++            {
++              scaleType: 'time',
++              dataKey: 'year',
++              disableLine: true,
++              valueFormatter: (value) => value.getFullYear().toString(),
++              colorMap: {
++                type: 'piecewise',
++                thresholds: [new Date(1961, 0, 1), new Date(1990, 0, 1)],
++                colors: ['blue', 'gray', 'red'],
++              },
++            },
++          ]}
++          yAxis={[
++            {
++              disableLine: true,
++              disableTicks: true,
++              valueFormatter: (value) => `${value}°`,
++            },
++          ]}
++          grid={{ horizontal: true }}
++          height={300}
++          slots={{
++            legend: PiecewiseColorLegend,
++          }}
++          slotProps={{
++            legend: {
++              axisDirection: 'x',
++              direction: props.direction,
++              markType: props.markType,
++              labelPosition: props.labelPosition,
++              labelFormatter: props.onlyShowExtremes
++                ? (params) =>
++                    params.index === 0 || params.index === params.length
++                      ? piecewiseColorDefaultLabelFormatter(params)
++                      : ''
++                : undefined,
++              sx: {
++                padding: props.padding,
++              },
++            },
++          }}
++        >
++          <ChartsReferenceLine y={0} />
++        </LineChart>
++      )}
++      getCode={({ props }) => {
++        return `import { 
++  PiecewiseColorLegend,
++  piecewiseColorDefaultLabelFormatter,
++} from '@mui/x-charts/ChartsLegend';
++
++<LineChart
++  {/** ... */}
++  slots={{ legend: PiecewiseColorLegend }}
++  slotProps={{
++    legend: {
++      axisDirection: 'x',
++      direction: '${props.direction}',
++      markType: '${props.markType}',
++      labelPosition: '${props.labelPosition}',
++      sx: { padding: ${props.padding} },${props.onlyShowExtremes ? "\n      labelFormatter: (params) =>\n        params.index === 0 || params.index === params.length\n          ? piecewiseColorDefaultLabelFormatter(params) \n          : ''" : ''}
++    },
++  }}
++/>
++`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/legend/legend.md b/docs/data/charts/legend/legend.md
+index 2d0da25629787..a9ab4a5199989 100644
+--- a/docs/data/charts/legend/legend.md
++++ b/docs/data/charts/legend/legend.md
+@@ -29,7 +29,7 @@ Each legend item is composed of two main elements: the `mark` and the `label`.
+ The example below explains how it is possible to customize some parts the legend.
+ And shows how to use both the `legendClasses` variable and the CSS class directly.
+ 
+-{{"demo": "LegendDimensionNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "LegendDimension.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### Position
+ 
+@@ -47,7 +47,7 @@ The `position` property is only available in the `slotProps`, but not in the `<C
+ In the second case, you are free to place the legend where you want.
+ :::
+ 
+-{{"demo": "LegendPositionNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "LegendPosition.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### Hiding
+ 
+@@ -62,14 +62,14 @@ Changing the `label` style can be done by targeting the root component's font pr
+ To change the `mark` color or shape, the `fill` class is used instead.
+ Keep in mind that the `mark` is an SVG element, so the `fill` property is used to change its color.
+ 
+-{{"demo": "LegendTextStylingNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "LegendTextStyling.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### Change mark shape
+ 
+ To change the mark shape, you can use the `labelMarkType` property of the series item.
+ For the `pie` series, the `labelMarkType` property is available for each of the pie slices too.
+ 
+-{{"demo": "LegendMarkTypeNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "LegendMarkType.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### Scrollable legend
+ 
+@@ -135,7 +135,7 @@ Or a function `({value, formattedValue}) => string`.
+ 
+ It is also possible to reverse the gradient with the `reverse` prop.
+ 
+-{{"demo": "ContinuousInteractiveDemoNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "ContinuousInteractiveDemo.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### Piecewise color mapping
+ 
+@@ -157,7 +157,7 @@ labelFormatter = ({ index, length, min, max, formattedMin, formattedMax }) =>
+ The `markType` can be changed with the `markType` prop.
+ Since the color values are based on the axis, and not the series, the `markType` has to be set directly on the legend.
+ 
+-{{"demo": "PiecewiseInteractiveDemoNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "PiecewiseInteractiveDemo.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ## Click event
+ 
+@@ -175,4 +175,4 @@ const clickHandler = (
+ The `context` object contains different properties depending on the legend type.
+ Click the legend items to see their content.
+ 
+-{{"demo": "LegendClickNoSnap.js"}}
++{{"demo": "LegendClick.js"}}
+diff --git a/docs/data/charts/lines/InterpolationDemoNoSnap.js b/docs/data/charts/lines/InterpolationDemo.js
+similarity index 86%
+rename from docs/data/charts/lines/InterpolationDemoNoSnap.js
+rename to docs/data/charts/lines/InterpolationDemo.js
+index 8b3b89229e0fe..2f6eb5bc6f66e 100644
+--- a/docs/data/charts/lines/InterpolationDemoNoSnap.js
++++ b/docs/data/charts/lines/InterpolationDemo.js
+@@ -1,5 +1,3 @@
+-// @ts-check
+-
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+ import TextField from '@mui/material/TextField';
+@@ -8,9 +6,6 @@ import { LineChart } from '@mui/x-charts/LineChart';
+ 
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
+ 
+-/**
+- * @type {import('@mui/x-charts/models').CurveType[]}
+- */
+ const curveTypes = [
+   'linear',
+   'catmullRom',
+@@ -22,9 +17,6 @@ const curveTypes = [
+   'stepAfter',
+ ];
+ 
+-/**
+- * @param {import('@mui/x-charts/models').CurveType} curveType
+- */
+ function getExample(curveType) {
+   return `<LineChart
+   series={[
+@@ -35,7 +27,7 @@ function getExample(curveType) {
+ />`;
+ }
+ 
+-export default function InterpolationDemoNoSnap() {
++export default function InterpolationDemo() {
+   const [curveType, setCurveType] = React.useState(curveTypes[0]);
+ 
+   return (
+@@ -45,7 +37,6 @@ export default function InterpolationDemoNoSnap() {
+         label="interpolation method"
+         value={curveType}
+         sx={{ minWidth: 200, mb: 2 }}
+-        // @ts-expect-error
+         onChange={(event) => setCurveType(event.target.value)}
+       >
+         {curveTypes.map((curve) => (
+diff --git a/docs/data/charts/lines/InterpolationDemo.tsx b/docs/data/charts/lines/InterpolationDemo.tsx
+new file mode 100644
+index 0000000000000..d6ed86287d49f
+--- /dev/null
++++ b/docs/data/charts/lines/InterpolationDemo.tsx
+@@ -0,0 +1,61 @@
++import * as React from 'react';
++import Box from '@mui/material/Box';
++import TextField from '@mui/material/TextField';
++import MenuItem from '@mui/material/MenuItem';
++import { LineChart } from '@mui/x-charts/LineChart';
++
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
++import { CurveType } from '@mui/x-charts/models';
++
++const curveTypes: CurveType[] = [
++  'linear',
++  'catmullRom',
++  'monotoneX',
++  'monotoneY',
++  'natural',
++  'step',
++  'stepBefore',
++  'stepAfter',
++];
++
++function getExample(curveType: CurveType) {
++  return `<LineChart
++  series={[
++    { curve: "${curveType}", data: [1, 5, 2, 6, 3, 9.3] },
++    { curve: "${curveType}", data: [6, 3, 7, 9.5, 4, 2] },
++  ]}
++  {/* ... */}
++/>`;
++}
++
++export default function InterpolationDemo() {
++  const [curveType, setCurveType] = React.useState(curveTypes[0]);
++
++  return (
++    <Box sx={{ p: 2, width: 1, maxWidth: 600 }}>
++      <TextField
++        select
++        label="interpolation method"
++        value={curveType}
++        sx={{ minWidth: 200, mb: 2 }}
++        onChange={(event) => setCurveType(event.target.value as CurveType)}
++      >
++        {curveTypes.map((curve) => (
++          <MenuItem key={curve} value={curve}>
++            {curve}
++          </MenuItem>
++        ))}
++      </TextField>
++      <LineChart
++        xAxis={[{ data: [1, 3, 5, 6, 7, 9], min: 0, max: 10 }]}
++        series={[
++          { curve: curveType, data: [1, 5, 2, 6, 3, 9.3] },
++          { curve: curveType, data: [6, 3, 7, 9.5, 4, 2] },
++        ]}
++        height={300}
++        skipAnimation
++      />
++      <HighlightedCode code={getExample(curveType)} language="tsx" />
++    </Box>
++  );
++}
+diff --git a/docs/data/charts/lines/LineClickNoSnap.js b/docs/data/charts/lines/LineClick.js
+similarity index 97%
+rename from docs/data/charts/lines/LineClickNoSnap.js
+rename to docs/data/charts/lines/LineClick.js
+index 8038b4ffc1f10..ed446514bd586 100644
+--- a/docs/data/charts/lines/LineClickNoSnap.js
++++ b/docs/data/charts/lines/LineClick.js
+@@ -46,7 +46,7 @@ const lineChartsParams = {
+   height: 400,
+ };
+ 
+-export default function LineClickNoSnap() {
++export default function LineClick() {
+   const [itemData, setItemData] = React.useState();
+   const [axisData, setAxisData] = React.useState();
+ 
+@@ -79,7 +79,7 @@ export default function LineClickNoSnap() {
+             aria-label="reset"
+             size="small"
+             onClick={() => {
+-              setItemData(null);
++              setItemData(undefined);
+               setAxisData(null);
+             }}
+           >
+diff --git a/docs/data/charts/lines/LineClick.tsx b/docs/data/charts/lines/LineClick.tsx
+new file mode 100644
+index 0000000000000..84daca08957bd
+--- /dev/null
++++ b/docs/data/charts/lines/LineClick.tsx
+@@ -0,0 +1,103 @@
++import * as React from 'react';
++import Stack from '@mui/material/Stack';
++import Box from '@mui/material/Box';
++import Typography from '@mui/material/Typography';
++import IconButton from '@mui/material/IconButton';
++import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
++
++import { LineChart } from '@mui/x-charts/LineChart';
++
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
++import { ChartsAxisData, LineItemIdentifier } from '@mui/x-charts/models';
++
++const lineChartsParams = {
++  series: [
++    {
++      id: 'series-1',
++      data: [3, 4, 1, 6, 5],
++      label: 'A',
++      area: true,
++      stack: 'total',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++    {
++      id: 'series-2',
++      data: [4, 3, 1, 5, 8],
++      label: 'B',
++      area: true,
++      stack: 'total',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++    {
++      id: 'series-3',
++      data: [4, 2, 5, 4, 1],
++      label: 'C',
++      area: true,
++      stack: 'total',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++  ],
++  xAxis: [{ data: [0, 3, 6, 9, 12], scaleType: 'linear', id: 'axis1' }],
++  height: 400,
++} as const;
++
++export default function LineClick() {
++  const [itemData, setItemData] = React.useState<LineItemIdentifier>();
++  const [axisData, setAxisData] = React.useState<ChartsAxisData | null>();
++
++  return (
++    <Stack
++      direction={{ xs: 'column', md: 'row' }}
++      spacing={{ xs: 0, md: 4 }}
++      sx={{ width: '100%' }}
++    >
++      <Box sx={{ flexGrow: 1 }}>
++        <LineChart
++          {...lineChartsParams}
++          onAreaClick={(event, d) => setItemData(d)}
++          onMarkClick={(event, d) => setItemData(d)}
++          onLineClick={(event, d) => setItemData(d)}
++          onAxisClick={(event, d) => setAxisData(d)}
++        />
++      </Box>
++
++      <Stack direction="column" sx={{ width: { xs: '100%', md: '40%' } }}>
++        <Box
++          sx={{
++            display: 'flex',
++            justifyContent: 'space-between',
++            alignItems: 'center',
++          }}
++        >
++          <Typography>Click on the chart</Typography>
++          <IconButton
++            aria-label="reset"
++            size="small"
++            onClick={() => {
++              setItemData(undefined);
++              setAxisData(null);
++            }}
++          >
++            <UndoOutlinedIcon fontSize="small" />
++          </IconButton>
++        </Box>
++        <HighlightedCode
++          code={`// Data from item click
++${itemData ? JSON.stringify(itemData, null, 2) : '// The data will appear here'}
++
++// Data from axis click
++${axisData ? JSON.stringify(axisData, null, 2) : '// The data will appear here'}
++`}
++          language="json"
++          copyButtonHidden
++        />
++      </Stack>
++    </Stack>
++  );
++}
+diff --git a/docs/data/charts/lines/lines.md b/docs/data/charts/lines/lines.md
+index 2fda754215e77..ef9f14cf63f6b 100644
+--- a/docs/data/charts/lines/lines.md
++++ b/docs/data/charts/lines/lines.md
+@@ -109,7 +109,7 @@ const clickHandler = (
+ ) => {};
+ ```
+ 
+-{{"demo": "LineClickNoSnap.js"}}
++{{"demo": "LineClick.js"}}
+ 
+ :::info
+ Their is a slight difference between the `event` of `onAxisClick` and the others:
+@@ -169,7 +169,7 @@ This property expects one of the following string values, corresponding to the i
+ This series property adds the option to control the interpolation of a series.
+ Different series could even have different interpolations.
+ 
+-{{"demo": "InterpolationDemoNoSnap.js", "hideToolbar": true}}
++{{"demo": "InterpolationDemo.js", "hideToolbar": true}}
+ 
+ #### Expanding steps
+ 
+diff --git a/docs/data/charts/pie/PieClickNoSnap.js b/docs/data/charts/pie/PieClick.js
+similarity index 93%
+rename from docs/data/charts/pie/PieClickNoSnap.js
+rename to docs/data/charts/pie/PieClick.js
+index 0e8eef9fbf240..dc745436eafc8 100644
+--- a/docs/data/charts/pie/PieClickNoSnap.js
++++ b/docs/data/charts/pie/PieClick.js
+@@ -6,9 +6,10 @@ import IconButton from '@mui/material/IconButton';
+ import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
+ import { PieChart } from '@mui/x-charts/PieChart';
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
++
+ import { mobileAndDesktopOS, platforms, valueFormatter } from './webUsageStats';
+ 
+-export default function PieClickNoSnap() {
++export default function PieClick() {
+   const [itemData, setItemData] = React.useState();
+ 
+   return (
+@@ -39,9 +40,7 @@ export default function PieClickNoSnap() {
+           <IconButton
+             aria-label="reset"
+             size="small"
+-            onClick={() => {
+-              setItemData(null);
+-            }}
++            onClick={() => setItemData(undefined)}
+           >
+             <UndoOutlinedIcon fontSize="small" />
+           </IconButton>
+diff --git a/docs/data/charts/pie/PieClick.tsx b/docs/data/charts/pie/PieClick.tsx
+new file mode 100644
+index 0000000000000..3b2bafc5ddf28
+--- /dev/null
++++ b/docs/data/charts/pie/PieClick.tsx
+@@ -0,0 +1,75 @@
++import * as React from 'react';
++import Stack from '@mui/material/Stack';
++import Box from '@mui/material/Box';
++import Typography from '@mui/material/Typography';
++import IconButton from '@mui/material/IconButton';
++import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
++import { PieChart } from '@mui/x-charts/PieChart';
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
++import { PieItemIdentifier } from '@mui/x-charts/models';
++import { mobileAndDesktopOS, platforms, valueFormatter } from './webUsageStats';
++
++export default function PieClick() {
++  const [itemData, setItemData] = React.useState<PieItemIdentifier>();
++
++  return (
++    <Stack
++      direction={{ xs: 'column', md: 'row' }}
++      spacing={{ xs: 0, md: 4 }}
++      sx={{ width: '100%' }}
++    >
++      <Box sx={{ flexGrow: 1 }}>
++        <PieChart
++          series={series}
++          width={300}
++          height={300}
++          hideLegend
++          onItemClick={(event, d) => setItemData(d)}
++        />{' '}
++      </Box>
++
++      <Stack direction="column" sx={{ width: { xs: '100%', md: '40%' } }}>
++        <Box
++          sx={{
++            display: 'flex',
++            justifyContent: 'space-between',
++            alignItems: 'center',
++          }}
++        >
++          <Typography>Click on the chart</Typography>
++          <IconButton
++            aria-label="reset"
++            size="small"
++            onClick={() => setItemData(undefined)}
++          >
++            <UndoOutlinedIcon fontSize="small" />
++          </IconButton>
++        </Box>
++        <HighlightedCode
++          code={`// Data from item click
++${itemData ? JSON.stringify(itemData, null, 2) : '// The data will appear here'}
++`}
++          language="json"
++          copyButtonHidden
++        />
++      </Stack>
++    </Stack>
++  );
++}
++
++const series = [
++  {
++    innerRadius: 0,
++    outerRadius: 80,
++    id: 'platform-series',
++    data: platforms,
++    valueFormatter,
++  },
++  {
++    innerRadius: 100,
++    outerRadius: 120,
++    id: 'OS-series',
++    data: mobileAndDesktopOS,
++    valueFormatter,
++  },
++];
+diff --git a/docs/data/charts/pie/PieShape.js b/docs/data/charts/pie/PieShape.js
+new file mode 100644
+index 0000000000000..790da08df6797
+--- /dev/null
++++ b/docs/data/charts/pie/PieShape.js
+@@ -0,0 +1,55 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { PieChart } from '@mui/x-charts/PieChart';
++import { desktopOS, valueFormatter } from './webUsageStats';
++
++export default function PieShape() {
++  return (
++    <ChartsUsageDemo
++      componentName="Pie shape"
++      data={{
++        innerRadius: { knob: 'number', defaultValue: 30 },
++        outerRadius: { knob: 'number', defaultValue: 100 },
++        paddingAngle: { knob: 'number', defaultValue: 5 },
++        cornerRadius: { knob: 'number', defaultValue: 5 },
++        startAngle: { knob: 'number', defaultValue: -45 },
++        endAngle: { knob: 'number', defaultValue: 225 },
++        cx: { knob: 'number', defaultValue: 150 },
++        cy: { knob: 'number', defaultValue: 150 },
++      }}
++      renderDemo={(props) => (
++        <PieChart
++          series={[
++            {
++              ...props,
++              data: desktopOS,
++              valueFormatter,
++            },
++          ]}
++          width={300}
++          height={300}
++          hideLegend
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
++
++<PieChart
++  series={[
++    {
++      data: [ ... ],
++      innerRadius: ${props.innerRadius},
++      outerRadius: ${props.outerRadius},
++      paddingAngle: ${props.paddingAngle},
++      cornerRadius: ${props.cornerRadius},
++      startAngle: ${props.startAngle},
++      endAngle: ${props.endAngle},
++      cx: ${props.cx},
++      cy: ${props.cy},
++    }
++  ]}
++/>`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/pie/PieShape.tsx b/docs/data/charts/pie/PieShape.tsx
+new file mode 100644
+index 0000000000000..790da08df6797
+--- /dev/null
++++ b/docs/data/charts/pie/PieShape.tsx
+@@ -0,0 +1,55 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { PieChart } from '@mui/x-charts/PieChart';
++import { desktopOS, valueFormatter } from './webUsageStats';
++
++export default function PieShape() {
++  return (
++    <ChartsUsageDemo
++      componentName="Pie shape"
++      data={{
++        innerRadius: { knob: 'number', defaultValue: 30 },
++        outerRadius: { knob: 'number', defaultValue: 100 },
++        paddingAngle: { knob: 'number', defaultValue: 5 },
++        cornerRadius: { knob: 'number', defaultValue: 5 },
++        startAngle: { knob: 'number', defaultValue: -45 },
++        endAngle: { knob: 'number', defaultValue: 225 },
++        cx: { knob: 'number', defaultValue: 150 },
++        cy: { knob: 'number', defaultValue: 150 },
++      }}
++      renderDemo={(props) => (
++        <PieChart
++          series={[
++            {
++              ...props,
++              data: desktopOS,
++              valueFormatter,
++            },
++          ]}
++          width={300}
++          height={300}
++          hideLegend
++        />
++      )}
++      getCode={({ props }) => {
++        return `import { PieChart } from '@mui/x-charts/PieChart';
++
++<PieChart
++  series={[
++    {
++      data: [ ... ],
++      innerRadius: ${props.innerRadius},
++      outerRadius: ${props.outerRadius},
++      paddingAngle: ${props.paddingAngle},
++      cornerRadius: ${props.cornerRadius},
++      startAngle: ${props.startAngle},
++      endAngle: ${props.endAngle},
++      cx: ${props.cx},
++      cy: ${props.cy},
++    }
++  ]}
++/>`;
++      }}
++    />
++  );
++}
+diff --git a/docs/data/charts/pie/PieShapeNoSnap.js b/docs/data/charts/pie/PieShapeNoSnap.js
+deleted file mode 100644
+index c312a499232ab..0000000000000
+--- a/docs/data/charts/pie/PieShapeNoSnap.js
++++ /dev/null
+@@ -1,57 +0,0 @@
+-import * as React from 'react';
+-import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+-import { PieChart } from '@mui/x-charts/PieChart';
+-import { desktopOS, valueFormatter } from './webUsageStats';
+-
+-export default function PieShapeNoSnap() {
+-  return (
+-    <ChartsUsageDemo
+-      componentName="Pie shape"
+-      data={[
+-        { propName: `innerRadius`, knob: 'number', defaultValue: 30 },
+-        { propName: `outerRadius`, knob: 'number', defaultValue: 100 },
+-        { propName: `paddingAngle`, knob: 'number', defaultValue: 5 },
+-        { propName: `cornerRadius`, knob: 'number', defaultValue: 5 },
+-        { propName: `startAngle`, knob: 'number', defaultValue: -45 },
+-        { propName: `endAngle`, knob: 'number', defaultValue: 225 },
+-        { propName: `cx`, knob: 'number', defaultValue: 150 },
+-        { propName: `cy`, knob: 'number', defaultValue: 150 },
+-      ]}
+-      renderDemo={(props) => (
+-        <PieChart
+-          series={[
+-            {
+-              ...props,
+-              data: desktopOS,
+-              valueFormatter,
+-            },
+-          ]}
+-          width={300}
+-          height={300}
+-          hideLegend
+-        />
+-      )}
+-      getCode={({ props }) => {
+-        return [
+-          `import { PieChart } from '@mui/x-charts/PieChart';`,
+-          '',
+-          `<PieChart`,
+-          `  series={[`,
+-          `    {`,
+-          `      data: [ ... ],`,
+-          `      innerRadius: ${props.innerRadius},`,
+-          `      outerRadius: ${props.outerRadius},`,
+-          `      paddingAngle: ${props.paddingAngle},`,
+-          `      cornerRadius: ${props.cornerRadius},`,
+-          `      startAngle: ${props.startAngle},`,
+-          `      endAngle: ${props.endAngle},`,
+-          `      cx: ${props.cx},`,
+-          `      cy: ${props.cy},`,
+-          `    }`,
+-          `  ]}`,
+-          '/>',
+-        ].join('\n');
+-      }}
+-    />
+-  );
+-}
+diff --git a/docs/data/charts/pie/pie.md b/docs/data/charts/pie/pie.md
+index fa9210520b17d..debf5f11d8c89 100644
+--- a/docs/data/charts/pie/pie.md
++++ b/docs/data/charts/pie/pie.md
+@@ -53,7 +53,7 @@ Pie series shape is described by multiple properties:
+ - `startAngle`/`endAngle` The angle range of the pie chart. Values are given in degrees.
+ - `cx`/`cy` The center of the pie charts. By default the middle of the drawing area.
+ 
+-{{"demo": "PieShapeNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "PieShape.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ The following properties accept percentage string (for example `'50%'`).
+ 
+@@ -103,7 +103,7 @@ const onItemClick = (
+ ) => {};
+ ```
+ 
+-{{"demo": "PieClickNoSnap.js"}}
++{{"demo": "PieClick.js"}}
+ 
+ ## Animation
+ 
+diff --git a/docs/data/charts/scatter/ScatterClick.js b/docs/data/charts/scatter/ScatterClick.js
+new file mode 100644
+index 0000000000000..3fe6cc989c3f0
+--- /dev/null
++++ b/docs/data/charts/scatter/ScatterClick.js
+@@ -0,0 +1,101 @@
++import * as React from 'react';
++import Stack from '@mui/material/Stack';
++import Box from '@mui/material/Box';
++import Typography from '@mui/material/Typography';
++import IconButton from '@mui/material/IconButton';
++import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
++
++import { ScatterChart } from '@mui/x-charts/ScatterChart';
++
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
++
++const scatterChartsParams = {
++  series: [
++    {
++      id: 'series-1',
++      data: [
++        { x: 6.5e-2, y: -1.3, id: 0 },
++        { x: -2.1, y: -7.0e-1, id: 1 },
++        { x: -7.6e-1, y: -6.7e-1, id: 2 },
++        { x: -1.5e-2, y: -2.0e-1, id: 3 },
++        { x: -1.4, y: -9.9e-1, id: 4 },
++        { x: -1.1, y: -1.5, id: 5 },
++        { x: -7.0e-1, y: -2.7e-1, id: 6 },
++        { x: -5.1e-1, y: -8.8e-1, id: 7 },
++        { x: -4.0e-3, y: -1.4, id: 8 },
++        { x: -1.3, y: -2.2, id: 9 },
++      ],
++      label: 'A',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++    {
++      id: 'series-2',
++      data: [
++        { x: 1.8, y: -1.7e-2, id: 0 },
++        { x: 7.1e-1, y: 2.6e-1, id: 1 },
++        { x: -1.2, y: 9.8e-1, id: 2 },
++        { x: 2.0, y: -2.0e-1, id: 3 },
++        { x: 9.4e-1, y: -2.7e-1, id: 4 },
++        { x: -4.8e-1, y: -1.6e-1, id: 5 },
++        { x: -1.5, y: 1.1, id: 6 },
++        { x: 1.3, y: 3.4e-1, id: 7 },
++        { x: -4.2e-1, y: 1.0e-1, id: 8 },
++        { x: 5.4e-2, y: 4.0e-1, id: 9 },
++      ],
++      label: 'B',
++      highlightScope: {
++        highlight: 'item',
++      },
++    },
++  ],
++  height: 400,
++};
++
++export default function ScatterClick() {
++  const [data, setData] = React.useState();
++
++  const { ...other } = data ?? {};
++  const dataDisplayed = data && {
++    ...other,
++  };
++  return (
++    <Stack
++      direction={{ xs: 'column', md: 'row' }}
++      spacing={{ xs: 0, md: 4 }}
++      sx={{ width: '100%' }}
++    >
++      <Box sx={{ flexGrow: 1 }}>
++        <ScatterChart {...scatterChartsParams} onItemClick={(_, d) => setData(d)} />
++      </Box>
++      <Stack direction="column" sx={{ width: { xs: '100%', md: '40%' } }}>
++        <Box
++          sx={{
++            display: 'flex',
++            justifyContent: 'space-between',
++            alignItems: 'center',
++          }}
++        >
++          <Typography>Click on the chart</Typography>
++          <IconButton
++            aria-label="reset"
++            size="small"
++            onClick={() => setData(undefined)}
++          >
++            <UndoOutlinedIcon fontSize="small" />
++          </IconButton>
++        </Box>
++        <HighlightedCode
++          code={
++            dataDisplayed
++              ? JSON.stringify(dataDisplayed, null, 1)
++              : '// The data will appear here'
++          }
++          language="json"
++          copyButtonHidden
++        />
++      </Stack>
++    </Stack>
++  );
++}
+diff --git a/docs/data/charts/scatter/ScatterClickNoSnap.js b/docs/data/charts/scatter/ScatterClick.tsx
+similarity index 78%
+rename from docs/data/charts/scatter/ScatterClickNoSnap.js
+rename to docs/data/charts/scatter/ScatterClick.tsx
+index a4ccaee0a4e49..1ad5e173868dd 100644
+--- a/docs/data/charts/scatter/ScatterClickNoSnap.js
++++ b/docs/data/charts/scatter/ScatterClick.tsx
+@@ -8,6 +8,7 @@ import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+ 
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
++import { ScatterItemIdentifier } from '@mui/x-charts/models';
+ 
+ const scatterChartsParams = {
+   series: [
+@@ -51,25 +52,13 @@ const scatterChartsParams = {
+     },
+   ],
+   height: 400,
+-};
++} as const;
+ 
+-export default function ScatterClickNoSnap() {
+-  const [data, setData] = React.useState();
++export default function ScatterClick() {
++  const [data, setData] = React.useState<ScatterItemIdentifier>();
+ 
+-  const { axis, item, ...other } = data ?? {};
++  const { ...other } = data ?? {};
+   const dataDisplayed = data && {
+-    ...(item
+-      ? {
+-          item: {
+-            dataIndex: item.dataIndex,
+-            series: {
+-              id: item.series.id,
+-              toReplace: '',
+-            },
+-          },
+-        }
+-      : undefined),
+-    ...(axis ? { axis } : undefined),
+     ...other,
+   };
+   return (
+@@ -81,7 +70,7 @@ export default function ScatterClickNoSnap() {
+       <Box sx={{ flexGrow: 1 }}>
+         <ScatterChart
+           {...scatterChartsParams}
+-          onItemClick={(event, d) => setData(d)}
++          onItemClick={(_: any, d: ScatterItemIdentifier) => setData(d)}
+         />
+       </Box>
+       <Stack direction="column" sx={{ width: { xs: '100%', md: '40%' } }}>
+@@ -96,9 +85,7 @@ export default function ScatterClickNoSnap() {
+           <IconButton
+             aria-label="reset"
+             size="small"
+-            onClick={() => {
+-              setData(null);
+-            }}
++            onClick={() => setData(undefined)}
+           >
+             <UndoOutlinedIcon fontSize="small" />
+           </IconButton>
+@@ -106,10 +93,7 @@ export default function ScatterClickNoSnap() {
+         <HighlightedCode
+           code={
+             dataDisplayed
+-              ? JSON.stringify(dataDisplayed, null, 1).replace(
+-                  '"toReplace": ""',
+-                  '// ... (entire series definition)',
+-                )
++              ? JSON.stringify(dataDisplayed, null, 1)
+               : '// The data will appear here'
+           }
+           language="json"
+diff --git a/docs/data/charts/scatter/scatter.md b/docs/data/charts/scatter/scatter.md
+index 46cf44d4bef4b..e78180edefd79 100644
+--- a/docs/data/charts/scatter/scatter.md
++++ b/docs/data/charts/scatter/scatter.md
+@@ -52,7 +52,7 @@ const onItemClick = (
+ ) => {};
+ ```
+ 
+-{{"demo": "ScatterClickNoSnap.js"}}
++{{"demo": "ScatterClick.js"}}
+ 
+ If `disableVoronoi=true`, users need to click precisely on the scatter element, and the mouse event will come from this element.
+ 
+diff --git a/docs/data/charts/styling/MarginNoSnap.js b/docs/data/charts/styling/Margin.js
+similarity index 78%
+rename from docs/data/charts/styling/MarginNoSnap.js
+rename to docs/data/charts/styling/Margin.js
+index 177b9177bc12a..2db3a713c66fc 100644
+--- a/docs/data/charts/styling/MarginNoSnap.js
++++ b/docs/data/charts/styling/Margin.js
+@@ -1,49 +1,45 @@
+-// @ts-check
+ import * as React from 'react';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ import { BarChart } from '@mui/x-charts/BarChart';
+ import { useDrawingArea, useXAxis, useYAxis } from '@mui/x-charts/hooks';
+ 
+-const data = ['left', 'right', 'top', 'bottom']
+-  .map((propName) => ({
+-    propName,
+-    knob: 'number',
+-    defaultValue: 40,
+-    step: 1,
+-    min: 0,
+-    max: 200,
+-  }))
+-  .concat(
+-    ['xAxisHeight', 'yAxisWidth'].map((propName) => ({
+-      propName,
+-      knob: 'number',
+-      defaultValue: 30,
+-      step: 1,
+-      min: 0,
+-      max: 200,
+-    })),
+-  );
+-export default function MarginNoSnap() {
++const defaultMargin = {
++  knob: 'number',
++  defaultValue: 40,
++  step: 1,
++  min: 0,
++  max: 200,
++};
++
++const defaultAxisSize = {
++  knob: 'number',
++  defaultValue: 30,
++  step: 1,
++  min: 0,
++  max: 200,
++};
++
++export default function Margin() {
+   return (
+     <ChartsUsageDemo
+       componentName="Margin demos"
+-      data={[
+-        ...data,
+-        {
+-          propName: 'hideXAxis',
++      data={{
++        left: defaultMargin,
++        right: defaultMargin,
++        top: defaultMargin,
++        bottom: defaultMargin,
++        xAxisHeight: defaultAxisSize,
++        yAxisWidth: defaultAxisSize,
++        hideXAxis: {
+           knob: 'switch',
+           defaultValue: false,
+         },
+-        {
+-          propName: 'hideYAxis',
++        hideYAxis: {
+           knob: 'switch',
+           defaultValue: false,
+         },
+-      ]}
+-      renderDemo={(
+-        /** @type {{ left: number; right: number; top: number; bottom: number; xAxisHeight: number; yAxisWidth: number; hideXAxis: boolean; hideYAxis: boolean; }} */
+-        props,
+-      ) => (
++      }}
++      renderDemo={(props) => (
+         <div style={{ width: '100%', margin: 4 }}>
+           <BarChart
+             series={[{ data: [6, 18, 12] }]}
+@@ -77,10 +73,8 @@ export default function MarginNoSnap() {
+           </BarChart>
+         </div>
+       )}
+-      getCode={(
+-        /** @type {{props: { left: number; right: number; top: number; bottom: number; xAxisHeight: number; yAxisWidth: number; hideXAxis: boolean; hideYAxis: boolean; }}} */
+-        { props },
+-      ) => `import { BarChart } from '@mui/x-charts/BarChart';
++      getCode={({ props }) =>
++        `import { BarChart } from '@mui/x-charts/BarChart';
+ 
+ <BarChart
+   // ...
+@@ -98,7 +92,8 @@ export default function MarginNoSnap() {
+     width: ${props.yAxisWidth}
+     position: ${props.hideYAxis ? "'none'" : "'right'"}
+   }]}
+-/>`}
++/>`
++      }
+     />
+   );
+ }
+diff --git a/docs/data/charts/styling/Margin.tsx b/docs/data/charts/styling/Margin.tsx
+new file mode 100644
+index 0000000000000..018e20d61aa49
+--- /dev/null
++++ b/docs/data/charts/styling/Margin.tsx
+@@ -0,0 +1,193 @@
++import * as React from 'react';
++import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
++import { BarChart } from '@mui/x-charts/BarChart';
++import { useDrawingArea, useXAxis, useYAxis } from '@mui/x-charts/hooks';
++
++const defaultMargin = {
++  knob: 'number',
++  defaultValue: 40,
++  step: 1,
++  min: 0,
++  max: 200,
++} as const;
++
++const defaultAxisSize = {
++  knob: 'number',
++  defaultValue: 30,
++  step: 1,
++  min: 0,
++  max: 200,
++} as const;
++
++export default function Margin() {
++  return (
++    <ChartsUsageDemo
++      componentName="Margin demos"
++      data={
++        {
++          left: defaultMargin,
++          right: defaultMargin,
++          top: defaultMargin,
++          bottom: defaultMargin,
++          xAxisHeight: defaultAxisSize,
++          yAxisWidth: defaultAxisSize,
++          hideXAxis: {
++            knob: 'switch',
++            defaultValue: false,
++          },
++          hideYAxis: {
++            knob: 'switch',
++            defaultValue: false,
++          },
++        } as const
++      }
++      renderDemo={(props) => (
++        <div style={{ width: '100%', margin: 4 }}>
++          <BarChart
++            series={[{ data: [6, 18, 12] }]}
++            height={300}
++            margin={{
++              left: props.left,
++              right: props.right,
++              top: props.top,
++              bottom: props.bottom,
++            }}
++            xAxis={[
++              {
++                id: 'x-axis',
++                scaleType: 'band',
++                data: ['Page 1', 'Page 2', 'Page 3'],
++                position: props.hideXAxis ? 'none' : 'top',
++                height: props.xAxisHeight,
++              },
++            ]}
++            yAxis={[
++              {
++                id: 'y-axis',
++                position: props.hideYAxis ? 'none' : 'right',
++                width: props.yAxisWidth,
++              },
++            ]}
++          >
++            <MarginVisualization />
++            <AxisSizeVisualization />
++            <DrawingAreaVisualization />
++          </BarChart>
++        </div>
++      )}
++      getCode={({ props }) =>
++        `import { BarChart } from '@mui/x-charts/BarChart';
++
++<BarChart
++  // ...
++  margin={{
++    left: ${props.left},
++    right: ${props.right},
++    top: ${props.top},
++    bottom: ${props.bottom},
++  }}
++  xAxis={[{
++    height: ${props.xAxisHeight},
++    position: ${props.hideXAxis ? "'none'" : "'top'"}
++  }]}
++  yAxis={[{
++    width: ${props.yAxisWidth}
++    position: ${props.hideYAxis ? "'none'" : "'right'"}
++  }]}
++/>`
++      }
++    />
++  );
++}
++
++function MarginVisualization() {
++  const { bottom, left, right, top, height, width } = useDrawingArea();
++  const xAxis = useXAxis('x-axis');
++  const yAxis = useYAxis('y-axis');
++
++  const xSize = (xAxis.position !== 'none' ? xAxis.height : 0) ?? 0;
++  const ySize = (yAxis.position !== 'none' ? yAxis.width : 0) ?? 0;
++
++  return (
++    <React.Fragment>
++      <rect
++        x={0}
++        y={0}
++        width={'100%'}
++        height={top - xSize}
++        fill="#008080"
++        opacity={0.5}
++      />
++      <rect
++        x={0}
++        y={height + top}
++        width={'100%'}
++        height={bottom}
++        fill="#008080"
++        opacity={0.5}
++      />
++      <rect
++        x={0}
++        y={top - xSize}
++        width={left}
++        height={height + xSize}
++        fill="#008080"
++        opacity={0.5}
++      />
++      <rect
++        x={width + left + ySize}
++        y={top - xSize}
++        width={right - ySize}
++        height={height + xSize}
++        fill="#008080"
++        opacity={0.5}
++      />
++    </React.Fragment>
++  );
++}
++
++function AxisSizeVisualization() {
++  const { left, top, height, width } = useDrawingArea();
++  const xAxis = useXAxis('x-axis');
++  const yAxis = useYAxis('y-axis');
++
++  return (
++    <React.Fragment>
++      {xAxis.position !== 'none' && (
++        <rect
++          x={left}
++          y={top - (xAxis.height ?? 0)}
++          width={width}
++          height={xAxis.height ?? 0}
++          fill="#EC407A"
++          opacity={0.5}
++        />
++      )}
++      {yAxis.position !== 'none' && (
++        <rect
++          x={width + left}
++          y={top}
++          width={yAxis.width ?? 0}
++          height={height}
++          fill="#EC407A"
++          opacity={0.5}
++        />
++      )}
++    </React.Fragment>
++  );
++}
++
++function DrawingAreaVisualization() {
++  const { left, top, height, width } = useDrawingArea();
++
++  return (
++    <rect
++      x={left}
++      y={top}
++      width={width}
++      height={height}
++      fill="#006BD6"
++      opacity={0.2}
++    />
++  );
++}
+diff --git a/docs/data/charts/styling/styling.md b/docs/data/charts/styling/styling.md
+index 7bc01a68010ea..d71064f8da5f5 100644
+--- a/docs/data/charts/styling/styling.md
++++ b/docs/data/charts/styling/styling.md
+@@ -161,7 +161,7 @@ To update it, use the `xAxis` and `yAxis` configuration as follows:
+ Axes only take up space in the side they are positioned.
+ If the axis is not be displayed (`position: 'none'`), they will not take up any space, regardless of their size.
+ 
+-{{"demo": "MarginNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "Margin.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ### CSS
+ 
+diff --git a/docs/data/charts/zoom-and-pan/ZoomOptionsNoSnap.js b/docs/data/charts/zoom-and-pan/ZoomOptions.js
+similarity index 67%
+rename from docs/data/charts/zoom-and-pan/ZoomOptionsNoSnap.js
+rename to docs/data/charts/zoom-and-pan/ZoomOptions.js
+index 458245a037af2..6918cf698685c 100644
+--- a/docs/data/charts/zoom-and-pan/ZoomOptionsNoSnap.js
++++ b/docs/data/charts/zoom-and-pan/ZoomOptions.js
+@@ -2,55 +2,49 @@ import * as React from 'react';
+ import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ 
+-const knobs = [
+-  {
+-    propName: 'panning',
++const knobs = {
++  panning: {
+     knob: 'switch',
+     defaultValue: true,
+   },
+-  {
+-    propName: 'minStart',
++  minStart: {
+     knob: 'number',
+     defaultValue: 0,
+     step: 1,
+     min: 0,
+     max: 50,
+   },
+-  {
+-    propName: 'maxEnd',
++  maxEnd: {
+     knob: 'number',
+     defaultValue: 100,
+     step: 1,
+     min: 50,
+     max: 100,
+   },
+-  {
+-    propName: 'minSpan',
++  minSpan: {
+     knob: 'number',
+     defaultValue: 10,
+     step: 1,
+     min: 0,
+     max: 100,
+   },
+-  {
+-    propName: 'maxSpan',
++  maxSpan: {
+     knob: 'number',
+     defaultValue: 100,
+     step: 1,
+     min: 0,
+     max: 100,
+   },
+-  {
+-    propName: 'step',
++  step: {
+     knob: 'number',
+     defaultValue: 5,
+     step: 1,
+     min: 1,
+     max: 100,
+   },
+-];
++};
+ 
+-export default function ZoomOptionsNoSnap() {
++export default function ZoomOptions() {
+   return (
+     <ChartsUsageDemo
+       componentName="Zoom Options demo"
+@@ -71,26 +65,24 @@ export default function ZoomOptionsNoSnap() {
+         </div>
+       )}
+       getCode={({ props }) => {
+-        return [
+-          `import { BarChart } from '@mui/x-charts/BarChart';`,
+-          '',
+-          `<BarChart`,
+-          `  // ...`,
+-          `  xAxis={[`,
+-          `    {`,
+-          `      // ...`,
+-          `      zoom: {`,
+-          `        minStart: ${props.minStart},`,
+-          `        maxEnd: ${props.maxEnd},`,
+-          `        minSpan: ${props.minSpan},`,
+-          `        maxSpan: ${props.maxSpan},`,
+-          `        step: ${props.step},`,
+-          `        panning: ${props.panning},`,
+-          `      }`,
+-          `    }`,
+-          `  ]}`,
+-          '/>',
+-        ].join('\n');
++        return `import { BarChart } from '@mui/x-charts/BarChart';
++
++<BarChart
++  // ...
++  xAxis={[
++    {
++  // ...
++  zoom: {
++    minStart: ${props.minStart},
++    maxEnd: ${props.maxEnd},
++    minSpan: ${props.minSpan},
++    maxSpan: ${props.maxSpan},
++    step: ${props.step},
++    panning: ${props.panning},
++  }
++    }
++  ]}
++/>`;
+       }}
+     />
+   );
+diff --git a/docs/data/charts/zoom-and-pan/ZoomOptionsNoSnap.tsx b/docs/data/charts/zoom-and-pan/ZoomOptions.tsx
+similarity index 64%
+rename from docs/data/charts/zoom-and-pan/ZoomOptionsNoSnap.tsx
+rename to docs/data/charts/zoom-and-pan/ZoomOptions.tsx
+index 3be92aabb5c58..1a714f4a16a84 100644
+--- a/docs/data/charts/zoom-and-pan/ZoomOptionsNoSnap.tsx
++++ b/docs/data/charts/zoom-and-pan/ZoomOptions.tsx
+@@ -2,60 +2,54 @@ import * as React from 'react';
+ import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+ import ChartsUsageDemo from 'docsx/src/modules/components/ChartsUsageDemo';
+ 
+-const knobs = [
+-  {
+-    propName: 'panning',
++const knobs = {
++  panning: {
+     knob: 'switch',
+     defaultValue: true,
+   },
+-  {
+-    propName: 'minStart',
++  minStart: {
+     knob: 'number',
+     defaultValue: 0,
+     step: 1,
+     min: 0,
+     max: 50,
+   },
+-  {
+-    propName: 'maxEnd',
++  maxEnd: {
+     knob: 'number',
+     defaultValue: 100,
+     step: 1,
+     min: 50,
+     max: 100,
+   },
+-  {
+-    propName: 'minSpan',
++  minSpan: {
+     knob: 'number',
+     defaultValue: 10,
+     step: 1,
+     min: 0,
+     max: 100,
+   },
+-  {
+-    propName: 'maxSpan',
++  maxSpan: {
+     knob: 'number',
+     defaultValue: 100,
+     step: 1,
+     min: 0,
+     max: 100,
+   },
+-  {
+-    propName: 'step',
++  step: {
+     knob: 'number',
+     defaultValue: 5,
+     step: 1,
+     min: 1,
+     max: 100,
+   },
+-];
++} as const;
+ 
+-export default function ZoomOptionsNoSnap() {
++export default function ZoomOptions() {
+   return (
+     <ChartsUsageDemo
+       componentName="Zoom Options demo"
+       data={knobs}
+-      renderDemo={(props: any) => (
++      renderDemo={(props) => (
+         <div style={{ width: '100%', margin: 4 }}>
+           <BarChartPro
+             height={300}
+@@ -70,27 +64,25 @@ export default function ZoomOptionsNoSnap() {
+           />
+         </div>
+       )}
+-      getCode={({ props }: any) => {
+-        return [
+-          `import { BarChart } from '@mui/x-charts/BarChart';`,
+-          '',
+-          `<BarChart`,
+-          `  // ...`,
+-          `  xAxis={[`,
+-          `    {`,
+-          `      // ...`,
+-          `      zoom: {`,
+-          `        minStart: ${props.minStart},`,
+-          `        maxEnd: ${props.maxEnd},`,
+-          `        minSpan: ${props.minSpan},`,
+-          `        maxSpan: ${props.maxSpan},`,
+-          `        step: ${props.step},`,
+-          `        panning: ${props.panning},`,
+-          `      }`,
+-          `    }`,
+-          `  ]}`,
+-          '/>',
+-        ].join('\n');
++      getCode={({ props }) => {
++        return `import { BarChart } from '@mui/x-charts/BarChart';
++
++<BarChart
++  // ...
++  xAxis={[
++    {
++  // ...
++  zoom: {
++    minStart: ${props.minStart},
++    maxEnd: ${props.maxEnd},
++    minSpan: ${props.minSpan},
++    maxSpan: ${props.maxSpan},
++    step: ${props.step},
++    panning: ${props.panning},
++  }
++    }
++  ]}
++/>`;
+       }}
+     />
+   );
+diff --git a/docs/data/charts/zoom-and-pan/zoom-and-pan.md b/docs/data/charts/zoom-and-pan/zoom-and-pan.md
+index 4620cccc3ec72..8adbc86fa7dc0 100644
+--- a/docs/data/charts/zoom-and-pan/zoom-and-pan.md
++++ b/docs/data/charts/zoom-and-pan/zoom-and-pan.md
+@@ -39,7 +39,7 @@ The following options are available:
+ - **maxSpan**: Restricts the maximum span size.
+ - **panning**: Enables or disables panning.
+ 
+-{{"demo": "ZoomOptionsNoSnap.js", "hideToolbar": true, "bg": "playground"}}
++{{"demo": "ZoomOptions.js", "hideToolbar": true, "bg": "playground"}}
+ 
+ ## Zoom filtering
+ 
+diff --git a/docs/src/modules/components/ChartsUsageDemo.js b/docs/src/modules/components/ChartsUsageDemo.tsx
+similarity index 63%
+rename from docs/src/modules/components/ChartsUsageDemo.js
+rename to docs/src/modules/components/ChartsUsageDemo.tsx
+index cb61ac36ce9b7..a78d8e39310ad 100644
+--- a/docs/src/modules/components/ChartsUsageDemo.js
++++ b/docs/src/modules/components/ChartsUsageDemo.tsx
+@@ -3,28 +3,39 @@ import PropTypes from 'prop-types';
+ import Box from '@mui/joy/Box';
+ import { BrandingProvider } from '@mui/docs/branding';
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
+-import DemoPropsForm from './DemoPropsForm';
++import DemoPropsForm, { DataType, PropsFromData } from './DemoPropsForm';
+ 
+-export default function ChartsUsageDemo({
++export type ChartsUsageDemoProps<Data extends Record<string, DataType>, Props> = {
++  componentName: string;
++  childrenAccepted?: boolean;
++  data: Data;
++  renderDemo: (props: Props, setProps: (props: Props) => void) => React.ReactNode;
++  getCode: (props: { name: string; props: Props; childrenAccepted: boolean }) => string;
++};
++
++export default function ChartsUsageDemo<
++  Data extends Record<string, DataType>,
++  Props extends PropsFromData<Data> = PropsFromData<Data>,
++>({
+   componentName,
+   childrenAccepted = false,
+   data,
+   renderDemo,
+   getCode,
+-}) {
+-  const [props, setProps] = React.useState(
+-    data.reduce((acc, { propName, defaultValue }) => {
+-      acc[propName] = defaultValue;
+-      return acc;
+-    }, {}),
++}: ChartsUsageDemoProps<Data, Props>) {
++  const [props, setProps] = React.useState<Props>(
++    Object.entries(data).reduce(
++      (acc, [propName, value]) => ({ ...acc, [propName]: value.defaultValue }),
++      {} as Props,
++    ),
+   );
+ 
+   React.useEffect(() => {
+     setProps(
+-      data.reduce((acc, { propName, defaultValue }) => {
+-        acc[propName] = defaultValue;
+-        return acc;
+-      }, {}),
++      Object.entries(data).reduce(
++        (acc, [propName, value]) => ({ ...acc, [propName]: value.defaultValue }),
++        {} as Props,
++      ),
+     );
+   }, [data]);
+ 
+@@ -57,12 +68,7 @@ export default function ChartsUsageDemo({
+           <HighlightedCode
+             code={getCode({
+               name: componentName,
+-              props: Object.entries(props).reduce((acc, [key, value]) => {
+-                if (data.find((d) => d.propName === key)?.codeBlockDisplay !== false) {
+-                  acc[key] = value;
+-                }
+-                return acc;
+-              }, {}),
++              props,
+               childrenAccepted,
+             })}
+             language="jsx"
+diff --git a/docs/src/modules/components/DemoPropsForm.tsx b/docs/src/modules/components/DemoPropsForm.tsx
+index c095e77e5b0b0..df8877de02dad 100644
+--- a/docs/src/modules/components/DemoPropsForm.tsx
++++ b/docs/src/modules/components/DemoPropsForm.tsx
+@@ -1,3 +1,5 @@
++/* eslint-disable  */
++
+ import * as React from 'react';
+ import Check from '@mui/icons-material/Check';
+ 
+@@ -31,52 +33,36 @@ const shallowEqual = (item1: { [k: string]: any }, item2: { [k: string]: any })
+   return equal;
+ };
+ 
+-type DataType<PropName> = {
+-  /**
+-   * Name of the prop, for example 'children'
+-   */
+-  propName: PropName;
++type Placement =
++  | 'top-start'
++  | 'top'
++  | 'top-end'
++  | 'left-start'
++  | 'right-start'
++  | 'left'
++  | 'right'
++  | 'left-end'
++  | 'right-end'
++  | 'bottom-start'
++  | 'bottom'
++  | 'bottom-end';
++
++type DefaultTypes = {
+   /**
+-   * The controller to be used:
+-   * - `switch`: render the switch component for boolean
+-   * - `color`: render the built-in color selector
+-   * - `select`: render <select> with the specified options
+-   * - `input`: render <input />
+-   * - `radio`: render group of radios
+-   * - `slider`: render the slider component
++   * The display name of the prop, for example 'X Axis Label'
+    */
+-  knob:
+-    | 'switch'
+-    | 'color'
+-    | 'select'
+-    | 'input'
+-    | 'radio'
+-    | 'controlled'
+-    | 'number'
+-    | 'placement'
+-    | 'slider';
++  displayName?: string;
++};
++
++type ConditionalTypes = {
+   /**
+    * The options for these knobs: `select` and `radio`
+    */
+-  options?: Array<string>;
++  options: readonly string[];
+   /**
+    * The labels for these knobs: `radio`
+    */
+-  labels?: Array<string>;
+-  /**
+-   * The default value to be used by the components.
+-   * If exists, it will be injected to the `renderDemo` callback but it will not show
+-   * in the code block.
+-   *
+-   * To make it appears in the code block, specified `codeBlockDisplay: true`
+-   */
+-  defaultValue?: string | number | boolean;
+-  /**
+-   * If not specify (`undefined`), the prop displays when user change the value
+-   * If `true`, the prop with defaultValue will always display in the code block.
+-   * If `false`, the prop does not display in the code block.
+-   */
+-  codeBlockDisplay?: boolean;
++  labels?: readonly string[];
+   /**
+    * Option for knobs: `number`
+    */
+@@ -91,7 +77,89 @@ type DataType<PropName> = {
+   max?: number;
+ };
+ 
+-interface ChartDemoPropsFormProps<PropName extends string> {
++type NumberDataType = {
++  knob: 'number' | 'slider';
++  /**
++   * The default value to be used by the components.
++   */
++  defaultValue?: number;
++} & DefaultTypes &
++  Pick<ConditionalTypes, 'step' | 'min' | 'max'>;
++
++type SelectDataType = {
++  knob: 'select' | 'color';
++  /**
++   * The default value to be used by the components.
++   */
++  defaultValue?: string;
++} & DefaultTypes &
++  Pick<ConditionalTypes, 'options'>;
++
++type RadioDataType = {
++  knob: 'radio';
++  /**
++   * The default value to be used by the components.
++   */
++  defaultValue?: string;
++} & DefaultTypes &
++  Pick<ConditionalTypes, 'options' | 'labels'>;
++
++type SwitchDataType = {
++  knob: 'switch';
++  /**
++   * The default value to be used by the components.
++   */
++  defaultValue?: boolean;
++} & DefaultTypes;
++
++type InputDataType = {
++  knob: 'input';
++  /**
++   * The default value to be used by the components.
++   */
++  defaultValue?: string;
++} & DefaultTypes;
++
++type PlacementDataType = {
++  knob: 'placement';
++  /**
++   * The default value to be used by the components.
++   */
++  defaultValue?: Placement;
++} & DefaultTypes;
++
++export type DataType =
++  | NumberDataType
++  | SelectDataType
++  | RadioDataType
++  | SwitchDataType
++  | InputDataType
++  | PlacementDataType;
++
++export type PropsFromData<Data extends Record<string, DataType>> = {
++  [K in keyof Data]: Data[K] extends { options: readonly (infer T)[] }
++    ? Data[K] extends { defaultValue: any }
++      ? T
++      : T | undefined
++    : Data[K] extends { defaultValue: any }
++      ? FromKnob<Data[K]>
++      : FromKnob<Data[K]> | undefined;
++};
++
++export type FromKnob<DT extends DataType> = DT['knob'] extends 'number' | 'slider'
++  ? number
++  : DT['knob'] extends 'switch'
++    ? boolean
++    : DT['knob'] extends 'input'
++      ? string
++      : DT['knob'] extends 'placement'
++        ? Placement
++        : never;
++
++interface ChartDemoPropsFormProps<
++  Data extends Record<string, DataType>,
++  Props extends PropsFromData<Data>,
++> {
+   /**
+    * Name of the component to show in the code block.
+    */
+@@ -99,67 +167,23 @@ interface ChartDemoPropsFormProps<PropName extends string> {
+   /**
+    * Configuration
+    */
+-  data: DataType<PropName>[];
++  data: Data;
+   /**
+    * Props to be displayed in the form
+    */
+-  props: Record<PropName, any>;
+-  onPropsChange: (data: Record<PropName, any> | ((data: Record<PropName, any>) => void)) => void;
++  props: Props;
++  onPropsChange: (state: Props | ((prevState: Props) => Props)) => void;
+ }
+ 
+-function ControlledColorRadio(props: any) {
+-  const { value, ...other } = props;
+-  return (
+-    <Paper
+-      color={value}
+-      sx={{
+-        width: 28,
+-        height: 28,
+-        borderRadius: 'sm',
+-        textTransform: 'capitalize',
+-        position: 'relative',
+-        bgcolor: value,
+-      }}
+-    >
+-      <Radio
+-        {...other}
+-        value={value}
+-        icon={<Check sx={{ opacity: 0 }} />}
+-        checkedIcon={
+-          <Check
+-            fontSize="medium"
+-            color="inherit"
+-            sx={(theme) => ({
+-              zIndex: 1,
+-              position: 'absolute',
+-              top: '50%',
+-              left: '50%',
+-              transform: 'translate(-50%, -50%)',
+-              pointerEvents: 'none',
+-              color: theme.palette.background.default,
+-            })}
+-          />
+-        }
+-        sx={{ width: '100%', height: '100%', margin: 0 }}
+-      />
+-    </Paper>
+-  );
+-}
+-
+-export default function ChartDemoPropsForm<T extends string>({
+-  componentName,
+-  data,
+-  props,
+-  onPropsChange,
+-}: ChartDemoPropsFormProps<T>) {
+-  const initialProps = React.useMemo<Record<T, any>>(
++export default function ChartDemoPropsForm<
++  Data extends Record<string, DataType>,
++  Props extends PropsFromData<Data>,
++>({ componentName, data, props, onPropsChange }: ChartDemoPropsFormProps<Data, Props>) {
++  const initialProps = React.useMemo(
+     () =>
+-      data.reduce(
+-        (acc, { propName, defaultValue }) => {
+-          acc[propName] = defaultValue;
+-          return acc;
+-        },
+-        {} as Record<T, any>,
++      Object.entries(data).reduce(
++        (acc, [propName, value]) => ({ ...acc, [propName]: value.defaultValue }),
++        {} as Props,
+       ),
+     [data],
+   );
+@@ -193,12 +217,10 @@ export default function ChartDemoPropsForm<T extends string>({
+           component="h3"
+           fontWeight="bold"
+           sx={{ scrollMarginTop: 160, fontFamily: 'General Sans' }}
+-          // eslint-disable-next-line material-ui/no-hardcoded-labels
+         >
+           Playground
+         </Typography>
+         <IconButton
+-          // eslint-disable-next-line material-ui/no-hardcoded-labels
+           aria-label="Reset all"
+           size="small"
+           onClick={() => onPropsChange(initialProps)}
+@@ -222,8 +244,10 @@ export default function ChartDemoPropsForm<T extends string>({
+           },
+         }}
+       >
+-        {data.map(({ propName, knob, options = [], defaultValue, labels, step, min, max }) => {
++        {Object.entries(data).map(([propName, propData]) => {
++          const { knob, defaultValue, displayName } = propData;
+           const resolvedValue = props[propName] ?? defaultValue;
++          const title = displayName || propName;
+           if (!knob) {
+             return null;
+           }
+@@ -234,7 +258,7 @@ export default function ChartDemoPropsForm<T extends string>({
+                 size="small"
+                 sx={{ justifyContent: 'space-between', display: 'flex', flexDirection: 'row' }}
+               >
+-                <FormLabel>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <Switch
+                   checked={Boolean(resolvedValue)}
+                   onChange={(event) =>
+@@ -248,9 +272,10 @@ export default function ChartDemoPropsForm<T extends string>({
+             );
+           }
+           if (knob === 'slider') {
++            const { step, min, max } = propData;
+             return (
+               <FormControl key={propName}>
+-                <FormLabel>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <Slider
+                   value={Number.parseFloat(`${resolvedValue}`)}
+                   onChange={(_, value) =>
+@@ -267,10 +292,11 @@ export default function ChartDemoPropsForm<T extends string>({
+             );
+           }
+           if (knob === 'radio') {
++            const { options, labels } = propData;
+             const labelId = `${componentName}-${propName}`;
+             return (
+               <FormControl key={propName} size="small">
+-                <FormLabel sx={{ textTransform: 'capitalize' }}>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <RadioGroup
+                   // orientation="horizontal"
+                   name={labelId}
+@@ -308,9 +334,10 @@ export default function ChartDemoPropsForm<T extends string>({
+             );
+           }
+           if (knob === 'color') {
++            const { options } = propData;
+             return (
+               <FormControl key={propName} sx={{ mb: 1 }} size="small">
+-                <FormLabel>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <RadioGroup
+                   name={`${componentName}-color`}
+                   value={resolvedValue || ''}
+@@ -343,12 +370,13 @@ export default function ChartDemoPropsForm<T extends string>({
+             );
+           }
+           if (knob === 'select') {
++            const { options } = propData;
+             return (
+               <FormControl key={propName} size="small">
+-                <FormLabel sx={{ textTransform: 'capitalize' }}>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <Select
+                   placeholder="Select a variant..."
+-                  value={(resolvedValue || 'none') as string}
++                  value={resolvedValue || 'none'}
+                   onChange={(event) =>
+                     onPropsChange((latestProps) => ({
+                       ...latestProps,
+@@ -368,7 +396,7 @@ export default function ChartDemoPropsForm<T extends string>({
+           if (knob === 'input') {
+             return (
+               <FormControl key={propName}>
+-                <FormLabel>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <Input
+                   size="small"
+                   value={props[propName] ?? ''}
+@@ -389,17 +417,14 @@ export default function ChartDemoPropsForm<T extends string>({
+             );
+           }
+           if (knob === 'number') {
++            const { step, min, max } = propData;
+             return (
+               <FormControl key={propName}>
+-                <FormLabel>{propName}</FormLabel>
++                <FormLabel>{title}</FormLabel>
+                 <Input
+                   size="small"
+                   type="number"
+-                  value={
+-                    typeof props[propName] === 'number'
+-                      ? (props[propName] as number)
+-                      : (defaultValue as string)
+-                  }
++                  value={typeof props[propName] === 'number' ? props[propName] : defaultValue}
+                   onChange={(event) => {
+                     if (Number.isNaN(Number.parseFloat(event.target.value))) {
+                       return;
+@@ -429,8 +454,7 @@ export default function ChartDemoPropsForm<T extends string>({
+           if (knob === 'placement') {
+             return (
+               <FormControl key={propName}>
+-                {/* eslint-disable-next-line material-ui/no-hardcoded-labels */}
+-                <FormLabel>Placement</FormLabel>
++                <FormLabel>{displayName ?? 'Placement'}</FormLabel>
+                 <RadioGroup
+                   name="placement"
+                   value={resolvedValue}
+@@ -466,7 +490,7 @@ export default function ChartDemoPropsForm<T extends string>({
+                         color: 'text.secondary',
+                       }}
+                     >
+-                      {resolvedValue}
++                      {`${resolvedValue}`}
+                     </Box>
+                     {/* void */}
+                     <div />
+@@ -535,3 +559,42 @@ export default function ChartDemoPropsForm<T extends string>({
+     </Box>
+   );
+ }
++
++function ControlledColorRadio(props: any) {
++  const { value, ...other } = props;
++  return (
++    <Paper
++      color={value}
++      sx={{
++        width: 28,
++        height: 28,
++        borderRadius: 'sm',
++        textTransform: 'capitalize',
++        position: 'relative',
++        bgcolor: value,
++      }}
++    >
++      <Radio
++        {...other}
++        value={value}
++        icon={<Check sx={{ opacity: 0 }} />}
++        checkedIcon={
++          <Check
++            fontSize="medium"
++            color="inherit"
++            sx={(theme) => ({
++              zIndex: 1,
++              position: 'absolute',
++              top: '50%',
++              left: '50%',
++              transform: 'translate(-50%, -50%)',
++              pointerEvents: 'none',
++              color: theme.palette.background.default,
++            })}
++          />
++        }
++        sx={{ width: '100%', height: '100%', margin: 0 }}
++      />
++    </Paper>
++  );
++}

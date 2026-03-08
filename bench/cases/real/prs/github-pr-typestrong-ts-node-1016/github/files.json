@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "29b90495a250941773ff440e9b141953ecbb832d",
+    "filename": "src/index.spec.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/TypeStrong/ts-node/blob/b6bc3013f921c3107f1af4a5429718f3a262e1ab/src%2Findex.spec.ts",
+    "raw_url": "https://github.com/TypeStrong/ts-node/raw/b6bc3013f921c3107f1af4a5429718f3a262e1ab/src%2Findex.spec.ts",
+    "contents_url": "https://api.github.com/repos/TypeStrong/ts-node/contents/src%2Findex.spec.ts?ref=b6bc3013f921c3107f1af4a5429718f3a262e1ab",
+    "patch": "@@ -596,7 +596,7 @@ describe('ts-node', function () {\n             return _compile.call(this, code, fileName)\n           }\n \n-          return old(m, fileName)\n+          return old!(m, fileName)\n         }\n       })\n "
+  }
+]

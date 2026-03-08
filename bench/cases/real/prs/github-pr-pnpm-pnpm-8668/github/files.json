@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "b0435f99a5436d0e1e62e4145096657321785ada",
+    "filename": "reviewing/license-scanner/src/getPkgInfo.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/73840e7a35ffe2827336fa79a43883ee9cc41262/reviewing%2Flicense-scanner%2Fsrc%2FgetPkgInfo.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/73840e7a35ffe2827336fa79a43883ee9cc41262/reviewing%2Flicense-scanner%2Fsrc%2FgetPkgInfo.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/reviewing%2Flicense-scanner%2Fsrc%2FgetPkgInfo.ts?ref=73840e7a35ffe2827336fa79a43883ee9cc41262",
+    "patch": "@@ -55,7 +55,7 @@ const LICENSE_NAMES = [\n   'BSD-4-Clause',\n   'CC01',\n   'CC0-1.0',\n-  'CC0-1.0',\n+  'CC0 1.0',\n   'CDDL1',\n   'CDDL-1.0',\n   'Common Development and Distribution License 1.0',"
+  }
+]

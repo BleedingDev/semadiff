@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-8815",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#8815: (v3) chore: remove hooks package",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 8815,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/8815",
+    "baseSha": "1d2c94b004334457b00849fc03cd32b49b0a2325",
+    "headSha": "fc0d164e431a2bf013592337999936d68be4ca9e",
+    "selectedFiles": [
+      "packages/react/src/components/index.ts"
+    ],
+    "collectedAt": "2026-03-08T04:00:21.583Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/components/index.ts",
+      "oldPath": "packages/react/src/components/index.ts",
+      "newPath": "packages/react/src/components/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/components/index.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 82,
+          "endLine": 82
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

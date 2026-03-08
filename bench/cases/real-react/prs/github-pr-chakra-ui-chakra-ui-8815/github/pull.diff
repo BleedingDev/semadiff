@@ -1,0 +1,3249 @@
+diff --git a/.changeset/stupid-turtles-sin.md b/.changeset/stupid-turtles-sin.md
+new file mode 100644
+index 00000000000..ece09634532
+--- /dev/null
++++ b/.changeset/stupid-turtles-sin.md
+@@ -0,0 +1,6 @@
++---
++"@chakra-ui/react": major
++---
++
++Remove the `@chakra-ui/hooks` package in favour of using dedicated, robust
++libraries like `react-use` and `usehooks-ts`
+diff --git a/apps/compositions/package.json b/apps/compositions/package.json
+index 0e2f3256cb1..2c262426e9b 100644
+--- a/apps/compositions/package.json
++++ b/apps/compositions/package.json
+@@ -16,7 +16,6 @@
+   "author": "Segun Adebayo <sage@adebayosegun.com>",
+   "license": "ISC",
+   "dependencies": {
+-    "@chakra-ui/hooks": "workspace:*",
+     "@chakra-ui/react": "workspace:*",
+     "@hookform/resolvers": "3.9.0",
+     "@tanstack/react-table": "8.19.3",
+diff --git a/apps/compositions/src/examples/tabs-lazy-mounted.tsx b/apps/compositions/src/examples/tabs-lazy-mounted.tsx
+index 7a54c4120b6..ffe3a99f907 100644
+--- a/apps/compositions/src/examples/tabs-lazy-mounted.tsx
++++ b/apps/compositions/src/examples/tabs-lazy-mounted.tsx
+@@ -1,8 +1,24 @@
+ "use client"
+ 
+-import { useInterval } from "@chakra-ui/hooks"
+-import { Tabs } from "@chakra-ui/react"
+-import { useState } from "react"
++import { Tabs, useCallbackRef } from "@chakra-ui/react"
++import { useEffect, useState } from "react"
++
++export function useInterval(callback: () => void, delay: number | null) {
++  const fn = useCallbackRef(callback)
++
++  useEffect(() => {
++    let intervalId: number | null = null
++    const tick = () => fn()
++    if (delay !== null) {
++      intervalId = window.setInterval(tick, delay)
++    }
++    return () => {
++      if (intervalId) {
++        window.clearInterval(intervalId)
++      }
++    }
++  }, [delay, fn])
++}
+ 
+ export const TabsLazyMounted = () => {
+   return (
+diff --git a/apps/compositions/src/ui/password-input.tsx b/apps/compositions/src/ui/password-input.tsx
+index 643686f8411..81afae7bd62 100644
+--- a/apps/compositions/src/ui/password-input.tsx
++++ b/apps/compositions/src/ui/password-input.tsx
+@@ -1,13 +1,20 @@
+ "use client"
+ 
+-import { mergeRefs, useControllableState } from "@chakra-ui/hooks"
+ import type {
+   ButtonProps,
+   GroupProps,
+   InputProps,
+   StackProps,
+ } from "@chakra-ui/react"
+-import { Box, HStack, IconButton, Input, Stack } from "@chakra-ui/react"
++import {
++  Box,
++  HStack,
++  IconButton,
++  Input,
++  Stack,
++  mergeRefs,
++  useControllableState,
++} from "@chakra-ui/react"
+ import { forwardRef, useRef } from "react"
+ import { LuEye, LuEyeOff } from "react-icons/lu"
+ import { InputGroup } from "./input-group"
+diff --git a/apps/www/app/enterprise/enterprise-form.tsx b/apps/www/app/enterprise/enterprise-form.tsx
+index 1d0e013255a..329a65a5adc 100644
+--- a/apps/www/app/enterprise/enterprise-form.tsx
++++ b/apps/www/app/enterprise/enterprise-form.tsx
+@@ -1,6 +1,5 @@
+ "use client"
+ 
+-import { useUpdateEffect } from "@chakra-ui/hooks"
+ import { Button, Card, Input, Textarea } from "@chakra-ui/react"
+ import { Field } from "compositions/ui/field"
+ import {
+@@ -8,10 +7,32 @@ import {
+   NativeSelectRoot,
+ } from "compositions/ui/native-select"
+ import { toaster } from "compositions/ui/toaster"
+-import { useRef } from "react"
++import { useEffect, useRef } from "react"
+ import { useFormState } from "react-dom"
+ import { submitEnterpriseForm } from "../actions"
+ 
++export const useUpdateEffect: typeof useEffect = (effect, deps) => {
++  const renderCycleRef = useRef(false)
++  const effectCycleRef = useRef(false)
++
++  useEffect(() => {
++    const isMounted = renderCycleRef.current
++    const shouldRun = isMounted && effectCycleRef.current
++    if (shouldRun) {
++      return effect()
++    }
++    effectCycleRef.current = true
++    // eslint-disable-next-line react-hooks/exhaustive-deps
++  }, deps)
++
++  useEffect(() => {
++    renderCycleRef.current = true
++    return () => {
++      renderCycleRef.current = false
++    }
++  }, [])
++}
++
+ export const EnterpriseForm = () => {
+   const [state, formAction] = useFormState(submitEnterpriseForm, {
+     success: false,
+diff --git a/apps/www/package.json b/apps/www/package.json
+index 4cce5d06418..df043562af3 100644
+--- a/apps/www/package.json
++++ b/apps/www/package.json
+@@ -14,7 +14,6 @@
+   },
+   "dependencies": {
+     "@ark-ui/react": "3.10.0",
+-    "@chakra-ui/hooks": "workspace:*",
+     "@chakra-ui/react": "workspace:*",
+     "@emotion/react": "11.11.4",
+     "@shikijs/rehype": "1.13.0",
+diff --git a/apps/www/tsconfig.json b/apps/www/tsconfig.json
+index bffebc788b9..9a7fd798666 100644
+--- a/apps/www/tsconfig.json
++++ b/apps/www/tsconfig.json
+@@ -23,7 +23,6 @@
+     "paths": {
+       "@/*": ["./*"],
+       "@chakra-ui/react": ["../../packages/react/src"],
+-      "@chakra-ui/hooks": ["../../packages/hooks/src"],
+       "@chakra-ui/utils": ["../../packages/utils/src"],
+       "compositions/*": ["../compositions/src/*"]
+     }
+diff --git a/package.json b/package.json
+index 3f3ce224026..85d3c7510a9 100644
+--- a/package.json
++++ b/package.json
+@@ -26,7 +26,6 @@
+     "test": "vitest",
+     "react": "pnpm --filter=@chakra-ui/react",
+     "utils": "pnpm --filter=@chakra-ui/utils",
+-    "hooks": "pnpm --filter=@chakra-ui/hooks",
+     "website": "pnpm --filter=./website",
+     "www": "pnpm --filter=./apps/www",
+     "lint": "eslint packages --ext .ts,.tsx --config .eslintrc --cache",
+diff --git a/packages/hooks/CHANGELOG.md b/packages/hooks/CHANGELOG.md
+deleted file mode 100644
+index 75540500cab..00000000000
+--- a/packages/hooks/CHANGELOG.md
++++ /dev/null
+@@ -1,1265 +0,0 @@
+-# Change Log
+-
+-## 3.0.0-next.23
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.23
+-
+-## 3.0.0-next.22
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.22
+-
+-## 3.0.0-next.21
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.21
+-
+-## 3.0.0-next.20
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.20
+-
+-## 3.0.0-next.19
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.19
+-
+-## 3.0.0-next.18
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.18
+-
+-## 3.0.0-next.17
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.17
+-
+-## 3.0.0-next.16
+-
+-### Patch Changes
+-
+-- [#8740](https://github.com/chakra-ui/chakra-ui/pull/8740)
+-  [`d5a225f`](https://github.com/chakra-ui/chakra-ui/commit/d5a225f1bc3eca8be67a69b78429481cf802372b)
+-  Thanks [@Pagebakers](https://github.com/Pagebakers)! - Use correct extension
+-  for ESM exports
+-
+-- Updated dependencies
+-  [[`d5a225f`](https://github.com/chakra-ui/chakra-ui/commit/d5a225f1bc3eca8be67a69b78429481cf802372b)]:
+-  - @chakra-ui/utils@3.0.0-next.16
+-
+-## 3.0.0-next.15
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.15
+-
+-## 3.0.0-next.14
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.14
+-
+-## 3.0.0-next.13
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.13
+-
+-## 3.0.0-next.12
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.12
+-
+-## 3.0.0-next.11
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.11
+-
+-## 3.0.0-next.10
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.10
+-
+-## 3.0.0-next.9
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.9
+-
+-## 3.0.0-next.8
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.8
+-
+-## 3.0.0-next.7
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.7
+-
+-## 3.0.0-next.6
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.6
+-
+-## 3.0.0-next.5
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.5
+-
+-## 3.0.0-next.4
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.4
+-
+-## 3.0.0-next.3
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.3
+-
+-## 3.0.0-next.2
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.2
+-
+-## 3.0.0-next.1
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.1
+-
+-## 3.0.0-next.0
+-
+-### Patch Changes
+-
+-- Updated dependencies []:
+-  - @chakra-ui/utils@3.0.0-next.0
+-
+-## 2.2.1
+-
+-### Patch Changes
+-
+-- [`63431c1ef`](https://github.com/chakra-ui/chakra-ui/commit/63431c1ef3b7e8ac9b97c94ca025dd54b9aa3338)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Fix issue with use
+-  client directive in next.js
+-
+-## 2.2.0
+-
+-### Minor Changes
+-
+-- [#7379](https://github.com/chakra-ui/chakra-ui/pull/7379)
+-  [`169d71679`](https://github.com/chakra-ui/chakra-ui/commit/169d71679ed22d2245240b4018a906d220d502f8)
+-  Thanks [@DimovyM](https://github.com/DimovyM)! - Added option to listen
+-  context menu click in useOutsideClick
+-
+-## 2.1.6
+-
+-### Patch Changes
+-
+-- [`2e07db479`](https://github.com/chakra-ui/chakra-ui/commit/2e07db479222b70609ed6945fa81bc728aad8755)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - **useClipboard**:
+-  Improve reactivity by ensuring it uses the latest reference of the passed
+-  `value`
+-
+-## 2.1.5
+-
+-### Patch Changes
+-
+-- [`ddbb1b4c4`](https://github.com/chakra-ui/chakra-ui/commit/ddbb1b4c49b8f124c0368929357e2891265a50c0)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Bump all packages
+-
+-- [`b427ef966`](https://github.com/chakra-ui/chakra-ui/commit/b427ef9668d9ee000f44eb0cdd4d0a5ae9f396ec)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Fix issue where
+-  `useDimension` uses stale value of node reference
+-
+-- Updated dependencies
+-  [[`ddbb1b4c4`](https://github.com/chakra-ui/chakra-ui/commit/ddbb1b4c49b8f124c0368929357e2891265a50c0)]:
+-  - @chakra-ui/react-utils@2.0.12
+-  - @chakra-ui/utils@2.0.15
+-
+-## 2.1.4
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`9cdd43733`](https://github.com/chakra-ui/chakra-ui/commit/9cdd43733469e834740ec589a73f0d546c1e6b5b)]:
+-  - @chakra-ui/utils@2.0.14
+-  - @chakra-ui/react-utils@2.0.11
+-
+-## 2.1.3
+-
+-### Patch Changes
+-
+-- [#7154](https://github.com/chakra-ui/chakra-ui/pull/7154)
+-  [`2d7398a01`](https://github.com/chakra-ui/chakra-ui/commit/2d7398a0142b5bdd3f68ce05bd159fc824cda5ef)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - ## All components
+-
+-  Improved the bundling setup for all components.
+-
+-  - Switched to the `.mjs` file extension for correct ESM behavior
+-  - Switched to the latest `tsup` will uses automatic JSX runtime detection
+-    removing the need for manually inject classic `React` import
+-  - Moved `tsup` config to `package.json` since it's very minimal
+-  - Removed `clean-package.config.json` in favor of the `package.json` property
+-  - Fixed issue where Storybook addon (dark mode and RTL) was not working
+-
+-- Updated dependencies
+-  [[`2d7398a01`](https://github.com/chakra-ui/chakra-ui/commit/2d7398a0142b5bdd3f68ce05bd159fc824cda5ef),
+-  [`0eedc151c`](https://github.com/chakra-ui/chakra-ui/commit/0eedc151caec8dbdb53e4e5e8354e2310553c19f)]:
+-  - @chakra-ui/react-utils@2.0.10
+-  - @chakra-ui/utils@2.0.13
+-
+-## 2.1.2
+-
+-### Patch Changes
+-
+-- [#6945](https://github.com/chakra-ui/chakra-ui/pull/6945)
+-  [`75eaba929`](https://github.com/chakra-ui/chakra-ui/commit/75eaba9293e2c7d5bd6aed2037df05128f335930)
+-  Thanks [@anddoutoi](https://github.com/anddoutoi)! - Fix issue where using
+-  `@chakra-ui/react` in a TypeScript project with `"type": "module"` in
+-  `package.json` and `"moduleResolution": "Node16"` in `tsconfig.json` cannot
+-  find the types.
+-- Updated dependencies
+-  [[`75eaba929`](https://github.com/chakra-ui/chakra-ui/commit/75eaba9293e2c7d5bd6aed2037df05128f335930)]:
+-  - @chakra-ui/react-utils@2.0.9
+-  - @chakra-ui/utils@2.0.12
+-
+-## 2.1.1
+-
+-### Patch Changes
+-
+-- [#6863](https://github.com/chakra-ui/chakra-ui/pull/6863)
+-  [`49dc149cc`](https://github.com/chakra-ui/chakra-ui/commit/49dc149cc600af83dcde4fa9b6a34a6b14dca837)
+-  Thanks [@Andarist](https://github.com/Andarist)! - Fixed issue where focus
+-  sometimes moved back to the open element when it was intentionally moved away
+-  from it.
+-
+-## 2.1.0
+-
+-### Minor Changes
+-
+-- [#6763](https://github.com/chakra-ui/chakra-ui/pull/6763)
+-  [`ed7f878b3`](https://github.com/chakra-ui/chakra-ui/commit/ed7f878b3463cc5a83d67a7aed6dd6fc5a0570f6)
+-  Thanks [@noobinthisgame](https://github.com/noobinthisgame)! - Added
+-  `setValue` as function exposed by `useClipboard` to enable control over the
+-  value after first initialization
+-
+-## 2.0.11
+-
+-### Patch Changes
+-
+-- [#6648](https://github.com/chakra-ui/chakra-ui/pull/6648)
+-  [`9de39921b`](https://github.com/chakra-ui/chakra-ui/commit/9de39921b983ad0eb2df7195e3b683c2e2e9e290)
+-  Thanks [@cschroeter](https://github.com/cschroeter)! - Declare package exports
+-  @see https://webpack.js.org/guides/package-exports/
+-
+-- Updated dependencies
+-  [[`9de39921b`](https://github.com/chakra-ui/chakra-ui/commit/9de39921b983ad0eb2df7195e3b683c2e2e9e290),
+-  [`d945b9a7d`](https://github.com/chakra-ui/chakra-ui/commit/d945b9a7da3056017cda0cdd552af40fa1426070)]:
+-  - @chakra-ui/react-utils@2.0.8
+-  - @chakra-ui/utils@2.0.11
+-
+-## 2.0.10
+-
+-### Patch Changes
+-
+-- [#6666](https://github.com/chakra-ui/chakra-ui/pull/6666)
+-  [`3e1b3f6b6`](https://github.com/chakra-ui/chakra-ui/commit/3e1b3f6b6a7398b71ac08339110f075695fbae94)
+-  Thanks [@TylerAPfledderer](https://github.com/TylerAPfledderer)! - Add missing
+-  component/function docs and relative docsite links.
+-
+-  Ensures that all Components, functions, and hooks that have detailed pages on
+-  the Chakra site have corresponding JSDocs and links back to the docsite via
+-  IDE intellisense.
+-
+-  Includes adding or fixing links within these docs to related WAI-ARIA
+-  patterns.
+-
+-- Updated dependencies
+-  [[`99329e44a`](https://github.com/chakra-ui/chakra-ui/commit/99329e44a0429a225cd1dffa4b7d76b68a828f44)]:
+-  - @chakra-ui/utils@2.0.10
+-  - @chakra-ui/react-utils@2.0.7
+-
+-## 2.0.9
+-
+-### Patch Changes
+-
+-- [#6508](https://github.com/chakra-ui/chakra-ui/pull/6508)
+-  [`445661955`](https://github.com/chakra-ui/chakra-ui/commit/445661955dff1329156b535ef50c7cf27b8663a9)
+-  Thanks [@anubra266](https://github.com/anubra266)! - - Initial release of
+-  react hooks
+-  - Refactor all packages to reduce bundle size
+-  - Refactor code for proper prop doc generatation
+-- Updated dependencies
+-  [[`445661955`](https://github.com/chakra-ui/chakra-ui/commit/445661955dff1329156b535ef50c7cf27b8663a9)]:
+-  - @chakra-ui/react-utils@2.0.6
+-  - @chakra-ui/utils@2.0.9
+-
+-## 2.0.8
+-
+-### Patch Changes
+-
+-- Force release
+-
+-- Updated dependencies []:
+-  - @chakra-ui/react-utils@2.0.5
+-  - @chakra-ui/utils@2.0.8
+-
+-## 2.0.7
+-
+-### Patch Changes
+-
+-- [#6457](https://github.com/chakra-ui/chakra-ui/pull/6457)
+-  [`04ff824ac`](https://github.com/chakra-ui/chakra-ui/commit/04ff824ac2f69aaa82d08bf2905ad4667327db12)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Deprecate
+-  `useDimensions` in favor of the `useSize` hook
+-
+-- Updated dependencies
+-  [[`dffc18b17`](https://github.com/chakra-ui/chakra-ui/commit/dffc18b1739ad148922fe98e4335457b298c8862),
+-  [`99af1e29f`](https://github.com/chakra-ui/chakra-ui/commit/99af1e29fa7b8c8b0bee217227d05f695a0acb47)]:
+-  - @chakra-ui/utils@2.0.7
+-  - @chakra-ui/react-utils@2.0.4
+-
+-## 2.0.6
+-
+-### Patch Changes
+-
+-- Force new release
+-
+-- Updated dependencies []:
+-  - @chakra-ui/react-utils@2.0.3
+-  - @chakra-ui/utils@2.0.6
+-
+-## 2.0.5
+-
+-### Patch Changes
+-
+-- [#6356](https://github.com/chakra-ui/chakra-ui/pull/6356)
+-  [`1839e22eb`](https://github.com/chakra-ui/chakra-ui/commit/1839e22ebad1c2a52795eac5fd0b3eb38ae03f9c)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - - Force release due
+-  to change in build configuration
+-  - Update package `main` and `module` entries
+-- Updated dependencies
+-  [[`1839e22eb`](https://github.com/chakra-ui/chakra-ui/commit/1839e22ebad1c2a52795eac5fd0b3eb38ae03f9c)]:
+-  - @chakra-ui/react-utils@2.0.2
+-  - @chakra-ui/utils@2.0.5
+-
+-## 2.0.4
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`c11743b47`](https://github.com/chakra-ui/chakra-ui/commit/c11743b47f38f8f38a21b120add3a9cf765b81ee)]:
+-  - @chakra-ui/utils@2.0.4
+-
+-## 2.0.3
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`36ef37d58`](https://github.com/chakra-ui/chakra-ui/commit/36ef37d58220dffc4b8e35c31fdcc57042e9a859),
+-  [`6c15ec2c2`](https://github.com/chakra-ui/chakra-ui/commit/6c15ec2c2a32a36ecc2d169308379a6825619543)]:
+-  - @chakra-ui/utils@2.0.3
+-
+-## 2.0.2
+-
+-### Patch Changes
+-
+-- [`06f29f8cd`](https://github.com/chakra-ui/chakra-ui/commit/06f29f8cdbb10ff1da523e0d0e958b9990d041e1)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Bump all packages
+-  to resolve deps issues
+-
+-- Updated dependencies
+-  [[`06f29f8cd`](https://github.com/chakra-ui/chakra-ui/commit/06f29f8cdbb10ff1da523e0d0e958b9990d041e1)]:
+-  - @chakra-ui/react-utils@2.0.1
+-  - @chakra-ui/utils@2.0.2
+-
+-## 2.0.1
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`f77e3c98f`](https://github.com/chakra-ui/chakra-ui/commit/f77e3c98f72fa17353e9fdad4c51810e83d9cb1c)]:
+-  - @chakra-ui/utils@2.0.1
+-
+-## 2.0.0
+-
+-### Major Changes
+-
+-- [#5879](https://github.com/chakra-ui/chakra-ui/pull/5879)
+-  [`c390af485`](https://github.com/chakra-ui/chakra-ui/commit/c390af4859bcbcf12c982c677492cd6d4960889f)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Bump all packages
+-  to next major for Chakra UI version 2.
+-
+-* [#5989](https://github.com/chakra-ui/chakra-ui/pull/5989)
+-  [`ed692c0ae`](https://github.com/chakra-ui/chakra-ui/commit/ed692c0ae670bcac92b3da50d141afc6e233dee7)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Omit `src`
+-  directory from being published to npm
+-
+-- [#5828](https://github.com/chakra-ui/chakra-ui/pull/5828)
+-  [`1a47fd27e`](https://github.com/chakra-ui/chakra-ui/commit/1a47fd27e6e37ff5d149e0469888eed0ec306632)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - ### Remove
+-  deprecations
+-
+-  **Affected components or packages:**
+-
+-  **Button, Icon Button, Input, NumberInput, Radio, Checkbox, Select**
+-
+-  - Removed the `isFullWidth` deprecation. Use `width=full` or `width=100%`
+-
+-  **Checkbox**
+-
+-  - Removed `defaultIsChecked`. Use `defaultChecked`
+-
+-  **Color mode**
+-
+-  - Removed references to `--chakra-ui-color-mode`. Use `data-theme` property
+-    instead
+-
+-  **Hooks**
+-
+-  - Removed `useEventCallback` hook
+-
+-  **Input / NumberInput**
+-
+-  - Removed the `isFullWidth` deprecation. Use `width=full` or `width=100%`
+-
+-  **Grid**
+-
+-  - Removed the `area` prop from `Grid` component. Should be passed to the
+-    `GridItem` instead.
+-
+-  **Styled system**
+-
+-  - Removed the `d` style prop. Use `display` instead.
+-  - Removed the `isTruncated` style prop. Use `noOfLines={1}` instead.
+-
+-  **Theme**
+-
+-  - Removed deprecated types.
+-
+-* [#5882](https://github.com/chakra-ui/chakra-ui/pull/5882)
+-  [`41b3119f5`](https://github.com/chakra-ui/chakra-ui/commit/41b3119f59226f7c70942d6fd0f46480f9bcf196)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Bump peer
+-  dependency to React and ReactDOM to >=18
+-
+-### Patch Changes
+-
+-- [#5940](https://github.com/chakra-ui/chakra-ui/pull/5940)
+-  [`8991ac13e`](https://github.com/chakra-ui/chakra-ui/commit/8991ac13e5ec71cc1fbd09610981913b7efe9798)
+-  Thanks [@morellodev](https://github.com/morellodev)! - Fixed issue in
+-  `useDisclosure` where `aria-expanded` in `getButtonProps` returned a fixed
+-  value.
+-
+-* [#5954](https://github.com/chakra-ui/chakra-ui/pull/5954)
+-  [`d32aea176`](https://github.com/chakra-ui/chakra-ui/commit/d32aea176b66b4d5206df10530c011f8eaa2e42d)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Fixed an issue
+-  where `useOutsideClick` ignored clicks outside of the `body` element
+-* Updated dependencies
+-  [[`c390af485`](https://github.com/chakra-ui/chakra-ui/commit/c390af4859bcbcf12c982c677492cd6d4960889f),
+-  [`ed692c0ae`](https://github.com/chakra-ui/chakra-ui/commit/ed692c0ae670bcac92b3da50d141afc6e233dee7),
+-  [`41b3119f5`](https://github.com/chakra-ui/chakra-ui/commit/41b3119f59226f7c70942d6fd0f46480f9bcf196)]:
+-  - @chakra-ui/react-utils@2.0.0
+-  - @chakra-ui/utils@2.0.0
+-
+-## 2.0.0-next.3
+-
+-### Major Changes
+-
+-- [#5989](https://github.com/chakra-ui/chakra-ui/pull/5989)
+-  [`ed692c0ae`](https://github.com/chakra-ui/chakra-ui/commit/ed692c0ae670bcac92b3da50d141afc6e233dee7)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Omit `src`
+-  directory from being published to npm
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`ed692c0ae`](https://github.com/chakra-ui/chakra-ui/commit/ed692c0ae670bcac92b3da50d141afc6e233dee7)]:
+-  - @chakra-ui/react-utils@2.0.0-next.2
+-  - @chakra-ui/utils@2.0.0-next.2
+-
+-## 2.0.0-next.2
+-
+-### Patch Changes
+-
+-- [#5940](https://github.com/chakra-ui/chakra-ui/pull/5940)
+-  [`8991ac13e`](https://github.com/chakra-ui/chakra-ui/commit/8991ac13e5ec71cc1fbd09610981913b7efe9798)
+-  Thanks [@morellodev](https://github.com/morellodev)! - [useDisclosure] Return
+-  a dynamic "aria-hidden" value from getButtonProps #5939
+-
+-* [#5954](https://github.com/chakra-ui/chakra-ui/pull/5954)
+-  [`d32aea176`](https://github.com/chakra-ui/chakra-ui/commit/d32aea176b66b4d5206df10530c011f8eaa2e42d)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Fixed an issue
+-  where `useOutsideClick` ignored clicks outside of the `body` element
+-
+-## 2.0.0-next.1
+-
+-### Major Changes
+-
+-- [#5882](https://github.com/chakra-ui/chakra-ui/pull/5882)
+-  [`41b3119f5`](https://github.com/chakra-ui/chakra-ui/commit/41b3119f59226f7c70942d6fd0f46480f9bcf196)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Bump peer
+-  depencency to React and ReactDOM to >=18
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`41b3119f5`](https://github.com/chakra-ui/chakra-ui/commit/41b3119f59226f7c70942d6fd0f46480f9bcf196)]:
+-  - @chakra-ui/react-utils@2.0.0-next.1
+-  - @chakra-ui/utils@2.0.0-next.1
+-
+-## 2.0.0-next.0
+-
+-### Major Changes
+-
+-- [#5879](https://github.com/chakra-ui/chakra-ui/pull/5879)
+-  [`c390af485`](https://github.com/chakra-ui/chakra-ui/commit/c390af4859bcbcf12c982c677492cd6d4960889f)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Bump all packages
+-  to next major for Chakra UI version 2.
+-
+-* [#5828](https://github.com/chakra-ui/chakra-ui/pull/5828)
+-  [`1a47fd27e`](https://github.com/chakra-ui/chakra-ui/commit/1a47fd27e6e37ff5d149e0469888eed0ec306632)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - ### Remove
+-  deprecations
+-
+-  **Affected components or packages:**
+-
+-  **Button, Icon Button, Input, NumberInput, Radio, Checkbox, Select**
+-
+-  - Removed the `isFullWidth` deprecation. Use `width=full` or `width=100%`
+-
+-  **Checkbox**
+-
+-  - Removed `defaultIsChecked`. Use `defaultChecked`
+-
+-  **Color mode**
+-
+-  - Removed references to `--chakra-ui-color-mode`. Use `data-theme` property
+-    instead
+-
+-  **Hooks**
+-
+-  - Removed `useEventCallback` hook
+-
+-  **Input / NumberInput**
+-
+-  - Removed the `isFullWidth` deprecation. Use `width=full` or `width=100%`
+-
+-  **Grid**
+-
+-  - Removed the `area` prop from `Grid` component. Should be passed to the
+-    `GridItem` instead.
+-
+-  **Styled system**
+-
+-  - Removed the `d` style prop. Use `display` instead.
+-  - Removed the `isTruncated` style prop. Use `noOfLines={1}` instead.
+-
+-  **Theme**
+-
+-  - Removed deprecated types.
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`c390af485`](https://github.com/chakra-ui/chakra-ui/commit/c390af4859bcbcf12c982c677492cd6d4960889f)]:
+-  - @chakra-ui/react-utils@2.0.0-next.0
+-  - @chakra-ui/utils@2.0.0-next.0
+-
+-## 1.9.1
+-
+-### Patch Changes
+-
+-- [#5739](https://github.com/chakra-ui/chakra-ui/pull/5739)
+-  [`a3b04dc1a`](https://github.com/chakra-ui/chakra-ui/commit/a3b04dc1ae49ad0d804bddc17fdca3afa218665c)
+-  Thanks [@ambar](https://github.com/ambar)! - Improve stability of `useBoolean`
+-  hook to ensure setter object reference stays the same
+-
+-## 1.9.0
+-
+-### Minor Changes
+-
+-- [#5199](https://github.com/chakra-ui/chakra-ui/pull/5199)
+-  [`73a06ae8c`](https://github.com/chakra-ui/chakra-ui/commit/73a06ae8ce1bee644e10f245edcf2f9f2b773964)
+-  Thanks [@mlajtos](https://github.com/mlajtos)! - Control whether Tooltip can
+-  be closed with Esc key
+-
+-## 1.8.5
+-
+-### Patch Changes
+-
+-- [#5623](https://github.com/chakra-ui/chakra-ui/pull/5623)
+-  [`5cd5cff35`](https://github.com/chakra-ui/chakra-ui/commit/5cd5cff35e4837539d83a2157a07585d461b0aac)
+-  Thanks [@Brennvo](https://github.com/Brennvo)! - Fixed an issue where the prop
+-  `isLazy` did not work as expected. This was achieved by updating the hook
+-  `useAnimationState`.
+-
+-## 1.8.4
+-
+-### Patch Changes
+-
+-- [`e1fe48cbe`](https://github.com/chakra-ui/chakra-ui/commit/e1fe48cbe37324744cfe6184d785c093cda1125e)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Bumped patch
+-  version for every package to fix release process. Root cause was a bug in our
+-  CI configuration.
+-- Updated dependencies
+-  [[`e1fe48cbe`](https://github.com/chakra-ui/chakra-ui/commit/e1fe48cbe37324744cfe6184d785c093cda1125e)]:
+-  - @chakra-ui/react-utils@1.2.3
+-  - @chakra-ui/utils@1.10.4
+-
+-## 1.8.3
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`a870e6b94`](https://github.com/chakra-ui/chakra-ui/commit/a870e6b94367b7c6448d5c5c5aa8577e33e15e3a)]:
+-  - @chakra-ui/utils@1.10.3
+-
+-## 1.8.2
+-
+-### Patch Changes
+-
+-- [#5536](https://github.com/chakra-ui/chakra-ui/pull/5536)
+-  [`a503acabe`](https://github.com/chakra-ui/chakra-ui/commit/a503acabefcaea86cb7f40a6305830f09d2d6083)
+-  Thanks [@TimKolberger](https://github.com/TimKolberger)! - Bumped patch
+-  version for every package to fix release process.
+-
+-- Updated dependencies
+-  [[`a503acabe`](https://github.com/chakra-ui/chakra-ui/commit/a503acabefcaea86cb7f40a6305830f09d2d6083)]:
+-  - @chakra-ui/react-utils@1.2.2
+-  - @chakra-ui/utils@1.10.2
+-
+-## 1.8.1
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`24b4333d0`](https://github.com/chakra-ui/chakra-ui/commit/24b4333d008d149380785f87f4891e28584ff89b)]:
+-  - @chakra-ui/utils@1.10.1
+-
+-## 1.8.0
+-
+-### Minor Changes
+-
+-- [#5442](https://github.com/chakra-ui/chakra-ui/pull/5442)
+-  [`cbad002e7`](https://github.com/chakra-ui/chakra-ui/commit/cbad002e7bdb439a0dfeada82ebfb5b529e145fe)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Add
+-  `useAnimationState` hook to help track motion component animations. Used in
+-  popopover and menu lazy modes
+-
+-### Patch Changes
+-
+-- [#5445](https://github.com/chakra-ui/chakra-ui/pull/5445)
+-  [`6e259a1f7`](https://github.com/chakra-ui/chakra-ui/commit/6e259a1f7008a00f7be096e6b315cb9d62ef9748)
+-  Thanks [@rjokelai](https://github.com/rjokelai)! - fix useConst types when
+-  using init function
+-
+-- Updated dependencies
+-  [[`1537a725f`](https://github.com/chakra-ui/chakra-ui/commit/1537a725fbc7f84979e374f546bda625fc685ac3)]:
+-  - @chakra-ui/utils@1.10.0
+-
+-## 1.7.2
+-
+-### Patch Changes
+-
+-- [#5237](https://github.com/chakra-ui/chakra-ui/pull/5237)
+-  [`801008e27`](https://github.com/chakra-ui/chakra-ui/commit/801008e276812a6f94f2f5dc634bcbfe01d23026)
+-  Thanks [@navarroaxel](https://github.com/navarroaxel)! - Add a comment about
+-  `useState` alternative
+-
+-* [#4835](https://github.com/chakra-ui/chakra-ui/pull/4835)
+-  [`8a0e5bdbc`](https://github.com/chakra-ui/chakra-ui/commit/8a0e5bdbccb7fa10dd4cd7b909ca60991fce81a0)
+-  Thanks [@igorwessel](https://github.com/igorwessel)! - Fixed a issue where
+-  `useId` generated inconsistent id values between client and server (SSR).
+-
+-## 1.7.1
+-
+-### Patch Changes
+-
+-- [#5075](https://github.com/chakra-ui/chakra-ui/pull/5075)
+-  [`b28142946`](https://github.com/chakra-ui/chakra-ui/commit/b281429462a099b7fd7f9352e837cd28d1a2da0e)
+-  Thanks [@cschroeter](https://github.com/cschroeter)! - Update babel config to
+-  transpile soruces for older browsers. This fixes issues with CRA and
+-  Storybook.
+-- Updated dependencies
+-  [[`b28142946`](https://github.com/chakra-ui/chakra-ui/commit/b281429462a099b7fd7f9352e837cd28d1a2da0e)]:
+-  - @chakra-ui/react-utils@1.2.1
+-  - @chakra-ui/utils@1.9.1
+-
+-## 1.7.0
+-
+-### Minor Changes
+-
+-- [#4991](https://github.com/chakra-ui/chakra-ui/pull/4991)
+-  [`6095eaf9a`](https://github.com/chakra-ui/chakra-ui/commit/6095eaf9ac64a7e4d9f934bcb530bae2a92111a6)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Update build system
+-  we use from a custom babel cli setup to
+-  [preconstruct](https://preconstruct.tools/).
+-
+-  The previous build system transpiles the code in `src` directory to `dist/esm`
+-  and `dist/cjs` keeping the same file structure. The new build system merges
+-  all files in `src` and transpiles to a single `esm` and `cjs` file.
+-
+-  **Potential Breaking Change:** The side effect of this is that, if you
+-  imported any function, component or hook using the **undocumented** approach
+-  like
+-  `import { useOutsideClick } from "@chakra-ui/hooks/dist/use-outside-click"`,
+-  you'll notice that the this doesn't work anymore.
+-
+-  Here's how to resolve it:
+-
+-  ```jsx live=false
+-  // Won't work 🎇
+-  import { useOutsideClick } from "@chakra-ui/hooks/dist/use-outside-click"
+-
+-  // Works ✅
+-  import { useOutsideClick } from "@chakra-ui/hooks"
+-  ```
+-
+-  If this affected your project, we recommend that you import hooks, functions
+-  or components the way it's shown in the documentation. This will help keep
+-  your project future-proof.
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`6095eaf9a`](https://github.com/chakra-ui/chakra-ui/commit/6095eaf9ac64a7e4d9f934bcb530bae2a92111a6)]:
+-  - @chakra-ui/react-utils@1.2.0
+-  - @chakra-ui/utils@1.9.0
+-
+-## 1.6.2
+-
+-### Patch Changes
+-
+-- [`5fe9b552b`](https://github.com/chakra-ui/chakra-ui/commit/5fe9b552bcae55935d1ab8ffde86b701075e6e6a)
+-  [#4822](https://github.com/chakra-ui/chakra-ui/pull/4822) Thanks
+-  [@takethefake](https://github.com/takethefake)! - used useCallbackRef for
+-  onOpenProp/onCloseProp in useDisclosure
+-
+-- Updated dependencies
+-  [[`cd0893c56`](https://github.com/chakra-ui/chakra-ui/commit/cd0893c561d8c72b69db7c03d10adae752468a4f)]:
+-  - @chakra-ui/utils@1.8.4
+-
+-## 1.6.1
+-
+-### Patch Changes
+-
+-- [`a9d1dc4ac`](https://github.com/chakra-ui/chakra-ui/commit/a9d1dc4ac874825f292d874ad4eadaf060fed436)
+-  [#4803](https://github.com/chakra-ui/chakra-ui/pull/4803) Thanks
+-  [@segunadebayo](https://github.com/segunadebayo)! - Forward `threshold`
+-  options from `usePanSession` to `PanSession` class
+-
+-- Updated dependencies
+-  [[`c06d242c6`](https://github.com/chakra-ui/chakra-ui/commit/c06d242c672a10f93fab4dc2321143beae2db669),
+-  [`5b4d8ef24`](https://github.com/chakra-ui/chakra-ui/commit/5b4d8ef24017dab1d69aeb5016b53366bdb3bcfd)]:
+-  - @chakra-ui/utils@1.8.3
+-
+-## 1.6.0
+-
+-### Minor Changes
+-
+-- [`28af4c030`](https://github.com/chakra-ui/chakra-ui/commit/28af4c0308e234871548c0857e946e33ff18a130)
+-  [#4595](https://github.com/chakra-ui/chakra-ui/pull/4595) Thanks
+-  [@margalit](https://github.com/margalit)! - - Added an enabled prop to the
+-  `useOutsideClick` hook to conditionally attach event handlers.
+-
+-  - Updated the `useMenu` hook to only enable the `useOutsideClick` hook when
+-    the menu is open.
+-
+-## 1.5.5
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`4c1071969`](https://github.com/chakra-ui/chakra-ui/commit/4c1071969a9b41a952b374f9990ac0bb89d24fa0),
+-  [`43f66097b`](https://github.com/chakra-ui/chakra-ui/commit/43f66097b39f1c37a4627dd6ca8a85555f35b95c)]:
+-  - @chakra-ui/utils@1.8.2
+-
+-## 1.5.4
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`4a1e4d93b`](https://github.com/chakra-ui/chakra-ui/commit/4a1e4d93b0a07df7266d40bb66039385b158d3d1)]:
+-  - @chakra-ui/utils@1.8.1
+-
+-## 1.5.3
+-
+-### Patch Changes
+-
+-- [`aa374ffcb`](https://github.com/chakra-ui/chakra-ui/commit/aa374ffcb4003efd88eb6a62e10723ea9fbfa3d0)
+-  [#4166](https://github.com/chakra-ui/chakra-ui/pull/4166) Thanks
+-  [@segunadebayo](https://github.com/segunadebayo)! - Fix inconsisent id
+-  generation between client and server
+-
+-## 1.5.2
+-
+-### Patch Changes
+-
+-- [`d0f50a46e`](https://github.com/chakra-ui/chakra-ui/commit/d0f50a46ea6c2bcf06d8cad8b9b3994fd934be01)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - - `usePanGesture`:
+-  Add `onPanSessionEnd` to pan event handlers and mark as internal
+-  - `useDimensions`: Remove `ref` from effect dependency list
+-- Updated dependencies
+-  [[`d0f50a46e`](https://github.com/chakra-ui/chakra-ui/commit/d0f50a46ea6c2bcf06d8cad8b9b3994fd934be01),
+-  [`b479ff22e`](https://github.com/chakra-ui/chakra-ui/commit/b479ff22ea10c1a1393224c37c36aa6ceabc4aab),
+-  [`07d15eab4`](https://github.com/chakra-ui/chakra-ui/commit/07d15eab480724f8fee1a09b7cecdf1e968d9ddd)]:
+-  - @chakra-ui/utils@1.8.0
+-
+-## 1.5.1
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`82f08867f`](https://github.com/chakra-ui/chakra-ui/commit/82f08867fa4825d647a3b9cc805220d9364f2f3f),
+-  [`e9ac4cc76`](https://github.com/chakra-ui/chakra-ui/commit/e9ac4cc7629cd79efc753b4e3353bacdad46cd7d)]:
+-  - @chakra-ui/react-utils@1.1.2
+-  - @chakra-ui/utils@1.7.0
+-
+-## 1.5.0
+-
+-### Minor Changes
+-
+-- [`384902e35`](https://github.com/chakra-ui/chakra-ui/commit/384902e35b186c8c8154b9569455c27f72ee0f6f)
+-  [#3836](https://github.com/chakra-ui/chakra-ui/pull/3836) Thanks
+-  [@segunadebayo](https://github.com/segunadebayo)! - - Add pan session hook
+-  `usePanGesture` for detecting pan gestures
+-
+-  - Update `useLatestRef` to inline value updates. Not concurrent mode safe but
+-    works for now.
+-
+-  - Add `useEventListenerMap` to provide an elegant way of attaching several
+-    pointer event to the `document` or an element.
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`0974e547c`](https://github.com/chakra-ui/chakra-ui/commit/0974e547c29e4efc1ba4d1eb1507d0dad7d7a77a),
+-  [`59ea894a7`](https://github.com/chakra-ui/chakra-ui/commit/59ea894a7e03d16cd7a1b89d00816eafa9fab65d)]:
+-  - @chakra-ui/utils@1.6.0
+-
+-## 1.4.0
+-
+-### Minor Changes
+-
+-- [`d1532f0b7`](https://github.com/chakra-ui/chakra-ui/commit/d1532f0b72c36d0609ee4510613d7c76f4f9c113)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - - Add support for
+-  passing function that returns element to `useEventListener` and
+-  `usePointerEvent`
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`8b5eb9654`](https://github.com/chakra-ui/chakra-ui/commit/8b5eb9654affe562795d38a19f732f84732a949d)]:
+-  - @chakra-ui/utils@1.5.2
+-
+-## 1.3.1
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`87a03b320`](https://github.com/chakra-ui/chakra-ui/commit/87a03b320b62e639ca4a891186f202cb839a8402),
+-  [`1a04a41bd`](https://github.com/chakra-ui/chakra-ui/commit/1a04a41bd2285069011a738fff422ba1a6fcce94),
+-  [`e481ba491`](https://github.com/chakra-ui/chakra-ui/commit/e481ba4914a7f163d93d4c22e2e457f1afb08721)]:
+-  - @chakra-ui/react-utils@1.1.1
+-  - @chakra-ui/utils@1.5.1
+-
+-## 1.3.0
+-
+-### Minor Changes
+-
+-- [`b724a9dd9`](https://github.com/chakra-ui/chakra-ui/commit/b724a9dd9429d02c0b2c7f7deac66d3553100bdc)
+-  [#3674](https://github.com/chakra-ui/chakra-ui/pull/3674) Thanks
+-  [@codebender828](https://github.com/codebender828)! - Extract all React based
+-  utilities and types into `@chakra-ui/react-utils`
+-
+-### Patch Changes
+-
+-- [`623e782e8`](https://github.com/chakra-ui/chakra-ui/commit/623e782e80124297740a109e5c6c58cddc35b2eb)
+-  [#3408](https://github.com/chakra-ui/chakra-ui/pull/3408) Thanks
+-  [@dodas](https://github.com/dodas)! - `useControllableState`: The `onChange`
+-  callback will be called only if the new value isn't equal to the current one.
+-- Updated dependencies
+-  [[`a58b724e9`](https://github.com/chakra-ui/chakra-ui/commit/a58b724e9c8656044f866b658f378662f2a44b46),
+-  [`b724a9dd9`](https://github.com/chakra-ui/chakra-ui/commit/b724a9dd9429d02c0b2c7f7deac66d3553100bdc)]:
+-  - @chakra-ui/utils@1.5.0
+-  - @chakra-ui/react-utils@1.1.0
+-
+-## 1.2.0
+-
+-### Minor Changes
+-
+-- [`e748219f3`](https://github.com/chakra-ui/chakra-ui/commit/e748219f300f0c51b0eb304fce38b014d7bcbc86)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - ### Pointer Events
+-
+-  Add unified pointer event management utils and hook for interal use only.
+-
+-  The hook is called `usePointerEvent`, it works pretty similar to
+-  `useEventListener` except that does two things:
+-
+-  - Unifies the pointer event system and ensure that only one of `onMouse*`,
+-    `onTouch*`, or `onPointer*` handler runs
+-  - Provide event information about the pointer event like `x` and `y` position
+-    depending on the pointer type.
+-
+-  > Credits to `framer-motion` for doing the hard work for this utilities
+-
+-  - Added `useFocusOnPointerDown` to get Safari to detect the correct
+-    `event.relatedTarget` when you blur a focused element.
+-
+-  ### Focus Management
+-
+-  Set `preventScroll` option to be `true` by default, setting focus on an
+-  element should happen without scrolling the page (in most cases).
+-
+-  Set `nextTick` to `undefined` by default and update all components that use
+-  next tick to use `{ nextTick: true }`.
+-
+-### Patch Changes
+-
+-- [`9c143bfe5`](https://github.com/chakra-ui/chakra-ui/commit/9c143bfe5bbf180929fabb0a1b4c18d40f7fd3fc)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! - Update focus utils
+-  to use `nextTick` option since its default value is now false in the focus
+-  utils
+-
+-  > `@internal` use only
+-
+-- Updated dependencies
+-  [[`e748219f3`](https://github.com/chakra-ui/chakra-ui/commit/e748219f300f0c51b0eb304fce38b014d7bcbc86),
+-  [`91ef14839`](https://github.com/chakra-ui/chakra-ui/commit/91ef148397187010804eb8f30307d2ec94c32c5b)]:
+-  - @chakra-ui/utils@1.4.0
+-
+-## 1.1.5
+-
+-### Patch Changes
+-
+-- [`83ae62905`](https://github.com/chakra-ui/chakra-ui/commit/83ae62905935fdb3104380d6fd845159b00095fa)
+-  [#3373](https://github.com/chakra-ui/chakra-ui/pull/3373) Thanks
+-  [@tobiasz](https://github.com/tobiasz)! - ### useClipboard
+-
+-  Add support to `format` - Optional string. Set the MIME type of what you want
+-  to copy as. Use text/html to copy as HTML, text/plain to avoid inherited
+-  styles showing when pasted into rich text editor.
+-
+-- Updated dependencies
+-  [[`87cc23e14`](https://github.com/chakra-ui/chakra-ui/commit/87cc23e14814e02cbbfc9737c2356cef682ddd5d)]:
+-  - @chakra-ui/utils@1.3.0
+-
+-## 1.1.4
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`ff4a36bca`](https://github.com/chakra-ui/chakra-ui/commit/ff4a36bca11cc177830f6f1da13700acd1e3a087),
+-  [`483687237`](https://github.com/chakra-ui/chakra-ui/commit/483687237f2c4fed05dc6a79693f307c601c1285),
+-  [`61962345c`](https://github.com/chakra-ui/chakra-ui/commit/61962345c5b1c862445c16c586e304b28c376c9a)]:
+-  - @chakra-ui/utils@1.2.0
+-
+-## 1.1.3
+-
+-### Patch Changes
+-
+-- [`b572bceed`](https://github.com/chakra-ui/chakra-ui/commit/b572bceedd9fb0c41c65118f0d9ba672791932ca)
+-  Thanks [@segunadebayo](https://github.com/segunadebayo)! -
+-  **useOutsideClick:**
+-
+-  - Update reference to `document.addEventListener` to detect owner document
+-    based on `ref` passed. This would help detect outside click currently from
+-    within an `iframe`.
+-
+-## 1.1.2
+-
+-### Patch Changes
+-
+-- [`002a4361`](https://github.com/chakra-ui/chakra-ui/commit/002a4361bd738bef49e021a2fff2b9b6a9af5815)
+-  [#3125](https://github.com/chakra-ui/chakra-ui/pull/3125) Thanks
+-  [@segunadebayo](https://github.com/segunadebayo)! - Fixed issue where using an
+-  uncontrolled RadioGroup without a defaultValue causes multiple radio options
+-  can be selected.
+-
+-  This was caused by the `useControllableProp` hook that uses `useRef` to check
+-  if a value is controlled or uncontrolled.
+-
+-## 1.1.1
+-
+-### Patch Changes
+-
+-- [`02855588`](https://github.com/chakra-ui/chakra-ui/commit/02855588a4ffbc6573768052e53cc538361e91ee)
+-  [#3056](https://github.com/chakra-ui/chakra-ui/pull/3056) Thanks
+-  [@with-heart](https://github.com/with-heart)! - - Resolved an issue where
+-  event handlers for certain components were removed after the first event
+-  occurred.
+-
+-  - Fixed SSR issue with `useId` hook
+-
+-## 1.1.0
+-
+-### Minor Changes
+-
+-- [`8b87406c`](https://github.com/chakra-ui/chakra-ui/commit/8b87406c3132586be3393117eef80d47ec82fc54)
+-  [#3015](https://github.com/chakra-ui/chakra-ui/pull/3015) Thanks
+-  [@with-heart](https://github.com/with-heart)! - Added `useCallbackRef` hook
+-  for persisting a value between renders and updating it if it changes.
+-
+-### Patch Changes
+-
+-- [`8b87406c`](https://github.com/chakra-ui/chakra-ui/commit/8b87406c3132586be3393117eef80d47ec82fc54)
+-  [#3015](https://github.com/chakra-ui/chakra-ui/pull/3015) Thanks
+-  [@with-heart](https://github.com/with-heart)! - Deprecated `useLatestRef`,
+-  `useEventCallback`, and `useMouseDownRef`. These functions will be removed in
+-  a future `major` version.
+-- Updated dependencies
+-  [[`8b87406c`](https://github.com/chakra-ui/chakra-ui/commit/8b87406c3132586be3393117eef80d47ec82fc54)]:
+-  - @chakra-ui/utils@1.1.0
+-
+-## 1.0.2
+-
+-### Patch Changes
+-
+-- Updated dependencies
+-  [[`e73878ee`](https://github.com/chakra-ui/chakra-ui/commit/e73878ee686c11d3f94ad6ac61b19ae9508d75a5)]:
+-  - @chakra-ui/utils@1.0.2
+-
+-## 1.0.1
+-
+-### Patch Changes
+-
+-- [`204ff7e3`](https://github.com/chakra-ui/chakra-ui/commit/204ff7e39dd37003786194704b36069ef94d56a6)
+-  [#2577](https://github.com/chakra-ui/chakra-ui/pull/2577) Thanks
+-  [@navin-moorthy](https://github.com/navin-moorthy)! - Fix setter function
+-  update of `value` in useControllable
+-
+-- Updated dependencies
+-  [[`5c482483`](https://github.com/chakra-ui/chakra-ui/commit/5c482483ce24fc798540c9792a15e06772eae213)]:
+-  - @chakra-ui/utils@1.0.1
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0 (2020-11-13)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0-rc.8 (2020-10-29)
+-
+-### Bug Fixes
+-
+-- **toast:** allow custom render in update
+-  ([eb8bff9](https://github.com/chakra-ui/chakra-ui/commit/eb8bff911e6ec9de0165ab1e8f5ca10d5e022459)),
+-  closes [#2362](https://github.com/chakra-ui/chakra-ui/issues/2362)
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0-rc.7 (2020-10-25)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# 1.0.0-rc.6 (2020-10-25)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# 1.0.0-rc.5 (2020-09-27)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# 1.0.0-rc.4 (2020-09-25)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# 1.0.0-rc.3 (2020-08-30)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0-rc.2 (2020-08-09)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# [1.0.0-rc.1](https://github.com/chakra-ui/chakra-ui/compare/@chakra-ui/hooks@1.0.0-rc.0...@chakra-ui/hooks@1.0.0-rc.1) (2020-08-06)
+-
+-### Features
+-
+-- update popper hook and use-clipboard
+-  ([2659f60](https://github.com/chakra-ui/chakra-ui/commit/2659f60b7d44815c7638d2bc03eb6a97ad7bc581))
+-
+-### Performance Improvements
+-
+-- improve popper hook
+-  ([d7ecb04](https://github.com/chakra-ui/chakra-ui/commit/d7ecb04baed8b6e6488321f7f2b28bed10a3a0d3))
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# [1.0.0-rc.0](https://github.com/chakra-ui/chakra-ui/compare/@chakra-ui/hooks@1.0.0-next.7...@chakra-ui/hooks@1.0.0-rc.0) (2020-07-26)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# [1.0.0-next.7](https://github.com/chakra-ui/chakra-ui/compare/@chakra-ui/hooks@1.0.0-next.6...@chakra-ui/hooks@1.0.0-next.7) (2020-07-26)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# [1.0.0-next.6](https://github.com/chakra-ui/chakra-ui/compare/@chakra-ui/hooks@1.0.0-next.5...@chakra-ui/hooks@1.0.0-next.6) (2020-07-15)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# [1.0.0-next.5](https://github.com/chakra-ui/chakra-ui/compare/@chakra-ui/hooks@1.0.0-next.4...@chakra-ui/hooks@1.0.0-next.5) (2020-07-15)
+-
+-**Note:** Version bump only for package @chakra-ui/hooks
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0-next.4 (2020-07-01)
+-
+-### Bug Fixes
+-
+-- [#891](https://github.com/chakra-ui/chakra-ui/issues/891)
+-  ([e107acc](https://github.com/chakra-ui/chakra-ui/commit/e107acc8487898a965b0d695c1da71f46fc56d5e))
+-- some menu bugs
+-  ([5f9efe1](https://github.com/chakra-ui/chakra-ui/commit/5f9efe1566f067467573a418d2ec319c9e8a607f))
+-- ts issue with sx prop
+-  ([d3b1340](https://github.com/chakra-ui/chakra-ui/commit/d3b1340cb255937927b4d4c56ce218141570b951))
+-
+-### Features
+-
+-- add live-region package
+-  ([e0efe6a](https://github.com/chakra-ui/chakra-ui/commit/e0efe6af7f501d1dd213a9d92de5710c55fe34ed))
+-- add setup for switch component tests
+-  ([d845d08](https://github.com/chakra-ui/chakra-ui/commit/d845d089a91841e6bb1b53daf9c35502c3ce2538))
+-- add setup for switch component tests
+-  ([fc0026b](https://github.com/chakra-ui/chakra-ui/commit/fc0026ba20199169df399218c15b0ca575ec4110))
+-- add tests for switch component
+-  ([a327f4a](https://github.com/chakra-ui/chakra-ui/commit/a327f4a2807ba900bc1cc62b13c7c498cb690526))
+-- add tests for switch component
+-  ([90805b3](https://github.com/chakra-ui/chakra-ui/commit/90805b3d0676409394a5ece9a1a834d156ebda51))
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0-next.3 (2020-06-28)
+-
+-### Bug Fixes
+-
+-- [#891](https://github.com/chakra-ui/chakra-ui/issues/891)
+-  ([e107acc](https://github.com/chakra-ui/chakra-ui/commit/e107acc8487898a965b0d695c1da71f46fc56d5e))
+-- some menu bugs
+-  ([5f9efe1](https://github.com/chakra-ui/chakra-ui/commit/5f9efe1566f067467573a418d2ec319c9e8a607f))
+-- ts issue with sx prop
+-  ([d3b1340](https://github.com/chakra-ui/chakra-ui/commit/d3b1340cb255937927b4d4c56ce218141570b951))
+-
+-### Features
+-
+-- add live-region package
+-  ([e0efe6a](https://github.com/chakra-ui/chakra-ui/commit/e0efe6af7f501d1dd213a9d92de5710c55fe34ed))
+-- add setup for switch component tests
+-  ([d845d08](https://github.com/chakra-ui/chakra-ui/commit/d845d089a91841e6bb1b53daf9c35502c3ce2538))
+-- add setup for switch component tests
+-  ([fc0026b](https://github.com/chakra-ui/chakra-ui/commit/fc0026ba20199169df399218c15b0ca575ec4110))
+-- add tests for switch component
+-  ([a327f4a](https://github.com/chakra-ui/chakra-ui/commit/a327f4a2807ba900bc1cc62b13c7c498cb690526))
+-- add tests for switch component
+-  ([90805b3](https://github.com/chakra-ui/chakra-ui/commit/90805b3d0676409394a5ece9a1a834d156ebda51))
+-
+-# Change Log
+-
+-All notable changes to this project will be documented in this file. See
+-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+-
+-# 1.0.0-next.2 (2020-06-21)
+-
+-### Bug Fixes
+-
+-- [#891](https://github.com/chakra-ui/chakra-ui/issues/891)
+-  ([e107acc](https://github.com/chakra-ui/chakra-ui/commit/e107acc8487898a965b0d695c1da71f46fc56d5e))
+-- some menu bugs
+-  ([5f9efe1](https://github.com/chakra-ui/chakra-ui/commit/5f9efe1566f067467573a418d2ec319c9e8a607f))
+-
+-### Features
+-
+-- add live-region package
+-  ([e0efe6a](https://github.com/chakra-ui/chakra-ui/commit/e0efe6af7f501d1dd213a9d92de5710c55fe34ed))
+-- add setup for switch component tests
+-  ([d845d08](https://github.com/chakra-ui/chakra-ui/commit/d845d089a91841e6bb1b53daf9c35502c3ce2538))
+-- add setup for switch component tests
+-  ([fc0026b](https://github.com/chakra-ui/chakra-ui/commit/fc0026ba20199169df399218c15b0ca575ec4110))
+-- add tests for switch component
+-  ([a327f4a](https://github.com/chakra-ui/chakra-ui/commit/a327f4a2807ba900bc1cc62b13c7c498cb690526))
+-- add tests for switch component
+-  ([90805b3](https://github.com/chakra-ui/chakra-ui/commit/90805b3d0676409394a5ece9a1a834d156ebda51))
+diff --git a/packages/hooks/README.md b/packages/hooks/README.md
+deleted file mode 100644
+index 0aef56d83d7..00000000000
+--- a/packages/hooks/README.md
++++ /dev/null
+@@ -1,9 +0,0 @@
+-# @chakra-ui/hooks
+-
+-A collection of React Hooks for Chakra UI components.
+-
+-## Installation
+-
+-```sh
+-yarn add @chakra-ui/hooks
+-```
+diff --git a/packages/hooks/__stories__/use-counter.stories.tsx b/packages/hooks/__stories__/use-counter.stories.tsx
+deleted file mode 100644
+index 9ff52c8c93d..00000000000
+--- a/packages/hooks/__stories__/use-counter.stories.tsx
++++ /dev/null
+@@ -1,44 +0,0 @@
+-import * as React from "react"
+-import { useCounter } from "../src/use-counter"
+-
+-export default {
+-  title: "System / Counter",
+-}
+-
+-export function Basic() {
+-  const [val, setVal] = React.useState<any>("8...4,.4")
+-  const counter = useCounter({
+-    value: val,
+-    // defaultValue: "8...4,.4",
+-    max: 10,
+-    min: 0,
+-    // step: 0.1,
+-    keepWithinRange: false,
+-    precision: 4,
+-    onChange: (next) => setVal(next),
+-  })
+-
+-  return (
+-    <div>
+-      <pre>
+-        {JSON.stringify(
+-          {
+-            value: counter.value,
+-            valueAsNumber: counter.valueAsNumber,
+-            outOfRange: counter.isOutOfRange,
+-          },
+-          null,
+-          2,
+-        )}
+-      </pre>
+-      <br />
+-      <button onClick={() => counter.increment()}>Increment</button>
+-      <button onClick={() => counter.decrement()}>Decrement</button>
+-      <input
+-        value={counter.value}
+-        style={{ background: "transparent" }}
+-        onChange={(e) => counter.update(e.target.value)}
+-      />
+-    </div>
+-  )
+-}
+diff --git a/packages/hooks/__tests__/use-clipboard.test.tsx b/packages/hooks/__tests__/use-clipboard.test.tsx
+deleted file mode 100644
+index 09c64824065..00000000000
+--- a/packages/hooks/__tests__/use-clipboard.test.tsx
++++ /dev/null
+@@ -1,57 +0,0 @@
+-import { act, renderHook } from "@testing-library/react"
+-import copy from "copy-to-clipboard"
+-import type { Mock } from "vitest"
+-import { useClipboard } from "../src/use-clipboard"
+-
+-vi.mock("copy-to-clipboard")
+-
+-vi.useFakeTimers()
+-vi.spyOn(global, "setTimeout")
+-
+-const text = "lorem ipsum"
+-
+-test.each`
+-  params               | expected
+-  ${100}               | ${100}
+-  ${{ timeout: 2000 }} | ${2000}
+-  ${{}}                | ${1500}
+-  ${0}                 | ${1500}
+-`("calls setTimeout with proper value", ({ params, expected }) => {
+-  ;(copy as Mock).mockReturnValue(true)
+-
+-  const { result } = renderHook(() => useClipboard(text, params))
+-
+-  act(() => {
+-    result.current.onCopy()
+-  })
+-
+-  expect(copy).toBeCalledWith(text, {})
+-  expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), expected)
+-})
+-
+-test("sets new copy value", () => {
+-  ;(copy as Mock).mockReturnValue(true)
+-
+-  const { result } = renderHook(() => useClipboard(text))
+-
+-  act(() => {
+-    result.current.onCopy()
+-  })
+-
+-  expect(copy).toBeCalledWith(text, {})
+-  expect(result.current.value).toBe(text)
+-
+-  const newText = "dolor sit amet"
+-
+-  act(() => {
+-    result.current.setValue(newText)
+-  })
+-
+-  expect(result.current.value).toBe(newText)
+-
+-  act(() => {
+-    result.current.onCopy()
+-  })
+-
+-  expect(copy).toBeCalledWith(newText, {})
+-})
+diff --git a/packages/hooks/__tests__/use-counter.test.tsx b/packages/hooks/__tests__/use-counter.test.tsx
+deleted file mode 100644
+index f566c37c0bf..00000000000
+--- a/packages/hooks/__tests__/use-counter.test.tsx
++++ /dev/null
+@@ -1,47 +0,0 @@
+-import { act, renderHook } from "@testing-library/react"
+-import { useCounter } from "../src/use-counter"
+-
+-test("should increment", () => {
+-  const { result } = renderHook(() => useCounter({ defaultValue: 0 }))
+-  act(result.current.increment)
+-  expect(result.current.valueAsNumber).toBe(1)
+-})
+-
+-test("should decrement", () => {
+-  const { result } = renderHook(() => useCounter({ defaultValue: 0 }))
+-  act(result.current.decrement)
+-  expect(result.current.valueAsNumber).toBe(-1)
+-})
+-
+-test("should increment with step", () => {
+-  const { result } = renderHook(() => useCounter({ defaultValue: 0, step: 5 }))
+-  act(result.current.decrement)
+-  expect(result.current.valueAsNumber).toBe(-5)
+-})
+-
+-test("should not exceed max", () => {
+-  const { result } = renderHook(() =>
+-    useCounter({ defaultValue: 0, step: 5, max: 4 }),
+-  )
+-  act(result.current.increment)
+-  expect(result.current.valueAsNumber).toBe(4)
+-})
+-
+-test("should exceed max but be out-of-range", () => {
+-  const { result } = renderHook(() =>
+-    useCounter({ defaultValue: 0, step: 5, max: 4, keepWithinRange: false }),
+-  )
+-  act(result.current.increment)
+-  expect(result.current.valueAsNumber).toBe(5)
+-  expect(result.current.isOutOfRange).toBeTruthy()
+-})
+-
+-test("should increment with small step", () => {
+-  const { result } = renderHook(() =>
+-    useCounter({ defaultValue: 0.2, step: 0.1, max: 4 }),
+-  )
+-  act(result.current.increment)
+-  expect(result.current.valueAsNumber).toBe(0.3)
+-})
+-
+-// https://github.com/wKovacs64/use-stepper/blob/master/src/__tests__/use-stepper.test.tsx
+diff --git a/packages/hooks/__tests__/use-outside-click.test.tsx b/packages/hooks/__tests__/use-outside-click.test.tsx
+deleted file mode 100644
+index 68b9d02e125..00000000000
+--- a/packages/hooks/__tests__/use-outside-click.test.tsx
++++ /dev/null
+@@ -1,112 +0,0 @@
+-import { fireEvent, render } from "@testing-library/react"
+-import * as React from "react"
+-import { useOutsideClick } from "../src/use-outside-click"
+-
+-const OutsideClicker = ({
+-  onOutsideClick,
+-  enabled = true,
+-}: {
+-  listenContextMenu?: boolean
+-  enabled?: boolean
+-  onOutsideClick: () => void
+-}) => {
+-  const ref = React.useRef<HTMLDivElement>(null)
+-  useOutsideClick({
+-    enabled,
+-    ref,
+-    handler: onOutsideClick,
+-  })
+-  return (
+-    <>
+-      <div ref={ref}>Element</div>
+-      <div>Outside</div>
+-    </>
+-  )
+-}
+-
+-test("should register clicks on other elements, the body, and the document", async () => {
+-  let outsideClicks = 0
+-  const { getByText } = render(
+-    <OutsideClicker onOutsideClick={() => outsideClicks++} />,
+-  )
+-  const element = getByText("Element")
+-  const outsideElement = getByText("Outside")
+-
+-  const click = (el: Node) => {
+-    fireEvent.mouseDown(el)
+-    fireEvent.mouseUp(el)
+-  }
+-
+-  expect(outsideClicks).toEqual(0)
+-
+-  click(element)
+-  expect(outsideClicks).toEqual(0)
+-
+-  click(outsideElement)
+-  expect(outsideClicks).toEqual(1)
+-
+-  click(document.body)
+-  expect(outsideClicks).toEqual(2)
+-
+-  click(document)
+-  expect(outsideClicks).toEqual(3)
+-})
+-
+-test("should register right clicks on other elements, the body, and the document", async () => {
+-  let outsideClicks = 0
+-  const { getByText } = render(
+-    <OutsideClicker
+-      onOutsideClick={() => outsideClicks++}
+-      listenContextMenu={true}
+-    />,
+-  )
+-  const element = getByText("Element")
+-  const outsideElement = getByText("Outside")
+-
+-  const rightClick = (el: Node) => {
+-    fireEvent.mouseDown(el, { button: 2 })
+-    fireEvent.mouseUp(el, { button: 2 })
+-  }
+-
+-  expect(outsideClicks).toEqual(0)
+-
+-  rightClick(element)
+-  expect(outsideClicks).toEqual(0)
+-
+-  rightClick(outsideElement)
+-  expect(outsideClicks).toEqual(1)
+-
+-  rightClick(document.body)
+-  expect(outsideClicks).toEqual(2)
+-
+-  rightClick(document)
+-  expect(outsideClicks).toEqual(3)
+-})
+-
+-test("shouldn't register clicks on other elements, the body, and the document", async () => {
+-  let outsideClicks = 0
+-  const { getByText } = render(
+-    <OutsideClicker onOutsideClick={() => outsideClicks++} enabled={false} />,
+-  )
+-  const element = getByText("Element")
+-  const outsideElement = getByText("Outside")
+-
+-  const click = (el: Node) => {
+-    fireEvent.mouseDown(el)
+-    fireEvent.mouseUp(el)
+-  }
+-
+-  expect(outsideClicks).toEqual(0)
+-
+-  click(element)
+-  expect(outsideClicks).toEqual(0)
+-
+-  click(outsideElement)
+-  expect(outsideClicks).toEqual(0)
+-
+-  click(document.body)
+-  expect(outsideClicks).toEqual(0)
+-
+-  click(document)
+-  expect(outsideClicks).toEqual(0)
+-})
+diff --git a/packages/hooks/package.json b/packages/hooks/package.json
+deleted file mode 100644
+index 4117d1f2945..00000000000
+--- a/packages/hooks/package.json
++++ /dev/null
+@@ -1,68 +0,0 @@
+-{
+-  "name": "@chakra-ui/hooks",
+-  "version": "3.0.0-next.23",
+-  "description": "React hooks for Chakra components",
+-  "keywords": [
+-    "hooks",
+-    "react",
+-    "chakra-ui",
+-    "utilities"
+-  ],
+-  "type": "module",
+-  "sideEffects": false,
+-  "author": "Segun Adebayo <sage@adebayosegun.com>",
+-  "homepage": "https://github.com/chakra-ui/chakra-ui#readme",
+-  "license": "MIT",
+-  "main": "dist/cjs/index.cjs",
+-  "module": "dist/esm/index.js",
+-  "types": "dist/types/index.d.ts",
+-  "files": [
+-    "dist"
+-  ],
+-  "publishConfig": {
+-    "access": "public"
+-  },
+-  "repository": {
+-    "type": "git",
+-    "url": "git+https://github.com/chakra-ui/chakra-ui.git",
+-    "directory": "packages/legacy/hooks"
+-  },
+-  "bugs": {
+-    "url": "https://github.com/chakra-ui/chakra-ui/issues"
+-  },
+-  "dependencies": {
+-    "@chakra-ui/utils": "workspace:*",
+-    "@zag-js/element-size": "0.64.0",
+-    "copy-to-clipboard": "3.3.3",
+-    "framesync": "6.1.2"
+-  },
+-  "peerDependencies": {
+-    "react": ">=18"
+-  },
+-  "devDependencies": {
+-    "react": "^18.3.1"
+-  },
+-  "scripts": {
+-    "prepack": "tsx ../../scripts/conditions.ts",
+-    "postpack": "tsx ../../scripts/conditions.ts --restore",
+-    "build:fast": "tsx ../../scripts/build/main.ts",
+-    "build": "tsx ../../scripts/build/main.ts --dts",
+-    "dev": "pnpm build:fast --watch",
+-    "clean": "rimraf dist .turbo",
+-    "typecheck": "tsc --noEmit"
+-  },
+-  "exports": {
+-    ".": {
+-      "source": "./src/index.ts",
+-      "import": {
+-        "types": "./dist/types/index.d.ts",
+-        "default": "./dist/esm/index.js"
+-      },
+-      "require": {
+-        "types": "./dist/types/index.d.ts",
+-        "default": "./dist/cjs/index.cjs"
+-      }
+-    },
+-    "./package.json": "./package.json"
+-  }
+-}
+diff --git a/packages/hooks/src/index.ts b/packages/hooks/src/index.ts
+deleted file mode 100644
+index 0679c92f845..00000000000
+--- a/packages/hooks/src/index.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-export { useBoolean } from "./use-boolean"
+-export { useCallbackRef } from "./use-callback-ref"
+-export { useClipboard } from "./use-clipboard"
+-export type { UseClipboardOptions } from "./use-clipboard"
+-export {
+-  useControllableProp,
+-  useControllableState,
+-} from "./use-controllable-state"
+-export type { UseControllableStateProps } from "./use-controllable-state"
+-export { useCounter } from "./use-counter"
+-export type { UseCounterProps, UseCounterReturn } from "./use-counter"
+-export { useDisclosure } from "./use-disclosure"
+-export type { UseDisclosureProps, UseDisclosureReturn } from "./use-disclosure"
+-export { useEventListener } from "./use-event-listener"
+-export { useFocusOnHide, useFocusOnShow } from "./use-focus-effect"
+-export { useFocusOnPointerDown } from "./use-focus-on-pointer-down"
+-export { useInterval } from "./use-interval"
+-export { useLatestRef } from "./use-latest-ref"
+-export { useMediaQuery } from "./use-media-query"
+-export type { UseMediaQueryOptions } from "./use-media-query"
+-export { mergeRefs, useMergeRefs } from "./use-merge-refs"
+-export { usePrevious } from "./use-previous"
+-export { useSafeLayoutEffect } from "./use-safe-layout-effect"
+-export { useSize, useSizes } from "./use-size"
+-export { useTimeout } from "./use-timeout"
+-export { useUpdateEffect } from "./use-update-effect"
+-export { useOutsideClick } from "./use-outside-click"
+-export type { UseOutsideClickProps } from "./use-outside-click"
+diff --git a/packages/hooks/src/use-counter.ts b/packages/hooks/src/use-counter.ts
+deleted file mode 100644
+index e00ffd940de..00000000000
+--- a/packages/hooks/src/use-counter.ts
++++ /dev/null
+@@ -1,207 +0,0 @@
+-"use client"
+-
+-import { clampValue, countDecimalPlaces, toPrecision } from "@chakra-ui/utils"
+-import { useCallback, useState } from "react"
+-import { useCallbackRef } from "./use-callback-ref"
+-
+-export interface UseCounterProps {
+-  /**
+-   * The callback fired when the value changes
+-   */
+-  onChange?(valueAsString: string, valueAsNumber: number): void
+-  /**
+-   * The number of decimal points used to round the value
+-   */
+-  precision?: number
+-  /**
+-   * The initial value of the counter. Should be less than `max` and greater than `min`
+-   */
+-  defaultValue?: string | number
+-  /**
+-   * The value of the counter. Should be less than `max` and greater than `min`
+-   */
+-  value?: string | number
+-  /**
+-   * The step used to increment or decrement the value
+-   * @default 1
+-   */
+-  step?: number
+-  /**
+-   * The minimum value of the counter
+-   * @default Number.MIN_SAFE_INTEGER
+-   */
+-  min?: number
+-  /**
+-   * The maximum value of the counter
+-   * @default Number.MAX_SAFE_INTEGER
+-   */
+-  max?: number
+-  /**
+-   * This controls the value update behavior in general.
+-   *
+-   * - If `true` and you use the stepper or up/down arrow keys,
+-   *  the value will not exceed the `max` or go lower than `min`
+-   *
+-   * - If `false`, the value will be allowed to go out of range.
+-   *
+-   * @default true
+-   */
+-  keepWithinRange?: boolean
+-}
+-
+-export function useCounter(props: UseCounterProps = {}) {
+-  const {
+-    onChange,
+-    precision: precisionProp,
+-    defaultValue,
+-    value: valueProp,
+-    step: stepProp = 1,
+-    min = Number.MIN_SAFE_INTEGER,
+-    max = Number.MAX_SAFE_INTEGER,
+-    keepWithinRange = true,
+-  } = props
+-
+-  const onChangeProp = useCallbackRef(onChange)
+-
+-  const [valueState, setValue] = useState<string | number>(() => {
+-    if (defaultValue == null) return ""
+-    return cast(defaultValue, stepProp, precisionProp) ?? ""
+-  })
+-
+-  /**
+-   * Because the component that consumes this hook can be controlled or uncontrolled
+-   * we'll keep track of that
+-   */
+-  const isControlled = typeof valueProp !== "undefined"
+-  const value = isControlled ? valueProp : valueState
+-
+-  const decimalPlaces = getDecimalPlaces(parse(value), stepProp)
+-
+-  const precision = precisionProp ?? decimalPlaces
+-
+-  const update = useCallback(
+-    (next: string | number) => {
+-      if (next === value) return
+-      if (!isControlled) {
+-        setValue(next.toString())
+-      }
+-      onChangeProp?.(next.toString(), parse(next))
+-    },
+-    [onChangeProp, isControlled, value],
+-  )
+-
+-  // Function to clamp the value and round it to the precision
+-  const clamp = useCallback(
+-    (value: number) => {
+-      let nextValue = value
+-
+-      if (keepWithinRange) {
+-        nextValue = clampValue(nextValue, min, max)
+-      }
+-
+-      return toPrecision(nextValue, precision)
+-    },
+-    [precision, keepWithinRange, max, min],
+-  )
+-
+-  const increment = useCallback(
+-    (step = stepProp) => {
+-      let next: string | number
+-
+-      /**
+-       * Let's follow the native browser behavior for
+-       * scenarios where the input starts empty ("")
+-       */
+-      if (value === "") {
+-        /**
+-         * If `min` is set, native input, starts at the `min`.
+-         * Else, it starts at `step`
+-         */
+-        next = parse(step)
+-      } else {
+-        next = parse(value) + step
+-      }
+-
+-      next = clamp(next as number)
+-      update(next)
+-    },
+-    [clamp, stepProp, update, value],
+-  )
+-
+-  const decrement = useCallback(
+-    (step = stepProp) => {
+-      let next: string | number
+-
+-      // Same thing here. We'll follow native implementation
+-      if (value === "") {
+-        next = parse(-step)
+-      } else {
+-        next = parse(value) - step
+-      }
+-
+-      next = clamp(next as number)
+-      update(next)
+-    },
+-    [clamp, stepProp, update, value],
+-  )
+-
+-  const reset = useCallback(() => {
+-    let next: string | number
+-    if (defaultValue == null) {
+-      next = ""
+-    } else {
+-      next = cast(defaultValue, stepProp, precisionProp) ?? min
+-    }
+-    update(next)
+-  }, [defaultValue, precisionProp, stepProp, update, min])
+-
+-  const castValue = useCallback(
+-    (value: string | number) => {
+-      const nextValue = cast(value, stepProp, precision) ?? min
+-      update(nextValue)
+-    },
+-    [precision, stepProp, update, min],
+-  )
+-
+-  const valueAsNumber = parse(value)
+-
+-  /**
+-   * Common range checks
+-   */
+-  const isOutOfRange = valueAsNumber > max || valueAsNumber < min
+-  const isAtMax = valueAsNumber === max
+-  const isAtMin = valueAsNumber === min
+-
+-  return {
+-    isOutOfRange,
+-    isAtMax,
+-    isAtMin,
+-    precision,
+-    value,
+-    valueAsNumber,
+-    update,
+-    reset,
+-    increment,
+-    decrement,
+-    clamp,
+-    cast: castValue,
+-    setValue,
+-  }
+-}
+-
+-export type UseCounterReturn = ReturnType<typeof useCounter>
+-
+-function parse(value: string | number) {
+-  return parseFloat(value.toString().replace(/[^\w.-]+/g, ""))
+-}
+-
+-function getDecimalPlaces(value: number, step: number) {
+-  return Math.max(countDecimalPlaces(step), countDecimalPlaces(value))
+-}
+-
+-function cast(value: string | number, step: number, precision?: number) {
+-  const parsedValue = parse(value)
+-  if (Number.isNaN(parsedValue)) return undefined
+-  const decimalPlaces = getDecimalPlaces(parsedValue, step)
+-  return toPrecision(parsedValue, precision ?? decimalPlaces)
+-}
+diff --git a/packages/hooks/src/use-focus-effect.ts b/packages/hooks/src/use-focus-effect.ts
+deleted file mode 100644
+index df7d168456a..00000000000
+--- a/packages/hooks/src/use-focus-effect.ts
++++ /dev/null
+@@ -1,130 +0,0 @@
+-"use client"
+-
+-import {
+-  type FocusableElement,
+-  getActiveElement,
+-  getAllFocusable,
+-  isTabbable,
+-} from "@chakra-ui/utils"
+-import type { RefObject } from "react"
+-import { useCallback, useRef } from "react"
+-import { useEventListener } from "./use-event-listener"
+-import { useSafeLayoutEffect } from "./use-safe-layout-effect"
+-import { useUpdateEffect } from "./use-update-effect"
+-
+-export interface UseFocusOnHideOptions {
+-  focusRef: RefObject<FocusableElement>
+-  shouldFocus?: boolean
+-  visible?: boolean
+-}
+-
+-function preventReturnFocus(containerRef: React.RefObject<HTMLElement>) {
+-  const el = containerRef.current
+-  if (!el) return false
+-
+-  const activeElement = getActiveElement(el)
+-  if (!activeElement) return false
+-
+-  if (el.contains(activeElement)) return false
+-  if (isTabbable(activeElement)) return true
+-
+-  return false
+-}
+-
+-/**
+- * Popover hook to manage the focus when the popover closes or hides.
+- *
+- * We either want to return focus back to the popover trigger or
+- * let focus proceed normally if user moved to another interactive
+- * element in the viewport.
+- */
+-export function useFocusOnHide(
+-  containerRef: RefObject<HTMLElement>,
+-  options: UseFocusOnHideOptions,
+-) {
+-  const { shouldFocus: shouldFocusProp, visible, focusRef } = options
+-
+-  const shouldFocus = shouldFocusProp && !visible
+-
+-  useUpdateEffect(() => {
+-    if (!shouldFocus) return
+-
+-    if (preventReturnFocus(containerRef)) {
+-      return
+-    }
+-
+-    const el = focusRef?.current || containerRef.current
+-
+-    let rafId: number
+-
+-    if (el) {
+-      rafId = requestAnimationFrame(() => {
+-        el.focus({ preventScroll: true })
+-      })
+-      return () => {
+-        cancelAnimationFrame(rafId)
+-      }
+-    }
+-  }, [shouldFocus, containerRef, focusRef])
+-}
+-
+-export interface UseFocusOnShowOptions {
+-  visible?: boolean
+-  shouldFocus?: boolean
+-  preventScroll?: boolean
+-  focusRef?: React.RefObject<FocusableElement>
+-}
+-
+-const defaultOptions: UseFocusOnShowOptions = {
+-  preventScroll: true,
+-  shouldFocus: false,
+-}
+-
+-export function useFocusOnShow<T extends HTMLElement>(
+-  target: React.RefObject<T> | T,
+-  options = defaultOptions,
+-) {
+-  const { focusRef, preventScroll, shouldFocus, visible } = options
+-  const element = isRefObject(target) ? target.current : target
+-
+-  const autoFocusValue = shouldFocus && visible
+-  const autoFocusRef = useRef(autoFocusValue)
+-  const lastVisibleRef = useRef(visible)
+-
+-  useSafeLayoutEffect(() => {
+-    if (!lastVisibleRef.current && visible) {
+-      autoFocusRef.current = autoFocusValue
+-    }
+-    lastVisibleRef.current = visible
+-  }, [visible, autoFocusValue])
+-
+-  const onFocus = useCallback(() => {
+-    if (!visible || !element || !autoFocusRef.current) return
+-    autoFocusRef.current = false
+-
+-    if (element.contains(document.activeElement as HTMLElement)) return
+-
+-    if (focusRef?.current) {
+-      requestAnimationFrame(() => {
+-        focusRef.current?.focus({ preventScroll })
+-      })
+-    } else {
+-      const tabbableEls = getAllFocusable(element)
+-      if (tabbableEls.length > 0) {
+-        requestAnimationFrame(() => {
+-          tabbableEls[0].focus({ preventScroll })
+-        })
+-      }
+-    }
+-  }, [visible, preventScroll, element, focusRef])
+-
+-  useUpdateEffect(() => {
+-    onFocus()
+-  }, [onFocus])
+-
+-  useEventListener(element, "transitionend", onFocus)
+-}
+-
+-function isRefObject(val: any): val is { current: any } {
+-  return "current" in val
+-}
+diff --git a/packages/hooks/src/use-focus-on-pointer-down.ts b/packages/hooks/src/use-focus-on-pointer-down.ts
+deleted file mode 100644
+index 364d22761a2..00000000000
+--- a/packages/hooks/src/use-focus-on-pointer-down.ts
++++ /dev/null
+@@ -1,54 +0,0 @@
+-"use client"
+-
+-import { useEventListener } from "./use-event-listener"
+-
+-export interface UseFocusOnMouseDownProps {
+-  enabled?: boolean
+-  ref: React.RefObject<HTMLElement>
+-  elements?: Array<React.RefObject<HTMLElement> | HTMLElement | null>
+-}
+-
+-function isRefObject(val: any): val is { current: any } {
+-  return "current" in val
+-}
+-
+-const isDom = () => typeof window !== "undefined"
+-function getPlatform() {
+-  const agent = (navigator as any).userAgentData
+-  return agent?.platform ?? navigator.platform
+-}
+-const vn = (v: RegExp) => isDom() && v.test(navigator.vendor)
+-const pt = (v: RegExp) => isDom() && v.test(getPlatform())
+-const isApple = () => pt(/mac|iphone|ipad|ipod/i)
+-const isSafari = () => isApple() && vn(/apple/i)
+-
+-/**
+- * Polyfill to get `relatedTarget` working correctly consistently
+- * across all browsers.
+- *
+- * It ensures that elements receives focus on pointer down if
+- * it's not the active element.
+- *
+- * @internal
+- */
+-export function useFocusOnPointerDown(props: UseFocusOnMouseDownProps) {
+-  const { ref, elements, enabled } = props
+-
+-  const doc = () => ref.current?.ownerDocument ?? document
+-
+-  useEventListener(doc, "pointerdown", (event) => {
+-    if (!isSafari() || !enabled) return
+-    const target = event.target as HTMLElement
+-
+-    const els = elements ?? [ref]
+-    const isValidTarget = els.some((elementOrRef) => {
+-      const el = isRefObject(elementOrRef) ? elementOrRef.current : elementOrRef
+-      return el?.contains(target) || el === target
+-    })
+-
+-    if (doc().activeElement !== target && isValidTarget) {
+-      event.preventDefault()
+-      target.focus()
+-    }
+-  })
+-}
+diff --git a/packages/hooks/src/use-interval.ts b/packages/hooks/src/use-interval.ts
+deleted file mode 100644
+index def18cec759..00000000000
+--- a/packages/hooks/src/use-interval.ts
++++ /dev/null
+@@ -1,27 +0,0 @@
+-"use client"
+-
+-import { useEffect } from "react"
+-import { useCallbackRef } from "./use-callback-ref"
+-
+-/**
+- * React Hook that provides a declarative `setInterval`
+- *
+- * @param callback the callback to execute at interval
+- * @param delay the `setInterval` delay (in ms)
+- */
+-export function useInterval(callback: () => void, delay: number | null) {
+-  const fn = useCallbackRef(callback)
+-
+-  useEffect(() => {
+-    let intervalId: number | null = null
+-    const tick = () => fn()
+-    if (delay !== null) {
+-      intervalId = window.setInterval(tick, delay)
+-    }
+-    return () => {
+-      if (intervalId) {
+-        window.clearInterval(intervalId)
+-      }
+-    }
+-  }, [delay, fn])
+-}
+diff --git a/packages/hooks/src/use-latest-ref.ts b/packages/hooks/src/use-latest-ref.ts
+deleted file mode 100644
+index 8c3e24fa12c..00000000000
+--- a/packages/hooks/src/use-latest-ref.ts
++++ /dev/null
+@@ -1,15 +0,0 @@
+-"use client"
+-
+-import { useRef } from "react"
+-
+-/**
+- * React hook to persist any value between renders,
+- * but keeps it up-to-date if it changes.
+- *
+- * @param value the value or function to persist
+- */
+-export function useLatestRef<T>(value: T) {
+-  const ref = useRef<T | null>(null)
+-  ref.current = value
+-  return ref as React.MutableRefObject<T>
+-}
+diff --git a/packages/hooks/src/use-merge-refs.ts b/packages/hooks/src/use-merge-refs.ts
+deleted file mode 100644
+index e01809b8ca1..00000000000
+--- a/packages/hooks/src/use-merge-refs.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-"use client"
+-
+-import { useMemo } from "react"
+-
+-export type ReactRef<T> = React.RefCallback<T> | React.MutableRefObject<T>
+-
+-export function assignRef<T = any>(
+-  ref: ReactRef<T> | null | undefined,
+-  value: T,
+-) {
+-  if (ref == null) return
+-
+-  if (typeof ref === "function") {
+-    ref(value)
+-    return
+-  }
+-
+-  try {
+-    ref.current = value
+-  } catch (error) {
+-    throw new Error(`Cannot assign value '${value}' to ref '${ref}'`)
+-  }
+-}
+-
+-export function mergeRefs<T>(...refs: (ReactRef<T> | null | undefined)[]) {
+-  return (node: T | null) => {
+-    refs.forEach((ref) => {
+-      assignRef(ref, node)
+-    })
+-  }
+-}
+-
+-export function useMergeRefs<T>(...refs: (ReactRef<T> | null | undefined)[]) {
+-  // eslint-disable-next-line react-hooks/exhaustive-deps
+-  return useMemo(() => mergeRefs(...refs), refs)
+-}
+diff --git a/packages/hooks/src/use-outside-click.ts b/packages/hooks/src/use-outside-click.ts
+deleted file mode 100644
+index b84d4ed6b4b..00000000000
+--- a/packages/hooks/src/use-outside-click.ts
++++ /dev/null
+@@ -1,92 +0,0 @@
+-"use client"
+-
+-import { useEffect, useRef } from "react"
+-import { useCallbackRef } from "./use-callback-ref"
+-
+-export interface UseOutsideClickProps {
+-  /**
+-   * Whether the hook is enabled
+-   */
+-  enabled?: boolean
+-  /**
+-   * The reference to a DOM element.
+-   */
+-  ref: React.RefObject<HTMLElement>
+-  /**
+-   * Function invoked when a click is triggered outside the referenced element.
+-   */
+-  handler?: (e: Event) => void
+-}
+-
+-/**
+- * Example, used in components like Dialogs and Popovers, so they can close
+- * when a user clicks outside them.
+- */
+-export function useOutsideClick(props: UseOutsideClickProps) {
+-  const { ref, handler, enabled = true } = props
+-  const savedHandler = useCallbackRef(handler)
+-
+-  const stateRef = useRef({
+-    isPointerDown: false,
+-    ignoreEmulatedMouseEvents: false,
+-  })
+-
+-  const state = stateRef.current
+-
+-  useEffect(() => {
+-    if (!enabled) return
+-    const onPointerDown: any = (e: PointerEvent) => {
+-      if (isValidEvent(e, ref)) {
+-        state.isPointerDown = true
+-      }
+-    }
+-
+-    const onMouseUp: any = (event: MouseEvent) => {
+-      if (state.ignoreEmulatedMouseEvents) {
+-        state.ignoreEmulatedMouseEvents = false
+-        return
+-      }
+-
+-      if (state.isPointerDown && handler && isValidEvent(event, ref)) {
+-        state.isPointerDown = false
+-        savedHandler(event)
+-      }
+-    }
+-
+-    const onTouchEnd = (event: TouchEvent) => {
+-      state.ignoreEmulatedMouseEvents = true
+-      if (handler && state.isPointerDown && isValidEvent(event, ref)) {
+-        state.isPointerDown = false
+-        savedHandler(event)
+-      }
+-    }
+-
+-    const doc = getOwnerDocument(ref.current)
+-    doc.addEventListener("mousedown", onPointerDown, true)
+-    doc.addEventListener("mouseup", onMouseUp, true)
+-    doc.addEventListener("touchstart", onPointerDown, true)
+-    doc.addEventListener("touchend", onTouchEnd, true)
+-
+-    return () => {
+-      doc.removeEventListener("mousedown", onPointerDown, true)
+-      doc.removeEventListener("mouseup", onMouseUp, true)
+-      doc.removeEventListener("touchstart", onPointerDown, true)
+-      doc.removeEventListener("touchend", onTouchEnd, true)
+-    }
+-  }, [handler, ref, savedHandler, state, enabled])
+-}
+-
+-function isValidEvent(event: Event, ref: React.RefObject<HTMLElement>) {
+-  const target = event.target as HTMLElement
+-
+-  if (target) {
+-    const doc = getOwnerDocument(target)
+-    if (!doc.contains(target)) return false
+-  }
+-
+-  return !ref.current?.contains(target)
+-}
+-
+-function getOwnerDocument(node?: Element | null): Document {
+-  return node?.ownerDocument ?? document
+-}
+diff --git a/packages/hooks/src/use-previous.ts b/packages/hooks/src/use-previous.ts
+deleted file mode 100644
+index 103e8f2d971..00000000000
+--- a/packages/hooks/src/use-previous.ts
++++ /dev/null
+@@ -1,13 +0,0 @@
+-"use client"
+-
+-import { useEffect, useRef } from "react"
+-
+-export function usePrevious<T>(value: T) {
+-  const ref = useRef<T | undefined>()
+-
+-  useEffect(() => {
+-    ref.current = value
+-  }, [value])
+-
+-  return ref.current as T
+-}
+diff --git a/packages/hooks/src/use-safe-layout-effect.ts b/packages/hooks/src/use-safe-layout-effect.ts
+deleted file mode 100644
+index 23ef6a1dc5e..00000000000
+--- a/packages/hooks/src/use-safe-layout-effect.ts
++++ /dev/null
+@@ -1,7 +0,0 @@
+-"use client"
+-
+-import { useEffect, useLayoutEffect } from "react"
+-
+-export const useSafeLayoutEffect = Boolean(globalThis?.document)
+-  ? useLayoutEffect
+-  : useEffect
+diff --git a/packages/hooks/src/use-timeout.ts b/packages/hooks/src/use-timeout.ts
+deleted file mode 100644
+index 5b46e0708de..00000000000
+--- a/packages/hooks/src/use-timeout.ts
++++ /dev/null
+@@ -1,33 +0,0 @@
+-"use client"
+-
+-import { useEffect } from "react"
+-import { useCallbackRef } from "./use-callback-ref"
+-
+-/**
+- * React hook that provides a declarative `setTimeout`
+- *
+- * @param callback the callback to run after specified delay
+- * @param delay the delay (in ms)
+- */
+-export function useTimeout(
+-  callback: (...args: any[]) => void,
+-  delay: number | null | undefined,
+-) {
+-  const fn = useCallbackRef(callback)
+-
+-  useEffect(() => {
+-    if (delay == null) return undefined
+-
+-    let timeoutId: number | null = null
+-
+-    timeoutId = window.setTimeout(() => {
+-      fn()
+-    }, delay)
+-
+-    return () => {
+-      if (timeoutId) {
+-        window.clearTimeout(timeoutId)
+-      }
+-    }
+-  }, [delay, fn])
+-}
+diff --git a/packages/hooks/tsconfig.build.json b/packages/hooks/tsconfig.build.json
+deleted file mode 100644
+index cafd11206ea..00000000000
+--- a/packages/hooks/tsconfig.build.json
++++ /dev/null
+@@ -1,11 +0,0 @@
+-{
+-  "extends": "../../tsconfig.json",
+-  "include": ["src"],
+-  "exclude": ["src/**/*.stories.tsx", "src/**/*.test.tsx", "node_modules"],
+-  "compilerOptions": {
+-    "noEmit": false,
+-    "emitDeclarationOnly": true,
+-    "declaration": true,
+-    "outDir": "dist/types"
+-  }
+-}
+diff --git a/packages/hooks/tsconfig.json b/packages/hooks/tsconfig.json
+deleted file mode 100644
+index 69b4c2efdb2..00000000000
+--- a/packages/hooks/tsconfig.json
++++ /dev/null
+@@ -1,7 +0,0 @@
+-{
+-  "extends": "../../tsconfig.json",
+-  "include": ["src", "__stories__", "__tests__", "../../vitest.setup.ts"],
+-  "compilerOptions": {
+-    "customConditions": ["source"]
+-  }
+-}
+diff --git a/packages/hooks/__tests__/use-controllable-state.test.tsx b/packages/react/__tests__/hooks/use-controllable-state.test.tsx
+similarity index 97%
+rename from packages/hooks/__tests__/use-controllable-state.test.tsx
+rename to packages/react/__tests__/hooks/use-controllable-state.test.tsx
+index 909b0564c6b..08b1967e025 100644
+--- a/packages/hooks/__tests__/use-controllable-state.test.tsx
++++ b/packages/react/__tests__/hooks/use-controllable-state.test.tsx
+@@ -1,7 +1,7 @@
+ import { act, render, renderHook, screen } from "@testing-library/react"
+ import { userEvent } from "@testing-library/user-event"
+ import { useState } from "react"
+-import { useControllableState } from "../src"
++import { useControllableState } from "../../src"
+ 
+ describe("Controllable State", () => {
+   test("should be uncontrolled when defaultValue is passed", () => {
+diff --git a/packages/react/package.json b/packages/react/package.json
+index 9015f291631..a3012594d29 100644
+--- a/packages/react/package.json
++++ b/packages/react/package.json
+@@ -40,7 +40,6 @@
+   "dependencies": {
+     "@ark-ui/anatomy": "3.5.0",
+     "@ark-ui/react": "3.10.0",
+-    "@chakra-ui/hooks": "workspace:*",
+     "@chakra-ui/utils": "workspace:*",
+     "@emotion/is-prop-valid": "1.2.2",
+     "@emotion/serialize": "1.1.4",
+diff --git a/packages/react/src/components/index.ts b/packages/react/src/components/index.ts
+index a23df4581ed..0416dc69972 100644
+--- a/packages/react/src/components/index.ts
++++ b/packages/react/src/components/index.ts
+@@ -79,5 +79,4 @@ export * from "./timeline"
+ export * from "./toast"
+ export * from "./tooltip"
+ export * from "./typography"
+-export * from "./use-breakpoint"
+ export * from "./visually-hidden"
+diff --git a/packages/react/src/hooks/index.ts b/packages/react/src/hooks/index.ts
+new file mode 100644
+index 00000000000..340a7fbbca7
+--- /dev/null
++++ b/packages/react/src/hooks/index.ts
+@@ -0,0 +1,5 @@
++export * from "./use-callback-ref"
++export * from "./use-controllable-state"
++export * from "./use-disclosure"
++export * from "./use-media-query"
++export * from "./use-breakpoint"
+diff --git a/packages/react/src/components/use-breakpoint.ts b/packages/react/src/hooks/use-breakpoint.ts
+similarity index 97%
+rename from packages/react/src/components/use-breakpoint.ts
+rename to packages/react/src/hooks/use-breakpoint.ts
+index dc8e0b14f65..ea7743ac5c6 100644
+--- a/packages/react/src/components/use-breakpoint.ts
++++ b/packages/react/src/hooks/use-breakpoint.ts
+@@ -1,8 +1,8 @@
+ "use client"
+ 
+-import { useMediaQuery } from "@chakra-ui/hooks"
+ import { type Dict, arrayToObjectNotation, isArray } from "@chakra-ui/utils"
+ import { useChakraContext } from "../styled-system"
++import { useMediaQuery } from "./use-media-query"
+ 
+ /* -----------------------------------------------------------------------------
+  * useBreakpoint
+diff --git a/packages/hooks/src/use-callback-ref.ts b/packages/react/src/hooks/use-callback-ref.ts
+similarity index 100%
+rename from packages/hooks/src/use-callback-ref.ts
+rename to packages/react/src/hooks/use-callback-ref.ts
+diff --git a/packages/hooks/src/use-controllable-state.ts b/packages/react/src/hooks/use-controllable-state.ts
+similarity index 100%
+rename from packages/hooks/src/use-controllable-state.ts
+rename to packages/react/src/hooks/use-controllable-state.ts
+diff --git a/packages/hooks/src/use-disclosure.ts b/packages/react/src/hooks/use-disclosure.ts
+similarity index 100%
+rename from packages/hooks/src/use-disclosure.ts
+rename to packages/react/src/hooks/use-disclosure.ts
+diff --git a/packages/hooks/src/use-media-query.ts b/packages/react/src/hooks/use-media-query.ts
+similarity index 100%
+rename from packages/hooks/src/use-media-query.ts
+rename to packages/react/src/hooks/use-media-query.ts
+diff --git a/packages/react/src/index.ts b/packages/react/src/index.ts
+index 7b0dc1752c5..71706a25975 100644
+--- a/packages/react/src/index.ts
++++ b/packages/react/src/index.ts
+@@ -5,3 +5,4 @@ export { mergeRefs } from "./merge-refs"
+ export { defaultConfig, defaultSystem } from "./preset"
+ export { defaultBaseConfig } from "./preset-base"
+ export * from "./styled-system"
++export * from "./hooks"
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 11663c2872c..8a3d9cb5aca 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -239,9 +239,6 @@ importers:
+ 
+   apps/compositions:
+     dependencies:
+-      '@chakra-ui/hooks':
+-        specifier: workspace:*
+-        version: link:../../packages/hooks
+       '@chakra-ui/react':
+         specifier: workspace:*
+         version: link:../../packages/react
+@@ -294,9 +291,6 @@ importers:
+       '@ark-ui/react':
+         specifier: 3.10.0
+         version: 3.10.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+-      '@chakra-ui/hooks':
+-        specifier: workspace:*
+-        version: link:../../packages/hooks
+       '@chakra-ui/react':
+         specifier: workspace:*
+         version: link:../../packages/react
+@@ -453,25 +447,6 @@ importers:
+         specifier: workspace:*
+         version: link:../react
+ 
+-  packages/hooks:
+-    dependencies:
+-      '@chakra-ui/utils':
+-        specifier: workspace:*
+-        version: link:../utils
+-      '@zag-js/element-size':
+-        specifier: 0.64.0
+-        version: 0.64.0
+-      copy-to-clipboard:
+-        specifier: 3.3.3
+-        version: 3.3.3
+-      framesync:
+-        specifier: 6.1.2
+-        version: 6.1.2
+-    devDependencies:
+-      react:
+-        specifier: 18.2.0
+-        version: 18.2.0
+-
+   packages/props-docs:
+     dependencies:
+       glob:
+@@ -493,9 +468,6 @@ importers:
+       '@ark-ui/react':
+         specifier: 3.10.0
+         version: 3.10.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+-      '@chakra-ui/hooks':
+-        specifier: workspace:*
+-        version: link:../hooks
+       '@chakra-ui/utils':
+         specifier: workspace:*
+         version: link:../utils
+@@ -735,9 +707,6 @@ importers:
+       '@chakra-ui/cli':
+         specifier: workspace:*
+         version: link:../packages/cli
+-      '@chakra-ui/hooks':
+-        specifier: workspace:*
+-        version: link:../packages/hooks
+       '@chakra-ui/props-docs':
+         specifier: workspace:*
+         version: link:../packages/props-docs
+@@ -768,9 +737,15 @@ importers:
+       '@octokit/rest':
+         specifier: 21.0.0
+         version: 21.0.0
++      '@zag-js/element-size':
++        specifier: ^0.68.0
++        version: 0.68.0
+       contentlayer:
+         specifier: 0.3.4
+         version: 0.3.4(esbuild@0.23.0)
++      copy-to-clipboard:
++        specifier: ^3.3.3
++        version: 3.3.3
+       date-fns:
+         specifier: 3.6.0
+         version: 3.6.0
+@@ -4837,12 +4812,12 @@ packages:
+   '@zag-js/element-size@0.62.1':
+     resolution: {integrity: sha512-QCtVeIJ611hJPorKEkdfrWWcMohadplZoW8xQW/2PLSmKUhTNLfHsZLyeoYKyj5Jk4X8OAN4onnMVETFw232EA==}
+ 
+-  '@zag-js/element-size@0.64.0':
+-    resolution: {integrity: sha512-A4R70CdOZ4DKaHvAHZsvvLpoBv2PrHPExQTN73vI5mwlS3Eqb6yn58GUOp6I4xIHAo4/EhFgxorT0rZYkfBtjw==}
+-
+   '@zag-js/element-size@0.65.1':
+     resolution: {integrity: sha512-P61DJGiPezfHjnXINRr+p7sNS2Q6r8JcTCVFNgJu9E4T/4/26kryM/ZZ9fTseL8dPRqepR85WXC6sTMpiKaUBw==}
+ 
++  '@zag-js/element-size@0.68.0':
++    resolution: {integrity: sha512-5Vd0T4WPmjt6EgKNm+iVYcfBH64F9qfPKTYYOZnRjBXUSqHZMqYEJkgzPS/XWMI1XSIs2yEQmr0zMVyFC1hNcw==}
++
+   '@zag-js/file-upload@0.62.1':
+     resolution: {integrity: sha512-Wh33acYMJLNRIV2y0GdSZqoN3aX/t/uzIBWh3rVsN7tpjDYWXLYIsXQttkGLFf0sgICK+3PVD+LLaIpiGDh4+Q==}
+ 
+@@ -6854,9 +6829,6 @@ packages:
+       react-dom:
+         optional: true
+ 
+-  framesync@6.1.2:
+-    resolution: {integrity: sha512-jBTqhX6KaQVDyus8muwZbBeGGP0XgujBRbQ7gM7BRdS3CadCZIHiawyzYLnafYcvZIh5j8WE7cxZKFn7dXhu9g==}
+-
+   fresh@0.5.2:
+     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
+     engines: {node: '>= 0.6'}
+@@ -10543,9 +10515,6 @@ packages:
+   tslib@1.14.1:
+     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+ 
+-  tslib@2.4.0:
+-    resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
+-
+   tslib@2.6.3:
+     resolution: {integrity: sha512-xNvxJEOUiWPGhUuUdQgAJPKOOJfGnIyKySOc09XkKsgdUV/3E2zvwZYdejjmRgPCgcym1juLH3226yA7sEFJKQ==}
+ 
+@@ -16484,10 +16453,10 @@ snapshots:
+ 
+   '@zag-js/element-size@0.62.1': {}
+ 
+-  '@zag-js/element-size@0.64.0': {}
+-
+   '@zag-js/element-size@0.65.1': {}
+ 
++  '@zag-js/element-size@0.68.0': {}
++
+   '@zag-js/file-upload@0.62.1':
+     dependencies:
+       '@zag-js/anatomy': 0.62.1
+@@ -18660,8 +18629,8 @@ snapshots:
+       '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.5.3)
+       eslint: 8.57.0
+       eslint-import-resolver-node: 0.3.9
+-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0))(eslint@8.57.0)
+-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
++      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
++      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
+       eslint-plugin-react: 7.34.3(eslint@8.57.0)
+       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
+@@ -18679,7 +18648,7 @@ snapshots:
+       eslint: 8.57.0
+       eslint-import-resolver-node: 0.3.9
+       eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)
++      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
+       eslint-plugin-react: 7.34.3(eslint@8.57.0)
+       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
+@@ -18737,13 +18706,13 @@ snapshots:
+       - eslint-import-resolver-webpack
+       - supports-color
+ 
+-  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0))(eslint@8.57.0):
++  eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0):
+     dependencies:
+       debug: 4.3.5
+       enhanced-resolve: 5.17.0
+       eslint: 8.57.0
+-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
++      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
++      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+       fast-glob: 3.3.2
+       get-tsconfig: 4.7.5
+       is-core-module: 2.14.0
+@@ -18760,7 +18729,7 @@ snapshots:
+       enhanced-resolve: 5.17.0
+       eslint: 8.57.0
+       eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)
++      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+       fast-glob: 3.3.2
+       get-tsconfig: 4.7.5
+       is-core-module: 2.14.0
+@@ -18823,14 +18792,14 @@ snapshots:
+     transitivePeerDependencies:
+       - supports-color
+ 
+-  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
++  eslint-module-utils@2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
+     dependencies:
+       debug: 3.2.7
+     optionalDependencies:
+       '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.5.3)
+       eslint: 8.57.0
+       eslint-import-resolver-node: 0.3.9
+-      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0)
++      eslint-import-resolver-typescript: 3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0)
+     transitivePeerDependencies:
+       - supports-color
+ 
+@@ -18926,7 +18895,7 @@ snapshots:
+       - eslint-import-resolver-webpack
+       - supports-color
+ 
+-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0):
++  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
+     dependencies:
+       array-includes: 3.1.8
+       array.prototype.findlastindex: 1.2.5
+@@ -18936,7 +18905,7 @@ snapshots:
+       doctrine: 2.1.0
+       eslint: 8.57.0
+       eslint-import-resolver-node: 0.3.9
+-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.14.1(eslint@8.57.0)(typescript@5.5.3))(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
++      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.3))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
+       hasown: 2.0.2
+       is-core-module: 2.14.0
+       is-glob: 4.0.3
+@@ -18953,6 +18922,33 @@ snapshots:
+       - eslint-import-resolver-webpack
+       - supports-color
+ 
++  eslint-plugin-import@2.29.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
++    dependencies:
++      array-includes: 3.1.8
++      array.prototype.findlastindex: 1.2.5
++      array.prototype.flat: 1.3.2
++      array.prototype.flatmap: 1.3.2
++      debug: 3.2.7
++      doctrine: 2.1.0
++      eslint: 8.57.0
++      eslint-import-resolver-node: 0.3.9
++      eslint-module-utils: 2.8.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1(@typescript-eslint/parser@7.2.0(eslint@8.57.0)(typescript@5.5.4))(eslint-import-resolver-node@0.3.9)(eslint-plugin-import@2.29.1)(eslint@8.57.0))(eslint@8.57.0)
++      hasown: 2.0.2
++      is-core-module: 2.14.0
++      is-glob: 4.0.3
++      minimatch: 3.1.2
++      object.fromentries: 2.0.8
++      object.groupby: 1.0.3
++      object.values: 1.2.0
++      semver: 6.3.1
++      tsconfig-paths: 3.15.0
++    optionalDependencies:
++      '@typescript-eslint/parser': 7.2.0(eslint@8.57.0)(typescript@5.5.4)
++    transitivePeerDependencies:
++      - eslint-import-resolver-typescript
++      - eslint-import-resolver-webpack
++      - supports-color
++
+   eslint-plugin-jsx-a11y@6.9.0(eslint@8.57.0):
+     dependencies:
+       aria-query: 5.1.3
+@@ -19524,10 +19520,6 @@ snapshots:
+       react: 18.2.0
+       react-dom: 18.2.0(react@18.2.0)
+ 
+-  framesync@6.1.2:
+-    dependencies:
+-      tslib: 2.4.0
+-
+   fresh@0.5.2: {}
+ 
+   fs-constants@1.0.0: {}
+@@ -24179,8 +24171,6 @@ snapshots:
+ 
+   tslib@1.14.1: {}
+ 
+-  tslib@2.4.0: {}
+-
+   tslib@2.6.3: {}
+ 
+   tsup@8.1.0(postcss@8.4.43)(typescript@5.5.3):
+diff --git a/sandbox/next-app/tsconfig.json b/sandbox/next-app/tsconfig.json
+index 04c85156dc3..c4a2dd32aa3 100644
+--- a/sandbox/next-app/tsconfig.json
++++ b/sandbox/next-app/tsconfig.json
+@@ -22,7 +22,6 @@
+     "plugins": [{ "name": "next" }],
+     "paths": {
+       "@chakra-ui/react": ["../../packages/react/src"],
+-      "@chakra-ui/hooks": ["../../packages/hooks/src"],
+       "@chakra-ui/utils": ["../../packages/utils/src"]
+     }
+   },
+diff --git a/sandbox/next-pages/tsconfig.json b/sandbox/next-pages/tsconfig.json
+index 3643fac0e1d..3bccfd3c39a 100644
+--- a/sandbox/next-pages/tsconfig.json
++++ b/sandbox/next-pages/tsconfig.json
+@@ -21,7 +21,6 @@
+     "customConditions": ["source"],
+     "paths": {
+       "@chakra-ui/react": ["../../packages/react/src"],
+-      "@chakra-ui/hooks": ["../../packages/hooks/src"],
+       "@chakra-ui/utils": ["../../packages/utils/src"]
+     }
+   },
+diff --git a/sandbox/vite-ts/vite.config.ts b/sandbox/vite-ts/vite.config.ts
+index e94b501abed..a96b3ddd026 100644
+--- a/sandbox/vite-ts/vite.config.ts
++++ b/sandbox/vite-ts/vite.config.ts
+@@ -9,7 +9,6 @@ export default defineConfig({
+     alias: {
+       "@chakra-ui/utils": resolve("..", "..", "packages/utils/src"),
+       "@chakra-ui/react": resolve("..", "..", "packages/react/src"),
+-      "@chakra-ui/hooks": resolve("..", "..", "packages/hooks/src"),
+     },
+   },
+ })
+diff --git a/scripts/build/main.ts b/scripts/build/main.ts
+index 0aa49b961b4..dfc4cc40a7f 100644
+--- a/scripts/build/main.ts
++++ b/scripts/build/main.ts
+@@ -2,10 +2,6 @@ import { resolve } from "path/posix"
+ import { buildProject } from "./build.js"
+ 
+ const aliases = [
+-  {
+-    find: new RegExp(`^@chakra-ui/hooks`),
+-    replacement: resolve("../hooks", "src"),
+-  },
+   {
+     find: new RegExp(`^@chakra-ui/utils`),
+     replacement: resolve("../utils", "src"),
+diff --git a/vite.config.ts b/vite.config.ts
+index be3c9dd4e4b..30b5a47d1cd 100644
+--- a/vite.config.ts
++++ b/vite.config.ts
+@@ -7,7 +7,6 @@ export default defineConfig({
+     alias: {
+       "@chakra-ui/utils": resolve("packages/utils/src"),
+       "@chakra-ui/react": resolve("packages/react/src"),
+-      "@chakra-ui/hooks": resolve("packages/hooks/src"),
+       compositions: resolve("apps/compositions/src"),
+     },
+   },
+diff --git a/website/package.json b/website/package.json
+index 836a4fe0d8c..72ac3dd9527 100644
+--- a/website/package.json
++++ b/website/package.json
+@@ -21,7 +21,6 @@
+   },
+   "dependencies": {
+     "@chakra-ui/cli": "workspace:*",
+-    "@chakra-ui/hooks": "workspace:*",
+     "@chakra-ui/props-docs": "workspace:*",
+     "@chakra-ui/react": "workspace:*",
+     "@chakra-ui/utils": "workspace:*",
+@@ -32,7 +31,9 @@
+     "@emotion/react": "11.11.4",
+     "@emotion/styled": "11.11.5",
+     "@octokit/rest": "21.0.0",
++    "@zag-js/element-size": "^0.68.0",
+     "contentlayer": "0.3.4",
++    "copy-to-clipboard": "^3.3.3",
+     "date-fns": "3.6.0",
+     "docsearch.js": "2.6.3",
+     "focus-visible": "5.2.0",
+@@ -59,9 +60,9 @@
+     "react-icons": "5.2.1",
+     "react-live": "4.1.7",
+     "react-lorem-component": "0.13.0",
+-    "react-responsive-masonry": "2.2.0",
+     "react-player": "2.16.0",
+     "react-remove-scroll": "2.5.10",
++    "react-responsive-masonry": "2.2.0",
+     "react-spinners": "0.14.1",
+     "react-table": "7.8.0",
+     "remark": "14.0.3",
+diff --git a/website/src/components/header.tsx b/website/src/components/header.tsx
+index 45af23a87e6..933369c78be 100644
+--- a/website/src/components/header.tsx
++++ b/website/src/components/header.tsx
+@@ -1,4 +1,3 @@
+-import { useDisclosure, useUpdateEffect } from '@chakra-ui/hooks'
+ import {
+   Box,
+   ClientOnly,
+@@ -10,6 +9,7 @@ import {
+   Link,
+   Square,
+   chakra,
++  useDisclosure,
+ } from '@chakra-ui/react'
+ import siteConfig from 'configs/site-config.json'
+ import { useScroll } from 'framer-motion'
+@@ -28,6 +28,7 @@ import { MobileNavButton, MobileNavContent } from './mobile-nav'
+ import Search from './omni-search'
+ import SponsorButton from './sponsor-button'
+ import VersionSwitcher from './version-switcher'
++import { useUpdateEffect } from 'hooks/use-update-effect'
+ 
+ function ColorModeIcon() {
+   const { theme } = useTheme()
+diff --git a/website/src/components/mdx-components/codeblock/codeblock.tsx b/website/src/components/mdx-components/codeblock/codeblock.tsx
+index 741fc6d85ba..40e4d7220f6 100644
+--- a/website/src/components/mdx-components/codeblock/codeblock.tsx
++++ b/website/src/components/mdx-components/codeblock/codeblock.tsx
+@@ -1,4 +1,4 @@
+-import { useBoolean } from '@chakra-ui/hooks'
++import { useBoolean } from 'hooks/use-boolean'
+ import { Box } from '@chakra-ui/react'
+ import dynamic from 'next/dynamic'
+ import { themes } from 'prism-react-renderer'
+diff --git a/website/src/components/mdx-components/codeblock/copy-button.tsx b/website/src/components/mdx-components/codeblock/copy-button.tsx
+index e976b7ae4fe..05c05912594 100644
+--- a/website/src/components/mdx-components/codeblock/copy-button.tsx
++++ b/website/src/components/mdx-components/codeblock/copy-button.tsx
+@@ -1,4 +1,4 @@
+-import { useClipboard } from '@chakra-ui/hooks'
++import { useClipboard } from 'hooks/use-clipboard'
+ import { Button, ButtonProps } from '@chakra-ui/react'
+ 
+ interface CopyButtonProps extends ButtonProps {
+diff --git a/website/src/components/mdx-components/codeblock/react-live-scope.tsx b/website/src/components/mdx-components/codeblock/react-live-scope.tsx
+index ee2809a8dba..5a53c268f5d 100644
+--- a/website/src/components/mdx-components/codeblock/react-live-scope.tsx
++++ b/website/src/components/mdx-components/codeblock/react-live-scope.tsx
+@@ -1,4 +1,3 @@
+-import * as ChakraHooks from '@chakra-ui/hooks'
+ import * as Chakra from '@chakra-ui/react'
+ import { chakra } from '@chakra-ui/react'
+ import * as Formik from 'formik'
+@@ -80,7 +79,6 @@ const ReactLiveScope = {
+   ...ReactTable,
+   ...Loaders,
+   ...reactIcons,
+-  ...ChakraHooks,
+   ...Chakra,
+   StarIcon,
+   FocusLock,
+diff --git a/website/src/components/mdx-components/inline-code.tsx b/website/src/components/mdx-components/inline-code.tsx
+index 4992353d9d1..22dcc8386ba 100644
+--- a/website/src/components/mdx-components/inline-code.tsx
++++ b/website/src/components/mdx-components/inline-code.tsx
+@@ -1,4 +1,4 @@
+-import { useSize } from '@chakra-ui/hooks'
++import { useSize } from 'hooks/use-size'
+ import { Code, HTMLChakraProps } from '@chakra-ui/react'
+ import { useRef } from 'react'
+ 
+diff --git a/website/src/components/mobile-nav.tsx b/website/src/components/mobile-nav.tsx
+index ff8e4d5da28..b0225d7e894 100644
+--- a/website/src/components/mobile-nav.tsx
++++ b/website/src/components/mobile-nav.tsx
+@@ -22,7 +22,7 @@ import { RemoveScroll } from 'react-remove-scroll'
+ import Logo from './logo'
+ import { SidebarContent, mainNavLinks } from './sidebar/sidebar'
+ import SponsorButton from './sponsor-button'
+-import { useUpdateEffect } from '@chakra-ui/hooks'
++import { useUpdateEffect } from 'hooks/use-update-effect'
+ 
+ type NavLinkProps = {
+   href: string
+diff --git a/website/src/components/omni-search.tsx b/website/src/components/omni-search.tsx
+index acc950c4adb..fb41eb98018 100644
+--- a/website/src/components/omni-search.tsx
++++ b/website/src/components/omni-search.tsx
+@@ -1,9 +1,12 @@
+-import { Box, Center, Dialog, Flex, HStack, chakra } from '@chakra-ui/react'
+ import {
++  Box,
++  Center,
++  Dialog,
++  Flex,
++  HStack,
++  chakra,
+   useDisclosure,
+-  useEventListener,
+-  useUpdateEffect,
+-} from '@chakra-ui/hooks'
++} from '@chakra-ui/react'
+ import searchData from 'configs/search-meta.json'
+ import { findAll } from 'highlight-words-core'
+ import { matchSorter } from 'match-sorter'
+@@ -14,6 +17,8 @@ import { FaSearch } from 'react-icons/fa'
+ import MultiRef from 'react-multi-ref'
+ import scrollIntoView from 'scroll-into-view-if-needed'
+ import { SearchButton } from './algolia-search'
++import { useUpdateEffect } from 'hooks/use-update-effect'
++import { useEventListener } from 'hooks/use-event-listener'
+ 
+ const SearchIcon = chakra(FaSearch)
+ 
+diff --git a/packages/hooks/src/use-boolean.ts b/website/src/hooks/use-boolean.ts
+similarity index 90%
+rename from packages/hooks/src/use-boolean.ts
+rename to website/src/hooks/use-boolean.ts
+index d6d5523bedb..bf0078422f7 100644
+--- a/packages/hooks/src/use-boolean.ts
++++ b/website/src/hooks/use-boolean.ts
+@@ -1,6 +1,4 @@
+-"use client"
+-
+-import { useMemo, useState } from "react"
++import { useMemo, useState } from 'react'
+ 
+ type InitialState = boolean | (() => boolean)
+ 
+diff --git a/packages/hooks/src/use-clipboard.ts b/website/src/hooks/use-clipboard.ts
+similarity index 91%
+rename from packages/hooks/src/use-clipboard.ts
+rename to website/src/hooks/use-clipboard.ts
+index ad38d4cfd40..6af746d028f 100644
+--- a/packages/hooks/src/use-clipboard.ts
++++ b/website/src/hooks/use-clipboard.ts
+@@ -1,7 +1,5 @@
+-"use client"
+-
+-import copy from "copy-to-clipboard"
+-import { useCallback, useEffect, useState } from "react"
++import copy from 'copy-to-clipboard'
++import { useCallback, useEffect, useState } from 'react'
+ 
+ export interface UseClipboardOptions {
+   /**
+@@ -35,7 +33,7 @@ export function useClipboard(
+   useEffect(() => setValueState(value), [value])
+ 
+   const { timeout = 1500, ...copyOptions } =
+-    typeof optionsOrTimeout === "number"
++    typeof optionsOrTimeout === 'number'
+       ? { timeout: optionsOrTimeout }
+       : optionsOrTimeout
+ 
+diff --git a/packages/hooks/src/use-event-listener.ts b/website/src/hooks/use-event-listener.ts
+similarity index 84%
+rename from packages/hooks/src/use-event-listener.ts
+rename to website/src/hooks/use-event-listener.ts
+index c040a58c0d7..37a715fe335 100644
+--- a/packages/hooks/src/use-event-listener.ts
++++ b/website/src/hooks/use-event-listener.ts
+@@ -1,7 +1,5 @@
+-"use client"
+-
+-import { useEffect } from "react"
+-import { useCallbackRef } from "./use-callback-ref"
++import { useEffect } from 'react'
++import { useCallbackRef } from '@chakra-ui/react'
+ 
+ type Target = EventTarget | null | (() => EventTarget | null)
+ type Options = boolean | AddEventListenerOptions
+@@ -33,7 +31,7 @@ export function useEventListener(
+   const listener = useCallbackRef(handler)
+ 
+   useEffect(() => {
+-    const node = typeof target === "function" ? target() : (target ?? document)
++    const node = typeof target === 'function' ? target() : (target ?? document)
+ 
+     if (!handler || !node) return
+ 
+@@ -44,7 +42,7 @@ export function useEventListener(
+   }, [event, target, options, listener, handler])
+ 
+   return () => {
+-    const node = typeof target === "function" ? target() : (target ?? document)
++    const node = typeof target === 'function' ? target() : (target ?? document)
+     node?.removeEventListener(event, listener, options)
+   }
+ }
+diff --git a/packages/hooks/src/use-size.ts b/website/src/hooks/use-size.ts
+similarity index 87%
+rename from packages/hooks/src/use-size.ts
+rename to website/src/hooks/use-size.ts
+index 82cc3e99d35..b9772156e1b 100644
+--- a/packages/hooks/src/use-size.ts
++++ b/website/src/hooks/use-size.ts
+@@ -1,8 +1,7 @@
+-"use client"
+-
+-import { type ElementSize, trackElementSize } from "@zag-js/element-size"
+-import { useEffect, useLayoutEffect, useState } from "react"
++import { type ElementSize, trackElementSize } from '@zag-js/element-size'
++import { useEffect, useLayoutEffect, useState } from 'react'
+ 
++// eslint-disable-next-line no-extra-boolean-cast
+ const useSafeLayoutEffect = Boolean(globalThis?.document)
+   ? useLayoutEffect
+   : useEffect
+@@ -64,7 +63,7 @@ export function useSizes<T extends HTMLElement | null>({
+ }
+ 
+ function isRef(ref: any): ref is React.RefObject<any> {
+-  return typeof ref === "object" && ref !== null && "current" in ref
++  return typeof ref === 'object' && ref !== null && 'current' in ref
+ }
+ 
+ export function useSize<T extends HTMLElement | null>(
+diff --git a/packages/hooks/src/use-update-effect.ts b/website/src/hooks/use-update-effect.ts
+similarity index 91%
+rename from packages/hooks/src/use-update-effect.ts
+rename to website/src/hooks/use-update-effect.ts
+index ccc510d0ffa..5492bb06938 100644
+--- a/packages/hooks/src/use-update-effect.ts
++++ b/website/src/hooks/use-update-effect.ts
+@@ -1,6 +1,4 @@
+-"use client"
+-
+-import { useEffect, useRef } from "react"
++import { useEffect, useRef } from 'react'
+ 
+ /**
+  * React effect hook that invokes only on update.
+diff --git a/website/tsconfig.json b/website/tsconfig.json
+index af9ede7048c..4faad47dfb2 100644
+--- a/website/tsconfig.json
++++ b/website/tsconfig.json
+@@ -19,7 +19,6 @@
+     "baseUrl": ".",
+     "paths": {
+       "@chakra-ui/react": ["../packages/react/src"],
+-      "@chakra-ui/hooks": ["../packages/hooks/src"],
+       "@chakra-ui/utils": ["../packages/utils/src"],
+       "contentlayer/generated": ["./.contentlayer/generated"],
+       "components/*": ["src/components/*"],

@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "fa67b53ae0f157efefeed22d7781f9b6b63a56ab",
+    "filename": "packages/x-data-grid-pro/src/tests/rowEditing.DataGridPro.test.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/mui-x/blob/35096542fcff5b6344b458769ebc7fe2439ab4da/packages%2Fx-data-grid-pro%2Fsrc%2Ftests%2FrowEditing.DataGridPro.test.tsx",
+    "raw_url": "https://github.com/mui/mui-x/raw/35096542fcff5b6344b458769ebc7fe2439ab4da/packages%2Fx-data-grid-pro%2Fsrc%2Ftests%2FrowEditing.DataGridPro.test.tsx",
+    "contents_url": "https://api.github.com/repos/mui/mui-x/contents/packages%2Fx-data-grid-pro%2Fsrc%2Ftests%2FrowEditing.DataGridPro.test.tsx?ref=35096542fcff5b6344b458769ebc7fe2439ab4da",
+    "patch": "@@ -1384,7 +1384,7 @@ describe('<DataGridPro /> - Row editing', () => {\n       }, [hasFocus, inputRef]);\n       return (\n         <Portal>\n-          <input ref={(ref) => setInputRef(ref)} data-testid=\"input\" />\n+          <input ref={setInputRef} data-testid=\"input\" />\n         </Portal>\n       );\n     }"
+  }
+]

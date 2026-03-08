@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "ccb2dd5b547fbadeb340bce326c09b25cc0a2b3b",
+    "filename": "packages/vite/src/node/plugins/importMetaGlob.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/vitejs/vite/blob/f249ed9a59bc613c4eecc964c0642b47bcaf7b91/packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/f249ed9a59bc613c4eecc964c0642b47bcaf7b91/packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts?ref=f249ed9a59bc613c4eecc964c0642b47bcaf7b91",
+    "patch": "@@ -448,6 +448,7 @@ export async function transformGlobImport(\n               dot: !!options.exhaustive,\n               expandDirectories: false,\n               ignore: options.exhaustive ? [] : ['**/node_modules/**'],\n+              extglob: false,\n             })\n           )\n             .filter((file) => file !== id)"
+  },
+  {
+    "sha": "c2d4cf00ee9adc0534f0d800cdcfc78104985b83",
+    "filename": "playground/glob-import/__tests__/glob-import.spec.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 9,
+    "changes": 15,
+    "blob_url": "https://github.com/vitejs/vite/blob/f249ed9a59bc613c4eecc964c0642b47bcaf7b91/playground%2Fglob-import%2F__tests__%2Fglob-import.spec.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/f249ed9a59bc613c4eecc964c0642b47bcaf7b91/playground%2Fglob-import%2F__tests__%2Fglob-import.spec.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/playground%2Fglob-import%2F__tests__%2Fglob-import.spec.ts?ref=f249ed9a59bc613c4eecc964c0642b47bcaf7b91",
+    "patch": "@@ -88,15 +88,12 @@ const baseRawResult = {\n }\n \n test('should work', async () => {\n-  // TODO: extglobs are not supported yet: https://github.com/vitejs/rolldown-vite/issues/365\n-  if (process.env._VITE_TEST_JS_PLUGIN) {\n-    await expect\n-      .poll(async () => JSON.parse(await page.textContent('.result')))\n-      .toStrictEqual(allResult)\n-    await expect\n-      .poll(async () => JSON.parse(await page.textContent('.result-eager')))\n-      .toStrictEqual(allResult)\n-  }\n+  await expect\n+    .poll(async () => JSON.parse(await page.textContent('.result')))\n+    .toStrictEqual(allResult)\n+  await expect\n+    .poll(async () => JSON.parse(await page.textContent('.result-eager')))\n+    .toStrictEqual(allResult)\n   await expect\n     .poll(async () =>\n       JSON.parse(await page.textContent('.result-node_modules')),"
+  },
+  {
+    "sha": "88f7a86cf059020c413721db00bad5159eee92d4",
+    "filename": "playground/glob-import/dir/index.js",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/vitejs/vite/blob/f249ed9a59bc613c4eecc964c0642b47bcaf7b91/playground%2Fglob-import%2Fdir%2Findex.js",
+    "raw_url": "https://github.com/vitejs/vite/raw/f249ed9a59bc613c4eecc964c0642b47bcaf7b91/playground%2Fglob-import%2Fdir%2Findex.js",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/playground%2Fglob-import%2Fdir%2Findex.js?ref=f249ed9a59bc613c4eecc964c0642b47bcaf7b91",
+    "patch": "@@ -1,4 +1,4 @@\n-const modules = import.meta.glob('./*.(js|ts)', { eager: true })\n+const modules = import.meta.glob('./*.{js,ts}', { eager: true })\n const globWithAlias = import.meta.glob('@dir/al*.js', { eager: true })\n \n // test negative glob"
+  }
+]

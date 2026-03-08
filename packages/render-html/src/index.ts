@@ -739,7 +739,7 @@ function renderOperation(op: DiffOperation) {
 
 function splitLines(text: string) {
   if (text.length === 0) {
-    return [""];
+    return [];
   }
   const lines = text.split(LINE_SPLIT_RE);
   if (lines.length > 1 && lines.at(-1) === "") {
@@ -988,12 +988,26 @@ function renderInlineMarkedText(
   return `<span class="${className}">${escapeHtml(text)}</span>`;
 }
 
+function buildTrivialLineEdits(oldLines: string[], newLines: string[]) {
+  if (oldLines.length === 0) {
+    return newLines.map((line) => ({ type: "insert" as const, line }));
+  }
+  if (newLines.length === 0) {
+    return oldLines.map((line) => ({ type: "delete" as const, line }));
+  }
+  return null;
+}
+
 function diffLines(
   oldLines: string[],
   newLines: string[],
   oldComparable?: string[],
   newComparable?: string[]
 ): LineEdit[] {
+  const trivialEdits = buildTrivialLineEdits(oldLines, newLines);
+  if (trivialEdits) {
+    return trivialEdits;
+  }
   const n = oldLines.length;
   const m = newLines.length;
   const compareOld = oldComparable ?? oldLines;
@@ -1384,6 +1398,142 @@ function pairIdenticalLineMoves(
   return output;
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: shared-row collapse is clearer as a single pass.
+function collapseSharedLineChanges(
+  rows: LineRow[],
+  normalizeLine: (line: string) => string
+) {
+  const insertByKey = new Map<string, number[]>();
+  for (let index = 0; index < rows.length; index += 1) {
+    const row = rows[index];
+    if (row?.type !== "insert") {
+      continue;
+    }
+    const text = row.text ?? "";
+    if (!isMoveCandidateLine(text)) {
+      continue;
+    }
+    const key = normalizeLine(text).trim();
+    if (!key) {
+      continue;
+    }
+    const list = insertByKey.get(key);
+    if (list) {
+      list.push(index);
+    } else {
+      insertByKey.set(key, [index]);
+    }
+  }
+
+  const usedInserts = new Set<number>();
+  const output: LineRow[] = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    if (usedInserts.has(index)) {
+      continue;
+    }
+    const row = rows[index];
+    if (!row) {
+      continue;
+    }
+    if (row.type === "replace") {
+      const oldText = rowOldText(row);
+      if (!isMoveCandidateLine(oldText)) {
+        output.push(row);
+        continue;
+      }
+      const newText = rowNewText(row);
+      const newKey = normalizeLine(newText).trim();
+      if (newKey && !isLowInfoSemanticLine(newKey)) {
+        output.push(row);
+        continue;
+      }
+      const oldKey = normalizeLine(oldText).trim();
+      const matchIndex = takeFirstAvailable(
+        insertByKey.get(oldKey),
+        usedInserts
+      );
+      if (matchIndex === null) {
+        output.push(row);
+        continue;
+      }
+      usedInserts.add(matchIndex);
+      const insertRow = rows[matchIndex];
+      output.push({
+        type: "equal",
+        oldLine: row.oldLine ?? null,
+        newLine: insertRow?.newLine ?? null,
+        text: oldText,
+      });
+      if (newKey && newKey !== oldKey && !isLowInfoSemanticLine(newKey)) {
+        output.push({
+          type: "insert",
+          oldLine: null,
+          newLine: row.newLine ?? null,
+          text: newText,
+        });
+      }
+      continue;
+    }
+    if (row.type !== "delete") {
+      if (row) {
+        output.push(row);
+      }
+      continue;
+    }
+    const text = row.text ?? "";
+    if (!isMoveCandidateLine(text)) {
+      output.push(row);
+      continue;
+    }
+    const key = normalizeLine(text).trim();
+    const matchIndex = takeFirstAvailable(insertByKey.get(key), usedInserts);
+    if (matchIndex === null) {
+      output.push(row);
+      continue;
+    }
+    usedInserts.add(matchIndex);
+    const insertRow = rows[matchIndex];
+    output.push({
+      type: "equal",
+      oldLine: row.oldLine ?? null,
+      newLine: insertRow?.newLine ?? null,
+      text,
+    });
+  }
+  return output;
+}
+
+function applySemanticRowSuppressions(
+  rows: LineRow[],
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine?: (line: string) => string,
+  useYamlComparable?: boolean,
+  useKeyMatching?: boolean
+) {
+  if (!normalizeLine) {
+    return rows;
+  }
+  let nextRows = suppressBalancedLineChanges(
+    rows,
+    oldLines,
+    newLines,
+    normalizeLine,
+    useYamlComparable
+  );
+  nextRows = suppressImportBlockStarts(nextRows);
+  nextRows = suppressInlinePropChanges(nextRows, normalizeLine);
+  if (useKeyMatching) {
+    nextRows = suppressRepeatedYamlChanges(
+      nextRows,
+      oldLines,
+      newLines,
+      normalizeLine
+    );
+  }
+  return nextRows;
+}
+
 function buildNormalizedLineCounts(
   lines: string[],
   normalizeLine: (line: string) => string
@@ -1426,6 +1576,35 @@ function suppressBalancedLineChanges(
     }
     const text = row.text ?? "";
     if (!isMoveCandidateLine(text)) {
+      return true;
+    }
+    return !balanced.has(normalizeLine(text));
+  });
+}
+
+function suppressBalancedImportChanges(
+  rows: LineRow[],
+  oldLines: string[],
+  newLines: string[],
+  normalizeLine: (line: string) => string
+) {
+  const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
+  const newCounts = buildNormalizedLineCounts(newLines, normalizeLine);
+  const balanced = new Set<string>();
+  for (const [key, count] of oldCounts) {
+    if (count > 0 && count === (newCounts.get(key) ?? 0)) {
+      balanced.add(key);
+    }
+  }
+  if (balanced.size === 0) {
+    return rows;
+  }
+  return rows.filter((row) => {
+    if (row?.type !== "insert" && row?.type !== "delete") {
+      return true;
+    }
+    const text = row.text ?? "";
+    if (!isImportLine(text)) {
       return true;
     }
     return !balanced.has(normalizeLine(text));
@@ -1602,6 +1781,55 @@ function isImportLine(line: string) {
 
 function isSideEffectImportLine(line: string) {
   return SIDE_EFFECT_IMPORT_RE.test(line.trim());
+}
+
+function takeLeadingImportCluster(lines: string[]) {
+  const cluster: string[] = [];
+  let index = 0;
+  let sawImport = false;
+  let inMultilineImport = false;
+
+  while (index < lines.length) {
+    const line = lines[index] ?? "";
+    const trimmed = line.trim();
+    if (!(sawImport || trimmed)) {
+      index += 1;
+      continue;
+    }
+    if (inMultilineImport) {
+      cluster.push(line);
+      index += 1;
+      if (trimmed.endsWith(";")) {
+        inMultilineImport = false;
+      }
+      continue;
+    }
+    if (isImportLine(line)) {
+      sawImport = true;
+      cluster.push(line);
+      index += 1;
+      inMultilineImport = !(
+        trimmed.endsWith(";") ||
+        trimmed.includes(" from ") ||
+        isSideEffectImportLine(trimmed)
+      );
+      continue;
+    }
+    if (sawImport && !trimmed) {
+      cluster.push(line);
+      index += 1;
+      continue;
+    }
+    break;
+  }
+
+  if (!sawImport) {
+    return null;
+  }
+  return {
+    cluster,
+    rest: lines.slice(index),
+  };
 }
 
 function buildLineKeyCounts(
@@ -1828,6 +2056,11 @@ const YAML_NAME_KEY_RE = /^name:\s*(.+)$/;
 const YAML_USES_KEY_RE = /^uses:\s*(.+)$/;
 const YAML_SHARED_THRESHOLD = 10;
 const YAML_SHARED_DIFF_RATIO = 0.058;
+const UPDATE_MARK_ALIGNMENT_LIMIT = 4000;
+const SEMANTIC_FALLBACK_MIN_LINE_DELTA = 3;
+const SEMANTIC_FALLBACK_MAX_LINE_RATIO = 1.15;
+const OPERATION_ANCHORED_MIN_LINE_VOLUME = 40;
+const OPERATION_ANCHORED_MAX_LINE_RATIO = 1.2;
 
 function isLineComment(line: string) {
   const trimmed = line.trim();
@@ -2667,19 +2900,50 @@ function buildRowsFromBlocks(
     const next = blocks[i + 1];
 
     if (block.type === "delete" && next?.type === "insert") {
-      const reorderedLines = reorderInsertLines(
-        block.lines,
-        next.lines,
-        normalizeLine
-      );
-      const insertLines = reorderedLines ?? next.lines;
       const shouldAlign =
         normalizeLine !== undefined &&
         !useYamlComparable &&
-        block.lines.length + insertLines.length <= 4000;
+        block.lines.length + next.lines.length <= 4000;
+      let deleteLines = block.lines;
+      let nextInsertLines = next.lines;
+      if (shouldAlign && normalizeLine) {
+        const leadingDeleteImports = takeLeadingImportCluster(deleteLines);
+        const leadingInsertImports = takeLeadingImportCluster(nextInsertLines);
+        if (
+          leadingDeleteImports &&
+          leadingInsertImports &&
+          (leadingDeleteImports.rest.length > 0 ||
+            leadingInsertImports.rest.length > 0)
+        ) {
+          const importResult = appendAlignedReplaceRows(
+            rows,
+            leadingDeleteImports.cluster,
+            leadingInsertImports.cluster,
+            oldLine,
+            newLine,
+            lineLayout,
+            normalizeLine,
+            useKeyMatching
+          );
+          oldLine = importResult.oldLine;
+          newLine = importResult.newLine;
+          deleteLines = leadingDeleteImports.rest;
+          nextInsertLines = leadingInsertImports.rest;
+          if (deleteLines.length === 0 && nextInsertLines.length === 0) {
+            i += 1;
+            continue;
+          }
+        }
+      }
+      const reorderedLines = reorderInsertLines(
+        deleteLines,
+        nextInsertLines,
+        normalizeLine
+      );
+      const insertLines = reorderedLines ?? nextInsertLines;
       const oldComparableSlice =
         useYamlComparable && oldComparable
-          ? oldComparable.slice(oldLine - 1, oldLine - 1 + block.lines.length)
+          ? oldComparable.slice(oldLine - 1, oldLine - 1 + deleteLines.length)
           : undefined;
       const newComparableSlice =
         useYamlComparable && newComparable
@@ -2689,7 +2953,7 @@ function buildRowsFromBlocks(
       if (shouldAlign && normalizeLine) {
         result = appendAlignedReplaceRows(
           rows,
-          block.lines,
+          deleteLines,
           insertLines,
           oldLine,
           newLine,
@@ -2703,7 +2967,7 @@ function buildRowsFromBlocks(
       } else if (lineLayout === "unified") {
         result = appendUnifiedReplaceRows(
           rows,
-          block.lines,
+          deleteLines,
           insertLines,
           oldLine,
           newLine
@@ -2711,7 +2975,7 @@ function buildRowsFromBlocks(
       } else {
         result = appendSplitReplaceRows(
           rows,
-          block.lines,
+          deleteLines,
           insertLines,
           oldLine,
           newLine
@@ -2756,31 +3020,94 @@ function addRangeLines(
   target: Set<number>,
   maxLine: number
 ) {
-  if (!range || maxLine <= 0) {
+  const bounds = resolveRangeLineBounds(range, maxLine);
+  if (!bounds) {
     return;
   }
-  let start = Math.max(1, Math.min(maxLine, range.start.line));
-  let end = Math.max(1, Math.min(maxLine, range.end.line));
-  if (range.end.column <= 1 && end > start) {
-    end -= 1;
-  }
-  if (end < start) {
-    [start, end] = [end, start];
-  }
+  const { start, end } = bounds;
   for (let line = start; line <= end; line += 1) {
     target.add(line);
   }
 }
 
+function resolveRangeLineBounds(range: Range | undefined, maxLine: number) {
+  if (!range || maxLine <= 0) {
+    return null;
+  }
+  let start = Math.max(1, Math.min(maxLine, range.start.line));
+  let end = Math.max(1, Math.min(maxLine, range.end.line));
+  if (range.end.column <= 1 && range.end.line <= maxLine && end > start) {
+    end -= 1;
+  }
+  if (end < start) {
+    [start, end] = [end, start];
+  }
+  return { start, end };
+}
+
 function buildLineMarkSets(
   operations: readonly DiffOperation[],
   oldLineCount: number,
-  newLineCount: number
+  newLineCount: number,
+  options: {
+    normalizeLine?: ((line: string) => string) | undefined;
+    useKeyMatching?: boolean | undefined;
+    useYamlComparable?: boolean | undefined;
+  } = {}
 ) {
   const changedOld = new Set<number>();
   const changedNew = new Set<number>();
   const movedOld = new Set<number>();
   const movedNew = new Set<number>();
+  const { normalizeLine, useKeyMatching, useYamlComparable } = options;
+
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: localized line marking needs the explicit fallback branches.
+  const addLocalizedUpdateLines = (operation: DiffOperation) => {
+    if (
+      !(operation.oldRange && operation.newRange) ||
+      operation.oldText === undefined ||
+      operation.newText === undefined
+    ) {
+      addRangeLines(operation.oldRange, changedOld, oldLineCount);
+      addRangeLines(operation.newRange, changedNew, newLineCount);
+      return;
+    }
+
+    const oldLines = splitLines(operation.oldText);
+    const newLines = splitLines(operation.newText);
+    if (oldLines.length + newLines.length > UPDATE_MARK_ALIGNMENT_LIMIT) {
+      addRangeLines(operation.oldRange, changedOld, oldLineCount);
+      addRangeLines(operation.newRange, changedNew, newLineCount);
+      return;
+    }
+
+    const localizedRows = buildRawLineRows(
+      oldLines,
+      newLines,
+      "split",
+      normalizeLine,
+      useKeyMatching,
+      useYamlComparable
+    );
+    for (const row of localizedRows) {
+      if (row.type === "gap" || row.type === "hunk" || row.type === "equal") {
+        continue;
+      }
+      if (
+        row.type === "replace" &&
+        normalizeLine &&
+        normalizeLine(rowOldText(row)) === normalizeLine(rowNewText(row))
+      ) {
+        continue;
+      }
+      if (row.oldLine != null) {
+        changedOld.add(operation.oldRange.start.line + row.oldLine - 1);
+      }
+      if (row.newLine != null) {
+        changedNew.add(operation.newRange.start.line + row.newLine - 1);
+      }
+    }
+  };
 
   for (const op of operations) {
     switch (op.type) {
@@ -2791,8 +3118,7 @@ function buildLineMarkSets(
         addRangeLines(op.oldRange, changedOld, oldLineCount);
         break;
       case "update":
-        addRangeLines(op.oldRange, changedOld, oldLineCount);
-        addRangeLines(op.newRange, changedNew, newLineCount);
+        addLocalizedUpdateLines(op);
         break;
       case "move":
         addRangeLines(op.oldRange, movedOld, oldLineCount);
@@ -2807,17 +3133,11 @@ function buildLineMarkSets(
 }
 
 function expandRangeLines(range: Range | undefined, maxLine: number) {
-  if (!range || maxLine <= 0) {
+  const bounds = resolveRangeLineBounds(range, maxLine);
+  if (!bounds) {
     return [];
   }
-  let start = Math.max(1, Math.min(maxLine, range.start.line));
-  let end = Math.max(1, Math.min(maxLine, range.end.line));
-  if (range.end.column <= 1 && end > start) {
-    end -= 1;
-  }
-  if (end < start) {
-    [start, end] = [end, start];
-  }
+  const { start, end } = bounds;
   const lines: number[] = [];
   for (let line = start; line <= end; line += 1) {
     lines.push(line);
@@ -2851,6 +3171,100 @@ function buildMoveLineMap(
       oldToNew.set(oldLine, newLine);
       newToOld.set(newLine, oldLine);
     }
+  }
+  return { oldToNew, newToOld };
+}
+
+function moveContextKey(text: string, normalizeLine: (line: string) => string) {
+  const normalized = normalizeLine(text).trim();
+  return normalized || text.trim();
+}
+
+function collectContextualMoveIds(operations: readonly DiffOperation[]) {
+  return new Set(
+    operations.flatMap((op) =>
+      op.type !== "move" && op.meta?.moveId ? [op.meta.moveId] : []
+    )
+  );
+}
+
+function buildMoveContextLineBuckets(
+  range: Range,
+  lines: readonly string[],
+  normalizeLine: (line: string) => string
+) {
+  const buckets = new Map<string, number[]>();
+  for (const lineNumber of expandRangeLines(range, lines.length)) {
+    const key = moveContextKey(lines[lineNumber - 1] ?? "", normalizeLine);
+    if (!key) {
+      continue;
+    }
+    const existing = buckets.get(key);
+    if (existing) {
+      existing.push(lineNumber);
+    } else {
+      buckets.set(key, [lineNumber]);
+    }
+  }
+  return buckets;
+}
+
+function pairContextualMoveOperation(
+  operation: DiffOperation,
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string,
+  oldToNew: Map<number, number>,
+  newToOld: Map<number, number>
+) {
+  if (operation.type !== "move" || !operation.oldRange || !operation.newRange) {
+    return;
+  }
+  const newCandidatesByKey = buildMoveContextLineBuckets(
+    operation.newRange,
+    newLines,
+    normalizeLine
+  );
+  const usedNew = new Set<number>();
+  for (const oldLine of expandRangeLines(operation.oldRange, oldLines.length)) {
+    const key = moveContextKey(oldLines[oldLine - 1] ?? "", normalizeLine);
+    if (!key) {
+      continue;
+    }
+    const match = takeFirstAvailable(newCandidatesByKey.get(key), usedNew);
+    if (match == null || oldToNew.has(oldLine) || newToOld.has(match)) {
+      continue;
+    }
+    usedNew.add(match);
+    oldToNew.set(oldLine, match);
+    newToOld.set(match, oldLine);
+  }
+}
+
+function buildContextualMovePairs(
+  operations: readonly DiffOperation[],
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string
+) {
+  const contextualMoveIds = collectContextualMoveIds(operations);
+  const oldToNew = new Map<number, number>();
+  const newToOld = new Map<number, number>();
+  if (contextualMoveIds.size === 0) {
+    return { oldToNew, newToOld };
+  }
+  for (const operation of operations) {
+    if (operation.type !== "move" || !contextualMoveIds.has(operation.id)) {
+      continue;
+    }
+    pairContextualMoveOperation(
+      operation,
+      oldLines,
+      newLines,
+      normalizeLine,
+      oldToNew,
+      newToOld
+    );
   }
   return { oldToNew, newToOld };
 }
@@ -3012,6 +3426,263 @@ function collapseMoveRows(
   return output;
 }
 
+function movePairKey(oldLine: number, newLine: number) {
+  return `${oldLine}:${newLine}`;
+}
+
+function buildPromotedMoveRow(
+  oldLine: number,
+  newLine: number,
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string
+): LineRow | null {
+  const oldText = oldLines[oldLine - 1] ?? "";
+  const newText = newLines[newLine - 1] ?? "";
+  const oldKey = moveContextKey(oldText, normalizeLine);
+  const newKey = moveContextKey(newText, normalizeLine);
+  if (!(oldKey && newKey)) {
+    return null;
+  }
+  if (oldKey !== newKey) {
+    return null;
+  }
+  return {
+    type: "move",
+    oldLine,
+    newLine,
+    oldText,
+    newText,
+  };
+}
+
+interface MoveRowPair {
+  oldLine: number;
+  newLine: number;
+}
+
+function resolveDirectMovePair(
+  row: LineRow,
+  oldToNew: ReadonlyMap<number, number>,
+  newToOld: ReadonlyMap<number, number>
+) {
+  if (row.oldLine == null || row.newLine == null) {
+    return null;
+  }
+  if (
+    oldToNew.get(row.oldLine) !== row.newLine ||
+    newToOld.get(row.newLine) !== row.oldLine
+  ) {
+    return null;
+  }
+  return { oldLine: row.oldLine, newLine: row.newLine } satisfies MoveRowPair;
+}
+
+function resolveSupplementalMovePair(
+  row: LineRow,
+  oldToNew: ReadonlyMap<number, number>,
+  newToOld: ReadonlyMap<number, number>
+) {
+  if (row.type === "delete" && row.oldLine != null) {
+    const newLine = oldToNew.get(row.oldLine);
+    return newLine == null ? null : { oldLine: row.oldLine, newLine };
+  }
+  if (row.type === "insert" && row.newLine != null) {
+    const oldLine = newToOld.get(row.newLine);
+    return oldLine == null ? null : { oldLine, newLine: row.newLine };
+  }
+  return null;
+}
+
+function resolveMoveRowPair(
+  row: LineRow,
+  oldToNew: ReadonlyMap<number, number>,
+  newToOld: ReadonlyMap<number, number>
+) {
+  return (
+    resolveDirectMovePair(row, oldToNew, newToOld) ??
+    resolveSupplementalMovePair(row, oldToNew, newToOld)
+  );
+}
+
+function appendFollowingPromotedMoveRows(
+  output: LineRow[],
+  pair: MoveRowPair | null,
+  row: LineRow,
+  oldToNew: ReadonlyMap<number, number>,
+  promotedPairs: Set<string>,
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string
+) {
+  if (!pair || row.newLine == null) {
+    return;
+  }
+  let oldLine = pair.oldLine + 1;
+  let newLine = pair.newLine + 1;
+  while (oldToNew.get(oldLine) === newLine) {
+    const pairKey = movePairKey(oldLine, newLine);
+    if (promotedPairs.has(pairKey)) {
+      oldLine += 1;
+      newLine += 1;
+      continue;
+    }
+    const promoted = buildPromotedMoveRow(
+      oldLine,
+      newLine,
+      oldLines,
+      newLines,
+      normalizeLine
+    );
+    if (!promoted) {
+      break;
+    }
+    promotedPairs.add(pairKey);
+    output.push(promoted);
+    oldLine += 1;
+    newLine += 1;
+  }
+}
+
+function appendMoveContextRow(
+  output: LineRow[],
+  row: LineRow,
+  pair: MoveRowPair,
+  promotedPairs: Set<string>,
+  oldToNew: ReadonlyMap<number, number>,
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string
+) {
+  const pairKey = movePairKey(pair.oldLine, pair.newLine);
+  if (promotedPairs.has(pairKey)) {
+    return;
+  }
+  const promoted = buildPromotedMoveRow(
+    pair.oldLine,
+    pair.newLine,
+    oldLines,
+    newLines,
+    normalizeLine
+  );
+  if (promoted) {
+    promotedPairs.add(pairKey);
+    output.push(promoted);
+  } else {
+    output.push(row);
+  }
+  appendFollowingPromotedMoveRows(
+    output,
+    pair,
+    row,
+    oldToNew,
+    promotedPairs,
+    oldLines,
+    newLines,
+    normalizeLine
+  );
+}
+
+function insertMissingPromotedMoveRows(
+  output: LineRow[],
+  oldToNew: ReadonlyMap<number, number>,
+  promotedPairs: Set<string>,
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string
+) {
+  for (const [oldLine, newLine] of [...oldToNew.entries()].sort(
+    (left, right) => left[1] - right[1] || left[0] - right[0]
+  )) {
+    const pairKey = movePairKey(oldLine, newLine);
+    if (promotedPairs.has(pairKey)) {
+      continue;
+    }
+    const promoted = buildPromotedMoveRow(
+      oldLine,
+      newLine,
+      oldLines,
+      newLines,
+      normalizeLine
+    );
+    if (!promoted) {
+      continue;
+    }
+    let insertAt = 0;
+    for (let index = 0; index < output.length; index += 1) {
+      const row = output[index];
+      if (!row || row.type === "gap" || row.type === "hunk") {
+        continue;
+      }
+      if (
+        (row.newLine != null && row.newLine <= newLine) ||
+        (row.oldLine != null && row.oldLine <= oldLine)
+      ) {
+        insertAt = index + 1;
+      }
+    }
+    promotedPairs.add(pairKey);
+    output.splice(insertAt, 0, promoted);
+  }
+}
+
+function promoteMoveContextRows(
+  rows: LineRow[],
+  operations: readonly DiffOperation[],
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine?: (line: string) => string
+) {
+  if (!normalizeLine || rows.length === 0) {
+    return rows;
+  }
+  const { oldToNew, newToOld } = buildContextualMovePairs(
+    operations,
+    oldLines,
+    newLines,
+    normalizeLine
+  );
+  if (oldToNew.size === 0) {
+    return rows;
+  }
+
+  const promotedPairs = new Set<string>();
+  const output: LineRow[] = [];
+
+  for (const row of rows) {
+    if (row.type === "gap" || row.type === "hunk") {
+      output.push(row);
+      continue;
+    }
+    const pair = resolveMoveRowPair(row, oldToNew, newToOld);
+    if (!pair) {
+      output.push(row);
+      continue;
+    }
+    appendMoveContextRow(
+      output,
+      row,
+      pair,
+      promotedPairs,
+      oldToNew,
+      oldLines,
+      newLines,
+      normalizeLine
+    );
+  }
+
+  insertMissingPromotedMoveRows(
+    output,
+    oldToNew,
+    promotedPairs,
+    oldLines,
+    newLines,
+    normalizeLine
+  );
+
+  return output;
+}
+
 function toEqualRow(row: LineRow): LineRow {
   return {
     type: "equal",
@@ -3127,15 +3798,26 @@ function applyLineOperations(
   operations: readonly DiffOperation[],
   oldLineCount: number,
   newLineCount: number,
-  normalizeLine?: (line: string) => string
+  options: {
+    normalizeLine?: ((line: string) => string) | undefined;
+    useKeyMatching?: boolean | undefined;
+    useYamlComparable?: boolean | undefined;
+  } = {}
 ): LineRow[] {
   if (operations.length === 0) {
     return rows;
   }
 
-  const marks = buildLineMarkSets(operations, oldLineCount, newLineCount);
+  const marks = buildLineMarkSets(
+    operations,
+    oldLineCount,
+    newLineCount,
+    options
+  );
 
-  return rows.map((row) => applyLineOperationToRow(row, marks, normalizeLine));
+  return rows.map((row) =>
+    applyLineOperationToRow(row, marks, options.normalizeLine)
+  );
 }
 
 function applyLineContext(rows: LineRow[], contextLines: number): LineRow[] {
@@ -3211,7 +3893,10 @@ function buildLineRows(
     useYamlComparable
   );
   if (!useYamlComparable) {
-    rows = pairIdenticalLineMoves(rows, normalizeLine);
+    rows = pairIdenticalLineMoves(
+      rows,
+      normalizeLine ?? ((line: string) => line)
+    );
   }
   if (applyOperations) {
     rows = applyLineOperations(
@@ -3219,7 +3904,11 @@ function buildLineRows(
       operations,
       oldLines.length,
       newLines.length,
-      normalizeLine
+      {
+        normalizeLine,
+        useKeyMatching,
+        useYamlComparable,
+      }
     );
     rows = collapseMoveRows(
       rows,
@@ -3228,25 +3917,212 @@ function buildLineRows(
       newLines,
       normalizeLine
     );
+    rows = promoteMoveContextRows(
+      rows,
+      operations,
+      oldLines,
+      newLines,
+      normalizeLine
+    );
     if (applySuppression) {
-      rows = suppressBalancedLineChanges(
+      rows = applySemanticRowSuppressions(
         rows,
         oldLines,
         newLines,
         normalizeLine,
-        useYamlComparable
+        useYamlComparable,
+        useKeyMatching
       );
-      rows = suppressImportBlockStarts(rows);
-      rows = suppressInlinePropChanges(rows, normalizeLine);
-      if (useKeyMatching) {
-        rows = suppressRepeatedYamlChanges(
-          rows,
-          oldLines,
-          newLines,
-          normalizeLine
-        );
-      }
     }
+  }
+  return applyLineContext(rows, contextLines);
+}
+
+function offsetLineRow(
+  row: LineRow,
+  oldLineOffset: number,
+  newLineOffset: number
+): LineRow {
+  const oldLine =
+    row.oldLine == null ? row.oldLine : row.oldLine + oldLineOffset;
+  const newLine =
+    row.newLine == null ? row.newLine : row.newLine + newLineOffset;
+  return {
+    ...row,
+    ...(oldLine !== undefined ? { oldLine } : {}),
+    ...(newLine !== undefined ? { newLine } : {}),
+  };
+}
+
+function resolveAnchoredStartLines(
+  operation: DiffOperation,
+  oldCursor: number,
+  newCursor: number
+) {
+  const oldStart = operation.oldRange?.start.line;
+  const newStart = operation.newRange?.start.line;
+  if (oldStart != null && newStart != null) {
+    return { oldStart, newStart };
+  }
+  if (oldStart != null) {
+    return {
+      oldStart,
+      newStart: newCursor + (oldStart - oldCursor),
+    };
+  }
+  if (newStart != null) {
+    return {
+      oldStart: oldCursor + (newStart - newCursor),
+      newStart,
+    };
+  }
+  return { oldStart: oldCursor, newStart: newCursor };
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: operation-anchored rendering is easiest to audit inline.
+function buildOperationAnchoredRows(
+  oldText: string,
+  newText: string,
+  contextLines: number,
+  lineLayout: "split" | "unified",
+  normalizeLine: (line: string) => string,
+  operations: readonly DiffOperation[],
+  useKeyMatching?: boolean,
+  useYamlComparable?: boolean
+) {
+  if (
+    operations.length === 0 ||
+    operations.some((op) => op.type === "move" || Boolean(op.meta?.moveId))
+  ) {
+    return null;
+  }
+
+  const oldLines = splitLines(oldText);
+  const newLines = splitLines(newText);
+  const rows: LineRow[] = [];
+  let oldCursor = 1;
+  let newCursor = 1;
+
+  const appendOperationPrefix = (oldStart: number, newStart: number) => {
+    while (oldCursor < oldStart && newCursor < newStart) {
+      rows.push({
+        type: "equal",
+        oldLine: oldCursor,
+        newLine: newCursor,
+        text: oldLines[oldCursor - 1] ?? newLines[newCursor - 1] ?? "",
+      });
+      oldCursor += 1;
+      newCursor += 1;
+    }
+    while (oldCursor < oldStart) {
+      rows.push({
+        type: "delete",
+        oldLine: oldCursor,
+        newLine: null,
+        text: oldLines[oldCursor - 1] ?? "",
+      });
+      oldCursor += 1;
+    }
+    while (newCursor < newStart) {
+      rows.push({
+        type: "insert",
+        oldLine: null,
+        newLine: newCursor,
+        text: newLines[newCursor - 1] ?? "",
+      });
+      newCursor += 1;
+    }
+    return oldCursor === oldStart && newCursor === newStart;
+  };
+
+  for (const operation of operations) {
+    const { oldStart, newStart } = resolveAnchoredStartLines(
+      operation,
+      oldCursor,
+      newCursor
+    );
+    if (!appendOperationPrefix(oldStart, newStart)) {
+      return null;
+    }
+
+    switch (operation.type) {
+      case "insert": {
+        if (operation.newText === undefined) {
+          return null;
+        }
+        for (const line of splitLines(operation.newText)) {
+          rows.push({
+            type: "insert",
+            oldLine: null,
+            newLine: newCursor,
+            text: line,
+          });
+          newCursor += 1;
+        }
+        break;
+      }
+      case "delete": {
+        if (operation.oldText === undefined) {
+          return null;
+        }
+        for (const line of splitLines(operation.oldText)) {
+          rows.push({
+            type: "delete",
+            oldLine: oldCursor,
+            newLine: null,
+            text: line,
+          });
+          oldCursor += 1;
+        }
+        break;
+      }
+      case "update": {
+        if (
+          operation.oldText === undefined ||
+          operation.newText === undefined
+        ) {
+          return null;
+        }
+        const opOldLines = splitLines(operation.oldText);
+        const opNewLines = splitLines(operation.newText);
+        let localRows = buildRawLineRows(
+          opOldLines,
+          opNewLines,
+          lineLayout,
+          normalizeLine,
+          useKeyMatching,
+          useYamlComparable
+        );
+        if (!useYamlComparable) {
+          localRows = pairIdenticalLineMoves(localRows, normalizeLine);
+        }
+        localRows = applySemanticRowSuppressions(
+          localRows,
+          opOldLines,
+          opNewLines,
+          normalizeLine,
+          useYamlComparable,
+          useKeyMatching
+        );
+        rows.push(
+          ...localRows.map((row) =>
+            offsetLineRow(row, oldCursor - 1, newCursor - 1)
+          )
+        );
+        oldCursor += opOldLines.length;
+        newCursor += opNewLines.length;
+        break;
+      }
+      default:
+        return null;
+    }
+  }
+
+  if (!appendOperationPrefix(oldLines.length + 1, newLines.length + 1)) {
+    return null;
+  }
+  if (oldCursor <= oldLines.length || newCursor <= newLines.length) {
+    return null;
   }
   return applyLineContext(rows, contextLines);
 }
@@ -3548,6 +4424,42 @@ function buildHtmlShell({
 </html>`;
 }
 
+function isContextualMovePreservedRow(
+  row: LineRow,
+  contextualMovePairs: ReturnType<typeof buildContextualMovePairs> | undefined,
+  oldLines: readonly string[],
+  newLines: readonly string[],
+  normalizeLine: (line: string) => string
+) {
+  if (row.type === "delete") {
+    if (row.oldLine == null) {
+      return false;
+    }
+    const newLine = contextualMovePairs?.oldToNew.get(row.oldLine);
+    if (newLine == null) {
+      return false;
+    }
+    return (
+      moveContextKey(oldLines[row.oldLine - 1] ?? "", normalizeLine) ===
+      moveContextKey(newLines[newLine - 1] ?? "", normalizeLine)
+    );
+  }
+  if (row.type === "insert") {
+    if (row.newLine == null) {
+      return false;
+    }
+    const oldLine = contextualMovePairs?.newToOld.get(row.newLine);
+    if (oldLine == null) {
+      return false;
+    }
+    return (
+      moveContextKey(oldLines[oldLine - 1] ?? "", normalizeLine) ===
+      moveContextKey(newLines[row.newLine - 1] ?? "", normalizeLine)
+    );
+  }
+  return false;
+}
+
 function buildRenderContext(
   diff: DiffDocument,
   options: HtmlRenderOptions
@@ -3596,30 +4508,39 @@ function buildRenderContext(
 
 function filterSemanticRows(
   rows: LineRow[],
-  normalizeLine: (line: string) => string
+  normalizeLine: (line: string) => string,
+  preserveOneSidedLowInfoRows = false,
+  contextualMovePairs?: ReturnType<typeof buildContextualMovePairs>,
+  oldLines: readonly string[] = [],
+  newLines: readonly string[] = []
 ) {
-  const filtered: LineRow[] = [];
-  for (const row of rows) {
+  return rows.filter((row) => {
     if (row.type === "gap" || row.type === "hunk") {
-      continue;
-    }
-    if (row.type === "insert" || row.type === "delete") {
-      const text = rowText(row);
-      const normalized = normalizeLine(text).trim();
-      if (!normalized || isLowInfoSemanticLine(normalized)) {
-        continue;
-      }
+      return false;
     }
     if (row.type === "replace") {
       const oldValue = row.oldText ?? "";
       const newValue = row.newText ?? "";
-      if (normalizeLine(oldValue) === normalizeLine(newValue)) {
-        continue;
-      }
+      return normalizeLine(oldValue) !== normalizeLine(newValue);
     }
-    filtered.push(row);
-  }
-  return filtered;
+    if (row.type !== "insert" && row.type !== "delete") {
+      return true;
+    }
+    if (
+      preserveOneSidedLowInfoRows ||
+      isContextualMovePreservedRow(
+        row,
+        contextualMovePairs,
+        oldLines,
+        newLines,
+        normalizeLine
+      )
+    ) {
+      return true;
+    }
+    const normalized = normalizeLine(rowText(row)).trim();
+    return Boolean(normalized && !isLowInfoSemanticLine(normalized));
+  });
 }
 
 function toProjectedEqualRow(row: LineRow): LineRow {
@@ -4193,6 +5114,30 @@ function countLineNoise(rows: LineRow[]) {
   return noise;
 }
 
+function countChangedLineVolume(rows: LineRow[]) {
+  let volume = 0;
+  for (const row of rows) {
+    switch (row.type) {
+      case "insert":
+      case "delete":
+        volume += 1;
+        break;
+      case "replace":
+      case "move":
+        if (row.oldLine != null) {
+          volume += 1;
+        }
+        if (row.newLine != null) {
+          volume += 1;
+        }
+        break;
+      default:
+        break;
+    }
+  }
+  return volume;
+}
+
 function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
   const preferredNoise = countLineNoise(preferred);
   const candidateNoise = countLineNoise(candidate);
@@ -4200,6 +5145,18 @@ function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
     return candidate;
   }
   return preferred;
+}
+
+function chooseLowerImpactRows(preferred: LineRow[], candidate: LineRow[]) {
+  const preferredVolume = countChangedLineVolume(preferred);
+  const candidateVolume = countChangedLineVolume(candidate);
+  if (candidateVolume < preferredVolume) {
+    return candidate;
+  }
+  if (candidateVolume > preferredVolume) {
+    return preferred;
+  }
+  return chooseLowerNoiseRows(preferred, candidate);
 }
 
 function isMeaningfulNormalizedLine(normalized: string) {
@@ -4264,19 +5221,58 @@ function hasMeaningfulRawLineChanges(
   return false;
 }
 
+function shouldPreferRowsByLineImpact(
+  preferredRows: LineRow[],
+  otherRows: LineRow[]
+) {
+  const preferredVolume = countChangedLineVolume(preferredRows);
+  const otherVolume = countChangedLineVolume(otherRows);
+  if (preferredVolume === 0 || otherVolume <= preferredVolume) {
+    return false;
+  }
+  return (
+    otherVolume - preferredVolume >= SEMANTIC_FALLBACK_MIN_LINE_DELTA &&
+    otherVolume / preferredVolume >= SEMANTIC_FALLBACK_MAX_LINE_RATIO
+  );
+}
+
+function shouldPreferOperationAnchoredRows(
+  anchoredRows: LineRow[],
+  currentRows: LineRow[]
+) {
+  const anchoredVolume = countChangedLineVolume(anchoredRows);
+  const currentVolume = countChangedLineVolume(currentRows);
+  if (
+    anchoredVolume === 0 ||
+    currentVolume < OPERATION_ANCHORED_MIN_LINE_VOLUME
+  ) {
+    return false;
+  }
+  return anchoredVolume <= currentVolume * OPERATION_ANCHORED_MAX_LINE_RATIO;
+}
+
 function chooseSemanticRowsWithFallback(
   semanticRows: LineRow[],
   rawRows: LineRow[],
   normalizeLine: (line: string) => string
 ) {
+  if (shouldPreferRowsByLineImpact(rawRows, semanticRows)) {
+    return rawRows;
+  }
+  if (shouldPreferRowsByLineImpact(semanticRows, rawRows)) {
+    return semanticRows;
+  }
   const chosenRows = chooseLowerNoiseRows(semanticRows, rawRows);
   if (hasLineChanges(chosenRows)) {
     return chosenRows;
   }
-  return hasLineChanges(rawRows) &&
+  if (
+    hasLineChanges(rawRows) &&
     hasMeaningfulRawLineChanges(rawRows, normalizeLine)
-    ? rawRows
-    : chosenRows;
+  ) {
+    return rawRows;
+  }
+  return chosenRows;
 }
 
 function annotateUnifiedAdjacentPairs(rows: LineRow[]) {
@@ -4309,7 +5305,8 @@ function buildSyntheticContextRow(
   oldLine: number | null,
   newLine: number | null,
   oldLines: string[],
-  newLines: string[]
+  newLines: string[],
+  synthesizeChangedRows: boolean
 ): LineRow | null {
   if (oldLine === null && newLine === null) {
     return null;
@@ -4321,10 +5318,16 @@ function buildSyntheticContextRow(
     if (oldText === newText) {
       return { type: "equal", oldLine, newLine, text: newText };
     }
+    if (!synthesizeChangedRows) {
+      return null;
+    }
     return { type: "replace", oldLine, newLine, oldText, newText };
   }
 
   if (oldLine !== null) {
+    if (!synthesizeChangedRows) {
+      return null;
+    }
     return {
       type: "delete",
       oldLine,
@@ -4337,6 +5340,9 @@ function buildSyntheticContextRow(
     return null;
   }
 
+  if (!synthesizeChangedRows) {
+    return null;
+  }
   return {
     type: "insert",
     oldLine: null,
@@ -4362,13 +5368,81 @@ function appendMissingContextRows(
   lastOldLine: number | null,
   lastNewLine: number | null,
   oldLines: string[],
-  newLines: string[]
+  newLines: string[],
+  synthesizeChangedRows: boolean,
+  lineLayout: "split" | "unified"
 ) {
   const missing = Math.max(oldGap, newGap, 0);
   if (missing <= 0) {
     return;
   }
 
+  if (synthesizeChangedRows) {
+    appendChangedGapRows(
+      output,
+      oldGap,
+      newGap,
+      lastOldLine,
+      lastNewLine,
+      oldLines,
+      newLines,
+      lineLayout
+    );
+    return;
+  }
+
+  appendSyntheticGapRows(
+    output,
+    missing,
+    oldGap,
+    newGap,
+    lastOldLine,
+    lastNewLine,
+    oldLines,
+    newLines,
+    synthesizeChangedRows
+  );
+}
+
+function appendChangedGapRows(
+  output: LineRow[],
+  oldGap: number,
+  newGap: number,
+  lastOldLine: number | null,
+  lastNewLine: number | null,
+  oldLines: string[],
+  newLines: string[],
+  lineLayout: "split" | "unified"
+) {
+  const oldStart = oldGap > 0 && lastOldLine !== null ? lastOldLine + 1 : null;
+  const newStart = newGap > 0 && lastNewLine !== null ? lastNewLine + 1 : null;
+  const gapOldLines =
+    oldStart !== null
+      ? oldLines.slice(oldStart - 1, oldStart - 1 + oldGap)
+      : [];
+  const gapNewLines =
+    newStart !== null
+      ? newLines.slice(newStart - 1, newStart - 1 + newGap)
+      : [];
+  const gapRows = buildRawLineRows(gapOldLines, gapNewLines, lineLayout);
+  output.push(
+    ...gapRows.map((row) =>
+      offsetLineRow(row, (oldStart ?? 1) - 1, (newStart ?? 1) - 1)
+    )
+  );
+}
+
+function appendSyntheticGapRows(
+  output: LineRow[],
+  missing: number,
+  oldGap: number,
+  newGap: number,
+  lastOldLine: number | null,
+  lastNewLine: number | null,
+  oldLines: string[],
+  newLines: string[],
+  synthesizeChangedRows: boolean
+) {
   for (let offset = 1; offset <= missing; offset += 1) {
     const missingOldLine =
       oldGap >= offset && lastOldLine !== null ? lastOldLine + offset : null;
@@ -4378,7 +5452,8 @@ function appendMissingContextRows(
       missingOldLine,
       missingNewLine,
       oldLines,
-      newLines
+      newLines,
+      synthesizeChangedRows
     );
     if (synthetic) {
       output.push(synthetic);
@@ -4393,7 +5468,9 @@ function isContextSeparatorRow(row: LineRow) {
 function expandLineDiscontinuities(
   rows: LineRow[],
   oldText: string,
-  newText: string
+  newText: string,
+  synthesizeChangedRows = true,
+  lineLayout: "split" | "unified" = "split"
 ) {
   if (rows.length === 0) {
     return rows;
@@ -4419,7 +5496,9 @@ function expandLineDiscontinuities(
       lastOldLine,
       lastNewLine,
       oldLines,
-      newLines
+      newLines,
+      synthesizeChangedRows,
+      lineLayout
     );
 
     output.push(row);
@@ -4877,6 +5956,27 @@ function renderLineView(
       semanticMode
     );
     if (semanticMode && normalizeLine) {
+      const semanticOldLines = splitLines(oldText);
+      const semanticNewLines = splitLines(newText);
+      const contextualMovePairs = buildContextualMovePairs(
+        diff.operations,
+        semanticOldLines,
+        semanticNewLines,
+        normalizeLine
+      );
+      const anchoredRows = buildOperationAnchoredRows(
+        oldText,
+        newText,
+        context.contextLines,
+        context.lineLayout,
+        normalizeLine,
+        diff.operations,
+        useKeyMatching,
+        useYamlComparable
+      );
+      if (anchoredRows && hasLineChanges(anchoredRows)) {
+        modeRows = chooseLowerImpactRows(modeRows, anchoredRows);
+      }
       const oldTokenByLine = buildLineTokenMap(
         oldText,
         options.semanticTokens?.old,
@@ -4891,7 +5991,12 @@ function renderLineView(
         const marks = buildLineMarkSets(
           diff.operations,
           oldLineCount,
-          newLineCount
+          newLineCount,
+          {
+            normalizeLine,
+            useKeyMatching,
+            useYamlComparable,
+          }
         );
         modeRows = filterAstProjectedRows(
           modeRows,
@@ -4900,44 +6005,98 @@ function renderLineView(
           newTokenByLine
         );
       }
-      modeRows = filterSemanticRows(modeRows, normalizeLine);
+      modeRows = filterSemanticRows(
+        modeRows,
+        normalizeLine,
+        oldLineCount === 0 || newLineCount === 0,
+        contextualMovePairs,
+        semanticOldLines,
+        semanticNewLines
+      );
     }
     if (useKeyMatching) {
       modeRows = filterLockfileRows(modeRows);
     }
     return hideComments ? applyHideComments(modeRows) : modeRows;
   };
-  const selectedRows =
+  const expandRows = (inputRows: LineRow[], synthesizeChangedRows = true) =>
+    expandLineDiscontinuities(
+      context.lineLayout === "unified"
+        ? annotateUnifiedAdjacentPairs(inputRows)
+        : inputRows,
+      oldText,
+      newText,
+      synthesizeChangedRows,
+      context.lineLayout
+    );
+  const buildOperationAnchoredCandidateRows = () => {
+    const anchoredRows = buildOperationAnchoredRows(
+      oldText,
+      newText,
+      context.contextLines,
+      context.lineLayout,
+      (line) => line,
+      diff.operations
+    );
+    if (!(anchoredRows && hasLineChanges(anchoredRows))) {
+      return null;
+    }
+    const filteredAnchoredRows = suppressBalancedImportChanges(
+      anchoredRows,
+      splitLines(oldText),
+      splitLines(newText),
+      (line) => line
+    );
+    return hideComments
+      ? applyHideComments(filteredAnchoredRows)
+      : filteredAnchoredRows;
+  };
+  let rows =
     context.lineMode === "raw"
-      ? buildRowsForMode("raw")
+      ? expandRows(buildRowsForMode("raw"))
       : (() => {
-          const semanticRows = buildRowsForMode("semantic");
-          const rawRows = buildRowsForMode("raw");
+          const semanticRows = reconcileProjectedInsertRows(
+            expandRows(buildRowsForMode("semantic")),
+            oldText,
+            (line) => normalizeLineForSemantic(line, semanticLanguage)
+          );
+          const rawRows = expandRows(buildRowsForMode("raw"));
           return chooseSemanticRowsWithFallback(semanticRows, rawRows, (line) =>
             normalizeLineForSemantic(line, semanticLanguage)
           );
         })();
-  if (!hasLineChanges(selectedRows)) {
+  let usedOperationAnchoredRows = false;
+  const operationAnchoredRows = buildOperationAnchoredCandidateRows();
+  if (
+    operationAnchoredRows &&
+    (shouldPreferRowsByLineImpact(operationAnchoredRows, rows) ||
+      shouldPreferOperationAnchoredRows(operationAnchoredRows, rows))
+  ) {
+    rows = operationAnchoredRows;
+    usedOperationAnchoredRows = true;
+  }
+  const stabilizedRows = dedupeExactLineRows(
+    usedOperationAnchoredRows
+      ? rows
+      : collapseSharedLineChanges(
+          rows,
+          context.lineMode === "raw"
+            ? (line) => line
+            : (line) => normalizeLineForSemantic(line, semanticLanguage)
+        )
+  );
+  const visibleRows = applyLineContext(
+    stripContextRows(stabilizedRows),
+    context.contextLines
+  );
+  if (!hasLineChanges(visibleRows)) {
     return "";
   }
-  const expandedRows = expandLineDiscontinuities(
-    context.lineLayout === "unified"
-      ? annotateUnifiedAdjacentPairs(selectedRows)
-      : selectedRows,
-    oldText,
-    newText
-  );
-  const rows =
-    context.lineMode === "raw"
-      ? expandedRows
-      : reconcileProjectedInsertRows(expandedRows, oldText, (line) =>
-          normalizeLineForSemantic(line, semanticLanguage)
-        );
 
   const summaryHtml = context.summaryHtml;
 
   if (!context.virtualize) {
-    const body = rows
+    const body = visibleRows
       .map((row) =>
         renderLineRow(
           row,
@@ -4959,7 +6118,7 @@ function renderLineView(
 
   const payload = escapeScript(
     Schema.encodeSync(LinePayloadJson)({
-      rows,
+      rows: visibleRows,
       batchSize: context.batchSize,
       lineLayout: context.lineLayout,
     })
@@ -4982,6 +6141,18 @@ function renderLineView(
     statusHtml,
     payload,
     script,
+  });
+}
+
+function dedupeExactLineRows(rows: LineRow[]) {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = JSON.stringify(row);
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
   });
 }
 
@@ -5052,7 +6223,10 @@ export function renderHtml(
 }
 
 export const __testing = {
+  buildContextualMovePairs,
+  buildOperationAnchoredRows,
   chooseSemanticRowsWithFallback,
+  countChangedLineVolume,
   hasMeaningfulRawLineChanges,
   renderInlineDiff,
 };

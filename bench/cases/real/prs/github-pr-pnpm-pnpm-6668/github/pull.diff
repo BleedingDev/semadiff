@@ -1,0 +1,12 @@
+diff --git a/resolving/npm-resolver/src/pickPackageFromMeta.ts b/resolving/npm-resolver/src/pickPackageFromMeta.ts
+index d0ba57a65e1..9f8373c773c 100644
+--- a/resolving/npm-resolver/src/pickPackageFromMeta.ts
++++ b/resolving/npm-resolver/src/pickPackageFromMeta.ts
+@@ -210,6 +210,6 @@ class PreferredVersionsPrioritizer {
+       }, {} as Record<number, string[]>)
+     return Object.keys(versionsByWeight)
+       .sort((a, b) => parseInt(b, 10) - parseInt(a, 10))
+-      .map((weigth) => versionsByWeight[parseInt(weigth, 10)])
++      .map((weight) => versionsByWeight[parseInt(weight, 10)])
+   }
+ }

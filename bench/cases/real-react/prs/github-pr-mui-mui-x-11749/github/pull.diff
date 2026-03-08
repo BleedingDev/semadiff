@@ -1,0 +1,45 @@
+diff --git a/babel.config.js b/babel.config.js
+index 99b3e5911f757..1019a75c38100 100644
+--- a/babel.config.js
++++ b/babel.config.js
+@@ -18,7 +18,9 @@ const defaultAlias = {
+   '@mui/x-tree-view': resolveAliasPath('./packages/x-tree-view/src'),
+   '@mui/markdown': '@mui/monorepo/packages/markdown',
+   '@mui/material-nextjs': '@mui/monorepo/packages/mui-material-nextjs/src',
+-  '@mui-internal/api-docs-builder': '@mui/monorepo/packages/api-docs-builder',
++  '@mui-internal/api-docs-builder': resolveAliasPath(
++    './node_modules/@mui/monorepo/packages/api-docs-builder',
++  ),
+   '@mui-internal/docs-utilities': '@mui/monorepo/packages/docs-utilities',
+   '@mui-internal/test-utils': resolveAliasPath(
+     './node_modules/@mui/monorepo/packages/test-utils/src',
+diff --git a/docs/scripts/generateProptypes.ts b/docs/scripts/generateProptypes.ts
+index c347b4aac6ad0..83da9f4f02c1f 100644
+--- a/docs/scripts/generateProptypes.ts
++++ b/docs/scripts/generateProptypes.ts
+@@ -6,7 +6,7 @@ import {
+   getPropTypesFromFile,
+   injectPropTypesInFile,
+ } from '@mui/monorepo/packages/typescript-to-proptypes';
+-import { fixBabelGeneratorIssues, fixLineEndings } from '@mui/monorepo/packages/docs-utilities';
++import { fixBabelGeneratorIssues, fixLineEndings } from '@mui-internal/docs-utilities';
+ import { createXTypeScriptProjects, XTypeScriptProject } from './createXTypeScriptProjects';
+ 
+ async function generateProptypes(project: XTypeScriptProject, sourceFile: string) {
+diff --git a/tsconfig.json b/tsconfig.json
+index d31ee09a62133..89e19bc68a580 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -28,6 +28,12 @@
+       "@mui/x-license-pro/*": ["./packages/x-license-pro/src/*"],
+       "@mui-internal/test-utils": ["./node_modules/@mui/monorepo/packages/test-utils/src"],
+       "@mui-internal/test-utils/*": ["./node_modules/@mui/monorepo/packages/test-utils/src/*"],
++      "@mui-internal/api-docs-builder": ["./node_modules/@mui/monorepo/packages/api-docs-builder"],
++      "@mui-internal/api-docs-builder/*": [
++        "./node_modules/@mui/monorepo/packages/api-docs-builder/*"
++      ],
++      "@mui-internal/docs-utilities": ["./node_modules/@mui/monorepo/packages/docs-utilities"],
++      "@mui-internal/docs-utilities/*": ["./node_modules/@mui/monorepo/packages/docs-utilities/*"],
+       "test/*": ["./test/*"],
+       "docs/*": ["./node_modules/@mui/monorepo/docs"],
+       "docsx/*": ["./docs/*"]

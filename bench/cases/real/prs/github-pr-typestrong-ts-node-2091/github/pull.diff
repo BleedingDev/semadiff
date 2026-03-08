@@ -1,0 +1,83 @@
+diff --git a/src/test/regression.spec.ts b/src/test/regression.spec.ts
+index f77319822..66f61785a 100644
+--- a/src/test/regression.spec.ts
++++ b/src/test/regression.spec.ts
+@@ -14,6 +14,17 @@ const exec = createExecTester({
+   }),
+ });
+ 
++test('#2076 regression test', async () => {
++  const r = await exec({
++    exec: createExec({
++      cwd: join(TEST_DIR, '2076'),
++    }),
++    cmd: `${CMD_TS_NODE_WITHOUT_PROJECT_FLAG} --showConfig`,
++  });
++
++  exp(r.err).toBeNull();
++});
++
+ test('#1488 regression test', async () => {
+   // Scenario that caused the bug:
+   // `allowJs` turned on
+diff --git a/src/ts-compiler-types.ts b/src/ts-compiler-types.ts
+index 9fa317f65..8df76ccf6 100644
+--- a/src/ts-compiler-types.ts
++++ b/src/ts-compiler-types.ts
+@@ -90,7 +90,8 @@ export interface TSInternal {
+     host: _ts.ModuleResolutionHost,
+     cache?: _ts.ModuleResolutionCache,
+     redirectedReference?: _ts.ResolvedProjectReference,
+-    lookupConfig?: boolean
++    conditionsOrIsConfigLookup?: string[] | boolean, // `conditions` parameter added in TS 5.3
++    isConfigLookup?: boolean
+   ): _ts.ResolvedModuleWithFailedLookupLocations;
+   // Added in TS 4.7
+   getModeForFileReference?: (
+diff --git a/src/ts-internals.ts b/src/ts-internals.ts
+index 81fb3070c..26d5a3c9d 100644
+--- a/src/ts-internals.ts
++++ b/src/ts-internals.ts
+@@ -1,5 +1,5 @@
+ import { isAbsolute, resolve } from 'path';
+-import { cachedLookup, normalizeSlashes } from './util';
++import { cachedLookup, normalizeSlashes, versionGteLt } from './util';
+ import type * as _ts from 'typescript';
+ import type { TSCommon, TSInternal } from './ts-compiler-types';
+ 
+@@ -40,6 +40,7 @@ function createTsInternalsUncached(_ts: TSCommon) {
+       return extendedConfigPath;
+     }
+     // If the path isn't a rooted or relative path, resolve like a module
++    const tsGte5_3_0 = versionGteLt(ts.version, '5.3.0');
+     const resolved = ts.nodeModuleNameResolver(
+       extendedConfig,
+       combinePaths(basePath, 'tsconfig.json'),
+@@ -47,7 +48,8 @@ function createTsInternalsUncached(_ts: TSCommon) {
+       host,
+       /*cache*/ undefined,
+       /*projectRefs*/ undefined,
+-      /*lookupConfig*/ true
++      /*conditionsOrIsConfigLookup*/ tsGte5_3_0 ? undefined : true,
++      /*isConfigLookup*/ tsGte5_3_0 ? true : undefined
+     );
+     if (resolved.resolvedModule) {
+       return resolved.resolvedModule.resolvedFileName;
+diff --git a/tests/2076/node_modules/custom-tsconfig/tsconfig.json b/tests/2076/node_modules/custom-tsconfig/tsconfig.json
+new file mode 100644
+index 000000000..0c1a273fd
+--- /dev/null
++++ b/tests/2076/node_modules/custom-tsconfig/tsconfig.json
+@@ -0,0 +1,3 @@
++{
++  "ts-node": {}
++}
+diff --git a/tests/2076/tsconfig.json b/tests/2076/tsconfig.json
+new file mode 100644
+index 000000000..d64b3db67
+--- /dev/null
++++ b/tests/2076/tsconfig.json
+@@ -0,0 +1,3 @@
++{
++  "extends": "custom-tsconfig/tsconfig.json"
++}

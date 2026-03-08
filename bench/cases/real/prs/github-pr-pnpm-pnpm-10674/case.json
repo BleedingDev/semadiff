@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-pnpm-pnpm-10674",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10674: refactor: remove last mentions of use-node-version",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10674,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10674",
+    "baseSha": "db80d174016a662426366e70194ac74f082e1f45",
+    "headSha": "3ab22ac4d18f1fc4017439832c49002e457f9aef",
+    "selectedFiles": [
+      "config/config/src/configFileKey.ts"
+    ],
+    "collectedAt": "2026-03-08T02:26:41.616Z"
+  },
+  "files": [
+    {
+      "id": "config/config/src/configFileKey.ts",
+      "oldPath": "config/config/src/configFileKey.ts",
+      "newPath": "config/config/src/configFileKey.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "config/config/src/configFileKey.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 135,
+          "endLine": 135
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

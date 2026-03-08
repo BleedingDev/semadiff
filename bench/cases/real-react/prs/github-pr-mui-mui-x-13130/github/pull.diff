@@ -1,0 +1,1223 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index 355a5b49b8a27..90ac7f719031d 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -3,38 +3,85 @@ const path = require('path');
+ 
+ // TODO move this helper to @mui/monorepo/.eslintrc
+ // It needs to know about the parent "no-restricted-imports" to not override them.
+-const buildPackageRestrictedImports = (packageName, root) => ({
+-  files: [`packages/${root}/src/**/*{.ts,.tsx,.js}`],
+-  excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx', '**.test.tx', '**.test.tsx'],
+-  rules: {
+-    'no-restricted-imports': [
+-      'error',
+-      {
+-        paths: [
+-          {
+-            name: packageName,
+-            message: 'Use relative import instead',
+-          },
+-          {
+-            name: '@mui/material',
+-            message: 'Use @mui/utils or a more specific import instead',
+-          },
+-        ],
+-        patterns: [
+-          // TODO move rule into main repo to allow deep @mui/monorepo imports
+-          {
+-            group: ['@mui/*/*/*'],
+-            message: 'Use less deep import instead',
+-          },
+-          {
+-            group: [`${packageName}/*`, `${packageName}/**`],
+-            message: 'Use relative import instead',
+-          },
+-        ],
+-      },
+-    ],
++const buildPackageRestrictedImports = (packageName, root, allowRootImports = true) => [
++  {
++    files: [`packages/${root}/src/**/*{.ts,.tsx,.js}`],
++    excludedFiles: ['*.d.ts', '*.spec.ts', '*.spec.tsx', '**.test.tx', '**.test.tsx'],
++    rules: {
++      'no-restricted-imports': [
++        'error',
++        {
++          paths: [
++            {
++              name: packageName,
++              message: 'Use relative import instead',
++            },
++            {
++              name: '@mui/material',
++              message: 'Use @mui/utils or a more specific import instead',
++            },
++          ],
++          patterns: [
++            // TODO move rule into main repo to allow deep @mui/monorepo imports
++            {
++              group: ['@mui/*/*/*'],
++              message: 'Use less deep import instead',
++            },
++            {
++              group: [`${packageName}/*`, `${packageName}/**`],
++              message: 'Use relative import instead',
++            },
++          ],
++        },
++      ],
++    },
+   },
+-});
++  ...(allowRootImports
++    ? []
++    : [
++        {
++          files: [
++            `packages/${root}/src/**/*.test{.ts,.tsx,.js}`,
++            `packages/${root}/src/**/*.spec{.ts,.tsx,.js}`,
++            'docs/data/**/*{.ts,.tsx,.js}',
++          ],
++          excludedFiles: ['*.d.ts'],
++          rules: {
++            'no-restricted-imports': [
++              'error',
++              {
++                paths: [
++                  {
++                    name: '@mui/x-charts',
++                    message: 'Use deeper import instead',
++                  },
++                  {
++                    name: '@mui/x-codemod',
++                    message: 'Use deeper import instead',
++                  },
++                  {
++                    name: '@mui/x-date-pickers',
++                    message: 'Use deeper import instead',
++                  },
++                  {
++                    name: '@mui/x-date-pickers-pro',
++                    message: 'Use deeper import instead',
++                  },
++                  {
++                    name: '@mui/x-tree-view',
++                    message: 'Use deeper import instead',
++                  },
++                  {
++                    name: '@mui/x-tree-view-pro',
++                    message: 'Use deeper import instead',
++                  },
++                ],
++              },
++            ],
++          },
++        },
++      ]),
++];
+ 
+ module.exports = {
+   ...baseline,
+@@ -159,15 +206,16 @@ module.exports = {
+         ],
+       },
+     },
+-    buildPackageRestrictedImports('@mui/x-charts', 'x-charts'),
+-    buildPackageRestrictedImports('@mui/x-data-grid', 'x-data-grid'),
+-    buildPackageRestrictedImports('@mui/x-data-grid-pro', 'x-data-grid-pro'),
+-    buildPackageRestrictedImports('@mui/x-data-grid-premium', 'x-data-grid-premium'),
+-    buildPackageRestrictedImports('@mui/x-data-grid-generator', 'x-data-grid-generator'),
+-    buildPackageRestrictedImports('@mui/x-pickers', 'x-pickers'),
+-    buildPackageRestrictedImports('@mui/x-pickers-pro', 'x-pickers-pro'),
+-    buildPackageRestrictedImports('@mui/x-tree-view', 'x-tree-view'),
+-    buildPackageRestrictedImports('@mui/x-tree-view-pro', 'x-tree-view-pro'),
+-    buildPackageRestrictedImports('@mui/x-license', 'x-license'),
++    ...buildPackageRestrictedImports('@mui/x-charts', 'x-charts', false),
++    ...buildPackageRestrictedImports('@mui/x-codemod', 'x-codemod', false),
++    ...buildPackageRestrictedImports('@mui/x-data-grid', 'x-data-grid'),
++    ...buildPackageRestrictedImports('@mui/x-data-grid-pro', 'x-data-grid-pro'),
++    ...buildPackageRestrictedImports('@mui/x-data-grid-premium', 'x-data-grid-premium'),
++    ...buildPackageRestrictedImports('@mui/x-data-grid-generator', 'x-data-grid-generator'),
++    ...buildPackageRestrictedImports('@mui/x-date-pickers', 'x-date-pickers', false),
++    ...buildPackageRestrictedImports('@mui/x-date-pickers-pro', 'x-date-pickers-pro', false),
++    ...buildPackageRestrictedImports('@mui/x-tree-view', 'x-tree-view', false),
++    ...buildPackageRestrictedImports('@mui/x-tree-view-pro', 'x-tree-view-pro', false),
++    ...buildPackageRestrictedImports('@mui/x-license', 'x-license'),
+   ],
+ };
+diff --git a/docs/data/charts/areas-demo/TinyAreaChart.js b/docs/data/charts/areas-demo/TinyAreaChart.js
+index 9983e7fbf4410..48dd265848276 100644
+--- a/docs/data/charts/areas-demo/TinyAreaChart.js
++++ b/docs/data/charts/areas-demo/TinyAreaChart.js
+@@ -1,5 +1,6 @@
+ import * as React from 'react';
+-import { ChartContainer, AreaPlot } from '@mui/x-charts';
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
++import { AreaPlot } from '@mui/x-charts/LineChart';
+ 
+ const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
+ const xLabels = [
+diff --git a/docs/data/charts/areas-demo/TinyAreaChart.tsx b/docs/data/charts/areas-demo/TinyAreaChart.tsx
+index 9983e7fbf4410..48dd265848276 100644
+--- a/docs/data/charts/areas-demo/TinyAreaChart.tsx
++++ b/docs/data/charts/areas-demo/TinyAreaChart.tsx
+@@ -1,5 +1,6 @@
+ import * as React from 'react';
+-import { ChartContainer, AreaPlot } from '@mui/x-charts';
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
++import { AreaPlot } from '@mui/x-charts/LineChart';
+ 
+ const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
+ const xLabels = [
+diff --git a/docs/data/charts/bar-demo/PositiveAndNegativeBarChart.tsx b/docs/data/charts/bar-demo/PositiveAndNegativeBarChart.tsx
+index 272095b6112c8..06b172320360f 100644
+--- a/docs/data/charts/bar-demo/PositiveAndNegativeBarChart.tsx
++++ b/docs/data/charts/bar-demo/PositiveAndNegativeBarChart.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { BarChart } from '@mui/x-charts/BarChart';
+-import { AxisConfig } from '@mui/x-charts';
++import { AxisConfig } from '@mui/x-charts/models';
+ 
+ const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
+ const pData = [2400, 1398, -9800, 3908, 4800, -3800, 4300];
+diff --git a/docs/data/charts/bar-demo/TinyBarChart.js b/docs/data/charts/bar-demo/TinyBarChart.js
+index 4c78c3a10173d..0f194cb6fc850 100644
+--- a/docs/data/charts/bar-demo/TinyBarChart.js
++++ b/docs/data/charts/bar-demo/TinyBarChart.js
+@@ -1,5 +1,6 @@
+ import * as React from 'react';
+-import { ChartContainer, BarPlot } from '@mui/x-charts';
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
++import { BarPlot } from '@mui/x-charts/BarChart';
+ 
+ const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
+ const xLabels = [
+diff --git a/docs/data/charts/bar-demo/TinyBarChart.tsx b/docs/data/charts/bar-demo/TinyBarChart.tsx
+index 4c78c3a10173d..0f194cb6fc850 100644
+--- a/docs/data/charts/bar-demo/TinyBarChart.tsx
++++ b/docs/data/charts/bar-demo/TinyBarChart.tsx
+@@ -1,5 +1,6 @@
+ import * as React from 'react';
+-import { ChartContainer, BarPlot } from '@mui/x-charts';
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
++import { BarPlot } from '@mui/x-charts/BarChart';
+ 
+ const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
+ const xLabels = [
+diff --git a/docs/data/charts/bars/BarsDataset.js b/docs/data/charts/bars/BarsDataset.js
+index 619a54cf3d8ec..f1c7f8cdd6ca0 100644
+--- a/docs/data/charts/bars/BarsDataset.js
++++ b/docs/data/charts/bars/BarsDataset.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { BarChart } from '@mui/x-charts/BarChart';
+-import { axisClasses } from '@mui/x-charts';
++import { axisClasses } from '@mui/x-charts/ChartsAxis';
+ 
+ const chartSetting = {
+   yAxis: [
+diff --git a/docs/data/charts/bars/BarsDataset.tsx b/docs/data/charts/bars/BarsDataset.tsx
+index ef19b7eee29a5..b03ac258bf589 100644
+--- a/docs/data/charts/bars/BarsDataset.tsx
++++ b/docs/data/charts/bars/BarsDataset.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { BarChart } from '@mui/x-charts/BarChart';
+-import { axisClasses } from '@mui/x-charts';
++import { axisClasses } from '@mui/x-charts/ChartsAxis';
+ 
+ const chartSetting = {
+   yAxis: [
+diff --git a/docs/data/charts/components/BasicScaleDemo.js b/docs/data/charts/components/BasicScaleDemo.js
+index fae1acefefebd..d965233f3d095 100644
+--- a/docs/data/charts/components/BasicScaleDemo.js
++++ b/docs/data/charts/components/BasicScaleDemo.js
+@@ -1,6 +1,8 @@
+ import * as React from 'react';
+ import { styled } from '@mui/material/styles';
+-import { ResponsiveChartContainer, LinePlot, useDrawingArea } from '@mui/x-charts';
++import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
++import { LinePlot } from '@mui/x-charts/LineChart';
++import { useDrawingArea } from '@mui/x-charts/hooks';
+ 
+ const StyledPath = styled('path')(({ theme }) => ({
+   fill: 'none',
+diff --git a/docs/data/charts/components/BasicScaleDemo.tsx b/docs/data/charts/components/BasicScaleDemo.tsx
+index fae1acefefebd..d965233f3d095 100644
+--- a/docs/data/charts/components/BasicScaleDemo.tsx
++++ b/docs/data/charts/components/BasicScaleDemo.tsx
+@@ -1,6 +1,8 @@
+ import * as React from 'react';
+ import { styled } from '@mui/material/styles';
+-import { ResponsiveChartContainer, LinePlot, useDrawingArea } from '@mui/x-charts';
++import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
++import { LinePlot } from '@mui/x-charts/LineChart';
++import { useDrawingArea } from '@mui/x-charts/hooks';
+ 
+ const StyledPath = styled('path')(({ theme }) => ({
+   fill: 'none',
+diff --git a/docs/data/charts/components/OriginDemo.js b/docs/data/charts/components/OriginDemo.js
+index 9578b34e59d81..159b98a0d09a1 100644
+--- a/docs/data/charts/components/OriginDemo.js
++++ b/docs/data/charts/components/OriginDemo.js
+@@ -1,13 +1,9 @@
+ import * as React from 'react';
+ import { styled } from '@mui/material/styles';
+ 
+-import {
+-  ResponsiveChartContainer,
+-  LinePlot,
+-  useDrawingArea,
+-  useYScale,
+-  useXScale,
+-} from '@mui/x-charts';
++import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
++import { LinePlot } from '@mui/x-charts/LineChart';
++import { useDrawingArea, useXScale, useYScale } from '@mui/x-charts/hooks';
+ 
+ const x = Array.from({ length: 21 }, (_, index) => -1 + 0.2 * index);
+ const linear = x.map((v) => -1 + v);
+diff --git a/docs/data/charts/components/OriginDemo.tsx b/docs/data/charts/components/OriginDemo.tsx
+index 1ac5c0b295d09..3f503e81112cf 100644
+--- a/docs/data/charts/components/OriginDemo.tsx
++++ b/docs/data/charts/components/OriginDemo.tsx
+@@ -1,13 +1,9 @@
+ import * as React from 'react';
+ import { styled } from '@mui/material/styles';
+ import { ScaleLinear } from 'd3-scale';
+-import {
+-  ResponsiveChartContainer,
+-  LinePlot,
+-  useDrawingArea,
+-  useYScale,
+-  useXScale,
+-} from '@mui/x-charts';
++import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
++import { LinePlot } from '@mui/x-charts/LineChart';
++import { useDrawingArea, useXScale, useYScale } from '@mui/x-charts/hooks';
+ 
+ const x = Array.from({ length: 21 }, (_, index) => -1 + 0.2 * index);
+ const linear = x.map((v) => -1 + v);
+diff --git a/docs/data/charts/components/ScaleDemo.js b/docs/data/charts/components/ScaleDemo.js
+index daca95509f12b..98a60004841c6 100644
+--- a/docs/data/charts/components/ScaleDemo.js
++++ b/docs/data/charts/components/ScaleDemo.js
+@@ -1,13 +1,10 @@
+ import * as React from 'react';
+ 
+ import { styled } from '@mui/material/styles';
+-import {
+-  ResponsiveChartContainer,
+-  LinePlot,
+-  ChartsYAxis,
+-  useDrawingArea,
+-  useYScale,
+-} from '@mui/x-charts';
++import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
++import { LinePlot } from '@mui/x-charts/LineChart';
++import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
++import { useDrawingArea, useYScale } from '@mui/x-charts/hooks';
+ 
+ const StyledPath = styled('path')(({ theme }) => ({
+   fill: 'none',
+diff --git a/docs/data/charts/components/ScaleDemo.tsx b/docs/data/charts/components/ScaleDemo.tsx
+index 35ad64f78f0c7..2733fc28bdf70 100644
+--- a/docs/data/charts/components/ScaleDemo.tsx
++++ b/docs/data/charts/components/ScaleDemo.tsx
+@@ -1,13 +1,10 @@
+ import * as React from 'react';
+ import { ScaleLinear } from 'd3-scale';
+ import { styled } from '@mui/material/styles';
+-import {
+-  ResponsiveChartContainer,
+-  LinePlot,
+-  ChartsYAxis,
+-  useDrawingArea,
+-  useYScale,
+-} from '@mui/x-charts';
++import { ResponsiveChartContainer } from '@mui/x-charts/ResponsiveChartContainer';
++import { LinePlot } from '@mui/x-charts/LineChart';
++import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
++import { useDrawingArea, useYScale } from '@mui/x-charts/hooks';
+ 
+ const StyledPath = styled('path')(({ theme }) => ({
+   fill: 'none',
+diff --git a/docs/data/charts/line-demo/LineChartWithReferenceLines.js b/docs/data/charts/line-demo/LineChartWithReferenceLines.js
+index b991babc95b19..b06c9cec6dcbd 100644
+--- a/docs/data/charts/line-demo/LineChartWithReferenceLines.js
++++ b/docs/data/charts/line-demo/LineChartWithReferenceLines.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { ChartContainer } from '@mui/x-charts/ChartContainer';
+-import { ChartsReferenceLine } from '@mui/x-charts';
++import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
+ import { LinePlot, MarkPlot } from '@mui/x-charts/LineChart';
+ import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
+ import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
+diff --git a/docs/data/charts/line-demo/LineChartWithReferenceLines.tsx b/docs/data/charts/line-demo/LineChartWithReferenceLines.tsx
+index b991babc95b19..b06c9cec6dcbd 100644
+--- a/docs/data/charts/line-demo/LineChartWithReferenceLines.tsx
++++ b/docs/data/charts/line-demo/LineChartWithReferenceLines.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { ChartContainer } from '@mui/x-charts/ChartContainer';
+-import { ChartsReferenceLine } from '@mui/x-charts';
++import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
+ import { LinePlot, MarkPlot } from '@mui/x-charts/LineChart';
+ import { ChartsXAxis } from '@mui/x-charts/ChartsXAxis';
+ import { ChartsYAxis } from '@mui/x-charts/ChartsYAxis';
+diff --git a/docs/data/charts/line-demo/TinyLineChart.js b/docs/data/charts/line-demo/TinyLineChart.js
+index 0dee6bfee644f..db42b863a4642 100644
+--- a/docs/data/charts/line-demo/TinyLineChart.js
++++ b/docs/data/charts/line-demo/TinyLineChart.js
+@@ -1,5 +1,5 @@
+ import * as React from 'react';
+-import { ChartContainer } from '@mui/x-charts';
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
+ import {
+   LinePlot,
+   MarkPlot,
+diff --git a/docs/data/charts/line-demo/TinyLineChart.tsx b/docs/data/charts/line-demo/TinyLineChart.tsx
+index 0dee6bfee644f..db42b863a4642 100644
+--- a/docs/data/charts/line-demo/TinyLineChart.tsx
++++ b/docs/data/charts/line-demo/TinyLineChart.tsx
+@@ -1,5 +1,5 @@
+ import * as React from 'react';
+-import { ChartContainer } from '@mui/x-charts';
++import { ChartContainer } from '@mui/x-charts/ChartContainer';
+ import {
+   LinePlot,
+   MarkPlot,
+diff --git a/docs/data/charts/pie-demo/PieChartWithCustomizedLabel.tsx b/docs/data/charts/pie-demo/PieChartWithCustomizedLabel.tsx
+index ec9b3250b4fa8..9610b494dcd60 100644
+--- a/docs/data/charts/pie-demo/PieChartWithCustomizedLabel.tsx
++++ b/docs/data/charts/pie-demo/PieChartWithCustomizedLabel.tsx
+@@ -1,5 +1,5 @@
+ import * as React from 'react';
+-import { DefaultizedPieValueType } from '@mui/x-charts';
++import { DefaultizedPieValueType } from '@mui/x-charts/models';
+ import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
+ 
+ const data = [
+diff --git a/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.js b/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.js
+index e0c3e1dac9843..b411dfbb3072a 100644
+--- a/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.js
++++ b/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+-import { axisClasses } from '@mui/x-charts';
++import { axisClasses } from '@mui/x-charts/ChartsAxis';
+ 
+ const data1 = [
+   { x: 100, y: 200, id: 1 },
+diff --git a/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.tsx b/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.tsx
+index 33e08e6bc5835..0379ec483a457 100644
+--- a/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.tsx
++++ b/docs/data/charts/scatter-demo/MultipleYAxesScatterChart.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+-import { axisClasses } from '@mui/x-charts';
++import { axisClasses } from '@mui/x-charts/ChartsAxis';
+ 
+ const data1 = [
+   { x: 100, y: 200, id: 1 },
+diff --git a/docs/data/charts/scatter/ColorScale.tsx b/docs/data/charts/scatter/ColorScale.tsx
+index 42e6b349def27..2a2a81061e84b 100644
+--- a/docs/data/charts/scatter/ColorScale.tsx
++++ b/docs/data/charts/scatter/ColorScale.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+-import { ScatterValueType } from '@mui/x-charts';
++import { ScatterValueType } from '@mui/x-charts/models';
+ import Stack from '@mui/material/Stack';
+ import TextField from '@mui/material/TextField';
+ import MenuItem from '@mui/material/MenuItem';
+diff --git a/docs/data/charts/styling/ColorTemplate.tsx b/docs/data/charts/styling/ColorTemplate.tsx
+index 28a7404dcfec5..4f9367488df54 100644
+--- a/docs/data/charts/styling/ColorTemplate.tsx
++++ b/docs/data/charts/styling/ColorTemplate.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+-import { ScatterValueType } from '@mui/x-charts';
++import { ScatterValueType } from '@mui/x-charts/models';
+ import Stack from '@mui/material/Stack';
+ import TextField from '@mui/material/TextField';
+ import MenuItem from '@mui/material/MenuItem';
+diff --git a/docs/data/charts/styling/MuiColorTemplate.tsx b/docs/data/charts/styling/MuiColorTemplate.tsx
+index 78d2415ffdcf2..a4667b5119696 100644
+--- a/docs/data/charts/styling/MuiColorTemplate.tsx
++++ b/docs/data/charts/styling/MuiColorTemplate.tsx
+@@ -10,7 +10,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
+ import Brightness7Icon from '@mui/icons-material/Brightness7';
+ import { Chance } from 'chance';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+-import { ScatterValueType } from '@mui/x-charts';
++import { ScatterValueType } from '@mui/x-charts/models';
+ import {
+   blueberryTwilightPalette,
+   mangoFusionPalette,
+diff --git a/docs/data/charts/tooltip/AxisFormatter.js b/docs/data/charts/tooltip/AxisFormatter.js
+index 07f82faf0cb83..59629dadef159 100644
+--- a/docs/data/charts/tooltip/AxisFormatter.js
++++ b/docs/data/charts/tooltip/AxisFormatter.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { BarChart } from '@mui/x-charts/BarChart';
+-import { axisClasses } from '@mui/x-charts';
++import { axisClasses } from '@mui/x-charts/ChartsAxis';
+ 
+ const dataset = [
+   { name: 'Austria', code: 'AT', gdp: 471 },
+diff --git a/docs/data/charts/tooltip/AxisFormatter.tsx b/docs/data/charts/tooltip/AxisFormatter.tsx
+index 5ba4b86b170ef..ca4193e4dbc9a 100644
+--- a/docs/data/charts/tooltip/AxisFormatter.tsx
++++ b/docs/data/charts/tooltip/AxisFormatter.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { BarChart, BarChartProps } from '@mui/x-charts/BarChart';
+-import { axisClasses } from '@mui/x-charts';
++import { axisClasses } from '@mui/x-charts/ChartsAxis';
+ 
+ const dataset = [
+   { name: 'Austria', code: 'AT', gdp: 471 },
+diff --git a/docs/data/charts/tooltip/ElementHighlights.tsx b/docs/data/charts/tooltip/ElementHighlights.tsx
+index 0182a725bb4c7..1f4f758750d0a 100644
+--- a/docs/data/charts/tooltip/ElementHighlights.tsx
++++ b/docs/data/charts/tooltip/ElementHighlights.tsx
+@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
+ import MenuItem from '@mui/material/MenuItem';
+ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+ import ToggleButton from '@mui/material/ToggleButton';
+-import { HighlightScope } from '@mui/x-charts';
++import { HighlightScope } from '@mui/x-charts/context';
+ import { BarChart } from '@mui/x-charts/BarChart';
+ import { LineChart } from '@mui/x-charts/LineChart';
+ import { ScatterChart } from '@mui/x-charts/ScatterChart';
+diff --git a/docs/data/charts/tooltip/SeriesFormatter.js b/docs/data/charts/tooltip/SeriesFormatter.js
+index dbb58a71b719d..d876c031babbe 100644
+--- a/docs/data/charts/tooltip/SeriesFormatter.js
++++ b/docs/data/charts/tooltip/SeriesFormatter.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { PieChart } from '@mui/x-charts/PieChart';
+-import { legendClasses } from '@mui/x-charts';
++import { legendClasses } from '@mui/x-charts/ChartsLegend';
+ 
+ const otherProps = {
+   width: 400,
+diff --git a/docs/data/charts/tooltip/SeriesFormatter.tsx b/docs/data/charts/tooltip/SeriesFormatter.tsx
+index 801c7add05518..030064774ba97 100644
+--- a/docs/data/charts/tooltip/SeriesFormatter.tsx
++++ b/docs/data/charts/tooltip/SeriesFormatter.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { PieChart, PieChartProps } from '@mui/x-charts/PieChart';
+-import { legendClasses } from '@mui/x-charts';
++import { legendClasses } from '@mui/x-charts/ChartsLegend';
+ 
+ const otherProps: Partial<PieChartProps> = {
+   width: 400,
+diff --git a/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.js b/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.js
+index 76af09a232a13..1c24decb1a7ed 100644
+--- a/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.js
++++ b/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.js
+@@ -11,6 +11,7 @@ import FormControl from '@mui/material/FormControl';
+ import InputLabel from '@mui/material/InputLabel';
+ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
++// eslint-disable-next-line no-restricted-imports
+ import * as exportedElements from '@mui/x-date-pickers-pro';
+ import Typography from '@mui/material/Typography';
+ 
+diff --git a/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.tsx b/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.tsx
+index 531a1122486c1..b2dd55b6bf610 100644
+--- a/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.tsx
++++ b/docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.tsx
+@@ -11,6 +11,7 @@ import FormControl from '@mui/material/FormControl';
+ import InputLabel from '@mui/material/InputLabel';
+ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
++// eslint-disable-next-line no-restricted-imports
+ import * as exportedElements from '@mui/x-date-pickers-pro';
+ import Typography from '@mui/material/Typography';
+ 
+diff --git a/docs/data/date-pickers/custom-field/BrowserV6MultiInputRangeField.tsx b/docs/data/date-pickers/custom-field/BrowserV6MultiInputRangeField.tsx
+index 78049576322c3..73fa1cf82f75d 100644
+--- a/docs/data/date-pickers/custom-field/BrowserV6MultiInputRangeField.tsx
++++ b/docs/data/date-pickers/custom-field/BrowserV6MultiInputRangeField.tsx
+@@ -17,8 +17,8 @@ import {
+   DateRangeValidationError,
+   MultiInputFieldSlotTextFieldProps,
+   RangeFieldSection,
++  UseDateRangeFieldProps,
+ } from '@mui/x-date-pickers-pro/models';
+-import { UseDateRangeFieldProps } from '@mui/x-date-pickers-pro';
+ 
+ interface BrowserFieldProps
+   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+diff --git a/docs/data/date-pickers/custom-field/BrowserV7MultiInputRangeField.tsx b/docs/data/date-pickers/custom-field/BrowserV7MultiInputRangeField.tsx
+index 09e0c7eda30c6..8763070380bac 100644
+--- a/docs/data/date-pickers/custom-field/BrowserV7MultiInputRangeField.tsx
++++ b/docs/data/date-pickers/custom-field/BrowserV7MultiInputRangeField.tsx
+@@ -19,8 +19,8 @@ import {
+   MultiInputFieldSlotTextFieldProps,
+   DateRangeValidationError,
+   DateRange,
++  UseDateRangeFieldProps,
+ } from '@mui/x-date-pickers-pro/models';
+-import { UseDateRangeFieldProps } from '@mui/x-date-pickers-pro';
+ 
+ const BrowserFieldRoot = styled('div', { name: 'BrowserField', slot: 'Root' })({
+   display: 'flex',
+diff --git a/docs/data/date-pickers/custom-field/JoyV6MultiInputRangeField.tsx b/docs/data/date-pickers/custom-field/JoyV6MultiInputRangeField.tsx
+index 0790a3d607365..831ada098b9cd 100644
+--- a/docs/data/date-pickers/custom-field/JoyV6MultiInputRangeField.tsx
++++ b/docs/data/date-pickers/custom-field/JoyV6MultiInputRangeField.tsx
+@@ -31,8 +31,8 @@ import {
+   DateRangeValidationError,
+   MultiInputFieldSlotTextFieldProps,
+   RangeFieldSection,
++  UseDateRangeFieldProps,
+ } from '@mui/x-date-pickers-pro/models';
+-import { UseDateRangeFieldProps } from '@mui/x-date-pickers-pro';
+ 
+ const joyTheme = extendJoyTheme();
+ 
+diff --git a/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.js b/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.js
+index dba43392856db..73bef38f055a8 100644
+--- a/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.js
++++ b/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.js
+@@ -1,7 +1,7 @@
+ import * as React from 'react';
+ import dayjs from 'dayjs';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+ 
+diff --git a/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.tsx b/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.tsx
+index dba43392856db..73bef38f055a8 100644
+--- a/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.tsx
++++ b/docs/data/date-pickers/custom-field/MultiInputFieldTextFieldProps.tsx
+@@ -1,7 +1,7 @@
+ import * as React from 'react';
+ import dayjs from 'dayjs';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.js b/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.js
+index cb6b2a07af728..8eedbc3bb2025 100644
+--- a/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.js
++++ b/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ 
+diff --git a/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.tsx b/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.tsx
+index cb6b2a07af728..8eedbc3bb2025 100644
+--- a/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.tsx
++++ b/docs/data/date-pickers/date-range-calendar/BasicDateRangeCalendar.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ 
+diff --git a/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.js b/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.js
+index bc679154648d2..2bc8af2bb52c5 100644
+--- a/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.js
++++ b/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.js
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+ import dayjs from 'dayjs';
+ import { styled } from '@mui/material/styles';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ import { DateRangePickerDay as MuiDateRangePickerDay } from '@mui/x-date-pickers-pro/DateRangePickerDay';
+diff --git a/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.tsx b/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.tsx
+index 93d0b1fc86302..f42faf053b0a3 100644
+--- a/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.tsx
++++ b/docs/data/date-pickers/date-range-calendar/CustomDateRangePickerDay.tsx
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+ import dayjs, { Dayjs } from 'dayjs';
+ import { styled } from '@mui/material/styles';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ import {
+diff --git a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.js b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.js
+index 202c98687271e..73d9ec43a18ae 100644
+--- a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.js
++++ b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ 
+diff --git a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.tsx b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.tsx
+index 202c98687271e..73d9ec43a18ae 100644
+--- a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.tsx
++++ b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCalendarsProp.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ 
+diff --git a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.js b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.js
+index 52a45d8cd2525..213f7bc721282 100644
+--- a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.js
++++ b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ 
+diff --git a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.tsx b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.tsx
+index 52a45d8cd2525..213f7bc721282 100644
+--- a/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.tsx
++++ b/docs/data/date-pickers/date-range-calendar/DateRangeCalendarCurrentMonthCalendarPositionProp.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangeCalendar } from '@mui/x-date-pickers-pro/DateRangeCalendar';
+ 
+diff --git a/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.js b/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.js
+index 7e3b7f02e423d..b29c87fb4e901 100644
+--- a/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.js
++++ b/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.tsx b/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.tsx
+index 7e3b7f02e423d..b29c87fb4e901 100644
+--- a/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.tsx
++++ b/docs/data/date-pickers/date-range-picker/BasicDateRangePicker.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.js b/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.js
+index fb89585c75856..1074e139c62a7 100644
+--- a/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.js
++++ b/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.tsx b/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.tsx
+index fb89585c75856..1074e139c62a7 100644
+--- a/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.tsx
++++ b/docs/data/date-pickers/date-range-picker/DateRangePickerCalendarProp.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.js b/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.js
+index a708a9662a677..1d9922c09c26b 100644
+--- a/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.js
++++ b/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateTimeRangePicker } from '@mui/x-date-pickers-pro/DateTimeRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.tsx b/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.tsx
+index a708a9662a677..1d9922c09c26b 100644
+--- a/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.tsx
++++ b/docs/data/date-pickers/date-time-range-picker/BasicDateTimeRangePicker.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateTimeRangePicker } from '@mui/x-date-pickers-pro/DateTimeRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.js b/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.js
+index b92abd2cfdee6..18534f4fb6e1d 100644
+--- a/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.js
++++ b/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateTimeRangePicker } from '@mui/x-date-pickers-pro/DateTimeRangePicker';
+ 
+diff --git a/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.tsx b/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.tsx
+index b92abd2cfdee6..18534f4fb6e1d 100644
+--- a/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.tsx
++++ b/docs/data/date-pickers/date-time-range-picker/DateTimeRangePickerCalendarProp.tsx
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+-import { LocalizationProvider } from '@mui/x-date-pickers-pro';
++import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
+ import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
+ import { DateTimeRangePicker } from '@mui/x-date-pickers-pro/DateTimeRangePicker';
+ 
+diff --git a/docs/data/tree-view/rich-tree-view/customization/LabelSlots.js b/docs/data/tree-view/rich-tree-view/customization/LabelSlots.js
+index 2b7de2e27e142..52402c34a18b8 100644
+--- a/docs/data/tree-view/rich-tree-view/customization/LabelSlots.js
++++ b/docs/data/tree-view/rich-tree-view/customization/LabelSlots.js
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import { TreeItem2, TreeItem2Label } from '@mui/x-tree-view/TreeItem2';
+ import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+ 
+-import { useTreeItem2Utils } from '@mui/x-tree-view';
++import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
+ 
+ function CustomLabel(props) {
+   const { children, onChange, ...other } = props;
+diff --git a/docs/data/tree-view/rich-tree-view/customization/LabelSlots.tsx b/docs/data/tree-view/rich-tree-view/customization/LabelSlots.tsx
+index 0dbfa7e69e570..e4975c392a44c 100644
+--- a/docs/data/tree-view/rich-tree-view/customization/LabelSlots.tsx
++++ b/docs/data/tree-view/rich-tree-view/customization/LabelSlots.tsx
+@@ -6,10 +6,8 @@ import {
+ } from '@mui/x-tree-view/TreeItem2';
+ import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+ import { TreeViewBaseItem } from '@mui/x-tree-view/models';
+-import {
+-  UseTreeItem2ContentSlotOwnProps,
+-  useTreeItem2Utils,
+-} from '@mui/x-tree-view';
++import { UseTreeItem2ContentSlotOwnProps } from '@mui/x-tree-view/useTreeItem2';
++import { useTreeItem2Utils } from '@mui/x-tree-view/hooks';
+ 
+ interface CustomLabelProps {
+   children: string;
+diff --git a/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.js b/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.js
+index 2ee4cd92bb214..32ecf3762dede 100644
+--- a/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.js
++++ b/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+-import { RichTreeView } from '@mui/x-tree-view';
++import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+ 
+ const MUI_X_PRODUCTS = [
+   {
+diff --git a/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.tsx b/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.tsx
+index c8803fc153b3c..0c064df157468 100644
+--- a/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.tsx
++++ b/docs/data/tree-view/rich-tree-view/selection/CheckboxMultiSelection.tsx
+@@ -1,6 +1,7 @@
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+-import { RichTreeView, TreeViewBaseItem } from '@mui/x-tree-view';
++import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
++import { TreeViewBaseItem } from '@mui/x-tree-view/models';
+ 
+ const MUI_X_PRODUCTS: TreeViewBaseItem[] = [
+   {
+diff --git a/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.js b/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.js
+index 17a520a2a7756..12b1b503c2b21 100644
+--- a/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.js
++++ b/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.js
+@@ -1,6 +1,6 @@
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+-import { RichTreeView } from '@mui/x-tree-view';
++import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
+ 
+ const MUI_X_PRODUCTS = [
+   {
+diff --git a/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.tsx b/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.tsx
+index 28bda421ad18e..16eac642a2408 100644
+--- a/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.tsx
++++ b/docs/data/tree-view/rich-tree-view/selection/CheckboxSelection.tsx
+@@ -1,6 +1,7 @@
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+-import { RichTreeView, TreeViewBaseItem } from '@mui/x-tree-view';
++import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
++import { TreeViewBaseItem } from '@mui/x-tree-view/models';
+ 
+ const MUI_X_PRODUCTS: TreeViewBaseItem[] = [
+   {
+diff --git a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-community-root-imports.spec.tsx b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-community-root-imports.spec.tsx
+index f088500ee460d..48e52f58d747f 100644
+--- a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-community-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-community-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import {
+   CalendarPicker,
+diff --git a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-pro-root-imports.spec.tsx b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-pro-root-imports.spec.tsx
+index db5c398573d40..7e93740b72f08 100644
+--- a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-pro-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/actual-pro-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import {
+   CalendarPicker,
+diff --git a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-community-root-imports.spec.tsx b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-community-root-imports.spec.tsx
+index 1fc7f7194e45d..c45a068155639 100644
+--- a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-community-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-community-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import {
+   DateCalendar,
+diff --git a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-pro-root-imports.spec.tsx b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-pro-root-imports.spec.tsx
+index fd9a051e7ab5c..becfd9822492c 100644
+--- a/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-pro-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v6.0.0/pickers/view-components-rename/expected-pro-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import {
+   DateCalendar,
+diff --git a/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/actual-rename-slots-types.spec.tsx b/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/actual-rename-slots-types.spec.tsx
+index d932d04617394..978b467a072c5 100644
+--- a/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/actual-rename-slots-types.spec.tsx
++++ b/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/actual-rename-slots-types.spec.tsx
+@@ -3,7 +3,7 @@
+ import {
+   DateCalendarSlotsComponent,
+   DateCalendarSlotsComponentsProps,
+-} from '@mui/x-date-pickers-pro';
++} from '@mui/x-date-pickers/DateCalendar';
+ 
+ const props: DateCalendarSlotsComponent = {};
+ const slotProps: DateCalendarSlotsComponentsProps = {};
+diff --git a/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/expected-rename-slots-types.spec.tsx b/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/expected-rename-slots-types.spec.tsx
+index 165ec1af80448..952c85459a00d 100644
+--- a/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/expected-rename-slots-types.spec.tsx
++++ b/packages/x-codemod/src/v7.0.0/pickers/rename-slots-types/expected-rename-slots-types.spec.tsx
+@@ -3,7 +3,7 @@
+ import {
+   DateCalendarSlots,
+   DateCalendarSlotProps,
+-} from '@mui/x-date-pickers-pro';
++} from '@mui/x-date-pickers/DateCalendar';
+ 
+ const props: DateCalendarSlots = {};
+ const slotProps: DateCalendarSlotProps = {};
+diff --git a/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/actual-root-imports.spec.tsx b/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/actual-root-imports.spec.tsx
+index 81f07970c4b62..4a6b80863b69c 100644
+--- a/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/actual-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/actual-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import {
+   TreeView,
+diff --git a/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/expected-root-imports.spec.tsx b/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/expected-root-imports.spec.tsx
+index 81f07970c4b62..4a6b80863b69c 100644
+--- a/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/expected-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v7.0.0/tree-view/rename-tree-view-simple-tree-view/expected-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import {
+   TreeView,
+diff --git a/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/actual-root-imports.spec.tsx b/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/actual-root-imports.spec.tsx
+index 75cf5ff316f22..cb3076a7bf733 100644
+--- a/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/actual-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/actual-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import { useTreeItem } from '@mui/x-tree-view';
+ 
+diff --git a/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/expected-root-imports.spec.tsx b/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/expected-root-imports.spec.tsx
+index 2caf75bd837dd..63de38cbf6c26 100644
+--- a/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/expected-root-imports.spec.tsx
++++ b/packages/x-codemod/src/v7.0.0/tree-view/rename-use-tree-item/expected-root-imports.spec.tsx
+@@ -1,3 +1,4 @@
++/* eslint-disable no-restricted-imports */
+ // @ts-nocheck
+ import { useTreeItemState } from '@mui/x-tree-view';
+ 
+diff --git a/packages/x-date-pickers-pro/src/DateRangeCalendar/DateRangeCalendar.types.ts b/packages/x-date-pickers-pro/src/DateRangeCalendar/DateRangeCalendar.types.ts
+index c588be3ea87e3..ae263da559b00 100644
+--- a/packages/x-date-pickers-pro/src/DateRangeCalendar/DateRangeCalendar.types.ts
++++ b/packages/x-date-pickers-pro/src/DateRangeCalendar/DateRangeCalendar.types.ts
+@@ -19,7 +19,7 @@ import {
+   DayCalendarProps,
+   ExportedUseViewsOptions,
+ } from '@mui/x-date-pickers/internals';
+-import { DayRangeValidationProps } from '../internals/models';
++import { DayRangeValidationProps } from '../internals/models/dateRange';
+ import { DateRange } from '../models';
+ import { DateRangeCalendarClasses } from './dateRangeCalendarClasses';
+ import { DateRangePickerDay, DateRangePickerDayProps } from '../DateRangePickerDay';
+diff --git a/packages/x-date-pickers-pro/src/LocalizationProvider/index.ts b/packages/x-date-pickers-pro/src/LocalizationProvider/index.ts
+new file mode 100644
+index 0000000000000..6ba6888026014
+--- /dev/null
++++ b/packages/x-date-pickers-pro/src/LocalizationProvider/index.ts
+@@ -0,0 +1 @@
++export { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+diff --git a/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.tsx b/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.tsx
+index fdf178e659063..69f9a4cf87ba7 100644
+--- a/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.tsx
++++ b/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.tsx
+@@ -22,8 +22,7 @@ import {
+   MultiInputDateRangeFieldSlotProps,
+ } from './MultiInputDateRangeField.types';
+ import { useMultiInputDateRangeField } from '../internals/hooks/useMultiInputRangeField/useMultiInputDateRangeField';
+-import { UseDateRangeFieldProps } from '../internals/models/dateRange';
+-import { MultiInputRangeFieldClasses, RangePosition } from '../models';
++import { MultiInputRangeFieldClasses, RangePosition, UseDateRangeFieldProps } from '../models';
+ 
+ export const multiInputDateRangeFieldClasses: MultiInputRangeFieldClasses = generateUtilityClasses(
+   'MuiMultiInputDateRangeField',
+diff --git a/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.types.ts b/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.types.ts
+index 5485e46e6220f..e933812498edd 100644
+--- a/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.types.ts
++++ b/packages/x-date-pickers-pro/src/MultiInputDateRangeField/MultiInputDateRangeField.types.ts
+@@ -4,9 +4,13 @@ import { SlotComponentProps } from '@mui/base/utils';
+ import Typography from '@mui/material/Typography';
+ import Stack, { StackProps } from '@mui/material/Stack';
+ import TextField from '@mui/material/TextField';
+-import { UseDateRangeFieldProps } from '../internals/models/dateRange';
+ import { UseMultiInputRangeFieldParams } from '../internals/hooks/useMultiInputRangeField/useMultiInputRangeField.types';
+-import { MultiInputFieldRefs, MultiInputRangeFieldClasses, RangePosition } from '../models';
++import {
++  MultiInputFieldRefs,
++  MultiInputRangeFieldClasses,
++  RangePosition,
++  UseDateRangeFieldProps,
++} from '../models';
+ 
+ export type UseMultiInputDateRangeFieldParams<
+   TDate extends PickerValidDate,
+diff --git a/packages/x-date-pickers-pro/src/SingleInputDateRangeField/SingleInputDateRangeField.types.ts b/packages/x-date-pickers-pro/src/SingleInputDateRangeField/SingleInputDateRangeField.types.ts
+index e53a975bd6743..518f3373ed36e 100644
+--- a/packages/x-date-pickers-pro/src/SingleInputDateRangeField/SingleInputDateRangeField.types.ts
++++ b/packages/x-date-pickers-pro/src/SingleInputDateRangeField/SingleInputDateRangeField.types.ts
+@@ -8,8 +8,12 @@ import {
+   UseClearableFieldSlots,
+   UseClearableFieldSlotProps,
+ } from '@mui/x-date-pickers/hooks';
+-import { UseDateRangeFieldProps } from '../internals/models';
+-import type { DateRange, RangeFieldSection, DateRangeValidationError } from '../models';
++import type {
++  DateRange,
++  RangeFieldSection,
++  DateRangeValidationError,
++  UseDateRangeFieldProps,
++} from '../models';
+ 
+ export interface UseSingleInputDateRangeFieldProps<
+   TDate extends PickerValidDate,
+diff --git a/packages/x-date-pickers-pro/src/index.ts b/packages/x-date-pickers-pro/src/index.ts
+index 3e539df6c582d..55114fb14fb87 100644
+--- a/packages/x-date-pickers-pro/src/index.ts
++++ b/packages/x-date-pickers-pro/src/index.ts
+@@ -34,6 +34,4 @@ export * from './MobileDateTimeRangePicker';
+ // View renderers
+ export * from './dateRangeViewRenderers';
+ 
+-export type { UseDateRangeFieldProps } from './internals/models/dateRange';
+-
+ export * from './models';
+diff --git a/packages/x-date-pickers-pro/src/internals/hooks/useEnrichedRangePickerFieldProps.ts b/packages/x-date-pickers-pro/src/internals/hooks/useEnrichedRangePickerFieldProps.ts
+index ef1678d4fc68b..a0b3a6b24f39f 100644
+--- a/packages/x-date-pickers-pro/src/internals/hooks/useEnrichedRangePickerFieldProps.ts
++++ b/packages/x-date-pickers-pro/src/internals/hooks/useEnrichedRangePickerFieldProps.ts
+@@ -23,7 +23,6 @@ import {
+   SlotComponentPropsFromProps,
+   DateOrTimeViewWithMeridiem,
+ } from '@mui/x-date-pickers/internals';
+-import { UseDateRangeFieldProps } from '../models';
+ import {
+   BaseMultiInputFieldProps,
+   MultiInputFieldSlotRootProps,
+@@ -32,6 +31,7 @@ import {
+   DateRange,
+   RangePosition,
+   FieldType,
++  UseDateRangeFieldProps,
+ } from '../../models';
+ import { UseRangePositionResponse } from './useRangePosition';
+ 
+diff --git a/packages/x-date-pickers-pro/src/internals/models/dateRange.ts b/packages/x-date-pickers-pro/src/internals/models/dateRange.ts
+index 941200a5e3754..0921a74b2caaf 100644
+--- a/packages/x-date-pickers-pro/src/internals/models/dateRange.ts
++++ b/packages/x-date-pickers-pro/src/internals/models/dateRange.ts
+@@ -1,15 +1,4 @@
+-import {
+-  BaseDateValidationProps,
+-  MakeOptional,
+-  UseFieldInternalProps,
+-} from '@mui/x-date-pickers/internals';
+ import { PickerValidDate } from '@mui/x-date-pickers/models';
+-import {
+-  DateRangeValidationError,
+-  RangeFieldSection,
+-  DateRange,
+-  RangeFieldSeparatorProps,
+-} from '../../models';
+ 
+ /**
+  * Props used to validate a day value in range pickers.
+@@ -27,23 +16,3 @@ export interface DayRangeValidationProps<TDate extends PickerValidDate> {
+    */
+   shouldDisableDate?: (day: TDate, position: 'start' | 'end') => boolean;
+ }
+-
+-export interface UseDateRangeFieldProps<
+-  TDate extends PickerValidDate,
+-  TEnableAccessibleFieldDOMStructure extends boolean,
+-> extends MakeOptional<
+-      Omit<
+-        UseFieldInternalProps<
+-          DateRange<TDate>,
+-          TDate,
+-          RangeFieldSection,
+-          TEnableAccessibleFieldDOMStructure,
+-          DateRangeValidationError
+-        >,
+-        'unstableFieldRef'
+-      >,
+-      'format'
+-    >,
+-    RangeFieldSeparatorProps,
+-    DayRangeValidationProps<TDate>,
+-    BaseDateValidationProps<TDate> {}
+diff --git a/packages/x-date-pickers-pro/src/internals/utils/validation/validateDateRange.ts b/packages/x-date-pickers-pro/src/internals/utils/validation/validateDateRange.ts
+index c0304ff0b9de8..bb138c82f438b 100644
+--- a/packages/x-date-pickers-pro/src/internals/utils/validation/validateDateRange.ts
++++ b/packages/x-date-pickers-pro/src/internals/utils/validation/validateDateRange.ts
+@@ -6,7 +6,7 @@ import {
+   DefaultizedProps,
+ } from '@mui/x-date-pickers/internals';
+ import { isRangeValid } from '../date-utils';
+-import { DayRangeValidationProps } from '../../models';
++import { DayRangeValidationProps } from '../../models/dateRange';
+ import { DateRangeValidationError, DateRange } from '../../../models';
+ 
+ export interface DateRangeComponentValidationProps<TDate extends PickerValidDate>
+diff --git a/packages/x-date-pickers-pro/src/models/dateRange.ts b/packages/x-date-pickers-pro/src/models/dateRange.ts
+new file mode 100644
+index 0000000000000..d110c1cb3b400
+--- /dev/null
++++ b/packages/x-date-pickers-pro/src/models/dateRange.ts
+@@ -0,0 +1,30 @@
++import {
++  BaseDateValidationProps,
++  MakeOptional,
++  UseFieldInternalProps,
++} from '@mui/x-date-pickers/internals';
++import { PickerValidDate } from '@mui/x-date-pickers/models';
++import { RangeFieldSection, RangeFieldSeparatorProps } from './fields';
++import { DateRangeValidationError } from './validation';
++import { DateRange } from './range';
++import { DayRangeValidationProps } from '../internals/models/dateRange';
++
++export interface UseDateRangeFieldProps<
++  TDate extends PickerValidDate,
++  TEnableAccessibleFieldDOMStructure extends boolean,
++> extends MakeOptional<
++      Omit<
++        UseFieldInternalProps<
++          DateRange<TDate>,
++          TDate,
++          RangeFieldSection,
++          TEnableAccessibleFieldDOMStructure,
++          DateRangeValidationError
++        >,
++        'unstableFieldRef'
++      >,
++      'format'
++    >,
++    RangeFieldSeparatorProps,
++    DayRangeValidationProps<TDate>,
++    BaseDateValidationProps<TDate> {}
+diff --git a/packages/x-date-pickers-pro/src/models/index.ts b/packages/x-date-pickers-pro/src/models/index.ts
+index 7a709045ff250..f97efb2767d14 100644
+--- a/packages/x-date-pickers-pro/src/models/index.ts
++++ b/packages/x-date-pickers-pro/src/models/index.ts
+@@ -1,3 +1,4 @@
++export * from './dateRange';
+ export * from './fields';
+ export * from './range';
+ export * from './validation';
+diff --git a/packages/x-date-pickers/src/internals/components/PickersModalDialog.tsx b/packages/x-date-pickers/src/internals/components/PickersModalDialog.tsx
+index 8c7c497a4875a..5b89bb61cf1be 100644
+--- a/packages/x-date-pickers/src/internals/components/PickersModalDialog.tsx
++++ b/packages/x-date-pickers/src/internals/components/PickersModalDialog.tsx
+@@ -2,8 +2,8 @@ import * as React from 'react';
+ import DialogContent from '@mui/material/DialogContent';
+ import Fade from '@mui/material/Fade';
+ import MuiDialog, { DialogProps as MuiDialogProps, dialogClasses } from '@mui/material/Dialog';
+-import { PaperProps as MuiPaperProps } from '@mui/material/Paper/Paper';
+-import { TransitionProps as MuiTransitionProps } from '@mui/material/transitions/transition';
++import { PaperProps as MuiPaperProps } from '@mui/material/Paper';
++import { TransitionProps as MuiTransitionProps } from '@mui/material/transitions';
+ import { styled } from '@mui/material/styles';
+ import { DIALOG_WIDTH } from '../constants/dimensions';
+ import { UsePickerValueActions } from '../hooks/usePicker/usePickerValue.types';
+diff --git a/packages/x-date-pickers/src/internals/demo/DemoContainer.tsx b/packages/x-date-pickers/src/internals/demo/DemoContainer.tsx
+index 223b3d60560a7..b94218a3e360c 100644
+--- a/packages/x-date-pickers/src/internals/demo/DemoContainer.tsx
++++ b/packages/x-date-pickers/src/internals/demo/DemoContainer.tsx
+@@ -3,7 +3,7 @@ import Stack, { StackProps, stackClasses } from '@mui/material/Stack';
+ import Typography from '@mui/material/Typography';
+ import { SxProps, Theme } from '@mui/material/styles';
+ import { textFieldClasses } from '@mui/material/TextField';
+-import { pickersTextFieldClasses } from '@mui/x-date-pickers/PickersTextField';
++import { pickersTextFieldClasses } from '../../PickersTextField';
+ 
+ interface DemoGridProps {
+   children: React.ReactNode;

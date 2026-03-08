@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-5218",
+  "language": "ts",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#5218: Export hook options types for RTK Query hooks",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 5218,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5218",
+    "baseSha": "b871d8bc302790ca00d7183b6c0a6a13fdc404a2",
+    "headSha": "20387a1a6902bbf597dbaec103e33dafc2ae53fe",
+    "selectedFiles": [
+      "packages/toolkit/src/query/react/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:16:45.937Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/query/react/index.ts",
+      "oldPath": "packages/toolkit/src/query/react/index.ts",
+      "newPath": "packages/toolkit/src/query/react/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/query/react/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 41,
+          "endLine": 42
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

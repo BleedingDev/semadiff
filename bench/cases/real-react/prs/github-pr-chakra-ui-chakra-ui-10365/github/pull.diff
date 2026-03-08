@@ -1,0 +1,2665 @@
+diff --git a/apps/compositions/src/examples/alert-explorer.tsx b/apps/compositions/src/examples/alert-explorer.tsx
+new file mode 100644
+index 00000000000..f5ec2195da6
+--- /dev/null
++++ b/apps/compositions/src/examples/alert-explorer.tsx
+@@ -0,0 +1,39 @@
++"use client"
++
++import { Alert, Stack } from "@chakra-ui/react"
++
++export const AlertExplorer = () => {
++  return (
++    <Stack gap="6" maxW="400px">
++      <Alert.Root status="info" variant="subtle">
++        <Alert.Indicator />
++        <Alert.Content>
++          <Alert.Title>Information</Alert.Title>
++          <Alert.Description>
++            This is an info alert with a description.
++          </Alert.Description>
++        </Alert.Content>
++      </Alert.Root>
++
++      <Alert.Root status="success" variant="solid">
++        <Alert.Indicator />
++        <Alert.Content>
++          <Alert.Title>Success</Alert.Title>
++          <Alert.Description>
++            Your action was successful and everything worked as expected.
++          </Alert.Description>
++        </Alert.Content>
++      </Alert.Root>
++
++      <Alert.Root status="error">
++        <Alert.Indicator />
++        <Alert.Content>
++          <Alert.Title>Error</Alert.Title>
++          <Alert.Description>
++            Something went wrong. Please try again.
++          </Alert.Description>
++        </Alert.Content>
++      </Alert.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/avatar-explorer-demo.tsx b/apps/compositions/src/examples/avatar-explorer-demo.tsx
+new file mode 100644
+index 00000000000..7ecc9279202
+--- /dev/null
++++ b/apps/compositions/src/examples/avatar-explorer-demo.tsx
+@@ -0,0 +1,16 @@
++import { Avatar, HStack } from "@chakra-ui/react"
++
++export const AvatarExplorerDemo = () => {
++  return (
++    <HStack gap={2}>
++      <Avatar.Root>
++        <Avatar.Fallback name="Segun Adebayo" />
++        <Avatar.Image src="https://bit.ly/sage-adebayo" />
++      </Avatar.Root>
++      <Avatar.Root>
++        <Avatar.Fallback name="Segun Adebayo" />
++        <Avatar.Image src="https://bit.ly/broken-link" />
++      </Avatar.Root>
++    </HStack>
++  )
++}
+diff --git a/apps/compositions/src/examples/blockquote-explorer.tsx b/apps/compositions/src/examples/blockquote-explorer.tsx
+new file mode 100644
+index 00000000000..a0393fe8ae1
+--- /dev/null
++++ b/apps/compositions/src/examples/blockquote-explorer.tsx
+@@ -0,0 +1,31 @@
++"use client"
++
++import { Blockquote } from "@chakra-ui/react"
++import { Box, Flex } from "@chakra-ui/react"
++import { RiQuoteText } from "react-icons/ri"
++
++export const BlockquoteExplorer = () => {
++  return (
++    <Box maxW="400px" p="4">
++      <Blockquote.Root pl="4" py="2">
++        <Flex align="flex-start" gap="2">
++          <Blockquote.Icon>
++            <RiQuoteText size={20} />
++          </Blockquote.Icon>
++
++          <Box flex="1">
++            <Blockquote.Content>
++              If anyone thinks he is something when he is nothing, he deceives
++              himself. Each one should test his own actions. Then he can take
++              pride in himself, without comparing himself to anyone else.
++            </Blockquote.Content>
++
++            <Flex mt="2" align="center" gap="2">
++              <Blockquote.Caption>— Marcus Aurelius</Blockquote.Caption>
++            </Flex>
++          </Box>
++        </Flex>
++      </Blockquote.Root>
++    </Box>
++  )
++}
+diff --git a/apps/compositions/src/examples/card-explorer.tsx b/apps/compositions/src/examples/card-explorer.tsx
+new file mode 100644
+index 00000000000..065c3bb8604
+--- /dev/null
++++ b/apps/compositions/src/examples/card-explorer.tsx
+@@ -0,0 +1,30 @@
++import { Avatar, Button, Card, Heading } from "@chakra-ui/react"
++
++export const CardExplorer = () => {
++  return (
++    <Card.Root width="320px" borderWidth="1px" rounded="md">
++      <Card.Header borderBottomWidth="1px" px="4" py="3">
++        <Heading size="sm">Profile</Heading>
++      </Card.Header>
++
++      <Card.Body gap="3" px="4" pt="4" pb="4">
++        <Avatar.Root size="lg" shape="rounded">
++          <Avatar.Image src="https://picsum.photos/200/300" />
++          <Avatar.Fallback name="Nue Camp" />
++        </Avatar.Root>
++        <Card.Title>Nue Camp</Card.Title>
++        <Card.Description fontSize="sm" color="gray.600">
++          This is the card body. Lorem ipsum dolor sit amet, consectetur
++          adipiscing elit. Curabitur nec odio vel dui euismod fermentum.
++        </Card.Description>
++      </Card.Body>
++
++      <Card.Footer justifyContent="flex-end" gap="2" px="4" pb="4">
++        <Button variant="outline" size="sm">
++          View
++        </Button>
++        <Button size="sm">Join</Button>
++      </Card.Footer>
++    </Card.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/checkbox-card-explorer.tsx b/apps/compositions/src/examples/checkbox-card-explorer.tsx
+new file mode 100644
+index 00000000000..95f9c152323
+--- /dev/null
++++ b/apps/compositions/src/examples/checkbox-card-explorer.tsx
+@@ -0,0 +1,58 @@
++"use client"
++
++import { Box, Button, CheckboxCard, Text } from "@chakra-ui/react"
++
++export const CheckboxCardExplorer = () => {
++  return (
++    <CheckboxCard.Root
++      defaultChecked
++      maxW="280px"
++      border="none"
++      shadow="none"
++      rounded="lg"
++      px="3"
++      py="2"
++      _checked={{ border: "1px solid", borderColor: "fg.subtle" }}
++    >
++      <CheckboxCard.HiddenInput />
++
++      <CheckboxCard.Control>
++        <CheckboxCard.Addon border="none">
++          <Box
++            bg="blue.500"
++            color="white"
++            fontWeight="bold"
++            rounded="full"
++            w="6"
++            h="6"
++            display="flex"
++            alignItems="center"
++            justifyContent="center"
++            fontSize="xs"
++          >
++            N
++          </Box>
++        </CheckboxCard.Addon>
++
++        <Box flex="1">
++          <CheckboxCard.Label fontWeight="medium">Next.js</CheckboxCard.Label>
++          <CheckboxCard.Description fontSize="sm" color="fg.muted">
++            A React framework for building web apps.
++          </CheckboxCard.Description>
++        </Box>
++
++        <CheckboxCard.Indicator />
++      </CheckboxCard.Control>
++
++      <CheckboxCard.Content>
++        <Text fontSize="sm" color="fg.muted" mb="2">
++          Includes features like server-side rendering, API routes, and
++          internationalization.
++        </Text>
++        <Button size="sm" variant="outline" colorScheme="blue">
++          Learn More
++        </Button>
++      </CheckboxCard.Content>
++    </CheckboxCard.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/checkbox-explorer.tsx b/apps/compositions/src/examples/checkbox-explorer.tsx
+new file mode 100644
+index 00000000000..0b805ed150c
+--- /dev/null
++++ b/apps/compositions/src/examples/checkbox-explorer.tsx
+@@ -0,0 +1,31 @@
++import { Checkbox } from "@chakra-ui/react"
++
++export const CheckboxExplorer = () => {
++  return (
++    <Checkbox.Group defaultValue={["terms"]} gap="4" flexDirection="column">
++      <Checkbox.Root value="terms">
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
++      </Checkbox.Root>
++
++      <Checkbox.Root value="newsletter">
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Subscribe to newsletter</Checkbox.Label>
++      </Checkbox.Root>
++
++      <Checkbox.Root value="updates">
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Receive product updates</Checkbox.Label>
++      </Checkbox.Root>
++    </Checkbox.Group>
++  )
++}
+diff --git a/apps/compositions/src/examples/clipboard-explorer.tsx b/apps/compositions/src/examples/clipboard-explorer.tsx
+new file mode 100644
+index 00000000000..b4dd2b39f57
+--- /dev/null
++++ b/apps/compositions/src/examples/clipboard-explorer.tsx
+@@ -0,0 +1,30 @@
++"use client"
++
++import { Button, Clipboard, Input, Stack, Text } from "@chakra-ui/react"
++
++export const ClipboardExplorer = () => {
++  return (
++    <Stack gap="6" maxW="sm">
++      <Clipboard.Root value="https://chakra-ui.com">
++        <Clipboard.Label mb="2">Copy link</Clipboard.Label>
++
++        <Stack direction="row" gap="2" mt="2" align="center">
++          <Clipboard.Input asChild>
++            <Input readOnly />
++          </Clipboard.Input>
++
++          <Clipboard.Control>
++            <Clipboard.Trigger asChild>
++              <Button size="sm" variant="outline">
++                Copy
++                <Clipboard.Indicator ml="2" />
++              </Button>
++            </Clipboard.Trigger>
++          </Clipboard.Control>
++        </Stack>
++
++        <Clipboard.ValueText as={Text} fontSize="sm" color="gray.600" />
++      </Clipboard.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/color-picker-explorer.tsx b/apps/compositions/src/examples/color-picker-explorer.tsx
+new file mode 100644
+index 00000000000..3b2cf355838
+--- /dev/null
++++ b/apps/compositions/src/examples/color-picker-explorer.tsx
+@@ -0,0 +1,152 @@
++"use client"
++
++import {
++  ColorPicker,
++  ColorPickerEyeDropper,
++  For,
++  HStack,
++  IconButton,
++  Square,
++  VStack,
++  getColorChannels,
++  parseColor,
++} from "@chakra-ui/react"
++import { LuCheck, LuPlus } from "react-icons/lu"
++
++const swatches = [
++  "#000000",
++  "#4A5568",
++  "#F56565",
++  "#ED64A6",
++  "#9F7AEA",
++  "#6B46C1",
++  "#4299E1",
++  "#0BC5EA",
++  "#00B5D8",
++  "#38B2AC",
++  "#48BB78",
++  "#68D391",
++  "#ECC94B",
++  "#DD6B20",
++]
++
++const ChannelInputs = (props: { format: ColorPicker.ColorFormat }) => {
++  const channels = getColorChannels(props.format)
++
++  return (
++    <ColorPicker.View format={props.format}>
++      <HStack wrap="wrap" gap="2" w="full">
++        <For each={channels}>
++          {(channel) => (
++            <VStack
++              key={channel}
++              gap="1"
++              flex="0 0 auto"
++              minW="60px"
++              align="stretch"
++            >
++              <ColorPicker.ChannelInput
++                channel={channel}
++                px="0"
++                height="7"
++                textStyle="xs"
++                textAlign="center"
++              />
++              <ColorPicker.ChannelText textAlign="center">
++                {channel.charAt(0).toUpperCase() + channel.slice(1)}
++              </ColorPicker.ChannelText>
++            </VStack>
++          )}
++        </For>
++      </HStack>
++    </ColorPicker.View>
++  )
++}
++
++export const ColorPickerExplorer = () => {
++  return (
++    <ColorPicker.Root
++      defaultValue={parseColor("#eb5e41")}
++      open
++      maxW="400px"
++      alignItems="flex-start"
++    >
++      <ColorPicker.HiddenInput />
++
++      <ColorPicker.Label>
++        Pick a color: <ColorPicker.ValueText />
++      </ColorPicker.Label>
++
++      <ColorPicker.Control>
++        <ColorPicker.Input />
++        <ColorPicker.Trigger>
++          <ColorPicker.ValueSwatch boxSize="6" />
++        </ColorPicker.Trigger>
++      </ColorPicker.Control>
++
++      <ColorPicker.Positioner>
++        <ColorPicker.Content
++          animation="none"
++          shadow="md"
++          padding="4"
++          borderRadius="md"
++          w="full"
++          maxW="400px"
++          bg="bg.subtle"
++        >
++          <VStack gap="4" w="full" align="stretch">
++            <VStack gap="2" align="stretch">
++              <ColorPicker.Area maxH="150px">
++                <ColorPicker.AreaBackground />
++                <ColorPicker.AreaThumb />
++              </ColorPicker.Area>
++            </VStack>
++            <ColorPicker.Sliders maxH="120px" />
++            <HStack gap="3" wrap="wrap">
++              <ColorPickerEyeDropper size="xs" />
++
++              <ColorPicker.FormatTrigger asChild>
++                <IconButton size="xs" aria-label="Format" variant="outline">
++                  F
++                </IconButton>
++              </ColorPicker.FormatTrigger>
++
++              <ColorPicker.FormatSelect />
++            </HStack>
++
++            <HStack gap="2" w="full" flexWrap="wrap">
++              <ChannelInputs format="rgba" />
++              <ChannelInputs format="hsla" />
++              <ChannelInputs format="hsba" />
++            </HStack>
++            <ColorPicker.SwatchGroup>
++              <HStack gap="2" wrap="wrap">
++                {swatches.map((color) => (
++                  <ColorPicker.SwatchTrigger key={color} value={color}>
++                    <ColorPicker.Swatch value={color}>
++                      <ColorPicker.SwatchIndicator>
++                        <LuCheck />
++                      </ColorPicker.SwatchIndicator>
++                    </ColorPicker.Swatch>
++                  </ColorPicker.SwatchTrigger>
++                ))}
++
++                <ColorPicker.Trigger>
++                  <Square
++                    size="7"
++                    bgSize="cover"
++                    overflow="hidden"
++                    border="4px solid"
++                    borderImage="conic-gradient(from 90deg, red, yellow, lime, aqua, blue, magenta, red) 1"
++                  >
++                    <LuPlus />
++                  </Square>
++                </ColorPicker.Trigger>
++              </HStack>
++            </ColorPicker.SwatchGroup>
++          </VStack>
++        </ColorPicker.Content>
++      </ColorPicker.Positioner>
++    </ColorPicker.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/color-picker-with-variants.tsx b/apps/compositions/src/examples/color-picker-with-variants.tsx
+index 34c3711926a..48674c5ce64 100644
+--- a/apps/compositions/src/examples/color-picker-with-variants.tsx
++++ b/apps/compositions/src/examples/color-picker-with-variants.tsx
+@@ -15,6 +15,7 @@ export const ColorPickerWithVariants = () => {
+       <For each={["outline", "subtle"]}>
+         {(variant) => (
+           <ColorPicker.Root
++            key={variant}
+             defaultValue={parseColor("#eb5e41")}
+             maxW="200px"
+             variant={variant}
+diff --git a/apps/compositions/src/examples/combobox-explorer.tsx b/apps/compositions/src/examples/combobox-explorer.tsx
+new file mode 100644
+index 00000000000..f46092dc737
+--- /dev/null
++++ b/apps/compositions/src/examples/combobox-explorer.tsx
+@@ -0,0 +1,74 @@
++"use client"
++
++import { Combobox, Stack, useFilter, useListCollection } from "@chakra-ui/react"
++
++export const ComboboxExplorer = () => {
++  const { contains } = useFilter({ sensitivity: "base" })
++
++  const { collection, filter } = useListCollection({
++    initialItems: frameworks,
++    filter: contains,
++  })
++
++  return (
++    <Stack maxW="320px">
++      <Combobox.Root
++        collection={collection}
++        onInputValueChange={(e) => filter(e.inputValue)}
++        open
++      >
++        <Combobox.Label mb="2" fontWeight="medium">
++          Select framework
++        </Combobox.Label>
++
++        <Combobox.Control>
++          <Combobox.Input placeholder="Type to search" />
++          <Combobox.IndicatorGroup>
++            <Combobox.ClearTrigger aria-label="Clear input" />
++            <Combobox.Trigger />
++          </Combobox.IndicatorGroup>
++        </Combobox.Control>
++
++        <Combobox.Positioner>
++          <Combobox.Content>
++            <Combobox.Empty>No items found</Combobox.Empty>
++
++            <Combobox.ItemGroup>
++              <Combobox.ItemGroupLabel>Popular</Combobox.ItemGroupLabel>
++              {collection.items.slice(0, 3).map((item) => (
++                <Combobox.Item item={item} key={item.value}>
++                  <Combobox.ItemText>{item.label}</Combobox.ItemText>
++                  <Combobox.ItemIndicator />
++                </Combobox.Item>
++              ))}
++            </Combobox.ItemGroup>
++
++            <Combobox.ItemGroup>
++              <Combobox.ItemGroupLabel>Others</Combobox.ItemGroupLabel>
++              {collection.items.slice(3).map((item) => (
++                <Combobox.Item item={item} key={item.value}>
++                  <Combobox.ItemText>{item.label}</Combobox.ItemText>
++                  <Combobox.ItemIndicator />
++                </Combobox.Item>
++              ))}
++            </Combobox.ItemGroup>
++          </Combobox.Content>
++        </Combobox.Positioner>
++      </Combobox.Root>
++    </Stack>
++  )
++}
++
++const frameworks = [
++  { label: "React", value: "react" },
++  { label: "Solid", value: "solid" },
++  { label: "Vue", value: "vue" },
++  { label: "Angular", value: "angular" },
++  { label: "Svelte", value: "svelte" },
++  { label: "Preact", value: "preact" },
++  { label: "Qwik", value: "qwik" },
++  { label: "Lit", value: "lit" },
++  { label: "Alpine.js", value: "alpinejs" },
++  { label: "Ember", value: "ember" },
++  { label: "Next.js", value: "nextjs" },
++]
+diff --git a/apps/compositions/src/examples/editable-explorer.tsx b/apps/compositions/src/examples/editable-explorer.tsx
+new file mode 100644
+index 00000000000..c60e993c53f
+--- /dev/null
++++ b/apps/compositions/src/examples/editable-explorer.tsx
+@@ -0,0 +1,54 @@
++"use client"
++
++import { Editable, HStack, IconButton, Text, VStack } from "@chakra-ui/react"
++import { LuCheck, LuPencilLine, LuX } from "react-icons/lu"
++
++export const EditableExplorer = () => {
++  return (
++    <VStack p="6" maxW="600px" mx="auto" gap="6" align="stretch">
++      <Editable.Root defaultValue="Click to edit" defaultEdit>
++        <VStack align="stretch" gap="3">
++          <Editable.Label>
++            <Text fontSize="sm" color="fg.muted">
++              Editable Label
++            </Text>
++          </Editable.Label>
++
++          <Editable.Area>
++            <Editable.Preview p="2" minH="40px" />
++            <Editable.Input p="2" mt="1" />
++          </Editable.Area>
++
++          <Editable.Textarea
++            placeholder="Editable textarea"
++            minH="80px"
++            data-part="textarea"
++            border={"1px solid"}
++            borderColor="fg.muted"
++            p="2"
++          />
++
++          <Editable.Control>
++            <HStack justify="flex-end" gap="2">
++              <Editable.EditTrigger asChild>
++                <IconButton size="sm" aria-label="Edit">
++                  <LuPencilLine />
++                </IconButton>
++              </Editable.EditTrigger>
++              <Editable.CancelTrigger asChild>
++                <IconButton size="sm" aria-label="Cancel">
++                  <LuX />
++                </IconButton>
++              </Editable.CancelTrigger>
++              <Editable.SubmitTrigger asChild>
++                <IconButton size="sm" aria-label="Submit">
++                  <LuCheck />
++                </IconButton>
++              </Editable.SubmitTrigger>
++            </HStack>
++          </Editable.Control>
++        </VStack>
++      </Editable.Root>
++    </VStack>
++  )
++}
+diff --git a/apps/compositions/src/examples/field-explorer.tsx b/apps/compositions/src/examples/field-explorer.tsx
+new file mode 100644
+index 00000000000..c2fffefe111
+--- /dev/null
++++ b/apps/compositions/src/examples/field-explorer.tsx
+@@ -0,0 +1,32 @@
++"use client"
++
++import { Button, Field, Input, Textarea, VStack } from "@chakra-ui/react"
++
++export const FieldExplorer = () => {
++  return (
++    <VStack p="6" maxW="500px" mx="auto" gap="6" align="stretch">
++      <Field.Root required invalid>
++        <Field.Label>
++          Email Address
++          <Field.RequiredIndicator />
++        </Field.Label>
++
++        <Input placeholder="you@example.com" />
++
++        <Field.HelperText>
++          Enter your email. We’ll never share it.
++        </Field.HelperText>
++
++        <Field.ErrorText>Please enter a valid email</Field.ErrorText>
++      </Field.Root>
++
++      <Field.Root>
++        <Field.Label>Message</Field.Label>
++        <Textarea placeholder="Your message..." minH="100px" />
++        <Field.HelperText>Optional: You can leave this empty</Field.HelperText>
++      </Field.Root>
++
++      <Button colorScheme="blue">Submit</Button>
++    </VStack>
++  )
++}
+diff --git a/apps/compositions/src/examples/fieldset-explorer.tsx b/apps/compositions/src/examples/fieldset-explorer.tsx
+new file mode 100644
+index 00000000000..4f733af315b
+--- /dev/null
++++ b/apps/compositions/src/examples/fieldset-explorer.tsx
+@@ -0,0 +1,59 @@
++"use client"
++
++import {
++  Button,
++  Field,
++  Fieldset,
++  For,
++  Input,
++  NativeSelect,
++  Stack,
++} from "@chakra-ui/react"
++
++export const FieldsetExplorer = () => {
++  return (
++    <Fieldset.Root size="lg" maxW="md">
++      <Stack>
++        <Fieldset.Legend>Contact details</Fieldset.Legend>
++        <Fieldset.HelperText>
++          Please provide your contact details below.
++        </Fieldset.HelperText>
++      </Stack>
++
++      <Fieldset.Content>
++        <Field.Root>
++          <Field.Label>Name</Field.Label>
++          <Input placeholder="Jane Doe" />
++        </Field.Root>
++
++        <Field.Root invalid>
++          <Field.Label>Email address</Field.Label>
++          <Input type="email" placeholder="me@example.com" />
++          <Fieldset.ErrorText>
++            Please enter a valid email address
++          </Fieldset.ErrorText>
++        </Field.Root>
++
++        <Field.Root>
++          <Field.Label>Country</Field.Label>
++          <NativeSelect.Root>
++            <NativeSelect.Field>
++              <For each={["United Kingdom", "Canada", "United States"]}>
++                {(item) => (
++                  <option key={item} value={item}>
++                    {item}
++                  </option>
++                )}
++              </For>
++            </NativeSelect.Field>
++            <NativeSelect.Indicator />
++          </NativeSelect.Root>
++        </Field.Root>
++      </Fieldset.Content>
++
++      <Button type="submit" alignSelf="flex-start">
++        Submit
++      </Button>
++    </Fieldset.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/file-upload-explorer.tsx b/apps/compositions/src/examples/file-upload-explorer.tsx
+new file mode 100644
+index 00000000000..e079e3a09cc
+--- /dev/null
++++ b/apps/compositions/src/examples/file-upload-explorer.tsx
+@@ -0,0 +1,133 @@
++"use client"
++
++import {
++  Button,
++  FileUpload,
++  Float,
++  HStack,
++  Text,
++  VStack,
++} from "@chakra-ui/react"
++import { useState } from "react"
++import { LuUpload, LuX } from "react-icons/lu"
++
++export const FileUploadExplorer = () => {
++  const createFile = (name: string, color: string) => {
++    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
++      <rect width="100" height="100" fill="${color}" />
++      <text x="50%" y="50%" font-size="12" fill="white" text-anchor="middle" alignment-baseline="middle">
++        ${name.split(".")[0].slice(0, 6)}
++      </text>
++    </svg>`
++    const blob = new Blob([svg], { type: "image/svg+xml" })
++    return new File([blob], name, { type: "image/svg+xml" })
++  }
++
++  const [files, setFiles] = useState<File[]>(() => [
++    createFile("uzumaki_naruto.svg", "#f97316"),
++  ])
++  const maxFiles = 6
++
++  return (
++    <VStack p="8" maxW="600px" mx="auto" gap="8" align="stretch">
++      <VStack gap="1" align="start">
++        <Text fontSize="xl" fontWeight="bold">
++          Let’s Add Some Naruto Images
++        </Text>
++        <Text fontSize="sm" color="gray.600">
++          You can upload up to {maxFiles} images by dragging them here or
++          browsing.
++        </Text>
++      </VStack>
++
++      <FileUpload.Root
++        accept="image/*"
++        maxFiles={maxFiles}
++        onFileAccept={(accepted) =>
++          setFiles((prev) => [...prev, ...(accepted.files ?? [])])
++        }
++        onFileReject={(rejected) => {
++          console.warn("Rejected files:", rejected)
++        }}
++      >
++        <FileUpload.Label fontWeight="semibold" mb="2">
++          Upload Your Favorite Naruto Characters
++        </FileUpload.Label>
++
++        <FileUpload.HiddenInput />
++
++        <FileUpload.Dropzone w="full">
++          <FileUpload.DropzoneContent w="full">
++            <VStack
++              gap="4"
++              p="8"
++              borderWidth="2px"
++              borderStyle="dashed"
++              borderRadius="md"
++              transition="all 0.2s"
++              w="full"
++            >
++              <LuUpload size={36} />
++              <Text fontSize="sm" color="gray.600" textAlign="center">
++                Drag & drop files here
++              </Text>
++              <Text fontSize="sm" color="gray.500" textAlign="center">
++                or click below to browse files
++              </Text>
++
++              <FileUpload.Trigger asChild>
++                <Button size="sm" colorScheme="blue">
++                  Browse Files
++                </Button>
++              </FileUpload.Trigger>
++              <FileUpload.FileText fontSize="xs" color="gray.500" />
++            </VStack>
++          </FileUpload.DropzoneContent>
++        </FileUpload.Dropzone>
++
++        {files.length > 0 && (
++          <VStack mt="6" gap="3" align="stretch" w="full">
++            <Text fontSize="md" fontWeight="semibold">
++              Uploaded Files
++            </Text>
++            <FileUpload.ItemGroup gap="3">
++              {files.map((file, i) => (
++                <FileUpload.Item key={i} file={file} w="full">
++                  <HStack
++                    gap="3"
++                    p="3"
++                    borderWidth="1px"
++                    borderRadius="md"
++                    w="full"
++                  >
++                    <FileUpload.ItemPreview>
++                      <FileUpload.ItemPreviewImage
++                        boxSize="16"
++                        borderRadius="md"
++                      />
++                    </FileUpload.ItemPreview>
++
++                    <FileUpload.ItemContent flex="1">
++                      <FileUpload.ItemName fontWeight="medium" />
++                      <FileUpload.ItemSizeText fontSize="xs" color="gray.500" />
++                    </FileUpload.ItemContent>
++
++                    <Float placement="top-end">
++                      <FileUpload.ItemDeleteTrigger
++                        onClick={() =>
++                          setFiles((prev) => prev.filter((_, idx) => idx !== i))
++                        }
++                      >
++                        <LuX />
++                      </FileUpload.ItemDeleteTrigger>
++                    </Float>
++                  </HStack>
++                </FileUpload.Item>
++              ))}
++            </FileUpload.ItemGroup>
++          </VStack>
++        )}
++      </FileUpload.Root>
++    </VStack>
++  )
++}
+diff --git a/apps/compositions/src/examples/hover-card-explorer.tsx b/apps/compositions/src/examples/hover-card-explorer.tsx
+new file mode 100644
+index 00000000000..f681dc10714
+--- /dev/null
++++ b/apps/compositions/src/examples/hover-card-explorer.tsx
+@@ -0,0 +1,49 @@
++import {
++  Avatar,
++  HStack,
++  HoverCard,
++  Icon,
++  Link,
++  Stack,
++  Text,
++} from "@chakra-ui/react"
++import { LuChartLine } from "react-icons/lu"
++
++export const HoverCardExplorer = () => {
++  return (
++    <HoverCard.Root size="sm" open>
++      <HoverCard.Trigger asChild>
++        <Link href="#">@chakra_ui</Link>
++      </HoverCard.Trigger>
++
++      <HoverCard.Positioner>
++        <HoverCard.Content>
++          <HoverCard.Arrow />
++          <Stack gap="4" direction="row">
++            <Avatar.Root>
++              <Avatar.Image src="https://pbs.twimg.com/profile_images/1244925541448286208/rzylUjaf_400x400.jpg" />
++              <Avatar.Fallback name="Chakra UI" />
++            </Avatar.Root>
++            <Stack gap="3">
++              <Stack gap="1">
++                <Text textStyle="sm" fontWeight="semibold">
++                  Chakra UI
++                </Text>
++                <Text textStyle="sm" color="fg.muted">
++                  The most powerful toolkit for building modern web
++                  applications.
++                </Text>
++              </Stack>
++              <HStack color="fg.subtle">
++                <Icon size="sm">
++                  <LuChartLine />
++                </Icon>
++                <Text textStyle="xs">2.5M Downloads</Text>
++              </HStack>
++            </Stack>
++          </Stack>
++        </HoverCard.Content>
++      </HoverCard.Positioner>
++    </HoverCard.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/listbox-explorer.tsx b/apps/compositions/src/examples/listbox-explorer.tsx
+index ed56ea6c755..7a170b6cffe 100644
+--- a/apps/compositions/src/examples/listbox-explorer.tsx
++++ b/apps/compositions/src/examples/listbox-explorer.tsx
+@@ -12,43 +12,49 @@ import { LuAtom, LuGlobe, LuPalette, LuZap } from "react-icons/lu"
+ export const ListboxExplorer = () => {
+   const { contains } = useFilter({ sensitivity: "base" })
+ 
++  const initialItems = [
++    {
++      label: "React.js",
++      value: "react",
++      icon: <LuAtom size={16} />,
++      category: "JavaScript",
++    },
++    {
++      label: "Vue.js",
++      value: "vue",
++      icon: <LuPalette size={16} />,
++      category: "JavaScript",
++    },
++    {
++      label: "Angular",
++      value: "angular",
++      icon: <LuGlobe size={16} />,
++      category: "JavaScript",
++    },
++    {
++      label: "Svelte",
++      value: "svelte",
++      icon: <LuZap size={16} />,
++      category: "JavaScript",
++    },
++    { label: "Naruto", value: "naruto", category: "Anime" },
++    { label: "One Piece", value: "one-piece", category: "Anime" },
++    { label: "The Godfather", value: "godfather", category: "Movies" },
++    { label: "The Dark Knight", value: "dark-knight", category: "Movies" },
++  ]
++
+   const { collection, filter } = useListCollection({
+-    initialItems: [
+-      {
+-        label: "React.js",
+-        value: "react",
+-        icon: <LuAtom size={16} />,
+-        category: "JavaScript",
+-      },
+-      {
+-        label: "Vue.js",
+-        value: "vue",
+-        icon: <LuPalette size={16} />,
+-        category: "JavaScript",
+-      },
+-      {
+-        label: "Angular",
+-        value: "angular",
+-        icon: <LuGlobe size={16} />,
+-        category: "JavaScript",
+-      },
+-      {
+-        label: "Svelte",
+-        value: "svelte",
+-        icon: <LuZap size={16} />,
+-        category: "JavaScript",
+-      },
+-      { label: "Naruto", value: "naruto", category: "Anime" },
+-      { label: "One Piece", value: "one-piece", category: "Anime" },
+-      { label: "The Godfather", value: "godfather", category: "Movies" },
+-      { label: "The Dark Knight", value: "dark-knight", category: "Movies" },
+-    ],
++    initialItems,
+     filter: contains,
+     groupBy: (item) => item.category,
+   })
+ 
+   return (
+-    <Listbox.Root maxW="320px" collection={collection}>
++    <Listbox.Root
++      maxW="320px"
++      collection={collection}
++      defaultValue={[collection.items[0].value]}
++    >
+       <Listbox.Label>Select item</Listbox.Label>
+ 
+       <Listbox.Input
+diff --git a/apps/compositions/src/examples/menu-explorer.tsx b/apps/compositions/src/examples/menu-explorer.tsx
+new file mode 100644
+index 00000000000..d774d54cca5
+--- /dev/null
++++ b/apps/compositions/src/examples/menu-explorer.tsx
+@@ -0,0 +1,22 @@
++import { Button, Menu } from "@chakra-ui/react"
++
++export const MenuExplorer = () => {
++  return (
++    <Menu.Root open>
++      <Menu.Trigger asChild>
++        <Button variant="outline" size="sm">
++          Open
++        </Button>
++      </Menu.Trigger>
++      <Menu.Positioner>
++        <Menu.Content>
++          <Menu.Item value="new-txt">New Text File</Menu.Item>
++          <Menu.Item value="new-file">New File...</Menu.Item>
++          <Menu.Item value="new-win">New Window</Menu.Item>
++          <Menu.Item value="open-file">Open File...</Menu.Item>
++          <Menu.Item value="export">Export</Menu.Item>
++        </Menu.Content>
++      </Menu.Positioner>
++    </Menu.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/number-input-explorer.tsx b/apps/compositions/src/examples/number-input-explorer.tsx
+new file mode 100644
+index 00000000000..8167a54d870
+--- /dev/null
++++ b/apps/compositions/src/examples/number-input-explorer.tsx
+@@ -0,0 +1,49 @@
++"use client"
++
++import { InputGroup, NumberInput, Text, VStack } from "@chakra-ui/react"
++import { LuArrowRightLeft } from "react-icons/lu"
++
++export const NumberInputExplorer = () => {
++  return (
++    <VStack p="8" maxW="400px" mx="auto" gap="8" align="stretch">
++      <VStack gap="1" align="start">
++        <Text fontSize="lg" fontWeight="bold">
++          Adjust a Number
++        </Text>
++        <Text fontSize="sm" color="gray.600">
++          Try using the arrows, typing directly, or dragging the scrubber to
++          change the value.
++        </Text>
++      </VStack>
++
++      <NumberInput.Root defaultValue="10" min={1} max={100} width="full">
++        <VStack align="start" gap="2" w="full">
++          <NumberInput.Label fontSize="sm" fontWeight="medium" color="gray.700">
++            Quantity
++          </NumberInput.Label>
++
++          <InputGroup
++            startElementProps={{ pointerEvents: "auto" }}
++            startElement={
++              <NumberInput.Scrubber cursor="ew-resize">
++                <LuArrowRightLeft />
++              </NumberInput.Scrubber>
++            }
++          >
++            <>
++              <NumberInput.Input pl="10" />
++              <NumberInput.Control>
++                <NumberInput.IncrementTrigger />
++                <NumberInput.DecrementTrigger />
++              </NumberInput.Control>
++            </>
++          </InputGroup>
++
++          <Text fontSize="xs" color="gray.500">
++            Enter a number between 1 and 100.
++          </Text>
++        </VStack>
++      </NumberInput.Root>
++    </VStack>
++  )
++}
+diff --git a/apps/compositions/src/examples/pin-input-explorer.tsx b/apps/compositions/src/examples/pin-input-explorer.tsx
+new file mode 100644
+index 00000000000..ecc14973033
+--- /dev/null
++++ b/apps/compositions/src/examples/pin-input-explorer.tsx
+@@ -0,0 +1,20 @@
++"use client"
++
++import { PinInput, VStack } from "@chakra-ui/react"
++
++export const PinInputExplorer = () => {
++  return (
++    <PinInput.Root otp>
++      <VStack alignItems="start">
++        <PinInput.Label>Enter 4-digit code</PinInput.Label>
++        <PinInput.HiddenInput />
++        <PinInput.Control>
++          <PinInput.Input index={0} />
++          <PinInput.Input index={1} />
++          <PinInput.Input index={2} />
++          <PinInput.Input index={3} />
++        </PinInput.Control>
++      </VStack>
++    </PinInput.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/progress-explorer.tsx b/apps/compositions/src/examples/progress-explorer.tsx
+new file mode 100644
+index 00000000000..82d4c0fa6bc
+--- /dev/null
++++ b/apps/compositions/src/examples/progress-explorer.tsx
+@@ -0,0 +1,15 @@
++import { Progress, Stack } from "@chakra-ui/react"
++
++export const ProgressExplorer = () => {
++  return (
++    <Stack gap="8" align="start">
++      <Progress.Root value={60} max={100} width="240px">
++        <Progress.Label>Loading…</Progress.Label>
++        <Progress.Track>
++          <Progress.Range />
++        </Progress.Track>
++        <Progress.ValueText />
++      </Progress.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/qr-code-explorer.tsx b/apps/compositions/src/examples/qr-code-explorer.tsx
+new file mode 100644
+index 00000000000..66798248b2e
+--- /dev/null
++++ b/apps/compositions/src/examples/qr-code-explorer.tsx
+@@ -0,0 +1,26 @@
++"use client"
++
++import { Button, QrCode, Stack } from "@chakra-ui/react"
++
++export const QrCodeExplorer = () => {
++  return (
++    <Stack gap="6" maxW="sm" align="center">
++      <QrCode.Root value="https://www.google.com">
++        <QrCode.Frame>
++          <QrCode.Pattern />
++        </QrCode.Frame>
++
++        <QrCode.DownloadTrigger
++          mt={4}
++          asChild
++          mimeType="image/png"
++          fileName="qr-code.png"
++        >
++          <Button size="sm" variant="outline">
++            Download QR
++          </Button>
++        </QrCode.DownloadTrigger>
++      </QrCode.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/radio-card-explorer.tsx b/apps/compositions/src/examples/radio-card-explorer.tsx
+new file mode 100644
+index 00000000000..07452281275
+--- /dev/null
++++ b/apps/compositions/src/examples/radio-card-explorer.tsx
+@@ -0,0 +1,62 @@
++"use client"
++
++import { HStack, RadioCard } from "@chakra-ui/react"
++import { LuCheck } from "react-icons/lu"
++
++export const RadioCardExplorer = () => {
++  return (
++    <RadioCard.Root defaultValue="next">
++      <RadioCard.Label>Select your favorite framework</RadioCard.Label>
++
++      <HStack align="stretch" gap="4" wrap="wrap">
++        {items.map((item) => (
++          <RadioCard.Item key={item.value} value={item.value} flex="1">
++            <RadioCard.ItemHiddenInput />
++
++            <RadioCard.ItemControl>
++              <RadioCard.ItemContent>
++                <RadioCard.ItemText fontWeight="medium">
++                  {item.title}
++                </RadioCard.ItemText>
++                <RadioCard.ItemDescription fontSize="sm" color="gray.600">
++                  {item.description}
++                </RadioCard.ItemDescription>
++              </RadioCard.ItemContent>
++
++              <RadioCard.ItemIndicator
++                borderWidth="0"
++                color="green.500"
++                checked={<LuCheck />}
++              />
++            </RadioCard.ItemControl>
++
++            <RadioCard.ItemAddon fontSize="xs" color="gray.500">
++              {item.addon}
++            </RadioCard.ItemAddon>
++          </RadioCard.Item>
++        ))}
++      </HStack>
++    </RadioCard.Root>
++  )
++}
++
++const items = [
++  {
++    value: "next",
++    title: "Next.js",
++    description: "Great for full-stack React apps",
++    addon: "Most popular",
++  },
++  {
++    value: "vite",
++    title: "Vite",
++    description: "Fast and modern build tool for SPAs",
++    addon: "Super fast dev server",
++  },
++  {
++    value: "astro",
++    title: "Astro",
++    description: "Perfect for content-driven static sites",
++    addon: "Great for blogs/docs",
++  },
++]
+diff --git a/apps/compositions/src/examples/select-basic-explorer.tsx b/apps/compositions/src/examples/select-basic-explorer.tsx
+index 7b6395e26b4..6e0f2a8d143 100644
+--- a/apps/compositions/src/examples/select-basic-explorer.tsx
++++ b/apps/compositions/src/examples/select-basic-explorer.tsx
+@@ -17,12 +17,43 @@ export const SelectBasicExplorer = () => {
+       </Select.Control>
+       <Select.Positioner>
+         <Select.Content>
+-          {frameworks.items.map((framework) => (
+-            <Select.Item item={framework} key={framework.value}>
+-              {framework.label}
+-              <Select.ItemIndicator />
+-            </Select.Item>
+-          ))}
++          <Select.ItemGroup>
++            <Select.ItemGroupLabel
++              px="2"
++              py="1"
++              fontSize="xs"
++              fontWeight="semibold"
++              textTransform="uppercase"
++              color="fg.muted"
++            >
++              Popular
++            </Select.ItemGroupLabel>
++            {frameworks.items.slice(0, 2).map((framework) => (
++              <Select.Item item={framework} key={framework.value}>
++                <Select.ItemText>{framework.label}</Select.ItemText>
++                <Select.ItemIndicator />
++              </Select.Item>
++            ))}
++          </Select.ItemGroup>
++
++          <Select.ItemGroup>
++            <Select.ItemGroupLabel
++              px="2"
++              py="1"
++              fontSize="xs"
++              fontWeight="semibold"
++              textTransform="uppercase"
++              color="fg.muted"
++            >
++              Others
++            </Select.ItemGroupLabel>
++            {frameworks.items.slice(2).map((framework) => (
++              <Select.Item item={framework} key={framework.value}>
++                <Select.ItemText>{framework.label}</Select.ItemText>
++                <Select.ItemIndicator />
++              </Select.Item>
++            ))}
++          </Select.ItemGroup>
+         </Select.Content>
+       </Select.Positioner>
+     </Select.Root>
+diff --git a/apps/compositions/src/examples/slider-explorer.tsx b/apps/compositions/src/examples/slider-explorer.tsx
+new file mode 100644
+index 00000000000..b344818865a
+--- /dev/null
++++ b/apps/compositions/src/examples/slider-explorer.tsx
+@@ -0,0 +1,44 @@
++import { Box, Slider, Stack } from "@chakra-ui/react"
++
++export const SliderExplorer = () => {
++  return (
++    <Stack maxW="280px" gap="8" w="full">
++      <Slider.Root defaultValue={[40]} orientation="horizontal">
++        <Slider.Label mb="2" fontWeight="medium">
++          Volume
++        </Slider.Label>
++
++        <Slider.Control height="6" display="flex" alignItems="center">
++          <Slider.Track bg="gray.200" rounded="full" height="2">
++            <Slider.Range bg="blue.500" rounded="full" />
++          </Slider.Track>
++
++          <Slider.Thumb index={0}>
++            <Box
++              bg="white"
++              borderWidth="2px"
++              borderColor="blue.500"
++              rounded="full"
++              boxSize="5"
++              display="flex"
++              alignItems="center"
++              justifyContent="center"
++              shadow="sm"
++            >
++              <Slider.ValueText fontSize="xs" color="blue.600" />
++              <Slider.DraggingIndicator />
++            </Box>
++          </Slider.Thumb>
++
++          <Slider.MarkerGroup mt="4">
++            <Slider.Marker value={0}>0</Slider.Marker>
++            <Slider.Marker value={50}>50</Slider.Marker>
++            <Slider.Marker value={100}>100</Slider.Marker>
++          </Slider.MarkerGroup>
++
++          <Slider.MarkerIndicator />
++        </Slider.Control>
++      </Slider.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/stat-explorer.tsx b/apps/compositions/src/examples/stat-explorer.tsx
+new file mode 100644
+index 00000000000..336f081b719
+--- /dev/null
++++ b/apps/compositions/src/examples/stat-explorer.tsx
+@@ -0,0 +1,87 @@
++"use client"
++
++import { HStack, Stack, Stat } from "@chakra-ui/react"
++
++export const StatExplorer = () => {
++  return (
++    <Stack maxW="sm" gap="6" align="stretch">
++      <Stat.Root borderRadius="md" width="full" p="4" borderWidth="1px">
++        <Stat.Label fontSize="sm" color="gray.600" mb="1">
++          Unique visitors
++        </Stat.Label>
++
++        <HStack gap="2">
++          <Stat.ValueText
++            as="span"
++            fontSize="2xl"
++            fontWeight="bold"
++            lineHeight="1"
++          >
++            192.1
++            <Stat.ValueUnit
++              as="span"
++              ml="1"
++              fontSize="lg"
++              color="gray.500"
++              lineHeight="1"
++            >
++              k
++            </Stat.ValueUnit>
++          </Stat.ValueText>
++
++          <Stat.UpIndicator
++            as="span"
++            color="green.500"
++            fontSize="sm"
++            lineHeight="1"
++          >
++            ▲ 12%
++          </Stat.UpIndicator>
++        </HStack>
++
++        <Stat.HelpText fontSize="sm" color="gray.500" mt="2">
++          Compared to last week
++        </Stat.HelpText>
++      </Stat.Root>
++
++      <Stat.Root borderRadius="md" width="full" p="4" borderWidth="1px">
++        <Stat.Label fontSize="sm" color="gray.600" mb="1">
++          New signups
++        </Stat.Label>
++
++        <HStack gap="2">
++          <Stat.ValueText
++            as="span"
++            fontSize="2xl"
++            fontWeight="bold"
++            lineHeight="1"
++          >
++            85
++            <Stat.ValueUnit
++              as="span"
++              ml="1"
++              fontSize="lg"
++              color="gray.500"
++              lineHeight="1"
++            >
++              users
++            </Stat.ValueUnit>
++          </Stat.ValueText>
++
++          <Stat.DownIndicator
++            as="span"
++            color="red.500"
++            fontSize="sm"
++            lineHeight="1"
++          >
++            ▼ 8%
++          </Stat.DownIndicator>
++        </HStack>
++
++        <Stat.HelpText fontSize="sm" color="gray.500" mt="2">
++          Compared to last week
++        </Stat.HelpText>
++      </Stat.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/steps-explorer.tsx b/apps/compositions/src/examples/steps-explorer.tsx
+new file mode 100644
+index 00000000000..aaa61cd0804
+--- /dev/null
++++ b/apps/compositions/src/examples/steps-explorer.tsx
+@@ -0,0 +1,81 @@
++"use client"
++
++import {
++  Box,
++  Button,
++  ButtonGroup,
++  Heading,
++  Stack,
++  Steps,
++  Text,
++} from "@chakra-ui/react"
++
++export const StepsExplorer = () => {
++  return (
++    <Stack maxW="md" gap="8">
++      <Heading size="md">Onboarding Steps</Heading>
++
++      <Steps.Root defaultStep={1} count={steps.length} orientation="vertical">
++        <Stack gap="8">
++          <Steps.List gap="6">
++            {steps.map((step, index) => (
++              <Box key={index} position="relative">
++                <Steps.Item index={index}>
++                  <Steps.Indicator />
++                  <Steps.Title fontWeight="semibold">{step.title}</Steps.Title>
++                  <Steps.Separator />
++                </Steps.Item>
++
++                <Box pl="10" mt="2">
++                  <Steps.Content index={index}>
++                    <Text color="gray.500">{step.description}</Text>
++                  </Steps.Content>
++                </Box>
++              </Box>
++            ))}
++          </Steps.List>
++
++          <Steps.CompletedContent>
++            <Text mt="2" fontWeight="medium" color="green.600">
++              ✅ All steps are complete! You're ready to go.
++            </Text>
++          </Steps.CompletedContent>
++
++          <Box>
++            <ButtonGroup
++              size="sm"
++              variant="outline"
++              width="full"
++              justifyContent="space-between"
++            >
++              <Steps.PrevTrigger asChild>
++                <Button>Previous</Button>
++              </Steps.PrevTrigger>
++              <Steps.NextTrigger asChild>
++                <Button>Next</Button>
++              </Steps.NextTrigger>
++            </ButtonGroup>
++          </Box>
++        </Stack>
++      </Steps.Root>
++    </Stack>
++  )
++}
++
++const steps = [
++  {
++    title: "Create Account",
++    description:
++      "Sign up with your email and create a secure password. Make sure to verify your email address.",
++  },
++  {
++    title: "Profile Setup",
++    description:
++      "Add your personal details, profile picture, and preferences so we can tailor your experience.",
++  },
++  {
++    title: "Get Started",
++    description:
++      "Explore the dashboard, connect with others, and start using the features immediately.",
++  },
++]
+diff --git a/apps/compositions/src/examples/tooltip-explorer.tsx b/apps/compositions/src/examples/tooltip-explorer.tsx
+new file mode 100644
+index 00000000000..2e8deb4caa9
+--- /dev/null
++++ b/apps/compositions/src/examples/tooltip-explorer.tsx
+@@ -0,0 +1,26 @@
++"use client"
++
++import { Button, Stack, Tooltip } from "@chakra-ui/react"
++
++export const TooltipExplorer = () => {
++  return (
++    <Stack align="center" gap="10" py="16">
++      <Tooltip.Root open>
++        <Tooltip.Trigger asChild>
++          <Button variant="outline" size="sm">
++            Hover me
++          </Button>
++        </Tooltip.Trigger>
++
++        <Tooltip.Positioner>
++          <Tooltip.Content>
++            This is the tooltip content
++            <Tooltip.Arrow>
++              <Tooltip.ArrowTip />
++            </Tooltip.Arrow>
++          </Tooltip.Content>
++        </Tooltip.Positioner>
++      </Tooltip.Root>
++    </Stack>
++  )
++}
+diff --git a/apps/compositions/src/examples/tree-view-explorer.tsx b/apps/compositions/src/examples/tree-view-explorer.tsx
+new file mode 100644
+index 00000000000..2d7d7f15fbf
+--- /dev/null
++++ b/apps/compositions/src/examples/tree-view-explorer.tsx
+@@ -0,0 +1,115 @@
++"use client"
++
++import {
++  Checkmark,
++  TreeView,
++  createTreeCollection,
++  useTreeViewNodeContext,
++} from "@chakra-ui/react"
++import { LuFile, LuFolder, LuSquareMinus, LuSquarePlus } from "react-icons/lu"
++
++interface Node {
++  id: string
++  name: string
++  children?: Node[]
++}
++
++const collection = createTreeCollection<Node>({
++  nodeToValue: (node) => node.id,
++  nodeToString: (node) => node.name,
++  rootNode: {
++    id: "ROOT",
++    name: "",
++    children: [
++      {
++        id: "node_modules",
++        name: "node_modules",
++        children: [
++          { id: "node_modules/zag-js", name: "zag-js" },
++          { id: "node_modules/pandacss", name: "panda" },
++          {
++            id: "node_modules/@types",
++            name: "@types",
++            children: [
++              { id: "node_modules/@types/react", name: "react" },
++              { id: "node_modules/@types/react-dom", name: "react-dom" },
++            ],
++          },
++        ],
++      },
++      {
++        id: "src",
++        name: "src",
++        children: [
++          { id: "src/app.tsx", name: "app.tsx" },
++          { id: "src/index.ts", name: "index.ts" },
++        ],
++      },
++      { id: "panda.config", name: "panda.config.ts" },
++      { id: "package.json", name: "package.json" },
++      { id: "renovate.json", name: "renovate.json" },
++      { id: "readme.md", name: "README.md" },
++    ],
++  },
++})
++
++const NodeCheckbox = (props: TreeView.NodeCheckboxProps) => {
++  const nodeState = useTreeViewNodeContext()
++  return (
++    <TreeView.NodeCheckbox aria-label="check node" {...props}>
++      <Checkmark
++        size="sm"
++        bg={{
++          base: "bg",
++          _checked: "colorPalette.solid",
++          _indeterminate: "colorPalette.solid",
++        }}
++        checked={nodeState.checked === true}
++        indeterminate={nodeState.checked === "indeterminate"}
++      />
++    </TreeView.NodeCheckbox>
++  )
++}
++
++export const TreeViewExplorer = () => {
++  return (
++    <TreeView.Root
++      collection={collection}
++      maxW="sm"
++      defaultExpandedValue={["node_modules", "node_modules/@types", "src"]}
++      defaultCheckedValue={[]}
++    >
++      <TreeView.Label mb="2" fontWeight="medium">
++        Project Explorer
++      </TreeView.Label>
++
++      <TreeView.Tree>
++        <TreeView.Node
++          indentGuide={<TreeView.BranchIndentGuide />}
++          render={({ node, nodeState }) =>
++            nodeState.isBranch ? (
++              <TreeView.BranchContent>
++                <TreeView.BranchControl>
++                  <TreeView.BranchTrigger>
++                    {nodeState.expanded ? <LuSquareMinus /> : <LuSquarePlus />}
++                  </TreeView.BranchTrigger>
++                  <NodeCheckbox />
++                  <LuFolder />
++                  <TreeView.BranchText>{node.name}</TreeView.BranchText>
++                  <TreeView.BranchIndicator />
++                </TreeView.BranchControl>
++              </TreeView.BranchContent>
++            ) : (
++              <TreeView.Item>
++                <NodeCheckbox />
++                <LuFile />
++                <TreeView.ItemText>{node.name}</TreeView.ItemText>
++                <TreeView.ItemIndicator />
++              </TreeView.Item>
++            )
++          }
++        />
++      </TreeView.Tree>
++    </TreeView.Root>
++  )
++}
+diff --git a/apps/www/components/component-explorer-sidebar.tsx b/apps/www/components/component-explorer-sidebar.tsx
+index aaaf3d03afa..7f44aebf9ea 100644
+--- a/apps/www/components/component-explorer-sidebar.tsx
++++ b/apps/www/components/component-explorer-sidebar.tsx
+@@ -1,11 +1,33 @@
+ "use client"
+ 
+-import { Box, Flex, Heading, Text } from "@chakra-ui/react"
++import { Box, BoxProps, Flex, Heading, Icon, Text } from "@chakra-ui/react"
+ import * as anatomies from "@chakra-ui/react/anatomy"
++import { useEffect, useRef, useState } from "react"
++import { HiChevronRight } from "react-icons/hi"
+ import { camelCase, kebabCase } from "scule"
+ 
+-export const normalizeComponentName = (name: string) =>
+-  name.split("-")[0].toLowerCase()
++export const normalizeComponentName = (name: string) => {
++  let parts = name.split("-")
++
++  while (
++    parts.length > 1 &&
++    ["basic", "explorer"].includes(parts[parts.length - 1])
++  ) {
++    parts.pop()
++  }
++
++  const pascal = parts
++    .map((p, i) =>
++      i === 0
++        ? p.toLowerCase()
++        : p.charAt(0).toUpperCase() + p.slice(1).toLowerCase(),
++    )
++    .join("")
++
++  const kebab = parts.map((p) => p.toLowerCase()).join("-")
++
++  return { pascal, kebab }
++}
+ 
+ export type HighlightStyle = Partial<
+   Pick<
+@@ -16,20 +38,26 @@ export type HighlightStyle = Partial<
+ 
+ const getPartElements = (
+   preview: HTMLElement,
+-  normalizedName: string,
++  kebabName: string,
+   part: string,
+ ): HTMLElement[] => {
+   const kebabPart = kebabCase(part)
+   const camelPart = camelCase(part)
+ 
+-  const scopeSelector = `[data-scope=${normalizedName}][data-part=${kebabPart}]`
++  const scopeSelector = `[data-scope=${kebabName}][data-part=${kebabPart}]`
+   const scopeMatches = Array.from(
+     preview.querySelectorAll<HTMLElement>(scopeSelector),
+   )
+   if (scopeMatches.length > 0) return scopeMatches
+ 
+-  const classSelector = `.chakra-${normalizedName}__${camelPart}`
+-  return Array.from(preview.querySelectorAll<HTMLElement>(classSelector))
++  const chakraSelector = `.chakra-${kebabName}__${camelPart}`
++  const chakraMatches = Array.from(
++    preview.querySelectorAll<HTMLElement>(chakraSelector),
++  )
++  if (chakraMatches.length > 0) return chakraMatches
++
++  const bareSelector = `.${kebabName}__${camelPart}`
++  return Array.from(preview.querySelectorAll<HTMLElement>(bareSelector))
+ }
+ 
+ const highlightElements = (
+@@ -53,7 +81,7 @@ const highlightElements = (
+ }
+ 
+ const applyHighlight = (
+-  normalizedName: string,
++  kebabName: string,
+   part: string | null,
+   action: "add" | "remove",
+   highlightStyle: HighlightStyle,
+@@ -62,7 +90,7 @@ const applyHighlight = (
+   const preview = document.getElementById("component-preview")
+   if (!preview) return
+ 
+-  const elements = getPartElements(preview, normalizedName, part)
++  const elements = getPartElements(preview, kebabName, part)
+   highlightElements(elements, action, highlightStyle)
+ }
+ 
+@@ -79,62 +107,146 @@ export const ComponentExplorerSidebar = ({
+   setActivePart,
+   getHighlightStyle,
+ }: ComponentExplorerSidebarProps) => {
+-  const normalizedName = normalizeComponentName(componentName)
+-  const anatomy =
+-    anatomies[`${normalizedName}Anatomy` as keyof typeof anatomies]
+-  const anatomyKeys = anatomy.keys()
++  const { pascal, kebab } = normalizeComponentName(componentName)
++  const anatomy = anatomies[`${pascal}Anatomy` as keyof typeof anatomies]
++  const anatomyKeys = anatomy ? Array.from(new Set(anatomy.keys())) : []
+   const highlightStyle = getHighlightStyle()
+ 
++  const flexRef = useRef<HTMLDivElement | null>(null)
++  const [canScrollLeft, setCanScrollLeft] = useState(false)
++  const [canScrollRight, setCanScrollRight] = useState(false)
++
++  const updateScrollState = () => {
++    const el = flexRef.current
++    if (!el) return
++    setCanScrollLeft(el.scrollLeft > 0)
++    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth)
++  }
++
++  useEffect(() => {
++    updateScrollState()
++    window.addEventListener("resize", updateScrollState)
++    return () => window.removeEventListener("resize", updateScrollState)
++  }, [anatomyKeys])
++
++  const scrollBy = (distance: number) => {
++    if (!flexRef.current) return
++    flexRef.current.scrollBy({ left: distance, behavior: "smooth" })
++  }
++
+   const selectPart = (part: string) => {
+     if (activePart === part) {
+-      applyHighlight(normalizedName, part, "remove", highlightStyle)
++      applyHighlight(kebab, part, "remove", highlightStyle)
+       setActivePart(null)
+     } else {
+       if (activePart)
+-        applyHighlight(normalizedName, activePart, "remove", highlightStyle)
++        applyHighlight(kebab, activePart, "remove", highlightStyle)
+       setActivePart(part)
+-      applyHighlight(normalizedName, part, "add", highlightStyle)
++      applyHighlight(kebab, part, "add", highlightStyle)
+     }
+   }
+ 
+   const hoverPart = (part: string, isEntering: boolean) => {
+     const preview = document.getElementById("component-preview")
+     if (!preview) return
+-
+-    const elements = getPartElements(preview, normalizedName, part)
+-    if (isEntering) {
+-      highlightElements(elements, "add", highlightStyle)
+-    } else if (activePart !== part) {
++    const elements = getPartElements(preview, kebab, part)
++    if (isEntering) highlightElements(elements, "add", highlightStyle)
++    else if (activePart !== part)
+       highlightElements(elements, "remove", highlightStyle)
+-    }
+   }
+ 
+   return (
+     <Box
+       p={5}
+       px={{ base: 0, lg: 5 }}
+-      bg="bg"
+-      minW={{ base: "100%", lg: "260px" }}
+-      maxW="100%"
++      bg={{ base: "transparent", lg: "bg" }}
++      borderRadius={{ base: "none", lg: "md" }}
++      border={{ base: "none", lg: "1px solid" }}
++      borderColor={{ base: "transparent", lg: "border.subtle" }}
++      w="100%"
++      order={{ base: -1, lg: 0 }}
+     >
+-      <Heading size="sm" mb={2} color="fg">
++      <Heading
++        size="sm"
++        mb={2}
++        color="fg"
++        display={{ base: "none", lg: "block" }}
++      >
+         Component Anatomy
+       </Heading>
+-      <Text fontSize="sm" mb={4} color="fg.muted">
++      <Text
++        fontSize="sm"
++        mb={4}
++        color="fg.muted"
++        display={{ base: "none", lg: "block" }}
++      >
+         Hover to highlight, click to select parts
+       </Text>
+-      <Flex wrap="wrap" gap={2}>
+-        {anatomyKeys.map((key) => (
+-          <AnatomyPart
+-            key={key}
+-            partKey={key}
+-            isSelected={activePart === key}
+-            onMouseEnter={() => hoverPart(key, true)}
+-            onMouseLeave={() => hoverPart(key, false)}
+-            onClick={() => selectPart(key)}
+-          />
+-        ))}
+-      </Flex>
++
++      <Box position="relative">
++        <Flex
++          ref={flexRef}
++          wrap={{ base: "nowrap", lg: "wrap" }}
++          gap={2}
++          overflowX={{ base: "auto", lg: "visible" }}
++          px={2}
++          onScroll={updateScrollState}
++        >
++          {anatomyKeys.map((key, i) => (
++            <AnatomyPart
++              key={key}
++              partKey={key}
++              isSelected={activePart === key}
++              onMouseEnter={() => hoverPart(key, true)}
++              onMouseLeave={() => hoverPart(key, false)}
++              onClick={() => selectPart(key)}
++              mr={i === anatomyKeys.length - 1 ? "40px" : undefined}
++            />
++          ))}
++        </Flex>
++
++        {canScrollLeft && (
++          <Box
++            display={{ base: "flex", lg: "none" }}
++            position="absolute"
++            top={0}
++            left={0}
++            w="32px"
++            h="100%"
++            alignItems="center"
++            justifyContent="center"
++            borderRadius="0 16px 16px 0"
++            bgGradient="linear(to-r, rgba(255,255,255,0.4), transparent)"
++            backdropFilter="blur(6px)"
++            boxShadow="0 0 6px rgba(0,0,0,0.1)"
++            cursor="pointer"
++            onClick={() => scrollBy(-100)}
++          >
++            <HiChevronRight size={16} style={{ transform: "rotate(180deg)" }} />
++          </Box>
++        )}
++
++        {canScrollRight && (
++          <Box
++            display={{ base: "flex", lg: "none" }}
++            position="absolute"
++            top={0}
++            right={0}
++            w="32px"
++            h="100%"
++            alignItems="center"
++            justifyContent="center"
++            borderRadius="16px 0 0 16px"
++            bgGradient="linear(to-l, rgba(255,255,255,0.4), transparent)"
++            backdropFilter="blur(6px)"
++            boxShadow="0 0 6px rgba(0,0,0,0.1)"
++            cursor="pointer"
++            onClick={() => scrollBy(100)}
++          >
++            <HiChevronRight size={16} />
++          </Box>
++        )}
++      </Box>
+     </Box>
+   )
+ }
+@@ -145,13 +257,14 @@ const AnatomyPart = <T extends string>({
+   onMouseEnter,
+   onMouseLeave,
+   onClick,
++  ...boxProps
+ }: {
+   partKey: T
+   isSelected: boolean
+   onMouseEnter: () => void
+   onMouseLeave: () => void
+   onClick: () => void
+-}) => (
++} & BoxProps) => (
+   <Box
+     px={3}
+     py={2}
+@@ -167,6 +280,7 @@ const AnatomyPart = <T extends string>({
+     onMouseEnter={onMouseEnter}
+     onMouseLeave={onMouseLeave}
+     onClick={onClick}
++    {...boxProps}
+   >
+     <Flex align="center" gap={2}>
+       <Text
+diff --git a/apps/www/components/component-explorer.tsx b/apps/www/components/component-explorer.tsx
+index 90f74e8ddda..351721b9ba1 100644
+--- a/apps/www/components/component-explorer.tsx
++++ b/apps/www/components/component-explorer.tsx
+@@ -1,4 +1,4 @@
+-import { Box } from "@chakra-ui/react"
++import { Box, Flex } from "@chakra-ui/react"
+ import { ComponentExplorerWrapper } from "./component-snapshot"
+ import { ExamplePreview } from "./example"
+ 
+@@ -12,11 +12,12 @@ export function ComponentExplorer({
+   return (
+     <Box
+       className={className}
+-      display={{ base: "block", lg: "grid" }}
+-      gridTemplateColumns={{ base: "1fr", lg: "1fr 260px" }}
+-      gridTemplateRows="auto auto"
++      display={{ base: "flex", lg: "grid" }}
++      flexDirection={{ base: "column", lg: undefined }}
++      gridTemplateColumns={{ base: undefined, lg: "1fr 260px" }}
++      gridTemplateRows={{ base: undefined, lg: "auto auto" }}
+       gap={4}
+-      mt={4}
++      mt={{ base: 2, lg: 4 }}
+       maxW="100%"
+     >
+       <Box
+diff --git a/apps/www/components/component-snapshot.tsx b/apps/www/components/component-snapshot.tsx
+index 6ee1dd7f1d3..1a027520cf2 100644
+--- a/apps/www/components/component-snapshot.tsx
++++ b/apps/www/components/component-snapshot.tsx
+@@ -40,26 +40,26 @@ export function ComponentCodeSnapshot({
+   getActiveStyle,
+ }: ComponentCodeSnapshotProps) {
+   const [html, setHtml] = useState("")
+-  const componentName = normalizeComponentName(name)
++  const { pascal, kebab } = normalizeComponentName(name) // ✅ destructure
+   const activeStyles = getActiveStyle()
+ 
+   useEffect(() => {
+     const generate = async () => {
+       const content = activePart
+-        ? `import { ${componentName}Anatomy } from "@chakra-ui/react/anatomy"
++        ? `import { ${pascal}Anatomy } from "@chakra-ui/react/anatomy"
+ import { defineSlotRecipe } from "@chakra-ui/react"
+ // __SPACE__
+-export const ${componentName}SlotRecipe = defineSlotRecipe({
+-  slots: ${componentName}Anatomy.keys(),
++export const ${pascal}SlotRecipe = defineSlotRecipe({
++  slots: ${pascal}Anatomy.keys(),
+   base: {
+     ${activePart}: ${JSON.stringify(activeStyles, null, 2)}
+   }
+ });`
+-        : `import { ${componentName}Anatomy } from "@chakra-ui/react/anatomy"
++        : `import { ${pascal}Anatomy } from "@chakra-ui/react/anatomy"
+ import { defineSlotRecipe } from "@chakra-ui/react"
+ // __SPACE__
+-export const ${componentName}SlotRecipe = defineSlotRecipe({
+-  slots: ${componentName}Anatomy.keys()
++export const ${pascal}SlotRecipe = defineSlotRecipe({
++  slots: ${pascal}Anatomy.keys()
+ });`
+ 
+       const formattedCode = formatWithTS(content)
+@@ -69,7 +69,7 @@ export const ${componentName}SlotRecipe = defineSlotRecipe({
+     }
+ 
+     generate()
+-  }, [componentName, activePart, activeStyles])
++  }, [pascal, activePart, activeStyles])
+ 
+   return (
+     <Box
+@@ -107,7 +107,7 @@ export const ${componentName}SlotRecipe = defineSlotRecipe({
+             fontFamily="mono"
+             letterSpacing="tight"
+           >
+-            {componentName}.recipe.ts
++            {kebab}.recipe.ts
+           </Text>
+ 
+           {activePart && (
+@@ -137,6 +137,7 @@ export const ${componentName}SlotRecipe = defineSlotRecipe({
+             wordBreak: "break-word",
+           },
+         }}
++        roundedBottom="lg"
+       >
+         <div
+           className="code-highlight"
+diff --git a/apps/www/content/docs/components/alert.mdx b/apps/www/content/docs/components/alert.mdx
+index 632c46d8465..35fae3ff32a 100644
+--- a/apps/www/content/docs/components/alert.mdx
++++ b/apps/www/content/docs/components/alert.mdx
+@@ -106,3 +106,10 @@ npx @chakra-ui/cli snippet add alert
+ ### Root
+ 
+ <PropTable component="Alert" part="Root" />
++
++## Explorer
++
++Explore the `Alert` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="alert-explorer" />
+diff --git a/apps/www/content/docs/components/blockquote.mdx b/apps/www/content/docs/components/blockquote.mdx
+index 636d57027fa..372243714a9 100644
+--- a/apps/www/content/docs/components/blockquote.mdx
++++ b/apps/www/content/docs/components/blockquote.mdx
+@@ -96,3 +96,10 @@ npx @chakra-ui/cli snippet add blockquote
+ ### Root
+ 
+ <PropTable component="Blockquote" part="Root" />
++
++## Explorer
++
++Explore the `Blockquote` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="blockquote-explorer" />
+diff --git a/apps/www/content/docs/components/breadcrumb.mdx b/apps/www/content/docs/components/breadcrumb.mdx
+index c2102a8de1d..c77b88dc0e0 100644
+--- a/apps/www/content/docs/components/breadcrumb.mdx
++++ b/apps/www/content/docs/components/breadcrumb.mdx
+@@ -116,3 +116,10 @@ npx @chakra-ui/cli snippet add breadcrumb
+ ### Root
+ 
+ <PropTable component="Breadcrumb" part="Root" />
++
++## Explorer
++
++Explore the `Breadcrumb` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="breadcrumb-basic" />
+diff --git a/apps/www/content/docs/components/card.mdx b/apps/www/content/docs/components/card.mdx
+index ef8aceddfaa..edba3955754 100644
+--- a/apps/www/content/docs/components/card.mdx
++++ b/apps/www/content/docs/components/card.mdx
+@@ -66,3 +66,10 @@ Use the Card component to display an avatar.
+ ### Root
+ 
+ <PropTable component="Card" part="Root" />
++
++## Explorer
++
++Explore the `Card` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="card-explorer" />
+diff --git a/apps/www/content/docs/components/checkbox-card.mdx b/apps/www/content/docs/components/checkbox-card.mdx
+index cd021c1f8d7..3bd2c78521d 100644
+--- a/apps/www/content/docs/components/checkbox-card.mdx
++++ b/apps/www/content/docs/components/checkbox-card.mdx
+@@ -115,3 +115,10 @@ Here's how to use the it
+ ### Root
+ 
+ <PropTable component="CheckboxCard" part="Root" />
++
++## Explorer
++
++Explore the `Checkbox Card` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="checkbox-card-explorer" />
+diff --git a/apps/www/content/docs/components/checkbox.mdx b/apps/www/content/docs/components/checkbox.mdx
+index 547993a20b2..5bcab7fc35a 100644
+--- a/apps/www/content/docs/components/checkbox.mdx
++++ b/apps/www/content/docs/components/checkbox.mdx
+@@ -185,3 +185,10 @@ Here's how to use the it
+ ### Root
+ 
+ <PropTable component="Checkbox" part="Root" />
++
++## Explorer
++
++Explore the `Checkbox` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="checkbox-explorer" />
+diff --git a/apps/www/content/docs/components/clipboard.mdx b/apps/www/content/docs/components/clipboard.mdx
+index 2649e0a27a3..406a1444641 100644
+--- a/apps/www/content/docs/components/clipboard.mdx
++++ b/apps/www/content/docs/components/clipboard.mdx
+@@ -64,3 +64,10 @@ Alternatively, you can use the `useClipboard` hook to create a custom component.
+ ### Root
+ 
+ <PropTable component="Clipboard" part="Root" />
++
++## Explorer
++
++Explore the `Clipboard` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="clipboard-explorer" />
+diff --git a/apps/www/content/docs/components/collapsible.mdx b/apps/www/content/docs/components/collapsible.mdx
+index 0280798db4e..d6301534490 100644
+--- a/apps/www/content/docs/components/collapsible.mdx
++++ b/apps/www/content/docs/components/collapsible.mdx
+@@ -36,3 +36,10 @@ Use the `unmountOnExit` prop to make the content unmount when collapsed.
+ ### Root
+ 
+ <PropTable component="Collapsible" part="Root" />
++
++## Explorer
++
++Explore the `Collapsible` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="collapsible-basic" />
+diff --git a/apps/www/content/docs/components/color-picker.mdx b/apps/www/content/docs/components/color-picker.mdx
+index 5cd76e5ffe6..e0322ea2545 100644
+--- a/apps/www/content/docs/components/color-picker.mdx
++++ b/apps/www/content/docs/components/color-picker.mdx
+@@ -239,3 +239,10 @@ Here's how to compose a swatch with a trigger.
+ ### Root
+ 
+ <PropTable component="ColorPicker" part="Root" />
++
++## Explorer
++
++Explore the `Color Picker` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="color-picker-explorer" />
+diff --git a/apps/www/content/docs/components/combobox.mdx b/apps/www/content/docs/components/combobox.mdx
+index b06f85cd30b..f4df1aea002 100644
+--- a/apps/www/content/docs/components/combobox.mdx
++++ b/apps/www/content/docs/components/combobox.mdx
+@@ -360,3 +360,10 @@ If you use a `Dialog` and have set `scrollBehavior="inside"`, you need to:
+ ### Item
+ 
+ <PropTable component="Combobox" part="Item" />
++
++## Explorer
++
++Explore the `Combobox` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="combobox-explorer" />
+diff --git a/apps/www/content/docs/components/data-list.mdx b/apps/www/content/docs/components/data-list.mdx
+index dbf79eb08d7..f9866c6fe90 100644
+--- a/apps/www/content/docs/components/data-list.mdx
++++ b/apps/www/content/docs/components/data-list.mdx
+@@ -86,3 +86,10 @@ npx @chakra-ui/cli snippet add data-list
+ ### Root
+ 
+ <PropTable component="DataList" part="Root" />
++
++## Explorer
++
++Explore the `DataList` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="data-list-basic" />
+diff --git a/apps/www/content/docs/components/editable.mdx b/apps/www/content/docs/components/editable.mdx
+index 604f504778d..b9768afee8a 100644
+--- a/apps/www/content/docs/components/editable.mdx
++++ b/apps/www/content/docs/components/editable.mdx
+@@ -72,3 +72,10 @@ editable.
+ ### Root
+ 
+ <PropTable component="Editable" part="Root" />
++
++## Explorer
++
++Explore the `Editable` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="editable-explorer" />
+diff --git a/apps/www/content/docs/components/empty-state.mdx b/apps/www/content/docs/components/empty-state.mdx
+index c27c70507c7..e4c784b05d4 100644
+--- a/apps/www/content/docs/components/empty-state.mdx
++++ b/apps/www/content/docs/components/empty-state.mdx
+@@ -70,3 +70,10 @@ npx @chakra-ui/cli snippet add empty-state
+ ### Root
+ 
+ <PropTable component="EmptyState" part="Root" />
++
++## Explorer
++
++Explore the `Empty State` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="empty-state-basic" />
+diff --git a/apps/www/content/docs/components/field.mdx b/apps/www/content/docs/components/field.mdx
+index 4e7080380af..ee6d4f9ea5f 100644
+--- a/apps/www/content/docs/components/field.mdx
++++ b/apps/www/content/docs/components/field.mdx
+@@ -105,3 +105,10 @@ npx @chakra-ui/cli snippet add field
+ ### Root
+ 
+ <PropTable component="Field" part="Root" />
++
++## Explorer
++
++Explore the `Field` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="field-explorer" />
+diff --git a/apps/www/content/docs/components/fieldset.mdx b/apps/www/content/docs/components/fieldset.mdx
+index 9a533e9a116..5c453fcfd38 100644
+--- a/apps/www/content/docs/components/fieldset.mdx
++++ b/apps/www/content/docs/components/fieldset.mdx
+@@ -45,3 +45,10 @@ text.
+ ## Props
+ 
+ <PropTable component="Fieldset" part="Root" />
++
++## Explorer
++
++Explore the `Fieldset` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="fieldset-explorer" />
+diff --git a/apps/www/content/docs/components/file-upload.mdx b/apps/www/content/docs/components/file-upload.mdx
+index 4590d2d9aa2..763090e9522 100644
+--- a/apps/www/content/docs/components/file-upload.mdx
++++ b/apps/www/content/docs/components/file-upload.mdx
+@@ -173,3 +173,10 @@ upload.
+ ### Root
+ 
+ <PropTable component="FileUpload" part="Root" />
++
++## Explorer
++
++Explore the `File Upload` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="file-upload-explorer" />
+diff --git a/apps/www/content/docs/components/hover-card.mdx b/apps/www/content/docs/components/hover-card.mdx
+index 655e71ba9a0..86e4ae30979 100644
+--- a/apps/www/content/docs/components/hover-card.mdx
++++ b/apps/www/content/docs/components/hover-card.mdx
+@@ -105,4 +105,10 @@ avoid placing crucial content within it.
+ ## Props
+ 
+ <PropTable component="HoverCard" part="Root" />
+-```
++
++## Explorer
++
++Explore the `Hover Card` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="hover-card-explorer" />
+diff --git a/apps/www/content/docs/components/image.mdx b/apps/www/content/docs/components/image.mdx
+index c2a67531dca..bf9260d56d5 100644
+--- a/apps/www/content/docs/components/image.mdx
++++ b/apps/www/content/docs/components/image.mdx
+@@ -54,9 +54,9 @@ the image component.
+ Use the `asChild` prop to render the image as a child of the `Image` component.
+ 
+ ```jsx
+-// import NextImage from "next/image"
++import NextImage from "next/image"
+ 
+-<Image asChild>
++;<Image asChild>
+   <NextImage src="..." alt="..." />
+ </Image>
+ ```
+diff --git a/apps/www/content/docs/components/list.mdx b/apps/www/content/docs/components/list.mdx
+index 05969b72215..a8d0ed2255f 100644
+--- a/apps/www/content/docs/components/list.mdx
++++ b/apps/www/content/docs/components/list.mdx
+@@ -51,3 +51,10 @@ Use the `_marker` prop to style the marker of the list
+ ## Props
+ 
+ <PropTable component="List" part="Root" />
++
++## Explorer
++
++Explore the `List` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="list-basic" />
+diff --git a/apps/www/content/docs/components/menu.mdx b/apps/www/content/docs/components/menu.mdx
+index 0d9da469e9f..46d155c1102 100644
+--- a/apps/www/content/docs/components/menu.mdx
++++ b/apps/www/content/docs/components/menu.mdx
+@@ -210,3 +210,10 @@ If you have set `scrollBehavior="inside"` on the `Dialog`, you need to:
+ ### Item
+ 
+ <PropTable component="Menu" part="Item" />
++
++## Explorer
++
++Explore the `Menu` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="menu-explorer" />
+diff --git a/apps/www/content/docs/components/native-select.mdx b/apps/www/content/docs/components/native-select.mdx
+index f82e660e1c2..4f6674abc78 100644
+--- a/apps/www/content/docs/components/native-select.mdx
++++ b/apps/www/content/docs/components/native-select.mdx
+@@ -117,3 +117,10 @@ npx @chakra-ui/cli snippet add native-select
+ ### Root
+ 
+ <PropTable component="NativeSelect" part="Root" />
++
++## Explorer
++
++Explore the `Select (Native)` component parts interactively. Click on parts in
++the sidebar to highlight them in the preview.
++
++<Explorer name="native-select-basic" />
+diff --git a/apps/www/content/docs/components/number-input.mdx b/apps/www/content/docs/components/number-input.mdx
+index 800ba8a853d..74333c41782 100644
+--- a/apps/www/content/docs/components/number-input.mdx
++++ b/apps/www/content/docs/components/number-input.mdx
+@@ -184,3 +184,10 @@ Here's how to use the it
+ ### Root
+ 
+ <PropTable component="NumberInput" part="Root" />
++
++## Explorer
++
++Explore the `NumberInput` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="number-input-explorer" />
+diff --git a/apps/www/content/docs/components/pin-input.mdx b/apps/www/content/docs/components/pin-input.mdx
+index 117fc23d52a..1a71b10fee3 100644
+--- a/apps/www/content/docs/components/pin-input.mdx
++++ b/apps/www/content/docs/components/pin-input.mdx
+@@ -125,3 +125,10 @@ Here's how to setup the Pin input for a closed component composition.
+ ### Root
+ 
+ <PropTable component="PinInput" part="Root" />
++
++## Explorer
++
++Explore the `Pin Input` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="pin-input-explorer" />
+diff --git a/apps/www/content/docs/components/progress.mdx b/apps/www/content/docs/components/progress.mdx
+index 5433784c66d..478fef24143 100644
+--- a/apps/www/content/docs/components/progress.mdx
++++ b/apps/www/content/docs/components/progress.mdx
+@@ -88,3 +88,10 @@ Here's how to create a closed component using the `Progress` component.
+ ### Root
+ 
+ <PropTable component="Progress" part="Root" />
++
++## Explorer
++
++Explore the `Progress` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="progress-explorer" />
+diff --git a/apps/www/content/docs/components/qr-code.mdx b/apps/www/content/docs/components/qr-code.mdx
+index 4171de249ed..f45250bb30f 100644
+--- a/apps/www/content/docs/components/qr-code.mdx
++++ b/apps/www/content/docs/components/qr-code.mdx
+@@ -120,3 +120,10 @@ npx @chakra-ui/cli snippet add qr-code
+ ### DownloadTrigger
+ 
+ <PropTable component="QrCode" part="DownloadTrigger" />
++
++## Explorer
++
++Explore the `QR Code` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="qr-code-explorer" />
+diff --git a/apps/www/content/docs/components/radio-card.mdx b/apps/www/content/docs/components/radio-card.mdx
+index 920ae951cca..4b714e89f76 100644
+--- a/apps/www/content/docs/components/radio-card.mdx
++++ b/apps/www/content/docs/components/radio-card.mdx
+@@ -140,3 +140,10 @@ Here's how to use the it
+ ### Root
+ 
+ <PropTable component="RadioCard" part="Root" />
++
++## Explorer
++
++Explore the `Radio Card` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="radio-card-explorer" />
+diff --git a/apps/www/content/docs/components/scroll-area.mdx b/apps/www/content/docs/components/scroll-area.mdx
+index aa68f579e52..ee157c6351d 100644
+--- a/apps/www/content/docs/components/scroll-area.mdx
++++ b/apps/www/content/docs/components/scroll-area.mdx
+@@ -153,3 +153,10 @@ content. This example shows how to create a scrollable menu with many items.
+ ### Corner
+ 
+ <PropTable component="ScrollArea" part="Corner" />
++
++## Explorer
++
++Explore the `Scroll Area` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="scroll-area-basic" />
+diff --git a/apps/www/content/docs/components/slider.mdx b/apps/www/content/docs/components/slider.mdx
+index e5aae38ddee..013ab0830c3 100644
+--- a/apps/www/content/docs/components/slider.mdx
++++ b/apps/www/content/docs/components/slider.mdx
+@@ -227,3 +227,10 @@ npx @chakra-ui/cli snippet add slider
+ ## Props
+ 
+ <PropTable component="Slider" part="Root" />
++
++## Explorer
++
++Explore the `Slider` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="slider-explorer" />
+diff --git a/apps/www/content/docs/components/stat.mdx b/apps/www/content/docs/components/stat.mdx
+index 9f9fe3a0899..5e0359924fb 100644
+--- a/apps/www/content/docs/components/stat.mdx
++++ b/apps/www/content/docs/components/stat.mdx
+@@ -79,3 +79,10 @@ Here's how to setup the Stat for a closed component composition.
+ ### Root
+ 
+ <PropTable component="Stat" part="Root" />
++
++## Explorer
++
++Explore the `Stat` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="stat-explorer" />
+diff --git a/apps/www/content/docs/components/status.mdx b/apps/www/content/docs/components/status.mdx
+index a4d547a8ca9..a11dce4d970 100644
+--- a/apps/www/content/docs/components/status.mdx
++++ b/apps/www/content/docs/components/status.mdx
+@@ -58,3 +58,10 @@ npx @chakra-ui/cli snippet add status
+ ## Props
+ 
+ <PropTable component="Status" part="Root" />
++
++## Explorer
++
++Explore the `Status` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="status-basic" />
+diff --git a/apps/www/content/docs/components/steps.mdx b/apps/www/content/docs/components/steps.mdx
+index e63840a06d2..51cb6cd41c8 100644
+--- a/apps/www/content/docs/components/steps.mdx
++++ b/apps/www/content/docs/components/steps.mdx
+@@ -101,3 +101,10 @@ description.
+ ### Root
+ 
+ <PropTable component="Steps" part="Root" />
++
++## Explorer
++
++Explore the `Steps` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="steps-explorer" />
+diff --git a/apps/www/content/docs/components/switch.mdx b/apps/www/content/docs/components/switch.mdx
+index f246d6c90fe..57d29531b6b 100644
+--- a/apps/www/content/docs/components/switch.mdx
++++ b/apps/www/content/docs/components/switch.mdx
+@@ -146,3 +146,10 @@ Here's how to use the it
+ ### Root
+ 
+ <PropTable component="Switch" part="Root" />
++
++## Explorer
++
++Explore the `Switch` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="switch-basic" />
+diff --git a/apps/www/content/docs/components/tabs.mdx b/apps/www/content/docs/components/tabs.mdx
+index 1265e3b949d..2d3136ea96c 100644
+--- a/apps/www/content/docs/components/tabs.mdx
++++ b/apps/www/content/docs/components/tabs.mdx
+@@ -148,3 +148,10 @@ Use the `_open` and `_close` conditional props to animate the tabs.
+ ### Content
+ 
+ <PropTable component="Tabs" part="TabContent" />
++
++## Explorer
++
++Explore the `Tabs` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="tabs-basic" />
+diff --git a/apps/www/content/docs/components/tag.mdx b/apps/www/content/docs/components/tag.mdx
+index c9dcb736a13..00d3c63ab3d 100644
+--- a/apps/www/content/docs/components/tag.mdx
++++ b/apps/www/content/docs/components/tag.mdx
+@@ -103,3 +103,10 @@ npx @chakra-ui/cli snippet add tag
+ ### Root
+ 
+ <PropTable component="Tag" part="Root" />
++
++## Explorer
++
++Explore the `Tag` component parts interactively. Click on parts in the sidebar
++to highlight them in the preview.
++
++<Explorer name="tag-basic" />
+diff --git a/apps/www/content/docs/components/tooltip.mdx b/apps/www/content/docs/components/tooltip.mdx
+index efc5e2d8fe5..78a72b3d8bd 100644
+--- a/apps/www/content/docs/components/tooltip.mdx
++++ b/apps/www/content/docs/components/tooltip.mdx
+@@ -141,3 +141,10 @@ Here's an example of how to wrap `Tooltip` around a `Tabs` component.
+ ### Root
+ 
+ <PropTable component="Tooltip" part="Root" />
++
++## Explorer
++
++Explore the `Tooltip` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="tooltip-explorer" />
+diff --git a/apps/www/content/docs/components/tree-view.mdx b/apps/www/content/docs/components/tree-view.mdx
+index 1e9c0156bfa..e66540c4f08 100644
+--- a/apps/www/content/docs/components/tree-view.mdx
++++ b/apps/www/content/docs/components/tree-view.mdx
+@@ -248,3 +248,10 @@ data.
+ ### Node
+ 
+ <PropTable component="TreeView" part="Node" />
++
++## Explorer
++
++Explore the `TreeView` component parts interactively. Click on parts in the
++sidebar to highlight them in the preview.
++
++<Explorer name="tree-view-explorer" />
+diff --git a/apps/www/content/docs/styling/style-props/spacing.mdx b/apps/www/content/docs/styling/style-props/spacing.mdx
+index bf97a015ca0..d635da3526e 100644
+--- a/apps/www/content/docs/styling/style-props/spacing.mdx
++++ b/apps/www/content/docs/styling/style-props/spacing.mdx
+@@ -143,10 +143,10 @@ axis of an element
+ <Box my="8" /> // shorthand
+ ```
+ 
+-| Prop            | CSS Property     | Token Category |
+-| --------------- | ---------------- | -------------- |
+-| `mx`, `marginX` | `margin-inline`  | `spacing`      |
+-| `my`, `marginY` | `margin-blolck`  | `spacing`      |
++| Prop            | CSS Property    | Token Category |
++| --------------- | --------------- | -------------- |
++| `mx`, `marginX` | `margin-inline` | `spacing`      |
++| `my`, `marginY` | `margin-blolck` | `spacing`      |
+ 
+ ## Spacing Between
+ 
+diff --git a/packages/react/src/components/checkbox-card/checkbox-card.tsx b/packages/react/src/components/checkbox-card/checkbox-card.tsx
+index 6bd51aed406..161ad26dcf8 100644
+--- a/packages/react/src/components/checkbox-card/checkbox-card.tsx
++++ b/packages/react/src/components/checkbox-card/checkbox-card.tsx
+@@ -86,6 +86,8 @@ export const CheckboxCardDescription = forwardRef<
+   return (
+     <chakra.div
+       ref={ref}
++      data-scope="checkbox-card"
++      data-part="description"
+       {...props}
+       css={[styles.description, props.css]}
+       data-disabled={api.disabled ? "" : undefined}
+@@ -126,6 +128,7 @@ export const CheckboxCardIndicator = forwardRef<
+ >(function CheckboxCardIndicator(props, ref) {
+   const api = useCheckboxContext()
+   const styles = useCheckboxCardStyles()
++
+   return (
+     <Checkmark
+       ref={ref}
+@@ -133,6 +136,8 @@ export const CheckboxCardIndicator = forwardRef<
+       indeterminate={api.indeterminate}
+       disabled={api.disabled}
+       unstyled
++      data-scope="checkbox-card"
++      data-part="indicator"
+       {...props}
+       css={[styles.indicator, props.css]}
+     />
+diff --git a/packages/react/src/components/editable/editable.tsx b/packages/react/src/components/editable/editable.tsx
+index ad29228b317..f69f6abac09 100644
+--- a/packages/react/src/components/editable/editable.tsx
++++ b/packages/react/src/components/editable/editable.tsx
+@@ -76,6 +76,18 @@ export const EditablePreview = withContext<
+ 
+ ////////////////////////////////////////////////////////////////////////////////////
+ 
++export interface EditableLabelProps
++  extends HTMLChakraProps<"label", ArkEditable.LabelProps>,
++    UnstyledProp {}
++
++export const EditableLabel = withContext<HTMLLabelElement, EditableLabelProps>(
++  ArkEditable.Label,
++  "label",
++  { forwardAsChild: true },
++)
++
++////////////////////////////////////////////////////////////////////////////////////
++
+ export interface EditableInputProps
+   extends HTMLChakraProps<"input", ArkEditable.InputBaseProps>,
+     UnstyledProp {}
+diff --git a/packages/react/src/components/editable/namespace.ts b/packages/react/src/components/editable/namespace.ts
+index 028b9b652e8..fc7ab61ab93 100644
+--- a/packages/react/src/components/editable/namespace.ts
++++ b/packages/react/src/components/editable/namespace.ts
+@@ -6,6 +6,7 @@ export {
+   EditablePropsProvider as PropsProvider,
+   EditableTextarea as Textarea,
+   EditableControl as Control,
++  EditableLabel as Label,
+   EditableArea as Area,
+   EditableEditTrigger as EditTrigger,
+   EditableCancelTrigger as CancelTrigger,
+@@ -21,6 +22,7 @@ export type {
+   EditableTextareaProps as TextareaProps,
+   EditableControlProps as ControlProps,
+   EditableAreaProps as AreaProps,
++  EditableLabelProps as LabelProps,
+   EditableEditTriggerProps as EditTriggerProps,
+   EditableCancelTriggerProps as CancelTriggerProps,
+   EditableSubmitTriggerProps as SubmitTriggerProps,
+diff --git a/packages/react/src/components/file-upload/file-upload.tsx b/packages/react/src/components/file-upload/file-upload.tsx
+index 9f6083fa291..56cc88b4d88 100644
+--- a/packages/react/src/components/file-upload/file-upload.tsx
++++ b/packages/react/src/components/file-upload/file-upload.tsx
+@@ -304,6 +304,8 @@ export const FileUploadFileText = forwardRef<
+     <Span
+       ref={ref}
+       data-placeholder={fileText === fallback ? "" : undefined}
++      data-scope="file-upload"
++      data-part="file-text"
+       {...rest}
+       css={[styles.fileText, props.css]}
+     >

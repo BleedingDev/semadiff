@@ -1,0 +1,3070 @@
+diff --git a/.changeset/wild-crabs-laugh.md b/.changeset/wild-crabs-laugh.md
+new file mode 100644
+index 0000000000..6942803f84
+--- /dev/null
++++ b/.changeset/wild-crabs-laugh.md
+@@ -0,0 +1,35 @@
++---
++"@zag-js/splitter": minor
++---
++
++[Breaking] Redesign splitter machine to support more use cases and improve DX.
++
++The key breaking change is:
++
++Before:
++
++```ts
++const service = useMachine(splitter.machine, {
++  id: useId(),
++  defaultSize: [
++    { id: "a", size: 50 },
++    { id: "b", size: 50 },
++  ],
++})
++```
++
++After:
++
++```ts
++const service = useMachine(splitter.machine, {
++  id: useId(),
++  panels: [{ id: "a" }, { id: "b" }],
++  defaultSize: [50, 50],
++})
++```
++
++The also comes with new features such as:
++
++- Support for collapsible panels
++- Support for collapse and expand events
++- New `api` methods for resizing the panels programmatically
+diff --git a/examples/next-ts/pages/splitter-collapsible.tsx b/examples/next-ts/pages/splitter-collapsible.tsx
+new file mode 100644
+index 0000000000..c132fd43fc
+--- /dev/null
++++ b/examples/next-ts/pages/splitter-collapsible.tsx
+@@ -0,0 +1,48 @@
++import { normalizeProps, useMachine } from "@zag-js/react"
++import { splitterControls } from "@zag-js/shared"
++import * as splitter from "@zag-js/splitter"
++import { useId } from "react"
++import { StateVisualizer } from "../components/state-visualizer"
++import { Toolbar } from "../components/toolbar"
++import { useControls } from "../hooks/use-controls"
++
++export default function Page() {
++  const controls = useControls(splitterControls)
++
++  const service = useMachine(splitter.machine, {
++    id: useId(),
++    panels: [
++      { id: "a", collapsible: true, collapsedSize: 5, minSize: 10, maxSize: 20 },
++      { id: "b", minSize: 50 },
++    ],
++    defaultSize: [15, 85],
++    onCollapse: (details) => {
++      console.log("onCollapse", details)
++    },
++    onExpand: (details) => {
++      console.log("onExpand", details)
++    },
++  })
++
++  const api = splitter.connect(service, normalizeProps)
++
++  return (
++    <>
++      <main className="splitter">
++        <div {...api.getRootProps()}>
++          <div {...api.getPanelProps({ id: "a" })}>
++            <p>A</p>
++          </div>
++          <div {...api.getResizeTriggerProps({ id: "a:b" })} />
++          <div {...api.getPanelProps({ id: "b" })}>
++            <p>B</p>
++          </div>
++        </div>
++      </main>
++
++      <Toolbar controls={controls.ui}>
++        <StateVisualizer state={service} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/next-ts/pages/splitter-conditional.tsx b/examples/next-ts/pages/splitter-conditional.tsx
+new file mode 100644
+index 0000000000..4a9aa605cc
+--- /dev/null
++++ b/examples/next-ts/pages/splitter-conditional.tsx
+@@ -0,0 +1,83 @@
++import { normalizeProps, useMachine } from "@zag-js/react"
++import { splitterControls } from "@zag-js/shared"
++import * as splitter from "@zag-js/splitter"
++import { useId, useState, useRef } from "react"
++import { StateVisualizer } from "../components/state-visualizer"
++import { Toolbar } from "../components/toolbar"
++import { useControls } from "../hooks/use-controls"
++
++export default function Page() {
++  const controls = useControls(splitterControls)
++
++  const initialPanels = [
++    { id: "a", order: 0 },
++    { id: "b", order: 1 },
++    { id: "c", order: 2 },
++  ]
++  const initialLayout = splitter.layout(initialPanels)
++
++  const [panels, setPanels] = useState(initialPanels)
++
++  const [sizes, setSizes] = useState<number[]>([])
++  const layoutCache = useRef<Record<string, number[]>>({
++    [initialLayout]: [],
++  })
++
++  const service = useMachine(splitter.machine, {
++    id: useId(),
++    panels,
++    size: sizes,
++    onResize({ layout, size }) {
++      setSizes(size)
++      layoutCache.current[layout] = size
++    },
++  })
++
++  const api = splitter.connect(service, normalizeProps)
++
++  const hidePanel = (id: string) => {
++    const index = panels.findIndex((panel) => panel.id === id)
++    const newPanels = [...panels]
++    newPanels.splice(index, 1)
++    setPanels(newPanels)
++    layoutCache.current[api.getLayout()] = sizes
++    const newSizes = [...sizes]
++    newSizes.splice(index, 1)
++    setSizes(newSizes)
++  }
++
++  const showPanel = (id: string) => {
++    const panel = initialPanels.find((panel) => panel.id === id)
++    if (!panel) return
++    const nextPanels = [...panels, panel]
++    const nextLayout = splitter.layout(nextPanels)
++    setPanels(nextPanels)
++    setSizes(layoutCache.current[nextLayout])
++  }
++
++  return (
++    <>
++      <main className="splitter">
++        <pre>{JSON.stringify(sizes, null, 2)}</pre>
++        <button onClick={() => hidePanel("a")}>Hide Panel A</button>
++        <button onClick={() => showPanel("a")}>Show Panel A</button>
++        <div {...api.getRootProps()}>
++          {api.getItems().map((item) => {
++            if (item.type === "panel") {
++              return (
++                <div key={item.id} {...api.getPanelProps({ id: item.id })}>
++                  <p>{item.id}</p>
++                </div>
++              )
++            }
++            return <div key={item.id} {...api.getResizeTriggerProps({ id: item.id })} />
++          })}
++        </div>
++      </main>
++
++      <Toolbar controls={controls.ui}>
++        <StateVisualizer state={service} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/next-ts/pages/splitter-multiple.tsx b/examples/next-ts/pages/splitter-multiple.tsx
+new file mode 100644
+index 0000000000..239a7b1602
+--- /dev/null
++++ b/examples/next-ts/pages/splitter-multiple.tsx
+@@ -0,0 +1,72 @@
++import { normalizeProps, useMachine } from "@zag-js/react"
++import * as splitter from "@zag-js/splitter"
++import { createContext, useContext, useId } from "react"
++
++const PanelContext = createContext<splitter.Api>({} as any)
++
++const PanelGroup = (props: React.PropsWithChildren<Omit<splitter.Props, "id">>) => {
++  const id = useId()
++  const service = useMachine(splitter.machine, { ...props, id })
++  const api = splitter.connect(service, normalizeProps)
++  return (
++    <PanelContext.Provider value={api}>
++      <div {...api.getRootProps()}>{props.children}</div>
++    </PanelContext.Provider>
++  )
++}
++
++const Panel = (props: React.PropsWithChildren<splitter.PanelProps>) => {
++  const api = useContext(PanelContext)
++  return <div {...api.getPanelProps(props)}>{props.children}</div>
++}
++
++const ResizeTrigger = (props: splitter.ResizeTriggerProps) => {
++  const api = useContext(PanelContext)
++  return <div {...api.getResizeTriggerProps(props)} />
++}
++
++export default function Page() {
++  return (
++    <main>
++      <PanelGroup
++        orientation="horizontal"
++        defaultSize={[20, 60, 20]}
++        panels={[
++          { id: "a", order: 0, minSize: 20 },
++          { id: "b", order: 1, collapsible: true },
++          { id: "c", order: 2, minSize: 20 },
++        ]}
++      >
++        <Panel id="a">Left</Panel>
++        <ResizeTrigger id="a:b" />
++        <Panel id="b">
++          <PanelGroup
++            orientation="vertical"
++            panels={[
++              { id: "b1", order: 0 },
++              { id: "b2", order: 1, collapsible: true },
++            ]}
++          >
++            <Panel id="b1">top</Panel>
++            <ResizeTrigger id="b1:b2" />
++            <Panel id="b2">
++              <PanelGroup
++                orientation="horizontal"
++                panels={[
++                  { id: "b21", order: 0 },
++                  { id: "b22", order: 1, collapsible: true },
++                ]}
++              >
++                <Panel id="b21">left</Panel>
++                <ResizeTrigger id="b21:b22" />
++                <Panel id="b22">right</Panel>
++              </PanelGroup>
++            </Panel>
++          </PanelGroup>
++        </Panel>
++        <ResizeTrigger id="b:c" />
++        <Panel id="c">right</Panel>
++      </PanelGroup>
++    </main>
++  )
++}
+diff --git a/examples/next-ts/pages/splitter.tsx b/examples/next-ts/pages/splitter.tsx
+index 68eab521c8..01e705eaf9 100644
+--- a/examples/next-ts/pages/splitter.tsx
++++ b/examples/next-ts/pages/splitter.tsx
+@@ -11,11 +11,7 @@ export default function Page() {
+ 
+   const service = useMachine(splitter.machine, {
+     id: useId(),
+-    defaultSize: [
+-      { id: "a", size: 50 },
+-      { id: "b", size: 50 },
+-    ],
+-    ...controls.context,
++    panels: [{ id: "a" }, { id: "b" }, { id: "c" }],
+   })
+ 
+   const api = splitter.connect(service, normalizeProps)
+@@ -23,19 +19,24 @@ export default function Page() {
+   return (
+     <>
+       <main className="splitter">
++        <pre>{JSON.stringify(api.getSizes(), null, 2)}</pre>
+         <div {...api.getRootProps()}>
+           <div {...api.getPanelProps({ id: "a" })}>
+-            <p>A</p>
++            <p>Left</p>
+           </div>
+           <div {...api.getResizeTriggerProps({ id: "a:b" })} />
+           <div {...api.getPanelProps({ id: "b" })}>
+-            <p>B</p>
++            <p>Middle</p>
++          </div>
++          <div {...api.getResizeTriggerProps({ id: "b:c" })} />
++          <div {...api.getPanelProps({ id: "c" })}>
++            <p>Right</p>
+           </div>
+         </div>
+       </main>
+ 
+       <Toolbar controls={controls.ui}>
+-        <StateVisualizer state={service} omit={["previousPanels", "initialSize"]} />
++        <StateVisualizer state={service} />
+       </Toolbar>
+     </>
+   )
+diff --git a/examples/nuxt-ts/pages/splitter.vue b/examples/nuxt-ts/pages/splitter.vue
+index a77322ddc6..fe2efcaa70 100644
+--- a/examples/nuxt-ts/pages/splitter.vue
++++ b/examples/nuxt-ts/pages/splitter.vue
+@@ -7,10 +7,7 @@ const controls = useControls(splitterControls)
+ 
+ const service = useMachine(splitter.machine, {
+   id: useId(),
+-  defaultSize: [
+-    { id: "a", size: 50 },
+-    { id: "b", size: 50 },
+-  ],
++  panels: [{ id: "a" }, { id: "b" }],
+ })
+ 
+ const api = computed(() => splitter.connect(service, normalizeProps))
+diff --git a/examples/solid-ts/src/routes/splitter.tsx b/examples/solid-ts/src/routes/splitter.tsx
+index 1d67368b70..7334a6cc5f 100644
+--- a/examples/solid-ts/src/routes/splitter.tsx
++++ b/examples/solid-ts/src/routes/splitter.tsx
+@@ -13,10 +13,7 @@ export default function Page() {
+     splitter.machine,
+     controls.mergeProps<splitter.Props>({
+       id: createUniqueId(),
+-      defaultSize: [
+-        { id: "a", size: 50 },
+-        { id: "b", size: 50 },
+-      ],
++      panels: [{ id: "a" }, { id: "b" }],
+     }),
+   )
+ 
+diff --git a/examples/svelte-ts/src/routes/splitter.svelte b/examples/svelte-ts/src/routes/splitter.svelte
+index 6246d3ceb0..05bf6196ab 100644
+--- a/examples/svelte-ts/src/routes/splitter.svelte
++++ b/examples/svelte-ts/src/routes/splitter.svelte
+@@ -10,10 +10,7 @@
+ 
+   const service = useMachine(splitter.machine, {
+     id: "1",
+-    defaultSize: [
+-      { id: "a", size: 50 },
+-      { id: "b", size: 50 },
+-    ],
++    panels: [{ id: "a" }, { id: "b" }],
+   })
+ 
+   const api = $derived(splitter.connect(service, normalizeProps))
+diff --git a/packages/core/src/types.ts b/packages/core/src/types.ts
+index dccfad7d49..ccbb9e3ed0 100644
+--- a/packages/core/src/types.ts
++++ b/packages/core/src/types.ts
+@@ -15,6 +15,7 @@ interface ContextParams<T extends Dict> {
+   scope: Scope
+   getContext: () => BindableContext<T>
+   getComputed: () => ComputedFn<T>
++  getRefs: () => BindableRefs<T>
+   flush: (fn: VoidFunction) => void
+ }
+ 
+diff --git a/packages/docs/data/api.json b/packages/docs/data/api.json
+index 2572742f4c..96bb2b6f05 100644
+--- a/packages/docs/data/api.json
++++ b/packages/docs/data/api.json
+@@ -3578,33 +3578,49 @@
+   },
+   "splitter": {
+     "api": {
+-      "focused": {
+-        "type": "boolean",
+-        "description": "Whether the splitter is focused."
+-      },
+       "dragging": {
+         "type": "boolean",
+-        "description": "Whether the splitter is being dragged."
++        "description": "Whether the splitter is currently being resized."
++      },
++      "getSizes": {
++        "type": "() => number[]",
++        "description": "The current sizes of the panels."
++      },
++      "setSizes": {
++        "type": "(size: number[]) => void",
++        "description": "Set the sizes of the panels."
++      },
++      "getItems": {
++        "type": "() => SplitterItem[]",
++        "description": "Get the items of the splitter."
++      },
++      "getPanelSize": {
++        "type": "(id: string) => number",
++        "description": "Get the size of a panel."
+       },
+-      "bounds": {
+-        "type": "PanelBounds",
+-        "description": "The bounds of the currently dragged splitter handle."
++      "isPanelCollapsed": {
++        "type": "(id: string) => boolean",
++        "description": "Whether a panel is collapsed."
++      },
++      "isPanelExpanded": {
++        "type": "(id: string) => boolean",
++        "description": "Whether a panel is expanded."
+       },
+-      "setToMinSize": {
+-        "type": "(id: PanelId) => void",
+-        "description": "Function to set a panel to its minimum size."
++      "collapsePanel": {
++        "type": "(id: string) => void",
++        "description": "Collapse a panel."
+       },
+-      "setToMaxSize": {
+-        "type": "(id: PanelId) => void",
+-        "description": "Function to set a panel to its maximum size."
++      "expandPanel": {
++        "type": "(id: string, minSize?: number) => void",
++        "description": "Expand a panel."
+       },
+-      "setSize": {
+-        "type": "(id: PanelId, size: number) => void",
+-        "description": "Function to set the size of a panel."
++      "resizePanel": {
++        "type": "(id: string, unsafePanelSize: number) => void",
++        "description": "Resize a panel."
+       },
+-      "getResizeTriggerState": {
+-        "type": "(props: ResizeTriggerProps) => ResizeTriggerState",
+-        "description": "Returns the state details for a resize trigger."
++      "getLayout": {
++        "type": "() => string",
++        "description": "Get the layout of the splitter."
+       }
+     },
+     "context": {
+@@ -3614,25 +3630,49 @@
+         "defaultValue": "\"horizontal\""
+       },
+       "size": {
+-        "type": "PanelSizeData[]",
++        "type": "number[]",
+         "description": "The controlled size data of the panels"
+       },
+       "defaultSize": {
+-        "type": "PanelSizeData[]",
++        "type": "number[]",
+         "description": "The initial size of the panels when rendered.\nUse when you don't need to control the size of the panels."
+       },
+-      "onSizeChange": {
+-        "type": "(details: SizeChangeDetails) => void",
++      "panels": {
++        "type": "PanelData[]",
++        "description": "The size constraints of the panels."
++      },
++      "onResize": {
++        "type": "(details: ResizeDetails) => void",
+         "description": "Function called when the splitter is resized."
+       },
+-      "onSizeChangeEnd": {
+-        "type": "(details: SizeChangeDetails) => void",
++      "onResizeStart": {
++        "type": "() => void",
++        "description": "Function called when the splitter resize starts."
++      },
++      "onResizeEnd": {
++        "type": "(details: ResizeEndDetails) => void",
+         "description": "Function called when the splitter resize ends."
+       },
+       "ids": {
+         "type": "Partial<{ root: string; resizeTrigger(id: string): string; label(id: string): string; panel(id: string | number): string; }>",
+         "description": "The ids of the elements in the splitter. Useful for composition."
+       },
++      "keyboardResizeBy": {
++        "type": "number",
++        "description": "The number of pixels to resize the panel by when the keyboard is used."
++      },
++      "nonce": {
++        "type": "string",
++        "description": "The nonce for the injected splitter cursor stylesheet."
++      },
++      "onCollapse": {
++        "type": "(details: ExpandCollapseDetails) => void",
++        "description": "Function called when a panel is collapsed."
++      },
++      "onExpand": {
++        "type": "(details: ExpandCollapseDetails) => void",
++        "description": "Function called when a panel is expanded."
++      },
+       "dir": {
+         "type": "\"ltr\" | \"rtl\"",
+         "description": "The document's text/writing direction.",
+diff --git a/packages/docs/data/data-attr.json b/packages/docs/data/data-attr.json
+index 686c613a32..0a1ec4d3e2 100644
+--- a/packages/docs/data/data-attr.json
++++ b/packages/docs/data/data-attr.json
+@@ -1261,11 +1261,14 @@
+     "Panel": {
+       "data-scope": "splitter",
+       "data-part": "panel",
+-      "data-orientation": "The orientation of the panel"
++      "data-orientation": "The orientation of the panel",
++      "data-id": "",
++      "data-index": "The index of the item"
+     },
+     "ResizeTrigger": {
+       "data-scope": "splitter",
+       "data-part": "resize-trigger",
++      "data-id": "",
+       "data-orientation": "The orientation of the resizetrigger",
+       "data-focus": "Present when focused",
+       "data-disabled": "Present when disabled"
+diff --git a/packages/frameworks/preact/src/machine.ts b/packages/frameworks/preact/src/machine.ts
+index 3a4e9e342c..a92c10d670 100644
+--- a/packages/frameworks/preact/src/machine.ts
++++ b/packages/frameworks/preact/src/machine.ts
+@@ -43,6 +43,9 @@ export function useMachine<T extends MachineSchema>(
+     getComputed() {
+       return computed as any
+     },
++    getRefs() {
++      return refs as any
++    },
+   })
+ 
+   const contextRef = useLiveRef<any>(context)
+diff --git a/packages/frameworks/react/src/machine.ts b/packages/frameworks/react/src/machine.ts
+index 15d018e3d6..76193c6335 100644
+--- a/packages/frameworks/react/src/machine.ts
++++ b/packages/frameworks/react/src/machine.ts
+@@ -48,6 +48,9 @@ export function useMachine<T extends MachineSchema>(
+     getComputed() {
+       return computed as any
+     },
++    getRefs() {
++      return refs as any
++    },
+   })
+ 
+   const contextRef = useLiveRef<any>(context)
+diff --git a/packages/frameworks/solid/src/machine.ts b/packages/frameworks/solid/src/machine.ts
+index 0e93bd9165..daaee57c57 100644
+--- a/packages/frameworks/solid/src/machine.ts
++++ b/packages/frameworks/solid/src/machine.ts
+@@ -53,6 +53,9 @@ export function useMachine<T extends MachineSchema>(
+     getComputed() {
+       return computed as any
+     },
++    getRefs() {
++      return refs as any
++    },
+   })
+ 
+   const ctx: BindableContext<T> = {
+diff --git a/packages/frameworks/svelte/src/machine.svelte.ts b/packages/frameworks/svelte/src/machine.svelte.ts
+index 13f4871f1e..dda849244b 100644
+--- a/packages/frameworks/svelte/src/machine.svelte.ts
++++ b/packages/frameworks/svelte/src/machine.svelte.ts
+@@ -47,6 +47,9 @@ export function useMachine<T extends MachineSchema>(
+     getComputed() {
+       return computed as any
+     },
++    getRefs() {
++      return refs as any
++    },
+   })
+ 
+   const ctx: BindableContext<T> = {
+diff --git a/packages/frameworks/vue/src/machine.ts b/packages/frameworks/vue/src/machine.ts
+index edf76a5381..7cfb97ee58 100644
+--- a/packages/frameworks/vue/src/machine.ts
++++ b/packages/frameworks/vue/src/machine.ts
+@@ -43,21 +43,23 @@ export function useMachine<T extends MachineSchema>(
+ 
+   const prop = useProp<any>(props)
+ 
+-  const context: any =
+-    machine.context?.({
+-      prop,
+-      bindable,
+-      get scope() {
+-        return scope.value
+-      },
+-      flush,
+-      getContext() {
+-        return ctx as any
+-      },
+-      getComputed() {
+-        return computed as any
+-      },
+-    }) ?? {}
++  const context: any = machine.context?.({
++    prop,
++    bindable,
++    get scope() {
++      return scope.value
++    },
++    flush,
++    getContext() {
++      return ctx as any
++    },
++    getComputed() {
++      return computed as any
++    },
++    getRefs() {
++      return refs as any
++    },
++  })
+ 
+   const ctx: BindableContext<T> = {
+     get(key) {
+diff --git a/packages/machines/splitter/src/index.ts b/packages/machines/splitter/src/index.ts
+index 2c41709459..a997984c5b 100644
+--- a/packages/machines/splitter/src/index.ts
++++ b/packages/machines/splitter/src/index.ts
+@@ -4,11 +4,16 @@ export { machine } from "./splitter.machine"
+ export * from "./splitter.props"
+ export type {
+   SplitterApi as Api,
++  ElementIds,
++  ExpandCollapseDetails,
+   SplitterMachine as Machine,
++  PanelData,
+   PanelProps,
+-  PanelSizeData,
+   SplitterProps as Props,
++  ResizeDetails,
++  ResizeEndDetails,
+   ResizeTriggerProps,
+   SplitterService as Service,
+-  SizeChangeDetails,
++  SplitterItem as Item,
+ } from "./splitter.types"
++export { getPanelLayout as layout } from "./utils/panel"
+diff --git a/packages/machines/splitter/src/splitter.connect.ts b/packages/machines/splitter/src/splitter.connect.ts
+index 5ee4d60d03..966e4d0964 100644
+--- a/packages/machines/splitter/src/splitter.connect.ts
++++ b/packages/machines/splitter/src/splitter.connect.ts
+@@ -1,59 +1,93 @@
+-import { dataAttr, getEventKey, getEventStep } from "@zag-js/dom-query"
++import { dataAttr, getEventKey, getEventPoint } from "@zag-js/dom-query"
+ import type { EventKeyMap, NormalizeProps, PropTypes } from "@zag-js/types"
+ import { ensure } from "@zag-js/utils"
+ import { parts } from "./splitter.anatomy"
+ import * as dom from "./splitter.dom"
+-import type { ResizeTriggerProps, ResizeTriggerState, SplitterApi, SplitterService } from "./splitter.types"
+-import { getHandleBounds } from "./splitter.utils"
++import type { SplitterApi, SplitterService } from "./splitter.types"
++import { getAriaValue } from "./utils/aria"
++import { fuzzyCompareNumbers, fuzzyNumbersEqual } from "./utils/fuzzy"
++import { findPanelIndex, getPanelById, getPanelFlexBoxStyle, getPanelLayout, panelDataHelper } from "./utils/panel"
+ 
+ export function connect<T extends PropTypes>(service: SplitterService, normalize: NormalizeProps<T>): SplitterApi<T> {
+   const { state, send, prop, computed, context, scope } = service
+ 
+-  const horizontal = computed("isHorizontal")
+-  const focused = state.hasTag("focus")
++  const horizontal = computed("horizontal")
+   const dragging = state.matches("dragging")
+-  const panels = computed("panels")
+-  const activeResizeId = context.get("activeResizeId")
+-
+-  function getResizeTriggerState(props: ResizeTriggerProps): ResizeTriggerState {
+-    const { id, disabled } = props
+-    const ids = id.split(":")
+-    const panelIds = ids.map((id) => dom.getPanelId(scope, id))
+-    const panels = getHandleBounds(computed("panels"), id)
+-
+-    return {
+-      disabled: !!disabled,
+-      focused: activeResizeId === id && focused,
+-      panelIds,
+-      min: panels?.min,
+-      max: panels?.max,
+-      value: 0,
+-    }
++
++  const getPanelStyle = (id: string) => {
++    const panels = prop("panels")
++    const panelIndex = panels.findIndex((panel) => panel.id === id)
++    const defaultSize = context.initial("size")[panelIndex]
++    const dragState = context.get("dragState")
++    return getPanelFlexBoxStyle({
++      defaultSize,
++      dragState,
++      sizes: context.get("size"),
++      panels: panels,
++      panelIndex,
++    })
+   }
+ 
+   return {
+-    focused: focused,
+-    dragging: dragging,
+-    getResizeTriggerState,
+-    bounds: getHandleBounds(computed("panels"), activeResizeId),
+-    setToMinSize(id) {
+-      const panel = panels.find((panel) => panel.id === id)
+-      send({ type: "SIZE.SET", id, size: panel?.minSize, src: "setToMinSize" })
++    dragging,
++    getItems() {
++      return prop("panels").flatMap((panel, index, arr) => {
++        const nextPanel = arr[index + 1]
++        if (panel && nextPanel) {
++          return [
++            { type: "panel", id: panel.id },
++            { type: "handle", id: `${panel.id}:${nextPanel.id}` },
++          ]
++        }
++        return [{ type: "panel", id: panel.id }]
++      })
++    },
++    getSizes() {
++      return context.get("size")
+     },
+-    setToMaxSize(id) {
+-      const panel = panels.find((panel) => panel.id === id)
+-      send({ type: "SIZE.SET", id, size: panel?.maxSize, src: "setToMaxSize" })
++    setSizes(size) {
++      send({ type: "SIZE.SET", size })
+     },
+-    setSize(id, size) {
+-      send({ type: "SIZE.SET", id, size })
++    collapsePanel(id) {
++      send({ type: "PANEL.COLLAPSE", id })
+     },
+-    setSizes(sizes) {
+-      send({ type: "SIZES.SET", sizes })
++    expandPanel(id, minSize) {
++      send({ type: "PANEL.EXPAND", id, minSize })
+     },
+-    getSize(id) {
+-      const panel = panels.find((panel) => panel.id === id)
+-      ensure(panel, `Panel with id ${id} not found`)
+-      return panel.size
++    resizePanel(id, unsafePanelSize) {
++      send({ type: "PANEL.RESIZE", id, size: unsafePanelSize })
++    },
++    getPanelSize(id) {
++      const panels = prop("panels")
++      const size = context.get("size")
++      const panelData = getPanelById(panels, id)
++
++      const { panelSize } = panelDataHelper(panels, panelData, size)
++      ensure(panelSize, `Panel size not found for panel "${panelData.id}"`)
++
++      return panelSize
++    },
++    isPanelCollapsed(id) {
++      const panels = prop("panels")
++      const size = context.get("size")
++      const panelData = getPanelById(panels, id)
++
++      const { collapsedSize = 0, collapsible, panelSize } = panelDataHelper(panels, panelData, size)
++      ensure(panelSize, `Panel size not found for panel "${panelData.id}"`)
++      return collapsible === true && fuzzyNumbersEqual(panelSize, collapsedSize)
++    },
++    isPanelExpanded(id) {
++      const panels = prop("panels")
++      const size = context.get("size")
++      const panelData = getPanelById(panels, id)
++
++      const { collapsedSize = 0, collapsible, panelSize } = panelDataHelper(panels, panelData, size)
++      ensure(panelSize, `Panel size not found for panel "${panelData.id}"`)
++
++      return !collapsible || fuzzyCompareNumbers(panelSize, collapsedSize) > 0
++    },
++    getLayout() {
++      return getPanelLayout(prop("panels"))
+     },
+ 
+     getRootProps() {
+@@ -78,47 +112,55 @@ export function connect<T extends PropTypes>(service: SplitterService, normalize
+         ...parts.panel.attrs,
+         "data-orientation": prop("orientation"),
+         dir: prop("dir"),
++        "data-id": id,
++        "data-index": findPanelIndex(prop("panels"), id),
+         id: dom.getPanelId(scope, id),
+         "data-ownedby": dom.getRootId(scope),
+-        style: dom.getPanelStyle(panels, id),
++        style: getPanelStyle(id),
+       })
+     },
+ 
+     getResizeTriggerProps(props) {
+-      const { id, disabled, step = 1 } = props
+-      const triggerState = getResizeTriggerState(props)
++      const { id, disabled } = props
++      const aria = getAriaValue(context.get("size"), prop("panels"), id)
++      const dragging = context.get("dragState")?.resizeTriggerId === id
++      const focused = dragging || context.get("keyboardState")?.resizeTriggerId === id
+ 
+       return normalize.element({
+         ...parts.resizeTrigger.attrs,
+         dir: prop("dir"),
+         id: dom.getResizeTriggerId(scope, id),
+         role: "separator",
++        "data-id": id,
+         "data-ownedby": dom.getRootId(scope),
+         tabIndex: disabled ? undefined : 0,
+-        "aria-valuenow": triggerState.value,
+-        "aria-valuemin": triggerState.min,
+-        "aria-valuemax": triggerState.max,
++        "aria-valuenow": aria.valueNow,
++        "aria-valuemin": aria.valueMin,
++        "aria-valuemax": aria.valueMax,
+         "data-orientation": prop("orientation"),
+         "aria-orientation": prop("orientation"),
+-        "aria-controls": triggerState.panelIds.join(" "),
+-        "data-focus": dataAttr(triggerState.focused),
++        "aria-controls": `${dom.getPanelId(scope, aria.beforeId)} ${dom.getPanelId(scope, aria.afterId)}`,
++        "data-focus": dataAttr(focused),
+         "data-disabled": dataAttr(disabled),
+         style: {
+           touchAction: "none",
+           userSelect: "none",
+           WebkitUserSelect: "none",
+           flex: "0 0 auto",
+-          pointerEvents: dragging && !triggerState.focused ? "none" : undefined,
++          pointerEvents: dragging && !focused ? "none" : undefined,
+           cursor: horizontal ? "col-resize" : "row-resize",
+           [horizontal ? "minHeight" : "minWidth"]: "0",
+         },
+         onPointerDown(event) {
++          if (event.button !== 0) return
+           if (disabled) {
+             event.preventDefault()
+             return
+           }
+-          send({ type: "POINTER_DOWN", id })
++          const point = getEventPoint(event)
++          send({ type: "POINTER_DOWN", id, point })
+           event.currentTarget.setPointerCapture(event.pointerId)
++
+           event.preventDefault()
+           event.stopPropagation()
+         },
+@@ -137,42 +179,52 @@ export function connect<T extends PropTypes>(service: SplitterService, normalize
+           send({ type: "POINTER_LEAVE", id })
+         },
+         onBlur() {
++          if (disabled) return
+           send({ type: "BLUR" })
+         },
+         onFocus() {
+-          send({ type: "FOCUS", id })
+-        },
+-        onDoubleClick() {
+           if (disabled) return
+-          send({ type: "DOUBLE_CLICK", id })
++          send({ type: "FOCUS", id })
+         },
+         onKeyDown(event) {
+           if (event.defaultPrevented) return
+           if (disabled) return
+ 
+-          const moveStep = getEventStep(event) * step
++          const keyboardResizeBy = prop("keyboardResizeBy")
++
++          let delta = 0
++          if (event.shiftKey) {
++            delta = 10
++          } else if (keyboardResizeBy != null) {
++            delta = keyboardResizeBy
++          } else {
++            delta = 1
++          }
+ 
+           const keyMap: EventKeyMap = {
+             Enter() {
+-              send({ type: "ENTER" })
++              send({ type: "ENTER", id })
+             },
+             ArrowUp() {
+-              send({ type: "ARROW_UP", step: moveStep })
++              send({ type: "KEYBOARD_MOVE", id, delta: horizontal ? 0 : delta })
+             },
+             ArrowDown() {
+-              send({ type: "ARROW_DOWN", step: moveStep })
++              send({ type: "KEYBOARD_MOVE", id, delta: horizontal ? 0 : delta })
+             },
+             ArrowLeft() {
+-              send({ type: "ARROW_LEFT", step: moveStep })
++              send({ type: "KEYBOARD_MOVE", id, delta: horizontal ? -delta : 0 })
+             },
+             ArrowRight() {
+-              send({ type: "ARROW_RIGHT", step: moveStep })
++              send({ type: "KEYBOARD_MOVE", id, delta: horizontal ? delta : 0 })
+             },
+             Home() {
+-              send({ type: "HOME" })
++              send({ type: "KEYBOARD_MOVE", id, delta: -100 })
+             },
+             End() {
+-              send({ type: "END" })
++              send({ type: "KEYBOARD_MOVE", id, delta: 100 })
++            },
++            F6() {
++              send({ type: "FOCUS.CYCLE", id, shiftKey: event.shiftKey })
+             },
+           }
+ 
+@@ -180,6 +232,7 @@ export function connect<T extends PropTypes>(service: SplitterService, normalize
+             dir: prop("dir"),
+             orientation: prop("orientation"),
+           })
++
+           const exec = keyMap[key]
+ 
+           if (exec) {
+diff --git a/packages/machines/splitter/src/splitter.dom.ts b/packages/machines/splitter/src/splitter.dom.ts
+index b7721243e8..12525dba7b 100644
+--- a/packages/machines/splitter/src/splitter.dom.ts
++++ b/packages/machines/splitter/src/splitter.dom.ts
+@@ -1,43 +1,39 @@
+ import type { Scope } from "@zag-js/core"
+ import { queryAll } from "@zag-js/dom-query"
+-import type { JSX, Style } from "@zag-js/types"
+-import type { PanelId, PanelSizeData, ResizeState } from "./splitter.types"
++import type { Style } from "@zag-js/types"
++import type { CursorState } from "./splitter.types"
+ 
+ export const getRootId = (ctx: Scope) => ctx.ids?.root ?? `splitter:${ctx.id}`
+ export const getResizeTriggerId = (ctx: Scope, id: string) =>
+   ctx.ids?.resizeTrigger?.(id) ?? `splitter:${ctx.id}:splitter:${id}`
+ export const getLabelId = (ctx: Scope) => ctx.ids?.label ?? `splitter:${ctx.id}:label`
+ export const getPanelId = (ctx: Scope, id: string | number) => ctx.ids?.panel?.(id) ?? `splitter:${ctx.id}:panel:${id}`
++export const getPanelEls = (ctx: Scope) => queryAll(getRootEl(ctx), `[data-part=panel][data-ownedby=${getRootId(ctx)}]`)
+ export const getGlobalCursorId = (ctx: Scope) => `splitter:${ctx.id}:global-cursor`
+ 
+ export const getRootEl = (ctx: Scope) => ctx.getById(getRootId(ctx))
+ export const getResizeTriggerEl = (ctx: Scope, id: string) => ctx.getById(getResizeTriggerId(ctx, id))
+ export const getPanelEl = (ctx: Scope, id: string | number) => ctx.getById(getPanelId(ctx, id))
+ 
+-export const getCursor = (state: ResizeState, x: boolean) => {
++export const getCursor = (state: CursorState, x: boolean) => {
+   let cursor: Style["cursor"] = x ? "col-resize" : "row-resize"
+   if (state.isAtMin) cursor = x ? "e-resize" : "s-resize"
+   if (state.isAtMax) cursor = x ? "w-resize" : "n-resize"
+   return cursor
+ }
+ 
+-export const getPanelStyle = (panels: PanelSizeData[], id: PanelId): JSX.CSSProperties => {
+-  const flexGrow = panels.find((panel) => panel.id === id)?.size ?? "0"
+-  return { flexBasis: 0, flexGrow, flexShrink: 1, overflow: "hidden" }
+-}
+-
+ export const getResizeTriggerEls = (ctx: Scope) => {
+-  const ownerId = CSS.escape(getRootId(ctx))
+-  return queryAll(getRootEl(ctx), `[role=separator][data-ownedby='${ownerId}']`)
++  return queryAll(getRootEl(ctx), `[role=separator][data-ownedby='${CSS.escape(getRootId(ctx))}']`)
+ }
+ 
+-export const setupGlobalCursor = (ctx: Scope, state: ResizeState, x: boolean) => {
++export const setupGlobalCursor = (ctx: Scope, state: CursorState, x: boolean, nonce?: string) => {
+   const styleEl = ctx.getById(getGlobalCursorId(ctx))
+   const textContent = `* { cursor: ${getCursor(state, x)} !important; }`
+   if (styleEl) {
+     styleEl.textContent = textContent
+   } else {
+     const style = ctx.getDoc().createElement("style")
++    if (nonce) style.nonce = nonce
+     style.id = getGlobalCursorId(ctx)
+     style.textContent = textContent
+     ctx.getDoc().head.appendChild(style)
+diff --git a/packages/machines/splitter/src/splitter.machine.ts b/packages/machines/splitter/src/splitter.machine.ts
+index f0cd79814b..26d7429393 100644
+--- a/packages/machines/splitter/src/splitter.machine.ts
++++ b/packages/machines/splitter/src/splitter.machine.ts
+@@ -1,16 +1,31 @@
+-import { createMachine } from "@zag-js/core"
+-import { getRelativePoint, raf, trackPointerMove } from "@zag-js/dom-query"
+-import { setRafTimeout } from "@zag-js/utils"
++import { createMachine, type Params } from "@zag-js/core"
++import { trackPointerMove } from "@zag-js/dom-query"
++import { ensure, ensureProps, isEqual, next, prev, setRafTimeout } from "@zag-js/utils"
+ import * as dom from "./splitter.dom"
+-import type { PanelSizeData, ResizeState, SplitterSchema } from "./splitter.types"
+-import { clamp, getHandleBounds, getHandlePanels, getNormalizedPanels, getPanelBounds } from "./splitter.utils"
++import type { CursorState, ResizeTriggerId, DragState, KeyboardState, SplitterSchema } from "./splitter.types"
++import { getAriaValue } from "./utils/aria"
++import { fuzzyNumbersEqual, fuzzySizeEqual } from "./utils/fuzzy"
++import {
++  findPanelDataIndex,
++  getPanelById,
++  getPanelLayout,
++  getUnsafeDefaultSize,
++  panelDataHelper,
++  serializePanels,
++  sortPanels,
++} from "./utils/panel"
++import { resizeByDelta } from "./utils/resize-by-delta"
++import { validateSizes } from "./utils/validate-sizes"
+ 
+ export const machine = createMachine<SplitterSchema>({
+   props({ props }) {
++    ensureProps(props, ["panels"])
+     return {
+       orientation: "horizontal",
+       defaultSize: [],
++      dir: "ltr",
+       ...props,
++      panels: sortPanels(props.panels),
+     }
+   },
+ 
+@@ -18,74 +33,92 @@ export const machine = createMachine<SplitterSchema>({
+     return "idle"
+   },
+ 
+-  context({ prop, bindable, getContext }) {
++  context({ prop, bindable, getContext, getRefs }) {
+     return {
+-      activeResizeId: bindable<string | null>(() => ({
+-        defaultValue: null,
+-      })),
+-      size: bindable<PanelSizeData[]>(() => ({
+-        defaultValue: prop("defaultSize"),
++      size: bindable(() => ({
+         value: prop("size"),
+-        hash(a) {
+-          return a.map((panel) => `${panel.id}:${panel.size}`).join(",")
++        defaultValue: prop("defaultSize"),
++        isEqual(a, b) {
++          return b != null && fuzzySizeEqual(a, b)
+         },
+         onChange(value) {
+-          const context = getContext()
+-          prop("onSizeChange")?.({
++          const ctx = getContext()
++          const refs = getRefs()
++
++          const sizesBeforeCollapse = refs.get("panelSizeBeforeCollapse")
++          const expandToSizes = Object.fromEntries(sizesBeforeCollapse.entries())
++          const resizeTriggerId = ctx.get("dragState")?.resizeTriggerId ?? null
++          const layout = getPanelLayout(prop("panels"))
++
++          prop("onResize")?.({
+             size: value,
+-            activeHandleId: context.get("activeResizeId"),
++            layout,
++            resizeTriggerId,
++            expandToSizes,
+           })
+         },
+       })),
+-      activeResizeState: bindable<ResizeState>(() => ({
+-        defaultValue: { isAtMin: false, isAtMax: false },
++      dragState: bindable<DragState | null>(() => ({
++        defaultValue: null,
++      })),
++      keyboardState: bindable<KeyboardState | null>(() => ({
++        defaultValue: null,
+       })),
+     }
+   },
+ 
+-  refs({ context }) {
+-    return {
+-      previousPanels: getNormalizedPanels(context.get("size")),
+-    }
++  watch({ track, action, prop }) {
++    track([() => serializePanels(prop("panels"))], () => {
++      action(["syncSize"])
++    })
+   },
+ 
+-  watch({ track, action, context }) {
+-    track([() => context.hash("size")], () => {
+-      action(["setActiveResizeState"])
+-    })
++  refs() {
++    return {
++      panelSizeBeforeCollapse: new Map(),
++      prevDelta: 0,
++      panelIdToLastNotifiedSizeMap: new Map(),
++    }
+   },
+ 
+   computed: {
+-    isHorizontal: ({ prop }) => prop("orientation") === "horizontal",
+-    panels: ({ context }) => getNormalizedPanels(context.get("size")),
++    horizontal({ prop }) {
++      return prop("orientation") === "horizontal"
++    },
+   },
+ 
+   on: {
+     "SIZE.SET": {
+-      actions: ["setPanelSize"],
++      actions: ["setSize"],
++    },
++    "PANEL.COLLAPSE": {
++      actions: ["collapsePanel"],
+     },
+-    "SIZES.SET": {
+-      actions: ["setPanelSizes"],
++    "PANEL.EXPAND": {
++      actions: ["expandPanel"],
++    },
++    "PANEL.RESIZE": {
++      actions: ["resizePanel"],
+     },
+   },
++
++  entry: ["syncSize"],
++
+   states: {
+     idle: {
+-      entry: ["clearActiveHandleId"],
++      entry: ["clearDraggingState", "clearKeyboardState"],
+       on: {
+         POINTER_OVER: {
+           target: "hover:temp",
+-          actions: ["setActiveHandleId"],
++          actions: ["setKeyboardState"],
+         },
+         FOCUS: {
+           target: "focused",
+-          actions: ["setActiveHandleId"],
++          actions: ["setKeyboardState"],
+         },
+         POINTER_DOWN: {
+           target: "dragging",
+-          actions: ["setActiveHandleId"],
+-        },
+-        DOUBLE_CLICK: {
+-          actions: ["resetStartPanel", "setPreviousPanels"],
++          actions: ["setDraggingState"],
+         },
+       },
+     },
+@@ -98,7 +131,7 @@ export const machine = createMachine<SplitterSchema>({
+         },
+         POINTER_DOWN: {
+           target: "dragging",
+-          actions: ["setActiveHandleId"],
++          actions: ["setDraggingState"],
+         },
+         POINTER_LEAVE: {
+           target: "idle",
+@@ -111,6 +144,7 @@ export const machine = createMachine<SplitterSchema>({
+       on: {
+         POINTER_DOWN: {
+           target: "dragging",
++          actions: ["setDraggingState"],
+         },
+         POINTER_LEAVE: {
+           target: "idle",
+@@ -124,53 +158,33 @@ export const machine = createMachine<SplitterSchema>({
+         BLUR: {
+           target: "idle",
+         },
++        ENTER: {
++          actions: ["collapseOrExpandPanel"],
++        },
+         POINTER_DOWN: {
+           target: "dragging",
+-          actions: ["setActiveHandleId"],
++          actions: ["setDraggingState"],
+         },
+-        ARROW_LEFT: {
+-          guard: "isHorizontal",
+-          actions: ["shrinkStartPanel", "setPreviousPanels"],
++        KEYBOARD_MOVE: {
++          actions: ["setKeyboardValue"],
+         },
+-        ARROW_RIGHT: {
+-          guard: "isHorizontal",
+-          actions: ["expandStartPanel", "setPreviousPanels"],
+-        },
+-        ARROW_UP: {
+-          guard: "isVertical",
+-          actions: ["shrinkStartPanel", "setPreviousPanels"],
+-        },
+-        ARROW_DOWN: {
+-          guard: "isVertical",
+-          actions: ["expandStartPanel", "setPreviousPanels"],
+-        },
+-        ENTER: [
+-          {
+-            guard: "isStartPanelAtMax",
+-            actions: ["setStartPanelToMin", "setPreviousPanels"],
+-          },
+-          { actions: ["setStartPanelToMax", "setPreviousPanels"] },
+-        ],
+-        HOME: {
+-          actions: ["setStartPanelToMin", "setPreviousPanels"],
+-        },
+-        END: {
+-          actions: ["setStartPanelToMax", "setPreviousPanels"],
++        "FOCUS.CYCLE": {
++          actions: ["focusNextResizeTrigger"],
+         },
+       },
+     },
+ 
+     dragging: {
+       tags: ["focus"],
+-      entry: ["focusResizeHandle"],
+       effects: ["trackPointerMove"],
++      entry: ["invokeOnResizeStart"],
+       on: {
+         POINTER_MOVE: {
+-          actions: ["setPointerValue", "setGlobalCursor", "invokeOnResize"],
++          actions: ["setPointerValue", "setGlobalCursor"],
+         },
+         POINTER_UP: {
+-          target: "focused",
+-          actions: ["setPreviousPanels", "clearGlobalCursor", "blurResizeHandle", "invokeOnResizeEnd"],
++          target: "idle",
++          actions: ["invokeOnResizeEnd", "clearGlobalCursor"],
+         },
+       },
+     },
+@@ -196,169 +210,386 @@ export const machine = createMachine<SplitterSchema>({
+       },
+     },
+ 
+-    guards: {
+-      isStartPanelAtMin: ({ context }) => context.get("activeResizeState").isAtMin,
+-      isStartPanelAtMax: ({ context }) => context.get("activeResizeState").isAtMax,
+-      isHorizontal: ({ prop }) => prop("orientation") === "horizontal",
+-      isVertical: ({ prop }) => prop("orientation") !== "horizontal",
+-    },
+-
+     actions: {
+-      setGlobalCursor({ context, scope, computed }) {
+-        const activeState = context.get("activeResizeState")
+-        const isHorizontal = computed("isHorizontal")
+-        dom.setupGlobalCursor(scope, activeState, isHorizontal)
+-      },
+-      clearGlobalCursor({ scope }) {
+-        dom.removeGlobalCursor(scope)
+-      },
+-      invokeOnResize({ context, prop }) {
+-        prop("onSizeChange")?.({
+-          size: Array.from(context.get("size")),
+-          activeHandleId: context.get("activeResizeId"),
++      setSize(params) {
++        const { context, event, prop } = params
++
++        const unsafeSize = event.size
++        const prevSize = context.get("size")
++        const panels = prop("panels")
++
++        const safeSize = validateSizes({
++          size: unsafeSize,
++          panels,
+         })
++
++        if (!isEqual(prevSize, safeSize)) {
++          setSize(params, safeSize)
++        }
+       },
+-      invokeOnResizeEnd({ context, prop }) {
+-        prop("onSizeChangeEnd")?.({
+-          size: Array.from(context.get("size")),
+-          activeHandleId: context.get("activeResizeId"),
++
++      syncSize({ context, prop }) {
++        const panels = prop("panels")
++        let prevSize = context.get("size")
++
++        let unsafeSize: number[] | null = null
++
++        if (prevSize.length === 0) {
++          unsafeSize = getUnsafeDefaultSize({
++            panels,
++            size: context.initial("size"),
++          })
++        }
++
++        const nextSize = validateSizes({
++          size: unsafeSize ?? prevSize,
++          panels,
+         })
++
++        if (!isEqual(prevSize, nextSize)) {
++          context.set("size", nextSize)
++        }
+       },
+-      setActiveHandleId({ context, event }) {
+-        context.set("activeResizeId", event.id)
++
++      setDraggingState({ context, event, prop, scope }) {
++        const orientation = prop("orientation")
++        const size = context.get("size")
++        const resizeTriggerId = event.id
++
++        const panelGroupEl = dom.getRootEl(scope)
++        if (!panelGroupEl) return
++
++        const handleElement = dom.getResizeTriggerEl(scope, resizeTriggerId)
++        ensure(handleElement, `Drag handle element not found for id "${resizeTriggerId}"`)
++
++        const initialCursorPosition = orientation === "horizontal" ? event.point.x : event.point.y
++
++        context.set("dragState", {
++          resizeTriggerId: event.id,
++          resizeTriggerRect: handleElement.getBoundingClientRect(),
++          initialCursorPosition,
++          initialSize: size,
++        })
+       },
+-      clearActiveHandleId({ context }) {
+-        context.set("activeResizeId", null)
++
++      clearDraggingState({ context }) {
++        context.set("dragState", null)
+       },
+-      setPanelSize({ context, event }) {
+-        const { id, size } = event
+-        context.set("size", (prev) =>
+-          prev.map((panel) => {
+-            const panelSize = clamp(size, panel.minSize ?? 0, panel.maxSize ?? 100)
+-            return panel.id === id ? { ...panel, size: panelSize } : panel
+-          }),
+-        )
++
++      setKeyboardState({ context, event }) {
++        context.set("keyboardState", {
++          resizeTriggerId: event.id,
++        })
+       },
+-      setPanelSizes({ context, event }) {
+-        context.set("size", event.sizes)
++
++      clearKeyboardState({ context }) {
++        context.set("keyboardState", null)
+       },
+-      setStartPanelToMin({ context, computed }) {
+-        const bounds = getPanelBounds(computed("panels"), context.get("activeResizeId"))
+-        if (!bounds) return
+-        const { before, after } = bounds
+-        context.set("size", (prev) => {
+-          const next = prev.slice()
+-          next[before.index].size = before.min
+-          next[after.index].size = after.min
+-          return next
+-        })
++
++      collapsePanel(params) {
++        const { context, prop, event, refs } = params
++
++        const prevSize = context.get("size")
++        const panels = prop("panels")
++
++        const panel = panels.find((panel) => panel.id === event.id)
++        ensure(panel, `Panel data not found for id "${event.id}"`)
++
++        if (panel.collapsible) {
++          const { collapsedSize = 0, panelSize, pivotIndices } = panelDataHelper(panels, panel, prevSize)
++
++          ensure(panelSize, `Panel size not found for panel "${panel.id}"`)
++
++          if (!fuzzyNumbersEqual(panelSize, collapsedSize)) {
++            refs.get("panelSizeBeforeCollapse").set(panel.id, panelSize)
++
++            const isLastPanel = findPanelDataIndex(panels, panel) === panels.length - 1
++            const delta = isLastPanel ? panelSize - collapsedSize : collapsedSize - panelSize
++
++            const nextSize = resizeByDelta({
++              delta,
++              initialSize: prevSize,
++              panels,
++              pivotIndices,
++              prevSize,
++              trigger: "imperative-api",
++            })
++
++            if (!isEqual(prevSize, nextSize)) {
++              setSize(params, nextSize)
++            }
++          }
++        }
+       },
+-      setStartPanelToMax({ context, computed }) {
+-        const bounds = getPanelBounds(computed("panels"), context.get("activeResizeId"))
+-        if (!bounds) return
+-        const { before, after } = bounds
+-        context.set("size", (prev) => {
+-          const next = prev.slice()
+-          next[before.index].size = before.max
+-          next[after.index].size = after.max
+-          return next
+-        })
++
++      expandPanel(params) {
++        const { context, prop, event, refs } = params
++
++        const panels = prop("panels")
++        const prevSize = context.get("size")
++
++        const panel = panels.find((panel) => panel.id === event.id)
++        ensure(panel, `Panel data not found for id "${event.id}"`)
++
++        if (panel.collapsible) {
++          const {
++            collapsedSize = 0,
++            panelSize = 0,
++            minSize: minSizeFromProps = 0,
++            pivotIndices,
++          } = panelDataHelper(panels, panel, prevSize)
++
++          const minSize = event.minSize ?? minSizeFromProps
++
++          if (fuzzyNumbersEqual(panelSize, collapsedSize)) {
++            // Restore this panel to the size it was before it was collapsed, if possible.
++            const prevPanelSize = refs.get("panelSizeBeforeCollapse").get(panel.id)
++
++            const baseSize = prevPanelSize != null && prevPanelSize >= minSize ? prevPanelSize : minSize
++
++            const isLastPanel = findPanelDataIndex(panels, panel) === panels.length - 1
++            const delta = isLastPanel ? panelSize - baseSize : baseSize - panelSize
++
++            const nextSize = resizeByDelta({
++              delta,
++              initialSize: prevSize,
++              panels,
++              pivotIndices,
++              prevSize,
++              trigger: "imperative-api",
++            })
++
++            if (!isEqual(prevSize, nextSize)) {
++              setSize(params, nextSize)
++            }
++          }
++        }
+       },
+-      expandStartPanel({ context, event, computed }) {
+-        const bounds = getPanelBounds(computed("panels"), context.get("activeResizeId"))
+-        if (!bounds) return
+-        const { before, after } = bounds
+-        context.set("size", (prev) => {
+-          const next = prev.slice()
+-          next[before.index].size = before.up(event.step)
+-          next[after.index].size = after.down(event.step)
+-          return next
++
++      resizePanel(params) {
++        const { context, prop, event } = params
++
++        const prevSize = context.get("size")
++        const panels = prop("panels")
++
++        const panel = getPanelById(panels, event.id)
++        const unsafePanelSize = event.size
++
++        const { panelSize, pivotIndices } = panelDataHelper(panels, panel, prevSize)
++        ensure(panelSize, `Panel size not found for panel "${panel.id}"`)
++
++        const isLastPanel = findPanelDataIndex(panels, panel) === panels.length - 1
++        const delta = isLastPanel ? panelSize - unsafePanelSize : unsafePanelSize - panelSize
++
++        const nextSize = resizeByDelta({
++          delta,
++          initialSize: prevSize,
++          panels: panels,
++          pivotIndices,
++          prevSize,
++          trigger: "imperative-api",
+         })
++
++        if (!isEqual(prevSize, nextSize)) {
++          setSize(params, nextSize)
++        }
+       },
+-      shrinkStartPanel({ context, event, computed }) {
+-        const bounds = getPanelBounds(computed("panels"), context.get("activeResizeId"))
+-        if (!bounds) return
+-        const { before, after } = bounds
+-        context.set("size", (prev) => {
+-          const next = prev.slice()
+-          next[before.index].size = before.down(event.step)
+-          next[after.index].size = after.up(event.step)
+-          return next
++
++      setPointerValue(params) {
++        const { context, event, prop, scope } = params
++
++        const dragState = context.get("dragState")
++        if (!dragState) return
++
++        const { resizeTriggerId, initialSize, initialCursorPosition } = dragState
++        const panels = prop("panels")
++
++        const panelGroupElement = dom.getRootEl(scope)
++        ensure(panelGroupElement, `Panel group element not found`)
++
++        const pivotIndices = resizeTriggerId.split(":").map((id) => panels.findIndex((panel) => panel.id === id))
++
++        const horizontal = prop("orientation") === "horizontal"
++
++        const cursorPosition = horizontal ? event.point.x : event.point.y
++        const groupRect = panelGroupElement.getBoundingClientRect()
++        const groupSizeInPixels = horizontal ? groupRect.width : groupRect.height
++
++        const offsetPixels = cursorPosition - initialCursorPosition
++        const offsetPercentage = (offsetPixels / groupSizeInPixels) * 100
++
++        const prevSize = context.get("size")
++
++        const nextSize = resizeByDelta({
++          delta: offsetPercentage,
++          initialSize: initialSize ?? prevSize,
++          panels,
++          pivotIndices,
++          prevSize,
++          trigger: "mouse-or-touch",
+         })
++
++        if (!isEqual(prevSize, nextSize)) {
++          setSize(params, nextSize)
++        }
+       },
+-      resetStartPanel({ context, computed }) {
+-        const bounds = getPanelBounds(computed("panels"), context.get("activeResizeId"))
+-        if (!bounds) return
+-        const { before, after } = bounds
+-        const initialSize = context.initial("size")
+-        context.set("size", (prev) => {
+-          const next = prev.slice()
+-          next[before.index].size = initialSize[before.index].size
+-          next[after.index].size = initialSize[after.index].size
+-          return next
++
++      setKeyboardValue(params) {
++        const { context, event, prop } = params
++
++        const panelDataArray = prop("panels")
++
++        const resizeTriggerId = event.id as ResizeTriggerId
++        const delta = event.delta
++
++        const pivotIndices = resizeTriggerId
++          .split(":")
++          .map((id) => panelDataArray.findIndex((panelData) => panelData.id === id))
++
++        const prevSize = context.get("size")
++
++        const nextSize = resizeByDelta({
++          delta,
++          initialSize: prevSize,
++          panels: panelDataArray,
++          pivotIndices,
++          prevSize,
++          trigger: "keyboard",
+         })
++
++        if (!isEqual(prevSize, nextSize)) {
++          setSize(params, nextSize)
++        }
+       },
+-      focusResizeHandle({ scope, context }) {
+-        raf(() => {
+-          const activeId = context.get("activeResizeId")
+-          if (!activeId) return
+-          dom.getResizeTriggerEl(scope, activeId)?.focus({ preventScroll: true })
++
++      invokeOnResizeEnd({ context, prop }) {
++        queueMicrotask(() => {
++          const dragState = context.get("dragState")
++          prop("onResizeEnd")?.({
++            size: context.get("size"),
++            resizeTriggerId: dragState?.resizeTriggerId ?? null,
++          })
+         })
+       },
+-      blurResizeHandle({ scope, context }) {
+-        raf(() => {
+-          const activeId = context.get("activeResizeId")
+-          if (!activeId) return
+-          dom.getResizeTriggerEl(scope, activeId)?.blur()
++
++      invokeOnResizeStart({ prop }) {
++        queueMicrotask(() => {
++          prop("onResizeStart")?.()
+         })
+       },
+-      setPreviousPanels({ refs, computed }) {
+-        refs.set("previousPanels", computed("panels").slice())
+-      },
+-      setActiveResizeState({ context, computed }) {
+-        const panels = getPanelBounds(computed("panels"), context.get("activeResizeId"))
+-        if (!panels) return
+-        const { before } = panels
+-        context.set("activeResizeState", {
+-          isAtMin: before.isAtMin,
+-          isAtMax: before.isAtMax,
+-        })
++
++      collapseOrExpandPanel(params) {
++        const { context, prop } = params
++
++        const panelDataArray = prop("panels")
++        const sizes = context.get("size")
++
++        const resizeTriggerId = context.get("keyboardState")?.resizeTriggerId
++        const [idBefore, idAfter] = resizeTriggerId?.split(":") ?? []
++
++        const index = panelDataArray.findIndex((panelData) => panelData.id === idBefore)
++        if (index === -1) return
++
++        const panelData = panelDataArray[index]
++        ensure(panelData, `No panel data found for index ${index}`)
++
++        const size = sizes[index]
++
++        const { collapsedSize = 0, collapsible, minSize = 0 } = panelData
++
++        if (size != null && collapsible) {
++          const pivotIndices = [idBefore, idAfter].map((id) =>
++            panelDataArray.findIndex((panelData) => panelData.id === id),
++          )
++
++          const nextSize = resizeByDelta({
++            delta: fuzzyNumbersEqual(size, collapsedSize) ? minSize - collapsedSize : collapsedSize - size,
++            initialSize: context.initial("size"),
++            panels: panelDataArray,
++            pivotIndices,
++            prevSize: sizes,
++            trigger: "keyboard",
++          })
++
++          if (!isEqual(sizes, nextSize)) {
++            setSize(params, nextSize)
++          }
++        }
+       },
+-      setPointerValue({ context, event, prop, scope, computed }) {
+-        const panels = getHandlePanels(computed("panels"), context.get("activeResizeId"))
+-        const bounds = getHandleBounds(computed("panels"), context.get("activeResizeId"))
+ 
+-        if (!panels || !bounds) return
++      setGlobalCursor({ context, scope, prop }) {
++        const dragState = context.get("dragState")
++        if (!dragState) return
+ 
+-        const rootEl = dom.getRootEl(scope)
+-        if (!rootEl) return
++        const panels = prop("panels")
++        const horizontal = prop("orientation") === "horizontal"
+ 
+-        const relativePoint = getRelativePoint(event.point, rootEl)
+-        const percentValue = relativePoint.getPercentValue({
+-          dir: prop("dir"),
+-          orientation: prop("orientation"),
+-        })
++        const [idBefore] = dragState.resizeTriggerId.split(":")
++        const indexBefore = panels.findIndex((panel) => panel.id === idBefore)
++        const panel = panels[indexBefore]
+ 
+-        let pointValue = percentValue * 100
++        const size = context.get("size")
++        const aria = getAriaValue(size, panels, dragState.resizeTriggerId)
+ 
+-        // update active resize state here because we use `previousPanels` in the calculations
+-        context.set("activeResizeState", {
+-          isAtMin: pointValue < bounds.min,
+-          isAtMax: pointValue > bounds.max,
+-        })
++        const isAtMin =
++          fuzzyNumbersEqual(aria.valueNow, aria.valueMin) || fuzzyNumbersEqual(aria.valueNow, panel.collapsedSize)
+ 
+-        pointValue = clamp(pointValue, bounds.min, bounds.max)
++        const isAtMax = fuzzyNumbersEqual(aria.valueNow, aria.valueMax)
++        const cursorState: CursorState = { isAtMin, isAtMax }
++        dom.setupGlobalCursor(scope, cursorState, horizontal, prop("nonce"))
++      },
+ 
+-        const { before, after } = panels
++      clearGlobalCursor({ scope }) {
++        dom.removeGlobalCursor(scope)
++      },
+ 
+-        const offset = pointValue - before.end
+-        context.set("size", (prev) => {
+-          const next = prev.slice()
+-          next[before.index].size = before.size + offset
+-          next[after.index].size = after.size - offset
+-          return next
+-        })
++      focusNextResizeTrigger({ event, scope }) {
++        const resizeTriggers = dom.getResizeTriggerEls(scope)
++        const index = resizeTriggers.findIndex((el) => el.dataset.id === event.id)
++        const handleEl = event.shiftKey ? prev(resizeTriggers, index) : next(resizeTriggers, index)
++        handleEl?.focus()
+       },
+     },
+   },
+ })
++
++function setSize(params: Params<SplitterSchema>, sizes: number[]) {
++  const { refs, prop, context } = params
++
++  const panelsArray = prop("panels")
++  const onCollapse = prop("onCollapse")
++  const onExpand = prop("onExpand")
++
++  const panelIdToLastNotifiedSizeMap = refs.get("panelIdToLastNotifiedSizeMap")
++
++  context.set("size", sizes)
++
++  sizes.forEach((size, index) => {
++    const panelData = panelsArray[index]
++    ensure(panelData, `Panel data not found for index ${index}`)
++
++    const { collapsedSize = 0, collapsible, id: panelId } = panelData
++
++    const lastNotifiedSize = panelIdToLastNotifiedSizeMap.get(panelId)
++    if (lastNotifiedSize == null || size !== lastNotifiedSize) {
++      panelIdToLastNotifiedSizeMap.set(panelId, size)
++
++      if (collapsible && (onCollapse || onExpand)) {
++        if (
++          (lastNotifiedSize == null || fuzzyNumbersEqual(lastNotifiedSize, collapsedSize)) &&
++          !fuzzyNumbersEqual(size, collapsedSize)
++        ) {
++          onExpand?.({ panelId, size })
++        }
++
++        if (
++          onCollapse &&
++          (lastNotifiedSize == null || !fuzzyNumbersEqual(lastNotifiedSize, collapsedSize)) &&
++          fuzzyNumbersEqual(size, collapsedSize)
++        ) {
++          onCollapse?.({ panelId, size })
++        }
++      }
++    }
++  })
++}
+diff --git a/packages/machines/splitter/src/splitter.props.ts b/packages/machines/splitter/src/splitter.props.ts
+index e33ccd706b..3ac04588e7 100644
+--- a/packages/machines/splitter/src/splitter.props.ts
++++ b/packages/machines/splitter/src/splitter.props.ts
+@@ -7,17 +7,23 @@ export const props = createProps<SplitterProps>()([
+   "getRootNode",
+   "id",
+   "ids",
+-  "onSizeChange",
+-  "onSizeChangeEnd",
++  "onResize",
++  "onResizeStart",
++  "onResizeEnd",
++  "onCollapse",
++  "onExpand",
+   "orientation",
+   "size",
+   "defaultSize",
++  "panels",
++  "keyboardResizeBy",
++  "nonce",
+ ])
+ 
+ export const splitProps = createSplitProps<Partial<SplitterProps>>(props)
+ 
+-export const panelProps = createProps<PanelProps>()(["id", "snapSize"])
++export const panelProps = createProps<PanelProps>()(["id"])
+ export const splitPanelProps = createSplitProps<PanelProps>(panelProps)
+ 
+-export const resizeTriggerProps = createProps<ResizeTriggerProps>()(["disabled", "id", "step"])
++export const resizeTriggerProps = createProps<ResizeTriggerProps>()(["disabled", "id"])
+ export const splitResizeTriggerProps = createSplitProps<ResizeTriggerProps>(resizeTriggerProps)
+diff --git a/packages/machines/splitter/src/splitter.types.ts b/packages/machines/splitter/src/splitter.types.ts
+index 37419aa916..9035de970d 100644
+--- a/packages/machines/splitter/src/splitter.types.ts
++++ b/packages/machines/splitter/src/splitter.types.ts
+@@ -1,29 +1,69 @@
+ import type { EventObject, Machine, Service } from "@zag-js/core"
+-import type { CommonProperties, DirectionProperty, PropTypes, Required, RequiredBy } from "@zag-js/types"
++import type { CommonProperties, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
+ 
+ /* -----------------------------------------------------------------------------
+  * Callback details
+  * -----------------------------------------------------------------------------*/
+ 
+-export type PanelId = string | number
++export type ResizeEvent = PointerEvent | KeyboardEvent
+ 
+-export interface PanelSizeData {
++export type PanelId = string
++export type ResizeTriggerId = `${PanelId}:${PanelId}`
++
++export interface PanelData {
++  /**
++   * The id of the panel.
++   */
+   id: PanelId
+-  size?: number | undefined
++  /**
++   * The order of the panel. useful of you intend to conditionally render the panel.
++   */
++  order?: number | undefined
++  /**
++   * The minimum size of the panel.
++   */
+   minSize?: number | undefined
++  /**
++   * The maximum size of the panel.
++   */
+   maxSize?: number | undefined
++  /**
++   * Whether the panel is collapsible.
++   */
++  collapsible?: boolean | undefined
++  /**
++   * The size of the panel when collapsed.
++   */
++  collapsedSize?: number | undefined
++}
++
++export interface CursorState {
++  isAtMin: boolean
++  isAtMax: boolean
++}
++
++export interface ResizeDetails {
++  size: number[]
++  resizeTriggerId: string | null
++  layout: string
++  expandToSizes: Record<string, number>
++}
++
++export interface ResizeEndDetails {
++  size: number[]
++  resizeTriggerId: string | null
+ }
+ 
+-export interface SizeChangeDetails {
+-  size: PanelSizeData[]
+-  activeHandleId: string | null
++export interface ExpandCollapseDetails {
++  panelId: string
++  size: number
+ }
+ 
+ /* -----------------------------------------------------------------------------
+  * Machine context
+  * -----------------------------------------------------------------------------*/
+ 
+-type ElementIds = Partial<{
++export type ElementIds = Partial<{
+   root: string
+   resizeTrigger(id: string): string
+   label(id: string): string
+@@ -39,67 +79,84 @@ export interface SplitterProps extends DirectionProperty, CommonProperties {
+   /**
+    * The controlled size data of the panels
+    */
+-  size?: PanelSizeData[] | undefined
++  size?: number[] | undefined
+   /**
+    * The initial size of the panels when rendered.
+    * Use when you don't need to control the size of the panels.
+    */
+-  defaultSize?: PanelSizeData[] | undefined
++  defaultSize?: number[] | undefined
++  /**
++   * The size constraints of the panels.
++   */
++  panels: PanelData[]
+   /**
+    * Function called when the splitter is resized.
+    */
+-  onSizeChange?: ((details: SizeChangeDetails) => void) | undefined
++  onResize?: ((details: ResizeDetails) => void) | undefined
++  /**
++   * Function called when the splitter resize starts.
++   */
++  onResizeStart?: (() => void) | undefined
+   /**
+    * Function called when the splitter resize ends.
+    */
+-  onSizeChangeEnd?: ((details: SizeChangeDetails) => void) | undefined
++  onResizeEnd?: ((details: ResizeEndDetails) => void) | undefined
+   /**
+    * The ids of the elements in the splitter. Useful for composition.
+    */
+   ids?: ElementIds | undefined
++  /**
++   * The number of pixels to resize the panel by when the keyboard is used.
++   */
++  keyboardResizeBy?: number | null
++  /**
++   * The nonce for the injected splitter cursor stylesheet.
++   */
++  nonce?: string | undefined
++  /**
++   * Function called when a panel is collapsed.
++   */
++  onCollapse?: ((details: ExpandCollapseDetails) => void) | undefined
++  /**
++   * Function called when a panel is expanded.
++   */
++  onExpand?: ((details: ExpandCollapseDetails) => void) | undefined
+ }
+ 
+-export type PropWithDefault = "orientation"
++export type PropWithDefault = "orientation" | "panels"
+ 
+-export type NormalizedPanelData = Array<
+-  Required<PanelSizeData> & {
+-    remainingSize: number
+-    minSize: number
+-    maxSize: number
+-    start: number
+-    end: number
+-  }
+->
+-
+-type ComputedContext = Readonly<{
+-  isHorizontal: boolean
+-  panels: NormalizedPanelData
+-  activeResizeBounds?: { min: number; max: number } | undefined
+-  activeResizePanels?: { before: PanelSizeData; after: PanelSizeData } | undefined
+-}>
++export interface DragState {
++  resizeTriggerId: string
++  resizeTriggerRect: DOMRect
++  initialCursorPosition: number
++  initialSize: number[]
++}
+ 
+-export interface ResizeState {
+-  isAtMin: boolean
+-  isAtMax: boolean
++export interface KeyboardState {
++  resizeTriggerId: string
+ }
+ 
+-interface PrivateContext {
+-  activeResizeId: string | null
+-  activeResizeState: ResizeState
+-  size: PanelSizeData[]
++interface Context {
++  dragState: DragState | null
++  keyboardState: KeyboardState | null
++  size: number[]
+ }
+ 
+ interface Refs {
+-  previousPanels: NormalizedPanelData
++  panelSizeBeforeCollapse: Map<string, number>
++  panelIdToLastNotifiedSizeMap: Map<string, number>
++  prevDelta: number
+ }
+ 
+ export interface SplitterSchema {
+   state: "idle" | "hover:temp" | "hover" | "dragging" | "focused"
+   tag: "focus"
+   props: RequiredBy<SplitterProps, PropWithDefault>
+-  context: PrivateContext
++  context: Context
++  computed: {
++    horizontal: boolean
++  }
+   refs: Refs
+-  computed: ComputedContext
+   action: string
+   event: EventObject
+   effect: string
+@@ -116,66 +173,70 @@ export type SplitterMachine = Machine<SplitterSchema>
+ 
+ export interface PanelProps {
+   id: PanelId
+-  snapSize?: number | undefined
+ }
+ 
+ export interface ResizeTriggerProps {
+-  id: `${PanelId}:${PanelId}`
+-  step?: number | undefined
++  id: ResizeTriggerId
+   disabled?: boolean | undefined
+ }
+ 
+-export interface ResizeTriggerState {
+-  disabled: boolean
+-  focused: boolean
+-  panelIds: string[]
+-  min: number | undefined
+-  max: number | undefined
+-  value: number
++export interface PanelItem {
++  type: "panel"
++  id: PanelId
+ }
+ 
+-export interface PanelBounds {
+-  min: number
+-  max: number
++export interface ResizeTriggerItem {
++  type: "handle"
++  id: ResizeTriggerId
+ }
+ 
++export type SplitterItem = PanelItem | ResizeTriggerItem
++
+ export interface SplitterApi<T extends PropTypes = PropTypes> {
+   /**
+-   * Whether the splitter is focused.
++   * Whether the splitter is currently being resized.
+    */
+-  focused: boolean
++  dragging: boolean
+   /**
+-   * Whether the splitter is being dragged.
++   * The current sizes of the panels.
+    */
+-  dragging: boolean
++  getSizes(): number[]
++  /**
++   * Set the sizes of the panels.
++   */
++  setSizes(size: number[]): void
++  /**
++   * Get the items of the splitter.
++   */
++  getItems(): SplitterItem[]
+   /**
+-   *  The bounds of the currently dragged splitter handle.
++   * Get the size of a panel.
+    */
+-  bounds: PanelBounds | undefined
++  getPanelSize(id: PanelId): number
+   /**
+-   * Function to set a panel to its minimum size.
++   * Whether a panel is collapsed.
+    */
+-  setToMinSize(id: PanelId): void
++  isPanelCollapsed(id: PanelId): boolean
+   /**
+-   * Function to set a panel to its maximum size.
++   * Whether a panel is expanded.
+    */
+-  setToMaxSize(id: PanelId): void
++  isPanelExpanded(id: PanelId): boolean
+   /**
+-   * Function to set the size of a panel.
++   * Collapse a panel.
+    */
+-  setSize(id: PanelId, size: number): void
++  collapsePanel(id: PanelId): void
+   /**
+-   * Function to set the size of multiple panels.
++   * Expand a panel.
+    */
+-  setSizes(sizes: PanelSizeData[]): void
++  expandPanel(id: PanelId, minSize?: number): void
+   /**
+-   * Returns the size of a panel.
++   * Resize a panel.
+    */
+-  getSize(id: PanelId): number
++  resizePanel(id: PanelId, unsafePanelSize: number): void
+   /**
+-   * Returns the state details for a resize trigger.
++   * Get the layout of the splitter.
+    */
+-  getResizeTriggerState(props: ResizeTriggerProps): ResizeTriggerState
++  getLayout(): string
+ 
+   getRootProps(): T["element"]
+   getPanelProps(props: PanelProps): T["element"]
+diff --git a/packages/machines/splitter/src/splitter.utils.ts b/packages/machines/splitter/src/splitter.utils.ts
+deleted file mode 100644
+index dea999e9ff..0000000000
+--- a/packages/machines/splitter/src/splitter.utils.ts
++++ /dev/null
+@@ -1,141 +0,0 @@
+-import type { NormalizedPanelData, PanelSizeData } from "./splitter.types"
+-
+-function validateSize(key: string, size: number) {
+-  if (Math.floor(size) > 100) {
+-    throw new Error(`Total ${key} of panels cannot be greater than 100`)
+-  }
+-}
+-
+-export function getNormalizedPanels(sizes: PanelSizeData[]): NormalizedPanelData {
+-  let numOfPanelsWithoutSize = 0
+-  let totalSize = 0
+-  let totalMinSize = 0
+-
+-  const panels = sizes.map((panel) => {
+-    const minSize = panel.minSize ?? 0
+-    const maxSize = panel.maxSize ?? 100
+-
+-    totalMinSize += minSize
+-
+-    if (panel.size == null) {
+-      numOfPanelsWithoutSize++
+-    } else {
+-      totalSize += panel.size
+-    }
+-
+-    return {
+-      ...panel,
+-      minSize,
+-      maxSize,
+-    }
+-  })
+-
+-  validateSize("minSize", totalMinSize)
+-  validateSize("size", totalSize)
+-
+-  let end = 0
+-  let remainingSize = 0
+-
+-  const result = panels.map((panel) => {
+-    let start = end
+-
+-    if (panel.size != null) {
+-      end += panel.size
+-      remainingSize = panel.size - panel.minSize
+-      return {
+-        ...panel,
+-        start,
+-        end,
+-        remainingSize,
+-      }
+-    }
+-
+-    const size = (100 - totalSize) / numOfPanelsWithoutSize
+-    end += size
+-    remainingSize = size - panel.minSize
+-
+-    return { ...panel, size, start, end, remainingSize }
+-  })
+-
+-  return result as NormalizedPanelData
+-}
+-
+-export function getHandlePanels(panels: NormalizedPanelData, id: string | null) {
+-  const [beforeId, afterId] = id?.split(":") ?? []
+-  if (!beforeId || !afterId) return
+-
+-  const beforeIndex = panels.findIndex((panel) => panel.id === beforeId)
+-  const afterIndex = panels.findIndex((panel) => panel.id === afterId)
+-  if (beforeIndex === -1 || afterIndex === -1) return
+-
+-  const before = panels[beforeIndex]
+-  const after = panels[afterIndex]
+-
+-  return {
+-    before: {
+-      ...before,
+-      index: beforeIndex,
+-    },
+-    after: {
+-      ...after,
+-      index: afterIndex,
+-    },
+-  }
+-}
+-
+-export function getHandleBounds(panels: NormalizedPanelData, id: string | null) {
+-  const handlePanels = getHandlePanels(panels, id)
+-  if (!handlePanels) return
+-  const { before, after } = handlePanels
+-  return {
+-    min: Math.max(before.start + before.minSize, after.end - after.maxSize),
+-    max: Math.min(after.end - after.minSize, before.maxSize + before.start),
+-  }
+-}
+-
+-export function getPanelBounds(panels: NormalizedPanelData, id: string | null) {
+-  const bounds = getHandleBounds(panels, id)
+-  const handlePanels = getHandlePanels(panels, id)
+-
+-  if (!bounds || !handlePanels) return
+-  const { before, after } = handlePanels
+-
+-  const beforeMin = Math.abs(before.start - bounds.min)
+-  const afterMin = after.size + (before.size - beforeMin)
+-
+-  const beforeMax = Math.abs(before.start - bounds.max)
+-  const afterMax = after.size - (beforeMax - before.size)
+-
+-  return {
+-    before: {
+-      index: before.index,
+-      min: beforeMin,
+-      max: beforeMax,
+-      isAtMin: beforeMin === before.size,
+-      isAtMax: beforeMax === before.size,
+-      up(step: number) {
+-        return Math.min(before.size + step, beforeMax)
+-      },
+-      down(step: number) {
+-        return Math.max(before.size - step, beforeMin)
+-      },
+-    },
+-    after: {
+-      index: after.index,
+-      min: afterMin,
+-      max: afterMax,
+-      isAtMin: afterMin === after.size,
+-      isAtMax: afterMax === after.size,
+-      up(step: number) {
+-        return Math.min(after.size + step, afterMin)
+-      },
+-      down(step: number) {
+-        return Math.max(after.size - step, afterMax)
+-      },
+-    },
+-  }
+-}
+-
+-export function clamp(value: number, min: number, max: number) {
+-  return Math.min(Math.max(value, min), max)
+-}
+diff --git a/packages/machines/splitter/src/utils/aria.ts b/packages/machines/splitter/src/utils/aria.ts
+new file mode 100644
+index 0000000000..f616d28c75
+--- /dev/null
++++ b/packages/machines/splitter/src/utils/aria.ts
+@@ -0,0 +1,66 @@
++/**
++ * This code was modified from react-resizable-panels by Brian Vaughn
++ * @see https://github.com/bvaughn/react-resizable-panels
++ */
++
++import { ensure } from "@zag-js/utils"
++import type { PanelData } from "../splitter.types"
++
++export function calculateAriaValues({
++  size,
++  panels,
++  pivotIndices,
++}: {
++  size: number[]
++  panels: PanelData[]
++  pivotIndices: number[]
++}) {
++  let currentMinSize = 0
++  let currentMaxSize = 100
++  let totalMinSize = 0
++  let totalMaxSize = 0
++
++  const firstIndex = pivotIndices[0]
++  ensure(firstIndex, "No pivot index found")
++
++  panels.forEach((panel, index) => {
++    const { maxSize = 100, minSize = 0 } = panel
++
++    if (index === firstIndex) {
++      currentMinSize = minSize
++      currentMaxSize = maxSize
++    } else {
++      totalMinSize += minSize
++      totalMaxSize += maxSize
++    }
++  })
++
++  const valueMax = Math.min(currentMaxSize, 100 - totalMinSize)
++  const valueMin = Math.max(currentMinSize, 100 - totalMaxSize)
++  const valueNow = size[firstIndex]
++
++  return {
++    valueMax,
++    valueMin,
++    valueNow,
++  }
++}
++
++export function getAriaValue(size: number[], panels: PanelData[], handleId: string) {
++  const [beforeId, afterId] = handleId.split(":")
++  const beforeIndex = panels.findIndex((panel) => panel.id === beforeId)
++  const afterIndex = panels.findIndex((panel) => panel.id === afterId)
++  const { valueMax, valueMin, valueNow } = calculateAriaValues({
++    size,
++    panels,
++    pivotIndices: [beforeIndex, afterIndex],
++  })
++
++  return {
++    beforeId,
++    afterId,
++    valueMax: Math.round(valueMax),
++    valueMin: Math.round(valueMin),
++    valueNow: valueNow != null ? Math.round(valueNow) : undefined,
++  }
++}
+diff --git a/packages/machines/splitter/src/utils/fuzzy.ts b/packages/machines/splitter/src/utils/fuzzy.ts
+new file mode 100644
+index 0000000000..3b538c5e4e
+--- /dev/null
++++ b/packages/machines/splitter/src/utils/fuzzy.ts
+@@ -0,0 +1,40 @@
++/**
++ * This code was modified from react-resizable-panels by Brian Vaughn
++ * @see https://github.com/bvaughn/react-resizable-panels
++ */
++
++export const PRECISION = 10
++
++export function fuzzyCompareNumbers(actual: number, expected: number, fractionDigits: number = PRECISION): number {
++  if (actual.toFixed(fractionDigits) === expected.toFixed(fractionDigits)) {
++    return 0
++  } else {
++    return actual > expected ? 1 : -1
++  }
++}
++
++export function fuzzyNumbersEqual(
++  actual: number | undefined,
++  expected: number | undefined,
++  fractionDigits: number = PRECISION,
++): boolean {
++  if (actual == null || expected == null) return false
++  return fuzzyCompareNumbers(actual, expected, fractionDigits) === 0
++}
++
++export function fuzzySizeEqual(actual: number[], expected: number[], fractionDigits?: number): boolean {
++  if (actual.length !== expected.length) {
++    return false
++  }
++
++  for (let index = 0; index < actual.length; index++) {
++    const actualSize = actual[index] as number
++    const expectedSize = expected[index] as number
++
++    if (!fuzzyNumbersEqual(actualSize, expectedSize, fractionDigits)) {
++      return false
++    }
++  }
++
++  return true
++}
+diff --git a/packages/machines/splitter/src/utils/panel.ts b/packages/machines/splitter/src/utils/panel.ts
+new file mode 100644
+index 0000000000..237c4ef614
+--- /dev/null
++++ b/packages/machines/splitter/src/utils/panel.ts
+@@ -0,0 +1,146 @@
++/**
++ * This code was modified from react-resizable-panels by Brian Vaughn
++ * @see https://github.com/bvaughn/react-resizable-panels
++ */
++
++import type { Style } from "@zag-js/types"
++import { ensure } from "@zag-js/utils"
++import type { DragState, PanelData } from "../splitter.types"
++
++export function getPanelById(panels: PanelData[], id: string) {
++  const panel = panels.find((panel) => panel.id === id)
++  ensure(panel, `Panel data not found for id "${id}"`)
++  return panel
++}
++
++export function findPanelDataIndex(panels: PanelData[], panel: PanelData) {
++  return panels.findIndex((prevPanel) => prevPanel === panel || prevPanel.id === panel.id)
++}
++
++export function findPanelIndex(panels: PanelData[], id: string) {
++  return panels.findIndex((panel) => panel.id === id)
++}
++
++export function panelDataHelper(panels: PanelData[], panel: PanelData, sizes: number[]) {
++  const index = findPanelIndex(panels, panel.id)
++  const pivotIndices = index === panels.length - 1 ? [index - 1, index] : [index, index + 1]
++  const panelSize = sizes[index]
++  return { ...panel, panelSize, pivotIndices }
++}
++
++export function sortPanels(panels: PanelData[]) {
++  return panels.sort((panelA, panelB) => {
++    const orderA = panelA.order
++    const orderB = panelB.order
++    if (orderA == null && orderB == null) {
++      return 0
++    } else if (orderA == null) {
++      return -1
++    } else if (orderB == null) {
++      return 1
++    } else {
++      return orderA - orderB
++    }
++  })
++}
++
++export function getPanelLayout(panels: PanelData[]) {
++  return panels
++    .map((panel) => panel.id)
++    .sort()
++    .join(":")
++}
++
++export function serializePanels(panels: PanelData[]) {
++  const keys = panels.map((panel) => panel.id)
++  const sortedKeys = keys.sort()
++  const serialized = sortedKeys.map((key) => {
++    const panel = panels.find((panel) => panel.id === key)
++    return JSON.stringify(panel)
++  })
++  return serialized.join(",")
++}
++
++// the % of the group's overall space this panel should occupy.
++export function getPanelFlexBoxStyle({
++  defaultSize,
++  dragState,
++  sizes,
++  panels,
++  panelIndex,
++  precision = 3,
++}: {
++  defaultSize: number | undefined
++  sizes: number[]
++  dragState: DragState | null
++  panels: PanelData[]
++  panelIndex: number
++  precision?: number
++}): Style {
++  const size = sizes[panelIndex]
++
++  let flexGrow
++  if (size == null) {
++    // Initial render (before panels have registered themselves)
++    // In order to support server rendering, fall back to default size if provided
++    flexGrow = defaultSize != undefined ? defaultSize.toPrecision(precision) : "1"
++  } else if (panels.length === 1) {
++    // Special case: Single panel group should always fill full width/height
++    flexGrow = "1"
++  } else {
++    flexGrow = size.toPrecision(precision)
++  }
++
++  return {
++    flexBasis: 0,
++    flexGrow,
++    flexShrink: 1,
++
++    // Without this, Panel sizes may be unintentionally overridden by their content
++    overflow: "hidden",
++
++    // Disable pointer events inside of a panel during resize
++    // This avoid edge cases like nested iframes
++    pointerEvents: dragState !== null ? "none" : undefined,
++  }
++}
++
++export function getUnsafeDefaultSize({ panels, size: sizes }: { panels: PanelData[]; size: number[] }): number[] {
++  const finalSizes = Array<number>(panels.length)
++
++  let numPanelsWithSizes = 0
++  let remainingSize = 100
++
++  // Distribute default sizes first
++  for (let index = 0; index < panels.length; index++) {
++    const panel = panels[index]
++    ensure(panel, `Panel data not found for index ${index}`)
++    const defaultSize = sizes[index]
++
++    if (defaultSize != null) {
++      numPanelsWithSizes++
++      finalSizes[index] = defaultSize
++      remainingSize -= defaultSize
++    }
++  }
++
++  // Remaining size should be distributed evenly between panels without default sizes
++  for (let index = 0; index < panels.length; index++) {
++    const panel = panels[index]
++    ensure(panel, `Panel data not found for index ${index}`)
++    const defaultSize = sizes[index]
++
++    if (defaultSize != null) {
++      continue
++    }
++
++    const numRemainingPanels = panels.length - numPanelsWithSizes
++    const size = remainingSize / numRemainingPanels
++
++    numPanelsWithSizes++
++    finalSizes[index] = size
++    remainingSize -= size
++  }
++
++  return finalSizes
++}
+diff --git a/packages/machines/splitter/src/utils/resize-by-delta.ts b/packages/machines/splitter/src/utils/resize-by-delta.ts
+new file mode 100644
+index 0000000000..5293c25f67
+--- /dev/null
++++ b/packages/machines/splitter/src/utils/resize-by-delta.ts
+@@ -0,0 +1,223 @@
++/**
++ * This code was modified from react-resizable-panels by Brian Vaughn
++ * @see https://github.com/bvaughn/react-resizable-panels
++ */
++
++import { ensure } from "@zag-js/utils"
++import type { PanelData } from "../splitter.types"
++import { fuzzyCompareNumbers, fuzzySizeEqual, fuzzyNumbersEqual } from "./fuzzy"
++import { resizePanel } from "./resize-panel"
++
++interface Layout {
++  delta: number
++  initialSize: number[]
++  panels: PanelData[]
++  pivotIndices: number[]
++  prevSize: number[]
++  trigger: "imperative-api" | "keyboard" | "mouse-or-touch"
++}
++
++export function resizeByDelta(props: Layout): number[] {
++  let { delta, initialSize, panels, pivotIndices, prevSize, trigger } = props
++
++  if (fuzzyNumbersEqual(delta, 0)) {
++    return initialSize
++  }
++
++  const nextSize = [...initialSize]
++
++  const [firstPivotIndex, secondPivotIndex] = pivotIndices
++
++  ensure(firstPivotIndex, "Invalid first pivot index")
++  ensure(secondPivotIndex, "Invalid second pivot index")
++
++  let deltaApplied = 0
++
++  // A resizing panel affects the panels before or after it.
++  //
++  // A negative delta means the panel(s) immediately after the resize handle should grow/expand by decreasing its offset.
++  // Other panels may also need to shrink/contract (and shift) to make room, depending on the min weights.
++  //
++  // A positive delta means the panel(s) immediately before the resize handle should "expand".
++  // This is accomplished by shrinking/contracting (and shifting) one or more of the panels after the resize handle.
++
++  {
++    // If this is a resize triggered by a keyboard event, our logic for expanding/collapsing is different.
++    // We no longer check the halfway threshold because this may prevent the panel from expanding at all.
++    if (trigger === "keyboard") {
++      {
++        // Check if we should expand a collapsed panel
++        const index = delta < 0 ? secondPivotIndex : firstPivotIndex
++        const panel = panels[index]
++        ensure(panel, `Panel data not found for index ${index}`)
++
++        const { collapsedSize = 0, collapsible, minSize = 0 } = panel
++
++        if (collapsible) {
++          const prevSize = initialSize[index]
++          ensure(prevSize, `Previous size not found for panel index ${index}`)
++
++          if (fuzzyNumbersEqual(prevSize, collapsedSize)) {
++            const localDelta = minSize - prevSize
++            if (fuzzyCompareNumbers(localDelta, Math.abs(delta)) > 0) {
++              delta = delta < 0 ? 0 - localDelta : localDelta
++            }
++          }
++        }
++      }
++
++      {
++        // Check if we should collapse a panel at its minimum size
++        const index = delta < 0 ? firstPivotIndex : secondPivotIndex
++        const panel = panels[index]
++        ensure(panel, `No panel data found for index ${index}`)
++
++        const { collapsedSize = 0, collapsible, minSize = 0 } = panel
++
++        if (collapsible) {
++          const prevSize = initialSize[index]
++          ensure(prevSize, `Previous size not found for panel index ${index}`)
++
++          if (fuzzyNumbersEqual(prevSize, minSize)) {
++            const localDelta = prevSize - collapsedSize
++            if (fuzzyCompareNumbers(localDelta, Math.abs(delta)) > 0) {
++              delta = delta < 0 ? 0 - localDelta : localDelta
++            }
++          }
++        }
++      }
++    }
++  }
++
++  {
++    // Pre-calculate max available delta in the opposite direction of our pivot.
++    // This will be the maximum amount we're allowed to expand/contract the panels in the primary direction.
++    // If this amount is less than the requested delta, adjust the requested delta.
++    // If this amount is greater than the requested delta, that's useful information too–
++    // as an expanding panel might change from collapsed to min size.
++
++    const increment = delta < 0 ? 1 : -1
++
++    let index = delta < 0 ? secondPivotIndex : firstPivotIndex
++    let maxAvailableDelta = 0
++
++    while (true) {
++      const prevSize = initialSize[index]
++      ensure(prevSize, `Previous size not found for panel index ${index}`)
++
++      const maxSafeSize = resizePanel({
++        panels,
++        index: index,
++        size: 100,
++      })
++      const delta = maxSafeSize - prevSize
++
++      maxAvailableDelta += delta
++      index += increment
++
++      if (index < 0 || index >= panels.length) {
++        break
++      }
++    }
++
++    const minAbsDelta = Math.min(Math.abs(delta), Math.abs(maxAvailableDelta))
++    delta = delta < 0 ? 0 - minAbsDelta : minAbsDelta
++  }
++
++  {
++    // Delta added to a panel needs to be subtracted from other panels (within the constraints that those panels allow).
++
++    const pivotIndex = delta < 0 ? firstPivotIndex : secondPivotIndex
++    let index = pivotIndex
++    while (index >= 0 && index < panels.length) {
++      const deltaRemaining = Math.abs(delta) - Math.abs(deltaApplied)
++
++      const prevSize = initialSize[index]
++      ensure(prevSize, `Previous size not found for panel index ${index}`)
++
++      const unsafeSize = prevSize - deltaRemaining
++      const safeSize = resizePanel({ panels, index, size: unsafeSize })
++
++      if (!fuzzyNumbersEqual(prevSize, safeSize)) {
++        deltaApplied += prevSize - safeSize
++
++        nextSize[index] = safeSize
++
++        if (
++          deltaApplied.toPrecision(3).localeCompare(Math.abs(delta).toPrecision(3), undefined, {
++            numeric: true,
++          }) >= 0
++        ) {
++          break
++        }
++      }
++
++      if (delta < 0) {
++        index--
++      } else {
++        index++
++      }
++    }
++  }
++
++  // If we were unable to resize any of the panels panels, return the previous state.
++  // This will essentially bailout and ignore e.g. drags past a panel's boundaries
++  if (fuzzySizeEqual(prevSize, nextSize)) {
++    return prevSize
++  }
++
++  {
++    // Now distribute the applied delta to the panels in the other direction
++    const pivotIndex = delta < 0 ? secondPivotIndex : firstPivotIndex
++
++    const prevSize = initialSize[pivotIndex]
++    ensure(prevSize, `Previous size not found for panel index ${pivotIndex}`)
++
++    const unsafeSize = prevSize + deltaApplied
++    const safeSize = resizePanel({ panels, index: pivotIndex, size: unsafeSize })
++
++    // Adjust the pivot panel before, but only by the amount that surrounding panels were able to shrink/contract.
++    nextSize[pivotIndex] = safeSize
++
++    // Edge case where expanding or contracting one panel caused another one to change collapsed state
++    if (!fuzzyNumbersEqual(safeSize, unsafeSize)) {
++      let deltaRemaining = unsafeSize - safeSize
++
++      const pivotIndex = delta < 0 ? secondPivotIndex : firstPivotIndex
++      let index = pivotIndex
++      while (index >= 0 && index < panels.length) {
++        const prevSize = nextSize[index]
++        ensure(prevSize, `Previous size not found for panel index ${index}`)
++
++        const unsafeSize = prevSize + deltaRemaining
++        const safeSize = resizePanel({ panels, index, size: unsafeSize })
++
++        if (!fuzzyNumbersEqual(prevSize, safeSize)) {
++          deltaRemaining -= safeSize - prevSize
++
++          nextSize[index] = safeSize
++        }
++
++        if (fuzzyNumbersEqual(deltaRemaining, 0)) {
++          break
++        }
++
++        if (delta > 0) {
++          index--
++        } else {
++          index++
++        }
++      }
++    }
++  }
++
++  const totalSize = nextSize.reduce((total, size) => size + total, 0)
++
++  // If our new sizes don't add up to 100%, that means the requested delta can't be applied
++  // In that case, fall back to our most recent valid sizes
++  if (!fuzzyNumbersEqual(totalSize, 100)) {
++    return prevSize
++  }
++
++  return nextSize
++}
+diff --git a/packages/machines/splitter/src/utils/resize-panel.ts b/packages/machines/splitter/src/utils/resize-panel.ts
+new file mode 100644
+index 0000000000..06b0fc5feb
+--- /dev/null
++++ b/packages/machines/splitter/src/utils/resize-panel.ts
+@@ -0,0 +1,34 @@
++/**
++ * This code was modified from react-resizable-panels by Brian Vaughn
++ * @see https://github.com/bvaughn/react-resizable-panels
++ */
++
++import { ensure } from "@zag-js/utils"
++import type { PanelData } from "../splitter.types"
++import { fuzzyCompareNumbers, PRECISION } from "./fuzzy"
++
++export function resizePanel({ panels, index, size }: { panels: PanelData[]; index: number; size: number }) {
++  const panel = panels[index]
++  ensure(panel, `Panel data not found for index ${index}`)
++
++  let { collapsedSize = 0, collapsible, maxSize = 100, minSize = 0 } = panel
++
++  if (fuzzyCompareNumbers(size, minSize) < 0) {
++    if (collapsible) {
++      // Collapsible panels should snap closed or open only once they cross the halfway point between collapsed and min size.
++      const halfwayPoint = (collapsedSize + minSize) / 2
++      if (fuzzyCompareNumbers(size, halfwayPoint) < 0) {
++        size = collapsedSize
++      } else {
++        size = minSize
++      }
++    } else {
++      size = minSize
++    }
++  }
++
++  size = Math.min(maxSize, size)
++  size = parseFloat(size.toFixed(PRECISION))
++
++  return size
++}
+diff --git a/packages/machines/splitter/src/utils/validate-sizes.ts b/packages/machines/splitter/src/utils/validate-sizes.ts
+new file mode 100644
+index 0000000000..b007a06996
+--- /dev/null
++++ b/packages/machines/splitter/src/utils/validate-sizes.ts
+@@ -0,0 +1,62 @@
++/**
++ * This code was modified from react-resizable-panels by Brian Vaughn
++ * @see https://github.com/bvaughn/react-resizable-panels
++ */
++
++import { ensure } from "@zag-js/utils"
++import type { PanelData } from "../splitter.types"
++import { fuzzyNumbersEqual } from "./fuzzy"
++import { resizePanel } from "./resize-panel"
++
++export function validateSizes({ size: prevSize, panels }: { size: number[]; panels: PanelData[] }): number[] {
++  const nextSize = [...prevSize]
++  const nextSizeTotalSize = nextSize.reduce((accumulated, current) => accumulated + current, 0)
++
++  // Validate size expectations
++  if (nextSize.length !== panels.length) {
++    throw Error(`Invalid ${panels.length} panel size: ${nextSize.map((size) => `${size}%`).join(", ")}`)
++  } else if (!fuzzyNumbersEqual(nextSizeTotalSize, 100) && nextSize.length > 0) {
++    for (let index = 0; index < panels.length; index++) {
++      const unsafeSize = nextSize[index]
++      ensure(unsafeSize, `No size data found for index ${index}`)
++      const safeSize = (100 / nextSizeTotalSize) * unsafeSize
++      nextSize[index] = safeSize
++    }
++  }
++
++  let remainingSize = 0
++
++  // First pass: Validate the proposed size given each panel's constraints
++  for (let index = 0; index < panels.length; index++) {
++    const unsafeSize = nextSize[index]
++    ensure(unsafeSize, `No size data found for index ${index}`)
++    const safeSize = resizePanel({ panels, index, size: unsafeSize })
++    if (unsafeSize != safeSize) {
++      remainingSize += unsafeSize - safeSize
++      nextSize[index] = safeSize
++    }
++  }
++
++  // If there is additional, left over space, assign it to any panel(s) that permits it
++  // (It's not worth taking multiple additional passes to evenly distribute)
++  if (!fuzzyNumbersEqual(remainingSize, 0)) {
++    for (let index = 0; index < panels.length; index++) {
++      const prevSize = nextSize[index]
++      ensure(prevSize, `No size data found for index ${index}`)
++      const unsafeSize = prevSize + remainingSize
++      const safeSize = resizePanel({ panels, index, size: unsafeSize })
++
++      if (prevSize !== safeSize) {
++        remainingSize -= safeSize - prevSize
++        nextSize[index] = safeSize
++
++        // Once we've used up the remainder, bail
++        if (fuzzyNumbersEqual(remainingSize, 0)) {
++          break
++        }
++      }
++    }
++  }
++
++  return nextSize
++}
+diff --git a/packages/utilities/dom-query/src/event.ts b/packages/utilities/dom-query/src/event.ts
+index fd9dd1ff14..15fc3a916d 100644
+--- a/packages/utilities/dom-query/src/event.ts
++++ b/packages/utilities/dom-query/src/event.ts
+@@ -131,7 +131,7 @@ export function getEventStep(event: Pick<KeyboardEvent, "ctrlKey" | "metaKey" |
+   }
+ }
+ 
+-export function getEventPoint(event: any, type: "page" | "client" = "client") {
++export function getEventPoint(event: any, type: "page" | "client" = "client"): { x: number; y: number } {
+   const point = isTouchEvent(event) ? event.touches[0] || event.changedTouches[0] : event
+   return { x: point[`${type}X`], y: point[`${type}Y`] }
+ }
+diff --git a/packages/utilities/i18n-utils/src/filter.ts b/packages/utilities/i18n-utils/src/filter.ts
+index 908023f0ec..7062cde810 100644
+--- a/packages/utilities/i18n-utils/src/filter.ts
++++ b/packages/utilities/i18n-utils/src/filter.ts
+@@ -12,7 +12,7 @@ export interface FilterOptions extends Intl.CollatorOptions {
+ 
+ const collatorCache = i18nCache(Intl.Collator)
+ 
+-export function filter(options?: FilterOptions): FilterReturn {
++export function createFilter(options?: FilterOptions): FilterReturn {
+   const { locale, ...rest } = options || {}
+   const collator = collatorCache(locale || "en-US", { usage: "search", ...rest })
+ 
+diff --git a/packages/utilities/stringify-state/src/index.ts b/packages/utilities/stringify-state/src/index.ts
+index c1951a4318..8e3a4c915a 100644
+--- a/packages/utilities/stringify-state/src/index.ts
++++ b/packages/utilities/stringify-state/src/index.ts
+@@ -54,24 +54,21 @@ export function stringifyState(state: Dict, omit?: string[]) {
+         }
+ 
+         switch (value?.toString()) {
+-          case "[object ShadowRoot]":
+-            const id = value.state.context.id ?? value.id
+-            return `Machine: ${id}`
+-
+-          case "[object ShadowRoot]":
++          case "[object ShadowRoot]": {
+             return "#shadow-root"
+-
+-          case "[object HTMLDocument]":
++          }
++          case "[object HTMLDocument]": {
+             return "#document"
+-
+-          case "[object Window]":
++          }
++          case "[object Window]": {
+             return "#window"
+-
+-          case "[object AbortController]":
++          }
++          case "[object AbortController]": {
+             return "#abort-controller"
+-
+-          default:
++          }
++          default: {
+             return value !== null && typeof value === "object" && value.nodeType === 1 ? value.tagName : value
++          }
+         }
+       } catch {
+         return value
+diff --git a/website/components/machines/splitter.tsx b/website/components/machines/splitter.tsx
+index a16fb889c4..9bca2aadb8 100644
+--- a/website/components/machines/splitter.tsx
++++ b/website/components/machines/splitter.tsx
+@@ -5,10 +5,8 @@ import { useId } from "react"
+ export function Splitter(props: any) {
+   const service = useMachine(splitter.machine, {
+     id: useId(),
+-    defaultSize: [
+-      { id: "a", size: 50 },
+-      { id: "b", size: 50 },
+-    ],
++    panels: [{ id: "a" }, { id: "b" }],
++    defaultSize: [50, 50],
+     ...props.controls,
+   })
+ 
+diff --git a/website/data/components/splitter.mdx b/website/data/components/splitter.mdx
+index eb813f72fb..57104b90b7 100644
+--- a/website/data/components/splitter.mdx
++++ b/website/data/components/splitter.mdx
+@@ -16,8 +16,15 @@ resize or expand/collapse them.
+ 
+ **Features**
+ 
+-- Double click a splitter to maximize pane
+-- Programmatic control of width or height
++- Built with flexbox for flexible layout and SSR
++- Support both dynamic horizontal and vertical panels
++- Support multiple panels and splitters
++- Support for collapsible panels
++- Support for panel constraints like min and max sizes
++- Programmatic control of panel sizes
++- Implements the
++  [Window Splitter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/)
++  for accessibility and keyboard controls
+ 
+ ## Installation
+ 
+@@ -60,22 +67,35 @@ splitter machine in your project 🔥
+ 
+ <CodeSnippet id="splitter/usage.mdx" />
+ 
+-## Listening for events
++## Setting the initial size
+ 
+-When the resize trigger of splitter changes, the `onSizeChangeStart` and
+-`onSizeChangeEnd` callback is invoked.
++To set the initial size of the splitter panels, use the `defaultSize` property.
++Ensure the `defaultSize` totals to `100`.
+ 
+-```jsx {7-12}
++> Note: The splitter only supports setting percentage values.
++
++```jsx {3}
+ const service = useMachine(splitter.machine, {
+-  id: useId(),
+-  defaultSize: [
+-    { id: "a", size: 50 },
+-    { id: "b", size: 50 },
+-  ],
+-  onSizeChangeStart(detail) {
++  // ...
++  defaultSize: [40, 60],
++})
++```
++
++## Listening for resize events
++
++When the resize trigger is dragged, the `onResize`, `onResizeStart` and
++`onResizeEnd` callback is invoked.
++
++```jsx {3-10}
++const service = useMachine(splitter.machine, {
++  // ...
++  onResize(detail) {
++    console.log("resize", detail)
++  },
++  onResizeStart(detail) {
+     console.log("change start", detail)
+   },
+-  onSizeChangeEnd(detail) {
++  onResizeEnd(detail) {
+     console.log("change end", detail)
+   },
+ })
+@@ -87,17 +107,65 @@ By default, the splitter is assumed to be horizontal. To change the orientation
+ to vertical, set the `orientation` property in the machine's context to
+ `vertical`.
+ 
+-```jsx {7}
++```jsx {3}
+ const service = useMachine(splitter.machine, {
+-  id: useId(),
+-  defaultSize: [
+-    { id: "a", size: 50 },
+-    { id: "b", size: 50 },
+-  ],
++  // ...
+   orientation: "vertical",
+ })
+ ```
+ 
++## Specifying constraints
++
++Use the `panels` property to specify constraints like `minSize` and `maxSize`
++for the splitter panels.
++
++```jsx {3-6}
++const service = useMachine(splitter.machine, {
++  // ...
++  panels: [
++    { id: "a", minSize: 100, maxSize: 300 },
++    { id: "b", minSize: 100, maxSize: 300 },
++  ],
++})
++```
++
++## Setting the collapsed size
++
++Set the `collapsedSize` and `collapsible` of a panel to specify the collapsed
++size of the panel.
++
++> For best results, ensure you also set the `minSize` of the panel
++
++```jsx {4}
++const service = useMachine(splitter.machine, {
++  // ...
++  panels: [
++    { id: "a", collapsible: true, collapsedSize: 5, minSize: 10, maxSize: 20 },
++    { id: "b", minSize: 50 },
++  ],
++})
++```
++
++This allows the user to drag the splitter to collapse the panel to the
++`collapsedSize`.
++
++## Listening for collapse events
++
++When the splitter panel is collapsed, the `onCollapse` callback is invoked.
++Alternatively, the `onExpand` callback is invoked when the panel is expanded.
++
++```jsx {3-8}
++const service = useMachine(splitter.machine, {
++  // ...
++  onCollapse(detail) {
++    console.log("collapse", detail)
++  },
++  onExpand(detail) {
++    console.log("expand", detail)
++  },
++})
++```
++
+ ## Styling guide
+ 
+ Earlier, we mentioned that each accordion part has a `data-part` attribute added
+@@ -136,4 +204,20 @@ on the item and content elements.
+ 
+ ## Methods and Properties
+ 
++The splitter's `api` exposes the following methods and properties:
++
++### Machine Context
++
++The splitter machine exposes the following context properties:
++
++<ContextTable name="splitter" />
++
++### Machine API
++
++The splitter `api` exposes the following methods:
++
+ <ApiTable name="splitter" />
++
++### Data Attributes
++
++<DataAttrTable name="splitter" />

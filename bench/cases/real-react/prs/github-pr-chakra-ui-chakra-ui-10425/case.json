@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10425",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10425: feat: add Splitter component",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10425,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10425",
+    "baseSha": "63d07c5f812fdb5e6ed8f01a953a822b2fc3a88d",
+    "headSha": "56869b20ee7f6ea03cbde7d7be58f8351100a791",
+    "selectedFiles": [
+      "packages/react/src/components/index.ts"
+    ],
+    "collectedAt": "2026-03-08T03:59:29.029Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/components/index.ts",
+      "oldPath": "packages/react/src/components/index.ts",
+      "newPath": "packages/react/src/components/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/components/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 89,
+          "endLine": 89
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,25 @@
+diff --git a/.changeset/shy-pumas-provide.md b/.changeset/shy-pumas-provide.md
+new file mode 100644
+index 00000000000..e0dcffd02d6
+--- /dev/null
++++ b/.changeset/shy-pumas-provide.md
+@@ -0,0 +1,5 @@
++---
++"@chakra-ui/avatar": patch
++---
++
++Fix issue where initials was not correctly computed when name includes a middle name like "Sage Naruto Manich"
+diff --git a/packages/components/avatar/src/avatar-name.tsx b/packages/components/avatar/src/avatar-name.tsx
+index 09696ef877b..d605dcdf31c 100644
+--- a/packages/components/avatar/src/avatar-name.tsx
++++ b/packages/components/avatar/src/avatar-name.tsx
+@@ -3,7 +3,8 @@ import { useAvatarStyles } from "./avatar-context"
+ import { AvatarOptions } from "./avatar-types"
+ 
+ export function initials(name: string) {
+-  const [firstName, lastName] = name.split(" ")
++  const [firstName, ...otherNames] = name.split(" ");
++  const [lastName] = otherNames.reverse();
+   return firstName && lastName
+     ? `${firstName.charAt(0)}${lastName.charAt(0)}`
+     : firstName.charAt(0)

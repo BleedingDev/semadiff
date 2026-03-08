@@ -1,0 +1,235 @@
+[
+  {
+    "tracking_name": "packages/browser-playwright/src/index.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fbrowser-playwright%2Fsrc%2Findex.ts&old_oid=4500aa7014960ac248fc6660dcac9b0b677f6146&old_mode=33188&new_filename=packages%2Fbrowser-playwright%2Fsrc%2Findex.ts&new_oid=b1226751ec81b3f40f76c71105f62dea28831f36&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/browser-playwright/src/index.ts",
+      "oid": "4500aa7014960ac248fc6660dcac9b0b677f6146",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/browser-playwright/src/index.ts",
+      "oid": "b1226751ec81b3f40f76c71105f62dea28831f36",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7c792a243e3d210916eea3ed7ee7a2e1729122cfaf54f3f35df8ba8afcb0e660"
+  },
+  {
+    "tracking_name": "packages/browser-playwright/src/playwright.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fbrowser-playwright%2Fsrc%2Fplaywright.ts&old_oid=ab971f45e7b0610b46e49bc03466f4712701ce9f&old_mode=33188&new_filename=packages%2Fbrowser-playwright%2Fsrc%2Fplaywright.ts&new_oid=d838c00997d189ec3d062ba10407a0cd02fc5ba3&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/browser-playwright/src/playwright.ts",
+      "oid": "ab971f45e7b0610b46e49bc03466f4712701ce9f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/browser-playwright/src/playwright.ts",
+      "oid": "d838c00997d189ec3d062ba10407a0cd02fc5ba3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "75357ce46cc8d4a09eb80b35031af5875aa571cbbae4d9daa8281b7d346f3108"
+  },
+  {
+    "tracking_name": "packages/browser-webdriverio/src/webdriverio.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fbrowser-webdriverio%2Fsrc%2Fwebdriverio.ts&old_oid=8e24d4503da229ad09de207049f800dc92dcab5d&old_mode=33188&new_filename=packages%2Fbrowser-webdriverio%2Fsrc%2Fwebdriverio.ts&new_oid=7963900803708acb344175ec4f77b6c22c52d609&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/browser-webdriverio/src/webdriverio.ts",
+      "oid": "8e24d4503da229ad09de207049f800dc92dcab5d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/browser-webdriverio/src/webdriverio.ts",
+      "oid": "7963900803708acb344175ec4f77b6c22c52d609",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b3b041515ac121e07d67485b79a06151274c71e9b57ea6cfb5ba2ebf6af168d1"
+  },
+  {
+    "tracking_name": "packages/browser/context.d.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fbrowser%2Fcontext.d.ts&old_oid=23fd3dd359d5e98b895dc0d64d640543391a5d5b&old_mode=33188&new_filename=packages%2Fbrowser%2Fcontext.d.ts&new_oid=d867b07a8838d8e8905e428ed910535e69848e74&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/browser/context.d.ts",
+      "oid": "23fd3dd359d5e98b895dc0d64d640543391a5d5b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/browser/context.d.ts",
+      "oid": "d867b07a8838d8e8905e428ed910535e69848e74",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7611be592c0bdead17ab851873da2403f1ea6fbb23d88f01d61323d4c7ce984b"
+  },
+  {
+    "tracking_name": "packages/browser/src/node/cdp.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fbrowser%2Fsrc%2Fnode%2Fcdp.ts&old_oid=40c23797fadb79b29a27264a7744b71d98ad67a2&old_mode=33188&new_filename=packages%2Fbrowser%2Fsrc%2Fnode%2Fcdp.ts&new_oid=1654b1a44196058ada02da8f0c3bdf022957cf4f&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/browser/src/node/cdp.ts",
+      "oid": "40c23797fadb79b29a27264a7744b71d98ad67a2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/browser/src/node/cdp.ts",
+      "oid": "1654b1a44196058ada02da8f0c3bdf022957cf4f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9c56e97ff83572aac481b661cb72999c3eb2b4ed70b4bef240dfb2e38d0b1d32"
+  },
+  {
+    "tracking_name": "packages/coverage-v8/package.json",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fcoverage-v8%2Fpackage.json&old_oid=c5843821cf7d60ac503d78d559d32b349fe3e130&old_mode=33188&new_filename=packages%2Fcoverage-v8%2Fpackage.json&new_oid=b47e956f012eb5c898172d8bad34286f2901c8b7&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "packages/coverage-v8/package.json",
+      "oid": "c5843821cf7d60ac503d78d559d32b349fe3e130",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/coverage-v8/package.json",
+      "oid": "b47e956f012eb5c898172d8bad34286f2901c8b7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7578dccecbdafde2bf9195d417cb931418a77e6c71365268894da04d1f19f26f"
+  },
+  {
+    "tracking_name": "packages/coverage-v8/src/browser.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fcoverage-v8%2Fsrc%2Fbrowser.ts&old_oid=701d83910af84d8842e99455c3349947d1f52600&old_mode=33188&new_filename=packages%2Fcoverage-v8%2Fsrc%2Fbrowser.ts&new_oid=87ec6e5c3c985db01b85e686dfa572db21ea0b84&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "packages/coverage-v8/src/browser.ts",
+      "oid": "701d83910af84d8842e99455c3349947d1f52600",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/coverage-v8/src/browser.ts",
+      "oid": "87ec6e5c3c985db01b85e686dfa572db21ea0b84",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "15ef977f99955d4052a17d4cb5865a4b1a20a4b0258eb8a8f76acec364a60c4f"
+  },
+  {
+    "tracking_name": "packages/vitest/browser/context.d.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fvitest%2Fbrowser%2Fcontext.d.ts&old_oid=a0f9bc61d33a898692654ae44cebc4fdd2946f0d&old_mode=33188&new_filename=packages%2Fvitest%2Fbrowser%2Fcontext.d.ts&new_oid=ad0a691696bb561c697f1186e43a9b365fc1dc00&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "packages/vitest/browser/context.d.ts",
+      "oid": "a0f9bc61d33a898692654ae44cebc4fdd2946f0d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vitest/browser/context.d.ts",
+      "oid": "ad0a691696bb561c697f1186e43a9b365fc1dc00",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "50fa399a6f0e4257ea10acf69369f0a5b5819c36c5bb4ebe153fb317d078a045"
+  },
+  {
+    "tracking_name": "packages/vitest/src/node/types/browser.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fvitest%2Fsrc%2Fnode%2Ftypes%2Fbrowser.ts&old_oid=dada8b46f418ad669c78ffff2608f74f9ea1f93a&old_mode=33188&new_filename=packages%2Fvitest%2Fsrc%2Fnode%2Ftypes%2Fbrowser.ts&new_oid=624e3ca7359a144a4d335513706082e6f311cee3&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "packages/vitest/src/node/types/browser.ts",
+      "oid": "dada8b46f418ad669c78ffff2608f74f9ea1f93a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vitest/src/node/types/browser.ts",
+      "oid": "624e3ca7359a144a4d335513706082e6f311cee3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "28e747b7e033f0f21186813258b5576281aeff361ab7668d315eed2e0feeed22"
+  },
+  {
+    "tracking_name": "packages/vitest/src/public/browser.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fvitest%2Fsrc%2Fpublic%2Fbrowser.ts&old_oid=64ee91c05172fc8620871333b72b478ccff19d22&old_mode=33188&new_filename=packages%2Fvitest%2Fsrc%2Fpublic%2Fbrowser.ts&new_oid=c0e5316e2d411e5b56e0f065b8717d255617d96f&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "packages/vitest/src/public/browser.ts",
+      "oid": "64ee91c05172fc8620871333b72b478ccff19d22",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vitest/src/public/browser.ts",
+      "oid": "c0e5316e2d411e5b56e0f065b8717d255617d96f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "cecc11e0edc6657539410d43e9af9c6ce353ff1703e04e4cbc54cfdce968de63"
+  },
+  {
+    "tracking_name": "pnpm-lock.yaml",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=pnpm-lock.yaml&old_oid=90fd713639419b80dab1d99dae2df0d2a513a4cf&old_mode=33188&new_filename=pnpm-lock.yaml&new_oid=c50e0dbb125a65a95f52a5e60e232acf7f14af7c&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "pnpm-lock.yaml",
+      "oid": "90fd713639419b80dab1d99dae2df0d2a513a4cf",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm-lock.yaml",
+      "oid": "c50e0dbb125a65a95f52a5e60e232acf7f14af7c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "32824c984905bb02bc7ffcef96a77addd1f1602cff71a11fbbfdd7f53ee026bb"
+  },
+  {
+    "tracking_name": "test/browser/specs/utils.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=test%2Fbrowser%2Fspecs%2Futils.ts&old_oid=736d3fade0a1e08eb2bf3811210b563158c7eff5&old_mode=33188&new_filename=test%2Fbrowser%2Fspecs%2Futils.ts&new_oid=c243a33af557c1acd5b9425ccd71a0a6a3cc8a4e&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "old": {
+      "name": "test/browser/specs/utils.ts",
+      "oid": "736d3fade0a1e08eb2bf3811210b563158c7eff5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "test/browser/specs/utils.ts",
+      "oid": "c243a33af557c1acd5b9425ccd71a0a6a3cc8a4e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ee065f8b65e5e354ea9fa5c0ff54955a2cf1df584a8870c8a6ee758326bce9cf"
+  },
+  {
+    "tracking_name": "test/browser/test/cdp.test-d.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?new_filename=test%2Fbrowser%2Ftest%2Fcdp.test-d.ts&new_oid=22dcc0a912ccf62f69036a6d6c26a2d932f4d361&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "new": {
+      "name": "test/browser/test/cdp.test-d.ts",
+      "oid": "22dcc0a912ccf62f69036a6d6c26a2d932f4d361",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "8d715f1db15d8a1710c6b58d1cbf035bb7cbe6773c84126a28482beb7c09a93f"
+  },
+  {
+    "tracking_name": "test/browser/vitest.config.mts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=test%2Fbrowser%2Fvitest.config.mts&old_oid=61ba1aed8ad570a2fb10af18654bc7bc336491ba&old_mode=33188&new_filename=test%2Fbrowser%2Fvitest.config.mts&new_oid=5f221683491c077a02715a83654c04e8134a1def&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "old": {
+      "name": "test/browser/vitest.config.mts",
+      "oid": "61ba1aed8ad570a2fb10af18654bc7bc336491ba",
+      "mode": 33188
+    },
+    "new": {
+      "name": "test/browser/vitest.config.mts",
+      "oid": "5f221683491c077a02715a83654c04e8134a1def",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f17d1d18c1a17d273b778968fce594c1c55607c27d3b8ce8768c4f8b2e10d31b"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "ee3528373ca17dfac7c1a129a3867acf5b4ba9ae",
+    "filename": "docs/src/components/pricing/PricingTable.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/3ac3dcc80b3720c0e80428247bb4cb52d8703719/docs%2Fsrc%2Fcomponents%2Fpricing%2FPricingTable.tsx",
+    "raw_url": "https://github.com/mui/material-ui/raw/3ac3dcc80b3720c0e80428247bb4cb52d8703719/docs%2Fsrc%2Fcomponents%2Fpricing%2FPricingTable.tsx",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/docs%2Fsrc%2Fcomponents%2Fpricing%2FPricingTable.tsx?ref=3ac3dcc80b3720c0e80428247bb4cb52d8703719",
+    "patch": "@@ -1287,7 +1287,7 @@ export default function PricingTable({\n \n   return (\n     <ThemeProvider theme={transitionTheme}>\n-      <Box ref={tableRef} {...props} sx={{ pt: 8, width: '100%', ...props.sx }}>\n+      <Box ref={tableRef} {...props} sx={{ pt: 8, width: '100%', contain: 'paint', ...props.sx }}>\n         <StickyHead container={tableRef} disableCalculation={columnHeaderHidden} />\n         {!columnHeaderHidden && (\n           <Box sx={gridSx}>"
+  }
+]

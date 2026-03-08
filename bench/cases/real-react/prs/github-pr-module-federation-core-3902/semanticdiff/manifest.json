@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2Fruntime%2FEmbedFederationRuntimePlugin.ts&old_oid=66a919ac5039cef5b72e1b280e7516920433411d&old_mode=33188&new_filename=packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2Fruntime%2FEmbedFederationRuntimePlugin.ts&new_oid=c1fe93ee9943ffcc15ba776b06c1a192061ee991&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+      "oid": "66a919ac5039cef5b72e1b280e7516920433411d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+      "oid": "c1fe93ee9943ffcc15ba776b06c1a192061ee991",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7fb3d8034f929776b2026841e79c7df277f8d83539d60611f28e0db8502eae31"
+  }
+]

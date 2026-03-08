@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-5015",
+  "language": "ts",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#5015: fix(types): re-exporting WritableDraft from immer",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 5015,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5015",
+    "baseSha": "af3e75bb9e6a51e13603d2a5684ef3ba1da07e3b",
+    "headSha": "d83b6d819ccb78c3f9088c771121b77586058609",
+    "selectedFiles": [
+      "packages/toolkit/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:16:59.664Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/index.ts",
+      "oldPath": "packages/toolkit/src/index.ts",
+      "newPath": "packages/toolkit/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/index.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 13
+        },
+        "newRange": {
+          "startLine": 13,
+          "endLine": 13
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

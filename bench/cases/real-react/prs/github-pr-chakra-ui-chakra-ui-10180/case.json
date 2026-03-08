@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10180",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10180: refactor: edit breadcrumb ellipsis markup",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10180,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10180",
+    "baseSha": "11423e71a5f8b90f9b89d9aa26db44c209976ad9",
+    "headSha": "1c3a984cb0546e0b44ced433bb774f5ddc95e366",
+    "selectedFiles": [
+      "packages/react/src/components/breadcrumb/breadcrumb.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:56:45.575Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "oldPath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "newPath": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 104,
+          "endLine": 104
+        },
+        "newRange": {
+          "startLine": 104,
+          "endLine": 104
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

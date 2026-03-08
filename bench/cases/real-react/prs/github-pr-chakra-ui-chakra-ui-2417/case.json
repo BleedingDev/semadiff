@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-2417",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#2417: chore: renamed @chakra-ui/core to @chakra-ui/react",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 2417,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/2417",
+    "baseSha": "f24301200cd5460abc7ecfb92c0f5b423300a5b6",
+    "headSha": "785fe4f9edd276897a840ced128189a65132ca80",
+    "selectedFiles": [
+      ".storybook/preview.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:58:06.125Z"
+  },
+  "files": [
+    {
+      "id": ".storybook/preview.tsx",
+      "oldPath": ".storybook/preview.tsx",
+      "newPath": ".storybook/preview.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": ".storybook/preview.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 7,
+          "endLine": 7
+        },
+        "newRange": {
+          "startLine": 7,
+          "endLine": 7
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,13 @@
+diff --git a/packages/create-vite/src/index.ts b/packages/create-vite/src/index.ts
+index 80b6700db44fd7..0f28cb399f8773 100755
+--- a/packages/create-vite/src/index.ts
++++ b/packages/create-vite/src/index.ts
+@@ -792,7 +792,7 @@ function setupReactCompiler(root: string, isTs: boolean) {
+         `  plugins: [
+     react({
+       babel: {
+-        plugins: [['babel-plugin-react-compiler']],
++        plugins: ['babel-plugin-react-compiler'],
+       },
+     }),
+   ],`,

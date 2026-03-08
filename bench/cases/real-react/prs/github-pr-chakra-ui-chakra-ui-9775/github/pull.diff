@@ -1,0 +1,653 @@
+diff --git a/apps/compositions/src/examples/number-input-basic.tsx b/apps/compositions/src/examples/number-input-basic.tsx
+index 98dbda85bcf..839f9b570bc 100644
+--- a/apps/compositions/src/examples/number-input-basic.tsx
++++ b/apps/compositions/src/examples/number-input-basic.tsx
+@@ -1,9 +1,10 @@
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputBasic = () => {
+   return (
+-    <NumberInputRoot defaultValue="10" width="200px">
+-      <NumberInputField />
+-    </NumberInputRoot>
++    <NumberInput.Root defaultValue="10" width="200px">
++      <NumberInput.Control />
++      <NumberInput.Input />
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-closed-component.tsx b/apps/compositions/src/examples/number-input-closed-component.tsx
+new file mode 100644
+index 00000000000..4a6500f8011
+--- /dev/null
++++ b/apps/compositions/src/examples/number-input-closed-component.tsx
+@@ -0,0 +1,24 @@
++import { NumberInput as ChakraNumberInput } from "@chakra-ui/react"
++import * as React from "react"
++
++export interface NumberInputProps extends ChakraNumberInput.RootProps {}
++
++export const NumberInputRoot = React.forwardRef<
++  HTMLDivElement,
++  NumberInputProps
++>(function NumberInput(props, ref) {
++  const { children, ...rest } = props
++  return (
++    <ChakraNumberInput.Root ref={ref} variant="outline" {...rest}>
++      {children}
++      <ChakraNumberInput.Control>
++        <ChakraNumberInput.IncrementTrigger />
++        <ChakraNumberInput.DecrementTrigger />
++      </ChakraNumberInput.Control>
++    </ChakraNumberInput.Root>
++  )
++})
++
++export const NumberInputField = ChakraNumberInput.Input
++export const NumberInputScrubber = ChakraNumberInput.Scrubber
++export const NumberInputLabel = ChakraNumberInput.Label
+diff --git a/apps/compositions/src/examples/number-input-controlled.tsx b/apps/compositions/src/examples/number-input-controlled.tsx
+index 10d1eeb0da5..7b1e1257be3 100644
+--- a/apps/compositions/src/examples/number-input-controlled.tsx
++++ b/apps/compositions/src/examples/number-input-controlled.tsx
+@@ -1,17 +1,18 @@
+ "use client"
+ 
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput } from "@chakra-ui/react"
+ import { useState } from "react"
+ 
+ export const NumberInputControlled = () => {
+   const [value, setValue] = useState("10")
+   return (
+-    <NumberInputRoot
++    <NumberInput.Root
+       maxW="200px"
+       value={value}
+       onValueChange={(e) => setValue(e.value)}
+     >
+-      <NumberInputField />
+-    </NumberInputRoot>
++      <NumberInput.Control />
++      <NumberInput.Input />
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-disabled.tsx b/apps/compositions/src/examples/number-input-with-disabled.tsx
+index c656af5aee9..5563c1f8c88 100644
+--- a/apps/compositions/src/examples/number-input-with-disabled.tsx
++++ b/apps/compositions/src/examples/number-input-with-disabled.tsx
+@@ -1,9 +1,10 @@
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputWithDisabled = () => {
+   return (
+-    <NumberInputRoot defaultValue="10" width="200px" disabled>
+-      <NumberInputField />
+-    </NumberInputRoot>
++    <NumberInput.Root defaultValue="10" width="200px" disabled>
++      <NumberInput.Control />
++      <NumberInput.Input />
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-element.tsx b/apps/compositions/src/examples/number-input-with-element.tsx
+index bd899f09aa7..a260880218d 100644
+--- a/apps/compositions/src/examples/number-input-with-element.tsx
++++ b/apps/compositions/src/examples/number-input-with-element.tsx
+@@ -1,13 +1,14 @@
++import { NumberInput } from "@chakra-ui/react"
+ import { InputGroup } from "compositions/ui/input-group"
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
+ import { LuDollarSign } from "react-icons/lu"
+ 
+ export const NumberInputWithElement = () => {
+   return (
+-    <NumberInputRoot defaultValue="10" width="200px">
++    <NumberInput.Root defaultValue="10" width="200px">
++      <NumberInput.Control />
+       <InputGroup startElement={<LuDollarSign />}>
+-        <NumberInputField />
++        <NumberInput.Input />
+       </InputGroup>
+-    </NumberInputRoot>
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-field.tsx b/apps/compositions/src/examples/number-input-with-field.tsx
+index 52278129349..3bc6754d346 100644
+--- a/apps/compositions/src/examples/number-input-with-field.tsx
++++ b/apps/compositions/src/examples/number-input-with-field.tsx
+@@ -1,12 +1,14 @@
+-import { Field } from "compositions/ui/field"
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { Field, NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputWithField = () => {
+   return (
+-    <Field label="Enter Number" helperText="Enter a number between 1 and 10">
+-      <NumberInputRoot width="200px">
+-        <NumberInputField />
+-      </NumberInputRoot>
+-    </Field>
++    <Field.Root>
++      <Field.Label>Enter Number</Field.Label>
++      <NumberInput.Root width="200px">
++        <NumberInput.Control />
++        <NumberInput.Input />
++      </NumberInput.Root>
++      <Field.HelperText>Enter a number between 1 and 10</Field.HelperText>
++    </Field.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-format-options.tsx b/apps/compositions/src/examples/number-input-with-format-options.tsx
+index c81e4e381a2..0d022baee8b 100644
+--- a/apps/compositions/src/examples/number-input-with-format-options.tsx
++++ b/apps/compositions/src/examples/number-input-with-format-options.tsx
+@@ -1,20 +1,20 @@
+-import { Stack } from "@chakra-ui/react"
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput, Stack } from "@chakra-ui/react"
+ 
+ export const NumberInputWithFormatOptions = () => {
+   return (
+     <Stack gap="5" maxW="200px">
+-      <NumberInputRoot
++      <NumberInput.Root
+         defaultValue="5"
+         step={0.01}
+         formatOptions={{
+           style: "percent",
+         }}
+       >
+-        <NumberInputField />
+-      </NumberInputRoot>
++        <NumberInput.Control />
++        <NumberInput.Input />
++      </NumberInput.Root>
+ 
+-      <NumberInputRoot
++      <NumberInput.Root
+         defaultValue="45"
+         formatOptions={{
+           style: "currency",
+@@ -23,10 +23,11 @@ export const NumberInputWithFormatOptions = () => {
+           currencySign: "accounting",
+         }}
+       >
+-        <NumberInputField />
+-      </NumberInputRoot>
++        <NumberInput.Control />
++        <NumberInput.Input />
++      </NumberInput.Root>
+ 
+-      <NumberInputRoot
++      <NumberInput.Root
+         defaultValue="4"
+         formatOptions={{
+           style: "unit",
+@@ -34,8 +35,9 @@ export const NumberInputWithFormatOptions = () => {
+           unitDisplay: "long",
+         }}
+       >
+-        <NumberInputField />
+-      </NumberInputRoot>
++        <NumberInput.Control />
++        <NumberInput.Input />
++      </NumberInput.Root>
+     </Stack>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-hook-form.tsx b/apps/compositions/src/examples/number-input-with-hook-form.tsx
+index ba51dd2cad0..e243a9a50b6 100644
+--- a/apps/compositions/src/examples/number-input-with-hook-form.tsx
++++ b/apps/compositions/src/examples/number-input-with-hook-form.tsx
+@@ -1,9 +1,7 @@
+ "use client"
+ 
+-import { Button } from "@chakra-ui/react"
++import { Button, Field, NumberInput } from "@chakra-ui/react"
+ import { zodResolver } from "@hookform/resolvers/zod"
+-import { Field } from "compositions/ui/field"
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
+ import { Controller, useForm } from "react-hook-form"
+ import { z } from "zod"
+ 
+@@ -26,16 +24,13 @@ export const NumberInputWithHookForm = () => {
+ 
+   return (
+     <form onSubmit={onSubmit}>
+-      <Field
+-        label="Number"
+-        invalid={!!errors.number}
+-        errorText={errors.number?.message}
+-      >
++      <Field.Root invalid={!!errors.number}>
++        <Field.Label>Number</Field.Label>
+         <Controller
+           name="number"
+           control={control}
+           render={({ field }) => (
+-            <NumberInputRoot
++            <NumberInput.Root
+               disabled={field.disabled}
+               name={field.name}
+               value={field.value}
+@@ -43,12 +38,13 @@ export const NumberInputWithHookForm = () => {
+                 field.onChange(value)
+               }}
+             >
+-              <NumberInputField onBlur={field.onBlur} />
+-            </NumberInputRoot>
++              <NumberInput.Control />
++              <NumberInput.Input onBlur={field.onBlur} />
++            </NumberInput.Root>
+           )}
+         />
+-      </Field>
+-
++        <Field.ErrorText>{errors.number?.message}</Field.ErrorText>
++      </Field.Root>
+       <Button size="sm" type="submit" mt="4">
+         Submit
+       </Button>
+diff --git a/apps/compositions/src/examples/number-input-with-invalid.tsx b/apps/compositions/src/examples/number-input-with-invalid.tsx
+index ff140cc0021..79089600277 100644
+--- a/apps/compositions/src/examples/number-input-with-invalid.tsx
++++ b/apps/compositions/src/examples/number-input-with-invalid.tsx
+@@ -1,12 +1,14 @@
+-import { Field } from "compositions/ui/field"
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { Field, NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputWithInvalid = () => {
+   return (
+-    <Field label="Enter Number" invalid errorText="The entry is invalid">
+-      <NumberInputRoot defaultValue="10" width="200px">
+-        <NumberInputField />
+-      </NumberInputRoot>
+-    </Field>
++    <Field.Root invalid>
++      <Field.Label>Enter Number</Field.Label>
++      <NumberInput.Root defaultValue="10" width="200px">
++        <NumberInput.Control />
++        <NumberInput.Input />
++      </NumberInput.Root>
++      <Field.ErrorText>The entry is invalid</Field.ErrorText>
++    </Field.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-min-max.tsx b/apps/compositions/src/examples/number-input-with-min-max.tsx
+index 65c92808632..25bbfc624a4 100644
+--- a/apps/compositions/src/examples/number-input-with-min-max.tsx
++++ b/apps/compositions/src/examples/number-input-with-min-max.tsx
+@@ -1,9 +1,10 @@
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputWithMinMax = () => {
+   return (
+-    <NumberInputRoot width="200px" defaultValue="10" min={5} max={50}>
+-      <NumberInputField />
+-    </NumberInputRoot>
++    <NumberInput.Root width="200px" defaultValue="10" min={5} max={50}>
++      <NumberInput.Control />
++      <NumberInput.Input />
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-mouse-wheel.tsx b/apps/compositions/src/examples/number-input-with-mouse-wheel.tsx
+index 371c01d03b6..f6df8daa52b 100644
+--- a/apps/compositions/src/examples/number-input-with-mouse-wheel.tsx
++++ b/apps/compositions/src/examples/number-input-with-mouse-wheel.tsx
+@@ -1,9 +1,10 @@
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputWithMouseWheel = () => {
+   return (
+-    <NumberInputRoot defaultValue="10" width="200px" allowMouseWheel>
+-      <NumberInputField />
+-    </NumberInputRoot>
++    <NumberInput.Root defaultValue="10" width="200px" allowMouseWheel>
++      <NumberInput.Control />
++      <NumberInput.Input />
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-scrubber.tsx b/apps/compositions/src/examples/number-input-with-scrubber.tsx
+index e61a043683d..8c22805adef 100644
+--- a/apps/compositions/src/examples/number-input-with-scrubber.tsx
++++ b/apps/compositions/src/examples/number-input-with-scrubber.tsx
+@@ -1,24 +1,21 @@
++import { NumberInput } from "@chakra-ui/react"
+ import { InputGroup } from "compositions/ui/input-group"
+-import {
+-  NumberInputField,
+-  NumberInputRoot,
+-  NumberInputScrubber,
+-} from "compositions/ui/number-input"
+ import { LuArrowRightLeft } from "react-icons/lu"
+ 
+ export const NumberInputWithScrubber = () => {
+   return (
+-    <NumberInputRoot defaultValue="10" width="200px">
++    <NumberInput.Root defaultValue="10" width="200px">
++      <NumberInput.Control />
+       <InputGroup
+         startElementProps={{ pointerEvents: "auto" }}
+         startElement={
+-          <NumberInputScrubber>
++          <NumberInput.Scrubber>
+             <LuArrowRightLeft />
+-          </NumberInputScrubber>
++          </NumberInput.Scrubber>
+         }
+       >
+-        <NumberInputField />
++        <NumberInput.Input />
+       </InputGroup>
+-    </NumberInputRoot>
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-sizes.tsx b/apps/compositions/src/examples/number-input-with-sizes.tsx
+index 20186d2031b..3b18c30e497 100644
+--- a/apps/compositions/src/examples/number-input-with-sizes.tsx
++++ b/apps/compositions/src/examples/number-input-with-sizes.tsx
+@@ -1,14 +1,14 @@
+-import { For, Stack } from "@chakra-ui/react"
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { For, NumberInput, Stack } from "@chakra-ui/react"
+ 
+ export const NumberInputWithSizes = () => {
+   return (
+     <Stack gap="5" width="200px">
+       <For each={["xs", "sm", "md", "lg"]}>
+         {(size) => (
+-          <NumberInputRoot size={size} key={size} defaultValue="10">
+-            <NumberInputField />
+-          </NumberInputRoot>
++          <NumberInput.Root size={size} key={size} defaultValue="10">
++            <NumberInput.Control />
++            <NumberInput.Input />
++          </NumberInput.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/compositions/src/examples/number-input-with-step.tsx b/apps/compositions/src/examples/number-input-with-step.tsx
+index e7036a3b35e..9b478fcd851 100644
+--- a/apps/compositions/src/examples/number-input-with-step.tsx
++++ b/apps/compositions/src/examples/number-input-with-step.tsx
+@@ -1,9 +1,10 @@
+-import { NumberInputField, NumberInputRoot } from "compositions/ui/number-input"
++import { NumberInput } from "@chakra-ui/react"
+ 
+ export const NumberInputWithStep = () => {
+   return (
+-    <NumberInputRoot maxW="200px" defaultValue="2" step={3}>
+-      <NumberInputField />
+-    </NumberInputRoot>
++    <NumberInput.Root maxW="200px" defaultValue="2" step={3}>
++      <NumberInput.Control />
++      <NumberInput.Input />
++    </NumberInput.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/number-input-with-stepper.tsx b/apps/compositions/src/examples/number-input-with-stepper.tsx
+index 528444d59d6..7221ebe17a3 100644
+--- a/apps/compositions/src/examples/number-input-with-stepper.tsx
++++ b/apps/compositions/src/examples/number-input-with-stepper.tsx
+@@ -1,5 +1,22 @@
+-import { StepperInput } from "compositions/ui/stepper-input"
++import { HStack, IconButton, NumberInput } from "@chakra-ui/react"
++import { LuMinus, LuPlus } from "react-icons/lu"
+ 
+ export const NumberInputWithStepper = () => {
+-  return <StepperInput defaultValue="3" />
++  return (
++    <NumberInput.Root defaultValue="3" unstyled spinOnPress={false}>
++      <HStack gap="2">
++        <NumberInput.DecrementTrigger asChild>
++          <IconButton variant="outline" size="sm">
++            <LuMinus />
++          </IconButton>
++        </NumberInput.DecrementTrigger>
++        <NumberInput.ValueText textAlign="center" fontSize="lg" minW="3ch" />
++        <NumberInput.IncrementTrigger asChild>
++          <IconButton variant="outline" size="sm">
++            <LuPlus />
++          </IconButton>
++        </NumberInput.IncrementTrigger>
++      </HStack>
++    </NumberInput.Root>
++  )
+ }
+diff --git a/apps/www/content/docs/components/number-input.mdx b/apps/www/content/docs/components/number-input.mdx
+index 8b726db3952..f43b96b0cac 100644
+--- a/apps/www/content/docs/components/number-input.mdx
++++ b/apps/www/content/docs/components/number-input.mdx
+@@ -12,54 +12,79 @@ links:
+ 
+ <ExampleTabs name="number-input-basic" />
+ 
+-## Setup
++## Usage
+ 
+-If you don't already have the snippet, run the following command to add the
+-`number-input` snippet
++```tsx
++import { NumberInput } from "@chakra-ui/react"
++```
+ 
+-```sh
+-npx @chakra-ui/cli snippet add number-input
++```tsx
++<NumberInput.Root>
++  <NumberInput.Control />
++  <NumberInput.Input />
++</NumberInput.Root>
+ ```
+ 
+-The snippet includes a closed component composition for the `NumberInput`
+-component.
++:::info
+ 
+-## Usage
++If you prefer a closed component composition, check out the
++[snippet below](#closed-component).
++
++:::
++
++## Shortcuts
++
++The `NumberInput` component also provides a set of shortcuts for common use
++cases.
++
++### NumberInputControl
++
++The `NumberInput.Control` renders the `NumberInput.IncrementTrigger` and
++`NumberInput.DecrementTrigger` within it by default.
++
++This works:
+ 
+-```jsx
+-import {
+-  NumberInputField,
+-  NumberInputLabel,
+-  NumberInputRoot,
+-} from "@/components/ui/number-input"
++```tsx
++<NumberInput.Root>
++  <NumberInput.Control>
++    <NumberInput.IncrementTrigger />
++    <NumberInput.DecrementTrigger />
++  </NumberInput.Control>
++  <NumberInput.Input />
++</NumberInput.Root>
+ ```
+ 
+-```jsx
+-<NumberInputRoot>
+-  <NumberInputLabel />
+-  <NumberInputField />
+-</NumberInputRoot>
++This might be more concise, if you don't need to customize the increment or
++decrement triggers:
++
++```tsx
++<NumberInput.Root>
++  <NumberInput.Control />
++  <NumberInput.Input />
++</NumberInput.Root>
+ ```
+ 
+ ## Examples
+ 
+ ### Sizes
+ 
+-Use the `size` prop to change the size of the number input.
++Pass the `size` prop to the `NumberInput.Root` component to change the size of
++the number input.
+ 
+ <ExampleTabs name="number-input-with-sizes" />
+ 
+ ### Formatting
+ 
+-Use the `formatOptions` prop to format the number input value. The value of this
+-maps to `Intl.NumberFormatOptions` and is applied based on the current locale.
++Pass the `formatOptions` prop to the `NumberInput.Root` component to format the
++number input value. The value of this maps to `Intl.NumberFormatOptions` and is
++applied based on the current locale.
+ 
+ <ExampleTabs name="number-input-with-format-options" />
+ 
+ ### Min and Max
+ 
+-Use the `min` and `max` props to set the minimum and maximum values of the
+-number input.
++Pass the `min` and `max` props to the `NumberInput.Root` component to set the
++minimum and maximum values of the number input.
+ 
+ If value entered is less than `min` or greater than `max`, the value will be
+ clamped to the nearest boundary on blur, or enter key press.
+@@ -68,52 +93,66 @@ clamped to the nearest boundary on blur, or enter key press.
+ 
+ ### Step
+ 
+-Use the `step` prop to change the increment or decrement interval of the number
+-input.
++Pass the `step` prop to the `NumberInput.Root` component to change the increment
++or decrement interval of the number input.
+ 
+ <ExampleTabs name="number-input-with-step" />
+ 
+ ### Controlled
+ 
+-Use the `value` and `onValueChange` props to control the value of the number
+-input.
++Pass the `value` and `onValueChange` props to the `NumberInput.Root` component
++to control the value of the number input.
+ 
+ <ExampleTabs name="number-input-controlled" />
+ 
+ ### Mobile Stepper
+ 
+-Use the `StepperInput` component to create a stepper input for mobile devices.
+-
+-> You can also apply `spinOnPress: false` to disable the spin functionality.
++Here's an example of how to compose the number input as a mobile stepper.
+ 
+ <ExampleTabs name="number-input-with-stepper" />
+ 
+ ### Mouse Wheel
+ 
+-Use the `allowMouseWheel` prop to enable or disable the mouse wheel to change
++Pass the `allowMouseWheel` prop to the `NumberInput.Root` component to enable or
++disable the mouse wheel to change
+ 
+ <ExampleTabs name="number-input-with-mouse-wheel" />
+ 
+ ### Disabled
+ 
+-Use the `disabled` prop to disable the number input.
++Pass the `disabled` prop to the `NumberInput.Root` component to disable the
++number input.
+ 
+ <ExampleTabs name="number-input-with-disabled" />
+ 
+ ### Invalid
+ 
+-Use the `Field` component and pass the `invalid` prop to indicate that the
+-number input is invalid.
++Use the `Field` component and the `invalid` prop to indicate that the number
++input is invalid.
+ 
+ <ExampleTabs name="number-input-with-invalid" />
+ 
+ ### Helper Text
+ 
+-Use the `Field` component and pass the `helperText` prop to add helper text to
+-the number input.
++Compose the `Field` and `Field.HelperText` components to add helper text to the
++number input.
+ 
+ <ExampleTabs name="number-input-with-field" />
+ 
++### Element
++
++Here's an example of how to compose the number input with the input group
++component to add an element on either the left or right.
++
++<ExampleTabs name="number-input-with-element" />
++
++### Scrubber
++
++Use the `NumberInput.Scrubber` component to make the number input supports
++scrubber interactions.
++
++<ExampleTabs name="number-input-with-scrubber" />
++
+ ### Hook Form
+ 
+ Here is an example of how to use the `NumberInput` component with
+@@ -121,6 +160,27 @@ Here is an example of how to use the `NumberInput` component with
+ 
+ <ExampleTabs name="number-input-with-hook-form" />
+ 
++### Closed Component
++
++Here's how to setup the Number Input for a closed component composition.
++
++<ExampleCode name="number-input-closed-component" />
++
++If you want to automatically add the closed component to your project, run the
++command:
++
++```bash
++npx @chakra-ui/cli snippet add number-input
++```
++
++#### Usage
++
++```tsx
++<NumberInputRoot>
++  <NumberInputField />
++</NumberInputRoot>
++```
++
+ ## Props
+ 
+ ### Root
+diff --git a/packages/react/__stories__/number-input.stories.tsx b/packages/react/__stories__/number-input.stories.tsx
+index b6ad1d7dc33..8897311f4b2 100644
+--- a/packages/react/__stories__/number-input.stories.tsx
++++ b/packages/react/__stories__/number-input.stories.tsx
+@@ -24,3 +24,5 @@ export { NumberInputWithMouseWheel as MouseWheel } from "compositions/examples/n
+ export { NumberInputWithScrubber as Scrubber } from "compositions/examples/number-input-with-scrubber"
+ export { NumberInputWithSizes as Sizes } from "compositions/examples/number-input-with-sizes"
+ export { NumberInputWithStep as Step } from "compositions/examples/number-input-with-step"
++export { NumberInputWithStepper as Stepper } from "compositions/examples/number-input-with-stepper"
++export { NumberInputWithElement as Element } from "compositions/examples/number-input-with-element"

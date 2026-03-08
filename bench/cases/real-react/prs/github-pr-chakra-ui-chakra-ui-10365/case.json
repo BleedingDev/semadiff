@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10365",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10365: docs: extend Component Explorer coverage across component docs",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10365,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10365",
+    "baseSha": "83c1641fc221822e522f492c7dfcda866397cf61",
+    "headSha": "8bd1e4d02b768100457c03b7f48cb5ecbd30bb20",
+    "selectedFiles": [
+      "apps/compositions/src/examples/color-picker-with-variants.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:59:43.719Z"
+  },
+  "files": [
+    {
+      "id": "apps/compositions/src/examples/color-picker-with-variants.tsx",
+      "oldPath": "apps/compositions/src/examples/color-picker-with-variants.tsx",
+      "newPath": "apps/compositions/src/examples/color-picker-with-variants.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/compositions/src/examples/color-picker-with-variants.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 18,
+          "endLine": 18
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-pnpm-pnpm-10900",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10900: fix: fix mount-modules test when fuse-native is not installed",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10900,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10900",
+    "baseSha": "77165a6fca84fa5d10de2647e8e741010bb8e548",
+    "headSha": "9f7217d94bfb17ffeb8e83530da78ffdc82f8907",
+    "selectedFiles": [
+      ".meta-updater/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:25:01.366Z"
+  },
+  "files": [
+    {
+      "id": ".meta-updater/src/index.ts",
+      "oldPath": ".meta-updater/src/index.ts",
+      "newPath": ".meta-updater/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": ".meta-updater/src/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 375,
+          "endLine": 375
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

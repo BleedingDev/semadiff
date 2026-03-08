@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10503",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10503: fix(strong): correct props type and font weight for Strong component",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10503,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10503",
+    "baseSha": "650bfd1fcfe8cbf78ae3c4066e3cd219ad5bc894",
+    "headSha": "2bb5e38bf2234660cc29c805d3fb6d57ddd84815",
+    "selectedFiles": [
+      "packages/react/src/components/strong/index.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:59:21.823Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/components/strong/index.tsx",
+      "oldPath": "packages/react/src/components/strong/index.tsx",
+      "newPath": "packages/react/src/components/strong/index.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/components/strong/index.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 5,
+          "endLine": 5
+        },
+        "newRange": {
+          "startLine": 5,
+          "endLine": 5
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

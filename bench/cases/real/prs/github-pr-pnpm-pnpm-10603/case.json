@@ -1,0 +1,80 @@
+{
+  "id": "github-pr-pnpm-pnpm-10603",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10603: refactor(test): some small polishments",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10603,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10603",
+    "baseSha": "cc7c0d22dfaf8b99b59a76965be058ec2ac29e1d",
+    "headSha": "a799ab11e015c37fd765346762252c518d6b952e",
+    "selectedFiles": [
+      "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts"
+    ],
+    "collectedAt": "2026-03-08T02:27:11.349Z"
+  },
+  "files": [
+    {
+      "id": "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts",
+      "oldPath": "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts",
+      "newPath": "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 84,
+          "endLine": 85
+        },
+        "newRange": {
+          "startLine": 84,
+          "endLine": 84
+        }
+      },
+      {
+        "fileId": "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 97,
+          "endLine": 98
+        },
+        "newRange": {
+          "startLine": 96,
+          "endLine": 96
+        }
+      },
+      {
+        "fileId": "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 110,
+          "endLine": 111
+        },
+        "newRange": {
+          "startLine": 108,
+          "endLine": 108
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

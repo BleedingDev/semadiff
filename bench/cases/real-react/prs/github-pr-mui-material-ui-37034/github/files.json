@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "78978f75e0660572eebe452914dcb1b89f82810d",
+    "filename": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 9,
+    "changes": 15,
+    "blob_url": "https://github.com/mui/material-ui/blob/9c12b4c9286c60d9b7a80511b40a9bfe32bc0116/packages%2Fapi-docs-builder%2FApiBuilders%2FHookApiBuilder.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/9c12b4c9286c60d9b7a80511b40a9bfe32bc0116/packages%2Fapi-docs-builder%2FApiBuilders%2FHookApiBuilder.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fapi-docs-builder%2FApiBuilders%2FHookApiBuilder.ts?ref=9c12b4c9286c60d9b7a80511b40a9bfe32bc0116",
+    "patch": "@@ -370,19 +370,16 @@ const generateApiTranslations = (outputDirectory: string, reactApi: ReactApi) =>\n   });\n };\n \n-const extractInfoFromInterface = (\n-  interfaceName: string,\n-  project: TypeScriptProject,\n-): ParsedProperty[] => {\n+const extractInfoFromType = (typeName: string, project: TypeScriptProject): ParsedProperty[] => {\n   // Generate the params\n   let result: ParsedProperty[] = [];\n \n   try {\n-    const exportedSymbol = project.exports[interfaceName];\n+    const exportedSymbol = project.exports[typeName];\n     const type = project.checker.getDeclaredTypeOfSymbol(exportedSymbol);\n     // @ts-ignore\n     const typeDeclaration = type?.symbol?.declarations?.[0];\n-    if (!typeDeclaration || !ts.isInterfaceDeclaration(typeDeclaration)) {\n+    if (!typeDeclaration) {\n       return [];\n     }\n \n@@ -399,7 +396,7 @@ const extractInfoFromInterface = (\n       .filter((property) => !property.tags.ignore)\n       .sort((a, b) => a.name.localeCompare(b.name));\n   } catch (e) {\n-    console.error(`No declaration for ${interfaceName}`);\n+    console.error(`No declaration for ${typeName}`);\n   }\n \n   return result;\n@@ -433,8 +430,8 @@ export default async function generateHookApi(hooksInfo: HookInfo, project: Type\n     { filename },\n   );\n \n-  const parameters = extractInfoFromInterface(`${upperFirst(name)}Parameters`, project);\n-  const returnValue = extractInfoFromInterface(`${upperFirst(name)}ReturnValue`, project);\n+  const parameters = extractInfoFromType(`${upperFirst(name)}Parameters`, project);\n+  const returnValue = extractInfoFromType(`${upperFirst(name)}ReturnValue`, project);\n \n   // Ignore what we might have generated in `annotateHookDefinition`\n   const annotatedDescriptionMatch = reactApi.description.match(/(Demos|API):\\r?\\n\\r?\\n/);"
+  }
+]

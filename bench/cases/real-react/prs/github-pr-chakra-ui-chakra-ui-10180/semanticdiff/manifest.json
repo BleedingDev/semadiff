@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fbreadcrumb%2Fbreadcrumb.tsx&old_oid=e81a88ac1eaedf997b6a93e5917a5a2f0d0ed770&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fbreadcrumb%2Fbreadcrumb.tsx&new_oid=a138f742dc191c716208b5a169ef721367b9baa5&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "oid": "e81a88ac1eaedf997b6a93e5917a5a2f0d0ed770",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+      "oid": "a138f742dc191c716208b5a169ef721367b9baa5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9709c5c9db1da5239feb7a8aef192b07163d5fbf821e63c3de192ad7f96ea579"
+  }
+]

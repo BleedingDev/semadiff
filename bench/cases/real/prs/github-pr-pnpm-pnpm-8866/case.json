@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-pnpm-pnpm-8866",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#8866: refactor: lockfile types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 8866,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/8866",
+    "baseSha": "a162703126ef0be886f76f7b598acb0f38b99394",
+    "headSha": "b90ec11b50b52a5c6cd741aad1642258380f2e8e",
+    "selectedFiles": [
+      "lockfile/fs/test/write.test.ts"
+    ],
+    "collectedAt": "2026-03-08T02:26:28.371Z"
+  },
+  "files": [
+    {
+      "id": "lockfile/fs/test/write.test.ts",
+      "oldPath": "lockfile/fs/test/write.test.ts",
+      "newPath": "lockfile/fs/test/write.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "lockfile/fs/test/write.test.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 84,
+          "endLine": 84
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

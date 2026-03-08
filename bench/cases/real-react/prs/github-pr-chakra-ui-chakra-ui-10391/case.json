@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10391",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10391: feat: add carousel component",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10391,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10391",
+    "baseSha": "69aabbfd5f32283329b272544670ebadea9b6788",
+    "headSha": "22d61525b1a22b05aa72d80cbdee9ab0248a2fbe",
+    "selectedFiles": [
+      "apps/www/docs.config.ts"
+    ],
+    "collectedAt": "2026-03-08T03:59:36.467Z"
+  },
+  "files": [
+    {
+      "id": "apps/www/docs.config.ts",
+      "oldPath": "apps/www/docs.config.ts",
+      "newPath": "apps/www/docs.config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/www/docs.config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 190,
+          "endLine": 190
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

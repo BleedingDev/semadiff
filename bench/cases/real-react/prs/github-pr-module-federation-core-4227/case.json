@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4227",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4227: fix(bridge-react):  remove the unnecessary bundle for react-router-dom when user not using react-router in bridge-react",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4227,
+    "prUrl": "https://github.com/module-federation/core/pull/4227",
+    "baseSha": "f53f2394e7087ec28efa845bbd7183f9b2ca8960",
+    "headSha": "d48c3cb37d4d7cd075b52c8417d21024e5ca449a",
+    "selectedFiles": [
+      "packages/bridge/bridge-react/vite.config.ts"
+    ],
+    "collectedAt": "2026-03-08T04:15:41.502Z"
+  },
+  "files": [
+    {
+      "id": "packages/bridge/bridge-react/vite.config.ts",
+      "oldPath": "packages/bridge/bridge-react/vite.config.ts",
+      "newPath": "packages/bridge/bridge-react/vite.config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/bridge/bridge-react/vite.config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 23,
+          "endLine": 23
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

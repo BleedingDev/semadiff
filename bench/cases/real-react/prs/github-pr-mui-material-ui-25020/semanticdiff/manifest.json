@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+    "diff": "/gh/mui/material-ui/diff?old_filename=packages%2Fmaterial-ui-lab%2Fsrc%2Finternal%2Fpickers%2Fhooks%2FuseMaskedInput.tsx&old_oid=0b7d18000f8c876ed5ea852d1d20c2746ce36c6d&old_mode=33188&new_filename=packages%2Fmaterial-ui-lab%2Fsrc%2Finternal%2Fpickers%2Fhooks%2FuseMaskedInput.tsx&new_oid=ab9d2db810d4b24c568437cf7db12b5817ee5e77&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+      "oid": "0b7d18000f8c876ed5ea852d1d20c2746ce36c6d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+      "oid": "ab9d2db810d4b24c568437cf7db12b5817ee5e77",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "89e8372373d3c3c6d32d846dcdbbea76e4659c0c32f5b88e7a47b3106652c2f4"
+  }
+]

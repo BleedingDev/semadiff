@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.test.ts&old_oid=a48a3405094fa35c77f5ee8d54c9e990c0aa8827&old_mode=33188&new_filename=packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.test.ts&new_oid=f78f70557a961200b574a99b41dceefec0e8c793&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+      "oid": "a48a3405094fa35c77f5ee8d54c9e990c0aa8827",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+      "oid": "f78f70557a961200b574a99b41dceefec0e8c793",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d91f72f01c16030a53cb94a6dd669b058547ca6d1d3f452da1dd1805e6a2797f"
+  }
+]

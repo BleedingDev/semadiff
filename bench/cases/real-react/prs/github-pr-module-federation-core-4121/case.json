@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-4121",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4121: Rename share resolver option to allowNodeModulesSuffixMatch",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4121,
+    "prUrl": "https://github.com/module-federation/core/pull/4121",
+    "baseSha": "fc6b70c82d44ac52435800de1e6c00556e772bb5",
+    "headSha": "4ed0e5079dbd122cbe6b51d3857d251b6189b4c0",
+    "selectedFiles": [
+      "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:01.404Z"
+  },
+  "files": [
+    {
+      "id": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+      "oldPath": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+      "newPath": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 542,
+          "endLine": 542
+        },
+        "newRange": {
+          "startLine": 542,
+          "endLine": 542
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

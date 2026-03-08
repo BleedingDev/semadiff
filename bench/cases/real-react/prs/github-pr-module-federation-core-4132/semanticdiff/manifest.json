@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=apps%2Frouter-demo%2Frouter-host-2000%2Frsbuild.config.ts&old_oid=ae5e6a70d2e634976769e8c839c9f23bc5b58422&old_mode=33188&new_filename=apps%2Frouter-demo%2Frouter-host-2000%2Frsbuild.config.ts&new_oid=a0fdba70d9ce5d78865e027511b3882351574b2e&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+      "oid": "ae5e6a70d2e634976769e8c839c9f23bc5b58422",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+      "oid": "a0fdba70d9ce5d78865e027511b3882351574b2e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "966ccd5b1149c892f25bddd96ca8bfcb9ab62b8d26f5b382af2f0c0d0466726b"
+  }
+]

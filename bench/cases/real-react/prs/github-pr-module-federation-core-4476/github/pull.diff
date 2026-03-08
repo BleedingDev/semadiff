@@ -1,0 +1,618 @@
+diff --git a/.changeset/clever-shirts-poke.md b/.changeset/clever-shirts-poke.md
+new file mode 100644
+index 00000000000..aefb25f8111
+--- /dev/null
++++ b/.changeset/clever-shirts-poke.md
+@@ -0,0 +1,6 @@
++---
++'@module-federation/modern-js-v3': patch
++'@module-federation/modern-js': patch
++---
++
++refactor: remove remote ip strategy feature
+diff --git a/packages/modernjs-v3/package.json b/packages/modernjs-v3/package.json
+index 06eef879c5b..9cbc7ecc6b7 100644
+--- a/packages/modernjs-v3/package.json
++++ b/packages/modernjs-v3/package.json
+@@ -66,11 +66,6 @@
+       "import": "./dist/esm/cli/mfRuntimePlugins/shared-strategy.mjs",
+       "require": "./dist/cjs/cli/mfRuntimePlugins/shared-strategy.js"
+     },
+-    "./resolve-entry-ipv4": {
+-      "types": "./dist/types/cli/mfRuntimePlugins/resolve-entry-ipv4.d.ts",
+-      "import": "./dist/esm/cli/mfRuntimePlugins/resolve-entry-ipv4.mjs",
+-      "require": "./dist/cjs/cli/mfRuntimePlugins/resolve-entry-ipv4.js"
+-    },
+     "./inject-node-fetch": {
+       "types": "./dist/types/cli/mfRuntimePlugins/inject-node-fetch.d.ts",
+       "import": "./dist/esm/cli/mfRuntimePlugins/inject-node-fetch.mjs",
+@@ -114,9 +109,6 @@
+       "shared-strategy": [
+         "./dist/types/cli/mfRuntimePlugins/shared-strategy.d.ts"
+       ],
+-      "resolve-entry-ipv4": [
+-        "./dist/types/cli/mfRuntimePlugins/resolve-entry-ipv4.d.ts"
+-      ],
+       "inject-node-fetch": [
+         "./dist/types/cli/mfRuntimePlugins/inject-node-fetch.d.ts"
+       ],
+diff --git a/packages/modernjs-v3/src/cli/configPlugin.spec.ts b/packages/modernjs-v3/src/cli/configPlugin.spec.ts
+index fd43ad65fd2..a6808b6d8c5 100644
+--- a/packages/modernjs-v3/src/cli/configPlugin.spec.ts
++++ b/packages/modernjs-v3/src/cli/configPlugin.spec.ts
+@@ -17,7 +17,6 @@ describe('patchMFConfig', async () => {
+   it('patchMFConfig: server', async () => {
+     const patchedConfig = JSON.parse(JSON.stringify(mfConfig));
+     patchMFConfig(patchedConfig, true);
+-    const ipv4 = getIPV4();
+ 
+     expect(patchedConfig).toStrictEqual({
+       dev: false,
+@@ -29,7 +28,7 @@ describe('patchMFConfig', async () => {
+       },
+       name: 'host',
+       remotes: {
+-        remote: `http://${ipv4}:3000/remoteEntry.js`,
++        remote: `http://localhost:3000/remoteEntry.js`,
+       },
+       remoteType: 'script',
+       runtimePlugins: [
+@@ -53,13 +52,12 @@ describe('patchMFConfig', async () => {
+   it('patchMFConfig: client', async () => {
+     const patchedConfig = JSON.parse(JSON.stringify(mfConfig));
+     patchMFConfig(patchedConfig, false);
+-    const ipv4 = getIPV4();
+ 
+     expect(patchedConfig).toStrictEqual({
+       filename: 'remoteEntry.js',
+       name: 'host',
+       remotes: {
+-        remote: `http://${ipv4}:3000/remoteEntry.js`,
++        remote: `http://localhost:3000/remoteEntry.js`,
+       },
+       remoteType: 'script',
+       runtimePlugins: [
+diff --git a/packages/modernjs-v3/src/cli/configPlugin.ts b/packages/modernjs-v3/src/cli/configPlugin.ts
+index bcbfd9314d5..94bd3c39c19 100644
+--- a/packages/modernjs-v3/src/cli/configPlugin.ts
++++ b/packages/modernjs-v3/src/cli/configPlugin.ts
+@@ -79,50 +79,6 @@ const injectRuntimePlugins = (
+   }
+ };
+ 
+-const replaceRemoteUrl = (
+-  mfConfig: moduleFederationPlugin.ModuleFederationPluginOptions,
+-  remoteIpStrategy?: 'ipv4' | 'inherit',
+-) => {
+-  if (remoteIpStrategy && remoteIpStrategy === 'inherit') {
+-    return;
+-  }
+-  if (!mfConfig.remotes) {
+-    return;
+-  }
+-  const ipv4 = getIPV4();
+-  const handleRemoteObject = (
+-    remoteObject: moduleFederationPlugin.RemotesObject,
+-  ) => {
+-    Object.keys(remoteObject).forEach((remoteKey) => {
+-      const remote = remoteObject[remoteKey];
+-      // no support array items yet
+-      if (Array.isArray(remote)) {
+-        return;
+-      }
+-      if (typeof remote === 'string' && remote.includes(LOCALHOST)) {
+-        remoteObject[remoteKey] = remote.replace(LOCALHOST, ipv4);
+-      }
+-      if (
+-        typeof remote === 'object' &&
+-        !Array.isArray(remote.external) &&
+-        remote.external.includes(LOCALHOST)
+-      ) {
+-        remote.external = remote.external.replace(LOCALHOST, ipv4);
+-      }
+-    });
+-  };
+-  if (Array.isArray(mfConfig.remotes)) {
+-    mfConfig.remotes.forEach((remoteObject) => {
+-      if (typeof remoteObject === 'string') {
+-        return;
+-      }
+-      handleRemoteObject(remoteObject);
+-    });
+-  } else if (typeof mfConfig.remotes !== 'string') {
+-    handleRemoteObject(mfConfig.remotes);
+-  }
+-};
+-
+ const patchDTSConfig = (
+   mfConfig: moduleFederationPlugin.ModuleFederationPluginOptions,
+   isServer: boolean,
+@@ -163,10 +119,7 @@ const patchDTSConfig = (
+ export const patchMFConfig = (
+   mfConfig: moduleFederationPlugin.ModuleFederationPluginOptions,
+   isServer: boolean,
+-  remoteIpStrategy?: 'ipv4' | 'inherit',
+-  enableSSR?: boolean,
+ ) => {
+-  replaceRemoteUrl(mfConfig, remoteIpStrategy);
+   addDataFetchExposes(mfConfig.exposes, isServer);
+ 
+   if (mfConfig.remoteType === undefined) {
+@@ -188,13 +141,6 @@ export const patchMFConfig = (
+     runtimePlugins,
+   );
+ 
+-  if (enableSSR && isDev()) {
+-    injectRuntimePlugins(
+-      require.resolve('@module-federation/modern-js-v3/resolve-entry-ipv4'),
+-      runtimePlugins,
+-    );
+-  }
+-
+   if (isServer) {
+     injectRuntimePlugins(
+       require.resolve('@module-federation/node/runtimePlugin'),
+@@ -414,12 +360,7 @@ export const moduleFederationConfigPlugin = (
+       addMyTypes2Ignored(chain, !isWeb ? ssrConfig : csrConfig);
+ 
+       const targetMFConfig = !isWeb ? ssrConfig : csrConfig;
+-      patchMFConfig(
+-        targetMFConfig,
+-        !isWeb,
+-        userConfig.remoteIpStrategy || 'ipv4',
+-        enableSSR,
+-      );
++      patchMFConfig(targetMFConfig, !isWeb);
+ 
+       patchBundlerConfig({
+         chain,
+@@ -444,16 +385,6 @@ export const moduleFederationConfigPlugin = (
+       }
+     });
+     api.config(() => {
+-      const ipv4 = getIPV4();
+-
+-      if (userConfig.remoteIpStrategy === undefined) {
+-        if (!enableSSR) {
+-          userConfig.remoteIpStrategy = 'inherit';
+-        } else {
+-          userConfig.remoteIpStrategy = 'ipv4';
+-        }
+-      }
+-
+       const devServerConfig = modernjsConfig.tools?.devServer;
+       const corsWarnMsgs = [
+         'View https://module-federation.io/guide/troubleshooting/other.html#cors-warn for more details.',
+@@ -485,12 +416,7 @@ export const moduleFederationConfigPlugin = (
+             'Access-Control-Allow-Headers': '*',
+           }
+         : undefined;
+-      const defineConfig = {
+-        REMOTE_IP_STRATEGY: JSON.stringify(userConfig.remoteIpStrategy),
+-      };
+-      if (enableSSR && isDev()) {
+-        defineConfig['FEDERATION_IPV4'] = JSON.stringify(ipv4);
+-      }
++
+       return {
+         tools: {
+           devServer: {
+@@ -506,7 +432,6 @@ export const moduleFederationConfigPlugin = (
+           },
+         },
+         source: {
+-          define: defineConfig,
+           enableAsyncEntry: modernjsConfig.source?.enableAsyncEntry ?? true,
+         },
+         dev: {
+diff --git a/packages/modernjs-v3/src/cli/index.ts b/packages/modernjs-v3/src/cli/index.ts
+index 04a76f078c7..d3e370e12d4 100644
+--- a/packages/modernjs-v3/src/cli/index.ts
++++ b/packages/modernjs-v3/src/cli/index.ts
+@@ -20,7 +20,6 @@ export const moduleFederationPlugin = (
+     assetResources: {},
+     distOutputDir: '',
+     originPluginOptions: { ...userConfig },
+-    remoteIpStrategy: userConfig?.remoteIpStrategy,
+     userConfig: userConfig || {},
+     assetFileNames: {},
+     fetchServerQuery: userConfig.fetchServerQuery ?? undefined,
+diff --git a/packages/modernjs-v3/src/cli/mfRuntimePlugins/resolve-entry-ipv4.ts b/packages/modernjs-v3/src/cli/mfRuntimePlugins/resolve-entry-ipv4.ts
+deleted file mode 100644
+index 252eb5b6fb2..00000000000
+--- a/packages/modernjs-v3/src/cli/mfRuntimePlugins/resolve-entry-ipv4.ts
++++ /dev/null
+@@ -1,70 +0,0 @@
+-import type { ModuleFederationRuntimePlugin } from '@module-federation/enhanced/runtime';
+-import { LOCALHOST } from '../../constant';
+-
+-declare const FEDERATION_IPV4: string | undefined;
+-declare const REMOTE_IP_STRATEGY: 'ipv4' | 'inherit' | undefined;
+-
+-const ipv4 =
+-  typeof FEDERATION_IPV4 !== 'undefined' ? FEDERATION_IPV4 : '127.0.0.1';
+-
+-const remoteIpStrategy =
+-  typeof REMOTE_IP_STRATEGY !== 'undefined' ? REMOTE_IP_STRATEGY : 'inherit';
+-
+-function replaceObjectLocalhost(key: string, obj: Record<string, any>) {
+-  if (remoteIpStrategy !== 'ipv4') {
+-    return;
+-  }
+-  if (!(key in obj)) {
+-    return;
+-  }
+-  const remote = obj[key];
+-  if (remote && typeof remote === 'string' && remote.includes(LOCALHOST)) {
+-    obj[key] = replaceLocalhost(remote);
+-  }
+-}
+-function replaceLocalhost(url: string): string {
+-  return url.replace(LOCALHOST, ipv4);
+-}
+-
+-const resolveEntryIpv4Plugin: () => ModuleFederationRuntimePlugin = () => ({
+-  name: 'resolve-entry-ipv4',
+-
+-  beforeRegisterRemote(args) {
+-    const { remote } = args;
+-    replaceObjectLocalhost('entry', remote);
+-    return args;
+-  },
+-  async afterResolve(args) {
+-    const { remoteInfo } = args;
+-    replaceObjectLocalhost('entry', remoteInfo);
+-    return args;
+-  },
+-  beforeLoadRemoteSnapshot(args) {
+-    const { moduleInfo } = args;
+-    if ('entry' in moduleInfo) {
+-      replaceObjectLocalhost('entry', moduleInfo);
+-      return args;
+-    }
+-    if ('version' in moduleInfo) {
+-      replaceObjectLocalhost('version', moduleInfo);
+-    }
+-    return args;
+-  },
+-  loadRemoteSnapshot(args) {
+-    const { remoteSnapshot } = args;
+-    if ('publicPath' in remoteSnapshot) {
+-      replaceObjectLocalhost('publicPath', remoteSnapshot);
+-    }
+-    if ('getPublicPath' in remoteSnapshot) {
+-      replaceObjectLocalhost('getPublicPath', remoteSnapshot);
+-    }
+-    if (remoteSnapshot.remotesInfo) {
+-      Object.keys(remoteSnapshot.remotesInfo).forEach((key) => {
+-        const remoteInfo = remoteSnapshot.remotesInfo[key];
+-        replaceObjectLocalhost('matchedVersion', remoteInfo);
+-      });
+-    }
+-    return args;
+-  },
+-});
+-export default resolveEntryIpv4Plugin;
+diff --git a/packages/modernjs-v3/src/types/index.ts b/packages/modernjs-v3/src/types/index.ts
+index f505e807225..fa1d505437a 100644
+--- a/packages/modernjs-v3/src/types/index.ts
++++ b/packages/modernjs-v3/src/types/index.ts
+@@ -9,7 +9,6 @@ export interface PluginOptions {
+         distOutputDir?: string;
+       }
+     | boolean;
+-  remoteIpStrategy?: 'ipv4' | 'inherit';
+   fetchServerQuery?: Record<string, unknown>;
+   secondarySharedTreeShaking?: boolean;
+ }
+@@ -33,7 +32,6 @@ export interface InternalModernPluginOptions {
+     browser?: StatsAssetResource;
+     node?: StatsAssetResource;
+   };
+-  remoteIpStrategy?: 'ipv4' | 'inherit';
+   userConfig?: PluginOptions;
+   fetchServerQuery?: Record<string, unknown>;
+   secondarySharedTreeShaking?: boolean;
+diff --git a/packages/modernjs/package.json b/packages/modernjs/package.json
+index cca5085deb8..a77511bfec0 100644
+--- a/packages/modernjs/package.json
++++ b/packages/modernjs/package.json
+@@ -66,11 +66,6 @@
+       "import": "./dist/esm/cli/mfRuntimePlugins/shared-strategy.mjs",
+       "require": "./dist/cjs/cli/mfRuntimePlugins/shared-strategy.js"
+     },
+-    "./resolve-entry-ipv4": {
+-      "types": "./dist/types/cli/mfRuntimePlugins/resolve-entry-ipv4.d.ts",
+-      "import": "./dist/esm/cli/mfRuntimePlugins/resolve-entry-ipv4.mjs",
+-      "require": "./dist/cjs/cli/mfRuntimePlugins/resolve-entry-ipv4.js"
+-    },
+     "./inject-node-fetch": {
+       "types": "./dist/types/cli/mfRuntimePlugins/inject-node-fetch.d.ts",
+       "import": "./dist/esm/cli/mfRuntimePlugins/inject-node-fetch.mjs",
+@@ -114,9 +109,6 @@
+       "shared-strategy": [
+         "./dist/types/cli/mfRuntimePlugins/shared-strategy.d.ts"
+       ],
+-      "resolve-entry-ipv4": [
+-        "./dist/types/cli/mfRuntimePlugins/resolve-entry-ipv4.d.ts"
+-      ],
+       "inject-node-fetch": [
+         "./dist/types/cli/mfRuntimePlugins/inject-node-fetch.d.ts"
+       ],
+diff --git a/packages/modernjs/src/cli/configPlugin.spec.ts b/packages/modernjs/src/cli/configPlugin.spec.ts
+index 5eddc30c40a..fc531db627e 100644
+--- a/packages/modernjs/src/cli/configPlugin.spec.ts
++++ b/packages/modernjs/src/cli/configPlugin.spec.ts
+@@ -17,8 +17,6 @@ describe('patchMFConfig', async () => {
+   it('patchMFConfig: server', async () => {
+     const patchedConfig = JSON.parse(JSON.stringify(mfConfig));
+     patchMFConfig(patchedConfig, true);
+-    const ipv4 = getIPV4();
+-
+     expect(patchedConfig).toStrictEqual({
+       dev: false,
+       dts: false,
+@@ -29,7 +27,7 @@ describe('patchMFConfig', async () => {
+       },
+       name: 'host',
+       remotes: {
+-        remote: `http://${ipv4}:3000/remoteEntry.js`,
++        remote: `http://localhost:3000/remoteEntry.js`,
+       },
+       remoteType: 'script',
+       runtimePlugins: [
+@@ -53,13 +51,12 @@ describe('patchMFConfig', async () => {
+   it('patchMFConfig: client', async () => {
+     const patchedConfig = JSON.parse(JSON.stringify(mfConfig));
+     patchMFConfig(patchedConfig, false);
+-    const ipv4 = getIPV4();
+ 
+     expect(patchedConfig).toStrictEqual({
+       filename: 'remoteEntry.js',
+       name: 'host',
+       remotes: {
+-        remote: `http://${ipv4}:3000/remoteEntry.js`,
++        remote: `http://localhost:3000/remoteEntry.js`,
+       },
+       remoteType: 'script',
+       runtimePlugins: [
+diff --git a/packages/modernjs/src/cli/configPlugin.ts b/packages/modernjs/src/cli/configPlugin.ts
+index a4fe38bc548..0b1832611c7 100644
+--- a/packages/modernjs/src/cli/configPlugin.ts
++++ b/packages/modernjs/src/cli/configPlugin.ts
+@@ -85,50 +85,6 @@ const injectRuntimePlugins = (
+   }
+ };
+ 
+-const replaceRemoteUrl = (
+-  mfConfig: moduleFederationPlugin.ModuleFederationPluginOptions,
+-  remoteIpStrategy?: 'ipv4' | 'inherit',
+-) => {
+-  if (remoteIpStrategy && remoteIpStrategy === 'inherit') {
+-    return;
+-  }
+-  if (!mfConfig.remotes) {
+-    return;
+-  }
+-  const ipv4 = getIPV4();
+-  const handleRemoteObject = (
+-    remoteObject: moduleFederationPlugin.RemotesObject,
+-  ) => {
+-    Object.keys(remoteObject).forEach((remoteKey) => {
+-      const remote = remoteObject[remoteKey];
+-      // no support array items yet
+-      if (Array.isArray(remote)) {
+-        return;
+-      }
+-      if (typeof remote === 'string' && remote.includes(LOCALHOST)) {
+-        remoteObject[remoteKey] = remote.replace(LOCALHOST, ipv4);
+-      }
+-      if (
+-        typeof remote === 'object' &&
+-        !Array.isArray(remote.external) &&
+-        remote.external.includes(LOCALHOST)
+-      ) {
+-        remote.external = remote.external.replace(LOCALHOST, ipv4);
+-      }
+-    });
+-  };
+-  if (Array.isArray(mfConfig.remotes)) {
+-    mfConfig.remotes.forEach((remoteObject) => {
+-      if (typeof remoteObject === 'string') {
+-        return;
+-      }
+-      handleRemoteObject(remoteObject);
+-    });
+-  } else if (typeof mfConfig.remotes !== 'string') {
+-    handleRemoteObject(mfConfig.remotes);
+-  }
+-};
+-
+ const patchDTSConfig = (
+   mfConfig: moduleFederationPlugin.ModuleFederationPluginOptions,
+   isServer: boolean,
+@@ -169,10 +125,7 @@ const patchDTSConfig = (
+ export const patchMFConfig = (
+   mfConfig: moduleFederationPlugin.ModuleFederationPluginOptions,
+   isServer: boolean,
+-  remoteIpStrategy?: 'ipv4' | 'inherit',
+-  enableSSR?: boolean,
+ ) => {
+-  replaceRemoteUrl(mfConfig, remoteIpStrategy);
+   addDataFetchExposes(mfConfig.exposes, isServer);
+ 
+   if (mfConfig.remoteType === undefined) {
+@@ -194,13 +147,6 @@ export const patchMFConfig = (
+     runtimePlugins,
+   );
+ 
+-  if (enableSSR && isDev()) {
+-    injectRuntimePlugins(
+-      require.resolve('@module-federation/modern-js/resolve-entry-ipv4'),
+-      runtimePlugins,
+-    );
+-  }
+-
+   if (isServer) {
+     injectRuntimePlugins(
+       require.resolve('@module-federation/node/runtimePlugin'),
+@@ -421,12 +367,7 @@ export const moduleFederationConfigPlugin = (
+       addMyTypes2Ignored(chain, !isWeb ? ssrConfig : csrConfig);
+ 
+       const targetMFConfig = !isWeb ? ssrConfig : csrConfig;
+-      patchMFConfig(
+-        targetMFConfig,
+-        !isWeb,
+-        userConfig.remoteIpStrategy || 'ipv4',
+-        enableSSR,
+-      );
++      patchMFConfig(targetMFConfig, !isWeb);
+ 
+       patchBundlerConfig({
+         chain,
+@@ -453,15 +394,6 @@ export const moduleFederationConfigPlugin = (
+     api.config(() => {
+       const bundlerType =
+         api.getAppContext().bundlerType === 'rspack' ? 'rspack' : 'webpack';
+-      const ipv4 = getIPV4();
+-
+-      if (userConfig.remoteIpStrategy === undefined) {
+-        if (!enableSSR) {
+-          userConfig.remoteIpStrategy = 'inherit';
+-        } else {
+-          userConfig.remoteIpStrategy = 'ipv4';
+-        }
+-      }
+ 
+       const devServerConfig = modernjsConfig.tools?.devServer;
+       const corsWarnMsgs = [
+@@ -494,12 +426,7 @@ export const moduleFederationConfigPlugin = (
+             'Access-Control-Allow-Headers': '*',
+           }
+         : undefined;
+-      const defineConfig = {
+-        REMOTE_IP_STRATEGY: JSON.stringify(userConfig.remoteIpStrategy),
+-      };
+-      if (enableSSR && isDev()) {
+-        defineConfig['FEDERATION_IPV4'] = JSON.stringify(ipv4);
+-      }
++
+       return {
+         tools: {
+           devServer: {
+@@ -515,7 +442,6 @@ export const moduleFederationConfigPlugin = (
+           },
+         },
+         source: {
+-          define: defineConfig,
+           enableAsyncEntry:
+             bundlerType === 'rspack'
+               ? (modernjsConfig.source?.enableAsyncEntry ?? true)
+diff --git a/packages/modernjs/src/cli/index.ts b/packages/modernjs/src/cli/index.ts
+index 5123dc6ee61..c71f5b5c733 100644
+--- a/packages/modernjs/src/cli/index.ts
++++ b/packages/modernjs/src/cli/index.ts
+@@ -25,7 +25,6 @@ export const moduleFederationPlugin = (
+     assetResources: {},
+     distOutputDir: '',
+     originPluginOptions: { ...userConfig },
+-    remoteIpStrategy: userConfig?.remoteIpStrategy,
+     userConfig: userConfig || {},
+     assetFileNames: {},
+     fetchServerQuery: userConfig.fetchServerQuery ?? undefined,
+diff --git a/packages/modernjs/src/cli/mfRuntimePlugins/resolve-entry-ipv4.ts b/packages/modernjs/src/cli/mfRuntimePlugins/resolve-entry-ipv4.ts
+deleted file mode 100644
+index 252eb5b6fb2..00000000000
+--- a/packages/modernjs/src/cli/mfRuntimePlugins/resolve-entry-ipv4.ts
++++ /dev/null
+@@ -1,70 +0,0 @@
+-import type { ModuleFederationRuntimePlugin } from '@module-federation/enhanced/runtime';
+-import { LOCALHOST } from '../../constant';
+-
+-declare const FEDERATION_IPV4: string | undefined;
+-declare const REMOTE_IP_STRATEGY: 'ipv4' | 'inherit' | undefined;
+-
+-const ipv4 =
+-  typeof FEDERATION_IPV4 !== 'undefined' ? FEDERATION_IPV4 : '127.0.0.1';
+-
+-const remoteIpStrategy =
+-  typeof REMOTE_IP_STRATEGY !== 'undefined' ? REMOTE_IP_STRATEGY : 'inherit';
+-
+-function replaceObjectLocalhost(key: string, obj: Record<string, any>) {
+-  if (remoteIpStrategy !== 'ipv4') {
+-    return;
+-  }
+-  if (!(key in obj)) {
+-    return;
+-  }
+-  const remote = obj[key];
+-  if (remote && typeof remote === 'string' && remote.includes(LOCALHOST)) {
+-    obj[key] = replaceLocalhost(remote);
+-  }
+-}
+-function replaceLocalhost(url: string): string {
+-  return url.replace(LOCALHOST, ipv4);
+-}
+-
+-const resolveEntryIpv4Plugin: () => ModuleFederationRuntimePlugin = () => ({
+-  name: 'resolve-entry-ipv4',
+-
+-  beforeRegisterRemote(args) {
+-    const { remote } = args;
+-    replaceObjectLocalhost('entry', remote);
+-    return args;
+-  },
+-  async afterResolve(args) {
+-    const { remoteInfo } = args;
+-    replaceObjectLocalhost('entry', remoteInfo);
+-    return args;
+-  },
+-  beforeLoadRemoteSnapshot(args) {
+-    const { moduleInfo } = args;
+-    if ('entry' in moduleInfo) {
+-      replaceObjectLocalhost('entry', moduleInfo);
+-      return args;
+-    }
+-    if ('version' in moduleInfo) {
+-      replaceObjectLocalhost('version', moduleInfo);
+-    }
+-    return args;
+-  },
+-  loadRemoteSnapshot(args) {
+-    const { remoteSnapshot } = args;
+-    if ('publicPath' in remoteSnapshot) {
+-      replaceObjectLocalhost('publicPath', remoteSnapshot);
+-    }
+-    if ('getPublicPath' in remoteSnapshot) {
+-      replaceObjectLocalhost('getPublicPath', remoteSnapshot);
+-    }
+-    if (remoteSnapshot.remotesInfo) {
+-      Object.keys(remoteSnapshot.remotesInfo).forEach((key) => {
+-        const remoteInfo = remoteSnapshot.remotesInfo[key];
+-        replaceObjectLocalhost('matchedVersion', remoteInfo);
+-      });
+-    }
+-    return args;
+-  },
+-});
+-export default resolveEntryIpv4Plugin;
+diff --git a/packages/modernjs/src/types/index.ts b/packages/modernjs/src/types/index.ts
+index f505e807225..fa1d505437a 100644
+--- a/packages/modernjs/src/types/index.ts
++++ b/packages/modernjs/src/types/index.ts
+@@ -9,7 +9,6 @@ export interface PluginOptions {
+         distOutputDir?: string;
+       }
+     | boolean;
+-  remoteIpStrategy?: 'ipv4' | 'inherit';
+   fetchServerQuery?: Record<string, unknown>;
+   secondarySharedTreeShaking?: boolean;
+ }
+@@ -33,7 +32,6 @@ export interface InternalModernPluginOptions {
+     browser?: StatsAssetResource;
+     node?: StatsAssetResource;
+   };
+-  remoteIpStrategy?: 'ipv4' | 'inherit';
+   userConfig?: PluginOptions;
+   fetchServerQuery?: Record<string, unknown>;
+   secondarySharedTreeShaking?: boolean;

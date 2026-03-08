@@ -1,0 +1,50 @@
+[
+  {
+    "sha": "893381d6f3a8bc33cccb25149f8259ed2fac0ae1",
+    "filename": ".meta-updater/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/.meta-updater%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/.meta-updater%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/.meta-updater%2Fsrc%2Findex.ts?ref=9f7217d94bfb17ffeb8e83530da78ffdc82f8907",
+    "patch": "@@ -372,6 +372,7 @@ async function updateManifest (workspaceDir: string, manifest: ProjectManifest,\n   if (scripts.test) {\n     Object.assign(manifest, {\n       jest: {\n+        ...(manifest as any).jest, // eslint-disable-line\n         preset,\n       },\n     })"
+  },
+  {
+    "sha": "e0259b2b7568cfb360a3ed8437192e52fe53351f",
+    "filename": "modules-mounter/daemon/__mocks__/fuse-native.js",
+    "status": "added",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/modules-mounter%2Fdaemon%2F__mocks__%2Ffuse-native.js",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/modules-mounter%2Fdaemon%2F__mocks__%2Ffuse-native.js",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/modules-mounter%2Fdaemon%2F__mocks__%2Ffuse-native.js?ref=9f7217d94bfb17ffeb8e83530da78ffdc82f8907",
+    "patch": "@@ -0,0 +1 @@\n+export default { ENOENT: -2 }"
+  },
+  {
+    "sha": "9727413c0f6401f8b1c73b9f68670db8f6fbf8dd",
+    "filename": "modules-mounter/daemon/package.json",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 1,
+    "changes": 5,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/modules-mounter%2Fdaemon%2Fpackage.json",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/modules-mounter%2Fdaemon%2Fpackage.json",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/modules-mounter%2Fdaemon%2Fpackage.json?ref=9f7217d94bfb17ffeb8e83530da78ffdc82f8907",
+    "patch": "@@ -66,6 +66,9 @@\n     \"node\": \">=22.13\"\n   },\n   \"jest\": {\n-    \"preset\": \"@pnpm/jest-config\"\n+    \"preset\": \"@pnpm/jest-config\",\n+    \"moduleNameMapper\": {\n+      \"^fuse-native$\": \"<rootDir>/__mocks__/fuse-native.js\"\n+    }\n   }\n }"
+  },
+  {
+    "sha": "caeafa9dcc2b289e3234bf1b0d901885d30f2962",
+    "filename": "modules-mounter/daemon/test/createFuseHandlers.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/modules-mounter%2Fdaemon%2Ftest%2FcreateFuseHandlers.test.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/9f7217d94bfb17ffeb8e83530da78ffdc82f8907/modules-mounter%2Fdaemon%2Ftest%2FcreateFuseHandlers.test.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/modules-mounter%2Fdaemon%2Ftest%2FcreateFuseHandlers.test.ts?ref=9f7217d94bfb17ffeb8e83530da78ffdc82f8907",
+    "patch": "@@ -1,12 +1,12 @@\n import { STORE_VERSION } from '@pnpm/constants'\n import { jest } from '@jest/globals'\n import path from 'path'\n-import type { FuseHandlers } from '../src/createFuseHandlers.js'\n \n jest.unstable_mockModule('fuse-native', () => ({ default: { ENOENT: -2 } }))\n \n const { default: Fuse } = await import('fuse-native')\n const { createFuseHandlers } = await import('../src/createFuseHandlers.js')\n+type FuseHandlers = Awaited<ReturnType<typeof createFuseHandlers>>\n \n describe('FUSE handlers', () => {\n   let handlers: FuseHandlers"
+  }
+]

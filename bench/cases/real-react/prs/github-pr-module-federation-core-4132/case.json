@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4132",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4132: feat: Add React Router v7 Support to Module Federation Bridge",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4132,
+    "prUrl": "https://github.com/module-federation/core/pull/4132",
+    "baseSha": "aa7daaef40c88447af4a324aa9a8aaf5e86228dd",
+    "headSha": "3b01878d96983408992c04f9b442da1aa17c5db3",
+    "selectedFiles": [
+      "apps/router-demo/router-host-2000/rsbuild.config.ts"
+    ],
+    "collectedAt": "2026-03-08T04:15:59.503Z"
+  },
+  "files": [
+    {
+      "id": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+      "oldPath": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+      "newPath": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/router-demo/router-host-2000/rsbuild.config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 31,
+          "endLine": 31
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10374",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10374: feat: add TagsInput component",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10374,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10374",
+    "baseSha": "8b7897dd33d232b04359d0bca274382f4d46aa85",
+    "headSha": "28fb03e5c7019b741d3b18635eba2fa121ef0ab0",
+    "selectedFiles": [
+      "apps/www/docs.config.ts"
+    ],
+    "collectedAt": "2026-03-08T03:59:57.958Z"
+  },
+  "files": [
+    {
+      "id": "apps/www/docs.config.ts",
+      "oldPath": "apps/www/docs.config.ts",
+      "newPath": "apps/www/docs.config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/www/docs.config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 154,
+          "endLine": 154
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

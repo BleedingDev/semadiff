@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/toolkit/src/index.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Findex.ts&old_oid=65291ab83beb2a873edd8e142092d3461102ce61&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Findex.ts&new_oid=7c23fd72556d67522e719d569691b94570e11642&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/toolkit/src/index.ts",
+      "oid": "65291ab83beb2a873edd8e142092d3461102ce61",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/index.ts",
+      "oid": "7c23fd72556d67522e719d569691b94570e11642",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5278ccae8e99ae0373490ef372d1953e0f3da303d948485ef7e00bd7de7fffa3"
+  }
+]

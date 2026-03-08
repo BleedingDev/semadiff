@@ -1,0 +1,25 @@
+diff --git a/.changeset/fix-global-link-output.md b/.changeset/fix-global-link-output.md
+new file mode 100644
+index 00000000000..8495ecad066
+--- /dev/null
++++ b/.changeset/fix-global-link-output.md
+@@ -0,0 +1,6 @@
++---
++"@pnpm/default-reporter": patch
++"pnpm": patch
++---
++
++Fixed global install output showing `???` instead of the linked package path when linking from the current directory.
+diff --git a/cli/default-reporter/src/reporterForClient/reportSummary.ts b/cli/default-reporter/src/reporterForClient/reportSummary.ts
+index affa96805fa..ad63f7a3d17 100644
+--- a/cli/default-reporter/src/reporterForClient/reportSummary.ts
++++ b/cli/default-reporter/src/reporterForClient/reportSummary.ts
+@@ -118,7 +118,7 @@ function printDiffs (
+       result += ` ${chalk.red('deprecated')}`
+     }
+     if (pkg.from) {
+-      result += ` ${chalk.grey(`<- ${pkg.from && path.relative(opts.prefix, pkg.from) || '???'}`)}`
++      result += ` ${chalk.grey(`<- ${path.relative(opts.prefix, pkg.from) || pkg.from}`)}`
+     }
+     if (pkg.added && depType === 'dev' && opts.pnpmConfig?.saveDev === false && opts.cmd === 'add') {
+       result += `${chalk.yellow(' already in devDependencies, was not moved to dependencies.')}`

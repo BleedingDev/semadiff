@@ -1,0 +1,68 @@
+diff --git a/docs/src/modules/sandbox/CodeSandbox.ts b/docs/src/modules/sandbox/CodeSandbox.ts
+index fe600a9501f2db..854b84784811fc 100644
+--- a/docs/src/modules/sandbox/CodeSandbox.ts
++++ b/docs/src/modules/sandbox/CodeSandbox.ts
+@@ -39,7 +39,7 @@ const createReactApp = (demo: {
+   raw: string;
+   codeVariant: CodeVariant;
+   githubLocation: string;
+-  product?: Product;
++  productId?: Product;
+   codeStyling: CodeStyling;
+ }) => {
+   const ext = getFileExtension(demo.codeVariant);
+@@ -50,7 +50,7 @@ const createReactApp = (demo: {
+       content: CRA.getHtml(demo),
+     },
+     [`index.${ext}`]: {
+-      content: CRA.getRootIndex(demo.product),
++      content: CRA.getRootIndex(demo.productId),
+     },
+     [`demo.${ext}`]: {
+       content: demo.raw,
+diff --git a/docs/src/modules/sandbox/CreateReactApp.ts b/docs/src/modules/sandbox/CreateReactApp.ts
+index 433fd3d5d6155b..bb97230e984058 100644
+--- a/docs/src/modules/sandbox/CreateReactApp.ts
++++ b/docs/src/modules/sandbox/CreateReactApp.ts
+@@ -45,8 +45,8 @@ export const getHtml = ({
+ </html>`;
+ };
+ 
+-export const getRootIndex = (product?: 'joy-ui' | 'base-ui') => {
+-  if (product === 'joy-ui') {
++export const getRootIndex = (productId?: 'joy-ui' | 'base-ui') => {
++  if (productId === 'joy-ui') {
+     return `import * as React from 'react';
+ import * as ReactDOM from 'react-dom/client';
+ import { StyledEngineProvider, CssVarsProvider } from '@mui/joy/styles';
+@@ -62,7 +62,7 @@ ReactDOM.createRoot(document.querySelector("#root")).render(
+   </React.StrictMode>
+ );`;
+   }
+-  if (product === 'base-ui') {
++  if (productId === 'base-ui') {
+     return `import * as React from 'react';
+ import * as ReactDOM from 'react-dom/client';
+ import Demo from './demo';
+diff --git a/docs/src/modules/sandbox/StackBlitz.ts b/docs/src/modules/sandbox/StackBlitz.ts
+index eb7858bb0ed410..ec91bac912fe8b 100644
+--- a/docs/src/modules/sandbox/StackBlitz.ts
++++ b/docs/src/modules/sandbox/StackBlitz.ts
+@@ -11,7 +11,7 @@ const createReactApp = (demo: {
+   raw: string;
+   codeVariant: CodeVariant;
+   githubLocation: string;
+-  product?: Product;
++  productId?: Product;
+   codeStyling?: CodeStyling;
+ }) => {
+   const ext = getFileExtension(demo.codeVariant);
+@@ -19,7 +19,7 @@ const createReactApp = (demo: {
+ 
+   const files: Record<string, string> = {
+     'index.html': CRA.getHtml(demo),
+-    [`index.${ext}`]: CRA.getRootIndex(demo.product),
++    [`index.${ext}`]: CRA.getRootIndex(demo.productId),
+     [`demo.${ext}`]: demo.raw,
+     ...(demo.codeVariant === 'TS' && {
+       'tsconfig.json': CRA.getTsconfig(),

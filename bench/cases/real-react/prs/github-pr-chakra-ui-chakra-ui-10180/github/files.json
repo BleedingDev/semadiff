@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "a138f742dc191c716208b5a169ef721367b9baa5",
+    "filename": "packages/react/src/components/breadcrumb/breadcrumb.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/1c3a984cb0546e0b44ced433bb774f5ddc95e366/packages%2Freact%2Fsrc%2Fcomponents%2Fbreadcrumb%2Fbreadcrumb.tsx",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/1c3a984cb0546e0b44ced433bb774f5ddc95e366/packages%2Freact%2Fsrc%2Fcomponents%2Fbreadcrumb%2Fbreadcrumb.tsx",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fcomponents%2Fbreadcrumb%2Fbreadcrumb.tsx?ref=1c3a984cb0546e0b44ced433bb774f5ddc95e366",
+    "patch": "@@ -101,7 +101,7 @@ export interface BreadcrumbEllipsisProps extends HTMLChakraProps<\"span\"> {}\n export const BreadcrumbEllipsis = withContext<\n   HTMLElement,\n   BreadcrumbEllipsisProps\n->(\"span\", \"ellipsis\", {\n+>(\"li\", \"ellipsis\", {\n   defaultProps: {\n     role: \"presentation\",\n     \"aria-hidden\": true,"
+  }
+]

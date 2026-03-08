@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10081",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10081: Fix/checkbox types export",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10081,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10081",
+    "baseSha": "63c267fe2ef8aa0db707b5932dddbf4db2d54e40",
+    "headSha": "2cfef3dae6f86ed59cf894a5fa59288c7eef8860",
+    "selectedFiles": [
+      "packages/react/src/components/checkbox/index.ts"
+    ],
+    "collectedAt": "2026-03-08T03:58:22.732Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/components/checkbox/index.ts",
+      "oldPath": "packages/react/src/components/checkbox/index.ts",
+      "newPath": "packages/react/src/components/checkbox/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/components/checkbox/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 19,
+          "endLine": 19
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

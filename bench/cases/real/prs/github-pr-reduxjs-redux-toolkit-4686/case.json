@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-4686",
+  "language": "tsx",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#4686: Update @testing-library/react from 13.3.0 to 16.0.1; Fixes #4685",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 4686,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/4686",
+    "baseSha": "3a6ec28968555f260a733a1d5c7b002d6cb6e1c9",
+    "headSha": "23a1c3f406f97ed53d54693ec7e33a51286e6853",
+    "selectedFiles": [
+      "packages/toolkit/src/query/tests/cleanup.test.tsx"
+    ],
+    "collectedAt": "2026-03-08T02:15:50.512Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+      "oldPath": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+      "newPath": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 46,
+          "endLine": 46
+        },
+        "newRange": {
+          "startLine": 46,
+          "endLine": 46
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

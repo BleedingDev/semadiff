@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "6f3481b45626d65d08cda1528cc8191e44192874",
+    "filename": ".changeset/few-apes-yawn.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/635104057de5320b969ba3f10ffef6b98713a1af/.changeset%2Ffew-apes-yawn.md",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/635104057de5320b969ba3f10ffef6b98713a1af/.changeset%2Ffew-apes-yawn.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/.changeset%2Ffew-apes-yawn.md?ref=635104057de5320b969ba3f10ffef6b98713a1af",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@chakra-ui/editable\": patch\n+---\n+\n+Export \"useEditableContext\" hook"
+  },
+  {
+    "sha": "020f705c75dae2e64be51e71d755cdc4d9422ac6",
+    "filename": "packages/components/editable/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/635104057de5320b969ba3f10ffef6b98713a1af/packages%2Fcomponents%2Feditable%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/635104057de5320b969ba3f10ffef6b98713a1af/packages%2Fcomponents%2Feditable%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Fcomponents%2Feditable%2Fsrc%2Findex.ts?ref=635104057de5320b969ba3f10ffef6b98713a1af",
+    "patch": "@@ -1,6 +1,7 @@\n export { Editable } from \"./editable\"\n export type { EditableProps } from \"./editable\"\n export { useEditableStyles } from \"./editable-context\"\n+export { useEditableContext } from \"./editable-context\"\n export { EditableInput } from \"./editable-input\"\n export type { EditableInputProps } from \"./editable-input\"\n export { EditablePreview } from \"./editable-preview\""
+  }
+]

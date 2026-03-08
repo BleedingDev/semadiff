@@ -1,0 +1,87 @@
+{
+  "id": "update-ts-001",
+  "language": "ts",
+  "kind": "micro",
+  "description": "Simple value update stays a single update.",
+  "files": [
+    {
+      "oldPath": "src/value.ts",
+      "newPath": "src/value.ts",
+      "status": "modified",
+      "beforePath": "old.ts",
+      "afterPath": "new.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "type": "update",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 1
+        },
+        "newRange": {
+          "startLine": 1,
+          "endLine": 1
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [
+      {
+        "side": "old",
+        "kind": "variable",
+        "name": "value",
+        "range": {
+          "startLine": 1,
+          "endLine": 1
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "kind": "variable",
+        "name": "value",
+        "range": {
+          "startLine": 1,
+          "endLine": 1
+        },
+        "exported": true
+      }
+    ],
+    "entityChanges": [
+      {
+        "kind": "variable",
+        "before": {
+          "kind": "variable",
+          "name": "value",
+          "range": {
+            "startLine": 1,
+            "endLine": 1
+          },
+          "exported": true
+        },
+        "after": {
+          "kind": "variable",
+          "name": "value",
+          "range": {
+            "startLine": 1,
+            "endLine": 1
+          },
+          "exported": true
+        },
+        "changeKinds": [
+          "modified"
+        ]
+      }
+    ],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": true,
+    "graph": false
+  }
+}

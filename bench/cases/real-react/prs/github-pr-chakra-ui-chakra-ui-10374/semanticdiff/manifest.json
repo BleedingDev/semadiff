@@ -1,0 +1,556 @@
+[
+  {
+    "tracking_name": ".changeset/fresh-bikes-eat.md",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=.changeset%2Ffresh-bikes-eat.md&new_oid=e92b2ef2dae80374ad4b7dec13c4c61dfffdd551&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/fresh-bikes-eat.md",
+      "oid": "e92b2ef2dae80374ad4b7dec13c4c61dfffdd551",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "b025b70f0449f4758785c2d7b467f8ca07dd5c8f57071adefa68b620dda2b80b"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/segmented-control-with-color-palette.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsegmented-control-with-color-palette.tsx&new_oid=4c67800f162c3619699ea365f9cf50a5d3b56809&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "new": {
+      "name": "apps/compositions/src/examples/segmented-control-with-color-palette.tsx",
+      "oid": "4c67800f162c3619699ea365f9cf50a5d3b56809",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "52b24c02fed1628324ec81839c514efc83ed7624655aeb8067971a857b2090be"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-basic.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-basic.tsx&new_oid=84f44ebb21c3f9e2ca9a8e670d9efce16643ad20&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-basic.tsx",
+      "oid": "84f44ebb21c3f9e2ca9a8e670d9efce16643ad20",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "37b5accf79adcd8fb2023f0b45784a7432efe8a6e0152d746569ff94abcf7eb9"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-controlled.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-controlled.tsx&new_oid=96a939c9aa4eaa31cd07b206e40240bdfdc81850&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-controlled.tsx",
+      "oid": "96a939c9aa4eaa31cd07b206e40240bdfdc81850",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "53b17a2377861076d2345b792822bf56b12bbd696db8e7f6d9060d0cd214493a"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-disabled.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-disabled.tsx&new_oid=9220ef021d9771bf9033d55240c14f7fe99f3e49&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-disabled.tsx",
+      "oid": "9220ef021d9771bf9033d55240c14f7fe99f3e49",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "4cff7aa7354387c5a494aacfab9262589307c419371614cf2aa2f84868dee0c8"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-editable.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-editable.tsx&new_oid=43e149274d2c55dc045752eaed2bd1ca8c6eaeda&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-editable.tsx",
+      "oid": "43e149274d2c55dc045752eaed2bd1ca8c6eaeda",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "57a17731e9952be9a0839094e5b71d0ca6438d4c92316f946652e2cd553ee406"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-explorer.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-explorer.tsx&new_oid=81454e58d24d8d08819bdb016f3501da556efa8c&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-explorer.tsx",
+      "oid": "81454e58d24d8d08819bdb016f3501da556efa8c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "c1dd33e8c5095940898bdeaf096ceae80b6dec055424b58383041ce2785c75dc"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-invalid.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-invalid.tsx&new_oid=637a41979a8ac3259a00f918745ae33dae58c7c8&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-invalid.tsx",
+      "oid": "637a41979a8ac3259a00f918745ae33dae58c7c8",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "9f6dc63c058b06afe3ad157a38f3e74c48810def96ad85cb888e0995739ab6b2"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-read-only.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-read-only.tsx&new_oid=52362c6608a0e4fa8e651b40fe0c524e434b3201&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-read-only.tsx",
+      "oid": "52362c6608a0e4fa8e651b40fe0c524e434b3201",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "6021c34093519d2e34fc1632317756c925a9184f0e19654b99b85e825565cbca"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-validation.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-validation.tsx&new_oid=0df0a6fbff1fa885d66a13a0283a98848e79c65b&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-validation.tsx",
+      "oid": "0df0a6fbff1fa885d66a13a0283a98848e79c65b",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "ca9e4c5a33df1233b6d85aa6cd4f13d5b103e9d3f662ace49aa3e885979e555c"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-blur-behavior.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-blur-behavior.tsx&new_oid=24e0f224c9613fe0710b8a299721e2cf25f88230&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-blur-behavior.tsx",
+      "oid": "24e0f224c9613fe0710b8a299721e2cf25f88230",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "32f0d94f6aedf61f587dc4f30fa091b5b2da3744d1d8ebe8555d5fab5fad3458"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-colors.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-colors.tsx&new_oid=e3bf1975c77c573f031e3c48c3930fe83889b634&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-colors.tsx",
+      "oid": "e3bf1975c77c573f031e3c48c3930fe83889b634",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "56869ba53b2b9b39bf8daf1db0a71cc81e009a351446b51bee10357ce3dd57bc"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-combobox.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-combobox.tsx&new_oid=e48dd0208704d9cac9796f4353e4e85ec666cb80&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-combobox.tsx",
+      "oid": "e48dd0208704d9cac9796f4353e4e85ec666cb80",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "f7ee8769205de03c0e08cfb206a203318558e03d05ef162efa4c8b0ff36bb888"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-delimiter.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-delimiter.tsx&new_oid=c050dc33c0d736a964e1573a254035a04faf5ee6&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-delimiter.tsx",
+      "oid": "c050dc33c0d736a964e1573a254035a04faf5ee6",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "c02aecc3fa432c1ff2ac477c2bdc7a07d0a8f4b308c705a5a2582b4b2d8c86e1"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-field.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-field.tsx&new_oid=a5921ecb95b5540f6570f1686109ccce4bf9aead&new_mode=33188",
+    "file": "diffs/diff-015.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-field.tsx",
+      "oid": "a5921ecb95b5540f6570f1686109ccce4bf9aead",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "fc2aae61ad66196b45b77a0cfb782e982e233e772989f31319f8050f381b8ee0"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-form.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-form.tsx&new_oid=eb5a2684bee67632b3c5acd7b50c6ea0f3ec91b3&new_mode=33188",
+    "file": "diffs/diff-016.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-form.tsx",
+      "oid": "eb5a2684bee67632b3c5acd7b50c6ea0f3ec91b3",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "24552c9e40e476602cc1ab1efc2192aada4307d3f8c5fec5f49c51f248d05cae"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-max.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-max.tsx&new_oid=a8621f759f09f7cce3dc44207f2b7ee07fb6d878&new_mode=33188",
+    "file": "diffs/diff-017.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-max.tsx",
+      "oid": "a8621f759f09f7cce3dc44207f2b7ee07fb6d878",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "5f9ecc47c5732b91c64c53f162c363faf642b659ba69c237047dc66136d02784"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-paste.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-paste.tsx&new_oid=33f10894451511f8b242e08de87497d24d24ae98&new_mode=33188",
+    "file": "diffs/diff-018.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-paste.tsx",
+      "oid": "33f10894451511f8b242e08de87497d24d24ae98",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "1c788b5f34d90f250f2585007d6dc01ebd8cc345990ea20ddccc966d11a0ebc6"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-sizes.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-sizes.tsx&new_oid=71434d8550fa8056dc3d070cebef17258b344c20&new_mode=33188",
+    "file": "diffs/diff-019.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-sizes.tsx",
+      "oid": "71434d8550fa8056dc3d070cebef17258b344c20",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "91abeac189cf7f0746142d0c1985ff416826febba803fa6b55c5cb5498d8ecd1"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-store.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-store.tsx&new_oid=072dac9eebe90e6fe0c2fbf7890635e5b2e8e244&new_mode=33188",
+    "file": "diffs/diff-020.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-store.tsx",
+      "oid": "072dac9eebe90e6fe0c2fbf7890635e5b2e8e244",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "691f2d9af55b571f8794e650e90105dce089f993ba7a1fcc208b1ad497b17af9"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/tags-input-with-variants.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Ftags-input-with-variants.tsx&new_oid=9d45cb8cdb0f2c1fa06022f5387cc345da292220&new_mode=33188",
+    "file": "diffs/diff-021.json",
+    "new": {
+      "name": "apps/compositions/src/examples/tags-input-with-variants.tsx",
+      "oid": "9d45cb8cdb0f2c1fa06022f5387cc345da292220",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "ec8c2133edb25b53460251362ef3eb0de4e6a0564a69c20c19ce06eba1536660"
+  },
+  {
+    "tracking_name": "apps/compositions/src/ui/tags-input.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fui%2Ftags-input.tsx&new_oid=68630afc7f89ea25ba5d20ab61f3536253bf0b50&new_mode=33188",
+    "file": "diffs/diff-022.json",
+    "new": {
+      "name": "apps/compositions/src/ui/tags-input.tsx",
+      "oid": "68630afc7f89ea25ba5d20ab61f3536253bf0b50",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "ebb324c5736dda48e7d791bd2b08d53771338816f673c3c31b4cf90764d80c8d"
+  },
+  {
+    "tracking_name": "apps/www/content/docs/components/segmented-control.mdx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fcontent%2Fdocs%2Fcomponents%2Fsegmented-control.mdx&old_oid=ce3d4a7fefd08ec47dc6b5a07972576fa69d8de4&old_mode=33188&new_filename=apps%2Fwww%2Fcontent%2Fdocs%2Fcomponents%2Fsegmented-control.mdx&new_oid=19d56c98626f333189dc99bc1e4d307851852fe9&new_mode=33188",
+    "file": "diffs/diff-023.json",
+    "old": {
+      "name": "apps/www/content/docs/components/segmented-control.mdx",
+      "oid": "ce3d4a7fefd08ec47dc6b5a07972576fa69d8de4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/content/docs/components/segmented-control.mdx",
+      "oid": "19d56c98626f333189dc99bc1e4d307851852fe9",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "31aaea31b3d03f6db5d5b845a4fc7f7e921e40850a3b98c1656926fa556f690d"
+  },
+  {
+    "tracking_name": "apps/www/content/docs/components/tags-input.mdx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fcontent%2Fdocs%2Fcomponents%2Ftags-input.mdx&new_oid=89bb4ac7bf7479d275fff3635adc2821fc43ea23&new_mode=33188",
+    "file": "diffs/diff-024.json",
+    "new": {
+      "name": "apps/www/content/docs/components/tags-input.mdx",
+      "oid": "89bb4ac7bf7479d275fff3635adc2821fc43ea23",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "da2eeb1ca5b4283a1d4fd456e30967dcb763bb86dafe3c3bf0612d154e27d945"
+  },
+  {
+    "tracking_name": "apps/www/docs.config.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fdocs.config.ts&old_oid=e74eff3720de94dde55432a65b2549d5d1c46cb6&old_mode=33188&new_filename=apps%2Fwww%2Fdocs.config.ts&new_oid=c6aa581e42ae40abcebf5ee7f00fa161953470ba&new_mode=33188",
+    "file": "diffs/diff-025.json",
+    "old": {
+      "name": "apps/www/docs.config.ts",
+      "oid": "e74eff3720de94dde55432a65b2549d5d1c46cb6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/docs.config.ts",
+      "oid": "c6aa581e42ae40abcebf5ee7f00fa161953470ba",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ca21f629ca3b84e7806e35ce62c73da4619680d71850695e8b0ffd44dd78eb79"
+  },
+  {
+    "tracking_name": "apps/www/public/compositions/index.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fcompositions%2Findex.json&old_oid=a841668dba6814cfdc876e74041d363d772798b6&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fcompositions%2Findex.json&new_oid=beb6bddd51da72f4a05ae32f1e31a6d88e4de7d8&new_mode=33188",
+    "file": "diffs/diff-026.json",
+    "old": {
+      "name": "apps/www/public/compositions/index.json",
+      "oid": "a841668dba6814cfdc876e74041d363d772798b6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/compositions/index.json",
+      "oid": "beb6bddd51da72f4a05ae32f1e31a6d88e4de7d8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c2312628d3a3cf14d7e33743eb4f4c23d95c4a3a36d2719d432abad53326f074"
+  },
+  {
+    "tracking_name": "apps/www/public/compositions/tags-input.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fpublic%2Fcompositions%2Ftags-input.json&new_oid=ed38144c11ea738cc270258881b3005d835e1e60&new_mode=33188",
+    "file": "diffs/diff-027.json",
+    "new": {
+      "name": "apps/www/public/compositions/tags-input.json",
+      "oid": "ed38144c11ea738cc270258881b3005d835e1e60",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "5fc80fd8c2859c2319c1506622f206d20f60ae250ccebf5c6d238f46ed3a8a4c"
+  },
+  {
+    "tracking_name": "apps/www/public/r/examples/listbox.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fpublic%2Fr%2Fexamples%2Flistbox.json&new_oid=f5ba031a795db386caa565b17390f88a493a5520&new_mode=33188",
+    "file": "diffs/diff-028.json",
+    "new": {
+      "name": "apps/www/public/r/examples/listbox.json",
+      "oid": "f5ba031a795db386caa565b17390f88a493a5520",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "2db67ca83435eec2bfb27db0994c098f10245c6f9d9afe44ee4bf5776d864e05"
+  },
+  {
+    "tracking_name": "apps/www/public/r/examples/tags-input.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fpublic%2Fr%2Fexamples%2Ftags-input.json&new_oid=ccd157e80fb092322fc8c714cfaa0de72e6d1936&new_mode=33188",
+    "file": "diffs/diff-029.json",
+    "new": {
+      "name": "apps/www/public/r/examples/tags-input.json",
+      "oid": "ccd157e80fb092322fc8c714cfaa0de72e6d1936",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "5449bedf7725d53d8814243e36eeb08f3da746d408a7ccbc96a3b4038dcc4e95"
+  },
+  {
+    "tracking_name": "packages/panda-preset/src/slot-recipes/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fpanda-preset%2Fsrc%2Fslot-recipes%2Findex.ts&old_oid=fbf46a61e4eca73996232f109bb3e189f586cc9b&old_mode=33188&new_filename=packages%2Fpanda-preset%2Fsrc%2Fslot-recipes%2Findex.ts&new_oid=cc042add5bacee3ce69bee3eb69800d3527a1a66&new_mode=33188",
+    "file": "diffs/diff-030.json",
+    "old": {
+      "name": "packages/panda-preset/src/slot-recipes/index.ts",
+      "oid": "fbf46a61e4eca73996232f109bb3e189f586cc9b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/panda-preset/src/slot-recipes/index.ts",
+      "oid": "cc042add5bacee3ce69bee3eb69800d3527a1a66",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c4fb6a7123c2d27c09847e8f260775d3ffcb8a1057e55d0390a4249400e56f42"
+  },
+  {
+    "tracking_name": "packages/panda-preset/src/slot-recipes/tags-input.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Fpanda-preset%2Fsrc%2Fslot-recipes%2Ftags-input.ts&new_oid=3078d9910ead9b24399611fe9f987b03c66abdf0&new_mode=33188",
+    "file": "diffs/diff-031.json",
+    "new": {
+      "name": "packages/panda-preset/src/slot-recipes/tags-input.ts",
+      "oid": "3078d9910ead9b24399611fe9f987b03c66abdf0",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "f3e111d9fe4da4536a744174716029f5ad224b2a436302f223d55c2bb6b44cfa"
+  },
+  {
+    "tracking_name": "packages/react/__stories__/segment-group.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2F__stories__%2Fsegment-group.stories.tsx&old_oid=367d9bce5264b46a72d4d0f86ca980f97aeca584&old_mode=33188&new_filename=packages%2Freact%2F__stories__%2Fsegment-group.stories.tsx&new_oid=98489beb8a197a8963e54174f5439eb3f624589f&new_mode=33188",
+    "file": "diffs/diff-032.json",
+    "old": {
+      "name": "packages/react/__stories__/segment-group.stories.tsx",
+      "oid": "367d9bce5264b46a72d4d0f86ca980f97aeca584",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/__stories__/segment-group.stories.tsx",
+      "oid": "98489beb8a197a8963e54174f5439eb3f624589f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2ece205a91273f9d3385b0f1c0ccb5d86d1b7dce11e2ff74e1755bf40c1c6ffd"
+  },
+  {
+    "tracking_name": "packages/react/__stories__/tags-input.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2F__stories__%2Ftags-input.stories.tsx&new_oid=c89e987aafca979559e68f57939c93d955839a5f&new_mode=33188",
+    "file": "diffs/diff-033.json",
+    "new": {
+      "name": "packages/react/__stories__/tags-input.stories.tsx",
+      "oid": "c89e987aafca979559e68f57939c93d955839a5f",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "70730872373372f0af373a0ebe340fd1e7f68fd364a7d7a2989787e685c5ea73"
+  },
+  {
+    "tracking_name": "packages/react/src/anatomy.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fanatomy.ts&old_oid=7f65a432f466810af685ba02542ff08cbcb1b15b&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fanatomy.ts&new_oid=14b8e18c2a18cb553df8be1b8f2dee0d0599313e&new_mode=33188",
+    "file": "diffs/diff-034.json",
+    "old": {
+      "name": "packages/react/src/anatomy.ts",
+      "oid": "7f65a432f466810af685ba02542ff08cbcb1b15b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/anatomy.ts",
+      "oid": "14b8e18c2a18cb553df8be1b8f2dee0d0599313e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "29860b2860672a8827d1bd05e6c01b7d9c0a2cd04427471984bb9783b1270967"
+  },
+  {
+    "tracking_name": "packages/react/src/components/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fcomponents%2Findex.ts&old_oid=a90cc3850427eaf01b714a320b4e8c21e1a27ad8&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Findex.ts&new_oid=3ebc1a09b35f9244b98579d635fdfad5209628dd&new_mode=33188",
+    "file": "diffs/diff-035.json",
+    "old": {
+      "name": "packages/react/src/components/index.ts",
+      "oid": "a90cc3850427eaf01b714a320b4e8c21e1a27ad8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/components/index.ts",
+      "oid": "3ebc1a09b35f9244b98579d635fdfad5209628dd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a8f122bf9257756078da94e8c3a64f5a360b49d5e2eee45ae7579ebc369f9053"
+  },
+  {
+    "tracking_name": "packages/react/src/components/tags-input/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Ftags-input%2Findex.ts&new_oid=722f61d9397955f868af2840da8b92ed66a96c1a&new_mode=33188",
+    "file": "diffs/diff-036.json",
+    "new": {
+      "name": "packages/react/src/components/tags-input/index.ts",
+      "oid": "722f61d9397955f868af2840da8b92ed66a96c1a",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "c4d16eb265097dd7cd9845f6db9132e90d6997d650987ca20f15e3bc3e12c72f"
+  },
+  {
+    "tracking_name": "packages/react/src/components/tags-input/namespace.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Ftags-input%2Fnamespace.ts&new_oid=e0501d41ab4d2e112ab744d65228da65d60bcec8&new_mode=33188",
+    "file": "diffs/diff-037.json",
+    "new": {
+      "name": "packages/react/src/components/tags-input/namespace.ts",
+      "oid": "e0501d41ab4d2e112ab744d65228da65d60bcec8",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "ac128b86843ff49560a0ad7dde1fc437cb86b9960d74322c4b265386cb03b12b"
+  },
+  {
+    "tracking_name": "packages/react/src/components/tags-input/tags-input.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Ftags-input%2Ftags-input.tsx&new_oid=bdbceb6e78f5826fe25733f280a9a871bdb78b4e&new_mode=33188",
+    "file": "diffs/diff-038.json",
+    "new": {
+      "name": "packages/react/src/components/tags-input/tags-input.tsx",
+      "oid": "bdbceb6e78f5826fe25733f280a9a871bdb78b4e",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "5cf36cfd0c06e493cabe89de31fc76157531b200d9e5e6ebfab19b31bddf809f"
+  },
+  {
+    "tracking_name": "packages/react/src/styled-system/generated/recipes.gen.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Fgenerated%2Frecipes.gen.ts&old_oid=72d9966166f84541e34bb77b9a34f03365a73ddb&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Fgenerated%2Frecipes.gen.ts&new_oid=e272ca17f3afbc0368d9b91ccc42e3a234ae87b6&new_mode=33188",
+    "file": "diffs/diff-039.json",
+    "old": {
+      "name": "packages/react/src/styled-system/generated/recipes.gen.ts",
+      "oid": "72d9966166f84541e34bb77b9a34f03365a73ddb",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/styled-system/generated/recipes.gen.ts",
+      "oid": "e272ca17f3afbc0368d9b91ccc42e3a234ae87b6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "264ce7dab0e5f739e5a5c10468094803c672e0f92b55bf2ada7462b023429c65"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/recipes/tags-input.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Ftheme%2Frecipes%2Ftags-input.ts&new_oid=66e92fd75a08420146760588b6418c32b7a3f55c&new_mode=33188",
+    "file": "diffs/diff-040.json",
+    "new": {
+      "name": "packages/react/src/theme/recipes/tags-input.ts",
+      "oid": "66e92fd75a08420146760588b6418c32b7a3f55c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "3d11df5107459372ea1460718d006340c753887579e024beb84e15deb54f0aad"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/slot-recipes.export.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.export.ts&old_oid=6838e386536bdf03c4d522a099f75dbf4a32ec97&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.export.ts&new_oid=42a59210f0c6cc05afba8b78c65e4e877d083b84&new_mode=33188",
+    "file": "diffs/diff-041.json",
+    "old": {
+      "name": "packages/react/src/theme/slot-recipes.export.ts",
+      "oid": "6838e386536bdf03c4d522a099f75dbf4a32ec97",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/slot-recipes.export.ts",
+      "oid": "42a59210f0c6cc05afba8b78c65e4e877d083b84",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "012ab4a5381aa9ab6a112580e7faed59fa34122ffa14835a30d9626da10cd339"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/slot-recipes.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.ts&old_oid=a07f1c4f3d7289b2dddd1f2c9c09ad4e209215f0&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.ts&new_oid=22e7b3cb74f554ce8e6e728a962e1dfca35f3192&new_mode=33188",
+    "file": "diffs/diff-042.json",
+    "old": {
+      "name": "packages/react/src/theme/slot-recipes.ts",
+      "oid": "a07f1c4f3d7289b2dddd1f2c9c09ad4e209215f0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/slot-recipes.ts",
+      "oid": "22e7b3cb74f554ce8e6e728a962e1dfca35f3192",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a43040496f616e5612bf863ca5f4ba75a026ec4e1542cfee2ce7dcba38be62b7"
+  }
+]

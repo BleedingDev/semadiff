@@ -1,0 +1,2885 @@
+diff --git a/.github/ISSUE_TEMPLATE/bug_report.md b/.github/ISSUE_TEMPLATE/bug_report.md
+index be666a1f554..cbf95a93743 100644
+--- a/.github/ISSUE_TEMPLATE/bug_report.md
++++ b/.github/ISSUE_TEMPLATE/bug_report.md
+@@ -41,7 +41,7 @@ Official Chakra CodeSandbox templates:
+ 
+ - OS: [e.g. macOS, Windows]
+ - Browser (if applies): [e.g. Chrome, Safari]
+-- Version of @chakra-ui/core: [e.g. 1.0.0-rc.3]
++- Version of @chakra-ui/react: [e.g. 1.0.0-rc.3]
+ - Version of Node.js: [e.g. 12.11.1]
+ 
+ ## Additional context
+diff --git a/.storybook/preview.tsx b/.storybook/preview.tsx
+index 6be536793d7..71f61018042 100644
+--- a/.storybook/preview.tsx
++++ b/.storybook/preview.tsx
+@@ -4,7 +4,7 @@ import {
+   useColorModeValue,
+   Flex,
+   IconButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { FaMoon, FaSun } from "react-icons/fa"
+ import * as React from "react"
+ import { withPerformance } from "storybook-addon-performance"
+diff --git a/README.md b/README.md
+index c879abed80c..90b7d0e25bf 100644
+--- a/README.md
++++ b/README.md
+@@ -9,10 +9,10 @@
+ <br>
+ 
+ <p align="center">
+-  <img alt="Bundle Size" src="https://badgen.net/bundlephobia/minzip/@chakra-ui/core"/>
++  <img alt="Bundle Size" src="https://badgen.net/bundlephobia/minzip/@chakra-ui/react"/>
+   <img alt="Language grade: JavaScript" src="https://img.shields.io/lgtm/grade/javascript/g/chakra-ui/chakra-ui.svg?logo=lgtm&logoWidth=18"/>
+   <img alt="MIT License" src="https://img.shields.io/github/license/chakra-ui/chakra-ui"/>
+-  <img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@chakra-ui/core.svg?style=flat"/>
++  <img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@chakra-ui/react.svg?style=flat"/>
+   <img alt="Github Stars" src="https://badgen.net/github/stars/chakra-ui/chakra-ui" />
+   <a href="https://discord.gg/yxpPm4q">
+     <img alt="Discord" src="https://img.shields.io/discord/660863154703695893.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2" />
+@@ -89,15 +89,15 @@ link to your website.
+ 
+ ## Installing Chakra UI
+ 
+-To use Chakra UI components, all you need to do is install the `@chakra-ui/core`
+-package and its peer dependencies:
++To use Chakra UI components, all you need to do is install the
++`@chakra-ui/react` package and its peer dependencies:
+ 
+ ```sh
+-$ yarn add @chakra-ui/core framer-motion
++$ yarn add @chakra-ui/react framer-motion
+ 
+ # or
+ 
+-$ npm install @chakra-ui/core framer-motion
++$ npm install @chakra-ui/react framer-motion
+ ```
+ 
+ ## Usage
+@@ -105,11 +105,11 @@ $ npm install @chakra-ui/core framer-motion
+ To start using the components, please follow these steps:
+ 
+ 1. Wrap your application with the `ThemeProvider` provided by
+-   **@chakra-ui/core**. We recommend that you also add the `CSSReset` component
++   **@chakra-ui/react**. We recommend that you also add the `CSSReset` component
+    to remove all browser styling.
+ 
+ ```jsx
+-import { ThemeProvider, CSSReset } from "@chakra-ui/core"
++import { ThemeProvider, CSSReset } from "@chakra-ui/react"
+ 
+ // Do this at the root of your application
+ function App({ children }) {
+@@ -128,7 +128,7 @@ can toggle between light and dark mode within your app.
+ 2. Now you can start using components like so!:
+ 
+ ```jsx
+-import { Button } from "@chakra-ui/core"
++import { Button } from "@chakra-ui/react"
+ 
+ function Example() {
+   return <Button>I just consumed some ⚡️Chakra!</Button>
+diff --git a/examples/create-react-app/package.json b/examples/create-react-app/package.json
+index d0db64f5500..3deb6ec84e5 100644
+--- a/examples/create-react-app/package.json
++++ b/examples/create-react-app/package.json
+@@ -3,7 +3,7 @@
+   "version": "1.0.0-rc.8",
+   "private": true,
+   "dependencies": {
+-    "@chakra-ui/core": "1.0.0-rc.8",
++    "@chakra-ui/react": "1.0.0-rc.8",
+     "react": "17.0.1",
+     "react-dom": "17.0.1"
+   },
+diff --git a/examples/create-react-app/src/App.tsx b/examples/create-react-app/src/App.tsx
+index cf11405cc23..e975cd28529 100644
+--- a/examples/create-react-app/src/App.tsx
++++ b/examples/create-react-app/src/App.tsx
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { Box, Text, Link, VStack, Code, Grid } from "@chakra-ui/core"
++import { Box, Text, Link, VStack, Code, Grid } from "@chakra-ui/react"
+ import { ColorModeSwitcher } from "./ColorModeSwitcher"
+ import { Logo } from "./Logo"
+ 
+diff --git a/examples/create-react-app/src/ColorModeSwitcher.tsx b/examples/create-react-app/src/ColorModeSwitcher.tsx
+index 9ad1f15ff63..7d94281de92 100644
+--- a/examples/create-react-app/src/ColorModeSwitcher.tsx
++++ b/examples/create-react-app/src/ColorModeSwitcher.tsx
+@@ -4,7 +4,7 @@ import {
+   useColorModeValue,
+   IconButton,
+   IconButtonProps,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { FaMoon, FaSun } from "react-icons/fa"
+ 
+ export const ColorModeSwitcher = (
+diff --git a/examples/create-react-app/src/Logo.tsx b/examples/create-react-app/src/Logo.tsx
+index d48826d1f55..087a7ccf147 100644
+--- a/examples/create-react-app/src/Logo.tsx
++++ b/examples/create-react-app/src/Logo.tsx
+@@ -4,7 +4,7 @@ import {
+   ImageProps,
+   keyframes,
+   usePrefersReducedMotion,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import logo from "./logo.svg"
+ 
+ const spin = keyframes`
+diff --git a/examples/create-react-app/src/index.tsx b/examples/create-react-app/src/index.tsx
+index d35c19ac59d..75385e2cbb6 100644
+--- a/examples/create-react-app/src/index.tsx
++++ b/examples/create-react-app/src/index.tsx
+@@ -2,7 +2,7 @@ import React, { StrictMode } from "react"
+ import { render } from "react-dom"
+ import App from "./App"
+ import * as serviceWorker from "./serviceWorker"
+-import { ChakraProvider } from "@chakra-ui/core"
++import { ChakraProvider } from "@chakra-ui/react"
+ 
+ render(
+   <StrictMode>
+diff --git a/examples/next-js/package.json b/examples/next-js/package.json
+index ec2f5452df5..783f6ac4d4c 100644
+--- a/examples/next-js/package.json
++++ b/examples/next-js/package.json
+@@ -8,7 +8,7 @@
+     "start": "next start"
+   },
+   "dependencies": {
+-    "@chakra-ui/core": "1.0.0-rc.8",
++    "@chakra-ui/react": "1.0.0-rc.8",
+     "next": "^10.0.1",
+     "react": "^17.0.1",
+     "react-dom": "^17.0.1"
+diff --git a/examples/next-js/pages/_document.js b/examples/next-js/pages/_document.js
+index d8d0c0d08eb..f52c1342b34 100644
+--- a/examples/next-js/pages/_document.js
++++ b/examples/next-js/pages/_document.js
+@@ -1,4 +1,4 @@
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ import NextDocument, { Html, Head, Main, NextScript } from "next/document"
+ 
+ export default class Document extends NextDocument {
+diff --git a/examples/next-js/pages/index.js b/examples/next-js/pages/index.js
+index 25c97ec5cf3..f6fb825273a 100644
+--- a/examples/next-js/pages/index.js
++++ b/examples/next-js/pages/index.js
+@@ -11,7 +11,7 @@ import {
+   InputRightElement,
+   Stack,
+   Container,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import Head from "next/head"
+ import { Chakra } from "../src/Chakra"
+ 
+diff --git a/examples/next-js/src/Chakra.js b/examples/next-js/src/Chakra.js
+index 979e8923c34..c7f121e1023 100644
+--- a/examples/next-js/src/Chakra.js
++++ b/examples/next-js/src/Chakra.js
+@@ -2,7 +2,7 @@ import {
+   ChakraProvider,
+   cookieStorageManager,
+   localStorageManager,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ 
+ export const Chakra = ({ children, cookies }) => {
+   return (
+diff --git a/examples/nextjs-typescript/Chakra.tsx b/examples/nextjs-typescript/Chakra.tsx
+index 9598ef6ac89..e9c75fd567d 100644
+--- a/examples/nextjs-typescript/Chakra.tsx
++++ b/examples/nextjs-typescript/Chakra.tsx
+@@ -2,7 +2,7 @@ import {
+   ChakraProvider,
+   cookieStorageManager,
+   localStorageManager,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { GetServerSidePropsContext } from "next"
+ import { ReactNode } from "react"
+ 
+diff --git a/examples/nextjs-typescript/components/ColorModeSwitcher.tsx b/examples/nextjs-typescript/components/ColorModeSwitcher.tsx
+index eb589c1bad7..6d70e81e9ff 100644
+--- a/examples/nextjs-typescript/components/ColorModeSwitcher.tsx
++++ b/examples/nextjs-typescript/components/ColorModeSwitcher.tsx
+@@ -3,7 +3,7 @@ import {
+   useColorModeValue,
+   IconButton,
+   IconButtonProps,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { FaMoon, FaSun } from "react-icons/fa"
+ 
+ type ColorModeSwitcherProps = Omit<IconButtonProps, "aria-label">
+diff --git a/examples/nextjs-typescript/components/Layout.tsx b/examples/nextjs-typescript/components/Layout.tsx
+index ba798065e75..f495c3c9e6e 100644
+--- a/examples/nextjs-typescript/components/Layout.tsx
++++ b/examples/nextjs-typescript/components/Layout.tsx
+@@ -1,6 +1,6 @@
+ import { ReactNode } from "react"
+ import Head from "next/head"
+-import { Container, Flex, Heading, HStack } from "@chakra-ui/core"
++import { Container, Flex, Heading, HStack } from "@chakra-ui/react"
+ import { ColorModeSwitcher } from "./ColorModeSwitcher"
+ import { Logo } from "./Logo"
+ import { NextChakraLink } from "./NextChakraLink"
+diff --git a/examples/nextjs-typescript/components/Logo.tsx b/examples/nextjs-typescript/components/Logo.tsx
+index 161555c12e2..587ea410c4d 100644
+--- a/examples/nextjs-typescript/components/Logo.tsx
++++ b/examples/nextjs-typescript/components/Logo.tsx
+@@ -3,7 +3,7 @@ import {
+   IconProps,
+   chakra,
+   usePrefersReducedMotion,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ 
+ const spin = keyframes`
+   from { transform: rotate(0deg); }
+diff --git a/examples/nextjs-typescript/components/NextChakraLink.tsx b/examples/nextjs-typescript/components/NextChakraLink.tsx
+index 01a180a332c..9e518909e50 100644
+--- a/examples/nextjs-typescript/components/NextChakraLink.tsx
++++ b/examples/nextjs-typescript/components/NextChakraLink.tsx
+@@ -4,7 +4,7 @@ import { LinkProps as NextLinkProps } from "next/dist/client/link"
+ import {
+   Link as ChakraLink,
+   LinkProps as ChakraLinkProps,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ 
+ export type NextChakraLinkProps = PropsWithChildren<
+   NextLinkProps & Omit<ChakraLinkProps, "as">
+diff --git a/examples/nextjs-typescript/components/PropertySummary.tsx b/examples/nextjs-typescript/components/PropertySummary.tsx
+index 156c60ee177..1845687950f 100644
+--- a/examples/nextjs-typescript/components/PropertySummary.tsx
++++ b/examples/nextjs-typescript/components/PropertySummary.tsx
+@@ -5,7 +5,7 @@ import {
+   Flex,
+   HStack,
+   Image,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { StarIcon } from "@chakra-ui/icons"
+ import { Property } from "../interfaces/Property"
+ 
+diff --git a/examples/nextjs-typescript/package.json b/examples/nextjs-typescript/package.json
+index 872197d7290..9e5f3cb33db 100644
+--- a/examples/nextjs-typescript/package.json
++++ b/examples/nextjs-typescript/package.json
+@@ -9,7 +9,7 @@
+     "type-check": "tsc"
+   },
+   "dependencies": {
+-    "@chakra-ui/core": "1.0.0-rc.8",
++    "@chakra-ui/react": "1.0.0-rc.8",
+     "@chakra-ui/icons": "1.0.0-rc.8",
+     "@chakra-ui/theme-tools": "1.0.0-rc.8",
+     "@types/faker": "^5.1.3",
+diff --git a/examples/nextjs-typescript/pages/_document.tsx b/examples/nextjs-typescript/pages/_document.tsx
+index 25df73e9467..f078fbf1f0a 100644
+--- a/examples/nextjs-typescript/pages/_document.tsx
++++ b/examples/nextjs-typescript/pages/_document.tsx
+@@ -1,4 +1,4 @@
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ import NextDocument, {
+   Html,
+   Head,
+diff --git a/examples/nextjs-typescript/pages/index.tsx b/examples/nextjs-typescript/pages/index.tsx
+index 128d2bbe34a..46802a7665b 100644
+--- a/examples/nextjs-typescript/pages/index.tsx
++++ b/examples/nextjs-typescript/pages/index.tsx
+@@ -1,4 +1,4 @@
+-import { Box, Code, Text, Link, VStack, Grid } from "@chakra-ui/core"
++import { Box, Code, Text, Link, VStack, Grid } from "@chakra-ui/react"
+ import { Chakra } from "../Chakra"
+ import { Layout } from "../components/Layout"
+ import { Logo } from "../components/Logo"
+diff --git a/examples/nextjs-typescript/pages/properties/[id].tsx b/examples/nextjs-typescript/pages/properties/[id].tsx
+index f1502a5269e..db4c715b7da 100644
+--- a/examples/nextjs-typescript/pages/properties/[id].tsx
++++ b/examples/nextjs-typescript/pages/properties/[id].tsx
+@@ -7,7 +7,7 @@ import {
+   Badge,
+   Image,
+   Text,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { Layout } from "../../components/Layout"
+ import { properties } from "../../utils/sample-data"
+ import { GetStaticProps, GetStaticPaths } from "next"
+diff --git a/examples/nextjs-typescript/pages/properties/index.tsx b/examples/nextjs-typescript/pages/properties/index.tsx
+index 93ac7b3501e..b9eded19312 100644
+--- a/examples/nextjs-typescript/pages/properties/index.tsx
++++ b/examples/nextjs-typescript/pages/properties/index.tsx
+@@ -1,4 +1,4 @@
+-import { Heading, Wrap, WrapItem } from "@chakra-ui/core"
++import { Heading, Wrap, WrapItem } from "@chakra-ui/react"
+ import { Layout } from "../../components/Layout"
+ import { properties } from "../../utils/sample-data"
+ import { PropertySummary } from "../../components/PropertySummary"
+diff --git a/package.json b/package.json
+index ebfb5524ec2..943931b1e70 100644
+--- a/package.json
++++ b/package.json
+@@ -55,7 +55,7 @@
+     "docs:start": "yarn docs start",
+     "dedup": "yarn-deduplicate --strategy highest yarn.lock",
+     "dedup:check": "yarn-deduplicate -s fewer yarn.lock --list --fail",
+-    "core": "yarn workspace @chakra-ui/core",
++    "react": "yarn workspace @chakra-ui/react",
+     "icon": "yarn workspace @chakra-ui/icon",
+     "hooks": "yarn workspace @chakra-ui/hooks",
+     "utils": "yarn workspace @chakra-ui/utils",
+diff --git a/packages/breadcrumb/README.md b/packages/breadcrumb/README.md
+index e937dfee5c6..9f9d42a9b87 100644
+--- a/packages/breadcrumb/README.md
++++ b/packages/breadcrumb/README.md
+@@ -23,7 +23,7 @@ Chakra UI exports 3 breadcrumb related components:
+ - `BreadcrumbLink`: The breadcrumb link.
+ 
+ ```js
+-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/core"
++import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/packages/editable/README.md b/packages/editable/README.md
+index d85438a63bf..16237ab58cf 100644
+--- a/packages/editable/README.md
++++ b/packages/editable/README.md
+@@ -17,7 +17,7 @@ npm i @chakra-ui/editable
+ ## Import component
+ 
+ ```js
+-import { Editable, EditableInput, EditablePreview } from "@chakra-ui/core"
++import { Editable, EditableInput, EditablePreview } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/packages/layout/stories/text.stories.tsx b/packages/layout/stories/text.stories.tsx
+index b837a4e1f95..e8b4c1cde82 100644
+--- a/packages/layout/stories/text.stories.tsx
++++ b/packages/layout/stories/text.stories.tsx
+@@ -1,5 +1,5 @@
+ import * as React from "react"
+-import { ChakraProvider, extendTheme } from "@chakra-ui/core"
++import { ChakraProvider, extendTheme } from "@chakra-ui/react"
+ import { Text } from "../src"
+ 
+ export default {
+diff --git a/packages/menu/README.md b/packages/menu/README.md
+index 2acf0ed2e6a..11cf1435f52 100644
+--- a/packages/menu/README.md
++++ b/packages/menu/README.md
+@@ -25,7 +25,7 @@ import {
+   MenuDivider,
+   MenuOptionGroup,
+   MenuItemOption,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/packages/modal/README.md b/packages/modal/README.md
+index 0ce40e6ed8f..94209a3051e 100644
+--- a/packages/modal/README.md
++++ b/packages/modal/README.md
+@@ -25,7 +25,7 @@ import {
+   ModalFooter,
+   ModalBody,
+   ModalCloseButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -132,7 +132,7 @@ import {
+   AlertDialogHeader,
+   AlertDialogContent,
+   AlertDialogOverlay,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Basic usage
+diff --git a/packages/number-input/README.md b/packages/number-input/README.md
+index 32cc495e588..88c50502c47 100644
+--- a/packages/number-input/README.md
++++ b/packages/number-input/README.md
+@@ -26,7 +26,7 @@ import {
+   NumberInputStepper,
+   NumberIncrementStepper,
+   NumberDecrementStepper,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/packages/popover/README.md b/packages/popover/README.md
+index 03b94c12288..4f7c652fc1e 100644
+--- a/packages/popover/README.md
++++ b/packages/popover/README.md
+@@ -26,7 +26,7 @@ import {
+   PopoverFooter,
+   PopoverArrow,
+   PopoverCloseButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Basic Usage
+diff --git a/packages/core/CHANGELOG.md b/packages/react/CHANGELOG.md
+similarity index 100%
+rename from packages/core/CHANGELOG.md
+rename to packages/react/CHANGELOG.md
+diff --git a/packages/core/README.md b/packages/react/README.md
+similarity index 92%
+rename from packages/core/README.md
+rename to packages/react/README.md
+index 61139d2aa25..1837228e67a 100644
+--- a/packages/core/README.md
++++ b/packages/react/README.md
+@@ -20,22 +20,22 @@ https://chakra-ui.com
+ ## Installing Chakra UI
+ 
+ ⚡️Chakra UI is made up of multiple components and tools which you can import
+-one by one. All you need to do is install the `@chakra-ui/core` package:
++one by one. All you need to do is install the `@chakra-ui/react` package:
+ 
+ ```sh
+-$ yarn add @chakra-ui/core
++$ yarn add @chakra-ui/react
+ # or
+-$ npm install --save @chakra-ui/core
++$ npm install --save @chakra-ui/react
+ ```
+ 
+ # Getting set up
+ 
+ To start using the components, please follow these steps:
+ 
+-1. Wrap your application in a `ThemeProvider` provided by **@chakra-ui/core**
++1. Wrap your application in a `ThemeProvider` provided by **@chakra-ui/react**
+ 
+ ```jsx
+-import { ThemeProvider, ColorModeProvider } from "@chakra-ui/core"
++import { ThemeProvider, ColorModeProvider } from "@chakra-ui/react"
+ 
+ const App = ({ children }) => (
+   <ThemeProvider>
+@@ -51,7 +51,7 @@ mode.
+ 2. Now you can start using components like so!:
+ 
+ ```jsx
+-import { Button } from "@chakra-ui/core"
++import { Button } from "@chakra-ui/react"
+ 
+ const App = () => <Button>I just consumed some ⚡️Chakra!</Button>
+ ```
+diff --git a/packages/core/jest.config.js b/packages/react/jest.config.js
+similarity index 100%
+rename from packages/core/jest.config.js
+rename to packages/react/jest.config.js
+diff --git a/packages/core/package.json b/packages/react/package.json
+similarity index 99%
+rename from packages/core/package.json
+rename to packages/react/package.json
+index ea929f41445..3f7cb6305f7 100644
+--- a/packages/core/package.json
++++ b/packages/react/package.json
+@@ -1,5 +1,5 @@
+ {
+-  "name": "@chakra-ui/core",
++  "name": "@chakra-ui/react",
+   "version": "1.0.0-rc.8",
+   "description": "Responsive and accessible React UI components built with React and Emotion",
+   "main": "dist/cjs/index.js",
+diff --git a/packages/core/src/chakra-provider.tsx b/packages/react/src/chakra-provider.tsx
+similarity index 100%
+rename from packages/core/src/chakra-provider.tsx
+rename to packages/react/src/chakra-provider.tsx
+diff --git a/packages/core/src/extend-theme.ts b/packages/react/src/extend-theme.ts
+similarity index 100%
+rename from packages/core/src/extend-theme.ts
+rename to packages/react/src/extend-theme.ts
+diff --git a/packages/core/src/index.tsx b/packages/react/src/index.tsx
+similarity index 100%
+rename from packages/core/src/index.tsx
+rename to packages/react/src/index.tsx
+diff --git a/packages/core/tests/extend-theme.test.tsx b/packages/react/tests/extend-theme.test.tsx
+similarity index 100%
+rename from packages/core/tests/extend-theme.test.tsx
+rename to packages/react/tests/extend-theme.test.tsx
+diff --git a/packages/core/tsconfig.json b/packages/react/tsconfig.json
+similarity index 100%
+rename from packages/core/tsconfig.json
+rename to packages/react/tsconfig.json
+diff --git a/packages/slider/README.md b/packages/slider/README.md
+index 3e62c2d032b..500d455a425 100644
+--- a/packages/slider/README.md
++++ b/packages/slider/README.md
+@@ -24,7 +24,7 @@ import {
+   SliderTrack,
+   SliderFilledTrack,
+   SliderThumb,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/packages/system/README.md b/packages/system/README.md
+index 6d22dda46da..73b795e6b2e 100644
+--- a/packages/system/README.md
++++ b/packages/system/README.md
+@@ -113,7 +113,7 @@ const theme = {
+ };
+ 
+ // 2. create or import Button from chakra-ui
+-import { Button } from "@chakra-ui/core"
++import { Button } from "@chakra-ui/react"
+ 
+ // or your own button
+ const Button = chakra("button", { themeKey: "Button" })
+diff --git a/packages/tabs/README.md b/packages/tabs/README.md
+index 779a67250b9..eaddf2b188c 100644
+--- a/packages/tabs/README.md
++++ b/packages/tabs/README.md
+@@ -20,7 +20,7 @@ npm i @chakra-ui/tabs
+ ## Import components
+ 
+ ```jsx
+-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/core"
++import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/packages/test-utils/package.json b/packages/test-utils/package.json
+index ce751c93fb6..31fe98662c3 100644
+--- a/packages/test-utils/package.json
++++ b/packages/test-utils/package.json
+@@ -23,7 +23,7 @@
+     "url": "https://github.com/chakra-ui/chakra-ui/issues"
+   },
+   "dependencies": {
+-    "@chakra-ui/core": "1.0.0-rc.8",
++    "@chakra-ui/react": "1.0.0-rc.8",
+     "@testing-library/jest-dom": "5.11.4",
+     "@testing-library/react": "10.4.9",
+     "@testing-library/react-hooks": "3.4.1",
+diff --git a/packages/test-utils/src/test-utils.tsx b/packages/test-utils/src/test-utils.tsx
+index 4e5a95b00c3..3cae010b658 100644
+--- a/packages/test-utils/src/test-utils.tsx
++++ b/packages/test-utils/src/test-utils.tsx
+@@ -1,4 +1,4 @@
+-import { ChakraProvider } from "@chakra-ui/core"
++import { ChakraProvider } from "@chakra-ui/react"
+ import "@testing-library/jest-dom/extend-expect"
+ import {
+   render as RtlRender,
+diff --git a/packages/toast/NOTES.md b/packages/toast/NOTES.md
+index 9bab0013af5..c1f98ddf7cf 100644
+--- a/packages/toast/NOTES.md
++++ b/packages/toast/NOTES.md
+@@ -38,7 +38,7 @@ For the non-hook version, we could export `toastManager` object that has all the
+ function.
+ 
+ ```jsx
+-import { toastManager } from "@chakra-ui/core"
++import { toastManager } from "@chakra-ui/react"
+ 
+ // To add we'll do this
+ toastManager.addToast(...)
+diff --git a/packages/tooltip/README.md b/packages/tooltip/README.md
+index 2d6eb576cf9..d7eb3db981b 100644
+--- a/packages/tooltip/README.md
++++ b/packages/tooltip/README.md
+@@ -16,7 +16,7 @@ npm i @chakra-ui/tooltip
+ ## Import components
+ 
+ ```js
+-import { Tooltip } from "@chakra-ui/core"
++import { Tooltip } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/scripts/setup-core.js b/scripts/setup-react.js
+similarity index 81%
+rename from scripts/setup-core.js
+rename to scripts/setup-react.js
+index d07b9435a30..5251bb64d1a 100644
+--- a/scripts/setup-core.js
++++ b/scripts/setup-react.js
+@@ -4,7 +4,7 @@ import prettier from "prettier"
+ import editJson from "edit-json-file"
+ 
+ const omittedPkgs = [
+-  "core",
++  "react",
+   "theme",
+   "preset-stripe",
+   "icons",
+@@ -32,15 +32,15 @@ pkgArray.forEach((pkg) => {
+ 
+ content = prettier.format(content, { semi: false, parser: "typescript" })
+ 
+-const coreDir = fs.resolve("packages/core/src", "index.tsx")
++const reactDir = fs.resolve("packages/react/src", "index.tsx")
+ 
+ try {
+-  fs.writeFileSync(coreDir, content)
++  fs.writeFileSync(reactDir, content)
+ } catch (e) {
+   console.log(e)
+ }
+ 
+-const pkgJson = editJson("packages/core/package.json")
++const pkgJson = editJson("packages/react/package.json")
+ pkgJson.unset("dependencies")
+ 
+ pkgArray.forEach((pkg) => {
+@@ -50,4 +50,4 @@ pkgArray.forEach((pkg) => {
+ 
+ pkgJson.save()
+ 
+-shell.exec("yarn core build")
++shell.exec("yarn react build")
+diff --git a/tooling/babel-plugin-chakra-ui/dist/index.js b/tooling/babel-plugin-chakra-ui/dist/index.js
+index ec5fdf25ccb..c803877a3b9 100644
+--- a/tooling/babel-plugin-chakra-ui/dist/index.js
++++ b/tooling/babel-plugin-chakra-ui/dist/index.js
+@@ -11,7 +11,7 @@ var _core = require("@babel/core");
+ 
+ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+ 
+-const PURE_CALLS = new Map([["@chakra-ui/system", ["forwardRef", "memo"]], ["@chakra-ui/core", ["forwardRef", "memo"]]]);
++const PURE_CALLS = new Map([["@chakra-ui/system", ["forwardRef", "memo"]], ["@chakra-ui/react", ["forwardRef", "memo"]]]);
+ 
+ var _default = (0, _helperPluginUtils.declare)(api => {
+   api.assertVersion(7);
+diff --git a/tooling/babel-plugin-chakra-ui/src/index.js b/tooling/babel-plugin-chakra-ui/src/index.js
+index d7c3b5a8a6d..30fa251ad34 100644
+--- a/tooling/babel-plugin-chakra-ui/src/index.js
++++ b/tooling/babel-plugin-chakra-ui/src/index.js
+@@ -4,7 +4,7 @@ import { types } from "@babel/core"
+ 
+ const PURE_CALLS = new Map([
+   ["@chakra-ui/system", ["forwardRef", "memo"]],
+-  ["@chakra-ui/core", ["forwardRef", "memo"]],
++  ["@chakra-ui/react", ["forwardRef", "memo"]],
+ ])
+ 
+ export default declare((api) => {
+diff --git a/tooling/cra-template-typescript/template.json b/tooling/cra-template-typescript/template.json
+index f31e1fdb87b..af80f3e9e59 100644
+--- a/tooling/cra-template-typescript/template.json
++++ b/tooling/cra-template-typescript/template.json
+@@ -1,7 +1,7 @@
+ {
+   "package": {
+     "dependencies": {
+-      "@chakra-ui/core": "^1.0.0-rc.5",
++      "@chakra-ui/react": "^1.0.0-rc.5",
+       "framer-motion": "^2.9.4",
+       "react-icons": "^3.0.0",
+       "@testing-library/jest-dom": "^5.9.0",
+diff --git a/tooling/cra-template-typescript/template/src/App.tsx b/tooling/cra-template-typescript/template/src/App.tsx
+index a1fb8a283b6..f78547366e2 100644
+--- a/tooling/cra-template-typescript/template/src/App.tsx
++++ b/tooling/cra-template-typescript/template/src/App.tsx
+@@ -8,7 +8,7 @@ import {
+   Code,
+   Grid,
+   theme,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { ColorModeSwitcher } from "./ColorModeSwitcher"
+ import { Logo } from "./Logo"
+ 
+diff --git a/tooling/cra-template-typescript/template/src/ColorModeSwitcher.tsx b/tooling/cra-template-typescript/template/src/ColorModeSwitcher.tsx
+index 6dc1199ac5d..2accca5b6ec 100644
+--- a/tooling/cra-template-typescript/template/src/ColorModeSwitcher.tsx
++++ b/tooling/cra-template-typescript/template/src/ColorModeSwitcher.tsx
+@@ -4,7 +4,7 @@ import {
+   useColorModeValue,
+   IconButton,
+   IconButtonProps,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { FaMoon, FaSun } from "react-icons/fa"
+ 
+ type ColorModeSwitcherProps = Omit<IconButtonProps, "aria-label">
+diff --git a/tooling/cra-template-typescript/template/src/Logo.tsx b/tooling/cra-template-typescript/template/src/Logo.tsx
+index 79bc5f5cde3..ba97a8f2c9b 100644
+--- a/tooling/cra-template-typescript/template/src/Logo.tsx
++++ b/tooling/cra-template-typescript/template/src/Logo.tsx
+@@ -5,7 +5,7 @@ import {
+   ImageProps,
+   forwardRef,
+   usePrefersReducedMotion,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import logo from "./logo.svg"
+ 
+ const spin = keyframes`
+diff --git a/tooling/cra-template-typescript/template/src/index.tsx b/tooling/cra-template-typescript/template/src/index.tsx
+index c6c45ea3f6d..4345cc67ed1 100644
+--- a/tooling/cra-template-typescript/template/src/index.tsx
++++ b/tooling/cra-template-typescript/template/src/index.tsx
+@@ -1,4 +1,4 @@
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ import * as React from "react"
+ import ReactDOM from "react-dom"
+ import { App } from "./App"
+diff --git a/tooling/cra-template-typescript/template/src/test-utils.tsx b/tooling/cra-template-typescript/template/src/test-utils.tsx
+index 0f7da714abb..d7ef121147d 100644
+--- a/tooling/cra-template-typescript/template/src/test-utils.tsx
++++ b/tooling/cra-template-typescript/template/src/test-utils.tsx
+@@ -1,6 +1,6 @@
+ import * as React from "react"
+ import { render, RenderOptions } from "@testing-library/react"
+-import { ChakraProvider, theme } from "@chakra-ui/core"
++import { ChakraProvider, theme } from "@chakra-ui/react"
+ 
+ const AllProviders = ({ children }: { children?: React.ReactNode }) => (
+   <ChakraProvider theme={theme}>{children}</ChakraProvider>
+diff --git a/tooling/cra-template/template.json b/tooling/cra-template/template.json
+index c96125883d4..d654657f278 100644
+--- a/tooling/cra-template/template.json
++++ b/tooling/cra-template/template.json
+@@ -1,7 +1,7 @@
+ {
+   "package": {
+     "dependencies": {
+-      "@chakra-ui/core": "^1.0.0@next",
++      "@chakra-ui/react": "^1.0.0@next",
+       "react-icons": "^3.0.0",
+       "framer-motion": "^2.9.4",
+       "@testing-library/jest-dom": "^5.9.0",
+diff --git a/tooling/cra-template/template/src/App.js b/tooling/cra-template/template/src/App.js
+index ce2652007f2..b6500c79f64 100644
+--- a/tooling/cra-template/template/src/App.js
++++ b/tooling/cra-template/template/src/App.js
+@@ -8,7 +8,7 @@ import {
+   Code,
+   Grid,
+   theme,
+-} from '@chakra-ui/core';
++} from '@chakra-ui/react';
+ import { ColorModeSwitcher } from './ColorModeSwitcher';
+ import { Logo } from './Logo';
+ 
+diff --git a/tooling/cra-template/template/src/ColorModeSwitcher.js b/tooling/cra-template/template/src/ColorModeSwitcher.js
+index c0e281e7a52..9766bf4fe44 100644
+--- a/tooling/cra-template/template/src/ColorModeSwitcher.js
++++ b/tooling/cra-template/template/src/ColorModeSwitcher.js
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { useColorMode, useColorModeValue, IconButton } from '@chakra-ui/core';
++import { useColorMode, useColorModeValue, IconButton } from '@chakra-ui/react';
+ import { FaMoon, FaSun } from 'react-icons/fa';
+ 
+ export const ColorModeSwitcher = props => {
+diff --git a/tooling/cra-template/template/src/Logo.js b/tooling/cra-template/template/src/Logo.js
+index 0b5b1601669..b6d19a1b826 100644
+--- a/tooling/cra-template/template/src/Logo.js
++++ b/tooling/cra-template/template/src/Logo.js
+@@ -1,5 +1,5 @@
+ import React from 'react';
+-import { Image, keyframes, usePrefersReducedMotion } from '@chakra-ui/core';
++import { Image, keyframes, usePrefersReducedMotion } from '@chakra-ui/react';
+ import logo from './logo.svg';
+ 
+ const spin = keyframes`
+diff --git a/tooling/cra-template/template/src/index.js b/tooling/cra-template/template/src/index.js
+index fbe8a21eca3..0668dfc3030 100644
+--- a/tooling/cra-template/template/src/index.js
++++ b/tooling/cra-template/template/src/index.js
+@@ -1,4 +1,4 @@
+-import { ColorModeScript } from '@chakra-ui/core';
++import { ColorModeScript } from '@chakra-ui/react';
+ import React, { StrictMode } from 'react';
+ import ReactDOM from 'react-dom';
+ import App from './App';
+diff --git a/tooling/cra-template/template/src/test-utils.js b/tooling/cra-template/template/src/test-utils.js
+index 4f8840af86e..c1253847b54 100644
+--- a/tooling/cra-template/template/src/test-utils.js
++++ b/tooling/cra-template/template/src/test-utils.js
+@@ -1,6 +1,6 @@
+ import React from 'react';
+ import { render } from '@testing-library/react';
+-import { ChakraProvider, theme } from '@chakra-ui/core';
++import { ChakraProvider, theme } from '@chakra-ui/react';
+ 
+ const AllProviders = ({ children }) => (
+   <ChakraProvider theme={theme}>{children}</ChakraProvider>
+diff --git a/tooling/gatsby-plugin-chakra-ui/README.md b/tooling/gatsby-plugin-chakra-ui/README.md
+index 63a380d2c57..9afef908a74 100644
+--- a/tooling/gatsby-plugin-chakra-ui/README.md
++++ b/tooling/gatsby-plugin-chakra-ui/README.md
+@@ -8,11 +8,11 @@ Gatsby plugin for adding Chakra UI
+ peer dependencies.
+ 
+ ```sh
+-npm i gatsby-plugin-chakra-ui @chakra-ui/core
++npm i gatsby-plugin-chakra-ui @chakra-ui/react
+ 
+ # or
+ 
+-yarn add gatsby-plugin-chakra-ui @chakra-ui/core
++yarn add gatsby-plugin-chakra-ui @chakra-ui/react
+ ```
+ 
+ ## Usage
+@@ -31,7 +31,7 @@ module.exports = {
+ ```jsx
+ // src/pages/index.js
+ import React from "react"
+-import { Box, Text } from "@chakra-ui/core"
++import { Box, Text } from "@chakra-ui/react"
+ 
+ function IndexPage() {
+   return (
+diff --git a/tooling/gatsby-plugin-chakra-ui/gatsby-browser.js b/tooling/gatsby-plugin-chakra-ui/gatsby-browser.js
+index a4926919e87..e3eadb21df5 100644
+--- a/tooling/gatsby-plugin-chakra-ui/gatsby-browser.js
++++ b/tooling/gatsby-plugin-chakra-ui/gatsby-browser.js
+@@ -5,7 +5,7 @@ import {
+   CSSReset,
+   GlobalStyle,
+   PortalManager,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import theme from "./src/theme"
+ 
+ export const wrapRootElement = (
+diff --git a/tooling/gatsby-plugin-chakra-ui/gatsby-ssr.js b/tooling/gatsby-plugin-chakra-ui/gatsby-ssr.js
+index 76599b2f8be..f29ddf1f36f 100644
+--- a/tooling/gatsby-plugin-chakra-ui/gatsby-ssr.js
++++ b/tooling/gatsby-plugin-chakra-ui/gatsby-ssr.js
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ export { wrapRootElement } from "./gatsby-browser"
+ 
+ export const onRenderBody = ({ setPreBodyComponents }) => {
+diff --git a/tooling/gatsby-plugin-chakra-ui/package.json b/tooling/gatsby-plugin-chakra-ui/package.json
+index c7ab78ae213..2bc64f0846b 100644
+--- a/tooling/gatsby-plugin-chakra-ui/package.json
++++ b/tooling/gatsby-plugin-chakra-ui/package.json
+@@ -18,7 +18,7 @@
+     "test": "jest --passWithNoTests"
+   },
+   "peerDependencies": {
+-    "@chakra-ui/core": ">=1.0.0-rc.5",
++    "@chakra-ui/react": ">=1.0.0-rc.5",
+     "@chakra-ui/theme": ">=1.0.0-rc.5",
+     "gatsby": "^2.24.85"
+   }
+diff --git a/tooling/props-docs/package.json b/tooling/props-docs/package.json
+index 756c1831c39..14c6db427ee 100644
+--- a/tooling/props-docs/package.json
++++ b/tooling/props-docs/package.json
+@@ -50,7 +50,7 @@
+   },
+   "dependencies": {
+     "@chakra-ui/styled-system": "1.0.0-rc.8",
+-    "@chakra-ui/core": "1.0.0-rc.8",
++    "@chakra-ui/react": "1.0.0-rc.8",
+     "react-docgen-typescript": "^1.20.5",
+     "regenerator-runtime": "^0.13.7",
+     "glob": "^7.1.6",
+diff --git a/website/layouts/mdx.tsx b/website/layouts/mdx.tsx
+index 23039641fcd..26a22496bde 100644
+--- a/website/layouts/mdx.tsx
++++ b/website/layouts/mdx.tsx
+@@ -1,4 +1,4 @@
+-import * as chakraComponents from "@chakra-ui/core"
++import * as chakraComponents from "@chakra-ui/react"
+ import { MDXProvider } from "@mdx-js/react"
+ import MDXComponents from "components/mdx-components"
+ import PageContainer from "components/page-container"
+diff --git a/website/package.json b/website/package.json
+index 78ad1ea8e62..70afac82051 100644
+--- a/website/package.json
++++ b/website/package.json
+@@ -11,7 +11,7 @@
+     "analyze": "ANALYZE=true next build"
+   },
+   "dependencies": {
+-    "@chakra-ui/core": "1.0.0-rc.8",
++    "@chakra-ui/react": "1.0.0-rc.8",
+     "@chakra-ui/theme-tools": "1.0.0-rc.8",
+     "@chakra-ui/utils": "1.0.0-rc.8",
+     "@chakra-ui/props-docs": "1.0.0-rc.8",
+diff --git a/website/pages/_app.tsx b/website/pages/_app.tsx
+index 8c87b99fb37..675027fe127 100644
+--- a/website/pages/_app.tsx
++++ b/website/pages/_app.tsx
+@@ -5,7 +5,7 @@ import Router from "next/router"
+ import React from "react"
+ import siteConfig from "configs/site-config"
+ import "../src/styles/algolia.css"
+-import { ChakraProvider } from "@chakra-ui/core"
++import { ChakraProvider } from "@chakra-ui/react"
+ import theme from "theme"
+ import FontFace from "components/font-face"
+ 
+diff --git a/website/pages/_document.tsx b/website/pages/_document.tsx
+index 31b0622f6c3..084036f3b8e 100644
+--- a/website/pages/_document.tsx
++++ b/website/pages/_document.tsx
+@@ -7,7 +7,7 @@ import NextDocument, {
+   DocumentContext,
+ } from "next/document"
+ import GAScript from "analytics/ga-script"
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ 
+ class Document extends NextDocument {
+   static getInitialProps(ctx: DocumentContext) {
+diff --git a/website/pages/docs/components/accordion.mdx b/website/pages/docs/components/accordion.mdx
+index 495952300f3..b701da4b4b9 100644
+--- a/website/pages/docs/components/accordion.mdx
++++ b/website/pages/docs/components/accordion.mdx
+@@ -38,7 +38,7 @@ import {
+   AccordionButton,
+   AccordionPanel,
+   AccordionIcon,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/components/breadcrumb.mdx b/website/pages/docs/components/breadcrumb.mdx
+index ba3f34c2845..4b3c61cd234 100644
+--- a/website/pages/docs/components/breadcrumb.mdx
++++ b/website/pages/docs/components/breadcrumb.mdx
+@@ -36,7 +36,7 @@ import {
+   BreadcrumbItem,
+   BreadcrumbLink,
+   BreadcrumbSeparator,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/components/close-button.mdx b/website/pages/docs/components/close-button.mdx
+index c87a9fdb245..0df314b0794 100644
+--- a/website/pages/docs/components/close-button.mdx
++++ b/website/pages/docs/components/close-button.mdx
+@@ -24,7 +24,7 @@ close functionality in feedback and overlay components like
+ ## Import
+ 
+ ```js
+-import { CloseButton } from "@chakra-ui/core"
++import { CloseButton } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/components/icon.mdx b/website/pages/docs/components/icon.mdx
+index 5a4ff2b0135..72917dcb144 100644
+--- a/website/pages/docs/components/icon.mdx
++++ b/website/pages/docs/components/icon.mdx
+@@ -64,12 +64,12 @@ component names:
+ To use third-party icon libraries like
+ [`react-icons`](https://react-icons.github.io/react-icons/), here are the steps:
+ 
+-1. Import the `Icon` component from `@chakra-ui/core`
++1. Import the `Icon` component from `@chakra-ui/react`
+ 2. Pass the desired third party icon into the `as` prop
+ 
+ ```jsx live=false
+ // 1. Import
+-import { Icon } from "@chakra-ui/core"
++import { Icon } from "@chakra-ui/react"
+ import { MdSettings } from "react-icons/md"
+ 
+ // 2. Use the `as` prop
+@@ -100,10 +100,10 @@ Chakra provides two methods for creating your custom icons:
+ - Using the [Icon](#using-the-icon-component) component
+ - Using the [createIcon](#using-the-createicon-function) function
+ 
+-They can be imported from `@chakra-ui/core`:
++They can be imported from `@chakra-ui/react`:
+ 
+ ```jsx live=false
+-import { Icon, createIcon } from "@chakra-ui/core"
++import { Icon, createIcon } from "@chakra-ui/react"
+ ```
+ 
+ Both `Icon` and `createIcon` enable you to style the icon using
+diff --git a/website/pages/docs/components/link.mdx b/website/pages/docs/components/link.mdx
+index bb863dcd038..77713e05985 100644
+--- a/website/pages/docs/components/link.mdx
++++ b/website/pages/docs/components/link.mdx
+@@ -19,7 +19,7 @@ styled to resemble a hyperlink and semantically renders an `<a>`.
+ ## Import
+ 
+ ```js
+-import { Link } from "@chakra-ui/core"
++import { Link } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/components/tabs.mdx b/website/pages/docs/components/tabs.mdx
+index 7a50ffe8527..7631959c2ee 100644
+--- a/website/pages/docs/components/tabs.mdx
++++ b/website/pages/docs/components/tabs.mdx
+@@ -23,7 +23,7 @@ attributes described in the
+ ## Import
+ 
+ ```js
+-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/core"
++import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react"
+ ```
+ 
+ - **Tabs**: Provides context and state for all components
+diff --git a/website/pages/docs/components/visually-hidden.mdx b/website/pages/docs/components/visually-hidden.mdx
+index 98ab23d98e8..64044c778d8 100644
+--- a/website/pages/docs/components/visually-hidden.mdx
++++ b/website/pages/docs/components/visually-hidden.mdx
+@@ -20,7 +20,7 @@ from the visual client, but keep it readable for screen readers.
+ ## Installation
+ 
+ ```bash
+-npm install @chakra-ui/core
++npm install @chakra-ui/react
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/data-display/avatar.mdx b/website/pages/docs/data-display/avatar.mdx
+index e9e705fdd3a..ea2ad05f6cb 100644
+--- a/website/pages/docs/data-display/avatar.mdx
++++ b/website/pages/docs/data-display/avatar.mdx
+@@ -28,7 +28,7 @@ Chakra UI exports 3 avatar-related components:
+ - `AvatarGroup`: A wrapper to stack multiple Avatars together.
+ 
+ ```js
+-import { Avatar, AvatarBadge } from "@chakra-ui/core"
++import { Avatar, AvatarBadge } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/data-display/badge.mdx b/website/pages/docs/data-display/badge.mdx
+index 07f38ff3071..97454ce37ad 100644
+--- a/website/pages/docs/data-display/badge.mdx
++++ b/website/pages/docs/data-display/badge.mdx
+@@ -19,7 +19,7 @@ Badges are used to highlight an item's status for quick recognition.
+ ## Import
+ 
+ ```js
+-import { Badge } from "@chakra-ui/core"
++import { Badge } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/data-display/code.mdx b/website/pages/docs/data-display/code.mdx
+index aaaf324e0b4..becaa6b78d4 100644
+--- a/website/pages/docs/data-display/code.mdx
++++ b/website/pages/docs/data-display/code.mdx
+@@ -22,7 +22,7 @@ code.
+ ## Import
+ 
+ ```js
+-import { Code } from "@chakra-ui/core"
++import { Code } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/data-display/divider.mdx b/website/pages/docs/data-display/divider.mdx
+index ec0fe6d92bc..6d0451cd4ee 100644
+--- a/website/pages/docs/data-display/divider.mdx
++++ b/website/pages/docs/data-display/divider.mdx
+@@ -18,12 +18,13 @@ Dividers are used to visually separate content in a list or group.
+ ## Import
+ 
+ ```js
+-import { Divider } from "@chakra-ui/core"
++import { Divider } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+ 
+-The `Divider` displays a thin horizontal or vertical line, and renders a `hr` tag.
++The `Divider` displays a thin horizontal or vertical line, and renders a `hr`
++tag.
+ 
+ ```jsx
+ <Divider />
+diff --git a/website/pages/docs/data-display/image.mdx b/website/pages/docs/data-display/image.mdx
+index 0e10fe38297..cfa53334e4c 100644
+--- a/website/pages/docs/data-display/image.mdx
++++ b/website/pages/docs/data-display/image.mdx
+@@ -22,7 +22,7 @@ styles as well.
+ ## Import
+ 
+ ```js
+-import { Image } from "@chakra-ui/core"
++import { Image } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -89,12 +89,12 @@ prop.
+ ## Usage with SSR
+ 
+ ```js
+-import { Img } from "@chakra-ui/core"
++import { Img } from "@chakra-ui/react"
+ ```
+ 
+-The `Img` Component provides a fallback for SSR applications which uses the image
+-directly without client side checks.
++The `Img` Component provides a fallback for SSR applications which uses the
++image directly without client side checks.
+ 
+ ## Props
+ 
+-<PropsTable of="Image" />   
++<PropsTable of="Image" />
+diff --git a/website/pages/docs/data-display/kbd.mdx b/website/pages/docs/data-display/kbd.mdx
+index 8cc57ec7b4c..af0e164323b 100644
+--- a/website/pages/docs/data-display/kbd.mdx
++++ b/website/pages/docs/data-display/kbd.mdx
+@@ -21,7 +21,7 @@ renders a `<kbd>` element.
+ ## Import
+ 
+ ```js
+-import { Kbd } from "@chakra-ui/core"
++import { Kbd } from "@chakra-ui/react"
+ ```
+ 
+ ```jsx
+@@ -40,8 +40,8 @@ All shortcuts should do their best to match what appears on the user’s keyboar
+ 
+ ## Modifer
+ 
+-The only punctuation you should need is the **+** to indicate that a combination of
+-keys will activate the shortcut.
++The only punctuation you should need is the **+** to indicate that a combination
++of keys will activate the shortcut.
+ 
+ ```jsx
+ <span>
+diff --git a/website/pages/docs/data-display/list.mdx b/website/pages/docs/data-display/list.mdx
+index 57e01778b18..4a8106fd362 100644
+--- a/website/pages/docs/data-display/list.mdx
++++ b/website/pages/docs/data-display/list.mdx
+@@ -6,7 +6,8 @@ description:
+   "List is used to display list items. It renders a <ul> element by default"
+ ---
+ 
+-`List` component is used to display list items. It renders a `<ul>` element by default.
++`List` component is used to display list items. It renders a `<ul>` element by
++default.
+ 
+ <ComponentLinks
+   github={{ url: "#" }}
+@@ -19,7 +20,7 @@ description:
+ ## Import
+ 
+ ```js
+-import { List, ListItem, ListIcon } from "@chakra-ui/core"
++import { List, ListItem, ListIcon } from "@chakra-ui/react"
+ ```
+ 
+ ## Unordered List
+diff --git a/website/pages/docs/data-display/stat.mdx b/website/pages/docs/data-display/stat.mdx
+index 26a44f3c1f8..cd2f52956f7 100644
+--- a/website/pages/docs/data-display/stat.mdx
++++ b/website/pages/docs/data-display/stat.mdx
+@@ -26,7 +26,7 @@ import {
+   StatHelpText,
+   StatArrow,
+   StatGroup,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Basic Usage
+@@ -65,8 +65,8 @@ import {
+ 
+ ## Props
+ 
+-- `StatLabel`, `StatHelpText`, `StatNumber` composes [Text](/docs/typography/text)
+-  component.
++- `StatLabel`, `StatHelpText`, `StatNumber` composes
++  [Text](/docs/typography/text) component.
+ - `StatArrow` composes [Icon](/docs/components/icon) component.
+ - `Stat` and `StatGroup` composes [Box](/docs/layout/box) component.
+ 
+diff --git a/website/pages/docs/data-display/tag.mdx b/website/pages/docs/data-display/tag.mdx
+index 327980b5019..95bbc1bebe7 100644
+--- a/website/pages/docs/data-display/tag.mdx
++++ b/website/pages/docs/data-display/tag.mdx
+@@ -33,7 +33,7 @@ import {
+   TagLeftIcon,
+   TagRightIcon,
+   TagCloseButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/features/chakra-factory.mdx b/website/pages/docs/features/chakra-factory.mdx
+index b9cb9fa6f42..6c327ecf4b0 100644
+--- a/website/pages/docs/features/chakra-factory.mdx
++++ b/website/pages/docs/features/chakra-factory.mdx
+@@ -9,7 +9,7 @@ Chakra factory serves as an **object of chakra enabled JSX elements**, and also
+ style props.
+ 
+ ```bash
+-import { chakra } from "@chakra-ui/core"
++import { chakra } from "@chakra-ui/react"
+ ```
+ 
+ ## Chakra JSX Elements
+@@ -51,7 +51,7 @@ The function will infer the prop types from the wrapped component and also add
+ chakra style props.
+ 
+ ```jsx live=false
+-import { chakra } from "@chakra-ui/core"
++import { chakra } from "@chakra-ui/react"
+ import Textarea from "react-input-autoresize"
+ 
+ const AutoResizeInput = chakra(Textarea)
+diff --git a/website/pages/docs/features/color-mode.mdx b/website/pages/docs/features/color-mode.mdx
+index 62f788c494a..44900085de6 100644
+--- a/website/pages/docs/features/color-mode.mdx
++++ b/website/pages/docs/features/color-mode.mdx
+@@ -116,7 +116,7 @@ To support this, extend the default theme with a `config` key matching
+ 
+ ```jsx live=false
+ // 1. import `ChakraProvider` component and `extendTheme`
+-import { extendTheme, ChakraProvider } from "@chakra-ui/core"
++import { extendTheme, ChakraProvider } from "@chakra-ui/react"
+ 
+ // 2. declare your configuration, these are the defaults
+ const config = {
+@@ -165,7 +165,7 @@ ReactDOM.render(
+ 
+ ```jsx live=false
+ // adjust your pages/_document.js
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ 
+ export default class Document extends NextDocument {
+   static getInitialProps(ctx) {
+@@ -192,8 +192,8 @@ export default class Document extends NextDocument {
+ 
+ ```jsx live=false
+ // gatsby-ssr.js
+-import React from 'react'
+-import { ColorModeScript } from "@chakra-ui/core"
++import React from "react"
++import { ColorModeScript } from "@chakra-ui/react"
+ 
+ export const onRenderBody = ({ setPreBodyComponents }) => {
+   setPreBodyComponents([
+@@ -226,13 +226,14 @@ import {
+   ChakraProvider,
+   cookieStorageManager,
+   localStorageManager,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ 
+ export function Chakra({ cookies, children }) {
+   // b) Pass `colorModeManager` prop
+-  const colorModeManager = typeof cookies === "string"
+-    ? cookieStorageManager(cookies)
+-    : localStorageManager
++  const colorModeManager =
++    typeof cookies === "string"
++      ? cookieStorageManager(cookies)
++      : localStorageManager
+ 
+   return (
+     <ChakraProvider colorModeManager={colorModeManager}>
+@@ -281,7 +282,7 @@ import {
+   ChakraProvider,
+   cookieStorageManager,
+   localStorageManager,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ 
+ export default function App({ cookies }) {
+   // 2. Pass `colorModeManager` prop - it finds the relevant cookie on its own
+diff --git a/website/pages/docs/features/responsive-styles.mdx b/website/pages/docs/features/responsive-styles.mdx
+index 8b7e4ea75d6..85ff570f27b 100644
+--- a/website/pages/docs/features/responsive-styles.mdx
++++ b/website/pages/docs/features/responsive-styles.mdx
+@@ -173,7 +173,7 @@ To define custom breakpoints, install `@chakra-ui/theme-tools`, and use the
+ 
+ ```jsx live=false
+ // 1. Import the utilities
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ import { createBreakpoints } from "@chakra-ui/theme-tools"
+ 
+ // 2. Update the breakpoints as key-value pairs
+diff --git a/website/pages/docs/features/style-props.mdx b/website/pages/docs/features/style-props.mdx
+index 34ea9e4ffbc..e6fc12125ad 100644
+--- a/website/pages/docs/features/style-props.mdx
++++ b/website/pages/docs/features/style-props.mdx
+@@ -17,7 +17,7 @@ each group.
+ ### Margin and padding
+ 
+ ```jsx live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ // m={2} refers to the value of `theme.space[2]`
+ <Box m={2}>Tomato</Box>
+@@ -49,7 +49,7 @@ import { Box } from "@chakra-ui/core"
+ ### Color and background color
+ 
+ ```jsx live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ // picks up a nested color value using dot notation
+ // => `theme.colors.gray[50]`
+@@ -75,7 +75,7 @@ import { Box } from "@chakra-ui/core"
+ ### Typography
+ 
+ ```jsx live=false
+-import { Text } from "@chakra-ui/core"
++import { Text } from "@chakra-ui/react"
+ 
+ // font-size of `theme.fontSizes.md`
+ <Text fontSize="md" />
+@@ -105,7 +105,7 @@ import { Text } from "@chakra-ui/core"
+ ### Layout, width and height
+ 
+ ```jsx live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ // verbose
+ <Box width="100%" height={32} />
+@@ -145,7 +145,7 @@ import { Box } from "@chakra-ui/core"
+ ### Flexbox
+ 
+ ```jsx live=false
+-import { Box, Flex } from "@chakra-ui/core"
++import { Box, Flex } from "@chakra-ui/react"
+ 
+ // verbose
+ <Box display="flex" alignItems="center" justifyContent="space-between">
+@@ -179,7 +179,7 @@ import { Box, Flex } from "@chakra-ui/core"
+ ### Grid Layout
+ 
+ ```jsx live=false
+-import { Box, Grid } from "@chakra-ui/core"
++import { Box, Grid } from "@chakra-ui/react"
+ 
+ // verbose
+ <Box display="grid" gridGap={2} gridAutoFlow="row dense">
+@@ -212,7 +212,7 @@ import { Box, Grid } from "@chakra-ui/core"
+ ### Background
+ 
+ ```jsx live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ // verbose
+ <Box
+@@ -274,7 +274,7 @@ import { Box } from "@chakra-ui/core"
+ ### Border Radius
+ 
+ ```jsx live=false
+-import { Button } from "@chakra-ui/core"
++import { Button } from "@chakra-ui/react"
+ 
+ // This button will have no right borderRadius
+ <Button borderRightRadius="0">Button 1</Button>
+@@ -301,7 +301,7 @@ import { Button } from "@chakra-ui/core"
+ ### Position
+ 
+ ```jsx live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ // verbose
+ <Box position="absolute">Cover</Box>
+@@ -384,7 +384,7 @@ import { Box } from "@chakra-ui/core"
+ ### Pseudo
+ 
+ ```jsx live=false
+-import { Button } from "@chakra-ui/core"
++import { Button } from "@chakra-ui/react"
+ 
+ // :hover style
+ <Button
+diff --git a/website/pages/docs/features/text-and-layer-styles.mdx b/website/pages/docs/features/text-and-layer-styles.mdx
+index 323e245520d..35ae44343df 100644
+--- a/website/pages/docs/features/text-and-layer-styles.mdx
++++ b/website/pages/docs/features/text-and-layer-styles.mdx
+@@ -28,7 +28,7 @@ Properties defined in a layer style
+ 
+ ```jsx live=false
+ // 1. Import `extendTheme`
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ // 2. Extend the theme with new layer styles
+ const theme = extendTheme({
+@@ -80,7 +80,7 @@ Properties defined in a text style
+ 
+ ```jsx live=false
+ // 1. Import `extendTheme`
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ // 2. Define the new text styles
+ const theme = extendTheme({
+diff --git a/website/pages/docs/feedback/alert.mdx b/website/pages/docs/feedback/alert.mdx
+index 082da98ce14..ac69f7298eb 100644
+--- a/website/pages/docs/feedback/alert.mdx
++++ b/website/pages/docs/feedback/alert.mdx
+@@ -28,7 +28,12 @@ Chakra UI exports 4 alert related components.
+   readers.
+ 
+ ```js
+-import { Alert, AlertIcon, AlertTitle, AlertDescription } from "@chakra-ui/core"
++import {
++  Alert,
++  AlertIcon,
++  AlertTitle,
++  AlertDescription,
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/feedback/circular-progress.mdx b/website/pages/docs/feedback/circular-progress.mdx
+index 7d2f56e165d..aa939bf4f48 100644
+--- a/website/pages/docs/feedback/circular-progress.mdx
++++ b/website/pages/docs/feedback/circular-progress.mdx
+@@ -26,7 +26,7 @@ and indeterminate processes.
+ ## Import
+ 
+ ```js
+-import { CircularProgress, CircularProgressLabel } from "@chakra-ui/core"
++import { CircularProgress, CircularProgressLabel } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/feedback/progress.mdx b/website/pages/docs/feedback/progress.mdx
+index deca0e84fb9..7e8d2f8175f 100644
+--- a/website/pages/docs/feedback/progress.mdx
++++ b/website/pages/docs/feedback/progress.mdx
+@@ -21,7 +21,7 @@ time or consists of several steps.
+ ## Import
+ 
+ ```js
+-import { Progress } from "@chakra-ui/core"
++import { Progress } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/feedback/skeleton.mdx b/website/pages/docs/feedback/skeleton.mdx
+index b8127663058..848d0af1bb1 100644
+--- a/website/pages/docs/feedback/skeleton.mdx
++++ b/website/pages/docs/feedback/skeleton.mdx
+@@ -17,7 +17,7 @@ package: "@chakra-ui/skeleton"
+ ## Import
+ 
+ ```js
+-import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/core"
++import { Skeleton, SkeletonCircle, SkeletonText } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -44,7 +44,7 @@ Or to wrap another component to take the same height and width.
+ Useful when fetching remote data.
+ 
+ ```js live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ function Card() {
+   const { data, loading, error } = useRemoteData()
+diff --git a/website/pages/docs/feedback/toast.mdx b/website/pages/docs/feedback/toast.mdx
+index b1676ef6975..df9e4847b55 100644
+--- a/website/pages/docs/feedback/toast.mdx
++++ b/website/pages/docs/feedback/toast.mdx
+@@ -25,7 +25,7 @@ time.
+ ## Import
+ 
+ ```js
+-import { useToast } from "@chakra-ui/core"
++import { useToast } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -223,7 +223,7 @@ Use `createStandaloneToast` to create toasts from outside of your React
+ Components.
+ 
+ ```js
+-import { createStandaloneToast } from "@chakra-ui/core"
++import { createStandaloneToast } from "@chakra-ui/react"
+ 
+ const toast = createStandaloneToast()
+ // const customToast = createStandaloeToast({ theme: yourCustomTheme })
+diff --git a/website/pages/docs/form/button.mdx b/website/pages/docs/form/button.mdx
+index ca4cdad377e..c96ba1e8d15 100644
+--- a/website/pages/docs/form/button.mdx
++++ b/website/pages/docs/form/button.mdx
+@@ -21,7 +21,7 @@ form, opening a dialog, canceling an action, or performing a delete operation.
+ ## Import
+ 
+ ```js
+-import { Button, ButtonGroup } from "@chakra-ui/core"
++import { Button, ButtonGroup } from "@chakra-ui/react"
+ ```
+ 
+ - **Button:** The button component with support for custom icons, spinners, etc.
+diff --git a/website/pages/docs/form/checkbox.mdx b/website/pages/docs/form/checkbox.mdx
+index f8167e047a9..64b4c75ecf0 100644
+--- a/website/pages/docs/form/checkbox.mdx
++++ b/website/pages/docs/form/checkbox.mdx
+@@ -25,7 +25,7 @@ to style the checkboxes.
+ ## Import
+ 
+ ```js
+-import { Checkbox, CheckboxGroup } from "@chakra-ui/core"
++import { Checkbox, CheckboxGroup } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/form/editable.mdx b/website/pages/docs/form/editable.mdx
+index 9ee01ad6000..049ce6e396d 100644
+--- a/website/pages/docs/form/editable.mdx
++++ b/website/pages/docs/form/editable.mdx
+@@ -33,7 +33,7 @@ Chakra UI exports 3 components to handle this functionality.
+ - `EditablePreview`: The read-only view of the component.
+ 
+ ```js
+-import { Editable, EditableInput, EditablePreview } from "@chakra-ui/core"
++import { Editable, EditableInput, EditablePreview } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/form/form-control.mdx b/website/pages/docs/form/form-control.mdx
+index 7ed6f4c4e82..b24bbe37d66 100644
+--- a/website/pages/docs/form/form-control.mdx
++++ b/website/pages/docs/form/form-control.mdx
+@@ -28,7 +28,7 @@ import {
+   FormLabel,
+   FormErrorMessage,
+   FormHelperText,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/form/icon-button.mdx b/website/pages/docs/form/icon-button.mdx
+index 7a2ba9ab990..a7deba04bf5 100644
+--- a/website/pages/docs/form/icon-button.mdx
++++ b/website/pages/docs/form/icon-button.mdx
+@@ -20,7 +20,7 @@ screen readers can give meaning to the button.
+ ## Import
+ 
+ ```js
+-import { IconButton } from "@chakra-ui/core"
++import { IconButton } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -31,8 +31,8 @@ import { IconButton } from "@chakra-ui/core"
+ 
+ ### Button Colors
+ 
+-The `IconButton` component accepts most of the props from the `Button` component,
+-so we can use `colorScheme` prop to change the color of the button.
++The `IconButton` component accepts most of the props from the `Button`
++component, so we can use `colorScheme` prop to change the color of the button.
+ 
+ ```jsx
+ <IconButton
+diff --git a/website/pages/docs/form/input.mdx b/website/pages/docs/form/input.mdx
+index e71e049c519..9b796e58f54 100644
+--- a/website/pages/docs/form/input.mdx
++++ b/website/pages/docs/form/input.mdx
+@@ -20,7 +20,7 @@ field.
+ ## Import
+ 
+ ```js
+-import { Input } from "@chakra-ui/core"
++import { Input } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/form/number-input.mdx b/website/pages/docs/form/number-input.mdx
+index e617d5c93dd..e4f00b1597e 100644
+--- a/website/pages/docs/form/number-input.mdx
++++ b/website/pages/docs/form/number-input.mdx
+@@ -7,8 +7,8 @@ description:
+   controls for incrementing or decrementing numeric values.
+ ---
+ 
+-The `NumberInput` component is similar to the [Input](/docs/form/input) component,
+-but it has controls for incrementing or decrementing numeric values.
++The `NumberInput` component is similar to the [Input](/docs/form/input)
++component, but it has controls for incrementing or decrementing numeric values.
+ 
+ <ComponentLinks
+   github={{ url: "#" }}
+@@ -39,7 +39,7 @@ import {
+   NumberInputStepper,
+   NumberIncrementStepper,
+   NumberDecrementStepper,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -297,8 +297,9 @@ function HookUsage() {
+ 
+ ### Increment value using Mouse wheel
+ 
+-The `NumberInput` component supports the ability to increment or decrement values
+-using the mouse wheel events. To activate this, pass the `allowMouseWheel` prop.
++The `NumberInput` component supports the ability to increment or decrement
++values using the mouse wheel events. To activate this, pass the
++`allowMouseWheel` prop.
+ 
+ ```jsx
+ function MouseWheelExample() {
+@@ -357,5 +358,5 @@ NumberInput composes `Flex` with some additional props listed below.
+ 
+ ### NumberDecrementStepper and NumberIncrementStepper Props
+ 
+-`NumberDecrementStepper` and `NumberIncrementStepper` composes the `Box` props so
+-you can pass all `Box` props.
++`NumberDecrementStepper` and `NumberIncrementStepper` composes the `Box` props
++so you can pass all `Box` props.
+diff --git a/website/pages/docs/form/pin-input.mdx b/website/pages/docs/form/pin-input.mdx
+index 977f3503612..e64ac82bfa1 100644
+--- a/website/pages/docs/form/pin-input.mdx
++++ b/website/pages/docs/form/pin-input.mdx
+@@ -23,7 +23,7 @@ The most common application is for entering OTP or security codes.
+ ## Import
+ 
+ ```js
+-import { PinInput, PinInputField } from "@chakra-ui/core"
++import { PinInput, PinInputField } from "@chakra-ui/react"
+ ```
+ 
+ - **PinInput:** The component that provides context to all the pin-input fields.
+diff --git a/website/pages/docs/form/radio.mdx b/website/pages/docs/form/radio.mdx
+index d39bde73668..1c1dcec290e 100644
+--- a/website/pages/docs/form/radio.mdx
++++ b/website/pages/docs/form/radio.mdx
+@@ -23,7 +23,7 @@ to style the radio.
+ ## Installation
+ 
+ ```js
+-import { Radio, RadioGroup } from "@chakra-ui/core"
++import { Radio, RadioGroup } from "@chakra-ui/react"
+ ```
+ 
+ ### Usage
+diff --git a/website/pages/docs/form/select.mdx b/website/pages/docs/form/select.mdx
+index cd3061710f4..f597556859e 100644
+--- a/website/pages/docs/form/select.mdx
++++ b/website/pages/docs/form/select.mdx
+@@ -16,7 +16,7 @@ otherwise you might consider using a radio group instead.
+ ## Import
+ 
+ ```js
+-import { Select } from "@chakra-ui/core"
++import { Select } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -33,7 +33,8 @@ Here's a basic usage of the `Select` component.
+ 
+ ### Changing the size of the Select
+ 
+-The`Select` component cones in three sizes : large (48px), default (40px) and small (32px).
++The`Select` component cones in three sizes : large (48px), default (40px) and
++small (32px).
+ 
+ ```jsx
+ <Stack spacing={3}>
+@@ -45,9 +46,9 @@ The`Select` component cones in three sizes : large (48px), default (40px) and sm
+ 
+ ### Changing the appearance of the Select
+ 
+-Just like the input component, `Select` comes in 3 variants, `outline`, `unstyled`
+-, `flushed` , and `filled`. Pass the `variant` prop and set it to either of
+-these values.
++Just like the input component, `Select` comes in 3 variants, `outline`,
++`unstyled` , `flushed` , and `filled`. Pass the `variant` prop and set it to
++either of these values.
+ 
+ ```jsx
+ <Stack spacing={3}>
+diff --git a/website/pages/docs/form/slider.mdx b/website/pages/docs/form/slider.mdx
+index a2f3e88ad3b..8e72c3712c0 100644
+--- a/website/pages/docs/form/slider.mdx
++++ b/website/pages/docs/form/slider.mdx
+@@ -34,7 +34,7 @@ import {
+   SliderTrack,
+   SliderFilledTrack,
+   SliderThumb,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/form/switch.mdx b/website/pages/docs/form/switch.mdx
+index 22609220407..2ff740cc215 100644
+--- a/website/pages/docs/form/switch.mdx
++++ b/website/pages/docs/form/switch.mdx
+@@ -22,7 +22,7 @@ workflow as a `Checkbox`.
+ ## Import
+ 
+ ```js
+-import { Switch } from "@chakra-ui/core"
++import { Switch } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/form/textarea.mdx b/website/pages/docs/form/textarea.mdx
+index e399ec9b14f..0ee59193267 100644
+--- a/website/pages/docs/form/textarea.mdx
++++ b/website/pages/docs/form/textarea.mdx
+@@ -17,7 +17,7 @@ The `Textarea` component allows you to easily create multi-line text inputs.
+ ## Import
+ 
+ ```js
+-import { Textarea } from "@chakra-ui/core"
++import { Textarea } from "@chakra-ui/react"
+ ```
+ 
+ ### Usage
+diff --git a/website/pages/docs/getting-started.mdx b/website/pages/docs/getting-started.mdx
+index 7fda19dd0be..d5f837ec59e 100644
+--- a/website/pages/docs/getting-started.mdx
++++ b/website/pages/docs/getting-started.mdx
+@@ -8,11 +8,11 @@ description: How to install and set up Chakra UI in your project
+ Inside your React project directory, install Chakra UI by running the following:
+ 
+ ```bash
+-npm i @chakra-ui/core @emotion/core @emotion/styled framer-motion
++npm i @chakra-ui/react @emotion/core @emotion/styled framer-motion
+ 
+ # or
+ 
+-yarn add @chakra-ui/core @emotion/core @emotion/styled framer-motion
++yarn add @chakra-ui/react @emotion/core @emotion/styled framer-motion
+ ```
+ 
+ > For `create-react-app` installation instructions, check this
+@@ -29,7 +29,7 @@ Go to the root of your application and do this:
+ import * as React from "react"
+ 
+ // 1. import `ChakraProvider` component
+-import { ChakraProvider } from "@chakra-ui/core"
++import { ChakraProvider } from "@chakra-ui/react"
+ 
+ function App() {
+   // 2. Use at the root of your app
+@@ -49,14 +49,14 @@ function App() {
+ ## Add custom theme (Optional)
+ 
+ If you need to customize the default chakra theme to match your design
+-requirements, you can extend the `theme` from `@chakra-ui/core`.
++requirements, you can extend the `theme` from `@chakra-ui/react`.
+ 
+ Chakra UI provides an `extendTheme` function that deep merges the default theme
+ with your customizations.
+ 
+ ```jsx live=false
+ // 1. Import the extendTheme function
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ // 2. Extend the theme to include custom colors, fonts, etc
+ const colors = {
+diff --git a/website/pages/docs/hooks/use-breakpoint-value.mdx b/website/pages/docs/hooks/use-breakpoint-value.mdx
+index b1bca1f7af2..885c8270ea5 100644
+--- a/website/pages/docs/hooks/use-breakpoint-value.mdx
++++ b/website/pages/docs/hooks/use-breakpoint-value.mdx
+@@ -18,7 +18,7 @@ achieve the same behavior.
+ ## Import
+ 
+ ```js
+-import { useBreakpointValue } from "@chakra-ui/core"
++import { useBreakpointValue } from "@chakra-ui/react"
+ ```
+ 
+ ## Return value
+diff --git a/website/pages/docs/hooks/use-clipboard.mdx b/website/pages/docs/hooks/use-clipboard.mdx
+index 194cfd43980..26fbd8bf4c0 100644
+--- a/website/pages/docs/hooks/use-clipboard.mdx
++++ b/website/pages/docs/hooks/use-clipboard.mdx
+@@ -18,7 +18,7 @@ The `useClipboard` hook returns an object with the following fields:
+ ## Import
+ 
+ ```js
+-import { useClipboard } from "@chakra-ui/core"
++import { useClipboard } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/hooks/use-controllable.mdx b/website/pages/docs/hooks/use-controllable.mdx
+index b7d0df36e4d..a2828278e4d 100644
+--- a/website/pages/docs/hooks/use-controllable.mdx
++++ b/website/pages/docs/hooks/use-controllable.mdx
+@@ -15,7 +15,7 @@ both controlled or uncontrolled state scenarios.
+ ## Import
+ 
+ ```js
+-import { useControllableProp, useControllableState } from "@chakra-ui/core"
++import { useControllableProp, useControllableState } from "@chakra-ui/react"
+ ```
+ 
+ ## useControllableProp
+diff --git a/website/pages/docs/hooks/use-disclosure.mdx b/website/pages/docs/hooks/use-disclosure.mdx
+index bae66446d0d..9cd8faf3297 100644
+--- a/website/pages/docs/hooks/use-disclosure.mdx
++++ b/website/pages/docs/hooks/use-disclosure.mdx
+@@ -13,7 +13,7 @@ description:
+ ## Import
+ 
+ ```js
+-import { useDisclosure } from "@chakra-ui/core"
++import { useDisclosure } from "@chakra-ui/react"
+ ```
+ 
+ ## Return value
+diff --git a/website/pages/docs/hooks/use-media-query.mdx b/website/pages/docs/hooks/use-media-query.mdx
+index ea2664ddfc2..b9e86691d33 100644
+--- a/website/pages/docs/hooks/use-media-query.mdx
++++ b/website/pages/docs/hooks/use-media-query.mdx
+@@ -4,15 +4,15 @@ package: "@chakra-ui/hooks"
+ description: "React hook to detect media queries"
+ ---
+ 
+-`useMediaQuery` is a custom hook used to help detect whether a single media query
+-or multiple media queries individually match.
++`useMediaQuery` is a custom hook used to help detect whether a single media
++query or multiple media queries individually match.
+ 
+ [Learn more about the API and its backgrounds.](https://developer.mozilla.org/en-US/docs/Web/API/Window/matchMedia)
+ 
+ ## Import
+ 
+ ```js
+-import { useMediaQuery } from "@chakra-ui/core"
++import { useMediaQuery } from "@chakra-ui/react"
+ ```
+ 
+ ## Return value
+diff --git a/website/pages/docs/hooks/use-prefers-reduced-motion.mdx b/website/pages/docs/hooks/use-prefers-reduced-motion.mdx
+index d6299cbdaa8..15f73031f23 100644
+--- a/website/pages/docs/hooks/use-prefers-reduced-motion.mdx
++++ b/website/pages/docs/hooks/use-prefers-reduced-motion.mdx
+@@ -12,7 +12,7 @@ preference.
+ ## Import
+ 
+ ```js
+-import { usePrefersReducedMotion } from "@chakra-ui/core"
++import { usePrefersReducedMotion } from "@chakra-ui/react"
+ ```
+ 
+ ## Return value
+@@ -32,7 +32,7 @@ import {
+   ImageProps,
+   keyframes,
+   usePrefersReducedMotion,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import logo from "./logo.svg"
+ 
+ const spin = keyframes`
+diff --git a/website/pages/docs/hooks/use-theme.mdx b/website/pages/docs/hooks/use-theme.mdx
+index 5ba8d5511f5..f531aecc4c0 100644
+--- a/website/pages/docs/hooks/use-theme.mdx
++++ b/website/pages/docs/hooks/use-theme.mdx
+@@ -9,7 +9,7 @@ description: "React hook to get access to theme by reading from theme context"
+ ## Import
+ 
+ ```js
+-import { useTheme } from "@chakra-ui/core"
++import { useTheme } from "@chakra-ui/react"
+ ```
+ 
+ ## Return value
+diff --git a/website/pages/docs/hooks/use-token.mdx b/website/pages/docs/hooks/use-token.mdx
+index 550031eb758..0cc08bcf7e1 100644
+--- a/website/pages/docs/hooks/use-token.mdx
++++ b/website/pages/docs/hooks/use-token.mdx
+@@ -9,7 +9,7 @@ description: "Hook to resolve design tokens from the theme"
+ ## Import
+ 
+ ```js
+-import { useToken } from "@chakra-ui/core"
++import { useToken } from "@chakra-ui/react"
+ ```
+ 
+ ## Return value
+diff --git a/website/pages/docs/layout/aspect-ratio.mdx b/website/pages/docs/layout/aspect-ratio.mdx
+index 82e0353e9e6..0ffa4151230 100644
+--- a/website/pages/docs/layout/aspect-ratio.mdx
++++ b/website/pages/docs/layout/aspect-ratio.mdx
+@@ -22,7 +22,7 @@ achieve this.
+ ## Import
+ 
+ ```js
+-import { AspectRatio } from "@chakra-ui/core"
++import { AspectRatio } from "@chakra-ui/react"
+ ```
+ 
+ ## Embed Video
+diff --git a/website/pages/docs/layout/box.mdx b/website/pages/docs/layout/box.mdx
+index 762da2f901a..0155012c9a2 100644
+--- a/website/pages/docs/layout/box.mdx
++++ b/website/pages/docs/layout/box.mdx
+@@ -30,7 +30,7 @@ components are built. By default, it renders a `div` element.
+ ## Import
+ 
+ ```js
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/layout/center.mdx b/website/pages/docs/layout/center.mdx
+index f6315dc8ffb..f5a6d645faf 100644
+--- a/website/pages/docs/layout/center.mdx
++++ b/website/pages/docs/layout/center.mdx
+@@ -20,7 +20,7 @@ Center is a layout component that centers its child within itself.
+ ## Import
+ 
+ ```js
+-import { Center, Square, Circle } from "@chakra-ui/core"
++import { Center, Square, Circle } from "@chakra-ui/react"
+ ```
+ 
+ - **Center:** centers its child given `width` and `height`
+diff --git a/website/pages/docs/layout/flex.mdx b/website/pages/docs/layout/flex.mdx
+index 62abac66d55..834a670b9f5 100644
+--- a/website/pages/docs/layout/flex.mdx
++++ b/website/pages/docs/layout/flex.mdx
+@@ -20,7 +20,7 @@ style shorthand. It renders a `div` element.
+ ## Import
+ 
+ ```js
+-import { Flex, Spacer } from "@chakra-ui/core"
++import { Flex, Spacer } from "@chakra-ui/react"
+ ```
+ 
+ - **Flex:** A `Box` with `display: flex`.
+diff --git a/website/pages/docs/layout/grid.mdx b/website/pages/docs/layout/grid.mdx
+index beab036db56..4747053f16b 100644
+--- a/website/pages/docs/layout/grid.mdx
++++ b/website/pages/docs/layout/grid.mdx
+@@ -20,7 +20,7 @@ comes with helpful style shorthand. It renders a `div` element.
+ ## Import
+ 
+ ```js
+-import { Grid, GridItem } from "@chakra-ui/core"
++import { Grid, GridItem } from "@chakra-ui/react"
+ ```
+ 
+ - **Grid:** The main wrapper with `display: grid`.
+diff --git a/website/pages/docs/layout/simple-grid.mdx b/website/pages/docs/layout/simple-grid.mdx
+index 1dbff525ec4..8d6243ea21d 100644
+--- a/website/pages/docs/layout/simple-grid.mdx
++++ b/website/pages/docs/layout/simple-grid.mdx
+@@ -24,7 +24,7 @@ ease. It renders a `div` element with `display: grid`.
+ ## Import
+ 
+ ```js
+-import { SimpleGrid } from "@chakra-ui/core"
++import { SimpleGrid } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/layout/stack.mdx b/website/pages/docs/layout/stack.mdx
+index ef6f541716a..2f69cfd8cde 100644
+--- a/website/pages/docs/layout/stack.mdx
++++ b/website/pages/docs/layout/stack.mdx
+@@ -23,7 +23,7 @@ to add spacing between its children.
+ ## Import
+ 
+ ```js
+-import { Stack, HStack, VStack } from "@chakra-ui/core"
++import { Stack, HStack, VStack } from "@chakra-ui/react"
+ ```
+ 
+ - **Stack:** Used to add spacing between elements in the horizontal or vertical
+diff --git a/website/pages/docs/layout/wrap.mdx b/website/pages/docs/layout/wrap.mdx
+index aaeb6aeeebe..12635a7beaf 100644
+--- a/website/pages/docs/layout/wrap.mdx
++++ b/website/pages/docs/layout/wrap.mdx
+@@ -22,7 +22,7 @@ well with things like dialog buttons, tags, and chips.
+ ## Import
+ 
+ ```js
+-import { Wrap, WrapItem } from "@chakra-ui/core"
++import { Wrap, WrapItem } from "@chakra-ui/react"
+ ```
+ 
+ - **Wrap**: Wrap composes the `Box` component and renders a `<ul>` tag
+diff --git a/website/pages/docs/migration.mdx b/website/pages/docs/migration.mdx
+index 8ff71ddbb1c..c27d204a25f 100644
+--- a/website/pages/docs/migration.mdx
++++ b/website/pages/docs/migration.mdx
+@@ -57,7 +57,7 @@ team.
+ 
+ ```diff
+ "dependencies": {
+-  "@chakra-ui/core": "^1.0.0",
++  "@chakra-ui/react": "^1.0.0",
+   "framer-motion": "^2.9.5",
+ - "@emotion/core": "^10.0.10",
+ + "@emotion/react": "^11.0.0",
+@@ -156,7 +156,7 @@ To provide easier extensibility and typesafety, breakpoints should now be
+ created through `createBreakpoints` by passing an object:
+ 
+ ```diff
+-+ import { extendTheme } from "@chakra-ui/core"
+++ import { extendTheme } from "@chakra-ui/react"
+ + import { createBreakpoints } from "@chakra-ui/theme-tools"
+ 
+ 
+@@ -210,8 +210,8 @@ and accessibility.
+   remove the notion that it is a header when it is actually a button.
+ 
+ ```diff
+-- import { AccordionHeader } from "@chakra-ui/core"
+-+ import { AccordionButton } from "@chakra-ui/core"
++- import { AccordionHeader } from "@chakra-ui/react"
+++ import { AccordionButton } from "@chakra-ui/react"
+ ```
+ 
+ > WAI-ARIA guidelines require that accordion buttons be wrapped in the
+@@ -239,8 +239,8 @@ out of the box when we don't. Here's how to handle this:
+ - Change all imports of `AspectRatioBox` to `AspectRatio`.
+ 
+ ```diff
+-- import { AspectRatioBox } from "@chakra-ui/core"
+-+ import  { AspectRatio } from "@chakra-ui/core"
++- import { AspectRatioBox } from "@chakra-ui/react"
+++ import  { AspectRatio } from "@chakra-ui/react"
+ ```
+ 
+ ### Breadcrumb
+@@ -321,7 +321,7 @@ errors, and reduces unused icons bloating your app.**
+ 
+ ```jsx live=false
+ // pages/_document.js
+-import { ColorModeScript } from "@chakra-ui/core"
++import { ColorModeScript } from "@chakra-ui/react"
+ 
+ export default class Document extends NextDocument {
+   static getInitialProps(ctx) {
+@@ -367,14 +367,14 @@ prop passed to `Editable` as well as the prop in its render props.
+ 
+ - Basic interface icons provided by Chakra have moved to the `@chakra-ui/icons`
+   package. Replace all `<Icon name="..." />` elements imported from
+-  `@chakra-ui/core` with equivalent React elements imported from
++  `@chakra-ui/react` with equivalent React elements imported from
+   `@chakra-ui/icons`.
+ 
+   > Replacement logic: If `<Icon name="search" />` is used, then replace it with
+   > `<SearchIcon />` from Chakra icons package.
+ 
+ ```diff
+-- import { Icon } from "@chakra-ui/core"
++- import { Icon } from "@chakra-ui/react"
+ - <Icon name="search" />
+ 
+ + import { SearchIcon } from "@chakra-ui/icons"
+@@ -387,7 +387,7 @@ Existing icons will appear as a question mark until refactored.
+   `theme` create your own icons using the `createIcon` utility:
+ 
+ ```jsx live=false
+-import { createIcon } from "@chakra-ui/core"
++import { createIcon } from "@chakra-ui/react"
+ 
+ export const UpDownIcon = createIcon({
+   displayName: "UpDownIcon",
+@@ -413,7 +413,7 @@ import { createIcon, MoonIcon, SunIcon } from "@chakra-ui/icons"
+ > from Chakra.
+ 
+ ```diff
+-import { PhoneIcon } from "@chakra-ui/core"
++import { PhoneIcon } from "@chakra-ui/react"
+ 
+ - <IconButton icon="phone">Call</IconButton>
+ + <IconButton icon={<PhoneIcon />}>Call</IconButton>
+diff --git a/website/pages/docs/overlay/alert-dialog.mdx b/website/pages/docs/overlay/alert-dialog.mdx
+index 528abfe43af..bc946b81781 100644
+--- a/website/pages/docs/overlay/alert-dialog.mdx
++++ b/website/pages/docs/overlay/alert-dialog.mdx
+@@ -38,7 +38,7 @@ import {
+   AlertDialogHeader,
+   AlertDialogContent,
+   AlertDialogOverlay,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/overlay/drawer.mdx b/website/pages/docs/overlay/drawer.mdx
+index 92c120a858f..d7c852fd260 100644
+--- a/website/pages/docs/overlay/drawer.mdx
++++ b/website/pages/docs/overlay/drawer.mdx
+@@ -31,7 +31,7 @@ import {
+   DrawerOverlay,
+   DrawerContent,
+   DrawerCloseButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/overlay/menu.mdx b/website/pages/docs/overlay/menu.mdx
+index 8a222e0b3fc..5c3c6695dc3 100644
+--- a/website/pages/docs/overlay/menu.mdx
++++ b/website/pages/docs/overlay/menu.mdx
+@@ -44,7 +44,7 @@ import {
+   MenuIcon,
+   MenuCommand,
+   MenuDivider,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/overlay/modal.mdx b/website/pages/docs/overlay/modal.mdx
+index cc2aeb0be6e..8c5863e3427 100644
+--- a/website/pages/docs/overlay/modal.mdx
++++ b/website/pages/docs/overlay/modal.mdx
+@@ -43,7 +43,7 @@ import {
+   ModalFooter,
+   ModalBody,
+   ModalCloseButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/overlay/popover.mdx b/website/pages/docs/overlay/popover.mdx
+index 486281574fb..6e62abe4258 100644
+--- a/website/pages/docs/overlay/popover.mdx
++++ b/website/pages/docs/overlay/popover.mdx
+@@ -41,7 +41,7 @@ import {
+   PopoverFooter,
+   PopoverArrow,
+   PopoverCloseButton,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ ```
+ 
+ ## Basic Usage
+diff --git a/website/pages/docs/overlay/tooltip.mdx b/website/pages/docs/overlay/tooltip.mdx
+index 77bfc5f71f0..ad159bf0a60 100644
+--- a/website/pages/docs/overlay/tooltip.mdx
++++ b/website/pages/docs/overlay/tooltip.mdx
+@@ -25,7 +25,7 @@ The `Tooltip` component follows the
+ ## Import
+ 
+ ```js
+-import { Tooltip } from "@chakra-ui/core"
++import { Tooltip } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+diff --git a/website/pages/docs/theming/advanced.mdx b/website/pages/docs/theming/advanced.mdx
+index fff367cdd6a..ecf9a9ea8ba 100644
+--- a/website/pages/docs/theming/advanced.mdx
++++ b/website/pages/docs/theming/advanced.mdx
+@@ -38,7 +38,7 @@ For example, to create a simple badge that changes its background based on color
+ mode. Here's how to go about it.
+ 
+ ```jsx live=false
+-import { extendTheme, theme } from "@chakra-ui/core"
++import { extendTheme, theme } from "@chakra-ui/react"
+ 
+ // 1. define component configuration
+ const components = {
+@@ -72,14 +72,14 @@ render(<CustomBadge>I am a custom badge</CustomBadge>)
+ 
+ ## Multipart or Composite Component
+ 
+-When it comes to multipart components for example tabs or menus etc, that have multiple
+-sub-parts, you can also style them based on the color mode. Here's the
++When it comes to multipart components for example tabs or menus etc, that have
++multiple sub-parts, you can also style them based on the color mode. Here's the
+ signature:
+ 
+ ```tsx live=false
+ type StyleInterpolation =
+   | { [part: string]: SystemStyleObject }
+-  | ((options: StyleOptions) => { [part: string]: SystemStyleObject });
++  | ((options: StyleOptions) => { [part: string]: SystemStyleObject })
+ 
+ interface StyleOptions {
+   theme: Theme
+diff --git a/website/pages/docs/theming/component-style.mdx b/website/pages/docs/theming/component-style.mdx
+index 127f7646662..01312c035ed 100644
+--- a/website/pages/docs/theming/component-style.mdx
++++ b/website/pages/docs/theming/component-style.mdx
+@@ -123,7 +123,7 @@ const Button = {
+ Make sense? Next, we'll update the theme to include this new component style.
+ 
+ ```jsx live=false
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ const theme = extendTheme({
+   components: {
+@@ -157,7 +157,7 @@ passed, the `defaultProps` defined in the style config will be used.
+ 
+ ```jsx live=false
+ // 1. Import useStyleConfig
+-import { useStyleConfig } from "@chakra-ui/core"
++import { useStyleConfig } from "@chakra-ui/react"
+ 
+ function Button(props) {
+   const { size, variant, ...rest } = props
+@@ -260,7 +260,7 @@ const Menu = {
+ Next, we'll update the theme object to included this new component style.
+ 
+ ```jsx live=false
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ const theme = extendTheme({
+   components: {
+@@ -288,8 +288,8 @@ const styles = useMultiStyleConfig(themeKey, props)
+ 
+ - `themeKey`: the key in `theme.components` that points to the desired
+   styleConfig.
+-- `props`: an option of the options for computing the final styles. It
+-  typically consists of the `size`, `variant`, and `colorScheme`.
++- `props`: an option of the options for computing the final styles. It typically
++  consists of the `size`, `variant`, and `colorScheme`.
+ 
+ #### Return Values
+ 
+@@ -299,7 +299,11 @@ used.
+ 
+ ```jsx live=false
+ // 1. Import the components and hook
+-import { StylesProvider, useMultiStyleConfig, useStyles } from "@chakra-ui/core"
++import {
++  StylesProvider,
++  useMultiStyleConfig,
++  useStyles,
++} from "@chakra-ui/react"
+ 
+ function Menu(props) {
+   const { size, variant, children, ...rest } = props
+diff --git a/website/pages/docs/theming/customize-theme.mdx b/website/pages/docs/theming/customize-theme.mdx
+index e9f260fa03f..8e643dbfafb 100644
+--- a/website/pages/docs/theming/customize-theme.mdx
++++ b/website/pages/docs/theming/customize-theme.mdx
+@@ -24,7 +24,7 @@ brand colors, here's what you'll do:
+ 
+ ```jsx live=false
+ // 1. Import `extendTheme`
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ // 2. Call `extendTheme` and pass your custom values
+ const theme = extendTheme({
+@@ -88,7 +88,7 @@ For example, let's override the component styles for Chakra's Button component.
+ 
+ ```jsx live=false
+ // theme.js
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ const theme = extendTheme({
+   components: {
+@@ -145,7 +145,7 @@ styles can be a style object or a function that returns a style object.
+ 
+ ```jsx live=false
+ // theme.js
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ import { mode } from "@chakra-ui/theme-tools"
+ 
+ // Version 1: Using objects
+@@ -205,7 +205,7 @@ like this:
+ 
+ ```jsx live=false
+ // theme.js
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ 
+ // Global style overrides
+ import styles from "./styles"
+diff --git a/website/pages/docs/theming/theme.mdx b/website/pages/docs/theming/theme.mdx
+index acc254ea720..2dda1058700 100644
+--- a/website/pages/docs/theming/theme.mdx
++++ b/website/pages/docs/theming/theme.mdx
+@@ -3,7 +3,7 @@ title: Default Theme
+ description: The default chakra theme tokens
+ ---
+ 
+-import { Box, Flex, Grid, useTheme } from "@chakra-ui/core"
++import { Box, Flex, Grid, useTheme } from "@chakra-ui/react"
+ import {
+   ColorPalette,
+   ColorPalettes,
+diff --git a/website/pages/docs/typography/heading.mdx b/website/pages/docs/typography/heading.mdx
+index 971517d0510..1b0a2420108 100644
+--- a/website/pages/docs/typography/heading.mdx
++++ b/website/pages/docs/typography/heading.mdx
+@@ -5,7 +5,7 @@ description: Headings are used for rendering headlines.
+ ---
+ 
+ import ComponentLinks from "../../../src/components/component-links"
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ 
+ Headings are used for rendering headlines.
+ 
+@@ -23,7 +23,7 @@ styles as well. It renders an `<h2>` tag by default.
+ ## Import
+ 
+ ```js
+-import { Heading } from "@chakra-ui/core"
++import { Heading } from "@chakra-ui/react"
+ ```
+ 
+ ## Usage
+@@ -108,7 +108,7 @@ prop. No need to write `css` or `styled()`.
+ 
+ ## Props
+ 
+-The `Heading` composes the [Box](/docs/layout/box) component, so you can pass all
+-`Box` props.
++The `Heading` composes the [Box](/docs/layout/box) component, so you can pass
++all `Box` props.
+ 
+ <PropsTable of="Heading" omit={null} />
+diff --git a/website/pages/docs/typography/text.mdx b/website/pages/docs/typography/text.mdx
+index 251cc331dae..6b92e0e29e0 100644
+--- a/website/pages/docs/typography/text.mdx
++++ b/website/pages/docs/typography/text.mdx
+@@ -6,8 +6,8 @@ description: Text is the used to render text and paragraphs within an interface.
+ 
+ import ComponentLinks from "../../../src/components/component-links"
+ 
+-`Text` component is the used to render text and paragraphs within an interface. It renders a
+-`<p>` tag by default.
++`Text` component is the used to render text and paragraphs within an interface.
++It renders a `<p>` tag by default.
+ 
+ <ComponentLinks
+   github={{ url: "#" }}
+@@ -20,7 +20,7 @@ import ComponentLinks from "../../../src/components/component-links"
+ ## Import
+ 
+ ```js
+-import { Text } from "@chakra-ui/core"
++import { Text } from "@chakra-ui/react"
+ ```
+ 
+ ## Changing the font size
+diff --git a/website/pages/guides/as-prop.mdx b/website/pages/guides/as-prop.mdx
+index 32b06c62fa5..76a9e756b50 100644
+--- a/website/pages/guides/as-prop.mdx
++++ b/website/pages/guides/as-prop.mdx
+@@ -35,7 +35,7 @@ Type '{ children: string; as: string; }' is not assignable to type 'IntrinsicAtt
+ 
+ To resolve this, you have 3 options
+ 
+-## Option 1: Using `forwardRef` from `@chakra-ui/core`
++## Option 1: Using `forwardRef` from `@chakra-ui/react`
+ 
+ This is the recommended approach as it ensures your components forwards their
+ reference properly.
+@@ -43,7 +43,7 @@ reference properly.
+ > Note 🚨: You need to use forwardRef from chakra-ui not react.
+ 
+ ```tsx live=false
+-import { forwardRef, Box, BoxProps } from "@chakra-ui/core"
++import { forwardRef, Box, BoxProps } from "@chakra-ui/react"
+ 
+ const Card = forwardRef<BoxProps, "div">((props, ref) => (
+   <Box px="4" py="5" rounded="sm" shadow="lg" ref={ref} {...props} />
+@@ -62,7 +62,7 @@ element type, and adds chakra specific style props.
+ etc), and any custom props (like `isOpen`, `isDisabled`, etc)
+ 
+ ```tsx live=false
+-import { ChakraComponent, Box, BoxProps } from "@chakra-ui/core"
++import { ChakraComponent, Box, BoxProps } from "@chakra-ui/react"
+ 
+ type DivComponent = ChakraComponent<"div", {}>
+ 
+@@ -81,7 +81,7 @@ What you need to do is to call the `chakra` function and pass it any element or
+ component type.
+ 
+ ```tsx live=false
+-import { chakra } from "@chakra-ui/core"
++import { chakra } from "@chakra-ui/react"
+ 
+ const Card = chakra("div", {
+   // attach style props
+diff --git a/website/pages/guides/integrations/with-cra.mdx b/website/pages/guides/integrations/with-cra.mdx
+index 4761ebef382..14e2fb6b942 100644
+--- a/website/pages/guides/integrations/with-cra.mdx
++++ b/website/pages/guides/integrations/with-cra.mdx
+@@ -49,7 +49,7 @@ functionality.
+ 
+ ### Pre-install dependencies
+ 
+-- `@chakra-ui/core`
++- `@chakra-ui/react`
+ - `@chakra-ui/theme`
+ - `@chakra-ui/theme-tools`
+ - `react-icons`
+diff --git a/website/pages/guides/integrations/with-framer.mdx b/website/pages/guides/integrations/with-framer.mdx
+index f2b8d3895a7..4570699e181 100644
+--- a/website/pages/guides/integrations/with-framer.mdx
++++ b/website/pages/guides/integrations/with-framer.mdx
+@@ -9,7 +9,7 @@ If you'd like to add some interesting motion interaction or animation to your
+ Chakra UI websites or apps, here's a quick tip:
+ 
+ ```jsx live=false
+-import { Box } from "@chakra-ui/core"
++import { Box } from "@chakra-ui/react"
+ import { motion } from "framer-motion"
+ 
+ // 1. Create a custom motion component from Box
+diff --git a/website/pages/guides/integrations/with-gatsby.mdx b/website/pages/guides/integrations/with-gatsby.mdx
+index 0420d9fd1be..617710b3fae 100644
+--- a/website/pages/guides/integrations/with-gatsby.mdx
++++ b/website/pages/guides/integrations/with-gatsby.mdx
+@@ -20,11 +20,11 @@ Gastby plugins make external APIs plug-and-play into your website. Installing
+ can be done with the following command:
+ 
+ ```bash
+-npm i gatsby-plugin-chakra-ui @chakra-ui/core
++npm i gatsby-plugin-chakra-ui @chakra-ui/react
+ 
+ # or
+ 
+-yarn add gatsby-plugin-chakra-ui @chakra-ui/core
++yarn add gatsby-plugin-chakra-ui @chakra-ui/react
+ ```
+ 
+ After installation, you'll need to add `gatsby-plugin-chakra-ui` to the
+@@ -77,7 +77,7 @@ two files should look like this:
+ 
+ ```js live=false
+ import React from "react"
+-import { ChakraProvider, CSSReset } from "@chakra-ui/core"
++import { ChakraProvider, CSSReset } from "@chakra-ui/react"
+ import customTheme from "./theme/theme"
+ 
+ export const wrapRootElement = ({ element }) => {
+@@ -102,7 +102,7 @@ below.
+ 
+ ```jsx live=false
+ import React from "react"
+-import { ChakraProvider, CSSReset } from "@chakra-ui/core"
++import { ChakraProvider, CSSReset } from "@chakra-ui/react"
+ import customTheme from "./theme/theme"
+ 
+ export const wrapRootElement = ({ element }) => {
+diff --git a/website/pages/guides/with-nextjs-font-files.mdx b/website/pages/guides/with-nextjs-font-files.mdx
+index 95d0412b7f0..6c65de75a41 100644
+--- a/website/pages/guides/with-nextjs-font-files.mdx
++++ b/website/pages/guides/with-nextjs-font-files.mdx
+@@ -98,7 +98,7 @@ is not there already, create an `_app.js` or `_app.ts` file in the `pages`
+ folder. Use this as a template to get going:
+ 
+ ```jsx
+-import { ChakraProvider, Global, extendTheme } from "@chakra-ui/core"
++import { ChakraProvider, Global, extendTheme } from "@chakra-ui/react"
+ import myTheme from "styles/theme"
+ import fonts from "styles/font-face"
+ 
+diff --git a/website/pages/guides/with-nextjs.mdx b/website/pages/guides/with-nextjs.mdx
+index 9ed1cb87dd0..25a6cae0e5c 100644
+--- a/website/pages/guides/with-nextjs.mdx
++++ b/website/pages/guides/with-nextjs.mdx
+@@ -15,9 +15,9 @@ and accessibly.
+ To get started, install the core Chakra UI package:
+ 
+ ```zsh
+-npm i @chakra-ui/core
++npm i @chakra-ui/react
+ # or
+-yarn add @chakra-ui/core
++yarn add @chakra-ui/react
+ ```
+ 
+ After installation, you'll need to add Chakra providers
+@@ -31,7 +31,7 @@ styles, and more.
+ Use it in `pages/_app.js`:
+ 
+ ```js live=false
+-import { ChakraProvider } from "@chakra-ui/core"
++import { ChakraProvider } from "@chakra-ui/react"
+ function MyApp({ Component, pageProps }) {
+   return (
+     <ChakraProvider>
+diff --git a/website/pages/index.tsx b/website/pages/index.tsx
+index d9daf6a6daf..cbb580145f2 100644
+--- a/website/pages/index.tsx
++++ b/website/pages/index.tsx
+@@ -18,7 +18,7 @@ import {
+   useColorModeValue,
+   Wrap,
+   WrapItem,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { chunk } from "@chakra-ui/utils"
+ import users from "chakra-users"
+ import Container from "components/container"
+diff --git a/website/pages/team.tsx b/website/pages/team.tsx
+index 7d631920cbc..7e34205eba6 100644
+--- a/website/pages/team.tsx
++++ b/website/pages/team.tsx
+@@ -10,7 +10,7 @@ import {
+   Text,
+   Wrap,
+   WrapItem,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { SkipNavContent, SkipNavLink } from "@chakra-ui/skip-nav"
+ import Container from "components/container"
+ import Header from "components/header"
+diff --git a/website/src/components/algolia-search.tsx b/website/src/components/algolia-search.tsx
+index f3b3238a0e0..94bfab67db5 100644
+--- a/website/src/components/algolia-search.tsx
++++ b/website/src/components/algolia-search.tsx
+@@ -4,7 +4,7 @@ import {
+   InputGroup,
+   InputLeftElement,
+   useEventListener,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { SearchIcon } from "@chakra-ui/icons"
+ import { get, startsWith } from "lodash/fp"
+ import { useRouter } from "next/router"
+diff --git a/website/src/components/carbon-ad.tsx b/website/src/components/carbon-ad.tsx
+index bf98f439c84..fb858230720 100644
+--- a/website/src/components/carbon-ad.tsx
++++ b/website/src/components/carbon-ad.tsx
+@@ -1,4 +1,4 @@
+-import { chakra, useColorModeValue, useTheme } from "@chakra-ui/core"
++import { chakra, useColorModeValue, useTheme } from "@chakra-ui/react"
+ import * as React from "react"
+ import loadScript from "utils/load-script"
+ 
+diff --git a/website/src/components/chakra.tsx b/website/src/components/chakra.tsx
+index 0329f213663..1f66f2a53aa 100644
+--- a/website/src/components/chakra.tsx
++++ b/website/src/components/chakra.tsx
+@@ -1,4 +1,4 @@
+-import { ChakraProvider } from "@chakra-ui/core"
++import { ChakraProvider } from "@chakra-ui/react"
+ import { GetServerSidePropsContext } from "next"
+ import theme from "theme"
+ 
+diff --git a/website/src/components/codeblock/codeblock.tsx b/website/src/components/codeblock/codeblock.tsx
+index 268f8e9c94c..480862e35cf 100644
+--- a/website/src/components/codeblock/codeblock.tsx
++++ b/website/src/components/codeblock/codeblock.tsx
+@@ -5,7 +5,7 @@ import {
+   ButtonProps,
+   chakra,
+   useClipboard,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import theme from "prism-react-renderer/themes/nightOwl"
+ import React, { useState } from "react"
+ import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live"
+diff --git a/website/src/components/codeblock/react-live-scope.tsx b/website/src/components/codeblock/react-live-scope.tsx
+index aa34dbdc1bc..ea10c480fe7 100644
+--- a/website/src/components/codeblock/react-live-scope.tsx
++++ b/website/src/components/codeblock/react-live-scope.tsx
+@@ -1,6 +1,6 @@
+ import React from "react"
+-import * as Chakra from "@chakra-ui/core"
+-import { chakra } from "@chakra-ui/core"
++import * as Chakra from "@chakra-ui/react"
++import { chakra } from "@chakra-ui/react"
+ import * as Icons from "@chakra-ui/icons"
+ import * as Formik from "formik"
+ import FocusLock from "react-focus-lock"
+diff --git a/website/src/components/color-palette.tsx b/website/src/components/color-palette.tsx
+index ac7a77eccf7..dce2606a3c4 100644
+--- a/website/src/components/color-palette.tsx
++++ b/website/src/components/color-palette.tsx
+@@ -5,7 +5,7 @@ import {
+   Grid,
+   GridProps,
+   useTheme,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import React from "react"
+ 
+ type ColorPaletteProps = FlexProps & { color?: string; name?: string }
+diff --git a/website/src/components/component-links.tsx b/website/src/components/component-links.tsx
+index e38a483f591..e71cd08fae2 100644
+--- a/website/src/components/component-links.tsx
++++ b/website/src/components/component-links.tsx
+@@ -8,7 +8,7 @@ import {
+   useColorModeValue,
+   LinkProps,
+   WrapItem,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { FaNpm, FaGithub } from "react-icons/fa"
+ import StorybookIcon from "./storybook-icon"
+ 
+diff --git a/website/src/components/container.tsx b/website/src/components/container.tsx
+index af914494ffd..6b9bb7f971a 100644
+--- a/website/src/components/container.tsx
++++ b/website/src/components/container.tsx
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { Box, BoxProps } from "@chakra-ui/core"
++import { Box, BoxProps } from "@chakra-ui/react"
+ 
+ export const Container = (props: BoxProps) => (
+   <Box
+diff --git a/website/src/components/discord-strip.tsx b/website/src/components/discord-strip.tsx
+index ca1f2f6b6e5..c2e5dcd644a 100644
+--- a/website/src/components/discord-strip.tsx
++++ b/website/src/components/discord-strip.tsx
+@@ -1,4 +1,4 @@
+-import { Box, BoxProps, chakra, Flex, Heading, Text } from "@chakra-ui/core"
++import { Box, BoxProps, chakra, Flex, Heading, Text } from "@chakra-ui/react"
+ import * as React from "react"
+ import { FaDiscord } from "react-icons/fa"
+ import Container from "./container"
+diff --git a/website/src/components/docs/icon.tsx b/website/src/components/docs/icon.tsx
+index 9f0795141a6..a16c78c8e0d 100644
+--- a/website/src/components/docs/icon.tsx
++++ b/website/src/components/docs/icon.tsx
+@@ -1,4 +1,4 @@
+-import { Icon, IconProps } from "@chakra-ui/core"
++import { Icon, IconProps } from "@chakra-ui/react"
+ 
+ /** This component is used in the `icon.mdx` page. */
+ const CircleIcon = (props: IconProps) => (
+diff --git a/website/src/components/edit-page-button.tsx b/website/src/components/edit-page-button.tsx
+index 9e419e8ac9e..10d6e19084d 100644
+--- a/website/src/components/edit-page-button.tsx
++++ b/website/src/components/edit-page-button.tsx
+@@ -1,5 +1,5 @@
+ import * as React from "react"
+-import { chakra, Icon, Stack, Link } from "@chakra-ui/core"
++import { chakra, Icon, Stack, Link } from "@chakra-ui/react"
+ import { MdEdit } from "react-icons/md"
+ 
+ const EditPageLink: React.FC<{ href?: string }> = ({ href }) => {
+diff --git a/website/src/components/footer.tsx b/website/src/components/footer.tsx
+index 0ac3c633a2c..2d4427e9af6 100644
+--- a/website/src/components/footer.tsx
++++ b/website/src/components/footer.tsx
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { Box, Icon, Text, Stack, Link, chakra } from "@chakra-ui/core"
++import { Box, Icon, Text, Stack, Link, chakra } from "@chakra-ui/react"
+ import { IoLogoTwitter, IoLogoLinkedin } from "react-icons/io"
+ import { MdEmail } from "react-icons/md"
+ import { DiGithubBadge } from "react-icons/di"
+diff --git a/website/src/components/header-nav-link.tsx b/website/src/components/header-nav-link.tsx
+index bfb79904c6c..d69cab592a1 100644
+--- a/website/src/components/header-nav-link.tsx
++++ b/website/src/components/header-nav-link.tsx
+@@ -1,4 +1,4 @@
+-import { chakra, HTMLChakraProps, useColorModeValue } from "@chakra-ui/core"
++import { chakra, HTMLChakraProps, useColorModeValue } from "@chakra-ui/react"
+ import NextLink from "next/link"
+ import { useRouter } from "next/router"
+ import React from "react"
+diff --git a/website/src/components/header.tsx b/website/src/components/header.tsx
+index d2135ca8714..3c8aeb27dfb 100644
+--- a/website/src/components/header.tsx
++++ b/website/src/components/header.tsx
+@@ -9,7 +9,7 @@ import {
+   useColorModeValue,
+   useDisclosure,
+   useUpdateEffect,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import siteConfig from "configs/site-config"
+ import { useViewportScroll } from "framer-motion"
+ import NextLink from "next/link"
+diff --git a/website/src/components/icons-list.tsx b/website/src/components/icons-list.tsx
+index 76e97a6766f..b3ca88e721b 100644
+--- a/website/src/components/icons-list.tsx
++++ b/website/src/components/icons-list.tsx
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { Grid, Flex, Text } from "@chakra-ui/core"
++import { Grid, Flex, Text } from "@chakra-ui/react"
+ import * as icons from "@chakra-ui/icons"
+ 
+ const iconList = {
+diff --git a/website/src/components/logo-mark.tsx b/website/src/components/logo-mark.tsx
+index ca30d0663a4..e6922d12f7c 100644
+--- a/website/src/components/logo-mark.tsx
++++ b/website/src/components/logo-mark.tsx
+@@ -1,4 +1,4 @@
+-import { chakra, useColorModeValue } from "@chakra-ui/core"
++import { chakra, useColorModeValue } from "@chakra-ui/react"
+ import * as React from "react"
+ 
+ function LogoMark(props) {
+diff --git a/website/src/components/logo.tsx b/website/src/components/logo.tsx
+index fa9492161be..ffb04f17753 100644
+--- a/website/src/components/logo.tsx
++++ b/website/src/components/logo.tsx
+@@ -1,4 +1,4 @@
+-import { chakra, useColorModeValue } from "@chakra-ui/core"
++import { chakra, useColorModeValue } from "@chakra-ui/react"
+ import React from "react"
+ 
+ const Logo = (props) => {
+diff --git a/website/src/components/mdx-components.tsx b/website/src/components/mdx-components.tsx
+index de78631a73b..3920899aff6 100644
+--- a/website/src/components/mdx-components.tsx
++++ b/website/src/components/mdx-components.tsx
+@@ -1,4 +1,4 @@
+-import { Alert, Box, chakra, Kbd, useColorModeValue } from "@chakra-ui/core"
++import { Alert, Box, chakra, Kbd, useColorModeValue } from "@chakra-ui/react"
+ import React from "react"
+ import CarbonAd from "./carbon-ad"
+ import CodeBlock from "./codeblock/codeblock"
+diff --git a/website/src/components/mobile-nav.tsx b/website/src/components/mobile-nav.tsx
+index e7a960eb19e..b6aee606bdb 100644
+--- a/website/src/components/mobile-nav.tsx
++++ b/website/src/components/mobile-nav.tsx
+@@ -9,7 +9,7 @@ import {
+   IconButtonProps,
+   useColorModeValue,
+   useUpdateEffect,
+-} from "@chakra-ui/core"
++} from "@chakra-ui/react"
+ import { AnimatePresence, motion, useElementScroll } from "framer-motion"
+ import useRouteChanged from "hooks/use-route-changed"
+ import { getRoutes } from "layouts/mdx"
+diff --git a/website/src/components/page-container.tsx b/website/src/components/page-container.tsx
+index 4043fee4deb..76d42a2eb17 100644
+--- a/website/src/components/page-container.tsx
++++ b/website/src/components/page-container.tsx
+@@ -1,4 +1,4 @@
+-import { Box, chakra } from "@chakra-ui/core"
++import { Box, chakra } from "@chakra-ui/react"
+ import { SkipNavContent, SkipNavLink } from "@chakra-ui/skip-nav"
+ import Container from "components/container"
+ import EditPageLink from "components/edit-page-button"
+diff --git a/website/src/components/pagination.tsx b/website/src/components/pagination.tsx
+index b7e43cef98b..5da259ad0db 100644
+--- a/website/src/components/pagination.tsx
++++ b/website/src/components/pagination.tsx
+@@ -1,4 +1,4 @@
+-import { Link, SimpleGrid, Text } from "@chakra-ui/core"
++import { Link, SimpleGrid, Text } from "@chakra-ui/react"
+ import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons"
+ import NextLink from "next/link"
+ import React from "react"
+diff --git a/website/src/components/sidebar/sidebar-category.tsx b/website/src/components/sidebar/sidebar-category.tsx
+index 1fc72113aa1..834fb7a187e 100644
+--- a/website/src/components/sidebar/sidebar-category.tsx
++++ b/website/src/components/sidebar/sidebar-category.tsx
+@@ -1,4 +1,4 @@
+-import { BoxProps, chakra, useColorModeValue } from "@chakra-ui/core"
++import { BoxProps, chakra, useColorModeValue } from "@chakra-ui/react"
+ import { ReactNode, RefObject, useEffect, useRef, useState } from "react"
+ 
+ interface SidebarCategoryProps extends BoxProps {
+diff --git a/website/src/components/sidebar/sidebar-link.tsx b/website/src/components/sidebar/sidebar-link.tsx
+index b5178512e1a..6a46a7b78eb 100644
+--- a/website/src/components/sidebar/sidebar-link.tsx
++++ b/website/src/components/sidebar/sidebar-link.tsx
+@@ -1,4 +1,4 @@
+-import { chakra, PropsOf, useColorModeValue } from "@chakra-ui/core"
++import { chakra, PropsOf, useColorModeValue } from "@chakra-ui/react"
+ import NextLink from "next/link"
+ import { useRouter } from "next/router"
+ import React from "react"
+diff --git a/website/src/components/sidebar/sidebar.tsx b/website/src/components/sidebar/sidebar.tsx
+index 8ef1f0d013f..a62b9cf0146 100644
+--- a/website/src/components/sidebar/sidebar.tsx
++++ b/website/src/components/sidebar/sidebar.tsx
+@@ -1,4 +1,4 @@
+-import { Box, chakra, Stack, useColorModeValue } from "@chakra-ui/core"
++import { Box, chakra, Stack, useColorModeValue } from "@chakra-ui/react"
+ import { useRouter } from "next/router"
+ import * as React from "react"
+ import { Routes } from "utils/get-route-context"
+diff --git a/website/src/components/sponsor-button.tsx b/website/src/components/sponsor-button.tsx
+index ec22f861064..c2740be43a2 100644
+--- a/website/src/components/sponsor-button.tsx
++++ b/website/src/components/sponsor-button.tsx
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { Box, BoxProps, Icon } from "@chakra-ui/core"
++import { Box, BoxProps, Icon } from "@chakra-ui/react"
+ import { FaHeart } from "react-icons/fa"
+ import siteConfig from "configs/site-config"
+ 
+diff --git a/website/src/components/table-of-content.tsx b/website/src/components/table-of-content.tsx
+index 0bfdbb8c29d..28dcb20eebf 100644
+--- a/website/src/components/table-of-content.tsx
++++ b/website/src/components/table-of-content.tsx
+@@ -1,5 +1,5 @@
+ import React from "react"
+-import { Link, Heading, Stack, useColorModeValue } from "@chakra-ui/core"
++import { Link, Heading, Stack, useColorModeValue } from "@chakra-ui/react"
+ 
+ interface EntryProps {
+   item: any
+diff --git a/website/src/components/tweet-card.tsx b/website/src/components/tweet-card.tsx
+index 69c89cf76cb..c1440aa1f4b 100644
+--- a/website/src/components/tweet-card.tsx
++++ b/website/src/components/tweet-card.tsx
+@@ -1,4 +1,4 @@
+-import { Avatar, Box, useColorModeValue } from "@chakra-ui/core"
++import { Avatar, Box, useColorModeValue } from "@chakra-ui/react"
+ import * as React from "react"
+ 
+ interface TweetCardProps {
+diff --git a/website/src/components/version-switcher.tsx b/website/src/components/version-switcher.tsx
+index f51278e43ad..9d111954b09 100644
+--- a/website/src/components/version-switcher.tsx
++++ b/website/src/components/version-switcher.tsx
+@@ -1,4 +1,4 @@
+-import { Select, SelectProps, useColorModeValue } from "@chakra-ui/core"
++import { Select, SelectProps, useColorModeValue } from "@chakra-ui/react"
+ import React from "react"
+ 
+ function VersionSwitcher(props: SelectProps) {
+diff --git a/website/theme.ts b/website/theme.ts
+index e374a83292f..7f19ad2a750 100644
+--- a/website/theme.ts
++++ b/website/theme.ts
+@@ -1,4 +1,4 @@
+-import { extendTheme } from "@chakra-ui/core"
++import { extendTheme } from "@chakra-ui/react"
+ import { mode } from "@chakra-ui/theme-tools"
+ 
+ const customTheme = extendTheme({

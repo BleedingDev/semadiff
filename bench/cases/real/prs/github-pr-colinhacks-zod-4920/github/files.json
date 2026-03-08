@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "c2d3ddf4416fb84e3f44130a0621ee5fc205b973",
+    "filename": "packages/docs/content/error-customization.mdx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/colinhacks/zod/blob/5c6b15d2bc4ef760005a3db3ee39defb61d78155/packages%2Fdocs%2Fcontent%2Ferror-customization.mdx",
+    "raw_url": "https://github.com/colinhacks/zod/raw/5c6b15d2bc4ef760005a3db3ee39defb61d78155/packages%2Fdocs%2Fcontent%2Ferror-customization.mdx",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fdocs%2Fcontent%2Ferror-customization.mdx?ref=5c6b15d2bc4ef760005a3db3ee39defb61d78155",
+    "patch": "@@ -365,6 +365,7 @@ The following locales are available:\n - `he` — Hebrew\n - `hu` — Hungarian\n - `id` — Indonesian\n+- `is` — Icelandic\n - `it` — Italian\n - `ja` — Japanese\n - `kh` — Khmer"
+  },
+  {
+    "sha": "d9559b7683970dae8bca6513102920d25be32d5d",
+    "filename": "packages/zod/src/v4/locales/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/colinhacks/zod/blob/5c6b15d2bc4ef760005a3db3ee39defb61d78155/packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/5c6b15d2bc4ef760005a3db3ee39defb61d78155/packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts?ref=5c6b15d2bc4ef760005a3db3ee39defb61d78155",
+    "patch": "@@ -14,6 +14,7 @@ export { default as frCA } from \"./fr-CA.js\";\n export { default as he } from \"./he.js\";\n export { default as hu } from \"./hu.js\";\n export { default as id } from \"./id.js\";\n+export { default as is } from \"./is.js\";\n export { default as it } from \"./it.js\";\n export { default as ja } from \"./ja.js\";\n export { default as kh } from \"./kh.js\";"
+  },
+  {
+    "sha": "57e0b68ea38faffaa4cb2293e144bb9a0aed478e",
+    "filename": "packages/zod/src/v4/locales/is.ts",
+    "status": "added",
+    "additions": 127,
+    "deletions": 0,
+    "changes": 127,
+    "blob_url": "https://github.com/colinhacks/zod/blob/5c6b15d2bc4ef760005a3db3ee39defb61d78155/packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Fis.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/5c6b15d2bc4ef760005a3db3ee39defb61d78155/packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Fis.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Fis.ts?ref=5c6b15d2bc4ef760005a3db3ee39defb61d78155",
+    "patch": "@@ -0,0 +1,127 @@\n+import type { $ZodStringFormats } from \"../core/checks.js\";\n+import type * as errors from \"../core/errors.js\";\n+import * as util from \"../core/util.js\";\n+\n+export const parsedType = (data: any): string => {\n+  const t = typeof data;\n+\n+  switch (t) {\n+    case \"number\": {\n+      return Number.isNaN(data) ? \"NaN\" : \"númer\";\n+    }\n+    case \"object\": {\n+      if (Array.isArray(data)) {\n+        return \"fylki\";\n+      }\n+      if (data === null) {\n+        return \"null\";\n+      }\n+\n+      if (Object.getPrototypeOf(data) !== Object.prototype && data.constructor) {\n+        return data.constructor.name;\n+      }\n+    }\n+  }\n+  return t;\n+};\n+\n+const error: () => errors.$ZodErrorMap = () => {\n+  const Sizable: Record<string, { unit: string; verb: string }> = {\n+    string: { unit: \"stafi\", verb: \"að hafa\" },\n+    file: { unit: \"bæti\", verb: \"að hafa\" },\n+    array: { unit: \"hluti\", verb: \"að hafa\" },\n+    set: { unit: \"hluti\", verb: \"að hafa\" },\n+  };\n+\n+  function getSizing(origin: string): { unit: string; verb: string } | null {\n+    return Sizable[origin] ?? null;\n+  }\n+\n+  const Nouns: {\n+    [k in $ZodStringFormats | (string & {})]?: string;\n+  } = {\n+    regex: \"gildi\",\n+    email: \"netfang\",\n+    url: \"vefslóð\",\n+    emoji: \"emoji\",\n+    uuid: \"UUID\",\n+    uuidv4: \"UUIDv4\",\n+    uuidv6: \"UUIDv6\",\n+    nanoid: \"nanoid\",\n+    guid: \"GUID\",\n+    cuid: \"cuid\",\n+    cuid2: \"cuid2\",\n+    ulid: \"ULID\",\n+    xid: \"XID\",\n+    ksuid: \"KSUID\",\n+    datetime: \"ISO dagsetning og tími\",\n+    date: \"ISO dagsetning\",\n+    time: \"ISO tími\",\n+    duration: \"ISO tímalengd\",\n+    ipv4: \"IPv4 address\",\n+    ipv6: \"IPv6 address\",\n+    cidrv4: \"IPv4 range\",\n+    cidrv6: \"IPv6 range\",\n+    base64: \"base64-encoded strengur\",\n+    base64url: \"base64url-encoded strengur\",\n+    json_string: \"JSON strengur\",\n+    e164: \"E.164 tölugildi\",\n+    jwt: \"JWT\",\n+    template_literal: \"gildi\",\n+  };\n+\n+  return (issue) => {\n+    switch (issue.code) {\n+      case \"invalid_type\":\n+        return `Rangt gildi: Þú slóst inn ${parsedType(issue.input)} þar sem á að vera ${issue.expected}`;\n+\n+      case \"invalid_value\":\n+        if (issue.values.length === 1) return `Rangt gildi: gert ráð fyrir ${util.stringifyPrimitive(issue.values[0])}`;\n+        return `Ógilt val: má vera eitt af eftirfarandi ${util.joinValues(issue.values, \"|\")}`;\n+      case \"too_big\": {\n+        const adj = issue.inclusive ? \"<=\" : \"<\";\n+        const sizing = getSizing(issue.origin);\n+        if (sizing)\n+          return `Of stórt: gert er ráð fyrir að ${issue.origin ?? \"gildi\"} hafi ${adj}${issue.maximum.toString()} ${sizing.unit ?? \"hluti\"}`;\n+        return `Of stórt: gert er ráð fyrir að ${issue.origin ?? \"gildi\"} sé ${adj}${issue.maximum.toString()}`;\n+      }\n+      case \"too_small\": {\n+        const adj = issue.inclusive ? \">=\" : \">\";\n+        const sizing = getSizing(issue.origin);\n+        if (sizing) {\n+          return `Of lítið: gert er ráð fyrir að ${issue.origin} hafi ${adj}${issue.minimum.toString()} ${sizing.unit}`;\n+        }\n+\n+        return `Of lítið: gert er ráð fyrir að ${issue.origin} sé ${adj}${issue.minimum.toString()}`;\n+      }\n+      case \"invalid_format\": {\n+        const _issue = issue as errors.$ZodStringFormatIssues;\n+        if (_issue.format === \"starts_with\") {\n+          return `Ógildur strengur: verður að byrja á \"${_issue.prefix}\"`;\n+        }\n+        if (_issue.format === \"ends_with\") return `Ógildur strengur: verður að enda á \"${_issue.suffix}\"`;\n+        if (_issue.format === \"includes\") return `Ógildur strengur: verður að innihalda \"${_issue.includes}\"`;\n+        if (_issue.format === \"regex\") return `Ógildur strengur: verður að fylgja mynstri ${_issue.pattern}`;\n+        return `Rangt ${Nouns[_issue.format] ?? issue.format}`;\n+      }\n+      case \"not_multiple_of\":\n+        return `Röng tala: verður að vera margfeldi af ${issue.divisor}`;\n+      case \"unrecognized_keys\":\n+        return `Óþekkt ${issue.keys.length > 1 ? \"ir lyklar\" : \"ur lykill\"}: ${util.joinValues(issue.keys, \", \")}`;\n+      case \"invalid_key\":\n+        return `Rangur lykill í ${issue.origin}`;\n+      case \"invalid_union\":\n+        return \"Rangt gildi\";\n+      case \"invalid_element\":\n+        return `Rangt gildi í ${issue.origin}`;\n+      default:\n+        return `Rangt gildi`;\n+    }\n+  };\n+};\n+\n+export default function (): { localeError: errors.$ZodErrorMap } {\n+  return {\n+    localeError: error(),\n+  };\n+}"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "apps/compositions/src/ui/native-select.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fcompositions%2Fsrc%2Fui%2Fnative-select.tsx&old_oid=9e6ebf501fca23769c6d173ec7eb5026b137f6f3&old_mode=33188&new_filename=apps%2Fcompositions%2Fsrc%2Fui%2Fnative-select.tsx&new_oid=73b9022fea6d33a0f3e3717cdacce1f59d4a7fff&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "apps/compositions/src/ui/native-select.tsx",
+      "oid": "9e6ebf501fca23769c6d173ec7eb5026b137f6f3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/compositions/src/ui/native-select.tsx",
+      "oid": "73b9022fea6d33a0f3e3717cdacce1f59d4a7fff",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a365a7a44584c75caa2b4f823b9d422015d2f1fb2dcdbdea360bd26e0d638e36"
+  }
+]

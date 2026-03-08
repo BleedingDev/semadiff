@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-47685",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/material-ui#47685: [code-infra] Upgrade react-docgen to v8",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 47685,
+    "prUrl": "https://github.com/mui/material-ui/pull/47685",
+    "baseSha": "0081c48dff63278c95939d223461e0f754ecf39a",
+    "headSha": "9da3f78ced31d67ff902d353be252fa8af43de93",
+    "selectedFiles": [
+      "packages/mui-joy/src/Menu/MenuProps.ts"
+    ],
+    "collectedAt": "2026-03-08T03:43:35.878Z"
+  },
+  "files": [
+    {
+      "id": "packages/mui-joy/src/Menu/MenuProps.ts",
+      "oldPath": "packages/mui-joy/src/Menu/MenuProps.ts",
+      "newPath": "packages/mui-joy/src/Menu/MenuProps.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/mui-joy/src/Menu/MenuProps.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 81,
+          "endLine": 81
+        },
+        "newRange": {
+          "startLine": 81,
+          "endLine": 81
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

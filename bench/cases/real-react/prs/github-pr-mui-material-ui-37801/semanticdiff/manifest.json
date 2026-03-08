@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "docs/src/modules/sandbox/CodeSandbox.ts",
+    "diff": "/gh/mui/material-ui/diff?old_filename=docs%2Fsrc%2Fmodules%2Fsandbox%2FCodeSandbox.ts&old_oid=fe600a9501f2db5f148df6f0a5dbf741b5d1fe2e&old_mode=33188&new_filename=docs%2Fsrc%2Fmodules%2Fsandbox%2FCodeSandbox.ts&new_oid=854b84784811fcc5f1db437543d3c3d0b9a50f27&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/src/modules/sandbox/CodeSandbox.ts",
+      "oid": "fe600a9501f2db5f148df6f0a5dbf741b5d1fe2e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/src/modules/sandbox/CodeSandbox.ts",
+      "oid": "854b84784811fcc5f1db437543d3c3d0b9a50f27",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "eca41a6e3d3d60c2cfa37e8c4e8cd37aea3e8ca1d5fc2aaf5752b9a2f42570b6"
+  }
+]

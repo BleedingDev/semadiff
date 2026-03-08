@@ -1,0 +1,13 @@
+diff --git a/reviewing/license-scanner/src/getPkgInfo.ts b/reviewing/license-scanner/src/getPkgInfo.ts
+index f209400eecb..b0435f99a54 100644
+--- a/reviewing/license-scanner/src/getPkgInfo.ts
++++ b/reviewing/license-scanner/src/getPkgInfo.ts
+@@ -55,7 +55,7 @@ const LICENSE_NAMES = [
+   'BSD-4-Clause',
+   'CC01',
+   'CC0-1.0',
+-  'CC0-1.0',
++  'CC0 1.0',
+   'CDDL1',
+   'CDDL-1.0',
+   'Common Development and Distribution License 1.0',

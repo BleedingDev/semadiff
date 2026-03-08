@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4419",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4419: refactor(dts-plugin): replace Koa dev server with native HTTP",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4419,
+    "prUrl": "https://github.com/module-federation/core/pull/4419",
+    "baseSha": "3be31f38040cb4139904f6ca303789b6633da748",
+    "headSha": "b25420078dc07aabdd31d96eab3d2a1d9fc1b988",
+    "selectedFiles": [
+      "packages/enhanced/test/ConfigTestCases.rstest.ts"
+    ],
+    "collectedAt": "2026-03-08T04:11:06.176Z"
+  },
+  "files": [
+    {
+      "id": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+      "oldPath": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+      "newPath": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 40,
+          "endLine": 40
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

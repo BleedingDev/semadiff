@@ -1,0 +1,82 @@
+[
+  {
+    "tracking_name": ".changeset/fix-global-install-output.md",
+    "diff": "/gh/pnpm/pnpm/diff?new_filename=.changeset%2Ffix-global-install-output.md&new_oid=7ab0bad2358ed21c6066b55ef4d0dee152424755&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/fix-global-install-output.md",
+      "oid": "7ab0bad2358ed21c6066b55ef4d0dee152424755",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "86e7f92574f69a64842eba2934d03b7e7564f92c350804e863c973a57fed3600"
+  },
+  {
+    "tracking_name": "cli/default-reporter/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=cli%2Fdefault-reporter%2Fsrc%2Findex.ts&old_oid=52b302bad44163dbc72f2b19627f83f0923c3bd4&old_mode=33188&new_filename=cli%2Fdefault-reporter%2Fsrc%2Findex.ts&new_oid=e159e9041f6d5204a0e01a2a0081fdd53442483a&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "cli/default-reporter/src/index.ts",
+      "oid": "52b302bad44163dbc72f2b19627f83f0923c3bd4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "cli/default-reporter/src/index.ts",
+      "oid": "e159e9041f6d5204a0e01a2a0081fdd53442483a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a09d438c1941a41532a98ef4223a2984af6457bd25a7c6a02e181c34bd157e0f"
+  },
+  {
+    "tracking_name": "cli/default-reporter/src/reporterForClient/pkgsDiff.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FpkgsDiff.ts&old_oid=578d73cf7f5bd9484df52ef903112c26702e1771&old_mode=33188&new_filename=cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FpkgsDiff.ts&new_oid=916c38f6e149267c612e38678005a8b69a228a71&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "cli/default-reporter/src/reporterForClient/pkgsDiff.ts",
+      "oid": "578d73cf7f5bd9484df52ef903112c26702e1771",
+      "mode": 33188
+    },
+    "new": {
+      "name": "cli/default-reporter/src/reporterForClient/pkgsDiff.ts",
+      "oid": "916c38f6e149267c612e38678005a8b69a228a71",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8384164d17d39de932887847a860d43ed0355ff5f9262fe1c23f63f4fbdf2079"
+  },
+  {
+    "tracking_name": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts&old_oid=9f5351c8afad49b9cccd08c0d790b5e48dfe402c&old_mode=33188&new_filename=cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts&new_oid=affa96805fad3acb4503a4ebd39eb7ccfe8d0b3e&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+      "oid": "9f5351c8afad49b9cccd08c0d790b5e48dfe402c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+      "oid": "affa96805fad3acb4503a4ebd39eb7ccfe8d0b3e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "439970ce8a3bde9ed7fa780c9bfa222d021210b9a608b0f72ab03a936902d812"
+  },
+  {
+    "tracking_name": "cli/default-reporter/test/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=cli%2Fdefault-reporter%2Ftest%2Findex.ts&old_oid=ea6435bc44b612a85b67fc3b9218e8952913f50b&old_mode=33188&new_filename=cli%2Fdefault-reporter%2Ftest%2Findex.ts&new_oid=7d89eada96464c2c0f2b4c459474881ea591c464&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "cli/default-reporter/test/index.ts",
+      "oid": "ea6435bc44b612a85b67fc3b9218e8952913f50b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "cli/default-reporter/test/index.ts",
+      "oid": "7d89eada96464c2c0f2b4c459474881ea591c464",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9b9cb8adbdaec3b3f5c9883b36280eeef739290d6c15cb7fc595d427b9d9c5a1"
+  }
+]

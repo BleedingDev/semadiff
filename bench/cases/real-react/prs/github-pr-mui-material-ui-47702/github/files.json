@@ -1,0 +1,98 @@
+[
+  {
+    "sha": "9fac6793ff92cdf688892b726bf3c4e19e48692e",
+    "filename": "eslint.config.mjs",
+    "status": "modified",
+    "additions": 9,
+    "deletions": 5,
+    "changes": 14,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/eslint.config.mjs",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/eslint.config.mjs",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/eslint.config.mjs?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -57,6 +57,7 @@ export default defineConfig(\n   createBaseConfig({\n     enableReactCompiler: ENABLE_REACT_COMPILER_PLUGIN,\n     baseDirectory: dirname,\n+    materialUi: true,\n   }),\n   {\n     name: 'Material UI overrides',\n@@ -70,7 +71,7 @@ export default defineConfig(\n     },\n     rules: {\n       'import/prefer-default-export': 'error',\n-      'material-ui/straight-quotes': 'error',\n+      'mui/straight-quotes': 'error',\n       'no-restricted-imports': [\n         'error',\n         {\n@@ -91,14 +92,17 @@ export default defineConfig(\n       'react-hooks/incompatible-library': 'off',\n       'react-hooks/static-components': 'off',\n       'react-hooks/purity': 'off',\n+\n+      // TODO (@Janpot) fix in https://github.com/mui/material-ui/pull/47692\n+      'mui/consistent-production-guard': 'off',\n     },\n   },\n   ...['mui-material', 'mui-system', 'mui-utils', 'mui-lab', 'mui-utils', 'mui-styled-engine'].map(\n     (packageName) => ({\n       files: [`packages/${packageName}/src/**/*${EXTENSION_TEST_FILE}`],\n       ignores: ['**/*.test.*', '**/*.spec.*'],\n       rules: {\n-        'material-ui/no-restricted-resolved-imports': [\n+        'mui/no-restricted-resolved-imports': [\n           'error',\n           [\n             {\n@@ -131,7 +135,7 @@ export default defineConfig(\n       },\n     },\n     rules: {\n-      'material-ui/no-empty-box': 'off',\n+      'mui/material-ui-no-empty-box': 'off',\n       // Disabled temporarily. Enable one by one.\n       'testing-library/no-container': 'off',\n       // TODO: investigate and fix\n@@ -218,7 +222,7 @@ export default defineConfig(\n       '**/mui-docs/**/*',\n     ],\n     rules: {\n-      'material-ui/disallow-react-api-in-server-components': 'error',\n+      'mui/disallow-react-api-in-server-components': 'error',\n     },\n   },\n   {\n@@ -256,7 +260,7 @@ export default defineConfig(\n     files: [`packages/*/src/**/*${EXTENSION_TS}`],\n     ignores: ['**/*.d.ts', '**/*.spec.*', 'packages/mui-joy/**/*'],\n     rules: {\n-      'material-ui/mui-name-matches-component-name': 'error',\n+      'mui/material-ui-name-matches-component-name': 'error',\n     },\n   },\n   {"
+  },
+  {
+    "sha": "e707c50b9334a07c2bbf42e4cd2e6b411a85ac5c",
+    "filename": "package.json",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/package.json",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/package.json",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/package.json?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -96,7 +96,7 @@\n     \"@mui-internal/api-docs-builder-core\": \"workspace:^\",\n     \"@mui/internal-babel-plugin-minify-errors\": \"2.0.8-canary.16\",\n     \"@mui/internal-bundle-size-checker\": \"1.0.9-canary.60\",\n-    \"@mui/internal-code-infra\": \"0.0.3-canary.76\",\n+    \"@mui/internal-code-infra\": \"0.0.3-canary.85\",\n     \"@mui/internal-docs-utils\": \"workspace:^\",\n     \"@mui/internal-netlify-cache\": \"0.0.2-canary.1\",\n     \"@mui/internal-scripts\": \"workspace:^\","
+  },
+  {
+    "sha": "b92212f961aae79db81e536d0473e1833396cebd",
+    "filename": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-docs%2Fsrc%2FMarkdownElement%2FMarkdownElement.tsx",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-docs%2Fsrc%2FMarkdownElement%2FMarkdownElement.tsx",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-docs%2Fsrc%2FMarkdownElement%2FMarkdownElement.tsx?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -305,7 +305,7 @@ const Root = styled('div')(\n       },\n       '&::before': {\n         position: 'absolute',\n-        // eslint-disable-next-line material-ui/straight-quotes\n+        // eslint-disable-next-line mui/straight-quotes\n         content: '\"“\"',\n         color: `var(--muidocs-palette-grey-300, ${lightTheme.palette.grey[300]})`,\n         fontSize: '2.5rem',"
+  },
+  {
+    "sha": "d42cce9b41ecb57cf2e32b5e2b46a4238e02fe63",
+    "filename": "packages/mui-material/src/Dialog/Dialog.test.js",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-material%2Fsrc%2FDialog%2FDialog.test.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-material%2Fsrc%2FDialog%2FDialog.test.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2FDialog%2FDialog.test.js?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -138,7 +138,7 @@ describe('<Dialog />', () => {\n     });\n \n     // keyDown not targeted at anything specific\n-    // eslint-disable-next-line material-ui/disallow-active-element-as-key-event-target\n+    // eslint-disable-next-line mui/disallow-active-element-as-key-event-target\n     fireEvent.keyDown(document.activeElement, { key: 'Escape' });\n     expect(onClose.calledOnce).to.equal(true);\n \n@@ -196,7 +196,7 @@ describe('<Dialog />', () => {\n       dialog.click();\n     });\n     // keyDown is not targeted at anything specific.\n-    // eslint-disable-next-line material-ui/disallow-active-element-as-key-event-target\n+    // eslint-disable-next-line mui/disallow-active-element-as-key-event-target\n     fireEvent.keyDown(document.activeElement, { key: 'Escape' });\n \n     expect(onClose.callCount).to.equal(0);"
+  },
+  {
+    "sha": "8827f405b142bb8b0025b82539dfc2681d31ef0d",
+    "filename": "packages/mui-material/src/Tooltip/Tooltip.test.js",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-material%2Fsrc%2FTooltip%2FTooltip.test.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-material%2Fsrc%2FTooltip%2FTooltip.test.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2FTooltip%2FTooltip.test.js?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -415,7 +415,7 @@ describe('<Tooltip />', () => {\n \n     fireEvent.keyDown(\n       // We don't care about the target. Any Escape should dismiss the tooltip\n-      // eslint-disable-next-line material-ui/disallow-active-element-as-key-event-target\n+      // eslint-disable-next-line mui/disallow-active-element-as-key-event-target\n       document.activeElement,\n       { key: 'Escape' },\n     );"
+  },
+  {
+    "sha": "67a815fbef3499142e7392a9981827b72340c803",
+    "filename": "packages/mui-material/src/styles/styled.spec.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-material%2Fsrc%2Fstyles%2Fstyled.spec.tsx",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-material%2Fsrc%2Fstyles%2Fstyled.spec.tsx",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2Fstyles%2Fstyled.spec.tsx?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -1,4 +1,4 @@\n-/* eslint-disable material-ui/no-empty-box */\n+/* eslint-disable mui/material-ui-no-empty-box */\n import * as React from 'react';\n import MuiPaper from '@mui/material/Paper';\n import { styled, css, ThemeProvider, createTheme } from '@mui/material/styles';"
+  },
+  {
+    "sha": "5a117ea0ad64305aa3f258d9be082b6e6c014326",
+    "filename": "packages/mui-system/src/Box/Box.spec.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-system%2Fsrc%2FBox%2FBox.spec.tsx",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/packages%2Fmui-system%2Fsrc%2FBox%2FBox.spec.tsx",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-system%2Fsrc%2FBox%2FBox.spec.tsx?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -104,7 +104,7 @@ function TestFillPropCallback() {\n   />;\n }\n \n-// eslint-disable-next-line material-ui/no-styled-box\n+// eslint-disable-next-line mui/material-ui-no-styled-box\n const StyledBox = styled(Box)`\n   color: white;\n ` as typeof Box;"
+  },
+  {
+    "sha": "e7d135ddb667ed5f9c1ffab9ffaf0c7eddee90e6",
+    "filename": "pnpm-lock.yaml",
+    "status": "modified",
+    "additions": 22,
+    "deletions": 6,
+    "changes": 28,
+    "blob_url": "https://github.com/mui/material-ui/blob/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/pnpm-lock.yaml",
+    "raw_url": "https://github.com/mui/material-ui/raw/4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c/pnpm-lock.yaml",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/pnpm-lock.yaml?ref=4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "patch": "@@ -71,8 +71,8 @@ importers:\n         specifier: 1.0.9-canary.60\n         version: 1.0.9-canary.60(@types/node@20.19.30)(jiti@2.6.1)(lightningcss@1.30.2)(rollup@4.46.2)(terser@5.39.0)(tsx@4.21.0)(yaml@2.8.0)\n       '@mui/internal-code-infra':\n-        specifier: 0.0.3-canary.76\n-        version: 0.0.3-canary.76(@next/eslint-plugin-next@15.5.9)(@types/node@20.19.30)(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-webpack@0.13.10)(eslint@9.39.2(jiti@2.6.1))(postcss@8.5.6)(prettier@3.8.1)(stylelint@16.26.1(typescript@5.9.3))(typescript@5.9.3)(vitest@4.0.13)\n+        specifier: 0.0.3-canary.85\n+        version: 0.0.3-canary.85(@next/eslint-plugin-next@15.5.9)(@types/node@20.19.30)(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-webpack@0.13.10)(eslint@9.39.2(jiti@2.6.1))(postcss@8.5.6)(prettier@3.8.1)(stylelint@16.26.1(typescript@5.9.3))(typescript@5.9.3)(vitest@4.0.13)\n       '@mui/internal-docs-utils':\n         specifier: workspace:^\n         version: link:packages-internal/docs-utils\n@@ -3647,6 +3647,12 @@ packages:\n     peerDependencies:\n       '@babel/core': 7.28.6\n \n+  '@mui/internal-babel-plugin-minify-errors@2.0.8-canary.20':\n+    resolution: {integrity: sha512-c1p/39GF0fAJs/w5CCPESkw2drzQ8fy/Ldlvu0z5MpyGrLeIG9pNNSjS8DxFvAEsFmUO6IF/XBfV7gYZ7sYcVA==}\n+    engines: {node: '>=14.0.0'}\n+    peerDependencies:\n+      '@babel/core': 7.28.6\n+\n   '@mui/internal-babel-plugin-resolve-imports@2.0.7-canary.31':\n     resolution: {integrity: sha512-PKxHBFM3fxJkngN/ues374AVjKI1Yg7cPP2bk/mg45IPSzgxMR9/9ssTR8F4BvZi6ZNvnOde497n4JSfqAv1zA==}\n     peerDependencies:\n@@ -3656,8 +3662,8 @@ packages:\n     resolution: {integrity: sha512-R77CJIXuKiKIfrKFVBEbKi2x+fA+fhf+HV907eLLBY9jN6zRB+9Cgyhsfi5mlYS62YEqZldqqY9jvIi+QLQweg==}\n     hasBin: true\n \n-  '@mui/internal-code-infra@0.0.3-canary.76':\n-    resolution: {integrity: sha512-EkMHEabqHmOTjl7askpVf5bnDVm7vWGBRq/l4VkYn9unQ76ZdJFJasmaEvJVuFPcFGVCYlJRhC6Fp+e4o7HmXw==}\n+  '@mui/internal-code-infra@0.0.3-canary.85':\n+    resolution: {integrity: sha512-q6B8ku4sXZ/Jz8t29kvWNngbcogsFNEMNBRfEvIAOkXTpcIC4//JjihuQ8aZ4NvNgb8sRzaRWMPa7nfnL7zwQg==}\n     hasBin: true\n     peerDependencies:\n       '@next/eslint-plugin-next': '*'\n@@ -14757,6 +14763,14 @@ snapshots:\n     transitivePeerDependencies:\n       - supports-color\n \n+  '@mui/internal-babel-plugin-minify-errors@2.0.8-canary.20(@babel/core@7.28.6)':\n+    dependencies:\n+      '@babel/core': 7.28.6\n+      '@babel/helper-module-imports': 7.28.6\n+      find-package-json: 1.2.0\n+    transitivePeerDependencies:\n+      - supports-color\n+\n   '@mui/internal-babel-plugin-resolve-imports@2.0.7-canary.31(@babel/core@7.28.6)':\n     dependencies:\n       '@babel/core': 7.28.6\n@@ -14792,7 +14806,7 @@ snapshots:\n       - tsx\n       - yaml\n \n-  '@mui/internal-code-infra@0.0.3-canary.76(@next/eslint-plugin-next@15.5.9)(@types/node@20.19.30)(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-webpack@0.13.10)(eslint@9.39.2(jiti@2.6.1))(postcss@8.5.6)(prettier@3.8.1)(stylelint@16.26.1(typescript@5.9.3))(typescript@5.9.3)(vitest@4.0.13)':\n+  '@mui/internal-code-infra@0.0.3-canary.85(@next/eslint-plugin-next@15.5.9)(@types/node@20.19.30)(@typescript-eslint/parser@8.53.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3))(eslint-import-resolver-webpack@0.13.10)(eslint@9.39.2(jiti@2.6.1))(postcss@8.5.6)(prettier@3.8.1)(stylelint@16.26.1(typescript@5.9.3))(typescript@5.9.3)(vitest@4.0.13)':\n     dependencies:\n       '@argos-ci/core': 4.5.0\n       '@babel/cli': 7.28.6(@babel/core@7.28.6)\n@@ -14809,7 +14823,7 @@ snapshots:\n       '@inquirer/confirm': 6.0.4(@types/node@20.19.30)\n       '@inquirer/select': 5.0.4(@types/node@20.19.30)\n       '@mui/internal-babel-plugin-display-name': 1.0.4-canary.11(@babel/core@7.28.6)(@babel/preset-react@7.28.5(@babel/core@7.28.6))\n-      '@mui/internal-babel-plugin-minify-errors': 2.0.8-canary.16(@babel/core@7.28.6)\n+      '@mui/internal-babel-plugin-minify-errors': 2.0.8-canary.20(@babel/core@7.28.6)\n       '@mui/internal-babel-plugin-resolve-imports': 2.0.7-canary.31(@babel/core@7.28.6)\n       '@napi-rs/keyring': 1.2.0\n       '@next/eslint-plugin-next': 15.5.9\n@@ -14822,13 +14836,15 @@ snapshots:\n       '@vitest/eslint-plugin': 1.6.6(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.13)\n       babel-plugin-optimize-clsx: 2.6.2\n       babel-plugin-react-compiler: 1.0.0\n+      babel-plugin-transform-import-meta: 2.3.3(@babel/core@7.28.6)\n       babel-plugin-transform-inline-environment-variables: 0.4.4\n       babel-plugin-transform-react-remove-prop-types: 0.4.24\n       babel-plugin-transform-remove-imports: 1.8.1(@babel/core@7.28.6)\n       chalk: 5.6.2\n       clipboardy: 5.0.2\n       content-type: 1.0.5\n       env-ci: 11.2.0\n+      es-toolkit: 1.44.0\n       eslint: 9.39.2(jiti@2.6.1)\n       eslint-config-prettier: 10.1.8(eslint@9.39.2(jiti@2.6.1))\n       eslint-import-resolver-typescript: 4.4.4(eslint-plugin-import@2.32.0)(eslint@9.39.2(jiti@2.6.1))"
+  }
+]

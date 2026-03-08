@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/machines/combobox/src/index.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=packages%2Fmachines%2Fcombobox%2Fsrc%2Findex.ts&old_oid=abd2b4e398e54c8ebd6f9b22ac775940ed206e13&old_mode=33188&new_filename=packages%2Fmachines%2Fcombobox%2Fsrc%2Findex.ts&new_oid=b26a4f2a90b185463a3eb061d75b4f6d6a0cbcf3&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/machines/combobox/src/index.ts",
+      "oid": "abd2b4e398e54c8ebd6f9b22ac775940ed206e13",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/machines/combobox/src/index.ts",
+      "oid": "b26a4f2a90b185463a3eb061d75b4f6d6a0cbcf3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8fe6ff4a1e7622a9731ec3cfad6248b5c19e5c8b473f4a9921811e446056804f"
+  }
+]

@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "3976fb393fde30e400e76e88d0e5a8443ef7c265",
+    "filename": "packages/bench/error-handling.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/dce4660ce29c004d026be1eeead9578ceeaefd68/packages%2Fbench%2Ferror-handling.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/dce4660ce29c004d026be1eeead9578ceeaefd68/packages%2Fbench%2Ferror-handling.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fbench%2Ferror-handling.ts?ref=dce4660ce29c004d026be1eeead9578ceeaefd68",
+    "patch": "@@ -1,4 +1,4 @@\n-import { makeData, makeSchema } from \"./benchUtil.js\";\n+import { makeData } from \"./benchUtil.js\";\n import { metabench } from \"./metabench.js\";\n \n import * as z4 from \"zod/v4\";"
+  },
+  {
+    "sha": "620d1fd39ad00d6d56cc2084c0457f6a887762bf",
+    "filename": "packages/bench/object.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/colinhacks/zod/blob/dce4660ce29c004d026be1eeead9578ceeaefd68/packages%2Fbench%2Fobject.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/dce4660ce29c004d026be1eeead9578ceeaefd68/packages%2Fbench%2Fobject.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fbench%2Fobject.ts?ref=dce4660ce29c004d026be1eeead9578ceeaefd68",
+    "patch": "@@ -2,7 +2,6 @@ import * as z4 from \"zod/v4\";\n import * as z3 from \"zod3\";\n import { metabench } from \"./metabench.js\";\n import * as v from \"valibot\";\n-import { type } from 'arktype';\n \n const z3Schema = z3.object({\n   string: z3.string(),"
+  },
+  {
+    "sha": "1e5f8a718cc1bf65f729bed37cc7de476fac643e",
+    "filename": "packages/tsc/generate.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 2,
+    "changes": 3,
+    "blob_url": "https://github.com/colinhacks/zod/blob/dce4660ce29c004d026be1eeead9578ceeaefd68/packages%2Ftsc%2Fgenerate.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/dce4660ce29c004d026be1eeead9578ceeaefd68/packages%2Ftsc%2Fgenerate.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Ftsc%2Fgenerate.ts?ref=dce4660ce29c004d026be1eeead9578ceeaefd68",
+    "patch": "@@ -1,5 +1,4 @@\n-import { writeFileSync } from \"node:fs\";\n-import { mkdirSync } from \"node:fs\";\n+import { mkdirSync, writeFileSync } from \"node:fs\";\n import { dirname } from \"node:path\";\n \n export const ZOD = {"
+  }
+]

@@ -1,0 +1,47 @@
+diff --git a/packages/react/src/styled-system/factory.types.ts b/packages/react/src/styled-system/factory.types.ts
+index 6b0b1e28fe4..4ae6eb6e40c 100644
+--- a/packages/react/src/styled-system/factory.types.ts
++++ b/packages/react/src/styled-system/factory.types.ts
+@@ -48,9 +48,9 @@ export type HtmlProp =
+   | "height"
+   | "content"
+ 
+-type PatchHtmlProps<T> = DistributiveOmit<T, HtmlProp> & HtmlProps
++export type PatchHtmlProps<T> = DistributiveOmit<T, HtmlProp> & HtmlProps
+ 
+-type JsxHtmlProps<T extends Dict, P extends Dict = {}> = Assign<
++export type JsxHtmlProps<T extends Dict, P extends Dict = {}> = Assign<
+   PatchHtmlProps<T>,
+   P
+ >
+diff --git a/packages/react/src/styled-system/index.ts b/packages/react/src/styled-system/index.ts
+index bcda7ecf27b..6ce1f7c539d 100644
+--- a/packages/react/src/styled-system/index.ts
++++ b/packages/react/src/styled-system/index.ts
+@@ -4,7 +4,7 @@ export { createSlotRecipeContext } from "./create-slot-recipe-context"
+ export type {
+   ConditionalValue,
+   GlobalStyleObject,
+-  JsxStyleProps,
++  // JsxStyleProps,
+   SystemStyleObject,
+   CssKeyframes,
+ } from "./css.types"
+@@ -24,6 +24,17 @@ export type {
+   HTMLChakraProps,
+   InferRecipeProps,
+   UnstyledProp,
++  JsxStyleProps,
++  DataAttr,
++  JsxFactory,
++  JsxElement,
++  PolymorphicProps,
++  HtmlProp,
++  HtmlProps,
++  JsxFactoryOptions,
++  JsxHtmlProps,
++  PatchHtmlProps,
++  StyledFactoryFn,
+ } from "./factory.types"
+ export type {
+   RecipeProps,

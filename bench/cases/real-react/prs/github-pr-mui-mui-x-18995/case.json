@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-mui-x-18995",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/mui-x#18995: [internal] Refactor virtualizer API",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/mui-x",
+    "prNumber": 18995,
+    "prUrl": "https://github.com/mui/mui-x/pull/18995",
+    "baseSha": "cdea24113374837a706a5feb18d190bf512f3d71",
+    "headSha": "88c2f692cf1d62c8f6c2a5d44471fc68d53cec1e",
+    "selectedFiles": [
+      "packages/x-data-grid/src/hooks/core/useGridStateInitialization.ts"
+    ],
+    "collectedAt": "2026-03-08T03:47:38.870Z"
+  },
+  "files": [
+    {
+      "id": "packages/x-data-grid/src/hooks/core/useGridStateInitialization.ts",
+      "oldPath": "packages/x-data-grid/src/hooks/core/useGridStateInitialization.ts",
+      "newPath": "packages/x-data-grid/src/hooks/core/useGridStateInitialization.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/x-data-grid/src/hooks/core/useGridStateInitialization.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 25,
+          "endLine": 25
+        },
+        "newRange": {
+          "startLine": 25,
+          "endLine": 25
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

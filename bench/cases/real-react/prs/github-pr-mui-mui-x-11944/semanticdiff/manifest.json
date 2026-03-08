@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+    "diff": "/gh/mui/mui-x/diff?old_filename=packages%2Fgrid%2Fx-data-grid%2Fsrc%2Fcomponents%2Fcell%2FGridActionsCellItem.tsx&old_oid=3cb8f38d93b5d2aeac3d3aed7042fe7421c01b0b&old_mode=33188&new_filename=packages%2Fgrid%2Fx-data-grid%2Fsrc%2Fcomponents%2Fcell%2FGridActionsCellItem.tsx&new_oid=642d410d54ed9699bb87031018bf8fec99bea5e3&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+      "oid": "3cb8f38d93b5d2aeac3d3aed7042fe7421c01b0b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+      "oid": "642d410d54ed9699bb87031018bf8fec99bea5e3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4708dd3a52aafe59f38d6f231bac523cd254e197302abe88f1d1d34c2039c04e"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "0f195bb8c1331c7e13c4779f2bf395a0b0bcc011",
+    "filename": "packages/vite/package.json",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/vitejs/vite/blob/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fpackage.json",
+    "raw_url": "https://github.com/vitejs/vite/raw/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fpackage.json",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fpackage.json?ref=7733df4ad652d5de77f72b3bd268f7a9b510add8",
+    "patch": "@@ -65,7 +65,7 @@\n     \"build-types\": \"pnpm build-types-roll && pnpm build-types-check\",\n     \"build-types-roll\": \"rolldown --config rolldown.dts.config.ts\",\n     \"build-types-check\": \"tsc --project tsconfig.check.json\",\n-    \"typecheck\": \"tsc && tsc -p src/node && tsc -p src/module-runner && tsc -p src/shared && tsc -p src/node/__tests_dts__\",\n+    \"typecheck\": \"tsc && tsc -p src/node && tsc -p src/module-runner && tsc -p src/shared && tsc -p src/node/__tests_dts__ && tsc -p src/module-runner/__tests_dts__\",\n     \"lint\": \"eslint --cache --ext .ts src/**\",\n     \"format\": \"prettier --write --cache --parser typescript \\\"src/**/*.ts\\\"\",\n     \"generate-target\": \"tsx scripts/generateTarget.ts\","
+  },
+  {
+    "sha": "d187a8924b5c3f0534c119e9d38944dee6b52f68",
+    "filename": "packages/vite/src/module-runner/__tests_dts__/importMeta.ts",
+    "status": "added",
+    "additions": 20,
+    "deletions": 0,
+    "changes": 20,
+    "blob_url": "https://github.com/vitejs/vite/blob/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2F__tests_dts__%2FimportMeta.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2F__tests_dts__%2FimportMeta.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fmodule-runner%2F__tests_dts__%2FimportMeta.ts?ref=7733df4ad652d5de77f72b3bd268f7a9b510add8",
+    "patch": "@@ -0,0 +1,20 @@\n+/**\n+ * Type test to verify ModuleRunnerImportMeta is structurally compatible\n+ * with ImportMeta (including @types/node augmentations).\n+ *\n+ * This replaces `extends ImportMeta` in the interface declaration with a\n+ * test-only assignability check that won't cause TS2717 \"subsequent property\n+ * declarations must have the same type\" errors in consumer projects using\n+ * skipLibCheck: false with augmented ImportMeta.\n+ */\n+\n+import type { ExpectExtends, ExpectTrue } from '@type-challenges/utils'\n+import type { ModuleRunnerImportMeta } from '../types'\n+\n+export type cases = [\n+  // Ensure ModuleRunnerImportMeta is assignable to ImportMeta\n+  // (which includes @types/node augmentations: dirname, filename, url, resolve, main)\n+  ExpectTrue<ExpectExtends<Omit<ImportMeta, 'main'>, ModuleRunnerImportMeta>>,\n+]\n+\n+export {}"
+  },
+  {
+    "sha": "0ba0f7e065d784cccfd0e9806332e73afab1e14d",
+    "filename": "packages/vite/src/module-runner/__tests_dts__/tsconfig.json",
+    "status": "added",
+    "additions": 9,
+    "deletions": 0,
+    "changes": 9,
+    "blob_url": "https://github.com/vitejs/vite/blob/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2F__tests_dts__%2Ftsconfig.json",
+    "raw_url": "https://github.com/vitejs/vite/raw/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2F__tests_dts__%2Ftsconfig.json",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fmodule-runner%2F__tests_dts__%2Ftsconfig.json?ref=7733df4ad652d5de77f72b3bd268f7a9b510add8",
+    "patch": "@@ -0,0 +1,9 @@\n+{\n+  \"extends\": \"../../../tsconfig.base.json\",\n+  \"compilerOptions\": {\n+    \"isolatedDeclarations\": false,\n+    \"declaration\": false\n+  },\n+  \"include\": [\"../\", \"../../types\"],\n+  \"exclude\": [\"../**/__tests__\"]\n+}"
+  },
+  {
+    "sha": "a72b9b5d63ed75e8d86214166a1ce19e9d12e9a7",
+    "filename": "packages/vite/src/module-runner/createImportMeta.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 2,
+    "changes": 3,
+    "blob_url": "https://github.com/vitejs/vite/blob/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2FcreateImportMeta.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2FcreateImportMeta.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fmodule-runner%2FcreateImportMeta.ts?ref=7733df4ad652d5de77f72b3bd268f7a9b510add8",
+    "patch": "@@ -32,8 +32,7 @@ export function createDefaultImportMeta(\n           `file transformation. Make sure to reference it by the full name.`,\n       )\n     },\n-    // @types/node adds `main` to `import.meta`, but we don't add that for the defaultImportMeta\n-  } satisfies Omit<ModuleRunnerImportMeta, 'main'> as any\n+  }\n }\n \n /**"
+  },
+  {
+    "sha": "38586c2900d2887585a5c0e20a155f1226fe4dc7",
+    "filename": "packages/vite/src/module-runner/types.ts",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 1,
+    "changes": 6,
+    "blob_url": "https://github.com/vitejs/vite/blob/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2Ftypes.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/7733df4ad652d5de77f72b3bd268f7a9b510add8/packages%2Fvite%2Fsrc%2Fmodule-runner%2Ftypes.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fmodule-runner%2Ftypes.ts?ref=7733df4ad652d5de77f72b3bd268f7a9b510add8",
+    "patch": "@@ -24,10 +24,14 @@ import type { InterceptorOptions } from './sourcemap/interceptor'\n \n export type { DefineImportMetadata, SSRImportMetadata }\n \n-export interface ModuleRunnerImportMeta extends ImportMeta {\n+export interface ModuleRunnerImportMeta {\n   url: string\n   env: ImportMetaEnv\n   hot?: ViteHotContext\n+  dirname: string\n+  filename: string\n+  glob: (...args: any[]) => any\n+  resolve(specifier: string, parent?: string): string\n   [key: string]: any\n }\n "
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-2273",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#2273: chore: rename @module-federation/enhanced-rspack to @module-federation/rspack and enhanced export runtime",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 2273,
+    "prUrl": "https://github.com/module-federation/core/pull/2273",
+    "baseSha": "f9335c7fd1e64df39e869d2fa5849af5172c57a5",
+    "headSha": "d410578ccbee58a7e1b004dac5dd4b166d6bf64e",
+    "selectedFiles": [
+      "packages/enhanced/src/rspack.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:19.237Z"
+  },
+  "files": [
+    {
+      "id": "packages/enhanced/src/rspack.ts",
+      "oldPath": "packages/enhanced/src/rspack.ts",
+      "newPath": "packages/enhanced/src/rspack.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/enhanced/src/rspack.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 1
+        },
+        "newRange": {
+          "startLine": 1,
+          "endLine": 1
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-25020",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#25020: [internal] More cleanup on Pickers code",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 25020,
+    "prUrl": "https://github.com/mui/material-ui/pull/25020",
+    "baseSha": "0c4481fb3056c018dfd9d9604c9df01a8b60fe13",
+    "headSha": "ef87ec0733b21772aeb5f491a8d0ffbe02ec49ec",
+    "selectedFiles": [
+      "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:40:01.742Z"
+  },
+  "files": [
+    {
+      "id": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+      "oldPath": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+      "newPath": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 111,
+          "endLine": 111
+        },
+        "newRange": {
+          "startLine": 111,
+          "endLine": 111
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

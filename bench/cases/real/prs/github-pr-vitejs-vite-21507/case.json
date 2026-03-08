@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-vitejs-vite-21507",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitejs/vite#21507: docs: bulk of typo fixes",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitejs/vite",
+    "prNumber": 21507,
+    "prUrl": "https://github.com/vitejs/vite/pull/21507",
+    "baseSha": "b243180c0a193c8ab17b88953e9cc7d03f632697",
+    "headSha": "ee0f73d382831cf40564436adbbfa5595b5bacc1",
+    "selectedFiles": [
+      "playground/assets/__tests__/assets.spec.ts"
+    ],
+    "collectedAt": "2026-03-08T02:19:09.550Z"
+  },
+  "files": [
+    {
+      "id": "playground/assets/__tests__/assets.spec.ts",
+      "oldPath": "playground/assets/__tests__/assets.spec.ts",
+      "newPath": "playground/assets/__tests__/assets.spec.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "playground/assets/__tests__/assets.spec.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 70,
+          "endLine": 70
+        },
+        "newRange": {
+          "startLine": 70,
+          "endLine": 70
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

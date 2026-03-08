@@ -1,0 +1,137 @@
+[
+  {
+    "tracking_name": ".changeset/install-from-release-channels.md",
+    "diff": "/gh/pnpm/pnpm/diff?new_filename=.changeset%2Finstall-from-release-channels.md&new_oid=be382bc6ad806d7bd64bd3745756fb86983fb2ef&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/install-from-release-channels.md",
+      "oid": "be382bc6ad806d7bd64bd3745756fb86983fb2ef",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "b6544eb52358f5164dca6eb65df094e95e95b7fe445fd2b429843e20c4a07e7e"
+  },
+  {
+    "tracking_name": "cspell.json",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=cspell.json&old_oid=9fe0d724df4c26b1b33ed5ab39623df7e331080b&old_mode=33188&new_filename=cspell.json&new_oid=71c065a557f022af0543beba03b76e64164b9110&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "cspell.json",
+      "oid": "9fe0d724df4c26b1b33ed5ab39623df7e331080b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "cspell.json",
+      "oid": "71c065a557f022af0543beba03b76e64164b9110",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "77519f787fe7e051a14c588f101d61e4d8f0d3b01bf8e16cb65d3838243d4e68"
+  },
+  {
+    "tracking_name": "env/node.resolver/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fnode.resolver%2Fsrc%2Findex.ts&old_oid=bd3f0d51885a33e4db22cf44aa5a2ee7397ed5d9&old_mode=33188&new_filename=env%2Fnode.resolver%2Fsrc%2Findex.ts&new_oid=878700595436b1d205e1438392275d17c9025310&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "env/node.resolver/src/index.ts",
+      "oid": "bd3f0d51885a33e4db22cf44aa5a2ee7397ed5d9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "env/node.resolver/src/index.ts",
+      "oid": "878700595436b1d205e1438392275d17c9025310",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0ef8a7d1a8f3c655f95ba196d0a07aff8d7b92a32210c1d61fac703030f20bb0"
+  },
+  {
+    "tracking_name": "env/node.resolver/src/parseEnvSpecifier.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fnode.resolver%2Fsrc%2FparseEnvSpecifier.ts&old_oid=77cce6a97d536af0790b134fbac85517a7b8498a&old_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "env/node.resolver/src/parseEnvSpecifier.ts",
+      "oid": "77cce6a97d536af0790b134fbac85517a7b8498a",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "34dc24c518c2dd5efafc43cc3fb4acfd9cd25049ef5d08b4dd04ed9f105a2b88"
+  },
+  {
+    "tracking_name": "env/node.resolver/src/parseNodeSpecifier.ts",
+    "diff": "/gh/pnpm/pnpm/diff?new_filename=env%2Fnode.resolver%2Fsrc%2FparseNodeSpecifier.ts&new_oid=2588175cfab5cf8cdb0b71118ec6d6a45cf02a72&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "new": {
+      "name": "env/node.resolver/src/parseNodeSpecifier.ts",
+      "oid": "2588175cfab5cf8cdb0b71118ec6d6a45cf02a72",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "4ab34f87a217f84d79905757b81cbe5acdadbe7b688f6b591eacef057c0e848d"
+  },
+  {
+    "tracking_name": "env/node.resolver/test/parseEnvSpecifier.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fnode.resolver%2Ftest%2FparseEnvSpecifier.ts&old_oid=53c37d2aff206e727288804be54adc495d0d1772&old_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "env/node.resolver/test/parseEnvSpecifier.ts",
+      "oid": "53c37d2aff206e727288804be54adc495d0d1772",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "03eecb0c0d0f19c768ca72d1ec5fba270332c03928009f3c52549d6573e80bec"
+  },
+  {
+    "tracking_name": "env/node.resolver/test/parseNodeSpecifier.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?new_filename=env%2Fnode.resolver%2Ftest%2FparseNodeSpecifier.test.ts&new_oid=6bb9d7ab551ed5eb1c59a3856b0574ec0413872c&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "new": {
+      "name": "env/node.resolver/test/parseNodeSpecifier.test.ts",
+      "oid": "6bb9d7ab551ed5eb1c59a3856b0574ec0413872c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "6be43c741bd1081b9e0c1ea2064f6573c2632e48a2ad35bdd7813bace5576a63"
+  },
+  {
+    "tracking_name": "env/plugin-commands-env/src/envList.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fplugin-commands-env%2Fsrc%2FenvList.ts&old_oid=8bece0ad3d4eda170e0ee992d5c2779353d4a183&old_mode=33188&new_filename=env%2Fplugin-commands-env%2Fsrc%2FenvList.ts&new_oid=71c028f6c315a73b75ee228b220918fddf6a3617&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "env/plugin-commands-env/src/envList.ts",
+      "oid": "8bece0ad3d4eda170e0ee992d5c2779353d4a183",
+      "mode": 33188
+    },
+    "new": {
+      "name": "env/plugin-commands-env/src/envList.ts",
+      "oid": "71c028f6c315a73b75ee228b220918fddf6a3617",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f02e38a246b91d25068b19d4d43b8978edf47a44f990775c667d995cadfae281"
+  },
+  {
+    "tracking_name": "env/plugin-commands-env/src/parseNodeSpecifier.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fplugin-commands-env%2Fsrc%2FparseNodeSpecifier.ts&old_oid=7b2d7a0470cd05c18175d7e3cc3506dc4f519cde&old_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "env/plugin-commands-env/src/parseNodeSpecifier.ts",
+      "oid": "7b2d7a0470cd05c18175d7e3cc3506dc4f519cde",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "df89b72d8dc30a1b869d43ac175b83701a9e399070b5733b0cf202fc01b11ec1"
+  },
+  {
+    "tracking_name": "env/plugin-commands-env/test/parseNodeSpecifier.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fplugin-commands-env%2Ftest%2FparseNodeSpecifier.ts&old_oid=e0ca210afd98d1ec88c130d8455a82766d7c6e19&old_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "env/plugin-commands-env/test/parseNodeSpecifier.ts",
+      "oid": "e0ca210afd98d1ec88c130d8455a82766d7c6e19",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "ca11421ee0132e8ff9c5c9c3c302ec87628e1026968c8c2f99adea000ea15fda"
+  }
+]

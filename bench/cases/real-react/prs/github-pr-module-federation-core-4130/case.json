@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4130",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4130: refactor: ship manifest ",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4130,
+    "prUrl": "https://github.com/module-federation/core/pull/4130",
+    "baseSha": "d7291673aa83ad25b9dddb1fd649e51a6f7a287b",
+    "headSha": "ac40ff8383a2349a53aafa5be3f4aa7e9d79606e",
+    "selectedFiles": [
+      "packages/modernjs/src/cli/configPlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:11:14.647Z"
+  },
+  "files": [
+    {
+      "id": "packages/modernjs/src/cli/configPlugin.ts",
+      "oldPath": "packages/modernjs/src/cli/configPlugin.ts",
+      "newPath": "packages/modernjs/src/cli/configPlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/modernjs/src/cli/configPlugin.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 40,
+          "endLine": 40
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

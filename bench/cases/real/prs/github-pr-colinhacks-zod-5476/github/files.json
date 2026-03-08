@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "c00cdd1542d71caa6c52bceeea53c4d88a2cb7ff",
+    "filename": "packages/zod/src/v4/classic/tests/function.test.ts",
+    "status": "modified",
+    "additions": 52,
+    "deletions": 0,
+    "changes": 52,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f8781da4397a8be1ece410c802acfd0ff20d8f4f/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffunction.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f8781da4397a8be1ece410c802acfd0ff20d8f4f/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffunction.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffunction.test.ts?ref=f8781da4397a8be1ece410c802acfd0ff20d8f4f",
+    "patch": "@@ -274,6 +274,58 @@ test(\"function with async refinements\", async () => {\n   expect(results).toEqual([\"fail\", \"success\"]);\n });\n \n+test(\"implement async with transforms\", async () => {\n+  const typeGuard = (data: string): data is \"1234\" => data === \"1234\";\n+  const codeSchema = z.string().transform((data, ctx) => {\n+    if (typeGuard(data)) {\n+      return data;\n+    } else {\n+      ctx.addIssue({\n+        code: z.ZodIssueCode.custom,\n+        message: \"Invalid code\",\n+      });\n+      return z.NEVER;\n+    }\n+  });\n+  const inputSchema = z.object({\n+    code: codeSchema,\n+  });\n+  const outputSchema = z.object({\n+    data: z.array(z.string()).default([]),\n+  });\n+  const fnImplementation = async (data: z.infer<typeof inputSchema>): Promise<z.infer<typeof outputSchema>> => {\n+    return {\n+      data: [data.code],\n+    };\n+  };\n+  const schema = z.function().input([inputSchema]).output(outputSchema);\n+\n+  const func = schema.implementAsync(fnImplementation);\n+  type TheInterface = {\n+    myFunction: (data: z.infer<typeof inputSchema>) => Promise<z.infer<typeof outputSchema>>;\n+  };\n+  const theImplementation: TheInterface = {\n+    myFunction: func,\n+  };\n+  const results = [];\n+  try {\n+    await theImplementation.myFunction({\n+      code: \"1234\",\n+    });\n+    results.push(\"success\");\n+  } catch (_) {\n+    results.push(\"fail\");\n+  }\n+  try {\n+    await func({ data: \"asdflkjasdflkjsf\" } as any);\n+    results.push(\"success\");\n+  } catch (_) {\n+    results.push(\"fail\");\n+  }\n+\n+  expect(results).toEqual([\"success\", \"fail\"]);\n+});\n+\n test(\"non async function with async refinements should fail\", async () => {\n   const func = z\n     .function()"
+  },
+  {
+    "sha": "83090832c7b88ea635292d4b7f54de6789628126",
+    "filename": "packages/zod/src/v4/core/schemas.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f8781da4397a8be1ece410c802acfd0ff20d8f4f/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f8781da4397a8be1ece410c802acfd0ff20d8f4f/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts?ref=f8781da4397a8be1ece410c802acfd0ff20d8f4f",
+    "patch": "@@ -3972,7 +3972,7 @@ export type $InferOuterFunctionType<Args extends $ZodFunctionIn, Returns extends\n \n export type $InferOuterFunctionTypeAsync<Args extends $ZodFunctionIn, Returns extends $ZodFunctionOut> = (\n   ...args: $ZodFunctionIn extends Args ? never[] : core.input<Args>\n-) => util.MaybeAsync<core.output<Returns>>;\n+) => Promise<core.output<Returns>>;\n \n export interface $ZodFunctionDef<\n   In extends $ZodFunctionIn = $ZodFunctionIn,"
+  }
+]

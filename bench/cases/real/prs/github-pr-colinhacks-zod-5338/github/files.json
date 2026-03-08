@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "e21879438fc54de44b7037a67d89e74da6b05624",
+    "filename": "packages/zod/src/v4/core/schemas.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/b55f06f0bd12b9059b5e1469b7bd3713e995291b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/b55f06f0bd12b9059b5e1469b7bd3713e995291b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts?ref=b55f06f0bd12b9059b5e1469b7bd3713e995291b",
+    "patch": "@@ -489,7 +489,7 @@ export const $ZodURL: core.$constructor<$ZodURL> = /*@__PURE__*/ core.$construct\n             code: \"invalid_format\",\n             format: \"url\",\n             note: \"Invalid hostname\",\n-            pattern: regexes.hostname.source,\n+            pattern: def.hostname.source,\n             input: payload.value,\n             inst,\n             continue: !def.abort,"
+  }
+]

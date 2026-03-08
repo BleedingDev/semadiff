@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-30338",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#30338: [internal] Rename missed `Material-UI` text to `MUI` in warning logs",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 30338,
+    "prUrl": "https://github.com/mui/material-ui/pull/30338",
+    "baseSha": "fc8a9d39ab3131aae97bbb081922e84a485b3edd",
+    "headSha": "8c20fa6a4895085d8fefb426834e66766add7eb0",
+    "selectedFiles": [
+      "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:40:54.179Z"
+  },
+  "files": [
+    {
+      "id": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+      "oldPath": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+      "newPath": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 148,
+          "endLine": 148
+        },
+        "newRange": {
+          "startLine": 148,
+          "endLine": 148
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

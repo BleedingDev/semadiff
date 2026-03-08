@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10188",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10188: refactor: fix duplicated ref",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10188,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10188",
+    "baseSha": "4ec69e0551ded11a1c7e985040e5130dbdd5b7aa",
+    "headSha": "bc38757b5c8d0d75ecb23aecba1d1736d49d6c1f",
+    "selectedFiles": [
+      "apps/compositions/src/ui/password-input.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:56:38.070Z"
+  },
+  "files": [
+    {
+      "id": "apps/compositions/src/ui/password-input.tsx",
+      "oldPath": "apps/compositions/src/ui/password-input.tsx",
+      "newPath": "apps/compositions/src/ui/password-input.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/compositions/src/ui/password-input.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 128,
+          "endLine": 128
+        },
+        "newRange": {
+          "startLine": 128,
+          "endLine": 128
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

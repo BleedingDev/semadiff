@@ -1,0 +1,452 @@
+[
+  {
+    "tracking_name": ".changeset/eight-phones-dress.md",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=.changeset%2Feight-phones-dress.md&new_oid=bbd6898bf92a82a56a83f20732153233edf9bbf7&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/eight-phones-dress.md",
+      "oid": "bbd6898bf92a82a56a83f20732153233edf9bbf7",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "64fa91c1b6bfa6be4c0b832b8f5838d2b8a94eadd7ebb07d250fc867379a780f"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-basic.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-basic.tsx&new_oid=8ee260b7000d5a4b319790b4f8844c003378c4ba&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-basic.tsx",
+      "oid": "8ee260b7000d5a4b319790b4f8844c003378c4ba",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "76f4cf3ae7ee530ab60ea3108938b8aee7a20eb7e2e0eea9679a3dfc1e4c2cb1"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-collapsible.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-collapsible.tsx&new_oid=74c5c4c879387cfe953f173ac7d7e59321c16cc7&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-collapsible.tsx",
+      "oid": "74c5c4c879387cfe953f173ac7d7e59321c16cc7",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "2fb6f47131875c2b3f0695a400226d01eac6f362e2ad948ec725fffc30df6469"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-conditional-rendering.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-conditional-rendering.tsx&new_oid=35eba753ee90dcbb512df1774a1228feb96405de&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-conditional-rendering.tsx",
+      "oid": "35eba753ee90dcbb512df1774a1228feb96405de",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "bad3af15af2a4242dabc26c4ecf260016ef91cb8297d5576db09ba8ed3534bf9"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-controlled.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-controlled.tsx&new_oid=89d8aecda366ddf36540341b3c233631b89f8d68&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-controlled.tsx",
+      "oid": "89d8aecda366ddf36540341b3c233631b89f8d68",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "def2a14bd431f235a1cb247b074cc2926602ccc38d9fe15336c9c5401d1d0b5e"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-disabled.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-disabled.tsx&new_oid=ade3314202475b27f13bd600e7e61a96a85cfcdc&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-disabled.tsx",
+      "oid": "ade3314202475b27f13bd600e7e61a96a85cfcdc",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "2b58089d914a6520a7f63dd48654a673361737aa9d80b11f6000bb561bbce9c8"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-dynamic-panel.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-dynamic-panel.tsx&new_oid=5ce9debaf706dd39c3906a3c2ff87f4fde0f00ad&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-dynamic-panel.tsx",
+      "oid": "5ce9debaf706dd39c3906a3c2ff87f4fde0f00ad",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "55723afed99940514676e451ba52ab4ff73962d439549d25ab285cd72bbb8a94"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-explorer.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-explorer.tsx&new_oid=ae1a5a7a32352e89b671ad63fcfe06e9d2e8ce1a&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-explorer.tsx",
+      "oid": "ae1a5a7a32352e89b671ad63fcfe06e9d2e8ce1a",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "34184655c9b8c62bc45e205a04599c892885345725b8a286bb52bcaac0e2faf8"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-ide-layout.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-ide-layout.tsx&new_oid=1d7fb35e9a1187b342abef73f0d8fae509ca9f6c&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-ide-layout.tsx",
+      "oid": "1d7fb35e9a1187b342abef73f0d8fae509ca9f6c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "a20d174fd39c8cee0dd3ca06ad041c1b1eba1247b4a28956be571a614290f0d9"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-keyboard-resize.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-keyboard-resize.tsx&new_oid=e53c9931e99a78dfd38acd8d92d302bbdfcce131&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-keyboard-resize.tsx",
+      "oid": "e53c9931e99a78dfd38acd8d92d302bbdfcce131",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "aa1d12b0a11d7fb9f76a3afb0285d145de3a34285c59a69d1571fb060f502fdb"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-min-max-constraints.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-min-max-constraints.tsx&new_oid=a42386fa2b77560821213f6ac1204c9cab6e01ff&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-min-max-constraints.tsx",
+      "oid": "a42386fa2b77560821213f6ac1204c9cab6e01ff",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "a227fa5f2bd96b5819921d17b10e08947832f1f0808d5b465c385ced9cdba0fd"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-multiple-panels.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-multiple-panels.tsx&new_oid=d1dc71aaae624a3f8f18757d5d19b94a361457f8&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-multiple-panels.tsx",
+      "oid": "d1dc71aaae624a3f8f18757d5d19b94a361457f8",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "98ffc6e7fe6445b1ad4de5d6ca5beac5ba02d231c3684a3a8c7ba887ee2b8e42"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-nested.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-nested.tsx&new_oid=b293cb19f31e2e527f10703efe39f639a68cf231&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-nested.tsx",
+      "oid": "b293cb19f31e2e527f10703efe39f639a68cf231",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "8e616f23a429331fcc72f67971d3adea89f09782c1210bab8e06881bf49f2ee6"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-reset-on-double-click.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-reset-on-double-click.tsx&new_oid=9eeccd1e2dcac3ab27b40f85683da33760873bd4&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-reset-on-double-click.tsx",
+      "oid": "9eeccd1e2dcac3ab27b40f85683da33760873bd4",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "729ba3efd47f0ebe2d6112621312ef5e89b2260e46f9f2c44a7f6b1bac121bf5"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-resize-events.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-resize-events.tsx&new_oid=bcec7feeb1acb15f532ce982d3c13e3308b27697&new_mode=33188",
+    "file": "diffs/diff-015.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-resize-events.tsx",
+      "oid": "bcec7feeb1acb15f532ce982d3c13e3308b27697",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "ca1c5d087216490f98f7f8b451c9c7f23575a0fe4fed444e4883e778d14cb05c"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-responsive-orientation.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-responsive-orientation.tsx&new_oid=c6f89c3b3933ffa3507df1e8879252e38af41662&new_mode=33188",
+    "file": "diffs/diff-016.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-responsive-orientation.tsx",
+      "oid": "c6f89c3b3933ffa3507df1e8879252e38af41662",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "3d42bb1e317d88b71ebad4c00eaae10b651ff02b4373f77ae3070f5ecd11a9d5"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-separator-only.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-separator-only.tsx&new_oid=e6cacbecceca5fc656f87adf7ac313ad00d58399&new_mode=33188",
+    "file": "diffs/diff-017.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-separator-only.tsx",
+      "oid": "e6cacbecceca5fc656f87adf7ac313ad00d58399",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "9a50e2544c0ff3e026948b3713e1c7a69e2e907ab7fe0b777423ff0097298582"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-vertical.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-vertical.tsx&new_oid=5e4b09d96e5a6d65f5bd0b7bcdf9cf747662c078&new_mode=33188",
+    "file": "diffs/diff-018.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-vertical.tsx",
+      "oid": "5e4b09d96e5a6d65f5bd0b7bcdf9cf747662c078",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "cc870b6a1dce13b18319de724e2f2f78a27ca547f0a2e01aaef1630a9465ed4d"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-with-storage.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-with-storage.tsx&new_oid=35ea96427967d86e11f25ca02a1556b3ea2459da&new_mode=33188",
+    "file": "diffs/diff-019.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-with-storage.tsx",
+      "oid": "35ea96427967d86e11f25ca02a1556b3ea2459da",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "c39ce4f20d0c4cb1c7b9e052b8de926216458210f1cc70a9b8dd5190fad1df27"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/splitter-with-store.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fsplitter-with-store.tsx&new_oid=05695af2342179887c97e16d1abfb27dd0592184&new_mode=33188",
+    "file": "diffs/diff-020.json",
+    "new": {
+      "name": "apps/compositions/src/examples/splitter-with-store.tsx",
+      "oid": "05695af2342179887c97e16d1abfb27dd0592184",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "35a3ae9562d9f8577ce35c2c2ecc90414af84c87a52b67a28497d84c7f191b15"
+  },
+  {
+    "tracking_name": "apps/compositions/src/ui/splitter.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fui%2Fsplitter.tsx&new_oid=2fe66c2e74d4cd4413484e5fb861f796e78451f7&new_mode=33188",
+    "file": "diffs/diff-021.json",
+    "new": {
+      "name": "apps/compositions/src/ui/splitter.tsx",
+      "oid": "2fe66c2e74d4cd4413484e5fb861f796e78451f7",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "92ebd9d75c876d4b4d22b29a894859763a7080661283f43538868080685ffac3"
+  },
+  {
+    "tracking_name": "apps/www/content/docs/components/splitter.mdx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fcontent%2Fdocs%2Fcomponents%2Fsplitter.mdx&new_oid=6a4dee1778c3a7f6087441f4b518058c4f767f78&new_mode=33188",
+    "file": "diffs/diff-022.json",
+    "new": {
+      "name": "apps/www/content/docs/components/splitter.mdx",
+      "oid": "6a4dee1778c3a7f6087441f4b518058c4f767f78",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "3d943ea9819106e7b6839d9d1b938f562b7026a704d488eaeb773c5d4c59f37d"
+  },
+  {
+    "tracking_name": "apps/www/public/compositions/index.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fcompositions%2Findex.json&old_oid=ecd6c691e8fc335a6848e9d184609e925d8f9279&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fcompositions%2Findex.json&new_oid=96f339ac5ff34b9709c53f8816dbbaf6ba03ac9d&new_mode=33188",
+    "file": "diffs/diff-023.json",
+    "old": {
+      "name": "apps/www/public/compositions/index.json",
+      "oid": "ecd6c691e8fc335a6848e9d184609e925d8f9279",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/compositions/index.json",
+      "oid": "96f339ac5ff34b9709c53f8816dbbaf6ba03ac9d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c2312628d3a3cf14d7e33743eb4f4c23d95c4a3a36d2719d432abad53326f074"
+  },
+  {
+    "tracking_name": "apps/www/public/compositions/splitter.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fpublic%2Fcompositions%2Fsplitter.json&new_oid=63b17d6942318643d6addb6b80ad66e52dbf0e39&new_mode=33188",
+    "file": "diffs/diff-024.json",
+    "new": {
+      "name": "apps/www/public/compositions/splitter.json",
+      "oid": "63b17d6942318643d6addb6b80ad66e52dbf0e39",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "d55df688d18119c3343ea91bd28aba8c5eaee2d1903d9fb97a9b434b55cf1bb5"
+  },
+  {
+    "tracking_name": "packages/panda-preset/src/slot-recipes/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fpanda-preset%2Fsrc%2Fslot-recipes%2Findex.ts&old_oid=4a23c6e1509b266bc669df9f8a23c70bf7b07cf9&old_mode=33188&new_filename=packages%2Fpanda-preset%2Fsrc%2Fslot-recipes%2Findex.ts&new_oid=e9201a5d0a9f1975e2639499d72f792130ed4e58&new_mode=33188",
+    "file": "diffs/diff-025.json",
+    "old": {
+      "name": "packages/panda-preset/src/slot-recipes/index.ts",
+      "oid": "4a23c6e1509b266bc669df9f8a23c70bf7b07cf9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/panda-preset/src/slot-recipes/index.ts",
+      "oid": "e9201a5d0a9f1975e2639499d72f792130ed4e58",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c4fb6a7123c2d27c09847e8f260775d3ffcb8a1057e55d0390a4249400e56f42"
+  },
+  {
+    "tracking_name": "packages/panda-preset/src/slot-recipes/splitter.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Fpanda-preset%2Fsrc%2Fslot-recipes%2Fsplitter.ts&new_oid=a700014d1eab46b4ed25aee92989dfe00b63292a&new_mode=33188",
+    "file": "diffs/diff-026.json",
+    "new": {
+      "name": "packages/panda-preset/src/slot-recipes/splitter.ts",
+      "oid": "a700014d1eab46b4ed25aee92989dfe00b63292a",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "8902c04fecabc1bbc1963769828edc92bbddecc6b7d491f40a998ffdce695a87"
+  },
+  {
+    "tracking_name": "packages/react/__stories__/splitter.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2F__stories__%2Fsplitter.stories.tsx&new_oid=56d8672034bf0147228ba115ea02de850e8e8eef&new_mode=33188",
+    "file": "diffs/diff-027.json",
+    "new": {
+      "name": "packages/react/__stories__/splitter.stories.tsx",
+      "oid": "56d8672034bf0147228ba115ea02de850e8e8eef",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "80eb66ed86f8f15239b5e7875ee54401b994e88d76733a67f0637e07dcb84d4b"
+  },
+  {
+    "tracking_name": "packages/react/src/anatomy.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fanatomy.ts&old_oid=35369a941d335fa8bf565f9b8a5dc059f950bb24&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fanatomy.ts&new_oid=d6643fa945c608a075683ca6f522591497ccdca4&new_mode=33188",
+    "file": "diffs/diff-028.json",
+    "old": {
+      "name": "packages/react/src/anatomy.ts",
+      "oid": "35369a941d335fa8bf565f9b8a5dc059f950bb24",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/anatomy.ts",
+      "oid": "d6643fa945c608a075683ca6f522591497ccdca4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "29860b2860672a8827d1bd05e6c01b7d9c0a2cd04427471984bb9783b1270967"
+  },
+  {
+    "tracking_name": "packages/react/src/components/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fcomponents%2Findex.ts&old_oid=6e268bde00d7d1cff28c9839db6b2f913d9346ae&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Findex.ts&new_oid=a1a81c6d390bfcb4f6ac356ea8e8326a4e0f3715&new_mode=33188",
+    "file": "diffs/diff-029.json",
+    "old": {
+      "name": "packages/react/src/components/index.ts",
+      "oid": "6e268bde00d7d1cff28c9839db6b2f913d9346ae",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/components/index.ts",
+      "oid": "a1a81c6d390bfcb4f6ac356ea8e8326a4e0f3715",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a8f122bf9257756078da94e8c3a64f5a360b49d5e2eee45ae7579ebc369f9053"
+  },
+  {
+    "tracking_name": "packages/react/src/components/splitter/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fsplitter%2Findex.ts&new_oid=06ff64f1ba666d60e9884d638c5dd8732a7fdb43&new_mode=33188",
+    "file": "diffs/diff-030.json",
+    "new": {
+      "name": "packages/react/src/components/splitter/index.ts",
+      "oid": "06ff64f1ba666d60e9884d638c5dd8732a7fdb43",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "85b59be1a95d5934d052c5881687c93b9ab94955d557c6cf8211c91d9af7dbff"
+  },
+  {
+    "tracking_name": "packages/react/src/components/splitter/namespace.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fsplitter%2Fnamespace.ts&new_oid=ae3028a7fcf2ea1aa5c24fd8bf2b952142496e9f&new_mode=33188",
+    "file": "diffs/diff-031.json",
+    "new": {
+      "name": "packages/react/src/components/splitter/namespace.ts",
+      "oid": "ae3028a7fcf2ea1aa5c24fd8bf2b952142496e9f",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "26c620e2fa693c431cc585c809bbce45fd889a130bfc2620431aaa69769cc7c0"
+  },
+  {
+    "tracking_name": "packages/react/src/components/splitter/splitter.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fsplitter%2Fsplitter.tsx&new_oid=d108acb2de482816cc599bd47efecf1679fd455f&new_mode=33188",
+    "file": "diffs/diff-032.json",
+    "new": {
+      "name": "packages/react/src/components/splitter/splitter.tsx",
+      "oid": "d108acb2de482816cc599bd47efecf1679fd455f",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "1e65c7ada14853d708f3483e1228e5d3b138df34e5c7d3f9d646f03d2e27a510"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/recipes/splitter.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Ftheme%2Frecipes%2Fsplitter.ts&new_oid=cebcd9f325634e7985092d052e5f17d98da69e03&new_mode=33188",
+    "file": "diffs/diff-033.json",
+    "new": {
+      "name": "packages/react/src/theme/recipes/splitter.ts",
+      "oid": "cebcd9f325634e7985092d052e5f17d98da69e03",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "b9d88f42d67b993383ee211d93e0fd19b440530e847dc7089a3f2959e239379a"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/slot-recipes.export.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.export.ts&old_oid=6228a5e7572654a9a9db7eaedb28cdc152a9e1fd&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.export.ts&new_oid=a20cacce349f5e00b829685c4cb26e63c4d2a6cb&new_mode=33188",
+    "file": "diffs/diff-034.json",
+    "old": {
+      "name": "packages/react/src/theme/slot-recipes.export.ts",
+      "oid": "6228a5e7572654a9a9db7eaedb28cdc152a9e1fd",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/slot-recipes.export.ts",
+      "oid": "a20cacce349f5e00b829685c4cb26e63c4d2a6cb",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "012ab4a5381aa9ab6a112580e7faed59fa34122ffa14835a30d9626da10cd339"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/slot-recipes.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.ts&old_oid=55b5179992788ad127cd4c8097f1e4a2efc48b30&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.ts&new_oid=56f49c036471e078a5fdaf228715a24d6fb8bf09&new_mode=33188",
+    "file": "diffs/diff-035.json",
+    "old": {
+      "name": "packages/react/src/theme/slot-recipes.ts",
+      "oid": "55b5179992788ad127cd4c8097f1e4a2efc48b30",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/slot-recipes.ts",
+      "oid": "56f49c036471e078a5fdaf228715a24d6fb8bf09",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a43040496f616e5612bf863ca5f4ba75a026ec4e1542cfee2ce7dcba38be62b7"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fenhanced%2Fsrc%2Fschemas%2Fcontainer%2FModuleFederationPlugin.ts&old_oid=8c7f55aac829105d07371ce73ed44fa495f7a004&old_mode=33188&new_filename=packages%2Fenhanced%2Fsrc%2Fschemas%2Fcontainer%2FModuleFederationPlugin.ts&new_oid=4d162dd7a3e9a8acee69aca91e144287068f2221&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+      "oid": "8c7f55aac829105d07371ce73ed44fa495f7a004",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts",
+      "oid": "4d162dd7a3e9a8acee69aca91e144287068f2221",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a4d6953ab42e340fefb61482e9610b4885f1f6eb2b15de251f86d24fe8ac3f28"
+  }
+]

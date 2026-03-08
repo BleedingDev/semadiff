@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "9f8373c773cbefc358b7722688642a64edc7901f",
+    "filename": "resolving/npm-resolver/src/pickPackageFromMeta.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/0e8df8fded87acdf85596b62236a73974ca3afaa/resolving%2Fnpm-resolver%2Fsrc%2FpickPackageFromMeta.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/0e8df8fded87acdf85596b62236a73974ca3afaa/resolving%2Fnpm-resolver%2Fsrc%2FpickPackageFromMeta.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/resolving%2Fnpm-resolver%2Fsrc%2FpickPackageFromMeta.ts?ref=0e8df8fded87acdf85596b62236a73974ca3afaa",
+    "patch": "@@ -210,6 +210,6 @@ class PreferredVersionsPrioritizer {\n       }, {} as Record<number, string[]>)\n     return Object.keys(versionsByWeight)\n       .sort((a, b) => parseInt(b, 10) - parseInt(a, 10))\n-      .map((weigth) => versionsByWeight[parseInt(weigth, 10)])\n+      .map((weight) => versionsByWeight[parseInt(weight, 10)])\n   }\n }"
+  }
+]

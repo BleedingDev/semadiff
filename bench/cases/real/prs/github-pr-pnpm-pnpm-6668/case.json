@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-pnpm-pnpm-6668",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#6668: fix: parameter typo",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 6668,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/6668",
+    "baseSha": "43151bbd6ea08e59a3256daaecd1336bd864b810",
+    "headSha": "0e8df8fded87acdf85596b62236a73974ca3afaa",
+    "selectedFiles": [
+      "resolving/npm-resolver/src/pickPackageFromMeta.ts"
+    ],
+    "collectedAt": "2026-03-08T02:25:53.104Z"
+  },
+  "files": [
+    {
+      "id": "resolving/npm-resolver/src/pickPackageFromMeta.ts",
+      "oldPath": "resolving/npm-resolver/src/pickPackageFromMeta.ts",
+      "newPath": "resolving/npm-resolver/src/pickPackageFromMeta.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "resolving/npm-resolver/src/pickPackageFromMeta.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 213,
+          "endLine": 213
+        },
+        "newRange": {
+          "startLine": 213,
+          "endLine": 213
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

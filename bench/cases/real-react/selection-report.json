@@ -1,0 +1,4944 @@
+{
+  "version": "0.1.0",
+  "caseRoot": "/Users/satan/side/experiments/semantic-diff-rewrite/bench/cases/real-react/prs",
+  "generatedAt": "2026-03-08T04:42:19.688Z",
+  "tools": [
+    {
+      "tool": "semadiff",
+      "toolVersion": "0.1.0",
+      "review": {
+        "cases": 100,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 100,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 100,
+        "totalRuntimeMs": 346.523,
+        "medianRuntimeMs": 1.59,
+        "p95RuntimeMs": 15.745
+      }
+    },
+    {
+      "tool": "git-diff",
+      "toolVersion": "git version 2.53.0",
+      "review": {
+        "cases": 100,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 100,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 100,
+        "totalRuntimeMs": 848.553,
+        "medianRuntimeMs": 8.345,
+        "p95RuntimeMs": 9.721
+      }
+    },
+    {
+      "tool": "git-diff-color-moved",
+      "toolVersion": "git version 2.53.0 (+color-moved)",
+      "review": {
+        "cases": 100,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 100,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 100,
+        "totalRuntimeMs": 798.238,
+        "medianRuntimeMs": 7.874,
+        "p95RuntimeMs": 8.932
+      }
+    },
+    {
+      "tool": "difftastic",
+      "toolVersion": "Difftastic 0.67.0\n\nToolchain: 1.91.1\nSystem:    macos aarch64",
+      "review": {
+        "cases": 100,
+        "averagePrecision": 0.04,
+        "averageRecall": 0.04,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 100,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 100,
+        "totalRuntimeMs": 2908.461,
+        "medianRuntimeMs": 25.935,
+        "p95RuntimeMs": 43.942
+      }
+    },
+    {
+      "tool": "semanticdiff",
+      "toolVersion": "cached-web",
+      "review": {
+        "cases": 100,
+        "averagePrecision": 0.99,
+        "averageRecall": 0.99,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 100,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 100,
+        "totalRuntimeMs": 116.374,
+        "medianRuntimeMs": 0.657,
+        "p95RuntimeMs": 4.026
+      }
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10072",
+      "description": "chakra-ui/chakra-ui#10072: fix(system): allow undefined for optional properties in CSS and recipe types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10072,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10072",
+        "baseSha": "cbe51b994104602c914568d2bcb60a0e67d09d14",
+        "headSha": "12df6ca1eda60d6c3846ba4c44b56975884c1bc6",
+        "selectedFiles": [
+          "packages/react/src/styled-system/css.types.ts"
+        ],
+        "collectedAt": "2026-03-08T03:58:39.881Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10081",
+      "description": "chakra-ui/chakra-ui#10081: Fix/checkbox types export",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10081,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10081",
+        "baseSha": "63c267fe2ef8aa0db707b5932dddbf4db2d54e40",
+        "headSha": "2cfef3dae6f86ed59cf894a5fa59288c7eef8860",
+        "selectedFiles": [
+          "packages/react/src/components/checkbox/index.ts"
+        ],
+        "collectedAt": "2026-03-08T03:58:22.732Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10118",
+      "description": "chakra-ui/chakra-ui#10118: fix: rename interface NativeSelectField to NativeSelectFieldProps",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10118,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10118",
+        "baseSha": "d7914ad43a382f30ea221e5fcbb151c658bee440",
+        "headSha": "dae0c83b71710c2a837074fb9ed63abf313563ff",
+        "selectedFiles": [
+          "apps/compositions/src/ui/native-select.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:57:45.391Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10180",
+      "description": "chakra-ui/chakra-ui#10180: refactor: edit breadcrumb ellipsis markup",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10180,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10180",
+        "baseSha": "11423e71a5f8b90f9b89d9aa26db44c209976ad9",
+        "headSha": "1c3a984cb0546e0b44ced433bb774f5ddc95e366",
+        "selectedFiles": [
+          "packages/react/src/components/breadcrumb/breadcrumb.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:56:45.575Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10184",
+      "description": "chakra-ui/chakra-ui#10184: fix(TS): update type definitions for onChange and shouldUpdate in useControllableProp hook",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10184,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10184",
+        "baseSha": "2cafb0ee474fe50e6fb3432ac1dbf02301ffe6ac",
+        "headSha": "86785009990fe390bfff204414b05dc24ad61d7b",
+        "selectedFiles": [
+          "packages/react/src/hooks/use-controllable-state.ts"
+        ],
+        "collectedAt": "2026-03-08T04:00:12.055Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10188",
+      "description": "chakra-ui/chakra-ui#10188: refactor: fix duplicated ref",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10188,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10188",
+        "baseSha": "4ec69e0551ded11a1c7e985040e5130dbdd5b7aa",
+        "headSha": "bc38757b5c8d0d75ecb23aecba1d1736d49d6c1f",
+        "selectedFiles": [
+          "apps/compositions/src/ui/password-input.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:56:38.070Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10277",
+      "description": "chakra-ui/chakra-ui#10277: fix(pagination): export pagination types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10277,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10277",
+        "baseSha": "2dd0617b2f8b7e416e6deaef3edafc6acac957b0",
+        "headSha": "af686a8627b63804477e184c6a24bf222d287a42",
+        "selectedFiles": [
+          "packages/react/src/components/pagination/index.ts"
+        ],
+        "collectedAt": "2026-03-08T03:58:16.688Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10365",
+      "description": "chakra-ui/chakra-ui#10365: docs: extend Component Explorer coverage across component docs",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10365,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10365",
+        "baseSha": "83c1641fc221822e522f492c7dfcda866397cf61",
+        "headSha": "8bd1e4d02b768100457c03b7f48cb5ecbd30bb20",
+        "selectedFiles": [
+          "apps/compositions/src/examples/color-picker-with-variants.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:59:43.719Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10374",
+      "description": "chakra-ui/chakra-ui#10374: feat: add TagsInput component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10374,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10374",
+        "baseSha": "8b7897dd33d232b04359d0bca274382f4d46aa85",
+        "headSha": "28fb03e5c7019b741d3b18635eba2fa121ef0ab0",
+        "selectedFiles": [
+          "apps/www/docs.config.ts"
+        ],
+        "collectedAt": "2026-03-08T03:59:57.958Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10391",
+      "description": "chakra-ui/chakra-ui#10391: feat: add carousel component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10391,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10391",
+        "baseSha": "69aabbfd5f32283329b272544670ebadea9b6788",
+        "headSha": "22d61525b1a22b05aa72d80cbdee9ab0248a2fbe",
+        "selectedFiles": [
+          "apps/www/docs.config.ts"
+        ],
+        "collectedAt": "2026-03-08T03:59:36.467Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10425",
+      "description": "chakra-ui/chakra-ui#10425: feat: add Splitter component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10425,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10425",
+        "baseSha": "63d07c5f812fdb5e6ed8f01a953a822b2fc3a88d",
+        "headSha": "56869b20ee7f6ea03cbde7d7be58f8351100a791",
+        "selectedFiles": [
+          "packages/react/src/components/index.ts"
+        ],
+        "collectedAt": "2026-03-08T03:59:29.029Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10503",
+      "description": "chakra-ui/chakra-ui#10503: fix(strong): correct props type and font weight for Strong component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10503,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10503",
+        "baseSha": "650bfd1fcfe8cbf78ae3c4066e3cd219ad5bc894",
+        "headSha": "2bb5e38bf2234660cc29c805d3fb6d57ddd84815",
+        "selectedFiles": [
+          "packages/react/src/components/strong/index.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:59:21.823Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-10590",
+      "description": "chakra-ui/chakra-ui#10590: feat(marquee): Marquee component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 10590,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10590",
+        "baseSha": "b52aa55dcaa665a2c2aad1ca273ad25a1d953075",
+        "headSha": "666d81478673b27cc634bbc05b62e88e4614baf5",
+        "selectedFiles": [
+          "packages/react/src/anatomy.ts"
+        ],
+        "collectedAt": "2026-03-08T03:59:11.188Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-2417",
+      "description": "chakra-ui/chakra-ui#2417: chore: renamed @chakra-ui/core to @chakra-ui/react",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 2417,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/2417",
+        "baseSha": "f24301200cd5460abc7ecfb92c0f5b423300a5b6",
+        "headSha": "785fe4f9edd276897a840ced128189a65132ca80",
+        "selectedFiles": [
+          ".storybook/preview.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:58:06.125Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-6185",
+      "description": "chakra-ui/chakra-ui#6185: test: update test packages and cleanup tests",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 6185,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/6185",
+        "baseSha": "7f11b0cd2299ec57b98399fc61314202919adbce",
+        "headSha": "cf24167365781e5a131e08d0d17726a3a39839b0",
+        "selectedFiles": [
+          "tooling/test-utils/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T03:57:36.266Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-7352",
+      "description": "chakra-ui/chakra-ui#7352: Export \"useEditableContext\" hook",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 7352,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/7352",
+        "baseSha": "b2b5d35452bf8a7a6ed16fba0f76e1037ce9986d",
+        "headSha": "635104057de5320b969ba3f10ffef6b98713a1af",
+        "selectedFiles": [
+          "packages/components/editable/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:00:45.393Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-7406",
+      "description": "chakra-ui/chakra-ui#7406: Update avatar-name.tsx",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 7406,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/7406",
+        "baseSha": "0e0d371a9118df28858f3fdff11bf5ed89441b7e",
+        "headSha": "0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5",
+        "selectedFiles": [
+          "packages/components/avatar/src/avatar-name.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:01:38.690Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-8332",
+      "description": "chakra-ui/chakra-ui#8332: feat: rename is* props",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 8332,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/8332",
+        "baseSha": "bb3ce6671d4b857ebe79ce968c4acbc0b32cff42",
+        "headSha": "d4fa3222ef1683621b03a5626a282d2dd68a46cf",
+        "selectedFiles": [
+          "packages/components/src/accordion/accordion-content.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:57:54.317Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-8815",
+      "description": "chakra-ui/chakra-ui#8815: (v3) chore: remove hooks package",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 8815,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/8815",
+        "baseSha": "1d2c94b004334457b00849fc03cd32b49b0a2325",
+        "headSha": "fc0d164e431a2bf013592337999936d68be4ca9e",
+        "selectedFiles": [
+          "packages/react/src/components/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:00:21.583Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-9223",
+      "description": "chakra-ui/chakra-ui#9223: fix: export factory types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 9223,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9223",
+        "baseSha": "304ead4d10f30a202a8b8a49b7bddddef047727b",
+        "headSha": "5b8c20629530b09cc27c3039bb876d58ba3081d2",
+        "selectedFiles": [
+          "packages/react/src/styled-system/factory.types.ts"
+        ],
+        "collectedAt": "2026-03-08T03:58:55.777Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-9240",
+      "description": "chakra-ui/chakra-ui#9240: fix: export missing slot recipe context types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 9240,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9240",
+        "baseSha": "6ab2ea3720cb4dd5af185f548a307d8307cea977",
+        "headSha": "dc5e143b28b7f883762e4c2a7a3664ff784cafb7",
+        "selectedFiles": [
+          "packages/react/src/styled-system/create-slot-recipe-context.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:58:49.366Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-9759",
+      "description": "chakra-ui/chakra-ui#9759: docs: refactor checkbox snippets",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 9759,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9759",
+        "baseSha": "96e1730c508762e12cb5c294f927786be6eb0b28",
+        "headSha": "0bc356933636351773ced2ab74360cbf5aa2abba",
+        "selectedFiles": [
+          "packages/react/__stories__/checkbox.stories.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:57:24.202Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-9766",
+      "description": "chakra-ui/chakra-ui#9766: docs: refactor radio snippets",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 9766,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9766",
+        "baseSha": "15b758b2d3c69fac24d1fe232197386110f74968",
+        "headSha": "739606b31743d606b10c27af2e43ecfc8c615c0f",
+        "selectedFiles": [
+          "packages/react/__stories__/radio-card.stories.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:57:02.538Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-9770",
+      "description": "chakra-ui/chakra-ui#9770: docs: refactor snippet usage",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 9770,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9770",
+        "baseSha": "491035070149b17a61625f9f48647ae98513761f",
+        "headSha": "d82173d904bcfeadae9ac078915f19fac114c15a",
+        "selectedFiles": [
+          "packages/react/__stories__/rating.stories.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:57:15.549Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-chakra-ui-9775",
+      "description": "chakra-ui/chakra-ui#9775: docs: refactor number input snippets",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/chakra-ui",
+        "prNumber": 9775,
+        "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9775",
+        "baseSha": "32b1822482f657827eae4fe89dddcb7cc70bfe03",
+        "headSha": "70a46ebe62b7ea98fce3d93ffa30cf43c2d59934",
+        "selectedFiles": [
+          "packages/react/__stories__/number-input.stories.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:57:09.019Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1333",
+      "description": "chakra-ui/zag#1333: [website]: Use vanilla css for demo components",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1333,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1333",
+        "baseSha": "dd1eeb919af569f7bbf730828b216e9f01d11af1",
+        "headSha": "af6b99e5c2279b11f55902b20874c28f848ce38d",
+        "selectedFiles": [
+          "packages/machines/splitter/src/splitter.connect.ts"
+        ],
+        "collectedAt": "2026-03-08T04:07:05.019Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1335",
+      "description": "chakra-ui/zag#1335: refactor(tabs): rename tablist to list",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1335,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1335",
+        "baseSha": "0c72502454a7c53260da9475bb04268228ab06f1",
+        "headSha": "eeaba781e08fe893f1c4ab37d43c2b0132477477",
+        "selectedFiles": [
+          "examples/next-ts/pages/tabs.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:04:59.602Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1439",
+      "description": "chakra-ui/zag#1439: docs: presence component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1439,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1439",
+        "baseSha": "04cf34ff7fd9e1ec290db1785fbb70ce97b892b3",
+        "headSha": "e039979fb63fb583aea87b2cd6894dc5e1f6da27",
+        "selectedFiles": [
+          "starters/react/app/page.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:06:57.542Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1442",
+      "description": "chakra-ui/zag#1442: refactor: collapsible machine",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1442,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1442",
+        "baseSha": "67dcceb2a2b0d6850d422a3730a90edf8fa2e2ea",
+        "headSha": "ba7597c6e386b9289b82cb9cfa019591c82cb7f9",
+        "selectedFiles": [
+          "starters/react/app/collapsible/controlled/page.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:04:41.027Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1489",
+      "description": "chakra-ui/zag#1489: refactor: composite widgets",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1489,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1489",
+        "baseSha": "dc7fc07effdac29ee99bc59edfa5026655e5c80b",
+        "headSha": "f191b6fb270d9154203390a9982789fb3dca3aea",
+        "selectedFiles": [
+          "packages/machines/combobox/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:04:33.994Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1625",
+      "description": "chakra-ui/zag#1625: refactor: redesign collection",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1625,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1625",
+        "baseSha": "25b5e1d946291a60aed89dc3cf4fb75e98b23942",
+        "headSha": "e83878b7832727bea74d3282084f4dfb16fadb9c",
+        "selectedFiles": [
+          "website/sidebar.config.ts"
+        ],
+        "collectedAt": "2026-03-08T04:04:22.298Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1641",
+      "description": "chakra-ui/zag#1641: refactor: change top-level process call in proxy.ts",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1641,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1641",
+        "baseSha": "266039c266265a3868d35f46d2564ea954cfe12c",
+        "headSha": "69ee3aacba43a23f548ac792d06c58bcd8278f27",
+        "selectedFiles": [
+          "packages/store/src/proxy.ts"
+        ],
+        "collectedAt": "2026-03-08T04:04:14.772Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1891",
+      "description": "chakra-ui/zag#1891: refactor: tour machine",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1891,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1891",
+        "baseSha": "831e941241d48f9345c4da0172e72956beed8b25",
+        "headSha": "ec181ea5bdf071b303051b79a6e95a87edce1ec5",
+        "selectedFiles": [
+          "e2e/dialog.e2e.ts"
+        ],
+        "collectedAt": "2026-03-08T04:04:08.094Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-197",
+      "description": "chakra-ui/zag#197: refactor: remove use setup hooks",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 197,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/197",
+        "baseSha": "146aa1364dd83f197104fdb2ac27b5a7896b4c8f",
+        "headSha": "9bc1a100e9e80bdf479443e7a7275c6c3f1226c6",
+        "selectedFiles": [
+          "packages/frameworks/react/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:07:27.498Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-1997",
+      "description": "chakra-ui/zag#1997: feat: improving generic component class",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 1997,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/1997",
+        "baseSha": "a2af4adc6a0d9438e025eadd12eb7eb513131a90",
+        "headSha": "80cc918c67371073b90c86e11a8ee9d0932935d6",
+        "selectedFiles": [
+          "packages/core/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:06:38.215Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2075",
+      "description": "chakra-ui/zag#2075: refactor(breaking): redesign carousel machine",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2075,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2075",
+        "baseSha": "778ebb965a94ac4d79e1fd68663081bf9fe46c35",
+        "headSha": "24693d95846e396703f8520fc632616c15601c1e",
+        "selectedFiles": [
+          "packages/core/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:03:58.982Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2105",
+      "description": "chakra-ui/zag#2105: fix: :pencil2: fix types from website/ folder",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2105,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2105",
+        "baseSha": "22df8cf8f7493808cd9bbda9944142fcfdfc325c",
+        "headSha": "4884c85aede0a8f8cc94efa832d58d8e7a3eeb94",
+        "selectedFiles": [
+          "website/pages/index.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:06:11.632Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2355",
+      "description": "chakra-ui/zag#2355: refactor: redesign splitter machine",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2355,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2355",
+        "baseSha": "c1f63fcf563467ef0337f68e4c6a384f1b7163e2",
+        "headSha": "30802c081960a234334e92a037eac2bdcc44a891",
+        "selectedFiles": [
+          "packages/core/src/types.ts"
+        ],
+        "collectedAt": "2026-03-08T04:03:51.607Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2396",
+      "description": "chakra-ui/zag#2396: feat: listbox component",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2396,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2396",
+        "baseSha": "cae14a0a7515bfe63df0f6d71e55712e5f09efde",
+        "headSha": "c0f5f215236c1f57fdca0a71fe5c867016ec6317",
+        "selectedFiles": [
+          "packages/frameworks/preact/src/machine.ts"
+        ],
+        "collectedAt": "2026-03-08T04:06:27.035Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2416",
+      "description": "chakra-ui/zag#2416: chore: cleanup vanilla poc",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2416,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2416",
+        "baseSha": "d609714debf44affc1b6bb888efb860109e4718b",
+        "headSha": "9d69d7d65ba5c6db1651de3c8668ae2d4acd719d",
+        "selectedFiles": [
+          "examples/vanilla-ts/src/component.ts"
+        ],
+        "collectedAt": "2026-03-08T04:04:48.165Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2531",
+      "description": "chakra-ui/zag#2531: fix(types): better exact optional property types support",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2531,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2531",
+        "baseSha": "075404e6f3722522fc50f790f9498601b94e2e15",
+        "headSha": "af39d453202d5393ecae94f65092fef021937c1a",
+        "selectedFiles": [
+          "packages/core/src/memo.ts"
+        ],
+        "collectedAt": "2026-03-08T04:05:56.435Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2678",
+      "description": "chakra-ui/zag#2678: refactor(navigation-menu): rewrite machine logic",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2678,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2678",
+        "baseSha": "b2703910dee0581adea6cf37af00c6b8e9d6fde6",
+        "headSha": "c71f5495f0dc7b0622fa22c97351ad15b703e07e",
+        "selectedFiles": [
+          "packages/machines/navigation-menu/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:03:41.515Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2696",
+      "description": "chakra-ui/zag#2696: fix(menu): make child and parent menu service types more precise",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2696,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2696",
+        "baseSha": "8f6030912c1b16c1d5d19cc75f6703be31443fe9",
+        "headSha": "088a96e9fb42c89f9d556b5e5611564d64a50baa",
+        "selectedFiles": [
+          "packages/machines/menu/src/menu.machine.ts"
+        ],
+        "collectedAt": "2026-03-08T04:05:42.037Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2710",
+      "description": "chakra-ui/zag#2710: fix(bottom-sheet): re-export types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2710,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2710",
+        "baseSha": "cd88929c596bedf21f99dbb39d8a8163f68499a5",
+        "headSha": "5df21f38d6ea209ce5073db7d63b8e650ff16f28",
+        "selectedFiles": [
+          "packages/machines/bottom-sheet/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:05:48.902Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2800",
+      "description": "chakra-ui/zag#2800: fix(image-cropper): export missing types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2800,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2800",
+        "baseSha": "e82c045bb635850bbf59c38c834a27d6e66ff034",
+        "headSha": "087caad7716a49fe4a9f52dc1fbc7379c71d12ca",
+        "selectedFiles": [
+          "packages/machines/image-cropper/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:05:33.568Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2917",
+      "description": "chakra-ui/zag#2917: feat(vanilla): updateProps and fix composition",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2917,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2917",
+        "baseSha": "476bb3da301a279721c7e5d45be0f3689596da34",
+        "headSha": "228b60c60049ff6a3e1a545d2fd6dac996e4e67a",
+        "selectedFiles": [
+          "packages/frameworks/vanilla/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:03:05.075Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2965",
+      "description": "chakra-ui/zag#2965: fix(listbox): dom ids",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2965,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2965",
+        "baseSha": "8ace22d2dbdcbcce5eff83cbf3aab6f54f85ba87",
+        "headSha": "9a56b1f23edc2898c3e2afe3bd15e99e412098de",
+        "selectedFiles": [
+          "packages/machines/listbox/src/listbox.dom.ts"
+        ],
+        "collectedAt": "2026-03-08T04:02:56.491Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2975",
+      "description": "chakra-ui/zag#2975: chore: add `data-placeholder-shown` to cascade select",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2975,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2975",
+        "baseSha": "c25e01fd0d87f4fe508a71184fdea65433520f4e",
+        "headSha": "8dcc45551196584f2e2c60220c16e7ed03485c19",
+        "selectedFiles": [
+          "packages/machines/cascade-select/src/cascade-select.connect.ts"
+        ],
+        "collectedAt": "2026-03-08T04:03:21.169Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2976",
+      "description": "chakra-ui/zag#2976: fix(cascade-select): rename `data-focused` to `data-focus` for consistency",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2976,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2976",
+        "baseSha": "5f74a1a4454b24d2d4b178be8830752a802b9c39",
+        "headSha": "b7602b297d1733caeedcf7c5a1ca61c4afe281f3",
+        "selectedFiles": [
+          "packages/machines/cascade-select/src/cascade-select.connect.ts"
+        ],
+        "collectedAt": "2026-03-08T04:02:44.284Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-chakra-ui-zag-2984",
+      "description": "chakra-ui/zag#2984: fix(vanilla): merge props",
+      "source": {
+        "kind": "github-pr",
+        "repository": "chakra-ui/zag",
+        "prNumber": 2984,
+        "prUrl": "https://github.com/chakra-ui/zag/pull/2984",
+        "baseSha": "d97c5a32ea2fd425af3af91c30d02159e98db756",
+        "headSha": "f5b47b9c466e807a7b6eddb82b6147b93cb4e168",
+        "selectedFiles": [
+          "packages/frameworks/vanilla/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:02:32.069Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-1612",
+      "description": "module-federation/core#1612: fix(enhanced): rename plugin took tap",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 1612,
+        "prUrl": "https://github.com/module-federation/core/pull/1612",
+        "baseSha": "315af24e14cd817e7d62e50b5354c79bb7ba6677",
+        "headSha": "1faae38d3bb0eefa3066ed0ffa0f2f4a2a46c43a",
+        "selectedFiles": [
+          "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:46.948Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-1754",
+      "description": "module-federation/core#1754: refactor(runtime): rename hooks",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 1754,
+        "prUrl": "https://github.com/module-federation/core/pull/1754",
+        "baseSha": "aeb94df355ba27e201f1ba5b8ed7d3913e67f3db",
+        "headSha": "171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+        "selectedFiles": [
+          "packages/runtime/src/plugins/snapshot/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:32.659Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-1880",
+      "description": "module-federation/core#1880: fix: rename usePlugins to prevent swc react-refresh from throwing errors when replacing variables",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 1880,
+        "prUrl": "https://github.com/module-federation/core/pull/1880",
+        "baseSha": "21fcb2f5cd6f8a20bba387dbf54dcefd31a791d7",
+        "headSha": "7f967b326fa1d992dff8d2c0766c45133c92c971",
+        "selectedFiles": [
+          "packages/runtime/src/utils/plugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:26.619Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-215",
+      "description": "module-federation/core#215: rename utils package",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 215,
+        "prUrl": "https://github.com/module-federation/core/pull/215",
+        "baseSha": "d2a4dfac7fcdaa2b6a21e3d2973808d01649da61",
+        "headSha": "80f4fcf6d3c52accc90e4dc4e3ae35b9d33cb19d",
+        "selectedFiles": [
+          "packages/nextjs-mf/client/RemoteContainer.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:40.112Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-2273",
+      "description": "module-federation/core#2273: chore: rename @module-federation/enhanced-rspack to @module-federation/rspack and enhanced export runtime",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 2273,
+        "prUrl": "https://github.com/module-federation/core/pull/2273",
+        "baseSha": "f9335c7fd1e64df39e869d2fa5849af5172c57a5",
+        "headSha": "d410578ccbee58a7e1b004dac5dd4b166d6bf64e",
+        "selectedFiles": [
+          "packages/enhanced/src/rspack.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:19.237Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3174",
+      "description": "module-federation/core#3174: feat(runtime): pass all loader hooks to the fetch and script functions",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3174,
+        "prUrl": "https://github.com/module-federation/core/pull/3174",
+        "baseSha": "54bfd1cf730a842fd323d88d1b7c8ff72678f0ce",
+        "headSha": "b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+        "selectedFiles": [
+          "packages/runtime/src/remote/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:15:21.615Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3329",
+      "description": "module-federation/core#3329: docs: Add documentation for the manifest fetch hook",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3329,
+        "prUrl": "https://github.com/module-federation/core/pull/3329",
+        "baseSha": "cafc5f040274ccb274f13d16910146415e8bd973",
+        "headSha": "db25ef01512e9f758994a7624ca1041dfa8667f3",
+        "selectedFiles": [
+          "packages/runtime/src/core.ts"
+        ],
+        "collectedAt": "2026-03-08T04:15:14.522Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3463",
+      "description": "module-federation/core#3463: fix(sdk): createLink hook error dom attr rel",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3463,
+        "prUrl": "https://github.com/module-federation/core/pull/3463",
+        "baseSha": "578aa43370e62a79204f74fadd0c51478084d279",
+        "headSha": "7e47cf1148d27f2ade06b8f1f0fb365e67c122ba",
+        "selectedFiles": [
+          "packages/sdk/src/dom.ts"
+        ],
+        "collectedAt": "2026-03-08T04:14:59.796Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3474",
+      "description": "module-federation/core#3474: feat(runtime): allow errorLoadRemote hook catch remote entry resource loading error",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3474,
+        "prUrl": "https://github.com/module-federation/core/pull/3474",
+        "baseSha": "7407daf6e0d2fda8cef232f3a50ae65e0d19d1aa",
+        "headSha": "8945d3df03aad168e7179b475b6d5ab8ed729660",
+        "selectedFiles": [
+          "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts"
+        ],
+        "collectedAt": "2026-03-08T04:15:07.747Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3543",
+      "description": "module-federation/core#3543: fix(bridge-react): prevent destroy/render the remote component every time after the states changed",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3543,
+        "prUrl": "https://github.com/module-federation/core/pull/3543",
+        "baseSha": "3081511c92407633e18a4a7c36f273f59f756b12",
+        "headSha": "8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+        "selectedFiles": [
+          "apps/router-demo/router-remote1-2001/rsbuild.config.ts"
+        ],
+        "collectedAt": "2026-03-08T04:14:28.569Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3768",
+      "description": "module-federation/core#3768: chore(dts-plugin): check types archive url and optimize the error msg",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3768,
+        "prUrl": "https://github.com/module-federation/core/pull/3768",
+        "baseSha": "2faa3a3e12dc219309027a65375d727c2001ddf9",
+        "headSha": "7210cefa1ec56382352842438e1156af055f7108",
+        "selectedFiles": [
+          "packages/dts-plugin/src/core/lib/archiveHandler.test.ts"
+        ],
+        "collectedAt": "2026-03-08T04:13:20.628Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3840",
+      "description": "module-federation/core#3840: feat(dts-plugin): added flag to fetch types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3840,
+        "prUrl": "https://github.com/module-federation/core/pull/3840",
+        "baseSha": "1fd6f65b2d2c62b23d6b4a7721f0ceac61fec853",
+        "headSha": "d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+        "selectedFiles": [
+          "packages/dts-plugin/src/core/configurations/hostPlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:13:10.582Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3902",
+      "description": "module-federation/core#3902: refactor: rename container hooks for clarity and consistency",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3902,
+        "prUrl": "https://github.com/module-federation/core/pull/3902",
+        "baseSha": "1825b9d768aeeb01dea4160184d9c3457d225e2f",
+        "headSha": "22eaadc5e3e4e728bfc0ae3780691e3e2f709e47",
+        "selectedFiles": [
+          "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:09.479Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-3973",
+      "description": "module-federation/core#3973: fix(bridge-react): Add loading in root component to avoid CLS problem",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 3973,
+        "prUrl": "https://github.com/module-federation/core/pull/3973",
+        "baseSha": "67a7bfa5def8cea4339eb92b30734d7c4943dc33",
+        "headSha": "fcd6480fe4807614e6d5809d0af3e2ffb9308657",
+        "selectedFiles": [
+          "packages/bridge/bridge-react/src/remote/create.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:14:03.049Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4061",
+      "description": "module-federation/core#4061: refactor(enhanced): resolve alias-aware consumes in afterResolve with caching",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4061,
+        "prUrl": "https://github.com/module-federation/core/pull/4061",
+        "baseSha": "c7a0d1dc5bf1a9873efa162b7e2c9aac6f3abd44",
+        "headSha": "47fd166ba7f865fa6ec96703747fb20e4c2f60f6",
+        "selectedFiles": [
+          "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts"
+        ],
+        "collectedAt": "2026-03-08T04:11:33.001Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4121",
+      "description": "module-federation/core#4121: Rename share resolver option to allowNodeModulesSuffixMatch",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4121,
+        "prUrl": "https://github.com/module-federation/core/pull/4121",
+        "baseSha": "fc6b70c82d44ac52435800de1e6c00556e772bb5",
+        "headSha": "4ed0e5079dbd122cbe6b51d3857d251b6189b4c0",
+        "selectedFiles": [
+          "packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:12:01.404Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4130",
+      "description": "module-federation/core#4130: refactor: ship manifest ",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4130,
+        "prUrl": "https://github.com/module-federation/core/pull/4130",
+        "baseSha": "d7291673aa83ad25b9dddb1fd649e51a6f7a287b",
+        "headSha": "ac40ff8383a2349a53aafa5be3f4aa7e9d79606e",
+        "selectedFiles": [
+          "packages/modernjs/src/cli/configPlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:11:14.647Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4132",
+      "description": "module-federation/core#4132: feat: Add React Router v7 Support to Module Federation Bridge",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4132,
+        "prUrl": "https://github.com/module-federation/core/pull/4132",
+        "baseSha": "aa7daaef40c88447af4a324aa9a8aaf5e86228dd",
+        "headSha": "3b01878d96983408992c04f9b442da1aa17c5db3",
+        "selectedFiles": [
+          "apps/router-demo/router-host-2000/rsbuild.config.ts"
+        ],
+        "collectedAt": "2026-03-08T04:15:59.503Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4227",
+      "description": "module-federation/core#4227: fix(bridge-react):  remove the unnecessary bundle for react-router-dom when user not using react-router in bridge-react",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4227,
+        "prUrl": "https://github.com/module-federation/core/pull/4227",
+        "baseSha": "f53f2394e7087ec28efa845bbd7183f9b2ca8960",
+        "headSha": "d48c3cb37d4d7cd075b52c8417d21024e5ca449a",
+        "selectedFiles": [
+          "packages/bridge/bridge-react/vite.config.ts"
+        ],
+        "collectedAt": "2026-03-08T04:15:41.502Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4419",
+      "description": "module-federation/core#4419: refactor(dts-plugin): replace Koa dev server with native HTTP",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4419,
+        "prUrl": "https://github.com/module-federation/core/pull/4419",
+        "baseSha": "3be31f38040cb4139904f6ca303789b6633da748",
+        "headSha": "b25420078dc07aabdd31d96eab3d2a1d9fc1b988",
+        "selectedFiles": [
+          "packages/enhanced/test/ConfigTestCases.rstest.ts"
+        ],
+        "collectedAt": "2026-03-08T04:11:06.176Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4446",
+      "description": "module-federation/core#4446: refactor(metro): align metro plugin configuration with MF SDK",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4446,
+        "prUrl": "https://github.com/module-federation/core/pull/4446",
+        "baseSha": "a0faa70404fde69a029142f2211d44b011937dfe",
+        "headSha": "b029e5d8aaeb79e2122df07b918bfca8163069f0",
+        "selectedFiles": [
+          "packages/metro-core/src/modules/asyncStartup.tsx"
+        ],
+        "collectedAt": "2026-03-08T04:10:57.056Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4455",
+      "description": "module-federation/core#4455: refactor(build): migrate Nx executors to vanilla CLI targets",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4455,
+        "prUrl": "https://github.com/module-federation/core/pull/4455",
+        "baseSha": "6edeb57dc7c9ee9334273d3710eb9c24e83fddec",
+        "headSha": "d99aeb392c44660d6a9c6f203dedaa5bca0a6cc0",
+        "selectedFiles": [
+          "apps/3000-home/cypress/support/e2e.ts"
+        ],
+        "collectedAt": "2026-03-08T04:10:48.229Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4460",
+      "description": "module-federation/core#4460: feat: tsup build alignment and local setup fixes",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4460,
+        "prUrl": "https://github.com/module-federation/core/pull/4460",
+        "baseSha": "dfbf05ff932c61419751700926d2c68f96a8f075",
+        "headSha": "e7a86322e368fa02fe79139244ac8b6b7e62539d",
+        "selectedFiles": [
+          "packages/dts-plugin/src/plugins/DevPlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:09:10.293Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4475",
+      "description": "module-federation/core#4475: fix(dts-plugin): stabilize package test and typings build",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4475,
+        "prUrl": "https://github.com/module-federation/core/pull/4475",
+        "baseSha": "aacfe60f9bbddb3a4945ca5398c36cb0618295fc",
+        "headSha": "7c55349d62b822b2f39650d2c926a5b064e2d2a1",
+        "selectedFiles": [
+          "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts"
+        ],
+        "collectedAt": "2026-03-08T04:09:37.199Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-module-federation-core-4476",
+      "description": "module-federation/core#4476: refactor: remove remote ip strategy feature",
+      "source": {
+        "kind": "github-pr",
+        "repository": "module-federation/core",
+        "prNumber": 4476,
+        "prUrl": "https://github.com/module-federation/core/pull/4476",
+        "baseSha": "befc21c138e8cd1f06ef35af311e5bfc8633864a",
+        "headSha": "25d05dc3c6a8ef67245f47fb5e4fbb42da20cae4",
+        "selectedFiles": [
+          "packages/modernjs-v3/src/cli/index.ts"
+        ],
+        "collectedAt": "2026-03-08T04:10:39.649Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-15125",
+      "description": "mui/material-ui#15125: [docs] SimplePortal example using Hooks",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 15125,
+        "prUrl": "https://github.com/mui/material-ui/pull/15125",
+        "baseSha": "cc429dec23f73ed8dde0468890b3238f533c9f17",
+        "headSha": "18c94ce1b6161795aa3b519346cf14604ba2dffc",
+        "selectedFiles": [
+          "docs/src/pages/utils/portal/SimplePortal.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:43:04.819Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-15399",
+      "description": "mui/material-ui#15399: [Portal] Migrate to React hooks",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 15399,
+        "prUrl": "https://github.com/mui/material-ui/pull/15399",
+        "baseSha": "7869aac11e9d4b2dc9bdd450cb890f58119409cf",
+        "headSha": "85602822d521a639432af2c893030cc372afbcb9",
+        "selectedFiles": [
+          "docs/src/pages/demos/progress/CircularIntegration.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:42:57.698Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-25020",
+      "description": "mui/material-ui#25020: [internal] More cleanup on Pickers code",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 25020,
+        "prUrl": "https://github.com/mui/material-ui/pull/25020",
+        "baseSha": "0c4481fb3056c018dfd9d9604c9df01a8b60fe13",
+        "headSha": "ef87ec0733b21772aeb5f491a8d0ffbe02ec49ec",
+        "selectedFiles": [
+          "packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:40:01.742Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-30338",
+      "description": "mui/material-ui#30338: [internal] Rename missed `Material-UI` text to `MUI` in warning logs",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 30338,
+        "prUrl": "https://github.com/mui/material-ui/pull/30338",
+        "baseSha": "fc8a9d39ab3131aae97bbb081922e84a485b3edd",
+        "headSha": "8c20fa6a4895085d8fefb426834e66766add7eb0",
+        "selectedFiles": [
+          "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:40:54.179Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-36400",
+      "description": "mui/material-ui#36400: [base] Refactor the compound components building blocks",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 36400,
+        "prUrl": "https://github.com/mui/material-ui/pull/36400",
+        "baseSha": "e05f16c4c5070a69abaa143d513a1f831f8dbfb9",
+        "headSha": "6070647410ddf11eeedeffe98948c12889d08b43",
+        "selectedFiles": [
+          "packages/mui-base/src/useButton/useButton.ts"
+        ],
+        "collectedAt": "2026-03-08T03:39:27.293Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-37034",
+      "description": "mui/material-ui#37034: [internal] Allow type alias as well in hooks API docs generation",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 37034,
+        "prUrl": "https://github.com/mui/material-ui/pull/37034",
+        "baseSha": "fe90fe90b28bf357bec47eaf9641d6bc3a862bd1",
+        "headSha": "9c12b4c9286c60d9b7a80511b40a9bfe32bc0116",
+        "selectedFiles": [
+          "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts"
+        ],
+        "collectedAt": "2026-03-08T03:42:34.060Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-37801",
+      "description": "mui/material-ui#37801: [docs] Rename product to productId",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 37801,
+        "prUrl": "https://github.com/mui/material-ui/pull/37801",
+        "baseSha": "08d33a4734728f6cd8c7e9bfbf9259ac63a1fffa",
+        "headSha": "62542f93f11fe37a0e97ae43b4d5dfaba66b10c1",
+        "selectedFiles": [
+          "docs/src/modules/sandbox/CodeSandbox.ts"
+        ],
+        "collectedAt": "2026-03-08T03:41:30.234Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-42833",
+      "description": "mui/material-ui#42833: [code-infra] Cleanup `@mui/docs` usage and legacy re-exports",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 42833,
+        "prUrl": "https://github.com/mui/material-ui/pull/42833",
+        "baseSha": "48cac390050585326d9259fc902fc7bc419da419",
+        "headSha": "4583bc0aa91c6f535729813046a0f144f1c3b8c2",
+        "selectedFiles": [
+          "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:40:33.403Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-43276",
+      "description": "mui/material-ui#43276: [material-ui][mui-system] Refactor types so they're compatible with upcoming React 19",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 43276,
+        "prUrl": "https://github.com/mui/material-ui/pull/43276",
+        "baseSha": "d9d0a37d6e11b83b3fefa716915cb1161a7a91db",
+        "headSha": "0254d0a46215661eb90ec299598da2d8b776c2da",
+        "selectedFiles": [
+          "docs/data/material/components/progress/CircularIntegration.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:39:50.144Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-43828",
+      "description": "mui/material-ui#43828: [core][Drawer] Refactor getScrollbarSize usages",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 43828,
+        "prUrl": "https://github.com/mui/material-ui/pull/43828",
+        "baseSha": "43c14e038a0ac5c92e58b760b43ebac3fe28b028",
+        "headSha": "3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+        "selectedFiles": [
+          "packages/mui-base/src/unstable_useModal/ModalManager.ts"
+        ],
+        "collectedAt": "2026-03-08T03:39:34.894Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-44704",
+      "description": "mui/material-ui#44704: [internal] React 19 useRef cleanup",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 44704,
+        "prUrl": "https://github.com/mui/material-ui/pull/44704",
+        "baseSha": "6381e29960319605e0d7c24a42108f9128098ae2",
+        "headSha": "e60317412516a673933de8f44efdb168431b2827",
+        "selectedFiles": [
+          "docs/data/joy/components/button-group/SplitButton.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:40:21.681Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-45060",
+      "description": "mui/material-ui#45060: [docs] Rename \"Base UI\" to \"MUI Base\" in all text",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 45060,
+        "prUrl": "https://github.com/mui/material-ui/pull/45060",
+        "baseSha": "33ce030f2bfeddce914a96899c542c34f567b00b",
+        "headSha": "44cd84340ee8c6165b2a1ba0c416a08ca5e82183",
+        "selectedFiles": [
+          "docs/src/components/productBaseUI/MuiBaseDeprecation.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:41:20.217Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-46967",
+      "description": "mui/material-ui#46967: [internal] Refactor `useForkRef` TS types: tighten `cleanupRef` and simplify ref typing",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 46967,
+        "prUrl": "https://github.com/mui/material-ui/pull/46967",
+        "baseSha": "02f0caa49747867d7c5c384a1c72088e54f1aaf9",
+        "headSha": "b3e0cb3f49e1e6acae45ca7ef9539d6d9ae95862",
+        "selectedFiles": [
+          "packages/mui-utils/src/useForkRef/useForkRef.ts"
+        ],
+        "collectedAt": "2026-03-08T03:39:17.819Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-47634",
+      "description": "mui/material-ui#47634: [website] Fix unclickable banner in the pricing page",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 47634,
+        "prUrl": "https://github.com/mui/material-ui/pull/47634",
+        "baseSha": "c2df49d944ea091e83636d28d484a4394bd0ed92",
+        "headSha": "3ac3dcc80b3720c0e80428247bb4cb52d8703719",
+        "selectedFiles": [
+          "docs/src/components/pricing/PricingTable.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:37:55.978Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-47685",
+      "description": "mui/material-ui#47685: [code-infra] Upgrade react-docgen to v8",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 47685,
+        "prUrl": "https://github.com/mui/material-ui/pull/47685",
+        "baseSha": "0081c48dff63278c95939d223461e0f754ecf39a",
+        "headSha": "9da3f78ced31d67ff902d353be252fa8af43de93",
+        "selectedFiles": [
+          "packages/mui-joy/src/Menu/MenuProps.ts"
+        ],
+        "collectedAt": "2026-03-08T03:43:35.878Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-47702",
+      "description": "mui/material-ui#47702: [code-infra] eslint rule rename",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 47702,
+        "prUrl": "https://github.com/mui/material-ui/pull/47702",
+        "baseSha": "dbd4d56935c578c8c714a1e95b8e3153327e633a",
+        "headSha": "4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+        "selectedFiles": [
+          "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:41:11.537Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-material-ui-47708",
+      "description": "mui/material-ui#47708: Bump react monorepo",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/material-ui",
+        "prNumber": 47708,
+        "prUrl": "https://github.com/mui/material-ui/pull/47708",
+        "baseSha": "e0a971ab71d0f870354c1eb17ea029e34f355ffa",
+        "headSha": "626b26abd0767e74aadfdb195aad38f42d99006c",
+        "selectedFiles": [
+          "docs/data/joy/getting-started/templates/sign-in-side/App.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:43:50.811Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-11749",
+      "description": "mui/mui-x#11749: [internal] Cleanup script and alias setup",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 11749,
+        "prUrl": "https://github.com/mui/mui-x/pull/11749",
+        "baseSha": "447ab5fe897deeae6426bd0c67be68cfdf5bdd7e",
+        "headSha": "6e146cadba5f6b1886d1a65bba97ac4562cc17fb",
+        "selectedFiles": [
+          "docs/scripts/generateProptypes.ts"
+        ],
+        "collectedAt": "2026-03-08T03:48:34.641Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-11944",
+      "description": "mui/mui-x#11944: [internal] Fix `test_types` failing on the `next` branch",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 11944,
+        "prUrl": "https://github.com/mui/mui-x/pull/11944",
+        "baseSha": "cc20ad95b43e7b8a8cf29418fac12f151744bf18",
+        "headSha": "f97bdc9811d43095a1fb2c10b569a3c06583c34c",
+        "selectedFiles": [
+          "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:50:47.154Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-12991",
+      "description": "mui/mui-x#12991: [internal] Prepare React 19",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 12991,
+        "prUrl": "https://github.com/mui/mui-x/pull/12991",
+        "baseSha": "7fe71c7775ca59d1f588569edef4e49823199429",
+        "headSha": "35096542fcff5b6344b458769ebc7fe2439ab4da",
+        "selectedFiles": [
+          "packages/x-data-grid-pro/src/tests/rowEditing.DataGridPro.test.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:54:02.735Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-13130",
+      "description": "mui/mui-x#13130: [internal] Refactor ESLint config to disallow root level imports",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 13130,
+        "prUrl": "https://github.com/mui/mui-x/pull/13130",
+        "baseSha": "0a2d34ea4add069f7eeba6d6e8dfe8a9941096f5",
+        "headSha": "78e7fe113dd3c0820b26f380bad9a5e58438e858",
+        "selectedFiles": [
+          "docs/data/date-pickers/base-concepts/ComponentExplorerNoSnap.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:47:22.698Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-1552",
+      "description": "mui/mui-x#1552: [internal] Simplify component type",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 1552,
+        "prUrl": "https://github.com/mui/mui-x/pull/1552",
+        "baseSha": "00526d79d3cba481021afefe2a2a57591aa9283a",
+        "headSha": "afcd4f123a1a8949f92665d56cddcd79d112a6b0",
+        "selectedFiles": [
+          "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:51:53.728Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-16686",
+      "description": "mui/mui-x#16686: [charts] Migrate `ChartsUsageDemo` to TSX and removed NoSnap",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 16686,
+        "prUrl": "https://github.com/mui/mui-x/pull/16686",
+        "baseSha": "3c5c6b89eb661b31ab1e2aa6565d535aee3ea145",
+        "headSha": "c2d327e4652cffb212d3aaffdc41eb5c427625e7",
+        "selectedFiles": [
+          "docs/data/charts/axis/FormatterDemo.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:54:44.539Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-18995",
+      "description": "mui/mui-x#18995: [internal] Refactor virtualizer API",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 18995,
+        "prUrl": "https://github.com/mui/mui-x/pull/18995",
+        "baseSha": "cdea24113374837a706a5feb18d190bf512f3d71",
+        "headSha": "88c2f692cf1d62c8f6c2a5d44471fc68d53cec1e",
+        "selectedFiles": [
+          "packages/x-data-grid/src/hooks/core/useGridStateInitialization.ts"
+        ],
+        "collectedAt": "2026-03-08T03:47:38.870Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-mui-mui-x-19595",
+      "description": "mui/mui-x#19595: [code-infra] Load `tsx` files in visual regression",
+      "source": {
+        "kind": "github-pr",
+        "repository": "mui/mui-x",
+        "prNumber": 19595,
+        "prUrl": "https://github.com/mui/mui-x/pull/19595",
+        "baseSha": "18345033c8935e6feeaaef0558686014a54c4bbb",
+        "headSha": "0c4ab6de5fafcc22fe06e832b5353dc0407beb28",
+        "selectedFiles": [
+          "test/regressions/charts/XAxisTickLabelOverflow.tsx"
+        ],
+        "collectedAt": "2026-03-08T03:54:27.022Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    }
+  ]
+}

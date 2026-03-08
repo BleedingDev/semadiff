@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-3973",
+  "language": "tsx",
+  "kind": "real",
+  "description": "module-federation/core#3973: fix(bridge-react): Add loading in root component to avoid CLS problem",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3973,
+    "prUrl": "https://github.com/module-federation/core/pull/3973",
+    "baseSha": "67a7bfa5def8cea4339eb92b30734d7c4943dc33",
+    "headSha": "fcd6480fe4807614e6d5809d0af3e2ffb9308657",
+    "selectedFiles": [
+      "packages/bridge/bridge-react/src/remote/create.tsx"
+    ],
+    "collectedAt": "2026-03-08T04:14:03.049Z"
+  },
+  "files": [
+    {
+      "id": "packages/bridge/bridge-react/src/remote/create.tsx",
+      "oldPath": "packages/bridge/bridge-react/src/remote/create.tsx",
+      "newPath": "packages/bridge/bridge-react/src/remote/create.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/bridge/bridge-react/src/remote/create.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 47,
+          "endLine": 47
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "7c23fd72556d67522e719d569691b94570e11642",
+    "filename": "packages/toolkit/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/d83b6d819ccb78c3f9088c771121b77586058609/packages%2Ftoolkit%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/d83b6d819ccb78c3f9088c771121b77586058609/packages%2Ftoolkit%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Findex.ts?ref=d83b6d819ccb78c3f9088c771121b77586058609",
+    "patch": "@@ -10,7 +10,7 @@ export {\n   original,\n   isDraft,\n } from 'immer'\n-export type { Draft } from 'immer'\n+export type { Draft, WritableDraft } from 'immer'\n export {\n   createSelector,\n   createSelectorCreator,"
+  }
+]

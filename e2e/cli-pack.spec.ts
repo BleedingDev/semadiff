@@ -31,6 +31,7 @@ test("packed CLI artifact can run a real diff", () => {
   const packages = [
     "@semadiff/cli",
     "@semadiff/core",
+    "@semadiff/entity-core",
     "@semadiff/pr-backend",
     "@semadiff/parsers",
     "@semadiff/parser-lightningcss",
@@ -114,5 +115,25 @@ test("packed CLI artifact can run a real diff", () => {
       { cwd: consumerDir, encoding: "utf8" }
     );
     expect(diffOutput.length).toBeGreaterThan(0);
+
+    const hybridOutput = execFileSync(
+      runtime.binary,
+      [
+        cliEntry,
+        "diff",
+        "--format",
+        "json",
+        "--experimental-hybrid",
+        oldFile,
+        newFile,
+      ],
+      { cwd: consumerDir, encoding: "utf8" }
+    );
+    const hybridJson = decodeJson<{
+      diff?: { operations?: unknown[] };
+      entities?: { changes?: unknown[] };
+    }>(hybridOutput);
+    expect(Array.isArray(hybridJson.diff?.operations)).toBe(true);
+    expect(Array.isArray(hybridJson.entities?.changes)).toBe(true);
   }
 });

@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-43276",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#43276: [material-ui][mui-system] Refactor types so they're compatible with upcoming React 19",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 43276,
+    "prUrl": "https://github.com/mui/material-ui/pull/43276",
+    "baseSha": "d9d0a37d6e11b83b3fefa716915cb1161a7a91db",
+    "headSha": "0254d0a46215661eb90ec299598da2d8b776c2da",
+    "selectedFiles": [
+      "docs/data/material/components/progress/CircularIntegration.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:39:50.144Z"
+  },
+  "files": [
+    {
+      "id": "docs/data/material/components/progress/CircularIntegration.tsx",
+      "oldPath": "docs/data/material/components/progress/CircularIntegration.tsx",
+      "newPath": "docs/data/material/components/progress/CircularIntegration.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/data/material/components/progress/CircularIntegration.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 13
+        },
+        "newRange": {
+          "startLine": 13,
+          "endLine": 13
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,2029 @@
+diff --git a/.eslintrc.js b/.eslintrc.js
+index b713ca81aa0d62..9560ab5032ba54 100644
+--- a/.eslintrc.js
++++ b/.eslintrc.js
+@@ -343,6 +343,7 @@ module.exports = /** @type {Config} */ ({
+             patterns: NO_RESTRICTED_IMPORTS_PATTERNS_DEEPLY_NESTED,
+           },
+         ],
++        'no-irregular-whitespace': ['error', { skipJSXText: true, skipStrings: true }],
+       },
+     },
+     {
+@@ -519,6 +520,7 @@ module.exports = /** @type {Config} */ ({
+         'import/no-default-export': 'error',
+         'import/prefer-default-export': 'off',
+         'react-compiler/react-compiler': 'off',
++        'no-irregular-whitespace': ['error', { skipComments: true }],
+       },
+     },
+     {
+@@ -544,6 +546,7 @@ module.exports = /** @type {Config} */ ({
+         // Reset the default until https://github.com/jsx-eslint/eslint-plugin-react/issues/3672 is fixed.
+         'react/jsx-no-target-blank': ['error', { allowReferrer: false }],
+         'react/prop-types': 'off',
++        'no-irregular-whitespace': ['error', { skipJSXText: true, skipStrings: true }],
+       },
+     },
+     {
+diff --git a/CHANGELOG.old.md b/CHANGELOG.old.md
+index e6c33fcc2fe53c..a8ad16b0f31721 100644
+--- a/CHANGELOG.old.md
++++ b/CHANGELOG.old.md
+@@ -3151,7 +3151,7 @@ A big thanks to the 12 contributors who made this release possible. Here are som
+ - [docs][base] Remove usage of `component` prop in docs (#37462) @sai6855
+ - [docs] Fix docs redirections @oliviertassinari
+ - [docs] Fix Fluent -> Fluent UI @oliviertassinari
+-- [docs] Fix MUI Base -> Base UI @oliviertassinari
++- [docs] Fix MUI Base -> Base UI @oliviertassinari
+ - [docs] Add base-vite-tailwind example repo (#36994) @mj12albert
+ - [docs] Fix search bar layout shift (#37460) @oliviertassinari
+ - [docs] Tweak Material UI's "Showcase" page design (#37259) @danilo-leal
+@@ -3366,7 +3366,7 @@ A big thanks to the 18 contributors who made this release possible. Here are som
+ 
+ ### Core
+ 
+-- [blog] Fix images using "MUI Base" instead of "Base UI" (#37044) @danilo-leal
++- [blog] Fix images using "MUI Base" instead of "Base UI" (#37044) @danilo-leal
+ - [core] Add VS Code extensions recommendations (#37166) @michaldudak
+ - [test] `e2e-website` related minor fixes (#37204) @ZeeshanTamboli
+ 
+@@ -3671,7 +3671,7 @@ A big thanks to the 9 contributors who made this release possible. Here are some
+ ### Core
+ 
+ - [core] Increase margin to scroll @oliviertassinari
+-- [core] Replace MUI Base with Base UI (#36716) @mnajdova
++- [core] Replace MUI Base with Base UI (#36716) @mnajdova
+ 
+ All contributors of this release in alphabetical order: @alirezahekmati, @danilo-leal, @hbjORbj, @Lioness100, @mnajdova, @oliviertassinari, @sai6855, @siriwatknp, @ZeeshanTamboli
+ 
+@@ -3711,7 +3711,7 @@ A big thanks to the 17 contributors who made this release possible. Here are som
+ - [docs][base] Move styles to the bottom of demos code for `Menu` (#36582) @gitstart
+ - [docs][base] Move styles code to bottom in the `Button` demos (#36590) @sai6855
+ - [docs][base] Show components & hooks API on the components page (#35938) @mnajdova
+-- [docs] Describe slotProps in MUI Base customization doc (#36206) @michaldudak
++- [docs] Describe slotProps in MUI Base customization doc (#36206) @michaldudak
+ - [docs] Fix double API page redirection (#36743) @oliviertassinari
+ - [docs] Remove hash property and leverage pathname (#36764) @siriwatknp
+ - [docs] Introduce markdown permalink to source (#36729) @oliviertassinari
+diff --git a/docs/README.md b/docs/README.md
+index 309763c7392c32..e564a475ff68fe 100644
+--- a/docs/README.md
++++ b/docs/README.md
+@@ -1,6 +1,6 @@
+ # Docs
+ 
+-This is the website of the company (MUI), the documentation of Material UI, Base UI, MUI System, and Joy UI.
++This is the website of the company (MUI), the documentation of Material UI, MUI Base, MUI System, and Joy UI.
+ 
+ To start the docs site in development mode, from the project root, run:
+ 
+diff --git a/docs/data/base/all-components/all-components.md b/docs/data/base/all-components/all-components.md
+index 99c56c2df357e6..9337626c4209f1 100644
+--- a/docs/data/base/all-components/all-components.md
++++ b/docs/data/base/all-components/all-components.md
+@@ -1,5 +1,5 @@
+-# Base UI components
++# MUI Base components
+ 
+-<p class="description">Every Base UI component available so far, sorted alphabetically.</p>
++<p class="description">Every MUI Base component available so far, sorted alphabetically.</p>
+ 
+ {{"component": "modules/components/BaseUIComponents.js"}}
+diff --git a/docs/data/base/components/autocomplete/autocomplete.md b/docs/data/base/components/autocomplete/autocomplete.md
+index 27a444d18a48aa..bd078c74054ae2 100644
+--- a/docs/data/base/components/autocomplete/autocomplete.md
++++ b/docs/data/base/components/autocomplete/autocomplete.md
+@@ -18,7 +18,7 @@ waiAria: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
+ 
+ An autocomplete component is an enhanced text input that shows a list of suggested options as users type and lets them select an option from the list.
+ 
+-Base UI provides the `useAutocomplete` hook for building a custom Autocomplete.
++MUI Base provides the `useAutocomplete` hook for building a custom Autocomplete.
+ It implements the WAI-ARIA Combobox pattern and is typically used to assist users in completing form inputs or search queries faster.
+ 
+ {{"demo": "AutocompleteIntroduction", "defaultCodeOpen": false, "bg": "gradient"}}
+@@ -102,9 +102,9 @@ Learn more about controlled and uncontrolled components in the [React documentat
+ 
+ React Portals can be used to render the listbox outside of the DOM hierarchy, making it easier to allow it to "float" above adjacent elements.
+ 
+-Base UI provides a [Popper](/base-ui/react-popper/) component built around React's `createPortal()` for exactly this purpose, and additionally helps you manage keyboard focus as it moves in and out of the portal.
++MUI Base provides a [Popper](/base-ui/react-popper/) component built around React's `createPortal()` for exactly this purpose, and additionally helps you manage keyboard focus as it moves in and out of the portal.
+ 
+-To render the listbox in Base UI's Popper, the `ref`s must be merged as follows:
++To render the listbox in MUI Base's Popper, the `ref`s must be merged as follows:
+ 
+ ```jsx
+ import { useAutocomplete } from '@mui/base/useAutocomplete';
+diff --git a/docs/data/base/components/button/button.md b/docs/data/base/components/button/button.md
+index 13b27adfd84093..966c86d2d8fd32 100644
+--- a/docs/data/base/components/button/button.md
++++ b/docs/data/base/components/button/button.md
+@@ -127,7 +127,7 @@ You can even use SVGs, as shown in the demo below:
+ 
+ ### Using with links
+ 
+-The following demo illustrates how to use the Button as a link, whether using the Base UI Button itself for the `href`, or with the [Next.js Link component](https://nextjs.org/docs/pages/api-reference/components/link):
++The following demo illustrates how to use the Button as a link, whether using the MUI Base Button itself for the `href`, or with the [Next.js Link component](https://nextjs.org/docs/pages/api-reference/components/link):
+ 
+ {{"demo": "UnstyledLinkButton.js", "defaultCodeOpen": true}}
+ 
+@@ -142,7 +142,7 @@ Instead, `aria-disabled` is used, which makes the Button focusable.
+ 
+ This should be used whenever the disabled Button needs to be read by screen readers.
+ 
+-Base UI uses this prop internally in [menu items](/base-ui/react-menu/), making it possible to use the keyboard to navigate to disabled items (in compliance with [ARIA guidelines](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols)).
++MUI Base uses this prop internally in [menu items](/base-ui/react-menu/), making it possible to use the keyboard to navigate to disabled items (in compliance with [ARIA guidelines](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols)).
+ 
+ The following demo shows how the `focusableWhenDisabled` prop works—use the <kbd class="key">Tab</kbd> key to navigate within this document to see that only the second Button accepts the focus:
+ 
+diff --git a/docs/data/base/components/drawer/drawer.md b/docs/data/base/components/drawer/drawer.md
+index 706e22f6ea8923..9add0473f583fa 100644
+--- a/docs/data/base/components/drawer/drawer.md
++++ b/docs/data/base/components/drawer/drawer.md
+@@ -9,5 +9,5 @@ githubLabel: 'component: drawer'
+ <p class="description">Navigation drawers (also known as sidebars) provide ergonomic access to different destinations without taking the user out of context.</p>
+ 
+ :::error
+-@mui/base has been deprecated and replaced by Base UI. Please follow [this GitHub issue](https://github.com/mui/base-ui/issues/38) to track the development of the Drawer component.
++@mui/base has been deprecated and replaced by MUI Base. Please follow [this GitHub issue](https://github.com/mui/base-ui/issues/38) to track the development of the Drawer component.
+ :::
+diff --git a/docs/data/base/components/menu/menu.md b/docs/data/base/components/menu/menu.md
+index 9fa66e0a2970a8..bc4c8af92c4285 100644
+--- a/docs/data/base/components/menu/menu.md
++++ b/docs/data/base/components/menu/menu.md
+@@ -19,7 +19,7 @@ newName: Menu
+ 
+ ## Introduction
+ 
+-The Base UI Dropdown Menu is implemented using a collection of related components:
++The MUI Base Dropdown Menu is implemented using a collection of related components:
+ 
+ - Dropdown - The outermost container that houses all Menu components.
+ - Menu Button - The button that toggles the visibility of the Menu.
+diff --git a/docs/data/base/components/number-input/number-input.md b/docs/data/base/components/number-input/number-input.md
+index 31dee0cd174e1b..2e9baa262ebbb9 100644
+--- a/docs/data/base/components/number-input/number-input.md
++++ b/docs/data/base/components/number-input/number-input.md
+@@ -19,7 +19,7 @@ newName: Number Field
+ ## Introduction
+ 
+ A number input is a UI element that accepts numeric values from the user.
+-Base UI's Number Input component is a customizable replacement for the native HTML `<input type="number">` that solves common usability issues of its native counterpart, such as:
++MUI Base's Number Input component is a customizable replacement for the native HTML `<input type="number">` that solves common usability issues of its native counterpart, such as:
+ 
+ - Inconsistencies across browsers in the appearance and behavior of the stepper buttons
+ - Allowing certain non-numeric characters ('e', '+', '-', '.') and silently discarding others
+@@ -43,7 +43,7 @@ The following demo shows how to create a Number Input component, apply some styl
+ 
+ ### Anatomy
+ 
+-The Base UI Number Input component consists of four slots:
++The MUI Base Number Input component consists of four slots:
+ 
+ - `root`: an outer `<div>` containing the other interior slots
+ - `input`: an `<input>` element
+diff --git a/docs/data/base/components/pagination/pagination.md b/docs/data/base/components/pagination/pagination.md
+index 9bf008e2c917ea..425a6a7e550039 100644
+--- a/docs/data/base/components/pagination/pagination.md
++++ b/docs/data/base/components/pagination/pagination.md
+@@ -9,5 +9,5 @@ githubLabel: 'component: Pagination'
+ <p class="description">The Pagination component lets the user select a specific page from a range of pages.</p>
+ 
+ :::error
+-@mui/base has been deprecated and replaced by Base UI. Please follow [this GitHub issue](https://github.com/mui/base-ui/issues/29) to track the development of the Pagination component.
++@mui/base has been deprecated and replaced by MUI Base. Please follow [this GitHub issue](https://github.com/mui/base-ui/issues/29) to track the development of the Pagination component.
+ :::
+diff --git a/docs/data/base/components/popper/popper.md b/docs/data/base/components/popper/popper.md
+index cbdafd8cf160b0..ffc71167003de2 100644
+--- a/docs/data/base/components/popper/popper.md
++++ b/docs/data/base/components/popper/popper.md
+@@ -25,7 +25,7 @@ It relies on the third-party library ([Popper.js v2](https://popper.js.org/docs/
+ The Popper.js library is no longer maintained.
+ It has been replaced by a new library: [Floating UI](https://floating-ui.com/).
+ 
+-Base UI offers the [Popup](/base-ui/react-popup/) component based on this new library.
++MUI Base offers the [Popup](/base-ui/react-popup/) component based on this new library.
+ It has features and an API similar to the Popper component, but is still in development and its API may change.
+ 
+ Once the [Popup](/base-ui/react-popup/) is stable, we will deprecate and, later, remove our Popper component.
+diff --git a/docs/data/base/components/popup/popup.md b/docs/data/base/components/popup/popup.md
+index 55ffd5c5f6bb8d..f2011dad29eb4b 100644
+--- a/docs/data/base/components/popup/popup.md
++++ b/docs/data/base/components/popup/popup.md
+@@ -24,7 +24,7 @@ It relies on the third-party [Floating UI](https://floating-ui.com/) library for
+ {{"demo": "UnstyledPopupIntroduction", "defaultCodeOpen": false, "bg": "gradient"}}
+ 
+ :::info
+-The Popup component, once stable, is intended to replace the [Popper](/base-ui/react-popper/) component, which will be phased out in a future release of Base UI.
++The Popup component, once stable, is intended to replace the [Popper](/base-ui/react-popper/) component, which will be phased out in a future release of MUI Base.
+ :::
+ 
+ ## Component
+@@ -63,7 +63,7 @@ Try changing this value to `top` in the interactive demo below to see how it wor
+ ### Transitions
+ 
+ You can animate the opening and closing of the Popup using CSS transitions, CSS animations, or third-party animation libraries.
+-It supports the API described on the [Base UI Transitions](/base-ui/react-transitions/) page.
++It supports the API described on the [MUI Base Transitions](/base-ui/react-transitions/) page.
+ 
+ ### Disable portal
+ 
+diff --git a/docs/data/base/components/rating/rating.md b/docs/data/base/components/rating/rating.md
+index 071a2fbf4f1207..16b3aee9845836 100644
+--- a/docs/data/base/components/rating/rating.md
++++ b/docs/data/base/components/rating/rating.md
+@@ -10,5 +10,5 @@ waiAria: https://www.w3.org/WAI/tutorials/forms/custom-controls/#a-star-rating
+ <p class="description">Rating components provide users with a simple action to give feedback as well as assess the opinions of others.</p>
+ 
+ :::error
+-@mui/base has been deprecated and replaced by Base UI. Please follow [this GitHub issue](https://github.com/mui/base-ui/issues/30) to track the development of the Rating component.
++@mui/base has been deprecated and replaced by MUI Base. Please follow [this GitHub issue](https://github.com/mui/base-ui/issues/30) to track the development of the Rating component.
+ :::
+diff --git a/docs/data/base/components/select/select.md b/docs/data/base/components/select/select.md
+index 4040d5bc25a68f..f81cda39b7fdd2 100644
+--- a/docs/data/base/components/select/select.md
++++ b/docs/data/base/components/select/select.md
+@@ -21,7 +21,7 @@ newName: Select
+ 
+ A select is a UI element that gives users a list of options to choose from.
+ 
+-Base UI's Select component replaces the native HTML `<select>` tag.
++MUI Base's Select component replaces the native HTML `<select>` tag.
+ It also includes the Option component for creating the options in the list, and Option Group for grouping those options.
+ 
+ {{"demo": "UnstyledSelectIntroduction", "defaultCodeOpen": false, "bg": "gradient"}}
+@@ -95,9 +95,9 @@ The uncontrolled component accepts the `defaultValue` that can be used to set th
+ To deselect all values, pass `null` to the respective prop.
+ 
+ :::warning
+-This pattern is where Base UI's Select differs from the equivalent [Material UI component](/material-ui/react-select/).
++This pattern is where MUI Base's Select differs from the equivalent [Material UI component](/material-ui/react-select/).
+ The Material UI Select takes an empty string to deselect all values.
+-In Base UI, you must use `null` to achieve this.
++In MUI Base, you must use `null` to achieve this.
+ :::
+ 
+ ### Object values
+diff --git a/docs/data/base/components/transitions/transitions.md b/docs/data/base/components/transitions/transitions.md
+index f2a55ded2b83ec..f19ad074df70fc 100644
+--- a/docs/data/base/components/transitions/transitions.md
++++ b/docs/data/base/components/transitions/transitions.md
+@@ -13,7 +13,7 @@ hooks: useTransitionTrigger, useTransitionStateManager
+ 
+ ## Introduction
+ 
+-Base UI offers higher-level components and low-level hooks that can be used to add animations to components as they enter and exit the screen.
++MUI Base offers higher-level components and low-level hooks that can be used to add animations to components as they enter and exit the screen.
+ 
+ :::info
+ The [Popup](/base-ui/react-popup/) is currently the only component that supports this API; [Select](/base-ui/react-select/) and [Menu](/base-ui/react-menu/) support will be added next.
+@@ -21,7 +21,7 @@ The [Popup](/base-ui/react-popup/) is currently the only component that supports
+ 
+ ## Components
+ 
+-Base UI offers two components to cover the majority of use cases using [CSS transitions](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions) and [animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations).
++MUI Base offers two components to cover the majority of use cases using [CSS transitions](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_transitions/Using_CSS_transitions) and [animations](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animations/Using_CSS_animations).
+ 
+ ### CSS Transition
+ 
+@@ -74,6 +74,6 @@ You can use any of the [transitions from Material UI](/material-ui/transitions/
+ 
+ ### React Spring
+ 
+-React Spring, another popular animation library, also can be used with the Base UI transitions API.
++React Spring, another popular animation library, also can be used with the MUI Base transitions API.
+ 
+ {{"demo": "ReactSpring.js"}}
+diff --git a/docs/data/base/getting-started/accessibility/accessibility.md b/docs/data/base/getting-started/accessibility/accessibility.md
+index 077b4ec3e35aea..87f0ce460fa659 100644
+--- a/docs/data/base/getting-started/accessibility/accessibility.md
++++ b/docs/data/base/getting-started/accessibility/accessibility.md
+@@ -1,14 +1,14 @@
+ # Accessibility
+ 
+-<p class="description">Learn how to make the most of Base UI's accessibility features and guidelines.</p>
++<p class="description">Learn how to make the most of MUI Base's accessibility features and guidelines.</p>
+ 
+-Accessibility is our top priority for Base UI components.
++Accessibility is our top priority for MUI Base components.
+ However, the library cannot make your application fully accessible on its own.
+ This page highlights the most common actions that you as a developer must take to ensure that your app is accessible to users who require assistive technologies.
+ 
+ ## Keyboard navigation
+ 
+-Base UI components follow the [WAI-ARIA 1.2 standard](https://www.w3.org/TR/wai-aria-1.2/), so they are accessible with a keyboard out of the box.
++MUI Base components follow the [WAI-ARIA 1.2 standard](https://www.w3.org/TR/wai-aria-1.2/), so they are accessible with a keyboard out of the box.
+ This is important for users who have trouble using a pointing device, but also comes in handy for users who find navigating with a keyboard faster, and who expect web components to behave the same way as native operating system controls.
+ 
+ Specifically, interactive components can be focused using the <kbd class="key">Tab</kbd> key.
+@@ -19,7 +19,7 @@ The Select and Menu also let users navigate to options that begin with a provide
+ 
+ ## Focus ring
+ 
+-While Base UI components handle keyboard navigation, it's the developer's responsibility to indicate when a component is focused and can receive keyboard input.
++While MUI Base components handle keyboard navigation, it's the developer's responsibility to indicate when a component is focused and can receive keyboard input.
+ This is usually done by styling the [`:focus`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus) or [`:focus-visible`](https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible) pseudoclasses.
+ Read the [WCAG guidelines on focus appearance](https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance) to learn more about requirements for focus indicators.
+ 
+@@ -27,7 +27,7 @@ Read the [WCAG guidelines on focus appearance](https://www.w3.org/WAI/WCAG22/Und
+ 
+ ## Color contrast
+ 
+-Since Base UI components are unstyled, it's up to you to implement the appropriate amount of color contrast between text and background.
++Since MUI Base components are unstyled, it's up to you to implement the appropriate amount of color contrast between text and background.
+ You can use [C. Liam Brown's Color Contrast Tool](https://cliambrown.com/contrast/) to measure contrast between colors in your design and ensure that they meet the minimum requirements
+ (note that this tool uses the [APCA algorithm](https://ruitina.com/apca-accessible-colour-contrast/), which is slated to become the new standard in WCAG 3).
+ 
+diff --git a/docs/data/base/getting-started/customization/customization.md b/docs/data/base/getting-started/customization/customization.md
+index 59fc91b4c797ec..471fd6d2c480f8 100644
+--- a/docs/data/base/getting-started/customization/customization.md
++++ b/docs/data/base/getting-started/customization/customization.md
+@@ -1,8 +1,8 @@
+-# Customizing Base UI components
++# Customizing MUI Base components
+ 
+-<p class="description">There are several ways to customize Base UI components, from applying custom CSS rules to building fully custom components using hooks.</p>
++<p class="description">There are several ways to customize MUI Base components, from applying custom CSS rules to building fully custom components using hooks.</p>
+ 
+-With Base UI, you have the freedom to decide how much you want to customize a component's structure and style.
++With MUI Base, you have the freedom to decide how much you want to customize a component's structure and style.
+ 
+ ## Styling the components
+ 
+@@ -10,12 +10,12 @@ This section reviews several methods of customization that are available: applyi
+ 
+ ### Which option to choose?
+ 
+-The multitude of options can be overwhelming, especially if you're new to Base UI.
++The multitude of options can be overwhelming, especially if you're new to MUI Base.
+ How to decide which one to use, then?
+ 
+ The first decision to make is whether to use unstyled components or hooks.
+ Hooks are better suited for making component libraries that can be further customized.
+-For example, our own Joy UI is implemented using hooks from Base UI.
++For example, our own Joy UI is implemented using hooks from MUI Base.
+ Hooks also serve as the basis for several Material UI components, and future versions of the library will use them even more extensively.
+ 
+ If you don't need to make your component library customizable (for instance, by exposing `slotProps`), then the unstyled components may be a better option thanks to their simplicity.
+@@ -83,7 +83,7 @@ export default function Switch(props) {
+ }
+ ```
+ 
+-See our [Working with Tailwind CSS guide](/base-ui/guides/working-with-tailwind-css/) for more information about integrating Base UI and Tailwind CSS.
++See our [Working with Tailwind CSS guide](/base-ui/guides/working-with-tailwind-css/) for more information about integrating MUI Base and Tailwind CSS.
+ 
+ #### Styled components
+ 
+diff --git a/docs/data/base/getting-started/overview/overview.md b/docs/data/base/getting-started/overview/overview.md
+index 4770357341cc6e..41a383a1619052 100644
+--- a/docs/data/base/getting-started/overview/overview.md
++++ b/docs/data/base/getting-started/overview/overview.md
+@@ -2,38 +2,38 @@
+ title: Overview
+ ---
+ 
+-# Base UI - Overview
++# MUI Base - Overview
+ 
+-<p class="description">Base UI is a library of headless ("unstyled") React components and low-level hooks. You gain complete control over your app's CSS and accessibility features.</p>
++<p class="description">MUI Base is a library of headless ("unstyled") React components and low-level hooks. You gain complete control over your app's CSS and accessibility features.</p>
+ 
+ ## Introduction
+ 
+-Base UI is a library of unstyled React UI components and hooks.
++MUI Base is a library of unstyled React UI components and hooks.
+ These components were extracted from [Material UI](/material-ui/), and are now available as a standalone package.
+ They feature the same robust engineering but without implementing Material Design.
+ 
+-Base UI includes prebuilt components with production-ready functionality, along with low-level hooks for transferring that functionality to other components.
++MUI Base includes prebuilt components with production-ready functionality, along with low-level hooks for transferring that functionality to other components.
+ 
+-With Base UI, you can rapidly build on top of our foundational components using any styling solution you choose—no need to override any default style engine or theme.
++With MUI Base, you can rapidly build on top of our foundational components using any styling solution you choose—no need to override any default style engine or theme.
+ 
+ :::warning
+-Base UI's API is currently being revised; there will be no new features or components added to the current implementation.
+-Learn more about plans for Base UI in [this blog post](/blog/base-ui-2024-plans/).
++MUI Base's API is currently being revised; there will be no new features or components added to the current implementation.
++Learn more about plans for MUI Base in [this blog post](/blog/base-ui-2024-plans/).
+ :::
+ 
+-## Advantages of Base UI
++## Advantages of MUI Base
+ 
+-- **Ship faster:** Base UI gives you the foundational building blocks you need to assemble a sleek and sophisticated user interface in a fraction of the time that it would take to do it all from scratch.
+-- **You own the CSS:** unlike Material UI, which uses Emotion as a default style engine, Base UI has no built-in styling solution.
++- **Ship faster:** MUI Base gives you the foundational building blocks you need to assemble a sleek and sophisticated user interface in a fraction of the time that it would take to do it all from scratch.
++- **You own the CSS:** unlike Material UI, which uses Emotion as a default style engine, MUI Base has no built-in styling solution.
+   This means you have complete control over your app's CSS.
+-- **Accessibility:** Base UI components are built with accessibility in mind.
++- **Accessibility:** MUI Base components are built with accessibility in mind.
+   We do our best to make all components screen reader-friendly, and offer suggestions for optimizing accessibility throughout our documentation.
+ 
+-## Base UI vs. Material UI
++## MUI Base vs. Material UI
+ 
+-Base UI features many of the same components as [Material UI](/material-ui/getting-started/), but without the Material Design implementation.
++MUI Base features many of the same components as [Material UI](/material-ui/getting-started/), but without the Material Design implementation.
+ 
+-Base UI is not packaged with any default theme or built-in style engine.
++MUI Base is not packaged with any default theme or built-in style engine.
+ This makes it a great choice if you need complete control over how your app's CSS is implemented.
+ 
+-You could think of Base UI as the "skeletal" or "headless" version of Material UI—in fact, future versions of Material UI will gradually adopt these components and hooks for their foundational structure.
++You could think of MUI Base as the "skeletal" or "headless" version of Material UI—in fact, future versions of Material UI will gradually adopt these components and hooks for their foundational structure.
+diff --git a/docs/data/base/getting-started/quickstart/quickstart.md b/docs/data/base/getting-started/quickstart/quickstart.md
+index 41e248e7ad0754..c5dfcb209a1359 100644
+--- a/docs/data/base/getting-started/quickstart/quickstart.md
++++ b/docs/data/base/getting-started/quickstart/quickstart.md
+@@ -1,6 +1,6 @@
+ # Quickstart
+ 
+-<p class="description">Get started with Base UI, a library of headless ("unstyled") React UI components and low-level hooks.</p>
++<p class="description">Get started with MUI Base, a library of headless ("unstyled") React UI components and low-level hooks.</p>
+ 
+ :::info
+ If you're using Next.js 13.4 or later, check out the [Next.js App Router guide](/base-ui/guides/next-js-app-router/).
+@@ -8,7 +8,7 @@ If you're using Next.js 13.4 or later, check out the [Next.js App Router guide](
+ 
+ ## Installation
+ 
+-`@mui/base` is completely standalone – run one of the following commands to add Base UI to your React project:
++`@mui/base` is completely standalone – run one of the following commands to add MUI Base to your React project:
+ 
+ <codeblock storageKey="package-manager">
+ 
+@@ -30,7 +30,7 @@ yarn add @mui/base
+ 
+ <!-- #react-peer-version -->
+ 
+-Please note that [react](https://www.npmjs.com/package/react) and [react-dom](https://www.npmjs.com/package/react-dom) are peer dependencies, meaning you should ensure they are installed before installing Base UI.
++Please note that [react](https://www.npmjs.com/package/react) and [react-dom](https://www.npmjs.com/package/react-dom) are peer dependencies, meaning you should ensure they are installed before installing MUI Base.
+ 
+ ```json
+ "peerDependencies": {
+@@ -41,13 +41,13 @@ Please note that [react](https://www.npmjs.com/package/react) and [react-dom](ht
+ 
+ ## Implementing a Button
+ 
+-This is a quick tutorial that goes through the basics of using and styling Base UI components by replicating a button from GitHub's UI, using their [Primer design system](https://primer.style/components/button/) as a reference.
++This is a quick tutorial that goes through the basics of using and styling MUI Base components by replicating a button from GitHub's UI, using their [Primer design system](https://primer.style/components/button/) as a reference.
+ 
+ {{"demo": "Tutorial.js", "defaultCodeOpen": false, "hideToolbar": true}}
+ 
+ ### Components and hooks
+ 
+-Base UI provides a `<Button />` component and a `useButton` hook.
++MUI Base provides a `<Button />` component and a `useButton` hook.
+ Both can be used to build a button, and each has its own benefits and trade-offs—see [Components vs. hooks](/base-ui/getting-started/usage/#components-vs-hooks) for details.
+ 
+ The code snippets below demonstrate the basic implementation of each:
+@@ -79,7 +79,7 @@ export default function App() {
+ }
+ ```
+ 
+-Base UI comes with no styles or styling solution—here's what the Button component looks like out of the box:
++MUI Base comes with no styles or styling solution—here's what the Button component looks like out of the box:
+ 
+ {{"demo": "BaseButton.js", "defaultCodeOpen": false}}
+ 
+@@ -106,7 +106,7 @@ Pass a `className` prop and use it as a styling hook:
+ <Button className="btn">Create Repository</Button>
+ ```
+ 
+-Base UI components like the Button come with a classes object (for example `buttonClasses`) that provides class hooks for styling a particular state.
++MUI Base components like the Button come with a classes object (for example `buttonClasses`) that provides class hooks for styling a particular state.
+ 
+ ```css
+ /* To style the disabled state: */
+@@ -116,7 +116,7 @@ Base UI components like the Button come with a classes object (for example `but
+ }
+ ```
+ 
+-The demo below shows how to create the Primer button using plain CSS with Base UI's Button component and `useButton` hook:
++The demo below shows how to create the Primer button using plain CSS with MUI Base's Button component and `useButton` hook:
+ 
+ {{"demo": "BaseButtonPlainCss.js", "defaultCodeOpen": false}}
+ 
+@@ -169,7 +169,7 @@ export default function App() {
+ 
+ ```
+ 
+-Most of the demos in the Base UI docs are styled with MUI System in this way.
++Most of the demos in the MUI Base docs are styled with MUI System in this way.
+ You can inspect the `theme` object used on this site in your browser console, or explore the default structure in the Material UI [Default theme](/material-ui/customization/default-theme/) documentation.
+ 
+ The demos below show how to create the Primer button using MUI System:
+diff --git a/docs/data/base/getting-started/roadmap/roadmap.md b/docs/data/base/getting-started/roadmap/roadmap.md
+index 0b138cb782ef44..6e6dc5e7eee033 100644
+--- a/docs/data/base/getting-started/roadmap/roadmap.md
++++ b/docs/data/base/getting-started/roadmap/roadmap.md
+@@ -1,22 +1,22 @@
+ # Roadmap
+ 
+-<p class="description">Keep up with ongoing projects and help shape the future of Base UI.</p>
++<p class="description">Keep up with ongoing projects and help shape the future of MUI Base.</p>
+ 
+ ## How we prioritize
+ 
+-Base UI is a community-driven project, meaning we usually pick the issues and suggestions that resonate the most with the community.
++MUI Base is a community-driven project, meaning we usually pick the issues and suggestions that resonate the most with the community.
+ Therefore, make sure to leave an upvote 👍 on [the GitHub issues](https://github.com/mui/base-ui/issues) you are most interested in.
+ 
+-Additionally, we conduct annual [developer surveys](/blog/?tags=Developer+survey/) which also serve as key inputs for Base UI's roadmap.
++Additionally, we conduct annual [developer surveys](/blog/?tags=Developer+survey/) which also serve as key inputs for MUI Base's roadmap.
+ Your participation is invaluable—keep an eye on MUI's social media to catch the next survey and help shape the future of the library!
+ 
+ ## Keeping track of the roadmap
+ 
+ ### GitHub project
+ 
+-The Base UI GitHub project is where you can see the ongoing priorities for the library.
++The MUI Base GitHub project is where you can see the ongoing priorities for the library.
+ We typically add umbrella issues to the project board after discussing them internally.
+ 
+-**[Visit the Base UI project board 👉](https://github.com/orgs/mui/projects/1/views/13)**
++**[Visit the MUI Base project board 👉](https://github.com/orgs/mui/projects/1/views/13)**
+ 
+-<img src="/static/base-ui/roadmap/github-roadmap.png" style="width: 814px;" alt="A screenshot of the public Base UI GitHub project." width="1628" height="400" />
++<img src="/static/base-ui/roadmap/github-roadmap.png" style="width: 814px;" alt="A screenshot of the public MUI Base GitHub project." width="1628" height="400" />
+diff --git a/docs/data/base/getting-started/support/support.md b/docs/data/base/getting-started/support/support.md
+index 670459dde18eca..7565e1fcce7228 100644
+--- a/docs/data/base/getting-started/support/support.md
++++ b/docs/data/base/getting-started/support/support.md
+@@ -1,6 +1,6 @@
+ # Support
+ 
+-<p class="description">Learn how to get support for Base UI components, including feature requests, bug fixes, and technical support from the team.</p>
++<p class="description">Learn how to get support for MUI Base components, including feature requests, bug fixes, and technical support from the team.</p>
+ 
+ ## GitHub
+ 
+@@ -10,7 +10,7 @@ If you think you've found a bug, or you have a new feature idea:
+ 
+ 1. Please start by [making sure it hasn't already been reported or fixed](https://github.com/mui/base-ui/issues?q=is%3Aopen+is%3Aclosed).
+    You can search through existing issues and pull requests to see if someone has reported one similar to yours.
+-2. Then, if no duplicates exist, [open an issue](https://github.com/mui/base-ui/issues/new/choose) in the Base UI repository.
++2. Then, if no duplicates exist, [open an issue](https://github.com/mui/base-ui/issues/new/choose) in the MUI Base repository.
+ 
+ ### New issue guidelines
+ 
+@@ -46,7 +46,7 @@ You can use a starter React template to build a reproduction case with [JavaScri
+ 
+ ## Stack Overflow
+ 
+-We use Stack Overflow for how-to questions. Answers are crowdsourced from expert developers in the Base UI community as well as Base UI maintainers.
++We use Stack Overflow for how-to questions. Answers are crowdsourced from expert developers in the MUI Base community as well as MUI Base maintainers.
+ 
+ You can search through existing questions and answers to see if someone has asked a similar question using the [base-ui tags](https://stackoverflow.com/questions/tagged/base-ui):
+ 
+@@ -54,7 +54,7 @@ If you can't find your answer, [ask a new question](https://stackoverflow.com/qu
+ 
+ ## Technical support
+ 
+-We do _not_ offer paid support for Core libraries like Base UI.
++We do _not_ offer paid support for Core libraries like MUI Base.
+ 
+ But you might want to read the [technical support offered](https://mui.com/x/introduction/support/#technical-support) on MUI X components.
+ 
+@@ -67,23 +67,23 @@ This includes issues introduced by external sources, like browser upgrades or ch
+ 
+ ### Supported versions
+ 
+-- Base UI v5: ⚠️ Beta version.
+-- Base UI v4 🅧 Never existed.
+-- Base UI v3 🅧 Never existed.
+-- Base UI v2: 🅧 Never existed.
+-- Base UI v1: 🅧 Never existed.
+-- Base UI v0.x: 🅧 Never existed.
++- MUI Base v5: ⚠️ Beta version.
++- MUI Base v4 🅧 Never existed.
++- MUI Base v3 🅧 Never existed.
++- MUI Base v2: 🅧 Never existed.
++- MUI Base v1: 🅧 Never existed.
++- MUI Base v0.x: 🅧 Never existed.
+ 
+ ## Community
+ 
+ ### Social media
+ 
+-The Base UI community is active on both [X/Twitter](https://x.com/MUI_hq) and [LinkedIn](https://www.linkedin.com/company/mui/).
++The MUI Base community is active on both [X/Twitter](https://x.com/MUI_hq) and [LinkedIn](https://www.linkedin.com/company/mui/).
+ These are great platforms to share what you're working on and connect with other developers.
+ 
+ ### Discord
+ 
+-We have a [Discord Server](https://mui.com/r/discord/) to bring the Base UI community together.
++We have a [Discord Server](https://mui.com/r/discord/) to bring the MUI Base community together.
+ Our tools are used by thousands of developers and teams all around the world, many of whom actively engage with the community.
+ 
+ You can join Discord to engage in lively discussions, share your projects, and interact with developers just like you from all around the world. We'd love for you to join us!
+@@ -94,9 +94,9 @@ How-to questions are not accepted on Discord, they should be asked on [Stack Ov
+ 
+ ## Custom work
+ 
+-If your team gets stuck and needs help getting unblocked, Base UI's engineers may be available on a contract basis.
++If your team gets stuck and needs help getting unblocked, MUI Base's engineers may be available on a contract basis.
+ 
+-Keep in mind that the work must be directly related to Base UI's products—we don't accept general web development or React work.
++Keep in mind that the work must be directly related to MUI Base's products—we don't accept general web development or React work.
+ 
+ Our contracting price starts at $200/hour or $1,500/day.
+ 
+diff --git a/docs/data/base/getting-started/usage/usage.md b/docs/data/base/getting-started/usage/usage.md
+index 65a0a34a494dd6..8e98e6ee912a0b 100644
+--- a/docs/data/base/getting-started/usage/usage.md
++++ b/docs/data/base/getting-started/usage/usage.md
+@@ -1,10 +1,10 @@
+ # Usage
+ 
+-<p class="description">Learn the basics of working with Base UI components.</p>
++<p class="description">Learn the basics of working with MUI Base components.</p>
+ 
+ ## Responsive meta tag
+ 
+-Base UI is a _mobile-first_ component library—we write code for mobile devices first, and then scale up the components as necessary using CSS media queries.
++MUI Base is a _mobile-first_ component library—we write code for mobile devices first, and then scale up the components as necessary using CSS media queries.
+ 
+ To ensure proper rendering and touch zooming for all devices, add the responsive viewport meta tag to your `<head>` element:
+ 
+@@ -24,7 +24,7 @@ The `slots` prop is an object that lets you override any interior subcomponents
+ 
+ :::info
+ Each component contains a root slot, and other appropriate slots based on the nature of the component.
+-For example, the Base UI Badge contains two slots:
++For example, the MUI Base Badge contains two slots:
+ 
+ - `root`: the container element that wraps the children.
+ - `badge`: the badge element itself.
+@@ -33,7 +33,7 @@ For example, the Base UI Badge contains two slots:
+ 
+ You can use the `slots` prop to override default slots with either custom components or HTML elements.
+ 
+-For example, the Base UI Badge component renders a `<span>` by default.
++For example, the MUI Base Badge component renders a `<span>` by default.
+ The code snippet below shows how to override this by assigning a `<div>` to the root slot:
+ 
+ ```jsx
+@@ -45,7 +45,7 @@ The code snippet below shows how to override this by assigning a `<div>` to the
+ The `slotProps` prop is an object that contains the props for all slots within a component.
+ You can use it to define additional custom props for a component's interior elements.
+ 
+-For example, the code snippet below shows how to add a custom CSS class to the badge slot of the Base UI Badge component:
++For example, the code snippet below shows how to add a custom CSS class to the badge slot of the MUI Base Badge component:
+ 
+ ```jsx
+ <Badge slotProps={{ badge: { className: 'my-badge' } }} />
+@@ -78,13 +78,13 @@ If you did the same with `slots.root`, you would need to place this attribute on
+ 
+ ## Components vs. hooks
+ 
+-Base UI includes two kinds of building blocks: **components** and **hooks**.
++MUI Base includes two kinds of building blocks: **components** and **hooks**.
+ 
+ :::info
+ Hooks encapsulate _logic_; components provide _structure_.
+ :::
+ 
+-Many Base UI components are implemented with the help of [React hooks](https://react.dev/reference/react/hooks).
++Many MUI Base components are implemented with the help of [React hooks](https://react.dev/reference/react/hooks).
+ You can use components or hooks—or a combination of both—when building custom components.
+ 
+ In general, we recommend that you begin building with the component, and if you find that you are too limited by the customization options available, then consider refactoring your component to use the corresponding hook instead.
+diff --git a/docs/data/base/guides/next-js-app-router/next-js-app-router.md b/docs/data/base/guides/next-js-app-router/next-js-app-router.md
+index 11db3639e39933..6df1db77b739dc 100644
+--- a/docs/data/base/guides/next-js-app-router/next-js-app-router.md
++++ b/docs/data/base/guides/next-js-app-router/next-js-app-router.md
+@@ -1,18 +1,18 @@
+ # Next.js App Router
+ 
+-<p class="description">Learn how to use Base UI with the Next.js App Router.</p>
++<p class="description">Learn how to use MUI Base with the Next.js App Router.</p>
+ 
+ ## Example
+ 
+ Starting fresh on a new App Router-based project?
+ 
+-Jump right into the code with [this example: Base UI - Next.js App Router with Tailwind CSS in TypeScript](https://github.com/mui/material-ui/tree/master/examples/base-ui-nextjs-tailwind-ts).
++Jump right into the code with [this example: MUI Base - Next.js App Router with Tailwind CSS in TypeScript](https://github.com/mui/material-ui/tree/master/examples/base-ui-nextjs-tailwind-ts).
+ 
+ ## Next.js and React Server Components
+ 
+ The Next.js App Router implements React Server Components, [an upcoming feature for React](https://github.com/reactjs/rfcs/blob/main/text/0227-server-module-conventions.md).
+ 
+-To support the App Router, the components and hooks from Base UI that need access to browser APIs are exported with the `"use client"` directive.
++To support the App Router, the components and hooks from MUI Base that need access to browser APIs are exported with the `"use client"` directive.
+ 
+ :::warning
+ React Server Components should not be conflated with the concept of server-side rendering (SSR).
+@@ -21,9 +21,9 @@ So-called Client Components are still server-rendered to HTML.
+ For more details, see [this explanation](https://github.com/reactwg/server-components/discussions/4) of Client Components and SSR from the React Working Group.
+ :::
+ 
+-## Setting up Base UI with the App Router
++## Setting up MUI Base with the App Router
+ 
+-Base UI gives you the freedom to choose your own styling solution, so setting up a Next.js App Router project largely depends on what you choose.
++MUI Base gives you the freedom to choose your own styling solution, so setting up a Next.js App Router project largely depends on what you choose.
+ This guide covers Tailwind CSS, Emotion, and other CSS-in-JS solutions like styled-components.
+ 
+ ### Tailwind CSS
+@@ -46,7 +46,7 @@ module.exports = {
+ };
+ ```
+ 
+-Refer to this [example repo](https://github.com/mui/material-ui/tree/master/examples/base-ui-nextjs-tailwind-ts) for a full working demo of a Next.js 13 app using Base UI and Tailwind CSS.
++Refer to this [example repo](https://github.com/mui/material-ui/tree/master/examples/base-ui-nextjs-tailwind-ts) for a full working demo of a Next.js 13 app using MUI Base and Tailwind CSS.
+ 
+ ### Emotion
+ 
+@@ -153,13 +153,13 @@ Currently, `prepend` does not work reliably with the App Router, but you can wor
+ 
+ ### Other CSS-in-JS libraries
+ 
+-To use Next.js with Base UI and styled-components or other CSS-in-JS solutions, follow the [Next.js doc on CSS-in-JS](https://nextjs.org/docs/app/building-your-application/styling/css-in-js).
++To use Next.js with MUI Base and styled-components or other CSS-in-JS solutions, follow the [Next.js doc on CSS-in-JS](https://nextjs.org/docs/app/building-your-application/styling/css-in-js).
+ 
+ ## Customization
+ 
+ ### Using callbacks for slot props
+ 
+-A common customization method in Base UI is to pass a callback to slots in `slotProps` in order to apply dynamic props. For example, you might want to change the background color by applying a different class when a Button is disabled:
++A common customization method in MUI Base is to pass a callback to slots in `slotProps` in order to apply dynamic props. For example, you might want to change the background color by applying a different class when a Button is disabled:
+ 
+ ```tsx
+ // page.tsx
+diff --git a/docs/data/base/guides/overriding-component-structure/overriding-component-structure.md b/docs/data/base/guides/overriding-component-structure/overriding-component-structure.md
+index 19918913131b44..979cccb0be9341 100644
+--- a/docs/data/base/guides/overriding-component-structure/overriding-component-structure.md
++++ b/docs/data/base/guides/overriding-component-structure/overriding-component-structure.md
+@@ -1,8 +1,8 @@
+ # Overriding component structure
+ 
+-<p class="description">Learn how to override the default DOM structure of Base UI components.</p>
++<p class="description">Learn how to override the default DOM structure of MUI Base components.</p>
+ 
+-Base UI components are designed to suit the widest possible range of use cases, but you may occasionally need to change how a component's structure is rendered in the DOM.
++MUI Base components are designed to suit the widest possible range of use cases, but you may occasionally need to change how a component's structure is rendered in the DOM.
+ 
+ To understand how to do this, it helps to have an accurate mental model of the components.
+ 
+@@ -13,7 +13,7 @@ Slots are most commonly filled by HTML tags, but may also be filled by React com
+ 
+ All components contain a root slot that defines their primary node in the DOM tree; more complex components also contain additional interior slots named after the elements they represent.
+ 
+-All _non-utility_ Base UI components accept [the `slots` prop](#the-slots-prop) for overriding their rendered HTML structure.
++All _non-utility_ MUI Base components accept [the `slots` prop](#the-slots-prop) for overriding their rendered HTML structure.
+ 
+ Additionally, you can pass custom props to [interior slots](#interior-slots) using `slotProps`.
+ 
+diff --git a/docs/data/base/guides/working-with-tailwind-css/working-with-tailwind-css.md b/docs/data/base/guides/working-with-tailwind-css/working-with-tailwind-css.md
+index 92cf9f71fa4ad9..75353e35b15e2c 100644
+--- a/docs/data/base/guides/working-with-tailwind-css/working-with-tailwind-css.md
++++ b/docs/data/base/guides/working-with-tailwind-css/working-with-tailwind-css.md
+@@ -1,10 +1,10 @@
+ # Working with Tailwind CSS
+ 
+-<p class="description">Learn how to style Base UI components with Tailwind CSS.</p>
++<p class="description">Learn how to style MUI Base components with Tailwind CSS.</p>
+ 
+ ## Getting started
+ 
+-The goal of this guide is to teach you how to style Base UI components using Tailwind CSS while building an interactive and accessible app.
++The goal of this guide is to teach you how to style MUI Base components using Tailwind CSS while building an interactive and accessible app.
+ 
+ ### Prerequisites
+ 
+@@ -243,7 +243,7 @@ You should now see the player rendered on the page, but the component is not yet
+ 
+ ### Create the Slider component
+ 
+-Let's start by giving life to the slider with the Slider component from Base UI.
++Let's start by giving life to the slider with the Slider component from MUI Base.
+ First, create a new file called `Slider.tsx`.
+ Copy and paste the code below into the file:
+ 
+@@ -376,7 +376,7 @@ Since we want to have an additional dot inside the thumb, we need to add new ele
+ Note that after the thumb, we are still rendering the `children` passed via props.
+ This is important because the `children` in this case contain a hidden `<input>` element which makes the thumb accessible.
+ 
+-This is just one example, but this pattern of building custom components for each slot is possible with all Base UI components.
++This is just one example, but this pattern of building custom components for each slot is possible with all MUI Base components.
+ 
+ :::warning
+ When building custom components for the slots, always propagate the props sent from the owner component on the root element.
+@@ -389,7 +389,7 @@ This is useful if you want to style the component based on some internal state.
+ ## Adding a custom focus selector to the buttons
+ 
+ To finish this guide off, let's see how you can add custom styles based on a component's internal state.
+-We'll create a custom Button component that uses the `focusVisible` state from the Base UI Button to apply a cyan ring around it.
++We'll create a custom Button component that uses the `focusVisible` state from the MUI Base Button to apply a cyan ring around it.
+ 
+ This is what it'll look like:
+ 
+@@ -513,9 +513,9 @@ Some classes were slightly changed on some buttons so we have a consistent focus
+ 
+ These are the things we covered in this guide:
+ 
+-✅ How to use Tailwind CSS utility classes to style Base UI components, using the `slotProps` prop for targeting specific slots within the component.\
++✅ How to use Tailwind CSS utility classes to style MUI Base components, using the `slotProps` prop for targeting specific slots within the component.\
+ ✅ How to create custom components for specific slots in more complex customization scenarios.
+ We used the `component` prop to pass them into the parent component.\
+ ✅ How to apply conditional styling based on the owner component's state using a callback as value for the `slotProps` prop.
+ 
+-Get all the code used in this guide in the [Base UI with Tailwind CSS](https://codesandbox.io/p/sandbox/working-with-tailwind-css-dhmf8w) example project.
++Get all the code used in this guide in the [MUI Base with Tailwind CSS](https://codesandbox.io/p/sandbox/working-with-tailwind-css-dhmf8w) example project.
+diff --git a/docs/data/joy/components/autocomplete/autocomplete.md b/docs/data/joy/components/autocomplete/autocomplete.md
+index ebf5bf7344fba8..85adcf917c5c2d 100644
+--- a/docs/data/joy/components/autocomplete/autocomplete.md
++++ b/docs/data/joy/components/autocomplete/autocomplete.md
+@@ -287,7 +287,7 @@ The following demo relies on [autosuggest-highlight](https://github.com/moroshko
+ 
+ ### GitHub's picker
+ 
+-To reproduce GitHub's label picker, the `Autocomplete` is rendered inside a Base UI [`Popper`](/base-ui/react-popper/). To remove the popup behavior from the autocomplete, replace the listbox slot with the `AutocompleteListbox` component.
++To reproduce GitHub's label picker, the `Autocomplete` is rendered inside a MUI Base [`Popper`](/base-ui/react-popper/). To remove the popup behavior from the autocomplete, replace the listbox slot with the `AutocompleteListbox` component.
+ 
+ {{"demo": "GitHubLabel.js"}}
+ 
+diff --git a/docs/data/joy/components/menu/menu.md b/docs/data/joy/components/menu/menu.md
+index 26af6084268566..48382e99f39fd1 100644
+--- a/docs/data/joy/components/menu/menu.md
++++ b/docs/data/joy/components/menu/menu.md
+@@ -91,7 +91,7 @@ Use `slotProps` to pass props to the IconButton component.
+ 
+ ### Positioned menu
+ 
+-The `Menu` is based on the Base UI `Popper` component, which exposes a few [placement props](/base-ui/react-popper/#placement).
++The `Menu` is based on the MUI Base `Popper` component, which exposes a few [placement props](/base-ui/react-popper/#placement).
+ For example, this is how you'd go for displaying the menu on the bottom-end of the anchor button.
+ 
+ {{"demo": "PositionedMenu.js"}}
+diff --git a/docs/data/joy/components/modal/modal.md b/docs/data/joy/components/modal/modal.md
+index ff5045d23f6792..fd7ff920193f08 100644
+--- a/docs/data/joy/components/modal/modal.md
++++ b/docs/data/joy/components/modal/modal.md
+@@ -226,7 +226,7 @@ Use `sx` prop with `theme.breakpoints.only('xs')` to customize the styles of the
+ 
+ ### Focus trap
+ 
+-Base UI `Modal` moves the focus back to the body of the component if the focus tries to escape it.
++MUI Base `Modal` moves the focus back to the body of the component if the focus tries to escape it.
+ 
+ This is done for accessibility purposes, but it can potentially create issues for your users.
+ 
+diff --git a/docs/data/joy/components/textarea/textarea.md b/docs/data/joy/components/textarea/textarea.md
+index 40513178fa5524..c51b872cad7e76 100644
+--- a/docs/data/joy/components/textarea/textarea.md
++++ b/docs/data/joy/components/textarea/textarea.md
+@@ -14,7 +14,7 @@ unstyled: /base-ui/react-textarea-autosize/
+ 
+ ## Introduction
+ 
+-Joy UI's textarea component is built on top of the Base UI [`TextareaAutoSize`](/base-ui/react-textarea-autosize/) component.
++Joy UI's textarea component is built on top of the MUI Base [`TextareaAutoSize`](/base-ui/react-textarea-autosize/) component.
+ 
+ {{"demo": "TextareaUsage.js", "hideToolbar": true, "bg": "gradient"}}
+ 
+diff --git a/docs/data/joy/getting-started/overview/overview.md b/docs/data/joy/getting-started/overview/overview.md
+index a1a7cb56a2402a..d8dd66a87eda6d 100644
+--- a/docs/data/joy/getting-started/overview/overview.md
++++ b/docs/data/joy/getting-started/overview/overview.md
+@@ -55,7 +55,7 @@ For example, observe how each element of the [Input](/joy-ui/react-input/) compo
+ 
+ ### Accessibility
+ 
+-Joy UI components are built on top of [Base UI's unstyled components and low-level hooks](/base-ui/getting-started/), giving you many accessibility features out of the box.
++Joy UI components are built on top of [MUI Base's unstyled components and low-level hooks](/base-ui/getting-started/), giving you many accessibility features out of the box.
+ We strive to make all components accessible to end users who require assistive technology, and offer suggestions for optimizing accessibility throughout our documentation.
+ 
+ Joy UI's Form Control component automatically generates a unique ID that links the Input that it wraps with the Form Label and Form Helper Text components, ensuring that your app complies with this guideline:
+diff --git a/docs/data/joy/main-features/color-inversion/ColorInversionFooter.js b/docs/data/joy/main-features/color-inversion/ColorInversionFooter.js
+index ed4f0dd5147010..0aea88918d72e4 100644
+--- a/docs/data/joy/main-features/color-inversion/ColorInversionFooter.js
++++ b/docs/data/joy/main-features/color-inversion/ColorInversionFooter.js
+@@ -128,7 +128,7 @@ export default function ColorInversionFooter() {
+                 <ListItemButton>Joy UI</ListItemButton>
+               </ListItem>
+               <ListItem>
+-                <ListItemButton>Base UI</ListItemButton>
++                <ListItemButton>MUI Base</ListItemButton>
+               </ListItem>
+               <ListItem>
+                 <ListItemButton>Material UI</ListItemButton>
+diff --git a/docs/data/joy/main-features/color-inversion/ColorInversionFooter.tsx b/docs/data/joy/main-features/color-inversion/ColorInversionFooter.tsx
+index adb2bb70afa7e2..ce972aa2b3bbef 100644
+--- a/docs/data/joy/main-features/color-inversion/ColorInversionFooter.tsx
++++ b/docs/data/joy/main-features/color-inversion/ColorInversionFooter.tsx
+@@ -133,7 +133,7 @@ export default function ColorInversionFooter() {
+                 <ListItemButton>Joy UI</ListItemButton>
+               </ListItem>
+               <ListItem>
+-                <ListItemButton>Base UI</ListItemButton>
++                <ListItemButton>MUI Base</ListItemButton>
+               </ListItem>
+               <ListItem>
+                 <ListItemButton>Material UI</ListItemButton>
+diff --git a/docs/data/material/components/click-away-listener/click-away-listener.md b/docs/data/material/components/click-away-listener/click-away-listener.md
+index 7618b34439ab53..8068a953195930 100644
+--- a/docs/data/material/components/click-away-listener/click-away-listener.md
++++ b/docs/data/material/components/click-away-listener/click-away-listener.md
+@@ -12,8 +12,8 @@ githubLabel: 'component: ClickAwayListener'
+ ## This document has moved
+ 
+ :::warning
+-Please refer to the [Click-Away Listener](/base-ui/react-click-away-listener/) component page in the Base UI docs for demos and details on usage.
++Please refer to the [Click-Away Listener](/base-ui/react-click-away-listener/) component page in the MUI Base docs for demos and details on usage.
+ 
+-Click-Away Listener is a part of the standalone [Base UI](/base-ui/) component library.
+-It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after Base UI gets a stable release.
++Click-Away Listener is a part of the standalone [MUI Base](/base-ui/) component library.
++It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after MUI Base gets a stable release.
+ :::
+diff --git a/docs/data/material/components/no-ssr/no-ssr.md b/docs/data/material/components/no-ssr/no-ssr.md
+index dec36823a9d88f..303431b46cef6b 100644
+--- a/docs/data/material/components/no-ssr/no-ssr.md
++++ b/docs/data/material/components/no-ssr/no-ssr.md
+@@ -11,8 +11,8 @@ components: NoSsr
+ ## This document has moved
+ 
+ :::warning
+-Please refer to the [No-SSR](/base-ui/react-no-ssr/) component page in the Base UI docs for demos and details on usage.
++Please refer to the [No-SSR](/base-ui/react-no-ssr/) component page in the MUI Base docs for demos and details on usage.
+ 
+-No-SSR is a part of the standalone [Base UI](/base-ui/) component library.
+-It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after Base UI gets a stable release.
++No-SSR is a part of the standalone [MUI Base](/base-ui/) component library.
++It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after MUI Base gets a stable release.
+ :::
+diff --git a/docs/data/material/components/popper/popper.md b/docs/data/material/components/popper/popper.md
+index 1730cd0fd38c6e..85833d7e6da69c 100644
+--- a/docs/data/material/components/popper/popper.md
++++ b/docs/data/material/components/popper/popper.md
+@@ -15,12 +15,12 @@ Some important features of the Popper component:
+ 
+ - 🕷 Popper relies on the 3rd party library ([Popper.js](https://popper.js.org/)) for perfect positioning.
+ - 💄 It's an alternative API to react-popper. It aims for simplicity.
+-- Its child element is a [Base UI Portal](/base-ui/react-portal/) on the body of the document to avoid rendering problems.
++- Its child element is a [MUI Base Portal](/base-ui/react-portal/) on the body of the document to avoid rendering problems.
+   You can disable this behavior with `disablePortal`.
+ - The scroll isn't blocked like with the [Popover](/material-ui/react-popover/) component.
+   The placement of the popper updates with the available area in the viewport.
+ - Clicking away does not hide the Popper component.
+-  If you need this behavior, you can use the [Base UI Click-Away Listener](/base-ui/react-click-away-listener/) - see the example in the [menu documentation section](/material-ui/react-menu/#composition-with-menu-list).
++  If you need this behavior, you can use the [MUI Base Click-Away Listener](/base-ui/react-click-away-listener/) - see the example in the [menu documentation section](/material-ui/react-menu/#composition-with-menu-list).
+ - The `anchorEl` is passed as the reference object to create a new `Popper.js` instance.
+ 
+ {{"component": "@mui/docs/ComponentLinkHeader", "design": false}}
+diff --git a/docs/data/material/components/portal/portal.md b/docs/data/material/components/portal/portal.md
+index 2f66f2159fd063..ebbc93a309a164 100644
+--- a/docs/data/material/components/portal/portal.md
++++ b/docs/data/material/components/portal/portal.md
+@@ -12,8 +12,8 @@ githubLabel: 'component: Portal'
+ ## This document has moved
+ 
+ :::warning
+-Please refer to the [Portal](/base-ui/react-portal/) component page in the Base UI docs for demos and details on usage.
++Please refer to the [Portal](/base-ui/react-portal/) component page in the MUI Base docs for demos and details on usage.
+ 
+-Portal is a part of the standalone [Base UI](/base-ui/) component library.
+-It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after Base UI gets a stable release.
++Portal is a part of the standalone [MUI Base](/base-ui/) component library.
++It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after MUI Base gets a stable release.
+ :::
+diff --git a/docs/data/material/components/text-fields/text-fields.md b/docs/data/material/components/text-fields/text-fields.md
+index 74205facd6ae01..b3bf54fff4fd5a 100644
+--- a/docs/data/material/components/text-fields/text-fields.md
++++ b/docs/data/material/components/text-fields/text-fields.md
+@@ -44,7 +44,7 @@ The `helperText` prop can then be used to provide feedback to the user about the
+ 
+ ## Multiline
+ 
+-The `multiline` prop transforms the Text Field into a [Base UI Textarea Autosize](/base-ui/react-textarea-autosize/) element.
++The `multiline` prop transforms the Text Field into a [MUI Base Textarea Autosize](/base-ui/react-textarea-autosize/) element.
+ Unless the `rows` prop is set, the height of the text field dynamically matches its content.
+ You can use the `minRows` and `maxRows` props to bound it.
+ 
+@@ -275,7 +275,7 @@ We do not recommend using `type="number"` with a Text Field due to potential usa
+ 
+   :::
+ 
+-If you need a text field with number validation, you can use Base UI's [Number Input](/base-ui/react-number-input/) instead.
++If you need a text field with number validation, you can use MUI Base's [Number Input](/base-ui/react-number-input/) instead.
+ 
+ You can follow [this GitHub issue](https://github.com/mui/material-ui/issues/19154) to track the progress of introducing the Number Input component to Material UI.
+ 
+diff --git a/docs/data/material/components/textarea-autosize/textarea-autosize.md b/docs/data/material/components/textarea-autosize/textarea-autosize.md
+index d4b51a9a2da082..cc0f203a61df93 100644
+--- a/docs/data/material/components/textarea-autosize/textarea-autosize.md
++++ b/docs/data/material/components/textarea-autosize/textarea-autosize.md
+@@ -12,8 +12,8 @@ githubLabel: 'component: TextareaAutosize'
+ ## This document has moved
+ 
+ :::warning
+-Please refer to the [Textarea Autosize](/base-ui/react-textarea-autosize/) component page in the Base UI docs for demos and details on usage.
++Please refer to the [Textarea Autosize](/base-ui/react-textarea-autosize/) component page in the MUI Base docs for demos and details on usage.
+ 
+-Textarea Autosize is a part of the standalone [Base UI](/base-ui/) component library.
+-It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after Base UI gets a stable release.
++Textarea Autosize is a part of the standalone [MUI Base](/base-ui/) component library.
++It is currently re-exported from `@mui/material` for your convenience, but it will be removed from this package in a future major version after MUI Base gets a stable release.
+ :::
+diff --git a/docs/data/material/customization/shadow-dom/shadow-dom.md b/docs/data/material/customization/shadow-dom/shadow-dom.md
+index fc19540b8b0f9b..fbb4061c327bf3 100644
+--- a/docs/data/material/customization/shadow-dom/shadow-dom.md
++++ b/docs/data/material/customization/shadow-dom/shadow-dom.md
+@@ -32,7 +32,7 @@ ReactDOM.createRoot(shadowRootElement).render(
+ 
+ ### 2. Theme
+ 
+-Material UI components like Menu, Dialog, Popover, and others use the [Base UI Portal](/base-ui/react-portal/) component to render a new "subtree" in a container outside of current DOM hierarchy.
++Material UI components like Menu, Dialog, Popover, and others use the [MUI Base Portal](/base-ui/react-portal/) component to render a new "subtree" in a container outside of current DOM hierarchy.
+ By default, this container is `document.body`.
+ But since the styles are applied only inside of the Shadow DOM, we need to render portals inside the Shadow DOM container as well:
+ 
+diff --git a/docs/data/material/discover-more/backers/backers.md b/docs/data/material/discover-more/backers/backers.md
+index b5176081f84c33..8a03acd40b583a 100644
+--- a/docs/data/material/discover-more/backers/backers.md
++++ b/docs/data/material/discover-more/backers/backers.md
+@@ -2,7 +2,7 @@
+ 
+ <p class="description">Support the development of the open-source projects of the MUI organization through crowdfunding.</p>
+ 
+-Material UI, Base UI, MUI System, and Joy UI are crowd-funded open-source projects, licensed under the permissive MIT license.
++Material UI, MUI Base, MUI System, and Joy UI are crowd-funded open-source projects, licensed under the permissive MIT license.
+ Sponsorship increases the rate of bug fixes, documentation improvements, and feature development.
+ 
+ ## Diamond sponsors
+@@ -74,7 +74,7 @@ via [Open Collective](https://opencollective.com/mui-org)
+ 
+ ### Why is Material UI a "crowd-funded open-source project"?
+ 
+-Material UI (as well as Base UI, MUI System, and Joy UI) is open-source to give users great freedom in how they use the software and to enable the community to have influence over how the project progresses to make it appropriate for a wide range of use cases.
++Material UI (as well as MUI Base, MUI System, and Joy UI) is open-source to give users great freedom in how they use the software and to enable the community to have influence over how the project progresses to make it appropriate for a wide range of use cases.
+ To ensure that these open-source libraries can stand the test of time for our users, they need to be well-directed and financially sustainable.
+ 
+ The absolute best way to support the MUI organization to work on its libraries' ongoing development efforts is to become a sponsor.
+diff --git a/docs/data/material/getting-started/overview/overview.md b/docs/data/material/getting-started/overview/overview.md
+index 4dc5721b2d857d..cce86cda4ae887 100644
+--- a/docs/data/material/getting-started/overview/overview.md
++++ b/docs/data/material/getting-started/overview/overview.md
+@@ -30,13 +30,13 @@ You can follow [this GitHub issue](https://github.com/mui/material-ui/issues/293
+   It's almost as old as React itself—its history stretches back to 2014—and we're in this for the long haul.
+   You can count on the community's support for years to come (for example [Stack Overflow](https://trends.stackoverflow.co/?tags=material-ui)).
+ 
+-### Material UI vs. Base UI
++### Material UI vs. MUI Base
+ 
+-Material UI and [Base UI](/base-ui/) feature many of the same UI components, but Base UI comes without any default styles or styling solutions.
++Material UI and [MUI Base](/base-ui/) feature many of the same UI components, but MUI Base comes without any default styles or styling solutions.
+ 
+ Material UI is _comprehensive_ in that it comes packaged with default styles, and is optimized to work with [Emotion](https://emotion.sh/docs/introduction) (or [styled-components](https://styled-components.com/)).
+ 
+-Base UI, by contrast, could be considered the "skeletal" or "headless" counterpart to Material UI—in fact, future versions of Material UI will use Base UI components and hooks for its foundational structure.
++MUI Base, by contrast, could be considered the "skeletal" or "headless" counterpart to Material UI—in fact, future versions of Material UI will use MUI Base components and hooks for its foundational structure.
+ 
+ ## Start now
+ 
+diff --git a/docs/data/material/integrations/interoperability/interoperability.md b/docs/data/material/integrations/interoperability/interoperability.md
+index 56c22bfc22d13c..1e3bf6016e98dd 100644
+--- a/docs/data/material/integrations/interoperability/interoperability.md
++++ b/docs/data/material/integrations/interoperability/interoperability.md
+@@ -376,7 +376,7 @@ const CustomizedSlider = styled(Slider)(
+ 
+ ### Portals
+ 
+-The [Base UI Portal](/base-ui/react-portal/) component provides a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
++The [MUI Base Portal](/base-ui/react-portal/) component provides a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
+ Because of the way styled-components scopes its CSS, you may run into issues where styling is not applied.
+ 
+ For example, if you attempt to style the `tooltip` generated by the [Tooltip](/material-ui/react-tooltip/) component,
+diff --git a/docs/data/system/getting-started/overview/overview.md b/docs/data/system/getting-started/overview/overview.md
+index 63060be32272eb..e2c9f2e65bf368 100644
+--- a/docs/data/system/getting-started/overview/overview.md
++++ b/docs/data/system/getting-started/overview/overview.md
+@@ -10,7 +10,7 @@ title: Overview
+ 
+ MUI System is a set of CSS utilities to help you build custom designs more efficiently.
+ It's used internally by libraries like [Material UI](/material-ui/), [Joy UI](/joy-ui/getting-started/).
+-It can also be used to style [Base UI](/base-ui/) components.
++It can also be used to style [MUI Base](/base-ui/) components.
+ 
+ MUI System gives you a set of flexible, generic wrapper components like [`Box`](/system/react-box/) and [`Container`](/system/react-container/) that can be quickly customized using the `sx` prop.
+ This prop lets you define styles directly within the components themselves, rather than creating bulky and redundant `const` definitions with styled-components.
+@@ -24,9 +24,9 @@ Learn more on [the `sx` prop page](/system/getting-started/the-sx-prop/).
+ - **Avoid context-switching:** with styled-components, you frequently have to jump between the usage and the definition to find what you need. With MUI System, it's all in one place.
+ - **Forget unnecessary custom names:** if you've ever struggled to come up with a good name for a styled-component, then you'll appreciate skipping that step entirely when using MUI System.
+ 
+-## MUI System vs. Base UI
++## MUI System vs. MUI Base
+ 
+-[Base UI](/base-ui/) is a library of "unstyled" React components, while MUI System is a set of utilities for quickly applying styles to those components (as well as our other component libraries like Material UI and Joy UI).
++[MUI Base](/base-ui/) is a library of "unstyled" React components, while MUI System is a set of utilities for quickly applying styles to those components (as well as our other component libraries like Material UI and Joy UI).
+ 
+-Base UI is a standalone component library, whereas MUI System is _supplemental_ in that it's designed to be paired with Base UI or any third-party components.
++MUI Base is a standalone component library, whereas MUI System is _supplemental_ in that it's designed to be paired with MUI Base or any third-party components.
+ See the [Custom components page](/system/getting-started/custom-components/) for details on how to use MUI System.
+diff --git a/docs/mui-vale/styles/MUI/MuiBrandName.yml b/docs/mui-vale/styles/MUI/MuiBrandName.yml
+index c12fb2f40d9a8d..7b980872b24450 100644
+--- a/docs/mui-vale/styles/MUI/MuiBrandName.yml
++++ b/docs/mui-vale/styles/MUI/MuiBrandName.yml
+@@ -12,6 +12,7 @@ swap:
+   Material UI: Material UI
+   MUI X: MUI X
+   Base UI: Base UI
++  MUI Base: MUI Base
+   MUI System: MUI System
+   MUI Store: MUI Store
+   MUI Core: MUI Core
+diff --git a/docs/pages/_app.js b/docs/pages/_app.js
+index 1b3a4e4e061636..d4883bd918e096 100644
+--- a/docs/pages/_app.js
++++ b/docs/pages/_app.js
+@@ -226,7 +226,7 @@ function AppWrapper(props) {
+     if (productId === 'base-ui') {
+       return {
+         metadata: '',
+-        name: 'Base UI',
++        name: 'MUI Base',
+         logo: SvgBaseUiLogo,
+         logoSvg: baseSvgLogoString,
+         wordmarkSvg: baseSvgWordmarkString,
+diff --git a/docs/pages/base-ui.tsx b/docs/pages/base-ui.tsx
+index 91f8644f6512c9..83112507bf8ef6 100644
+--- a/docs/pages/base-ui.tsx
++++ b/docs/pages/base-ui.tsx
+@@ -16,8 +16,8 @@ export default function BaseUI() {
+   return (
+     <BrandingCssVarsProvider>
+       <Head
+-        title="Base UI: Unstyled React components and low-level hooks"
+-        description={`Base UI is a library of headless ("unstyled") React components and low-level hooks. You gain complete control over your app's CSS and accessibility features.`}
++        title="MUI Base: Unstyled React components and low-level hooks"
++        description='MUI Base is a library of headless ("unstyled") React components and low-level hooks. You gain complete control over your app&apos;s CSS and accessibility features.'
+         card="/static/social-previews/baseui-preview.jpg"
+       >
+         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+diff --git a/docs/src/components/header/HeaderNavDropdown.tsx b/docs/src/components/header/HeaderNavDropdown.tsx
+index 713edd4644e911..1c0f299b07a592 100644
+--- a/docs/src/components/header/HeaderNavDropdown.tsx
++++ b/docs/src/components/header/HeaderNavDropdown.tsx
+@@ -95,7 +95,7 @@ const DOCS = [
+     href: ROUTES.joyDocs,
+   },
+   {
+-    name: 'Base UI',
++    name: 'MUI Base',
+     description: 'Unstyled React components and low-level hooks.',
+     href: ROUTES.baseDocs,
+   },
+diff --git a/docs/src/components/pricing/PricingTable.tsx b/docs/src/components/pricing/PricingTable.tsx
+index c7789a0572181c..2f0eb0334a24dc 100644
+--- a/docs/src/components/pricing/PricingTable.tsx
++++ b/docs/src/components/pricing/PricingTable.tsx
+@@ -429,9 +429,9 @@ function RowHead({
+ 
+ const rowHeaders: Record<string, React.ReactNode> = {
+   // Core
+-  'Base UI': (
++  'MUI Base': (
+     <ColumnHead
+-      label="Base UI"
++      label="MUI Base"
+       tooltip="A library of headless ('unstyled') React UI components and low-level hooks, available in @mui/base."
+     />
+   ),
+@@ -737,7 +737,7 @@ const toBeDefined = (
+ 
+ const communityData: Record<string, React.ReactNode> = {
+   // Core open-source libraries
+-  'Base UI': yes,
++  'MUI Base': yes,
+   'MUI System': yes,
+   'Material UI': yes,
+   'Joy UI': yes,
+@@ -840,7 +840,7 @@ const communityData: Record<string, React.ReactNode> = {
+ 
+ const proData: Record<string, React.ReactNode> = {
+   // Core
+-  'Base UI': yes,
++  'MUI Base': yes,
+   'MUI System': yes,
+   'Material UI': yes,
+   'Joy UI': yes,
+@@ -944,7 +944,7 @@ const proData: Record<string, React.ReactNode> = {
+ 
+ const premiumData: Record<string, React.ReactNode> = {
+   // Core
+-  'Base UI': yes,
++  'MUI Base': yes,
+   'MUI System': yes,
+   'Material UI': yes,
+   'Joy UI': yes,
+@@ -1369,7 +1369,7 @@ export default function PricingTable({
+         {divider}
+         {renderRow('Joy UI')}
+         {divider}
+-        {renderRow('Base UI')}
++        {renderRow('MUI Base')}
+         {divider}
+         {renderRow('MUI System')}
+         <RowHead startIcon={<IconImage name="product-advanced" width={28} height={28} />}>
+diff --git a/docs/src/components/productBaseUI/BaseUIComponents.tsx b/docs/src/components/productBaseUI/BaseUIComponents.tsx
+index f0ecbab9d3000b..ee720b2bbe7c1a 100644
+--- a/docs/src/components/productBaseUI/BaseUIComponents.tsx
++++ b/docs/src/components/productBaseUI/BaseUIComponents.tsx
+@@ -81,7 +81,7 @@ export default function BaseUIComponents() {
+                 <br /> <GradientText>CSS adventure</GradientText>
+               </Typography>
+             }
+-            description="Base UI's skeletal components give you a sturdy foundation to apply custom styles with ease. With no defaults to override, you're free to start from scratch using vanilla CSS, Tailwind CSS, MUI System, or any other framework you prefer."
++            description="MUI Base's skeletal components give you a sturdy foundation to apply custom styles with ease. With no defaults to override, you're free to start from scratch using vanilla CSS, Tailwind CSS, MUI System, or any other framework you prefer."
+           />
+           <Group desktopColumns={2} sx={{ m: -2, p: 2 }}>
+             {DEMOS.map((name) => (
+diff --git a/docs/src/components/productBaseUI/BaseUICustomization.tsx b/docs/src/components/productBaseUI/BaseUICustomization.tsx
+index b1263233e99c6f..0a5bbcc037a2eb 100644
+--- a/docs/src/components/productBaseUI/BaseUICustomization.tsx
++++ b/docs/src/components/productBaseUI/BaseUICustomization.tsx
+@@ -244,14 +244,14 @@ export default function BaseUICustomization() {
+                 <br /> with a lightweight API
+               </Typography>
+             }
+-            description="With Base UI, you have the freedom to decide how much you want to customize a component's structure and style."
++            description="With MUI Base, you have the freedom to decide how much you want to customize a component's structure and style."
+           />
+           <Group sx={{ m: -2, p: 2 }}>
+             <Highlighter disableBorder {...getSelectedProps(0)} onClick={() => setIndex(0)}>
+               <Item
+                 icon={<SvgTwinkle />}
+                 title="Applying custom CSS rules"
+-                description="Your CSS, your rules. With Base UI there are no styles to override, so you can start with a clean slate."
++                description="Your CSS, your rules. With MUI Base there are no styles to override, so you can start with a clean slate."
+               />
+             </Highlighter>
+             <Highlighter disableBorder {...getSelectedProps(1)} onClick={() => setIndex(1)}>
+@@ -265,7 +265,7 @@ export default function BaseUICustomization() {
+               <Item
+                 icon={<SvgTwinkle />}
+                 title="Creating custom components using hooks"
+-                description="Base UI includes low-level hooks for adding functionality to your own fully custom-built components."
++                description="MUI Base includes low-level hooks for adding functionality to your own fully custom-built components."
+               />
+             </Highlighter>
+           </Group>
+diff --git a/docs/src/components/productBaseUI/BaseUIEnd.tsx b/docs/src/components/productBaseUI/BaseUIEnd.tsx
+index cf9ea8da96761d..60206f1cc03785 100644
+--- a/docs/src/components/productBaseUI/BaseUIEnd.tsx
++++ b/docs/src/components/productBaseUI/BaseUIEnd.tsx
+@@ -37,14 +37,14 @@ export default function BaseUIEnd() {
+             }
+             description={
+               <React.Fragment>
+-                Base UI wouldn&apos;t be possible without our global community of contributors. Join
+-                us today to get help when you need it, and lend a hand when you can.
++                MUI Base wouldn&apos;t be possible without our global community of contributors.
++                Join us today to get help when you need it, and lend a hand when you can.
+               </React.Fragment>
+             }
+           />
+           <GetStartedButtons
+             primaryUrl={ROUTES.baseDocs}
+-            secondaryLabel="Learn Base UI"
++            secondaryLabel="Learn MUI Base"
+             secondaryUrl={ROUTES.baseQuickstart}
+             altInstallation="npm install @mui/base"
+           />
+@@ -55,10 +55,10 @@ export default function BaseUIEnd() {
+               <GlowingIconContainer icon={<CompareIcon color="primary" />} />
+               <div>
+                 <Typography gutterBottom sx={{ color: 'text.primary', fontWeight: 'semiBold' }}>
+-                  Base UI vs. Material UI
++                  MUI Base vs. Material UI
+                 </Typography>
+                 <Typography>
+-                  Base UI features many of the same components as Material UI, but without the
++                  MUI Base features many of the same components as Material UI, but without the
+                   Material Design implementation.
+                 </Typography>
+               </div>
+@@ -70,7 +70,7 @@ export default function BaseUIEnd() {
+                   Does it come with styles?
+                 </Typography>
+                 <Typography>
+-                  Base UI <i>is not packaged</i> with any default theme or built-in style engine.
++                  MUI Base <i>is not packaged</i> with any default theme or built-in style engine.
+                   This makes it a great choice if you need complete control over how your app&apos;s
+                   CSS is implemented.
+                 </Typography>
+diff --git a/docs/src/components/productBaseUI/BaseUIHero.tsx b/docs/src/components/productBaseUI/BaseUIHero.tsx
+index a90fe44968141a..1d876f56c148dc 100644
+--- a/docs/src/components/productBaseUI/BaseUIHero.tsx
++++ b/docs/src/components/productBaseUI/BaseUIHero.tsx
+@@ -62,7 +62,7 @@ export default function BaseUIHero() {
+               /
+             </Typography>
+             <Typography component="span" variant="inherit" sx={{ color: 'text.primary' }}>
+-              Base UI
++              MUI Base
+             </Typography>
+           </Typography>
+ 
+@@ -80,13 +80,13 @@ export default function BaseUIHero() {
+             total flexibility
+           </Typography>
+           <Typography sx={{ color: 'text.secondary', mb: 3, maxWidth: 500 }}>
+-            Base UI gives you a set of foundational &quot;headless&quot; components that you can
++            MUI Base gives you a set of foundational &quot;headless&quot; components that you can
+             build with using any styling solution you choose—no need to override any default style
+             engine or theme.
+           </Typography>
+           <GetStartedButtons
+             primaryUrl={ROUTES.baseDocs}
+-            secondaryLabel="Learn Base UI"
++            secondaryLabel="Learn MUI Base"
+             secondaryUrl={ROUTES.baseQuickstart}
+             altInstallation="npm install @mui/base"
+           />
+diff --git a/docs/src/components/productBaseUI/BaseUISummary.tsx b/docs/src/components/productBaseUI/BaseUISummary.tsx
+index a42d450154ceb1..00c945e07903fc 100644
+--- a/docs/src/components/productBaseUI/BaseUISummary.tsx
++++ b/docs/src/components/productBaseUI/BaseUISummary.tsx
+@@ -21,14 +21,14 @@ const content = [
+     icon: <PhishingRoundedIcon color="primary" />,
+     title: 'Low-level hooks',
+     description:
+-      "When it's time to go fully custom, Base UI has you covered with low-level hooks for fine-grained flexibility in component design.",
++      "When it's time to go fully custom, MUI Base has you covered with low-level hooks for fine-grained flexibility in component design.",
+     link: '/base-ui/getting-started/usage/#components-vs-hooks',
+   },
+   {
+     icon: <AccessibilityNewRounded color="primary" />,
+     title: 'Accessibility',
+     description:
+-      'We take accessibility seriously. The Base UI docs are loaded with guidelines and best practices.',
++      'We take accessibility seriously. The MUI Base docs are loaded with guidelines and best practices.',
+     link: '/base-ui/getting-started/accessibility/',
+   },
+ ];
+@@ -38,14 +38,14 @@ export default function BaseUISummary() {
+     <Section cozy>
+       <SectionHeadline
+         alwaysCenter
+-        overline="Why Base UI"
++        overline="Why MUI Base"
+         title={
+           <Typography variant="h2" sx={{ mt: 1 }}>
+             Essential building blocks
+             <br /> for <GradientText>sleek and accessible</GradientText> UIs
+           </Typography>
+         }
+-        description="Base UI abstracts away the more frustrating aspects of UI development—like accessibility, cross-browser compatibility, and event handling—so you can skip ahead to design implementation."
++        description="MUI Base abstracts away the more frustrating aspects of UI development—like accessibility, cross-browser compatibility, and event handling—so you can skip ahead to design implementation."
+       />
+       <Box sx={{ mt: 6 }}>
+         <Grid container spacing={3}>
+diff --git a/docs/src/components/productBaseUI/BaseUITestimonial.tsx b/docs/src/components/productBaseUI/BaseUITestimonial.tsx
+index c7c19b95ef433a..96a49163b6d500 100644
+--- a/docs/src/components/productBaseUI/BaseUITestimonial.tsx
++++ b/docs/src/components/productBaseUI/BaseUITestimonial.tsx
+@@ -44,13 +44,13 @@ export default function BaseUITestimonial() {
+               component="img"
+               src="/static/branding/base-ui/nhost-screenshot.png"
+               srcSet="/static/branding/base-ui/nhost-screenshot-2x.png 2x"
+-              alt="Screenshot displaying part of the Nhost dashboard that used Base UI to be built."
++              alt="Screenshot displaying part of the Nhost dashboard that used MUI Base to be built."
+               loading="lazy"
+               sx={{ backgroundColor: '#fff', width: 510, height: 210 }}
+             />
+           </Box>
+           <Typography variant="body2" sx={{ mt: 2 }}>
+-            Nhost&apos;s new dashboard, powered by Base UI &nbsp;&nbsp;
++            Nhost&apos;s new dashboard, powered by MUI Base &nbsp;&nbsp;
+             <Typography
+               component="span"
+               variant="inherit"
+@@ -67,7 +67,7 @@ export default function BaseUITestimonial() {
+         <Grid sx={{ display: 'flex', flexDirection: 'column', gap: 3 }} size={{ xs: 12, sm: 6 }}>
+           <Typography>
+             “After considering various options, we decided to migrate our custom components to
+-            Material UI, and that&apos;s when we discovered Base UI. As a set of headless
++            Material UI, and that&apos;s when we discovered MUI Base. As a set of headless
+             components, it offered exactly what we needed to implement our design system while
+             maintaining full customizability. The focus on accessibility was also a big plus, as it
+             ensured that our dashboard was usable by everyone. Low-level component hooks were just
+diff --git a/docs/src/components/productBaseUI/BaseUIThemesDemo.tsx b/docs/src/components/productBaseUI/BaseUIThemesDemo.tsx
+index 5d970f332f47c1..ca1288536f6419 100644
+--- a/docs/src/components/productBaseUI/BaseUIThemesDemo.tsx
++++ b/docs/src/components/productBaseUI/BaseUIThemesDemo.tsx
+@@ -1,7 +1,7 @@
+ import * as React from 'react';
+ import clsx from 'clsx';
+ 
+-// Base UI imports
++// @mui/base imports
+ import { Badge, badgeClasses } from '@mui/base/Badge';
+ import { Input, InputProps } from '@mui/base/Input';
+ import { Dropdown } from '@mui/base/Dropdown';
+@@ -819,7 +819,7 @@ export default function BaseUIThemesDemo() {
+               <StyledBadge badgeContent={5}>
+                 <Box
+                   component="img"
+-                  alt="Michał Dudak, the leading engineer for Base UI."
++                  alt="Michał Dudak, the leading engineer for MUI Base."
+                   src="/static/branding/about/michał-dudak.png"
+                   sx={{
+                     display: 'inline-block',
+@@ -1003,14 +1003,14 @@ export default function BaseUIThemesDemo() {
+                 id="unstyled-modal-title"
+                 sx={{ mt: 1, mb: 0.5, textWrap: 'balance' }}
+               >
+-                Oh, hey, this is a Base UI modal.
++                Oh, hey, this is a MUI Base modal.
+               </Box>
+               <Box
+                 component="p"
+                 id="unstyled-modal-description"
+                 sx={{ m: 0, mb: 4, color: 'text.secondary', textWrap: 'balance' }}
+               >
+-                Base UI modals manages modal stacking when more than one is needed, creates a
++                MUI Base modals manages modal stacking when more than one is needed, creates a
+                 backdrop to disable interaction with the rest of the app, and a lot more.
+               </Box>
+               <StyledButton onClick={handleCloseModal}>Close</StyledButton>
+@@ -1022,7 +1022,7 @@ export default function BaseUIThemesDemo() {
+           <StyledSnackbar open={openSnackbar} autoHideDuration={5000} onClose={handleCloseSnackbar}>
+             <CheckCircleRoundedIcon fontSize="small" />
+             <div>
+-              <div data-title>This is a Base UI snackbar.</div>
++              <div data-title>This is a MUI Base snackbar.</div>
+               <div data-description>Free to design as you want it.</div>
+             </div>
+           </StyledSnackbar>
+diff --git a/docs/src/components/productBaseUI/MuiBaseDeprecation.tsx b/docs/src/components/productBaseUI/MuiBaseDeprecation.tsx
+index 0779500cb4c260..d7356a453d41f2 100644
+--- a/docs/src/components/productBaseUI/MuiBaseDeprecation.tsx
++++ b/docs/src/components/productBaseUI/MuiBaseDeprecation.tsx
+@@ -1,4 +1,3 @@
+-/* eslint-disable no-irregular-whitespace */
+ import * as React from 'react';
+ import Box from '@mui/material/Box';
+ import { MarkdownElement } from '@mui/docs/MarkdownElement';
+diff --git a/docs/src/components/productCore/CoreProducts.tsx b/docs/src/components/productCore/CoreProducts.tsx
+index a0297d91a066da..0706a0b44ea88e 100644
+--- a/docs/src/components/productCore/CoreProducts.tsx
++++ b/docs/src/components/productCore/CoreProducts.tsx
+@@ -37,9 +37,9 @@ const content = [
+   },
+   {
+     icon: <SvgBaseUiLogo width={14} height={14} sx={logoColor} />,
+-    title: 'Base UI',
++    title: 'MUI Base',
+     description:
+-      "A library of unstyled React components and low-level hooks. With Base UI, you gain complete control over your app's CSS and accessibility features.",
++      "A library of unstyled React components and low-level hooks. With MUI Base, you gain complete control over your app's CSS and accessibility features.",
+     link: '/base-ui/',
+   },
+   {
+diff --git a/docs/src/components/productMaterial/MaterialEnd.tsx b/docs/src/components/productMaterial/MaterialEnd.tsx
+index 6b4ad3486d9f5f..777fc3faa3ee00 100644
+--- a/docs/src/components/productMaterial/MaterialEnd.tsx
++++ b/docs/src/components/productMaterial/MaterialEnd.tsx
+@@ -88,10 +88,10 @@ export default function MaterialEnd({ noFaq }: MaterialEndProps) {
+                 <GlowingIconContainer icon={<CompareIcon color="primary" />} />
+                 <div>
+                   <Typography gutterBottom sx={{ color: 'text.primary', fontWeight: 'semiBold' }}>
+-                    Material UI vs. Base UI
++                    Material UI vs. MUI Base
+                   </Typography>
+                   <Typography>
+-                    Material UI implements Google&apos;s Material Design whereas Base UI features
++                    Material UI implements Google&apos;s Material Design whereas MUI Base features
+                     many of the same components, but without the Material Design implementation.
+                   </Typography>
+                 </div>
+diff --git a/docs/src/components/showcase/NotificationCard.tsx b/docs/src/components/showcase/NotificationCard.tsx
+index 8088639cedbbe4..b352d8c22f8244 100644
+--- a/docs/src/components/showcase/NotificationCard.tsx
++++ b/docs/src/components/showcase/NotificationCard.tsx
+@@ -65,7 +65,7 @@ export default function NotificationCard() {
+                 Incredible discoveries
+               </Typography>
+               <Typography sx={{ fontSize: 14, color: 'text.secondary' }}>
+-                It&apos;s about Material UI & Base UI...
++                It&apos;s about Material UI & MUI Base...
+               </Typography>
+             </div>
+             <Chip
+diff --git a/docs/src/components/showcase/ThemeTabs.tsx b/docs/src/components/showcase/ThemeTabs.tsx
+index a0d208721ea201..ec06a971561d46 100644
+--- a/docs/src/components/showcase/ThemeTabs.tsx
++++ b/docs/src/components/showcase/ThemeTabs.tsx
+@@ -50,7 +50,7 @@ export default function ThemeTabs() {
+         ]}
+       >
+         <Tab label="Material UI" />
+-        <Tab label="Base UI" />
++        <Tab label="MUI Base" />
+         <Tab label="Joy UI" />
+       </Tabs>
+     </Fade>
+diff --git a/docs/src/components/showcase/ThemeTimeline.tsx b/docs/src/components/showcase/ThemeTimeline.tsx
+index e63871db097423..e8e0496182cdcd 100644
+--- a/docs/src/components/showcase/ThemeTimeline.tsx
++++ b/docs/src/components/showcase/ThemeTimeline.tsx
+@@ -111,7 +111,7 @@ export default function BasicTimeline() {
+                 <TimelineDot />
+                 <TimelineConnector />
+               </TimelineSeparator>
+-              <TimelineContent>Base UI</TimelineContent>
++              <TimelineContent>MUI Base</TimelineContent>
+             </TimelineItem>
+             <TimelineItem>
+               <TimelineSeparator>
+diff --git a/docs/src/components/showcase/ThemeToggleButton.tsx b/docs/src/components/showcase/ThemeToggleButton.tsx
+index 2359550e6148ac..44f30813601eac 100644
+--- a/docs/src/components/showcase/ThemeToggleButton.tsx
++++ b/docs/src/components/showcase/ThemeToggleButton.tsx
+@@ -42,7 +42,7 @@ export default function ThemeToggleButton() {
+       >
+         <ToggleButton value="joy">Joy UI</ToggleButton>
+         <ToggleButton value="material">Material UI</ToggleButton>
+-        <ToggleButton value="base">Base UI</ToggleButton>
++        <ToggleButton value="base">MUI Base</ToggleButton>
+       </ToggleButtonGroup>
+     </Fade>
+   );
+diff --git a/docs/src/layouts/AppFooter.tsx b/docs/src/layouts/AppFooter.tsx
+index bffdb8ca5bc467..42b1228f8b0da6 100644
+--- a/docs/src/layouts/AppFooter.tsx
++++ b/docs/src/layouts/AppFooter.tsx
+@@ -77,7 +77,7 @@ export default function AppFooter(props: AppFooterProps) {
+               Material UI
+             </Link>
+             <Link prefetch={false} href={ROUTES.productBase}>
+-              Base UI
++              MUI Base
+             </Link>
+             <Link prefetch={false} href={ROUTES.productAdvanced}>
+               MUI X
+diff --git a/docs/src/modules/components/AppSearch.js b/docs/src/modules/components/AppSearch.js
+index 201a926960567f..17012117f65196 100644
+--- a/docs/src/modules/components/AppSearch.js
++++ b/docs/src/modules/components/AppSearch.js
+@@ -134,7 +134,7 @@ function NewStartScreen() {
+     },
+     {
+       category: {
+-        name: 'Base UI',
++        name: 'MUI Base',
+       },
+       items: [
+         {
+@@ -270,7 +270,7 @@ function NewStartScreen() {
+ const productNameProductId = {
+   'material-ui': 'Material UI',
+   'joy-ui': 'Joy UI',
+-  'base-ui': 'Base UI',
++  'base-ui': 'MUI Base',
+   x: 'MUI X',
+   system: 'MUI System',
+   toolpad: 'Toolpad',
+diff --git a/docs/src/modules/components/Demo.js b/docs/src/modules/components/Demo.js
+index 53e688b3a9f7af..b5b11f93a46c1c 100644
+--- a/docs/src/modules/components/Demo.js
++++ b/docs/src/modules/components/Demo.js
+@@ -68,7 +68,7 @@ function useDemoData(codeVariant, demo, githubLocation, codeStyling) {
+       name = 'Joy UI';
+     } else if (canonicalAs.startsWith('/base-ui/')) {
+       productId = 'base-ui';
+-      name = 'Base UI';
++      name = 'MUI Base';
+     } else if (canonicalAs.startsWith('/x/')) {
+       name = 'MUI X';
+     }
+diff --git a/docs/src/modules/components/MuiProductSelector.tsx b/docs/src/modules/components/MuiProductSelector.tsx
+index af9370110bd50d..9874a60f3351ce 100644
+--- a/docs/src/modules/components/MuiProductSelector.tsx
++++ b/docs/src/modules/components/MuiProductSelector.tsx
+@@ -141,7 +141,7 @@ const coreProducts = [
+   },
+   {
+     id: 'base-ui',
+-    name: 'Base UI',
++    name: 'MUI Base',
+     description: 'Unstyled components and hooks.',
+     icon: <SvgBaseUiLogo width={14} height={14} sx={logoColor} />,
+     href: ROUTES.baseDocs,
+diff --git a/docs/src/modules/utils/getProductInfoFromUrl.test.js b/docs/src/modules/utils/getProductInfoFromUrl.test.js
+index 90b14261522b73..ba296fcc1d26f3 100644
+--- a/docs/src/modules/utils/getProductInfoFromUrl.test.js
++++ b/docs/src/modules/utils/getProductInfoFromUrl.test.js
+@@ -22,7 +22,7 @@ describe('getProductInfoFromUrl', () => {
+     });
+   });
+ 
+-  it('should handle Base UI', () => {
++  it('should handle MUI Base', () => {
+     expect(getProductInfoFromUrl('/base-ui/react-button/')).to.deep.equal({
+       productCategoryId: 'core',
+       productId: 'base-ui',
+diff --git a/docs/translations/api-docs-base/css-transition/css-transition.json b/docs/translations/api-docs-base/css-transition/css-transition.json
+index 0071d2e1cd76ff..b092cf058fa1c2 100644
+--- a/docs/translations/api-docs-base/css-transition/css-transition.json
++++ b/docs/translations/api-docs-base/css-transition/css-transition.json
+@@ -1,5 +1,5 @@
+ {
+-  "componentDescription": "A utility component that hooks up to the Base UI transitions API and\napplies a CSS transition to its children when necessary.",
++  "componentDescription": "A utility component that hooks up to the MUI Base transitions API and\napplies a CSS transition to its children when necessary.",
+   "propDescriptions": {
+     "enterClassName": {
+       "description": "The name of the CSS class applied to the component when the transition is requested to enter."
+diff --git a/examples/base-ui-cra-ts/public/index.html b/examples/base-ui-cra-ts/public/index.html
+index cbd4989b1443c4..d0ce61c747019b 100644
+--- a/examples/base-ui-cra-ts/public/index.html
++++ b/examples/base-ui-cra-ts/public/index.html
+@@ -4,7 +4,7 @@
+     <meta charset="utf-8" />
+     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
+     <meta name="viewport" content="initial-scale=1, width=device-width" />
+-    <title>CRA + Base UI + TS</title>
++    <title>CRA + MUI Base + TS</title>
+   </head>
+   <body>
+     <noscript>You need to enable JavaScript to run this app.</noscript>
+diff --git a/examples/base-ui-cra/public/index.html b/examples/base-ui-cra/public/index.html
+index 71fe1731a68db2..9a5e8c93bdae53 100644
+--- a/examples/base-ui-cra/public/index.html
++++ b/examples/base-ui-cra/public/index.html
+@@ -5,7 +5,7 @@
+     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+     <meta name="viewport" content="width=device-width, initial-scale=1" />
+     <meta name="description" content="Web site created using create-react-app" />
+-    <title>CRA + Base UI</title>
++    <title>CRA + MUI Base</title>
+   </head>
+   <body>
+     <noscript>You need to enable JavaScript to run this app.</noscript>
+diff --git a/examples/base-ui-vite-tailwind-ts/src/App.tsx b/examples/base-ui-vite-tailwind-ts/src/App.tsx
+index a2085ff2abeb48..812bba2fdfb8eb 100644
+--- a/examples/base-ui-vite-tailwind-ts/src/App.tsx
++++ b/examples/base-ui-vite-tailwind-ts/src/App.tsx
+@@ -4,12 +4,12 @@ export default function App() {
+   return (
+     <div className="p-8">
+       <h1 className="text-3xl font-semibold mb-4">
+-        Base UI + Vite.js + Tailwind CSS in TypeScript
++        MUI Base + Vite.js + Tailwind CSS in TypeScript
+       </h1>
+       <ul>
+         <li className="card">
+-          <a href="https://mui.com/base-ui/" className="link">
+-            Base UI
++          <a href="https://mui.com/base-ui/getting-started/" className="link">
++            MUI Base
+           </a>{' '}
+           is a library of unstyled React UI components and hooks.
+         </li>
+diff --git a/examples/base-ui-vite-tailwind/index.html b/examples/base-ui-vite-tailwind/index.html
+index f0bd91e217c9ed..6a414e77372ccd 100644
+--- a/examples/base-ui-vite-tailwind/index.html
++++ b/examples/base-ui-vite-tailwind/index.html
+@@ -4,7 +4,7 @@
+     <meta charset="utf-8" />
+     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+     <meta name="viewport" content="initial-scale=1, width=device-width" />
+-    <title>Vite + Base UI + Tailwind CSS</title>
++    <title>Vite + MUI Base + Tailwind CSS</title>
+   </head>
+   <body>
+     <div id="root"></div>
+diff --git a/examples/base-ui-vite-tailwind/src/App.jsx b/examples/base-ui-vite-tailwind/src/App.jsx
+index 8bd16d6d813f59..08a5cc71a69413 100644
+--- a/examples/base-ui-vite-tailwind/src/App.jsx
++++ b/examples/base-ui-vite-tailwind/src/App.jsx
+@@ -3,7 +3,7 @@ import * as React from 'react';
+ export default function App() {
+   return (
+     <div className="p-8">
+-      <h1 className="text-3xl font-semibold mb-4">Base UI + Vite.js + Tailwind CSS</h1>
++      <h1 className="text-3xl font-semibold mb-4">MUI Base + Vite.js + Tailwind CSS</h1>
+       <ul>
+         <li className="card">
+           <a href="https://mui.com/base-ui/" className="link">
+diff --git a/packages/mui-base/package.json b/packages/mui-base/package.json
+index 6b19317df89237..da1bf81f2e5c63 100644
+--- a/packages/mui-base/package.json
++++ b/packages/mui-base/package.json
+@@ -3,7 +3,7 @@
+   "version": "5.0.0-beta.68",
+   "private": false,
+   "author": "MUI Team",
+-  "description": "Base UI is a library of headless ('unstyled') React components and low-level hooks. You gain complete control over your app's CSS and accessibility features.",
++  "description": "MUI Base is a library of headless ('unstyled') React components and low-level hooks. You gain complete control over your app's CSS and accessibility features.",
+   "main": "./src/index.js",
+   "keywords": [
+     "react",
+diff --git a/packages/mui-base/src/Transitions/CssTransition.tsx b/packages/mui-base/src/Transitions/CssTransition.tsx
+index 7c668323fb2cc5..a6be3db6c59238 100644
+--- a/packages/mui-base/src/Transitions/CssTransition.tsx
++++ b/packages/mui-base/src/Transitions/CssTransition.tsx
+@@ -27,7 +27,7 @@ export interface CssTransitionProps {
+ }
+ 
+ /**
+- * A utility component that hooks up to the Base UI transitions API and
++ * A utility component that hooks up to the MUI Base transitions API and
+  * applies a CSS transition to its children when necessary.
+  *
+  * Demos:
+diff --git a/packages/mui-base/src/useMenuItem/useMenuItemContextStabilizer.ts b/packages/mui-base/src/useMenuItem/useMenuItemContextStabilizer.ts
+index 43e8719d5e0eac..14bbb9975ecc77 100644
+--- a/packages/mui-base/src/useMenuItem/useMenuItemContextStabilizer.ts
++++ b/packages/mui-base/src/useMenuItem/useMenuItemContextStabilizer.ts
+@@ -43,7 +43,7 @@ export function useMenuItemContextStabilizer(id: string | undefined) {
+       if (itemValue !== itemId) {
+         throw new Error(
+           [
+-            'Base UI MenuItem: Tried to access the state of another MenuItem.',
++            'MUI Base MenuItem: Tried to access the state of another MenuItem.',
+             `itemValue: ${itemValue} | id: ${itemId}`,
+             'This is unsupported when the MenuItem uses the MenuItemContextStabilizer as a performance optimization.',
+           ].join('/n'),
+diff --git a/packages/mui-base/src/useOption/useOptionContextStabilizer.ts b/packages/mui-base/src/useOption/useOptionContextStabilizer.ts
+index fe77b4e319f17a..f75bef0285cec9 100644
+--- a/packages/mui-base/src/useOption/useOptionContextStabilizer.ts
++++ b/packages/mui-base/src/useOption/useOptionContextStabilizer.ts
+@@ -33,7 +33,7 @@ export function useOptionContextStabilizer<OptionValue>(value: OptionValue) {
+       if (itemValue !== value) {
+         throw new Error(
+           [
+-            'Base UI Option: Tried to access the state of another Option.',
++            'MUI Base Option: Tried to access the state of another Option.',
+             'This is unsupported when the Option uses the OptionContextStabilizer as a performance optimization.',
+           ].join('/n'),
+         );
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 0659a4e9b1f8c5..ea2fa53ba5813c 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -359,7 +359,7 @@ importers:
+         version: link:../../packages/mui-utils/build
+       next:
+         specifier: latest
+-        version: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++        version: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       react:
+         specifier: ^19.0.0
+         version: 19.0.0
+@@ -369,7 +369,7 @@ importers:
+     devDependencies:
+       '@pigment-css/nextjs-plugin':
+         specifier: 0.0.29
+-        version: 0.0.29(@types/react@19.0.6)(next@15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(webpack-sources@3.2.3)
++        version: 0.0.29(@types/react@19.0.6)(next@15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(webpack-sources@3.2.3)
+       '@types/node':
+         specifier: ^20.17.12
+         version: 20.17.12
+@@ -661,7 +661,7 @@ importers:
+         version: 9.7.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       '@toolpad/core':
+         specifier: ^0.12.0
+-        version: 0.12.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/icons-material@packages+mui-icons-material+build)(@mui/material-pigment-css@6.4.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@pigment-css/react@0.0.29(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/material@packages+mui-material+build)(@types/react@19.0.6)(next@15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(vite@5.4.11(@types/node@20.17.12)(terser@5.37.0))
++        version: 0.12.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/icons-material@packages+mui-icons-material+build)(@mui/material-pigment-css@6.4.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@pigment-css/react@0.0.29(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/material@packages+mui-material+build)(@types/react@19.0.6)(next@15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(vite@5.4.11(@types/node@20.17.12)(terser@5.37.0))
+       autoprefixer:
+         specifier: ^10.4.20
+         version: 10.4.20(postcss@8.4.49)
+@@ -745,7 +745,7 @@ importers:
+         version: 5.3.3(@mui/material@packages+mui-material+build)(@types/react@19.0.6)(react@19.0.0)
+       next:
+         specifier: ^15.1.4
+-        version: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++        version: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       notistack:
+         specifier: 3.0.1
+         version: 3.0.1(csstype@3.1.3)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+@@ -1457,7 +1457,7 @@ importers:
+         version: 19.0.6
+       next:
+         specifier: ^15.1.4
+-        version: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++        version: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       react:
+         specifier: ^19.0.0
+         version: 19.0.0
+@@ -1631,7 +1631,7 @@ importers:
+         version: 4.17.21
+       next:
+         specifier: ^15.1.4
+-        version: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++        version: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       react:
+         specifier: ^19.0.0
+         version: 19.0.0
+@@ -1835,7 +1835,7 @@ importers:
+         version: 19.0.6
+       next:
+         specifier: ^15.1.4
+-        version: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++        version: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       react:
+         specifier: ^19.0.0
+         version: 19.0.0
+@@ -4448,56 +4448,56 @@ packages:
+     resolution: {integrity: sha512-JkbaWFeydQdeDHz1mAy4rw+E3bl9YtbCgkntfTxq+IlNX/aIMv2/b1kZnQZcil4/sPoZGL831Dq6E374qRpU1A==}
+     engines: {node: '>=18.0.0'}
+ 
+-  '@next/env@15.1.4':
+-    resolution: {integrity: sha512-2fZ5YZjedi5AGaeoaC0B20zGntEHRhi2SdWcu61i48BllODcAmmtj8n7YarSPt4DaTsJaBFdxQAVEVzgmx2Zpw==}
++  '@next/env@15.1.5':
++    resolution: {integrity: sha512-jg8ygVq99W3/XXb9Y6UQsritwhjc+qeiO7QrGZRYOfviyr/HcdnhdBQu4gbp2rBIh2ZyBYTBMWbPw3JSCb0GHw==}
+ 
+   '@next/eslint-plugin-next@15.1.4':
+     resolution: {integrity: sha512-HwlEXwCK3sr6zmVGEvWBjW9tBFs1Oe6hTmTLoFQtpm4As5HCdu8jfSE0XJOp7uhfEGLniIx8yrGxEWwNnY0fmQ==}
+ 
+-  '@next/swc-darwin-arm64@15.1.4':
+-    resolution: {integrity: sha512-wBEMBs+np+R5ozN1F8Y8d/Dycns2COhRnkxRc+rvnbXke5uZBHkUGFgWxfTXn5rx7OLijuUhyfB+gC/ap58dDw==}
++  '@next/swc-darwin-arm64@15.1.5':
++    resolution: {integrity: sha512-5ttHGE75Nw9/l5S8zR2xEwR8OHEqcpPym3idIMAZ2yo+Edk0W/Vf46jGqPOZDk+m/SJ+vYZDSuztzhVha8rcdA==}
+     engines: {node: '>= 10'}
+     cpu: [arm64]
+     os: [darwin]
+ 
+-  '@next/swc-darwin-x64@15.1.4':
+-    resolution: {integrity: sha512-7sgf5rM7Z81V9w48F02Zz6DgEJulavC0jadab4ZsJ+K2sxMNK0/BtF8J8J3CxnsJN3DGcIdC260wEKssKTukUw==}
++  '@next/swc-darwin-x64@15.1.5':
++    resolution: {integrity: sha512-8YnZn7vDURUUTInfOcU5l0UWplZGBqUlzvqKKUFceM11SzfNEz7E28E1Arn4/FsOf90b1Nopboy7i7ufc4jXag==}
+     engines: {node: '>= 10'}
+     cpu: [x64]
+     os: [darwin]
+ 
+-  '@next/swc-linux-arm64-gnu@15.1.4':
+-    resolution: {integrity: sha512-JaZlIMNaJenfd55kjaLWMfok+vWBlcRxqnRoZrhFQrhM1uAehP3R0+Aoe+bZOogqlZvAz53nY/k3ZyuKDtT2zQ==}
++  '@next/swc-linux-arm64-gnu@15.1.5':
++    resolution: {integrity: sha512-rDJC4ctlYbK27tCyFUhgIv8o7miHNlpCjb2XXfTLQszwAUOSbcMN9q2y3urSrrRCyGVOd9ZR9a4S45dRh6JF3A==}
+     engines: {node: '>= 10'}
+     cpu: [arm64]
+     os: [linux]
+ 
+-  '@next/swc-linux-arm64-musl@15.1.4':
+-    resolution: {integrity: sha512-7EBBjNoyTO2ipMDgCiORpwwOf5tIueFntKjcN3NK+GAQD7OzFJe84p7a2eQUeWdpzZvhVXuAtIen8QcH71ZCOQ==}
++  '@next/swc-linux-arm64-musl@15.1.5':
++    resolution: {integrity: sha512-FG5RApf4Gu+J+pHUQxXPM81oORZrKBYKUaBTylEIQ6Lz17hKVDsLbSXInfXM0giclvXbyiLXjTv42sQMATmZ0A==}
+     engines: {node: '>= 10'}
+     cpu: [arm64]
+     os: [linux]
+ 
+-  '@next/swc-linux-x64-gnu@15.1.4':
+-    resolution: {integrity: sha512-9TGEgOycqZFuADyFqwmK/9g6S0FYZ3tphR4ebcmCwhL8Y12FW8pIBKJvSwV+UBjMkokstGNH+9F8F031JZKpHw==}
++  '@next/swc-linux-x64-gnu@15.1.5':
++    resolution: {integrity: sha512-NX2Ar3BCquAOYpnoYNcKz14eH03XuF7SmSlPzTSSU4PJe7+gelAjxo3Y7F2m8+hLT8ZkkqElawBp7SWBdzwqQw==}
+     engines: {node: '>= 10'}
+     cpu: [x64]
+     os: [linux]
+ 
+-  '@next/swc-linux-x64-musl@15.1.4':
+-    resolution: {integrity: sha512-0578bLRVDJOh+LdIoKvgNDz77+Bd85c5JrFgnlbI1SM3WmEQvsjxTA8ATu9Z9FCiIS/AliVAW2DV/BDwpXbtiQ==}
++  '@next/swc-linux-x64-musl@15.1.5':
++    resolution: {integrity: sha512-EQgqMiNu3mrV5eQHOIgeuh6GB5UU57tu17iFnLfBEhYfiOfyK+vleYKh2dkRVkV6ayx3eSqbIYgE7J7na4hhcA==}
+     engines: {node: '>= 10'}
+     cpu: [x64]
+     os: [linux]
+ 
+-  '@next/swc-win32-arm64-msvc@15.1.4':
+-    resolution: {integrity: sha512-JgFCiV4libQavwII+kncMCl30st0JVxpPOtzWcAI2jtum4HjYaclobKhj+JsRu5tFqMtA5CJIa0MvYyuu9xjjQ==}
++  '@next/swc-win32-arm64-msvc@15.1.5':
++    resolution: {integrity: sha512-HPULzqR/VqryQZbZME8HJE3jNFmTGcp+uRMHabFbQl63TtDPm+oCXAz3q8XyGv2AoihwNApVlur9Up7rXWRcjg==}
+     engines: {node: '>= 10'}
+     cpu: [arm64]
+     os: [win32]
+ 
+-  '@next/swc-win32-x64-msvc@15.1.4':
+-    resolution: {integrity: sha512-xxsJy9wzq7FR5SqPCUqdgSXiNXrMuidgckBa8nH9HtjjxsilgcN6VgXF6tZ3uEWuVEadotQJI8/9EQ6guTC4Yw==}
++  '@next/swc-win32-x64-msvc@15.1.5':
++    resolution: {integrity: sha512-n74fUb/Ka1dZSVYfjwQ+nSJ+ifUff7jGurFcTuJNKZmI62FFOxQXUYit/uZXPTj2cirm1rvGWHG2GhbSol5Ikw==}
+     engines: {node: '>= 10'}
+     cpu: [x64]
+     os: [win32]
+@@ -10084,8 +10084,8 @@ packages:
+   nested-error-stacks@2.1.1:
+     resolution: {integrity: sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==}
+ 
+-  next@15.1.4:
+-    resolution: {integrity: sha512-mTaq9dwaSuwwOrcu3ebjDYObekkxRnXpuVL21zotM8qE2W0HBOdVIdg2Li9QjMEZrj73LN96LcWcz62V19FjAg==}
++  next@15.1.5:
++    resolution: {integrity: sha512-Cf/TEegnt01hn3Hoywh6N8fvkhbOuChO4wFje24+a86wKOubgVaWkDqxGVgoWlz2Hp9luMJ9zw3epftujdnUOg==}
+     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+     hasBin: true
+     peerDependencies:
+@@ -15530,34 +15530,34 @@ snapshots:
+       '@netlify/node-cookies': 0.1.0
+       urlpattern-polyfill: 8.0.2
+ 
+-  '@next/env@15.1.4': {}
++  '@next/env@15.1.5': {}
+ 
+   '@next/eslint-plugin-next@15.1.4':
+     dependencies:
+       fast-glob: 3.3.1
+ 
+-  '@next/swc-darwin-arm64@15.1.4':
++  '@next/swc-darwin-arm64@15.1.5':
+     optional: true
+ 
+-  '@next/swc-darwin-x64@15.1.4':
++  '@next/swc-darwin-x64@15.1.5':
+     optional: true
+ 
+-  '@next/swc-linux-arm64-gnu@15.1.4':
++  '@next/swc-linux-arm64-gnu@15.1.5':
+     optional: true
+ 
+-  '@next/swc-linux-arm64-musl@15.1.4':
++  '@next/swc-linux-arm64-musl@15.1.5':
+     optional: true
+ 
+-  '@next/swc-linux-x64-gnu@15.1.4':
++  '@next/swc-linux-x64-gnu@15.1.5':
+     optional: true
+ 
+-  '@next/swc-linux-x64-musl@15.1.4':
++  '@next/swc-linux-x64-musl@15.1.5':
+     optional: true
+ 
+-  '@next/swc-win32-arm64-msvc@15.1.4':
++  '@next/swc-win32-arm64-msvc@15.1.5':
+     optional: true
+ 
+-  '@next/swc-win32-x64-msvc@15.1.4':
++  '@next/swc-win32-x64-msvc@15.1.5':
+     optional: true
+ 
+   '@nicolo-ribaudo/chokidar-2@2.1.8-no-fsevents.3':
+@@ -15993,10 +15993,10 @@ snapshots:
+   '@opentelemetry/api@1.8.0':
+     optional: true
+ 
+-  '@pigment-css/nextjs-plugin@0.0.29(@types/react@19.0.6)(next@15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(webpack-sources@3.2.3)':
++  '@pigment-css/nextjs-plugin@0.0.29(@types/react@19.0.6)(next@15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(webpack-sources@3.2.3)':
+     dependencies:
+       '@pigment-css/unplugin': 0.0.29(@types/react@19.0.6)(react@19.0.0)(webpack-sources@3.2.3)
+-      next: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++      next: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+     transitivePeerDependencies:
+       - '@types/react'
+       - react
+@@ -16766,7 +16766,7 @@ snapshots:
+       '@theme-ui/css': 0.17.1(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))
+       react: 19.0.0
+ 
+-  '@toolpad/core@0.12.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/icons-material@packages+mui-icons-material+build)(@mui/material-pigment-css@6.4.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@pigment-css/react@0.0.29(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/material@packages+mui-material+build)(@types/react@19.0.6)(next@15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(vite@5.4.11(@types/node@20.17.12)(terser@5.37.0))':
++  '@toolpad/core@0.12.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/icons-material@packages+mui-icons-material+build)(@mui/material-pigment-css@6.4.0(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@emotion/styled@11.13.5(@emotion/react@11.13.5(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@pigment-css/react@0.0.29(@types/react@19.0.6)(react@19.0.0))(@types/react@19.0.6)(react@19.0.0))(@mui/material@packages+mui-material+build)(@types/react@19.0.6)(next@15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)(vite@5.4.11(@types/node@20.17.12)(terser@5.37.0))':
+     dependencies:
+       '@babel/runtime': 7.26.0
+       '@mui/icons-material': link:packages/mui-icons-material/build
+@@ -16781,7 +16781,7 @@ snapshots:
+       prop-types: 15.8.1
+       react: 19.0.0
+     optionalDependencies:
+-      next: 15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
++      next: 15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+       react-router: 7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+     transitivePeerDependencies:
+       - '@emotion/react'
+@@ -22765,9 +22765,9 @@ snapshots:
+ 
+   nested-error-stacks@2.1.1: {}
+ 
+-  next@15.1.4(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
++  next@15.1.5(@babel/core@7.26.0)(@opentelemetry/api@1.8.0)(@playwright/test@1.48.2)(babel-plugin-macros@3.1.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+     dependencies:
+-      '@next/env': 15.1.4
++      '@next/env': 15.1.5
+       '@swc/counter': 0.1.3
+       '@swc/helpers': 0.5.15
+       busboy: 1.6.0
+@@ -22777,14 +22777,14 @@ snapshots:
+       react-dom: 19.0.0(react@19.0.0)
+       styled-jsx: 5.1.6(@babel/core@7.26.0)(babel-plugin-macros@3.1.0)(react@19.0.0)
+     optionalDependencies:
+-      '@next/swc-darwin-arm64': 15.1.4
+-      '@next/swc-darwin-x64': 15.1.4
+-      '@next/swc-linux-arm64-gnu': 15.1.4
+-      '@next/swc-linux-arm64-musl': 15.1.4
+-      '@next/swc-linux-x64-gnu': 15.1.4
+-      '@next/swc-linux-x64-musl': 15.1.4
+-      '@next/swc-win32-arm64-msvc': 15.1.4
+-      '@next/swc-win32-x64-msvc': 15.1.4
++      '@next/swc-darwin-arm64': 15.1.5
++      '@next/swc-darwin-x64': 15.1.5
++      '@next/swc-linux-arm64-gnu': 15.1.5
++      '@next/swc-linux-arm64-musl': 15.1.5
++      '@next/swc-linux-x64-gnu': 15.1.5
++      '@next/swc-linux-x64-musl': 15.1.5
++      '@next/swc-win32-arm64-msvc': 15.1.5
++      '@next/swc-win32-x64-msvc': 15.1.5
+       '@opentelemetry/api': 1.8.0
+       '@playwright/test': 1.48.2
+       sharp: 0.33.5

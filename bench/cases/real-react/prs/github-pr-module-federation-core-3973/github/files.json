@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "a7ae62d841d48efccab40d3167dbdb14aa47f73a",
+    "filename": "packages/bridge/bridge-react/src/remote/component.tsx",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 1,
+    "changes": 5,
+    "blob_url": "https://github.com/module-federation/core/blob/fcd6480fe4807614e6d5809d0af3e2ffb9308657/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcomponent.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/fcd6480fe4807614e6d5809d0af3e2ffb9308657/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcomponent.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcomponent.tsx?ref=fcd6480fe4807614e6d5809d0af3e2ffb9308657",
+    "patch": "@@ -23,6 +23,7 @@ const RemoteAppWrapper = forwardRef(function (\n     className,\n     style,\n     fallback,\n+    loading,\n     ...resProps\n   } = props;\n \n@@ -104,7 +105,9 @@ const RemoteAppWrapper = forwardRef(function (\n   // bridge-remote-root\n   const rootComponentClassName = `${getRootDomDefaultClassName(moduleName)} ${className || ''}`;\n   return (\n-    <div className={rootComponentClassName} style={style} ref={rootRef}></div>\n+    <div className={rootComponentClassName} style={style} ref={rootRef}>\n+      {loading}\n+    </div>\n   );\n });\n "
+  },
+  {
+    "sha": "8b73d3666df80a53a02ce800debc5a5f903b5d7f",
+    "filename": "packages/bridge/bridge-react/src/remote/create.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/module-federation/core/blob/fcd6480fe4807614e6d5809d0af3e2ffb9308657/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcreate.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/fcd6480fe4807614e6d5809d0af3e2ffb9308657/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcreate.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcreate.tsx?ref=fcd6480fe4807614e6d5809d0af3e2ffb9308657",
+    "patch": "@@ -44,6 +44,7 @@ function createLazyRemoteComponent<\n               providerInfo={exportFn}\n               exportName={info.export || 'default'}\n               fallback={info.fallback}\n+              loading={info.loading}\n               ref={ref}\n               {...props}\n             />"
+  }
+]

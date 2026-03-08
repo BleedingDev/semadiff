@@ -1,0 +1,699 @@
+diff --git a/docs/src/modules/components/AppSearch.js b/docs/src/modules/components/AppSearch.js
+index 4721e74aaed1f8..780d6d7e46ee33 100644
+--- a/docs/src/modules/components/AppSearch.js
++++ b/docs/src/modules/components/AppSearch.js
+@@ -160,7 +160,7 @@ const useStyles = makeStyles(theme => ({
+ function AppSearch(props) {
+   const { userLanguage } = props;
+   const classes = useStyles();
+-  const inputRef = React.useRef();
++  const inputRef = React.useRef(null);
+   const theme = useTheme();
+ 
+   React.useEffect(() => {
+diff --git a/docs/src/pages/demos/progress/CircularIntegration.js b/docs/src/pages/demos/progress/CircularIntegration.js
+index bb8b9b8b52f18d..9c49ca12392cca 100644
+--- a/docs/src/pages/demos/progress/CircularIntegration.js
++++ b/docs/src/pages/demos/progress/CircularIntegration.js
+@@ -44,7 +44,7 @@ function CircularIntegration() {
+   const classes = useStyles();
+   const [loading, setLoading] = React.useState(false);
+   const [success, setSuccess] = React.useState(false);
+-  const timer = React.useRef(undefined);
++  const timer = React.useRef();
+ 
+   const buttonClassname = clsx({
+     [classes.buttonSuccess]: success,
+diff --git a/docs/src/pages/demos/progress/CircularIntegration.tsx b/docs/src/pages/demos/progress/CircularIntegration.tsx
+index b6e3f3de3a6bc4..5d447e88d1fd0a 100644
+--- a/docs/src/pages/demos/progress/CircularIntegration.tsx
++++ b/docs/src/pages/demos/progress/CircularIntegration.tsx
+@@ -44,7 +44,7 @@ function CircularIntegration() {
+   const classes = useStyles();
+   const [loading, setLoading] = React.useState(false);
+   const [success, setSuccess] = React.useState(false);
+-  const timer = React.useRef<number | undefined>(undefined);
++  const timer = React.useRef<number>();
+ 
+   const buttonClassname = clsx({
+     [classes.buttonSuccess]: success,
+diff --git a/packages/material-ui/src/ClickAwayListener/ClickAwayListener.js b/packages/material-ui/src/ClickAwayListener/ClickAwayListener.js
+index e5da704ab1b865..353889d21619cf 100644
+--- a/packages/material-ui/src/ClickAwayListener/ClickAwayListener.js
++++ b/packages/material-ui/src/ClickAwayListener/ClickAwayListener.js
+@@ -27,7 +27,7 @@ function ClickAwayListener(props) {
+   const mountedRef = useMountedRef();
+   const movedRef = React.useRef(false);
+ 
+-  const nodeRef = React.useRef();
++  const nodeRef = React.useRef(null);
+   // can be removed once we drop support for non ref forwarding class components
+   const handleOwnRef = React.useCallback(instance => {
+     // #StrictMode ready
+diff --git a/packages/material-ui/src/Collapse/Collapse.js b/packages/material-ui/src/Collapse/Collapse.js
+index 91e14639674a1d..e8e1eba0484add 100644
+--- a/packages/material-ui/src/Collapse/Collapse.js
++++ b/packages/material-ui/src/Collapse/Collapse.js
+@@ -59,7 +59,7 @@ const Collapse = React.forwardRef(function Collapse(props, ref) {
+     ...other
+   } = props;
+   const timer = React.useRef();
+-  const wrapperRef = React.useRef();
++  const wrapperRef = React.useRef(null);
+   const autoTransitionDuration = React.useRef();
+ 
+   React.useEffect(() => {
+diff --git a/packages/material-ui/src/Dialog/Dialog.js b/packages/material-ui/src/Dialog/Dialog.js
+index 2db1e1b0979926..ebd91c3aa75c2d 100644
+--- a/packages/material-ui/src/Dialog/Dialog.js
++++ b/packages/material-ui/src/Dialog/Dialog.js
+@@ -166,7 +166,7 @@ const Dialog = React.forwardRef(function Dialog(props, ref) {
+     ...other
+   } = props;
+ 
+-  const mouseDownTarget = React.useRef(null);
++  const mouseDownTarget = React.useRef();
+   const handleMouseDown = event => {
+     mouseDownTarget.current = event.target;
+   };
+diff --git a/packages/material-ui/src/InputBase/Textarea.js b/packages/material-ui/src/InputBase/Textarea.js
+index e1ba65ef600471..519648805cbeb6 100644
+--- a/packages/material-ui/src/InputBase/Textarea.js
++++ b/packages/material-ui/src/InputBase/Textarea.js
+@@ -31,9 +31,9 @@ const Textarea = React.forwardRef(function Textarea(props, ref) {
+   const { onChange, rows, rowsMax, style, value, ...other } = props;
+ 
+   const { current: isControlled } = React.useRef(value != null);
+-  const inputRef = React.useRef();
++  const inputRef = React.useRef(null);
+   const [state, setState] = React.useState({});
+-  const shadowRef = React.useRef();
++  const shadowRef = React.useRef(null);
+   const handleRef = useForkRef(ref, inputRef);
+ 
+   const syncHeight = React.useCallback(() => {
+diff --git a/packages/material-ui/src/ListItem/ListItem.js b/packages/material-ui/src/ListItem/ListItem.js
+index a72aea852f523b..bd056e7e753873 100644
+--- a/packages/material-ui/src/ListItem/ListItem.js
++++ b/packages/material-ui/src/ListItem/ListItem.js
+@@ -111,7 +111,7 @@ const ListItem = React.forwardRef(function ListItem(props, ref) {
+     dense: dense || context.dense || false,
+     alignItems,
+   };
+-  const listItemRef = React.useRef();
++  const listItemRef = React.useRef(null);
+   useEnhancedEffect(() => {
+     if (autoFocus) {
+       if (listItemRef.current) {
+diff --git a/packages/material-ui/src/Menu/Menu.js b/packages/material-ui/src/Menu/Menu.js
+index 0eecb74fc476ef..43d9b652d646d7 100644
+--- a/packages/material-ui/src/Menu/Menu.js
++++ b/packages/material-ui/src/Menu/Menu.js
+@@ -56,9 +56,9 @@ const Menu = React.forwardRef(function Menu(props, ref) {
+ 
+   const autoFocus = autoFocusProp !== undefined ? autoFocusProp : !disableAutoFocusItem;
+ 
+-  const menuListActionsRef = React.useRef();
+-  const firstValidItemRef = React.useRef();
+-  const firstSelectedItemRef = React.useRef();
++  const menuListActionsRef = React.useRef(null);
++  const firstValidItemRef = React.useRef(null);
++  const firstSelectedItemRef = React.useRef(null);
+ 
+   const getContentAnchorEl = () => firstSelectedItemRef.current || firstValidItemRef.current;
+ 
+diff --git a/packages/material-ui/src/MenuList/MenuList.js b/packages/material-ui/src/MenuList/MenuList.js
+index 8ebd90011a9e27..a0522be01957ce 100644
+--- a/packages/material-ui/src/MenuList/MenuList.js
++++ b/packages/material-ui/src/MenuList/MenuList.js
+@@ -79,7 +79,7 @@ const useEnhancedEffect = typeof window === 'undefined' ? React.useEffect : Reac
+ 
+ const MenuList = React.forwardRef(function MenuList(props, ref) {
+   const { actions, autoFocus, className, onKeyDown, disableListWrap, ...other } = props;
+-  const listRef = React.useRef();
++  const listRef = React.useRef(null);
+   const textCriteriaRef = React.useRef({
+     keys: [],
+     repeating: true,
+diff --git a/packages/material-ui/src/Modal/Modal.js b/packages/material-ui/src/Modal/Modal.js
+index 54b752d683da30..239f14b7dcc0fa 100644
+--- a/packages/material-ui/src/Modal/Modal.js
++++ b/packages/material-ui/src/Modal/Modal.js
+@@ -167,7 +167,7 @@ class Modal extends React.Component {
+   };
+ 
+   handlePortalRef = ref => {
+-    this.mountNode = ref ? ref.getMountNode() : ref;
++    this.mountNode = ref;
+   };
+ 
+   handleModalRef = ref => {
+diff --git a/packages/material-ui/src/Modal/Modal.test.js b/packages/material-ui/src/Modal/Modal.test.js
+index 48e137312986ef..8a3814a9477eb7 100644
+--- a/packages/material-ui/src/Modal/Modal.test.js
++++ b/packages/material-ui/src/Modal/Modal.test.js
+@@ -9,7 +9,6 @@ import {
+   describeConformance,
+ } from '@material-ui/core/test-utils';
+ import Fade from '../Fade';
+-import Portal from '../Portal';
+ import Backdrop from '../Backdrop';
+ import Modal from './Modal';
+ 
+@@ -176,10 +175,7 @@ describe('<Modal />', () => {
+ 
+     it('should render the content into the portal', () => {
+       wrapper.setProps({ open: true });
+-      const portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       const container = document.getElementById('container');
+       const heading = document.getElementById('heading');
+ 
+diff --git a/packages/material-ui/src/Modal/TrapFocus.js b/packages/material-ui/src/Modal/TrapFocus.js
+index 99a8b0d777f289..1199eaee982b53 100644
+--- a/packages/material-ui/src/Modal/TrapFocus.js
++++ b/packages/material-ui/src/Modal/TrapFocus.js
+@@ -18,10 +18,10 @@ function TrapFocus(props) {
+     open,
+   } = props;
+   const ignoreNextEnforceFocus = React.useRef();
+-  const sentinelStart = React.useRef();
+-  const sentinelEnd = React.useRef();
++  const sentinelStart = React.useRef(null);
++  const sentinelEnd = React.useRef(null);
+   const lastFocus = React.useRef();
+-  const rootRef = React.useRef();
++  const rootRef = React.useRef(null);
+   // can be removed once we drop support for non ref forwarding class components
+   const handleOwnRef = React.useCallback(instance => {
+     // #StrictMode ready
+diff --git a/packages/material-ui/src/Popper/Popper.js b/packages/material-ui/src/Popper/Popper.js
+index af13406cd30340..67fe429d5323ac 100644
+--- a/packages/material-ui/src/Popper/Popper.js
++++ b/packages/material-ui/src/Popper/Popper.js
+@@ -48,7 +48,7 @@ const Popper = React.forwardRef(function Popper(props, ref) {
+     transition,
+     ...other
+   } = props;
+-  const tooltipRef = React.useRef();
++  const tooltipRef = React.useRef(null);
+   const popperRef = React.useRef();
+   const [exited, setExited] = React.useState(!props.open);
+   const [placement, setPlacement] = React.useState();
+diff --git a/packages/material-ui/src/Portal/Portal.js b/packages/material-ui/src/Portal/Portal.js
+index cae1d0c9853b58..7c08ce617c492e 100644
+--- a/packages/material-ui/src/Portal/Portal.js
++++ b/packages/material-ui/src/Portal/Portal.js
+@@ -1,82 +1,49 @@
+ import React from 'react';
+ import ReactDOM from 'react-dom';
+ import PropTypes from 'prop-types';
+-import ownerDocument from '../utils/ownerDocument';
++import { useForkRef } from '../utils/reactHelpers';
+ import { exactProp } from '@material-ui/utils';
+ 
+-function getContainer(container, defaultContainer) {
++function getContainer(container) {
+   container = typeof container === 'function' ? container() : container;
+-  return ReactDOM.findDOMNode(container) || defaultContainer;
++  return ReactDOM.findDOMNode(container);
+ }
+ 
+-function getOwnerDocument(element) {
+-  return ownerDocument(ReactDOM.findDOMNode(element));
+-}
++const useEnhancedEffect = typeof window !== 'undefined' ? React.useLayoutEffect : React.useEffect;
+ 
+ /**
+  * Portals provide a first-class way to render children into a DOM node
+  * that exists outside the DOM hierarchy of the parent component.
+  */
+-class Portal extends React.Component {
+-  componentDidMount() {
+-    this.setMountNode(this.props.container);
+-
+-    // Only rerender if needed
+-    if (!this.props.disablePortal) {
+-      this.forceUpdate(this.props.onRendered);
++const Portal = React.forwardRef(function Portal(props, ref) {
++  const { children, container, disablePortal, onRendered } = props;
++  const [mountNode, setMountNode] = React.useState(null);
++  const childRef = React.useRef(null);
++  const handleRef = useForkRef(children.ref, childRef);
++
++  useEnhancedEffect(() => {
++    if (!disablePortal) {
++      setMountNode(getContainer(container) || document.body);
+     }
+-  }
+-
+-  componentDidUpdate(prevProps) {
+-    if (
+-      prevProps.container !== this.props.container ||
+-      prevProps.disablePortal !== this.props.disablePortal
+-    ) {
+-      this.setMountNode(this.props.container);
++  }, [container]);
+ 
+-      // Only rerender if needed
+-      if (!this.props.disablePortal) {
+-        this.forceUpdate(() => {
+-          if (this.props.onRendered) {
+-            // This might be triggered earlier than the componentDidUpdate of a parent element.
+-            // We need to account for it.
+-            clearTimeout(this.renderedTimer);
+-            this.renderedTimer = setTimeout(this.props.onRendered);
+-          }
+-        });
+-      }
++  React.useEffect(() => {
++    if (onRendered && mountNode) {
++      onRendered();
+     }
+-  }
+-
+-  componentWillUnmount() {
+-    this.mountNode = null;
+-    clearTimeout(this.renderedTimer);
+-  }
++  }, [mountNode, onRendered]);
+ 
+-  setMountNode(container) {
+-    if (this.props.disablePortal) {
+-      this.mountNode = ReactDOM.findDOMNode(this).parentElement;
+-      return;
+-    }
++  React.useImperativeHandle(ref, () => mountNode || childRef.current, [mountNode]);
+ 
+-    this.mountNode = getContainer(container, getOwnerDocument(this).body);
++  if (disablePortal) {
++    React.Children.only(children);
++    return React.cloneElement(children, {
++      ref: handleRef,
++    });
+   }
+ 
+-  /**
+-   * @public
+-   */
+-  getMountNode = () => this.mountNode;
+-
+-  render() {
+-    const { children, disablePortal } = this.props;
+-
+-    if (disablePortal) {
+-      return children;
+-    }
+-
+-    return this.mountNode ? ReactDOM.createPortal(children, this.mountNode) : null;
+-  }
+-}
++  return mountNode ? ReactDOM.createPortal(children, mountNode) : mountNode;
++});
+ 
+ Portal.propTypes = {
+   /**
+@@ -106,7 +73,8 @@ Portal.defaultProps = {
+ };
+ 
+ if (process.env.NODE_ENV !== 'production') {
+-  Portal.propTypes = exactProp(Portal.propTypes);
++  // eslint-disable-next-line
++  Portal['propTypes' + ''] = exactProp(Portal.propTypes);
+ }
+ 
+ export default Portal;
+diff --git a/packages/material-ui/src/Portal/Portal.test.js b/packages/material-ui/src/Portal/Portal.test.js
+index 2fb4b8217bfa20..c10789f6a79878 100644
+--- a/packages/material-ui/src/Portal/Portal.test.js
++++ b/packages/material-ui/src/Portal/Portal.test.js
+@@ -4,6 +4,7 @@ import { assert } from 'chai';
+ import { spy } from 'sinon';
+ import PropTypes from 'prop-types';
+ import { createMount, createRender } from '@material-ui/core/test-utils';
++import consoleErrorMock from 'test/utils/consoleErrorMock';
+ import Portal from './Portal';
+ import Select from '../Select';
+ import MenuItem from '../MenuItem';
+@@ -86,6 +87,14 @@ describe('<Portal />', () => {
+         return;
+       }
+ 
++      beforeEach(() => {
++        consoleErrorMock.spy();
++      });
++
++      afterEach(() => {
++        consoleErrorMock.reset();
++      });
++
+       it('render nothing on the server', () => {
+         const markup1 = render(<div>Bar</div>);
+         assert.strictEqual(markup1.text(), 'Bar');
+@@ -109,24 +118,39 @@ describe('<Portal />', () => {
+     });
+ 
+     it('should have access to the mountNode', () => {
+-      const wrapper = mount(
+-        <Portal>
++      const refSpy1 = spy();
++      mount(
++        <Portal ref={refSpy1}>
+           <h1>Foo</h1>
+         </Portal>,
+       );
+-      const instance = wrapper.find('Portal').instance();
+-      assert.strictEqual(instance.getMountNode(), instance.mountNode);
++      assert.deepEqual(refSpy1.args, [[null], [null], [document.body]]);
++      const refSpy2 = spy();
++      mount(
++        <Portal disablePortal ref={refSpy2}>
++          <h1 className="woofPortal">Foo</h1>
++        </Portal>,
++      );
++      assert.deepEqual(refSpy2.args, [[document.querySelector('.woofPortal')]]);
+     });
+ 
+     it('should render in a different node', () => {
+       const wrapper = mount(
+-        <Portal>
+-          <h1 className="woofPortal">Foo</h1>
+-        </Portal>,
++        <div>
++          <h1 className="woofPortal1">Foo</h1>
++          <Portal>
++            <h1 className="woofPortal2">Foo</h1>
++          </Portal>
++        </div>,
++      );
++      assert.strictEqual(
++        wrapper.getDOMNode().contains(document.querySelector('.woofPortal1')),
++        true,
++      );
++      assert.strictEqual(
++        wrapper.getDOMNode().contains(document.querySelector('.woofPortal2')),
++        false,
+       );
+-      const instance = wrapper.find('Portal').instance();
+-      assert.notStrictEqual(instance.mountNode, null, 'should have a mountNode');
+-      assert.strictEqual(document.querySelectorAll('.woofPortal').length, 1);
+     });
+ 
+     it('should unmount when parent unmounts', () => {
+@@ -270,7 +294,15 @@ describe('<Portal />', () => {
+     wrapper.setProps({ container: null });
+ 
+     setTimeout(() => {
+-      assert.deepEqual(callOrder, ['onRendered', 'cDU', 'cDU', 'cDU', 'onRendered']);
++      assert.deepEqual(callOrder, [
++        'onRendered',
++        'cDU',
++        'onRendered',
++        'cDU',
++        'onRendered',
++        'cDU',
++        'onRendered',
++      ]);
+       done();
+     });
+   });
+diff --git a/packages/material-ui/src/RadioGroup/RadioGroup.js b/packages/material-ui/src/RadioGroup/RadioGroup.js
+index caa53163f41a0a..83f5440c0f9413 100644
+--- a/packages/material-ui/src/RadioGroup/RadioGroup.js
++++ b/packages/material-ui/src/RadioGroup/RadioGroup.js
+@@ -9,7 +9,7 @@ import RadioGroupContext from './RadioGroupContext';
+ 
+ const RadioGroup = React.forwardRef(function RadioGroup(props, ref) {
+   const { actions, children, name, value: valueProp, onChange, ...other } = props;
+-  const rootRef = React.useRef();
++  const rootRef = React.useRef(null);
+   const { current: isControlled } = React.useRef(props.value != null);
+   const [valueState, setValue] = React.useState(() => {
+     if (!isControlled) {
+diff --git a/packages/material-ui/src/Select/SelectInput.js b/packages/material-ui/src/Select/SelectInput.js
+index 0f79da0f02aa0d..812aa8ae09026e 100644
+--- a/packages/material-ui/src/Select/SelectInput.js
++++ b/packages/material-ui/src/Select/SelectInput.js
+@@ -47,7 +47,7 @@ const SelectInput = React.forwardRef(function SelectInput(props, ref) {
+     variant,
+     ...other
+   } = props;
+-  const displayRef = React.useRef();
++  const displayRef = React.useRef(null);
+   const ignoreNextBlur = React.useRef(false);
+   const { current: isOpenControlled } = React.useRef(props.open != null);
+   const [menuMinWidthState, setMenuMinWidthState] = React.useState();
+diff --git a/packages/material-ui/src/Select/SelectInput.test.js b/packages/material-ui/src/Select/SelectInput.test.js
+index dd3d15227c3113..f4870a166d4458 100644
+--- a/packages/material-ui/src/Select/SelectInput.test.js
++++ b/packages/material-ui/src/Select/SelectInput.test.js
+@@ -3,7 +3,6 @@ import { assert } from 'chai';
+ import { spy, stub, useFakeTimers } from 'sinon';
+ import { createShallow, createMount } from '@material-ui/core/test-utils';
+ import Menu from '../Menu';
+-import Portal from '../Portal';
+ import MenuItem from '../MenuItem';
+ import SelectInput from './SelectInput';
+ 
+@@ -386,10 +385,7 @@ describe('<SelectInput />', () => {
+       it('should call onChange when clicking an item', () => {
+         wrapper.find(`.${defaultProps.classes.select}`).simulate('click');
+         assert.strictEqual(wrapper.find(MenuItem).exists(), true);
+-        const portalLayer = wrapper
+-          .find(Portal)
+-          .instance()
+-          .getMountNode();
++        const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+ 
+         portalLayer.querySelectorAll('li')[1].click();
+         assert.strictEqual(wrapper.find(MenuItem).exists(), true);
+@@ -410,10 +406,7 @@ describe('<SelectInput />', () => {
+         const wrapper = mount(<SelectInput {...defaultProps} value="" autoFocus />);
+         wrapper.find(`.${defaultProps.classes.select}`).simulate('click');
+         assert.strictEqual(wrapper.find(MenuItem).exists(), true);
+-        const portalLayer = wrapper
+-          .find(Portal)
+-          .instance()
+-          .getMountNode();
++        const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+         assert.strictEqual(document.activeElement, portalLayer.querySelectorAll('ul')[0]);
+       });
+     });
+diff --git a/packages/material-ui/src/Slide/Slide.js b/packages/material-ui/src/Slide/Slide.js
+index 239c295a241bd3..b91777d232ce88 100644
+--- a/packages/material-ui/src/Slide/Slide.js
++++ b/packages/material-ui/src/Slide/Slide.js
+@@ -86,7 +86,7 @@ const Slide = React.forwardRef(function Slide(props, ref) {
+     ...other
+   } = props;
+ 
+-  const childrenRef = React.useRef();
++  const childrenRef = React.useRef(null);
+   /**
+    * used in cloneElement(children, { ref: handleRef })
+    */
+diff --git a/packages/material-ui/src/Tabs/ScrollbarSize.js b/packages/material-ui/src/Tabs/ScrollbarSize.js
+index e503fbc1d53c3a..2e9c179422c5ce 100644
+--- a/packages/material-ui/src/Tabs/ScrollbarSize.js
++++ b/packages/material-ui/src/Tabs/ScrollbarSize.js
+@@ -20,7 +20,7 @@ const styles = {
+ function ScrollbarSize(props) {
+   const { onChange } = props;
+   const scrollbarHeight = React.useRef();
+-  const nodeRef = React.useRef();
++  const nodeRef = React.useRef(null);
+ 
+   const setMeasurements = () => {
+     scrollbarHeight.current = nodeRef.current.offsetHeight - nodeRef.current.clientHeight;
+diff --git a/packages/material-ui/src/TextField/TextField.js b/packages/material-ui/src/TextField/TextField.js
+index dad3bf7735e70a..0beeba9231f75b 100644
+--- a/packages/material-ui/src/TextField/TextField.js
++++ b/packages/material-ui/src/TextField/TextField.js
+@@ -93,7 +93,7 @@ const TextField = React.forwardRef(function TextField(props, ref) {
+   } = props;
+ 
+   const [labelWidth, setLabelWidth] = React.useState(0);
+-  const labelRef = React.useRef();
++  const labelRef = React.useRef(null);
+   React.useEffect(() => {
+     if (variant === 'outlined') {
+       // #StrictMode ready
+diff --git a/packages/material-ui/src/utils/reactHelpers.test.js b/packages/material-ui/src/utils/reactHelpers.test.js
+index 77a7cb7ced93a5..ef3367f9f3d22e 100644
+--- a/packages/material-ui/src/utils/reactHelpers.test.js
++++ b/packages/material-ui/src/utils/reactHelpers.test.js
+@@ -66,7 +66,7 @@ describe('utils/reactHelpers.js', () => {
+     it('returns a single ref-setter function that forks the ref to its inputs', () => {
+       function Component(props) {
+         const { innerRef } = props;
+-        const ownRef = React.useRef();
++        const ownRef = React.useRef(null);
+         const [, forceUpdate] = React.useState(0);
+         React.useEffect(() => forceUpdate(n => !n), []);
+ 
+diff --git a/packages/material-ui/test/integration/Menu.test.js b/packages/material-ui/test/integration/Menu.test.js
+index 530e01292ee41f..ddd891ef87c4bb 100644
+--- a/packages/material-ui/test/integration/Menu.test.js
++++ b/packages/material-ui/test/integration/Menu.test.js
+@@ -3,7 +3,6 @@ import { assert } from 'chai';
+ import TestUtils from 'react-dom/test-utils';
+ import { createMount } from 'packages/material-ui/src/test-utils';
+ import Popover from 'packages/material-ui/src/Popover';
+-import Portal from 'packages/material-ui/src/Portal';
+ import SimpleMenu from './fixtures/menus/SimpleMenu';
+ import Menu from 'packages/material-ui/src/Menu';
+ import MenuItem from 'packages/material-ui/src/MenuItem';
+@@ -41,10 +40,7 @@ describe('<Menu> integration', () => {
+ 
+     it('should focus the list as nothing has been selected', () => {
+       wrapper.find('button').simulate('click');
+-      portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       assert.strictEqual(document.activeElement, portalLayer.querySelectorAll('ul')[0]);
+     });
+ 
+@@ -133,18 +129,12 @@ describe('<Menu> integration', () => {
+ 
+     it('should focus the 3rd selected item', () => {
+       wrapper.find('button').simulate('click');
+-      const portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       assert.strictEqual(document.activeElement, portalLayer.querySelectorAll('li')[2]);
+     });
+ 
+     it('should select the 2nd item and close the menu', () => {
+-      const portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       const item = portalLayer.querySelector('ul').children[1];
+       item.click();
+       assert.strictEqual(wrapper.text(), 'selectedIndex: 1, open: false');
+@@ -152,10 +142,7 @@ describe('<Menu> integration', () => {
+ 
+     it('should focus the 2nd selected item', () => {
+       wrapper.find('button').simulate('click');
+-      const portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       assert.strictEqual(document.activeElement, portalLayer.querySelectorAll('li')[1]);
+     });
+   });
+@@ -355,10 +342,7 @@ describe('<Menu> integration', () => {
+     beforeEach(() => {
+       wrapper = mount(<SimpleMenu transitionDuration={0} />);
+       wrapper.find('button').simulate('click');
+-      portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      portalLayer = document.querySelector('[data-mui-test="Modal"]');
+     });
+ 
+     it('should close the menu with tab', done => {
+diff --git a/packages/material-ui/test/integration/MenuList.test.js b/packages/material-ui/test/integration/MenuList.test.js
+index 0f10b034c1d0a9..68fe13d38ba6e4 100644
+--- a/packages/material-ui/test/integration/MenuList.test.js
++++ b/packages/material-ui/test/integration/MenuList.test.js
+@@ -8,7 +8,7 @@ import { createMount } from 'packages/material-ui/src/test-utils';
+ import PropTypes from 'prop-types';
+ 
+ function FocusOnMountMenuItem(props) {
+-  const listItemRef = React.useRef();
++  const listItemRef = React.useRef(null);
+   React.useLayoutEffect(() => {
+     listItemRef.current.focus();
+   }, []);
+diff --git a/packages/material-ui/test/integration/NestedMenu.test.js b/packages/material-ui/test/integration/NestedMenu.test.js
+index d96357a4121654..d77c1acc817585 100644
+--- a/packages/material-ui/test/integration/NestedMenu.test.js
++++ b/packages/material-ui/test/integration/NestedMenu.test.js
+@@ -1,7 +1,6 @@
+ import React from 'react';
+ import { assert } from 'chai';
+ import { createMount } from 'packages/material-ui/src/test-utils';
+-import Portal from 'packages/material-ui/src/Portal';
+ import NestedMenu from './fixtures/menus/NestedMenu';
+ 
+ describe('<NestedMenu> integration', () => {
+@@ -18,7 +17,6 @@ describe('<NestedMenu> integration', () => {
+ 
+   describe('mounted open', () => {
+     let wrapper;
+-    let portalLayer;
+ 
+     before(() => {
+       wrapper = mount(<NestedMenu />);
+@@ -34,10 +32,7 @@ describe('<NestedMenu> integration', () => {
+     it('should focus the list as nothing has been selected', () => {
+       wrapper.setProps({ firstMenuOpen: true });
+ 
+-      portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       assert.strictEqual(document.activeElement, portalLayer.querySelectorAll('ul')[0]);
+     });
+ 
+diff --git a/packages/material-ui/test/integration/Select.test.js b/packages/material-ui/test/integration/Select.test.js
+index 3d2dc97b4a2e6f..33b5080a556455 100644
+--- a/packages/material-ui/test/integration/Select.test.js
++++ b/packages/material-ui/test/integration/Select.test.js
+@@ -1,7 +1,6 @@
+ import React from 'react';
+ import { assert } from 'chai';
+ import { createMount } from 'packages/material-ui/src/test-utils';
+-import Portal from 'packages/material-ui/src/Portal';
+ import SelectAndDialog from './fixtures/select/SelectAndDialog';
+ 
+ describe('<Select> integration', () => {
+@@ -19,10 +18,7 @@ describe('<Select> integration', () => {
+   describe('with Dialog', () => {
+     it('should focus the selected item', done => {
+       const wrapper = mount(<SelectAndDialog />);
+-      const portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       const selectDisplay = portalLayer.querySelector('[data-mui-test="SelectDisplay"]');
+ 
+       wrapper.setProps({
+@@ -57,10 +53,7 @@ describe('<Select> integration', () => {
+ 
+     it('should be able to change the selected item', done => {
+       const wrapper = mount(<SelectAndDialog />);
+-      const portalLayer = wrapper
+-        .find(Portal)
+-        .instance()
+-        .getMountNode();
++      const portalLayer = document.querySelector('[data-mui-test="Modal"]');
+       const selectDisplay = portalLayer.querySelector('[data-mui-test="SelectDisplay"]');
+ 
+       wrapper.setProps({
+diff --git a/packages/material-ui/test/integration/fixtures/menus/NestedMenu.js b/packages/material-ui/test/integration/fixtures/menus/NestedMenu.js
+index 61ecd4b3ff476b..acdb1d55b0ae1b 100644
+--- a/packages/material-ui/test/integration/fixtures/menus/NestedMenu.js
++++ b/packages/material-ui/test/integration/fixtures/menus/NestedMenu.js
+@@ -5,7 +5,7 @@ import Menu from '@material-ui/core/Menu';
+ import MenuItem from '@material-ui/core/MenuItem';
+ 
+ function NestedMenu(props) {
+-  const rootRef = React.useRef();
++  const rootRef = React.useRef(null);
+ 
+   return (
+     <div>

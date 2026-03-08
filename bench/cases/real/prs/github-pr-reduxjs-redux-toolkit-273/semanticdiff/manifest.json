@@ -1,0 +1,179 @@
+[
+  {
+    "tracking_name": ".gitignore",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=.gitignore&old_oid=5c47353524d677a48290f4155308d61d28e68087&old_mode=33188&new_filename=.gitignore&new_oid=3bfc284df88217f5ceb7b5d64425f3c8a6d7d54a&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": ".gitignore",
+      "oid": "5c47353524d677a48290f4155308d61d28e68087",
+      "mode": 33188
+    },
+    "new": {
+      "name": ".gitignore",
+      "oid": "3bfc284df88217f5ceb7b5d64425f3c8a6d7d54a",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "bc37d034bad564583790a46f19d807abfe519c5671395fd494d8cce506c42947"
+  },
+  {
+    "tracking_name": ".prettierignore",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=.prettierignore&old_oid=ea305f69015699003646c0e515ace897ebf5fb9b&old_mode=33188&new_filename=.prettierignore&new_oid=6963fd8341e496a2e09e6a46b8005dda6dea07cd&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": ".prettierignore",
+      "oid": "ea305f69015699003646c0e515ace897ebf5fb9b",
+      "mode": 33188
+    },
+    "new": {
+      "name": ".prettierignore",
+      "oid": "6963fd8341e496a2e09e6a46b8005dda6dea07cd",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "b640b344ee7f3f03d2a443795a5d0708ef50e2e6e34214109ab2aad13ad6ba98"
+  },
+  {
+    "tracking_name": "api-extractor.json",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?new_filename=api-extractor.json&new_oid=c005b5eea28888e5975b7bc1b52706fb22b8936a&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "new": {
+      "name": "api-extractor.json",
+      "oid": "c005b5eea28888e5975b7bc1b52706fb22b8936a",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "f585cde7223992bd05eb9584cf713731f8bb1ade5254846e1ff88ff5462bfc7e"
+  },
+  {
+    "tracking_name": "etc/redux-toolkit.api.md",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?new_filename=etc%2Fredux-toolkit.api.md&new_oid=46f470eb23ce5f6d74890acba277b43046c8138c&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "new": {
+      "name": "etc/redux-toolkit.api.md",
+      "oid": "46f470eb23ce5f6d74890acba277b43046c8138c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "e7e6e821811a38e7b647f3f04a03476f93f4296096f9004c9e46564370dcea3e"
+  },
+  {
+    "tracking_name": "package-lock.json",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=package-lock.json&old_oid=08e1d238aa2bfad4f44b6ac73c4f8e6c5ac53550&old_mode=33188&new_filename=package-lock.json&new_oid=c3b1ea7fd3d02bf4dd3f5a97c75673a4b9b582cf&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "package-lock.json",
+      "oid": "08e1d238aa2bfad4f44b6ac73c4f8e6c5ac53550",
+      "mode": 33188
+    },
+    "new": {
+      "name": "package-lock.json",
+      "oid": "c3b1ea7fd3d02bf4dd3f5a97c75673a4b9b582cf",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "053150b640a7ce75eff69d1a22cae7f0f94ad64ce9a855db544dda0929316519"
+  },
+  {
+    "tracking_name": "package.json",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=package.json&old_oid=0eaa257b61485f9fe313fc180c6e82b7b9bddfc6&old_mode=33188&new_filename=package.json&new_oid=fb31488f20133d7c072f998957f0b1cff19b0119&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "package.json",
+      "oid": "0eaa257b61485f9fe313fc180c6e82b7b9bddfc6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "package.json",
+      "oid": "fb31488f20133d7c072f998957f0b1cff19b0119",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519"
+  },
+  {
+    "tracking_name": "src/createAction.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=src%2FcreateAction.ts&old_oid=f6b9ba557d72c4dceb1268352ba2bc25d94ef05c&old_mode=33188&new_filename=src%2FcreateAction.ts&new_oid=72f55cd65ab77bfe54411592851fcd8fa3e2392f&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "src/createAction.ts",
+      "oid": "f6b9ba557d72c4dceb1268352ba2bc25d94ef05c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "src/createAction.ts",
+      "oid": "72f55cd65ab77bfe54411592851fcd8fa3e2392f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "acaa93c6b37ffa7c4adb60a13ee83b834589d9551cc78fdf190f2dfc64dfa179"
+  },
+  {
+    "tracking_name": "src/createSlice.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=src%2FcreateSlice.ts&old_oid=14636226a3800fb2525f2dabf8251d0ca0e44db7&old_mode=33188&new_filename=src%2FcreateSlice.ts&new_oid=9c0dcdbb0f992c44974adfae5fecdcf5f5ab9e02&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "src/createSlice.ts",
+      "oid": "14636226a3800fb2525f2dabf8251d0ca0e44db7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "src/createSlice.ts",
+      "oid": "9c0dcdbb0f992c44974adfae5fecdcf5f5ab9e02",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ea9e020cb01ca61df3b4401885d85825eedc19b5b85903dd8a90ca5ddce2d51f"
+  },
+  {
+    "tracking_name": "src/tsHelpers.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=src%2FtsHelpers.ts&old_oid=7b0f517bbd781aff140b76ad6aeb105e129b0be9&old_mode=33188&new_filename=src%2FtsHelpers.ts&new_oid=647d85f96a9e4f9517104df7c5b32848fac519d3&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "src/tsHelpers.ts",
+      "oid": "7b0f517bbd781aff140b76ad6aeb105e129b0be9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "src/tsHelpers.ts",
+      "oid": "647d85f96a9e4f9517104df7c5b32848fac519d3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "eec302f7f818a7f4831f2ef589ac2abd813df086cc40f9b884b98b1e171db886"
+  },
+  {
+    "tracking_name": "type-tests/files/createAction.typetest.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=type-tests%2Ffiles%2FcreateAction.typetest.ts&old_oid=784733ca869cb543570f36e0550688ed672a52cf&old_mode=33188&new_filename=type-tests%2Ffiles%2FcreateAction.typetest.ts&new_oid=8cb5fce644656e93218d11494b5dce190c290b9c&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "type-tests/files/createAction.typetest.ts",
+      "oid": "784733ca869cb543570f36e0550688ed672a52cf",
+      "mode": 33188
+    },
+    "new": {
+      "name": "type-tests/files/createAction.typetest.ts",
+      "oid": "8cb5fce644656e93218d11494b5dce190c290b9c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "92100678802dbc03b4ce131043a2b65a29c88ff7fcb0cfc82708f6991de053f5"
+  },
+  {
+    "tracking_name": "type-tests/files/createSlice.typetest.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=type-tests%2Ffiles%2FcreateSlice.typetest.ts&old_oid=fd2c0ee7010cf9a89d28b8d9eae73d31a4aba2ad&old_mode=33188&new_filename=type-tests%2Ffiles%2FcreateSlice.typetest.ts&new_oid=fb20932f9bb72bb0853e42a4edc1e97c1b402c72&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "type-tests/files/createSlice.typetest.ts",
+      "oid": "fd2c0ee7010cf9a89d28b8d9eae73d31a4aba2ad",
+      "mode": 33188
+    },
+    "new": {
+      "name": "type-tests/files/createSlice.typetest.ts",
+      "oid": "fb20932f9bb72bb0853e42a4edc1e97c1b402c72",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a59929d31aa2bfa860eb125c8745e61e21cfd8fd2f8b39b6d71bf9ae621cec59"
+  }
+]

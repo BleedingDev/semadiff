@@ -1,0 +1,4074 @@
+diff --git a/.changeset/dirty-turtles-attack.md b/.changeset/dirty-turtles-attack.md
+new file mode 100644
+index 0000000000..d89e6c4968
+--- /dev/null
++++ b/.changeset/dirty-turtles-attack.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/presence": patch
++---
++
++Fix a bug where elements get stuck in unmountSuspended state during rapid hovering
+diff --git a/e2e/models/navigation-menu.model.ts b/e2e/models/navigation-menu.model.ts
+index 195e874476..91e3bd023a 100644
+--- a/e2e/models/navigation-menu.model.ts
++++ b/e2e/models/navigation-menu.model.ts
+@@ -7,7 +7,7 @@ export class NavigationMenuModel extends Model {
+     super(page)
+   }
+ 
+-  goto(id?: "viewport" | "nested") {
++  goto(id?: "viewport") {
+     return this.page.goto(`/navigation-menu${id ? `-${id}` : ""}`)
+   }
+ 
+@@ -66,4 +66,8 @@ export class NavigationMenuModel extends Model {
+   async seeLinkIsFocused(value: string) {
+     await expect(this.getLink(value)).toBeFocused()
+   }
++
++  async wait(ms: number) {
++    await this.page.waitForTimeout(ms)
++  }
+ }
+diff --git a/e2e/navigation-menu.e2e.ts b/e2e/navigation-menu.e2e.ts
+index 50f0f0144a..360d7265fe 100644
+--- a/e2e/navigation-menu.e2e.ts
++++ b/e2e/navigation-menu.e2e.ts
+@@ -3,7 +3,7 @@ import { NavigationMenuModel } from "./models/navigation-menu.model"
+ 
+ let I: NavigationMenuModel
+ 
+-test.describe.skip("navigation-menu", () => {
++test.describe("navigation-menu", () => {
+   test.beforeEach(async ({ page }) => {
+     I = new NavigationMenuModel(page)
+     await I.goto()
+@@ -69,6 +69,57 @@ test.describe.skip("navigation-menu", () => {
+     await I.dontSeeContent("products")
+   })
+ 
++  test("hover, click to close, hover out and back in", async () => {
++    // hover to open
++    await I.hoverTrigger("products")
++    await I.seeContent("products")
++
++    // click to close
++    await I.clickTrigger("products")
++    await I.dontSeeContent("products")
++
++    // keep hovering (should not re-open)
++    await I.hoverTrigger("products")
++    await I.dontSeeContent("products")
++
++    // hover out
++    await I.hoverTrigger("company")
++    await I.dontSeeContent("products")
++
++    // hover back in (should open now)
++    await I.hoverTrigger("products")
++    await I.seeContent("products")
++  })
++
++  test("keyboard open, mouse hover, escape close, then continue", async () => {
++    // open with keyboard
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.seeContent("products")
++
++    // continue interaction with mouse by hovering
++    await I.hoverTrigger("company")
++    await I.seeContent("company")
++    await I.dontSeeContent("products")
++
++    // close with escape key
++    await I.pressKey("Escape")
++    await I.dontSeeContent("company")
++
++    // continue interaction with mouse
++    await I.hoverTrigger("products")
++    await I.seeContent("products")
++
++    // close with escape again
++    await I.pressKey("Escape")
++    await I.dontSeeContent("products")
++
++    // continue interaction with keyboard
++    await I.focusTrigger("company")
++    await I.pressKey("Enter")
++    await I.seeContent("company")
++  })
++
+   test("focus link on tab", async () => {
+     await I.focusTrigger("products")
+     await I.pressKey("Enter")
+@@ -86,7 +137,7 @@ test.describe.skip("navigation-menu", () => {
+     await I.seeContent("company")
+     await I.dontSeeContent("products")
+ 
+-    await I.pressKey("Tab", 5)
++    await I.pressKey("Tab", 6)
+     await I.seeLinkIsFocused("pricing")
+ 
+     // focus outside
+@@ -94,4 +145,311 @@ test.describe.skip("navigation-menu", () => {
+     await I.dontSeeContent("company")
+     await I.dontSeeContent("products")
+   })
++
++  test("focus restoration after escape", async () => {
++    // open with keyboard and tab into content
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.seeContent("products")
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // close with escape - focus should return to trigger
++    await I.pressKey("Escape")
++    await I.dontSeeContent("products")
++    await I.seeTriggerIsFocused("products")
++  })
++
++  test("shift+tab navigation (backwards)", async () => {
++    // navigate forward to pricing link
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab", 7)
++    await I.seeTriggerIsFocused("company")
++
++    // navigate backwards with Shift+Tab
++    await I.pressKey("Shift+Tab", 6)
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // continue backwards
++    await I.pressKey("Shift+Tab")
++    await I.seeTriggerIsFocused("products")
++  })
++
++  test("arrow key navigation between triggers", async () => {
++    await I.focusTrigger("products")
++    await I.seeTriggerIsFocused("products")
++
++    // arrow right to next trigger
++    await I.pressKey("ArrowRight")
++    await I.seeTriggerIsFocused("company")
++
++    // arrow right to next trigger
++    await I.pressKey("ArrowRight", 2)
++    await I.seeLinkIsFocused("pricing")
++
++    // arrow left to previous trigger
++    await I.pressKey("ArrowLeft")
++    await I.seeTriggerIsFocused("developers")
++
++    // arrow left to previous trigger
++    await I.pressKey("ArrowLeft")
++    await I.seeTriggerIsFocused("company")
++  })
++
++  test("Home and End key navigation on triggers", async () => {
++    // start at company trigger (middle)
++    await I.focusTrigger("company")
++    await I.seeTriggerIsFocused("company")
++
++    // press Home to jump to first trigger
++    await I.pressKey("Home")
++    await I.seeTriggerIsFocused("products")
++
++    // press End to jump to last element
++    await I.pressKey("End")
++    await I.seeLinkIsFocused("pricing")
++
++    // press Home again to return to first
++    await I.pressKey("Home")
++    await I.seeTriggerIsFocused("products")
++  })
++
++  test("arrow down navigation within content", async () => {
++    // open content and tab to first link
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // navigate down to next link
++    await I.pressKey("ArrowDown")
++    await I.seeContentLinkIsFocused("products", "Customer Engagement")
++
++    // navigate down to next link
++    await I.pressKey("ArrowDown")
++    await I.seeContentLinkIsFocused("products", "Marketing Automation")
++  })
++
++  test("arrow up navigation within content", async () => {
++    // open content and tab to first link, then move down
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab")
++    await I.pressKey("ArrowDown", 2)
++    await I.seeContentLinkIsFocused("products", "Marketing Automation")
++
++    // navigate up to previous link
++    await I.pressKey("ArrowUp")
++    await I.seeContentLinkIsFocused("products", "Customer Engagement")
++
++    // navigate up to previous link
++    await I.pressKey("ArrowUp")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++  })
++
++  test("Home and End key navigation in content", async () => {
++    // open content and tab to first link, then move to middle
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab")
++    await I.pressKey("ArrowDown", 2)
++    await I.seeContentLinkIsFocused("products", "Marketing Automation")
++
++    // press Home to jump to first link
++    await I.pressKey("Home")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // press End to jump to last link
++    await I.pressKey("End")
++    await I.seeContentLinkIsFocused("products", "API Documentation")
++
++    // press Home again to return to first
++    await I.pressKey("Home")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++  })
++
++  test("arrow navigation does not loop in content", async () => {
++    // open content and tab to first link
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // try to navigate up from first link - should stay on first
++    await I.pressKey("ArrowUp")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // navigate to last link
++    await I.pressKey("ArrowDown", 5)
++    await I.seeContentLinkIsFocused("products", "API Documentation")
++
++    // try to navigate down from last link - should stay on last
++    await I.pressKey("ArrowDown")
++    await I.seeContentLinkIsFocused("products", "API Documentation")
++  })
++
++  test("opening with enter vs space key", async () => {
++    // open with Enter
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.seeContent("products")
++    await I.pressKey("Escape")
++
++    // open with Space
++    await I.focusTrigger("products")
++    await I.pressKey(" ")
++    await I.seeContent("products")
++  })
++
++  test("switching menus is instant when one is open", async () => {
++    // open first menu with hover
++    await I.hoverTrigger("products")
++    await I.wait(250)
++    await I.seeContent("products")
++
++    // hover to second trigger - should switch instantly (no delay)
++    await I.hoverTrigger("company")
++
++    // should immediately see new content (no need to wait for open delay)
++    await I.seeContent("company")
++    await I.dontSeeContent("products")
++  })
++
++  test("focus moves from content to trigger does not close", async () => {
++    // open content and tab to link
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // shift+tab back to trigger
++    await I.pressKey("Shift+Tab")
++    await I.seeTriggerIsFocused("products")
++
++    // content should still be visible
++    await I.seeContent("products")
++  })
++
++  test("focus moves from trigger to content does not close", async () => {
++    // open content with keyboard
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.seeContent("products")
++
++    // tab to content
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // content should still be visible
++    await I.seeContent("products")
++  })
++
++  test("escape from different positions in content restores focus", async () => {
++    // open and navigate to third link
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.pressKey("Tab")
++    await I.pressKey("ArrowDown", 2)
++    await I.seeContentLinkIsFocused("products", "Marketing Automation")
++
++    // escape should close and focus trigger
++    await I.pressKey("Escape")
++    await I.dontSeeContent("products")
++    await I.seeTriggerIsFocused("products")
++  })
++
++  test("opening multiple menus maintains proper tab order", async () => {
++    // open and close products
++    await I.focusTrigger("products")
++    await I.pressKey("Enter")
++    await I.seeContent("products")
++    await I.pressKey("Escape")
++
++    // open company
++    await I.focusTrigger("company")
++    await I.pressKey("Enter")
++    await I.seeContent("company")
++
++    // tab through content
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("company", "About Us")
++
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("company", "Leadership Team")
++  })
++
++  test("hover open and keyboard close restores proper state", async () => {
++    // open with hover
++    await I.hoverTrigger("products")
++    await I.wait(250)
++    await I.seeContent("products")
++
++    // tab into content
++    await I.focusTrigger("products")
++    await I.pressKey("Tab")
++    await I.seeContentLinkIsFocused("products", "Analytics Platform")
++
++    // close with escape
++    await I.pressKey("Escape")
++    await I.dontSeeContent("products")
++    await I.seeTriggerIsFocused("products")
++
++    // should be able to open again
++    await I.pressKey("Enter")
++    await I.seeContent("products")
++  })
++
++  test("hover to open, click same trigger twice rapidly", async () => {
++    // hover to open
++    await I.hoverTrigger("products")
++    await I.wait(250)
++    await I.seeContent("products")
++
++    // click once to close
++    await I.clickTrigger("products")
++    await I.dontSeeContent("products")
++
++    // immediately click again - should not reopen
++    await I.clickTrigger("products")
++    await I.seeContent("products")
++  })
++
++  test("escape during close delay cancels the close", async () => {
++    // open with click
++    await I.clickTrigger("products")
++    await I.seeContent("products")
++
++    // hover away to start close delay
++    await I.clickOutside()
++
++    // press escape before close delay completes
++    await I.wait(100)
++    await I.pressKey("Escape")
++
++    // should close immediately
++    await I.dontSeeContent("products")
++  })
++
++  test("multiple menus rapid switching", async () => {
++    // open first
++    await I.hoverTrigger("products")
++    await I.wait(250)
++    await I.seeContent("products")
++
++    // quickly switch multiple times
++    await I.hoverTrigger("company")
++    await I.seeContent("company")
++
++    await I.hoverTrigger("developers")
++    await I.seeContent("developers")
++
++    await I.hoverTrigger("products")
++    await I.seeContent("products")
++
++    // verify final state is correct
++    await I.seeContent("products")
++    await I.dontSeeContent("company")
++    await I.dontSeeContent("developers")
++  })
+ })
+diff --git a/examples/next-ts/pages/navigation-menu-nested.tsx b/examples/next-ts/pages/navigation-menu-nested.tsx
+deleted file mode 100644
+index 45f34bc48c..0000000000
+--- a/examples/next-ts/pages/navigation-menu-nested.tsx
++++ /dev/null
+@@ -1,272 +0,0 @@
+-import * as navigationMenu from "@zag-js/navigation-menu"
+-import { normalizeProps, useMachine } from "@zag-js/react"
+-import { ChevronDown } from "lucide-react"
+-import { useId } from "react"
+-import { Presence } from "../components/presence"
+-import { StateVisualizer } from "../components/state-visualizer"
+-import { Toolbar } from "../components/toolbar"
+-import { useEffectOnce } from "../hooks/use-effect-once"
+-
+-export default function Page() {
+-  const rootService = useMachine(navigationMenu.machine, { id: useId() })
+-  const rootMenu = navigationMenu.connect(rootService, normalizeProps)
+-
+-  const productService = useMachine(navigationMenu.machine, { id: useId(), defaultValue: "extensibility" })
+-  const productSubmenu = navigationMenu.connect(productService, normalizeProps)
+-
+-  const companyService = useMachine(navigationMenu.machine, { id: useId(), defaultValue: "customers" })
+-  const companySubmenu = navigationMenu.connect(companyService, normalizeProps)
+-
+-  const renderLinks = (menu: typeof rootMenu, opts: { value: string; items: string[] }) => {
+-    const { value, items } = opts
+-    return items.map((item, index) => (
+-      <a href="#" key={`${value}-${item}-${index}`} {...menu.getLinkProps({ value })}>
+-        {item}
+-      </a>
+-    ))
+-  }
+-
+-  useEffectOnce(() => {
+-    productSubmenu.setParent(rootService)
+-    rootMenu.setChild(productService)
+-  })
+-
+-  useEffectOnce(() => {
+-    companySubmenu.setParent(rootService)
+-    rootMenu.setChild(companyService)
+-  })
+-
+-  return (
+-    <>
+-      <main className="navigation-menu nested">
+-        <Navbar>
+-          <div {...rootMenu.getRootProps()}>
+-            <div {...rootMenu.getListProps()}>
+-              <div {...rootMenu.getItemProps({ value: "products" })}>
+-                <button {...rootMenu.getTriggerProps({ value: "products" })}>
+-                  Products
+-                  <ChevronDown />
+-                </button>
+-              </div>
+-
+-              <div {...rootMenu.getItemProps({ value: "company" })}>
+-                <button {...rootMenu.getTriggerProps({ value: "company" })}>
+-                  Company
+-                  <ChevronDown />
+-                </button>
+-              </div>
+-
+-              <div {...rootMenu.getItemProps({ value: "developers", disabled: true })}>
+-                <button {...rootMenu.getTriggerProps({ value: "developers", disabled: true })}>
+-                  Developers
+-                  <ChevronDown />
+-                </button>
+-              </div>
+-
+-              <div {...rootMenu.getItemProps({ value: "pricing" })}>
+-                <a href="#" {...rootMenu.getLinkProps({ value: "pricing" })}>
+-                  Pricing
+-                </a>
+-              </div>
+-            </div>
+-
+-            <Presence {...rootMenu.getViewportProps()}>
+-              <Presence {...rootMenu.getContentProps({ value: "products" })}>
+-                <div {...productSubmenu.getRootProps()}>
+-                  <div {...productSubmenu.getIndicatorTrackProps()}>
+-                    <div {...productSubmenu.getListProps()}>
+-                      <div {...productSubmenu.getItemProps({ value: "extensibility" })}>
+-                        <button {...productSubmenu.getTriggerProps({ value: "extensibility" })}>Extensibility</button>
+-                      </div>
+-
+-                      <div {...productSubmenu.getItemProps({ value: "security" })}>
+-                        <button {...productSubmenu.getTriggerProps({ value: "security" })}>Security</button>
+-                      </div>
+-
+-                      <div {...productSubmenu.getItemProps({ value: "authentication" })}>
+-                        <button {...productSubmenu.getTriggerProps({ value: "authentication" })}>Authentication</button>
+-                      </div>
+-                      <div {...productSubmenu.getIndicatorProps()} />
+-                    </div>
+-                  </div>
+-
+-                  <Presence {...productSubmenu.getViewportProps()}>
+-                    <Presence
+-                      {...productSubmenu.getContentProps({ value: "extensibility" })}
+-                      style={{
+-                        gridTemplateColumns: "1.5fr 1fr 1fr",
+-                      }}
+-                    >
+-                      {renderLinks(productSubmenu, {
+-                        value: "extensibility",
+-                        items: ["Donec quis dui", "Vestibulum", "Nunc dignissim"],
+-                      })}
+-                      {renderLinks(productSubmenu, {
+-                        value: "extensibility",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                      {renderLinks(productSubmenu, {
+-                        value: "extensibility",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                    </Presence>
+-
+-                    <Presence
+-                      {...productSubmenu.getContentProps({ value: "security" })}
+-                      style={{
+-                        gridTemplateColumns: "1fr 1fr 1fr",
+-                      }}
+-                    >
+-                      {renderLinks(productSubmenu, {
+-                        value: "security",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque", "Vestibulum"],
+-                      })}
+-                      {renderLinks(productSubmenu, {
+-                        value: "security",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                      {renderLinks(productSubmenu, {
+-                        value: "security",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor"],
+-                      })}
+-                    </Presence>
+-
+-                    <Presence
+-                      {...productSubmenu.getContentProps({ value: "authentication" })}
+-                      style={{
+-                        gridTemplateColumns: "1.5fr 1fr 1fr",
+-                      }}
+-                    >
+-                      {renderLinks(productSubmenu, {
+-                        value: "authentication",
+-                        items: ["Donec quis dui", "Vestibulum", "Nunc dignissim"],
+-                      })}
+-                      {renderLinks(productSubmenu, {
+-                        value: "authentication",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                      {renderLinks(productSubmenu, {
+-                        value: "authentication",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                    </Presence>
+-                  </Presence>
+-                </div>
+-              </Presence>
+-
+-              <Presence {...rootMenu.getContentProps({ value: "company" })}>
+-                <div {...companySubmenu.getRootProps()}>
+-                  <div {...companySubmenu.getIndicatorTrackProps()}>
+-                    <div {...companySubmenu.getListProps()}>
+-                      <div {...companySubmenu.getItemProps({ value: "customers" })}>
+-                        <button {...companySubmenu.getTriggerProps({ value: "customers" })}>Customers</button>
+-                      </div>
+-
+-                      <div {...companySubmenu.getItemProps({ value: "partners" })}>
+-                        <button {...companySubmenu.getTriggerProps({ value: "partners" })}>Partners</button>
+-                      </div>
+-
+-                      <div {...companySubmenu.getItemProps({ value: "enterprise" })}>
+-                        <button {...companySubmenu.getTriggerProps({ value: "enterprise" })}>Enterprise</button>
+-                      </div>
+-                    </div>
+-                    <div {...companySubmenu.getIndicatorProps()} />
+-                  </div>
+-
+-                  <Presence {...companySubmenu.getViewportProps()}>
+-                    <Presence
+-                      {...companySubmenu.getContentProps({ value: "customers" })}
+-                      style={{
+-                        gridTemplateColumns: "1.5fr 1fr",
+-                      }}
+-                    >
+-                      {renderLinks(companySubmenu, {
+-                        value: "customers",
+-                        items: ["Donec quis dui", "Vestibulum", "Nunc dignissim"],
+-                      })}
+-                      {renderLinks(companySubmenu, {
+-                        value: "customers",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                    </Presence>
+-
+-                    <Presence
+-                      {...companySubmenu.getContentProps({ value: "partners" })}
+-                      style={{
+-                        gridTemplateColumns: "1fr 1fr",
+-                      }}
+-                    >
+-                      {renderLinks(companySubmenu, {
+-                        value: "partners",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque", "Vestibulum"],
+-                      })}
+-                      {renderLinks(companySubmenu, {
+-                        value: "partners",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                    </Presence>
+-
+-                    <Presence
+-                      {...companySubmenu.getContentProps({ value: "enterprise" })}
+-                      style={{
+-                        gridTemplateColumns: "1.5fr 1fr",
+-                      }}
+-                    >
+-                      {renderLinks(companySubmenu, {
+-                        value: "enterprise",
+-                        items: ["Donec quis dui", "Vestibulum", "Nunc dignissim"],
+-                      })}
+-                      {renderLinks(companySubmenu, {
+-                        value: "enterprise",
+-                        items: ["Fusce pellentesque", "Aliquam porttitor", "Pellentesque"],
+-                      })}
+-                    </Presence>
+-                  </Presence>
+-                </div>
+-              </Presence>
+-
+-              <Presence {...rootMenu.getContentProps({ value: "developers" })}>
+-                {renderLinks(rootMenu, {
+-                  value: "developers",
+-                  items: ["Donec quis dui", "Vestibulum", "Fusce pellentesque", "Aliquam porttitor"],
+-                })}
+-                {renderLinks(rootMenu, {
+-                  value: "developers",
+-                  items: ["Fusce pellentesque", "Aliquam porttitor"],
+-                })}
+-              </Presence>
+-            </Presence>
+-          </div>
+-        </Navbar>
+-      </main>
+-
+-      <Toolbar viz>
+-        <StateVisualizer state={rootService} label="root" />
+-        <StateVisualizer state={productService} label="product" />
+-        <StateVisualizer state={companyService} label="company" />
+-      </Toolbar>
+-    </>
+-  )
+-}
+-
+-const Navbar = ({ children }: { children: React.ReactNode }) => {
+-  return (
+-    <div
+-      style={{
+-        position: "relative",
+-        display: "flex",
+-        boxSizing: "border-box",
+-        alignItems: "center",
+-        padding: "15px 20px",
+-        justifyContent: "space-between",
+-        width: "100%",
+-        backgroundColor: "white",
+-        boxShadow: "0 50px 100px -20px rgba(50,50,93,0.1),0 30px 60px -30px rgba(0,0,0,0.2)",
+-      }}
+-    >
+-      <button>Logo</button>
+-      {children}
+-      <button>Login</button>
+-    </div>
+-  )
+-}
+diff --git a/examples/next-ts/pages/navigation-menu-viewport.tsx b/examples/next-ts/pages/navigation-menu-viewport.tsx
+index 237345e85f..082bb373c8 100644
+--- a/examples/next-ts/pages/navigation-menu-viewport.tsx
++++ b/examples/next-ts/pages/navigation-menu-viewport.tsx
+@@ -30,7 +30,20 @@ export default function Page() {
+   return (
+     <>
+       <main className="navigation-menu viewport">
+-        <Navbar>
++        <div
++          style={{
++            position: "relative",
++            display: "flex",
++            boxSizing: "border-box",
++            alignItems: "center",
++            padding: "15px 20px",
++            justifyContent: "space-between",
++            width: "100%",
++            backgroundColor: "white",
++            boxShadow: "0 50px 100px -20px rgba(50,50,93,0.1),0 30px 60px -30px rgba(0,0,0,0.2)",
++          }}
++        >
++          <button>Logo</button>
+           <div {...api.getRootProps()}>
+             <div {...api.getIndicatorTrackProps()}>
+               <div {...api.getListProps()}>
+@@ -39,6 +52,8 @@ export default function Page() {
+                     Products
+                     <ChevronDown />
+                   </button>
++                  <span {...api.getTriggerProxyProps({ value: "products" })} />
++                  <span {...api.getViewportProxyProps({ value: "products" })} />
+                 </div>
+ 
+                 <div {...api.getItemProps({ value: "company" })}>
+@@ -46,6 +61,8 @@ export default function Page() {
+                     Company
+                     <ChevronDown />
+                   </button>
++                  <span {...api.getTriggerProxyProps({ value: "company" })} />
++                  <span {...api.getViewportProxyProps({ value: "company" })} />
+                 </div>
+ 
+                 <div {...api.getItemProps({ value: "developers" })}>
+@@ -53,6 +70,8 @@ export default function Page() {
+                     Developers
+                     <ChevronDown />
+                   </button>
++                  <span {...api.getTriggerProxyProps({ value: "developers" })} />
++                  <span {...api.getViewportProxyProps({ value: "developers" })} />
+                 </div>
+ 
+                 <div {...api.getItemProps({ value: "pricing" })}>
+@@ -138,7 +157,17 @@ export default function Page() {
+               </Presence>
+             </div>
+           </div>
+-        </Navbar>
++          <button>Login</button>
++        </div>
++
++        <header>
++          <h1>Heading</h1>
++          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
++          <div>
++            <button>Get Started</button>
++            <a href="#">Learn More</a>
++          </div>
++        </header>
+       </main>
+ 
+       <Toolbar controls={controls.ui} viz>
+@@ -147,25 +176,3 @@ export default function Page() {
+     </>
+   )
+ }
+-
+-const Navbar = ({ children }: { children: React.ReactNode }) => {
+-  return (
+-    <div
+-      style={{
+-        position: "relative",
+-        display: "flex",
+-        boxSizing: "border-box",
+-        alignItems: "center",
+-        padding: "15px 20px",
+-        justifyContent: "space-between",
+-        width: "100%",
+-        backgroundColor: "white",
+-        boxShadow: "0 50px 100px -20px rgba(50,50,93,0.1),0 30px 60px -30px rgba(0,0,0,0.2)",
+-      }}
+-    >
+-      <button>Logo</button>
+-      {children}
+-      <button>Login</button>
+-    </div>
+-  )
+-}
+diff --git a/examples/nuxt-ts/app/pages/navigation-menu-viewport.vue b/examples/nuxt-ts/app/pages/navigation-menu-viewport.vue
+new file mode 100644
+index 0000000000..19b44c5215
+--- /dev/null
++++ b/examples/nuxt-ts/app/pages/navigation-menu-viewport.vue
+@@ -0,0 +1,196 @@
++<script setup lang="ts">
++import * as navigationMenu from "@zag-js/navigation-menu"
++import { navigationMenuControls } from "@zag-js/shared"
++import { normalizeProps, useMachine } from "@zag-js/vue"
++import { ChevronDown } from "lucide-vue-next"
++import { Teleport } from "vue"
++
++const controls = useControls(navigationMenuControls)
++
++const service = useMachine(navigationMenu.machine, {
++  id: useId(),
++})
++
++const api = computed(() => navigationMenu.connect(service, normalizeProps))
++</script>
++
++<template>
++  <main class="navigation-menu viewport">
++    <div
++      :style="{
++        position: 'relative',
++        display: 'flex',
++        boxSizing: 'border-box',
++        alignItems: 'center',
++        padding: '15px 20px',
++        justifyContent: 'space-between',
++        width: '100%',
++        backgroundColor: 'white',
++        boxShadow: '0 50px 100px -20px rgba(50,50,93,0.1),0 30px 60px -30px rgba(0,0,0,0.2)',
++      }"
++    >
++      <button>Logo</button>
++      <div v-bind="api.getRootProps()">
++        <div v-bind="api.getIndicatorTrackProps()">
++          <div v-bind="api.getListProps()">
++            <div v-bind="api.getItemProps({ value: 'products' })">
++              <button v-bind="api.getTriggerProps({ value: 'products' })">
++                Products
++                <ChevronDown />
++              </button>
++              <span v-bind="api.getTriggerProxyProps({ value: 'products' })" />
++              <span v-bind="api.getViewportProxyProps({ value: 'products' })" />
++              <Teleport :to="api.getViewportNode()">
++                <Presence
++                  v-bind="api.getContentProps({ value: 'products' })"
++                  :style="{
++                    gridTemplateColumns: '1fr 2fr',
++                    width: '600px',
++                  }"
++                >
++                  <a
++                    v-for="(item, index) in [
++                      'Analytics Platform',
++                      'Customer Engagement',
++                      'Marketing Automation',
++                      'Data Integration',
++                      'Enterprise Solutions',
++                      'API Documentation',
++                    ]"
++                    :key="`products-${item}-${index}`"
++                    href="#"
++                    v-bind="api.getLinkProps({ value: 'products' })"
++                  >
++                    {{ item }}
++                  </a>
++
++                  <a
++                    v-for="(item, index) in [
++                      'Case Studies',
++                      'Success Stories',
++                      'Integration Partners',
++                      'Security & Compliance',
++                    ]"
++                    :key="`products-2-${item}-${index}`"
++                    href="#"
++                    v-bind="api.getLinkProps({ value: 'products' })"
++                  >
++                    {{ item }}
++                  </a>
++                </Presence>
++              </Teleport>
++            </div>
++
++            <div v-bind="api.getItemProps({ value: 'company' })">
++              <button v-bind="api.getTriggerProps({ value: 'company' })">
++                Company
++                <ChevronDown />
++              </button>
++              <span v-bind="api.getTriggerProxyProps({ value: 'company' })" />
++              <span v-bind="api.getViewportProxyProps({ value: 'company' })" />
++              <Teleport :to="api.getViewportNode()">
++                <Presence
++                  v-bind="api.getContentProps({ value: 'company' })"
++                  :style="{
++                    gridTemplateColumns: '1fr 1fr',
++                    width: '450px',
++                  }"
++                >
++                  <a
++                    v-for="(item, index) in ['About Us', 'Leadership Team', 'Careers', 'Press Releases']"
++                    :key="`company-${item}-${index}`"
++                    href="#"
++                    v-bind="api.getLinkProps({ value: 'company' })"
++                  >
++                    {{ item }}
++                  </a>
++
++                  <a
++                    v-for="(item, index) in ['Investors', 'Partners', 'Corporate Responsibility']"
++                    :key="`company-2-${item}-${index}`"
++                    href="#"
++                    v-bind="api.getLinkProps({ value: 'company' })"
++                  >
++                    {{ item }}
++                  </a>
++                </Presence>
++              </Teleport>
++            </div>
++
++            <div v-bind="api.getItemProps({ value: 'developers' })">
++              <button v-bind="api.getTriggerProps({ value: 'developers' })">
++                Developers
++                <ChevronDown />
++              </button>
++              <span v-bind="api.getTriggerProxyProps({ value: 'developers' })" />
++              <span v-bind="api.getViewportProxyProps({ value: 'developers' })" />
++              <Teleport :to="api.getViewportNode()">
++                <Presence
++                  v-bind="api.getContentProps({ value: 'developers' })"
++                  :style="{
++                    gridTemplateColumns: '1.6fr 1fr',
++                    width: '650px',
++                  }"
++                >
++                  <a
++                    v-for="(item, index) in [
++                      'API Documentation',
++                      'SDKs & Libraries',
++                      'Developer Guides',
++                      'Code Samples',
++                      'Webhooks',
++                      'GraphQL Explorer',
++                    ]"
++                    :key="`developers-${item}-${index}`"
++                    href="#"
++                    v-bind="api.getLinkProps({ value: 'developers' })"
++                  >
++                    {{ item }}
++                  </a>
++
++                  <a
++                    v-for="(item, index) in ['Developer Community', 'Changelog', 'Status Page', 'Rate Limits']"
++                    :key="`developers-2-${item}-${index}`"
++                    href="#"
++                    v-bind="api.getLinkProps({ value: 'developers' })"
++                  >
++                    {{ item }}
++                  </a>
++                </Presence>
++              </Teleport>
++            </div>
++
++            <div v-bind="api.getItemProps({ value: 'pricing' })">
++              <a href="#" v-bind="api.getLinkProps({ value: 'pricing' })"> Pricing </a>
++            </div>
++
++            <Presence v-bind="api.getIndicatorProps()">
++              <div v-bind="api.getArrowProps()" />
++            </Presence>
++          </div>
++        </div>
++
++        <div v-bind="api.getViewportPositionerProps()">
++          <Presence v-bind="api.getViewportProps()"> </Presence>
++        </div>
++      </div>
++      <button>Login</button>
++    </div>
++
++    <header>
++      <h1>Heading</h1>
++      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
++      <div>
++        <button>Get Started</button>
++        <a href="#">Learn More</a>
++      </div>
++    </header>
++  </main>
++
++  <Toolbar :viz="true">
++    <StateVisualizer :state="service" :context="['value', 'previousValue', 'triggerRect', 'viewportSize']" />
++    <template #controls>
++      <Controls :control="controls" />
++    </template>
++  </Toolbar>
++</template>
+diff --git a/examples/nuxt-ts/app/pages/navigation-menu.vue b/examples/nuxt-ts/app/pages/navigation-menu.vue
+new file mode 100644
+index 0000000000..fa40d3845e
+--- /dev/null
++++ b/examples/nuxt-ts/app/pages/navigation-menu.vue
+@@ -0,0 +1,115 @@
++<script setup lang="ts">
++import * as navigationMenu from "@zag-js/navigation-menu"
++import { navigationMenuControls } from "@zag-js/shared"
++import { normalizeProps, useMachine } from "@zag-js/vue"
++import { ChevronDown } from "lucide-vue-next"
++
++const controls = useControls(navigationMenuControls)
++
++const service = useMachine(
++  navigationMenu.machine,
++  controls.mergeProps<navigationMenu.Props>({
++    id: useId(),
++  }),
++)
++
++const api = computed(() => navigationMenu.connect(service, normalizeProps))
++
++</script>
++
++<template>
++  <main class="navigation-menu basic">
++    <div v-bind="api.getRootProps()">
++      <div v-bind="api.getListProps()">
++        <div v-bind="api.getItemProps({ value: 'products' })">
++          <button v-bind="api.getTriggerProps({ value: 'products' })">
++            Products
++            <ChevronDown />
++          </button>
++          <Presence v-bind="api.getContentProps({ value: 'products' })">
++            <Presence v-bind="api.getIndicatorProps()">
++              <div v-bind="api.getArrowProps()" />
++            </Presence>
++            <a
++              v-for="(item, index) in [
++                'Analytics Platform',
++                'Customer Engagement',
++                'Marketing Automation',
++                'Data Integration',
++                'Enterprise Solutions',
++                'API Documentation',
++              ]"
++              :key="`products-${item}-${index}`"
++              href="#"
++              v-bind="api.getLinkProps({ value: 'products' })"
++            >
++              {{ item }}
++            </a>
++          </Presence>
++        </div>
++
++        <div v-bind="api.getItemProps({ value: 'company' })">
++          <button v-bind="api.getTriggerProps({ value: 'company' })">
++            Company
++            <ChevronDown />
++          </button>
++          <Presence v-bind="api.getContentProps({ value: 'company' })">
++            <Presence v-bind="api.getIndicatorProps()">
++              <div v-bind="api.getArrowProps()" />
++            </Presence>
++            <a
++              v-for="(item, index) in [
++                'About Us',
++                'Leadership Team',
++                'Careers',
++                'Press Releases',
++              ]"
++              :key="`company-${item}-${index}`"
++              href="#"
++              v-bind="api.getLinkProps({ value: 'company' })"
++            >
++              {{ item }}
++            </a>
++          </Presence>
++        </div>
++
++        <div v-bind="api.getItemProps({ value: 'developers' })">
++          <button v-bind="api.getTriggerProps({ value: 'developers' })">
++            Developers
++            <ChevronDown />
++          </button>
++          <Presence v-bind="api.getContentProps({ value: 'developers' })">
++            <Presence v-bind="api.getIndicatorProps()">
++              <div v-bind="api.getArrowProps()" />
++            </Presence>
++            <a
++              v-for="(item, index) in [
++                'Investors',
++                'Partners',
++                'Corporate Responsibility',
++              ]"
++              :key="`developers-${item}-${index}`"
++              href="#"
++              v-bind="api.getLinkProps({ value: 'developers' })"
++            >
++              {{ item }}
++            </a>
++          </Presence>
++        </div>
++
++        <div v-bind="api.getItemProps({ value: 'pricing' })">
++          <a href="#" v-bind="api.getLinkProps({ value: 'pricing' })">
++            Pricing
++          </a>
++        </div>
++      </div>
++    </div>
++  </main>
++
++  <Toolbar>
++    <StateVisualizer :state="service" :context="['value', 'previousValue']" />
++    <template #controls>
++      <Controls :control="controls" />
++    </template>
++  </Toolbar>
++</template>
+\ No newline at end of file
+diff --git a/examples/nuxt-ts/app/pages/popover.vue b/examples/nuxt-ts/app/pages/popover.vue
+index 235a90fe94..fdacdff4f1 100644
+--- a/examples/nuxt-ts/app/pages/popover.vue
++++ b/examples/nuxt-ts/app/pages/popover.vue
+@@ -25,7 +25,7 @@ const api = computed(() => popover.connect(service, normalizeProps))
+       </button>
+       <Teleport to="#teleports" :disabled="!api.portalled">
+         <div v-bind="api.getPositionerProps()">
+-          <div data-testid="popover-content" class="popover-content" v-bind="api.getContentProps()">
++          <Presence data-testid="popover-content" class="popover-content" v-bind="api.getContentProps()">
+             <div v-bind="api.getArrowProps()">
+               <div v-bind="api.getArrowTipProps()" />
+             </div>
+@@ -36,7 +36,7 @@ const api = computed(() => popover.connect(service, normalizeProps))
+               <input data-testid="input" placeholder="input" />
+               <button data-testid="popover-close-button" v-bind="api.getCloseTriggerProps()">X</button>
+             </div>
+-          </div>
++          </Presence>
+         </div>
+       </Teleport>
+       <span data-testid="plain-text">I am just text</span>
+diff --git a/examples/preact-ts/src/components/presence.tsx b/examples/preact-ts/src/components/presence.tsx
+new file mode 100644
+index 0000000000..1283def478
+--- /dev/null
++++ b/examples/preact-ts/src/components/presence.tsx
+@@ -0,0 +1,41 @@
++import * as presence from "@zag-js/presence"
++import { normalizeProps, useMachine } from "@zag-js/preact"
++import { forwardRef, Ref } from "preact/compat"
++import { useEffect, useRef } from "preact/hooks"
++import { JSX } from "preact"
++
++interface PresenceProps extends JSX.HTMLAttributes<HTMLDivElement> {}
++
++export const Presence = forwardRef<HTMLDivElement, PresenceProps>(function Presence(props, ref) {
++  const { hidden, ...rest } = props
++
++  const present = !hidden
++  const service = useMachine(presence.machine, { present })
++  const api = presence.connect(service, normalizeProps)
++
++  const internalRef = useRef<HTMLDivElement>(null)
++  const mergedRef: Ref<HTMLDivElement> = (node) => {
++    internalRef.current = node
++    if (typeof ref === "function") {
++      ref(node)
++    } else if (ref) {
++      ref.current = node
++    }
++  }
++
++  useEffect(() => {
++    if (internalRef.current) {
++      api.setNode(internalRef.current)
++    }
++  }, [])
++
++  return (
++    <div
++      ref={mergedRef}
++      data-scope="presence"
++      data-state={api.skip ? undefined : present ? "open" : "closed"}
++      hidden={!api.present}
++      {...rest}
++    />
++  )
++})
+diff --git a/examples/solid-ts/src/routes/navigation-menu-viewport.tsx b/examples/solid-ts/src/routes/navigation-menu-viewport.tsx
+new file mode 100644
+index 0000000000..e1685f3132
+--- /dev/null
++++ b/examples/solid-ts/src/routes/navigation-menu-viewport.tsx
+@@ -0,0 +1,184 @@
++import * as navigationMenu from "@zag-js/navigation-menu"
++import { normalizeProps, useMachine } from "@zag-js/solid"
++import { navigationMenuControls } from "@zag-js/shared"
++import { ChevronDown } from "lucide-solid"
++import { createMemo, createUniqueId, For } from "solid-js"
++import { Presence } from "~/components/presence"
++import { StateVisualizer } from "~/components/state-visualizer"
++import { Toolbar } from "~/components/toolbar"
++import { useControls } from "~/hooks/use-controls"
++
++export default function Page() {
++  const controls = useControls(navigationMenuControls)
++
++  const service = useMachine(
++    navigationMenu.machine,
++    controls.mergeProps<navigationMenu.Props>({
++      id: createUniqueId(),
++    }),
++  )
++
++  const api = createMemo(() => navigationMenu.connect(service, normalizeProps))
++
++  const renderLinks = (opts: { value: string; items: string[] }) => {
++    const { value, items } = opts
++    return (
++      <For each={items}>
++        {(item) => (
++          <a href="#" {...api().getLinkProps({ value })}>
++            {item}
++          </a>
++        )}
++      </For>
++    )
++  }
++
++  return (
++    <>
++      <main class="navigation-menu viewport">
++        <div
++          style={{
++            position: "relative",
++            display: "flex",
++            "box-sizing": "border-box",
++            "align-items": "center",
++            padding: "15px 20px",
++            "justify-content": "space-between",
++            width: "100%",
++            "background-color": "white",
++            "box-shadow": "0 50px 100px -20px rgba(50,50,93,0.1),0 30px 60px -30px rgba(0,0,0,0.2)",
++          }}
++        >
++          <button>Logo</button>
++          <div {...api().getRootProps()}>
++            <div {...api().getIndicatorTrackProps()}>
++              <div {...api().getListProps()}>
++                <div {...api().getItemProps({ value: "products" })}>
++                  <button {...api().getTriggerProps({ value: "products" })}>
++                    Products
++                    <ChevronDown />
++                  </button>
++                  <span {...api().getTriggerProxyProps({ value: "products" })} />
++                  <span {...api().getViewportProxyProps({ value: "products" })} />
++                </div>
++
++                <div {...api().getItemProps({ value: "company" })}>
++                  <button {...api().getTriggerProps({ value: "company" })}>
++                    Company
++                    <ChevronDown />
++                  </button>
++                  <span {...api().getTriggerProxyProps({ value: "company" })} />
++                  <span {...api().getViewportProxyProps({ value: "company" })} />
++                </div>
++
++                <div {...api().getItemProps({ value: "developers" })}>
++                  <button {...api().getTriggerProps({ value: "developers" })}>
++                    Developers
++                    <ChevronDown />
++                  </button>
++                  <span {...api().getTriggerProxyProps({ value: "developers" })} />
++                  <span {...api().getViewportProxyProps({ value: "developers" })} />
++                </div>
++
++                <div {...api().getItemProps({ value: "pricing" })}>
++                  <a href="#" {...api().getLinkProps({ value: "pricing" })}>
++                    Pricing
++                  </a>
++                </div>
++
++                <Presence {...api().getIndicatorProps()}>
++                  <div {...api().getArrowProps()} />
++                </Presence>
++              </div>
++            </div>
++
++            <div {...api().getViewportPositionerProps()}>
++              <Presence {...api().getViewportProps()}>
++                <Presence
++                  {...api().getContentProps({ value: "products" })}
++                  style={{
++                    "grid-template-columns": "1fr 2fr",
++                    width: "600px",
++                  }}
++                >
++                  {renderLinks({
++                    value: "products",
++                    items: [
++                      "Analytics Platform",
++                      "Customer Engagement",
++                      "Marketing Automation",
++                      "Data Integration",
++                      "Enterprise Solutions",
++                      "API Documentation",
++                    ],
++                  })}
++
++                  {renderLinks({
++                    value: "products",
++                    items: ["Case Studies", "Success Stories", "Integration Partners", "Security & Compliance"],
++                  })}
++                </Presence>
++
++                <Presence
++                  {...api().getContentProps({ value: "company" })}
++                  style={{
++                    "grid-template-columns": "1fr 1fr",
++                    width: "450px",
++                  }}
++                >
++                  {renderLinks({
++                    value: "company",
++                    items: ["About Us", "Leadership Team", "Careers", "Press Releases"],
++                  })}
++
++                  {renderLinks({
++                    value: "company",
++                    items: ["Investors", "Partners", "Corporate Responsibility"],
++                  })}
++                </Presence>
++
++                <Presence
++                  {...api().getContentProps({ value: "developers" })}
++                  style={{
++                    "grid-template-columns": "1.6fr 1fr",
++                    width: "650px",
++                  }}
++                >
++                  {renderLinks({
++                    value: "developers",
++                    items: [
++                      "API Documentation",
++                      "SDKs & Libraries",
++                      "Developer Guides",
++                      "Code Samples",
++                      "Webhooks",
++                      "GraphQL Explorer",
++                    ],
++                  })}
++                  {renderLinks({
++                    value: "developers",
++                    items: ["Developer Community", "Changelog", "Status Page", "Rate Limits"],
++                  })}
++                </Presence>
++              </Presence>
++            </div>
++          </div>
++          <button>Login</button>
++        </div>
++
++        <header>
++          <h1>Heading</h1>
++          <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
++          <div>
++            <button>Get Started</button>
++            <a href="#">Learn More</a>
++          </div>
++        </header>
++      </main>
++
++      <Toolbar controls={controls} viz>
++        <StateVisualizer state={service} context={["value", "previousValue"]} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/solid-ts/src/routes/navigation-menu.tsx b/examples/solid-ts/src/routes/navigation-menu.tsx
+new file mode 100644
+index 0000000000..e81b06eda4
+--- /dev/null
++++ b/examples/solid-ts/src/routes/navigation-menu.tsx
+@@ -0,0 +1,110 @@
++import * as navigationMenu from "@zag-js/navigation-menu"
++import { normalizeProps, useMachine } from "@zag-js/solid"
++import { navigationMenuControls } from "@zag-js/shared"
++import { ChevronDown } from "lucide-solid"
++import { createMemo, createUniqueId, For } from "solid-js"
++import { Presence } from "~/components/presence"
++import { StateVisualizer } from "~/components/state-visualizer"
++import { Toolbar } from "~/components/toolbar"
++import { useControls } from "~/hooks/use-controls"
++
++export default function Page() {
++  const controls = useControls(navigationMenuControls)
++
++  const service = useMachine(
++    navigationMenu.machine,
++    controls.mergeProps<navigationMenu.Props>({
++      id: createUniqueId(),
++    }),
++  )
++
++  const api = createMemo(() => navigationMenu.connect(service, normalizeProps))
++
++  const renderLinks = (opts: { value: string; items: string[] }) => {
++    const { value, items } = opts
++    return (
++      <For each={items}>
++        {(item) => (
++          <a href="#" {...api().getLinkProps({ value })}>
++            {item}
++          </a>
++        )}
++      </For>
++    )
++  }
++
++  return (
++    <>
++      <main class="navigation-menu basic">
++        <div {...api().getRootProps()}>
++          <div {...api().getListProps()}>
++            <div {...api().getItemProps({ value: "products" })}>
++              <button {...api().getTriggerProps({ value: "products" })}>
++                Products
++                <ChevronDown />
++              </button>
++              <Presence {...api().getContentProps({ value: "products" })}>
++                <Presence {...api().getIndicatorProps()}>
++                  <div {...api().getArrowProps()} />
++                </Presence>
++                {renderLinks({
++                  value: "products",
++                  items: [
++                    "Analytics Platform",
++                    "Customer Engagement",
++                    "Marketing Automation",
++                    "Data Integration",
++                    "Enterprise Solutions",
++                    "API Documentation",
++                  ],
++                })}
++              </Presence>
++            </div>
++
++            <div {...api().getItemProps({ value: "company" })}>
++              <button {...api().getTriggerProps({ value: "company" })}>
++                Company
++                <ChevronDown />
++              </button>
++              <Presence {...api().getContentProps({ value: "company" })}>
++                <Presence {...api().getIndicatorProps()}>
++                  <div {...api().getArrowProps()} />
++                </Presence>
++                {renderLinks({
++                  value: "company",
++                  items: ["About Us", "Leadership Team", "Careers", "Press Releases"],
++                })}
++              </Presence>
++            </div>
++
++            <div {...api().getItemProps({ value: "developers" })}>
++              <button {...api().getTriggerProps({ value: "developers" })}>
++                Developers
++                <ChevronDown />
++              </button>
++              <Presence {...api().getContentProps({ value: "developers" })}>
++                <Presence {...api().getIndicatorProps()}>
++                  <div {...api().getArrowProps()} />
++                </Presence>
++                {renderLinks({
++                  value: "developers",
++                  items: ["Investors", "Partners", "Corporate Responsibility"],
++                })}
++              </Presence>
++            </div>
++
++            <div {...api().getItemProps({ value: "pricing" })}>
++              <a href="#" {...api().getLinkProps({ value: "pricing" })}>
++                Pricing
++              </a>
++            </div>
++          </div>
++        </div>
++      </main>
++
++      <Toolbar controls={controls} viz>
++        <StateVisualizer state={service} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/solid-ts/src/routes/popover.tsx b/examples/solid-ts/src/routes/popover.tsx
+index 176b0177ef..13ed6599c7 100644
+--- a/examples/solid-ts/src/routes/popover.tsx
++++ b/examples/solid-ts/src/routes/popover.tsx
+@@ -3,6 +3,7 @@ import { popoverControls } from "@zag-js/shared"
+ import { normalizeProps, useMachine } from "@zag-js/solid"
+ import { ParentProps, createMemo, createUniqueId } from "solid-js"
+ import { Portal } from "solid-js/web"
++import { Presence } from "~/components/presence"
+ import { StateVisualizer } from "~/components/state-visualizer"
+ import { Toolbar } from "~/components/toolbar"
+ import { useControls } from "~/hooks/use-controls"
+@@ -29,7 +30,7 @@ export default function Page() {
+           </button>
+           <Wrapper guard={api().portalled}>
+             <div {...api().getPositionerProps()}>
+-              <div data-testid="popover-content" class="popover-content" {...api().getContentProps()}>
++              <Presence data-testid="popover-content" class="popover-content" {...api().getContentProps()}>
+                 <div {...api().getArrowProps()}>
+                   <div {...api().getArrowTipProps()} />
+                 </div>
+@@ -46,7 +47,7 @@ export default function Page() {
+                     X
+                   </button>
+                 </div>
+-              </div>
++              </Presence>
+             </div>
+           </Wrapper>
+           <span data-testid="plain-text">I am just text</span>
+diff --git a/examples/svelte-ts/src/routes/navigation-menu-viewport/+page.svelte b/examples/svelte-ts/src/routes/navigation-menu-viewport/+page.svelte
+new file mode 100644
+index 0000000000..3b5f5cdcf1
+--- /dev/null
++++ b/examples/svelte-ts/src/routes/navigation-menu-viewport/+page.svelte
+@@ -0,0 +1,180 @@
++<script lang="ts">
++  import Presence from "$lib/components/presence.svelte"
++  import StateVisualizer from "$lib/components/state-visualizer.svelte"
++  import Toolbar from "$lib/components/toolbar.svelte"
++  import { useControls } from "$lib/use-controls.svelte"
++  import * as navigationMenu from "@zag-js/navigation-menu"
++  import { navigationMenuControls } from "@zag-js/shared"
++  import { normalizeProps, useMachine } from "@zag-js/svelte"
++
++  const controls = useControls(navigationMenuControls)
++
++  const id = $props.id()
++  const service = useMachine(
++    navigationMenu.machine,
++    controls.mergeProps<navigationMenu.Props>({
++      id,
++    }),
++  )
++
++  const api = $derived(navigationMenu.connect(service, normalizeProps))
++
++  function renderLinks(opts: { value: string; items: string[] }) {
++    const { value, items } = opts
++    return items.map((item, index) => ({ item, index, value }))
++  }
++</script>
++
++<main class="navigation-menu viewport">
++  <div class="navbar">
++    <button>Logo</button>
++
++    <div {...api.getRootProps()}>
++      <div {...api.getIndicatorTrackProps()}>
++        <div {...api.getListProps()}>
++          <div {...api.getItemProps({ value: "products" })}>
++            <button {...api.getTriggerProps({ value: "products" })}>
++              Products
++              <svg
++                width="16"
++                height="16"
++                viewBox="0 0 24 24"
++                fill="none"
++                stroke="currentColor"
++                stroke-width="2"
++                stroke-linecap="round"
++                stroke-linejoin="round"
++              >
++                <polyline points="6,9 12,15 18,9"></polyline>
++              </svg>
++            </button>
++            <span {...api.getTriggerProxyProps({ value: "products" })}></span>
++            <span {...api.getViewportProxyProps({ value: "products" })}></span>
++          </div>
++
++          <div {...api.getItemProps({ value: "company" })}>
++            <button {...api.getTriggerProps({ value: "company" })}>
++              Company
++              <svg
++                width="16"
++                height="16"
++                viewBox="0 0 24 24"
++                fill="none"
++                stroke="currentColor"
++                stroke-width="2"
++                stroke-linecap="round"
++                stroke-linejoin="round"
++              >
++                <polyline points="6,9 12,15 18,9"></polyline>
++              </svg>
++            </button>
++            <span {...api.getTriggerProxyProps({ value: "company" })}></span>
++            <span {...api.getViewportProxyProps({ value: "company" })}></span>
++          </div>
++
++          <div {...api.getItemProps({ value: "developers" })}>
++            <button {...api.getTriggerProps({ value: "developers" })}>
++              Developers
++              <svg
++                width="16"
++                height="16"
++                viewBox="0 0 24 24"
++                fill="none"
++                stroke="currentColor"
++                stroke-width="2"
++                stroke-linecap="round"
++                stroke-linejoin="round"
++              >
++                <polyline points="6,9 12,15 18,9"></polyline>
++              </svg>
++            </button>
++            <span {...api.getTriggerProxyProps({ value: "developers" })}></span>
++            <span {...api.getViewportProxyProps({ value: "developers" })}></span>
++          </div>
++
++          <div {...api.getItemProps({ value: "pricing" })}>
++            <a href="#" {...api.getLinkProps({ value: "pricing" })}> Pricing </a>
++          </div>
++
++          <Presence {...api.getIndicatorProps()}>
++            <div {...api.getArrowProps()}></div>
++          </Presence>
++        </div>
++      </div>
++
++      <div {...api.getViewportPositionerProps()}>
++        <Presence {...api.getViewportProps()}>
++          <Presence
++            {...api.getContentProps({ value: "products" })}
++            style="grid-template-columns: 1fr 2fr; width: 600px"
++          >
++            {#each renderLinks( { value: "products", items: ["Analytics Platform", "Customer Engagement", "Marketing Automation", "Data Integration", "Enterprise Solutions", "API Documentation"] }, ) as { item, index, value } (`${value}-${item}-${index}`)}
++              <a href="#" {...api.getLinkProps({ value })}>
++                {item}
++              </a>
++            {/each}
++
++            {#each renderLinks( { value: "products", items: ["Case Studies", "Success Stories", "Integration Partners", "Security & Compliance"] }, ) as { item, index, value } (`${value}-${item}-${index}`)}
++              <a href="#" {...api.getLinkProps({ value })}>
++                {item}
++              </a>
++            {/each}
++          </Presence>
++
++          <Presence {...api.getContentProps({ value: "company" })} style="grid-template-columns: 1fr 1fr; width: 450px">
++            {#each renderLinks( { value: "company", items: ["About Us", "Leadership Team", "Careers", "Press Releases"] }, ) as { item, index, value } (`${value}-${item}-${index}`)}
++              <a href="#" {...api.getLinkProps({ value })}>
++                {item}
++              </a>
++            {/each}
++
++            {#each renderLinks( { value: "company", items: ["Investors", "Partners", "Corporate Responsibility"] }, ) as { item, index, value } (`${value}-${item}-${index}`)}
++              <a href="#" {...api.getLinkProps({ value })}>
++                {item}
++              </a>
++            {/each}
++          </Presence>
++
++          <Presence
++            {...api.getContentProps({ value: "developers" })}
++            style="grid-template-columns: 1.6fr 1fr; width: 650px"
++          >
++            {#each renderLinks( { value: "developers", items: ["API Documentation", "SDKs & Libraries", "Developer Guides", "Code Samples", "Webhooks", "GraphQL Explorer"] }, ) as { item, index, value } (`${value}-${item}-${index}`)}
++              <a href="#" {...api.getLinkProps({ value })}>
++                {item}
++              </a>
++            {/each}
++
++            {#each renderLinks( { value: "developers", items: ["Developer Community", "Changelog", "Status Page", "Rate Limits"] }, ) as { item, index, value } (`${value}-${item}-${index}`)}
++              <a href="#" {...api.getLinkProps({ value })}>
++                {item}
++              </a>
++            {/each}
++          </Presence>
++        </Presence>
++      </div>
++    </div>
++
++    <button>Login</button>
++  </div>
++</main>
++
++<Toolbar {controls} viz>
++  <StateVisualizer state={service} context={["value", "previousValue", "triggerRect", "viewportSize"]} />
++</Toolbar>
++
++<style>
++  .navbar {
++    position: relative;
++    display: flex;
++    box-sizing: border-box;
++    align-items: center;
++    padding: 15px 20px;
++    justify-content: space-between;
++    width: 100%;
++    background-color: white;
++    box-shadow:
++      0 50px 100px -20px rgba(50, 50, 93, 0.1),
++      0 30px 60px -30px rgba(0, 0, 0, 0.2);
++  }
++</style>
+diff --git a/examples/svelte-ts/src/routes/navigation-menu/+page.svelte b/examples/svelte-ts/src/routes/navigation-menu/+page.svelte
+new file mode 100644
+index 0000000000..7e2df1134d
+--- /dev/null
++++ b/examples/svelte-ts/src/routes/navigation-menu/+page.svelte
+@@ -0,0 +1,124 @@
++<script lang="ts">
++  import Presence from "$lib/components/presence.svelte"
++  import StateVisualizer from "$lib/components/state-visualizer.svelte"
++  import Toolbar from "$lib/components/toolbar.svelte"
++  import { useControls } from "$lib/use-controls.svelte"
++  import * as navigationMenu from "@zag-js/navigation-menu"
++  import { navigationMenuControls } from "@zag-js/shared"
++  import { normalizeProps, useMachine } from "@zag-js/svelte"
++
++  const controls = useControls(navigationMenuControls)
++
++  const id = $props.id()
++  const service = useMachine(
++    navigationMenu.machine,
++    controls.mergeProps<navigationMenu.Props>({
++      id,
++    }),
++  )
++
++  const api = $derived(navigationMenu.connect(service, normalizeProps))
++
++  function renderLinks(opts: { value: string; items: string[] }) {
++    const { value, items } = opts
++    return items.map((item, index) => ({ item, index, value }))
++  }
++</script>
++
++<main class="navigation-menu basic">
++  <div {...api.getRootProps()}>
++    <div {...api.getListProps()}>
++      <div {...api.getItemProps({ value: "products" })}>
++        <button {...api.getTriggerProps({ value: "products" })}>
++          Products
++          <svg
++            width="16"
++            height="16"
++            viewBox="0 0 24 24"
++            fill="none"
++            stroke="currentColor"
++            stroke-width="2"
++            stroke-linecap="round"
++            stroke-linejoin="round"
++          >
++            <polyline points="6,9 12,15 18,9"></polyline>
++          </svg>
++        </button>
++        <Presence {...api.getContentProps({ value: "products" })}>
++          <Presence {...api.getIndicatorProps()}>
++            <div {...api.getArrowProps()}></div>
++          </Presence>
++          {#each renderLinks( { value: "products", items: ["Analytics Platform", "Customer Engagement", "Marketing Automation", "Data Integration", "Enterprise Solutions", "API Documentation"] }, ) as { item, index, value }}
++            <a href="#" {...api.getLinkProps({ value })}>
++              {item}
++            </a>
++          {/each}
++        </Presence>
++      </div>
++
++      <div {...api.getItemProps({ value: "company" })}>
++        <button {...api.getTriggerProps({ value: "company" })}>
++          Company
++          <svg
++            width="16"
++            height="16"
++            viewBox="0 0 24 24"
++            fill="none"
++            stroke="currentColor"
++            stroke-width="2"
++            stroke-linecap="round"
++            stroke-linejoin="round"
++          >
++            <polyline points="6,9 12,15 18,9"></polyline>
++          </svg>
++        </button>
++        <Presence {...api.getContentProps({ value: "company" })}>
++          <Presence {...api.getIndicatorProps()}>
++            <div {...api.getArrowProps()}></div>
++          </Presence>
++          {#each renderLinks( { value: "company", items: ["About Us", "Leadership Team", "Careers", "Press Releases"] }, ) as { item, index, value }}
++            <a href="#" {...api.getLinkProps({ value })}>
++              {item}
++            </a>
++          {/each}
++        </Presence>
++      </div>
++
++      <div {...api.getItemProps({ value: "developers" })}>
++        <button {...api.getTriggerProps({ value: "developers" })}>
++          Developers
++          <svg
++            width="16"
++            height="16"
++            viewBox="0 0 24 24"
++            fill="none"
++            stroke="currentColor"
++            stroke-width="2"
++            stroke-linecap="round"
++            stroke-linejoin="round"
++          >
++            <polyline points="6,9 12,15 18,9"></polyline>
++          </svg>
++        </button>
++        <Presence {...api.getContentProps({ value: "developers" })}>
++          <Presence {...api.getIndicatorProps()}>
++            <div {...api.getArrowProps()}></div>
++          </Presence>
++          {#each renderLinks( { value: "developers", items: ["Investors", "Partners", "Corporate Responsibility"] }, ) as { item, index, value }}
++            <a href="#" {...api.getLinkProps({ value })}>
++              {item}
++            </a>
++          {/each}
++        </Presence>
++      </div>
++
++      <div {...api.getItemProps({ value: "pricing" })}>
++        <a href="#" {...api.getLinkProps({ value: "pricing" })}> Pricing </a>
++      </div>
++    </div>
++  </div>
++</main>
++
++<Toolbar {controls} viz>
++  <StateVisualizer state={service} context={["value", "previousValue"]} />
++</Toolbar>
+diff --git a/examples/svelte-ts/src/routes/popover/+page.svelte b/examples/svelte-ts/src/routes/popover/+page.svelte
+index 693a65dbe2..4c8e74b073 100644
+--- a/examples/svelte-ts/src/routes/popover/+page.svelte
++++ b/examples/svelte-ts/src/routes/popover/+page.svelte
+@@ -1,10 +1,11 @@
+ <script lang="ts">
++  import Presence from "$lib/components/presence.svelte"
++  import StateVisualizer from "$lib/components/state-visualizer.svelte"
++  import Toolbar from "$lib/components/toolbar.svelte"
+   import { useControls } from "$lib/use-controls.svelte"
+   import * as popover from "@zag-js/popover"
+-  import { normalizeProps, portal, useMachine } from "@zag-js/svelte"
+   import { popoverControls } from "@zag-js/shared"
+-  import Toolbar from "$lib/components/toolbar.svelte"
+-  import StateVisualizer from "$lib/components/state-visualizer.svelte"
++  import { normalizeProps, portal, useMachine } from "@zag-js/svelte"
+ 
+   const controls = useControls(popoverControls)
+ 
+@@ -26,7 +27,7 @@
+     <div {...api.getAnchorProps()}>anchor</div>
+ 
+     <div use:portal={{ disabled: !api.portalled }} {...api.getPositionerProps()}>
+-      <div data-testid="popover-content" class="popover-content" {...api.getContentProps()}>
++      <Presence class="popover-content" data-testid="popover-content" {...api.getContentProps()}>
+         <div {...api.getArrowProps()}>
+           <div {...api.getArrowTipProps()}></div>
+         </div>
+@@ -38,7 +39,7 @@
+           <input data-testid="input" placeholder="input" />
+           <button data-testid="popover-close-button" {...api.getCloseTriggerProps()}> X </button>
+         </div>
+-      </div>
++      </Presence>
+     </div>
+ 
+     <span data-testid="plain-text">I am just text</span>
+diff --git a/packages/machines/navigation-menu/package.json b/packages/machines/navigation-menu/package.json
+index 02bdab41c0..a2d0b3a04b 100644
+--- a/packages/machines/navigation-menu/package.json
++++ b/packages/machines/navigation-menu/package.json
+@@ -37,7 +37,7 @@
+   },
+   "dependencies": {
+     "@zag-js/anatomy": "workspace:*",
+-    "@zag-js/interact-outside": "workspace:*",
++    "@zag-js/dismissable": "workspace:*",
+     "@zag-js/core": "workspace:*",
+     "@zag-js/dom-query": "workspace:*",
+     "@zag-js/utils": "workspace:*",
+diff --git a/packages/machines/navigation-menu/src/auto-reset.ts b/packages/machines/navigation-menu/src/auto-reset.ts
+deleted file mode 100644
+index 5420c7bc42..0000000000
+--- a/packages/machines/navigation-menu/src/auto-reset.ts
++++ /dev/null
+@@ -1,30 +0,0 @@
+-export interface AutoReset<T> {
+-  get(): T
+-  set(v: T): void
+-  cleanup(): void
+-}
+-
+-export function autoReset<T>(init: T, timeout: number): AutoReset<T> {
+-  let timer: any = null
+-  let value: T = init
+-
+-  const resetAfter = () =>
+-    setTimeout(() => {
+-      value = init
+-    }, timeout)
+-
+-  return {
+-    get() {
+-      return value
+-    },
+-    set(v: T) {
+-      value = v
+-      if (timer) clearTimeout(timer)
+-      timer = resetAfter()
+-    },
+-    cleanup() {
+-      if (timer) clearTimeout(timer)
+-      timer = null
+-    },
+-  }
+-}
+diff --git a/packages/machines/navigation-menu/src/index.ts b/packages/machines/navigation-menu/src/index.ts
+index abf5321e70..299c71a9bc 100644
+--- a/packages/machines/navigation-menu/src/index.ts
++++ b/packages/machines/navigation-menu/src/index.ts
+@@ -9,6 +9,7 @@ export type {
+   NavigationMenuService as Service,
+   ArrowProps,
+   ElementIds,
++  ViewportProps,
+   ItemProps,
+   LinkProps,
+   ValueChangeDetails,
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.connect.ts b/packages/machines/navigation-menu/src/navigation-menu.connect.ts
+index 5f97f77735..5a846872ec 100644
+--- a/packages/machines/navigation-menu/src/navigation-menu.connect.ts
++++ b/packages/machines/navigation-menu/src/navigation-menu.connect.ts
+@@ -1,5 +1,14 @@
+-import { dataAttr, getEventKey, getWindow } from "@zag-js/dom-query"
+-import type { EventKeyMap, NormalizeProps, PropTypes } from "@zag-js/types"
++import {
++  contains,
++  dataAttr,
++  getTabbables,
++  getWindow,
++  isSelfTarget,
++  navigate,
++  visuallyHiddenStyle,
++} from "@zag-js/dom-query"
++import type { NormalizeProps, PropTypes } from "@zag-js/types"
++import { toPx } from "@zag-js/utils"
+ import { parts } from "./navigation-menu.anatomy"
+ import * as dom from "./navigation-menu.dom"
+ import type { ItemProps, NavigationMenuApi, NavigationMenuService } from "./navigation-menu.types"
+@@ -8,10 +17,12 @@ export function connect<T extends PropTypes>(
+   service: NavigationMenuService,
+   normalize: NormalizeProps<T>,
+ ): NavigationMenuApi<T> {
+-  const { context, send, prop, scope, computed, refs } = service
++  const { context, send, prop, scope } = service
+ 
+   const triggerRect = context.get("triggerRect")
++
+   const viewportSize = context.get("viewportSize")
++  const viewportPosition = context.get("viewportPosition")
+ 
+   const value = context.get("value")
+   const previousValue = context.get("previousValue")
+@@ -19,13 +30,14 @@ export function connect<T extends PropTypes>(
+ 
+   const isViewportRendered = context.get("isViewportRendered")
+   const preventTransition = value && !previousValue
+-  const pointerMoveOpenedRef = refs.get("pointerMoveOpenedRef")
+ 
+   function getItemState(props: ItemProps) {
+     const selected = value === props.value
+     const wasSelected = !value && previousValue === props.value
+     return {
++      itemId: dom.getItemId(scope, props.value),
+       triggerId: dom.getTriggerId(scope, props.value),
++      triggerProxyId: dom.getTriggerProxyId(scope, props.value),
+       contentId: dom.getContentId(scope, props.value),
+       selected,
+       wasSelected,
+@@ -37,32 +49,31 @@ export function connect<T extends PropTypes>(
+   return {
+     open,
+     value,
+-    orientation: prop("orientation")!,
++    orientation: prop("orientation"),
++    isViewportRendered,
++    getViewportNode() {
++      return dom.getViewportEl(scope)
++    },
+     setValue(value) {
+       send({ type: "VALUE.SET", value })
+     },
+-    setParent(parent) {
+-      send({ type: "PARENT.SET", parent })
+-    },
+-    setChild(child) {
+-      send({ type: "CHILD.SET", value: child, id: child.prop("id") })
+-    },
+ 
+     getRootProps() {
+       return normalize.element({
+         ...parts.root.attrs,
+         id: dom.getRootId(scope),
+-        "aria-label": "Main",
+-        "data-orientation": prop("orientation")!,
+-        "data-type": computed("isSubmenu") ? "submenu" : "root",
++        "aria-label": "Main Navigation",
++        "data-orientation": prop("orientation"),
+         dir: prop("dir"),
+         style: {
+-          "--trigger-width": triggerRect != null ? triggerRect.width + "px" : undefined,
+-          "--trigger-height": triggerRect != null ? triggerRect.height + "px" : undefined,
+-          "--trigger-x": triggerRect != null ? triggerRect.x + "px" : undefined,
+-          "--trigger-y": triggerRect != null ? triggerRect.y + "px" : undefined,
+-          "--viewport-width": viewportSize != null ? viewportSize.width + "px" : undefined,
+-          "--viewport-height": viewportSize != null ? viewportSize.height + "px" : undefined,
++          "--trigger-width": toPx(triggerRect?.width),
++          "--trigger-height": toPx(triggerRect?.height),
++          "--trigger-x": toPx(triggerRect?.x),
++          "--trigger-y": toPx(triggerRect?.y),
++          "--viewport-width": toPx(viewportSize?.width),
++          "--viewport-height": toPx(viewportSize?.height),
++          "--viewport-x": toPx(viewportPosition?.x),
++          "--viewport-y": toPx(viewportPosition?.y),
+         },
+       })
+     },
+@@ -72,8 +83,7 @@ export function connect<T extends PropTypes>(
+         ...parts.list.attrs,
+         id: dom.getListId(scope),
+         dir: prop("dir"),
+-        "data-orientation": prop("orientation")!,
+-        "data-type": computed("isSubmenu") ? "submenu" : "root",
++        "data-orientation": prop("orientation"),
+       })
+     },
+ 
+@@ -81,11 +91,29 @@ export function connect<T extends PropTypes>(
+       const itemState = getItemState(props)
+       return normalize.element({
+         ...parts.item.attrs,
++        id: itemState.itemId,
+         dir: prop("dir"),
+         "data-value": props.value,
+         "data-state": itemState.open ? "open" : "closed",
+-        "data-orientation": prop("orientation")!,
++        "data-orientation": prop("orientation"),
+         "data-disabled": dataAttr(itemState.disabled),
++        onKeyDown(event) {
++          switch (event.key) {
++            case "ArrowDown":
++            case "ArrowUp":
++            case "ArrowLeft":
++            case "ArrowRight":
++            case "Home":
++            case "End": {
++              send({ type: "ITEM.NAVIGATE", value: props.value, key: event.key })
++              event.preventDefault()
++              event.stopPropagation()
++              break
++            }
++            default:
++              break
++          }
++        },
+       })
+     },
+ 
+@@ -94,7 +122,7 @@ export function connect<T extends PropTypes>(
+         ...parts.indicatorTrack.attrs,
+         id: dom.getIndicatorTrackId(scope),
+         dir: prop("dir"),
+-        "data-orientation": prop("orientation")!,
++        "data-orientation": prop("orientation"),
+         style: { position: "relative" },
+       })
+     },
+@@ -106,8 +134,7 @@ export function connect<T extends PropTypes>(
+         dir: prop("dir"),
+         hidden: !open,
+         "data-state": open ? "open" : "closed",
+-        "data-orientation": prop("orientation")!,
+-        "data-type": computed("isSubmenu") ? "submenu" : "root",
++        "data-orientation": prop("orientation"),
+         style: {
+           position: "absolute",
+           transition: preventTransition ? "none" : undefined,
+@@ -120,7 +147,7 @@ export function connect<T extends PropTypes>(
+         ...parts.arrow.attrs,
+         "aria-hidden": true,
+         dir: prop("dir"),
+-        "data-orientation": prop("orientation")!,
++        "data-orientation": prop("orientation"),
+       })
+     },
+ 
+@@ -130,77 +157,104 @@ export function connect<T extends PropTypes>(
+         ...parts.trigger.attrs,
+         id: itemState.triggerId,
+         "data-uid": prop("id"),
++        "data-trigger-proxy-id": dom.getTriggerProxyId(scope, props.value),
+         dir: prop("dir"),
+-        disabled: props.disabled,
++        disabled: itemState.disabled,
+         "data-value": props.value,
+         "data-state": itemState.selected ? "open" : "closed",
+-        "data-type": computed("isSubmenu") ? "submenu" : "root",
+-        "data-disabled": dataAttr(props.disabled),
++        "data-disabled": dataAttr(itemState.disabled),
+         "aria-controls": itemState.contentId,
+         "aria-expanded": itemState.selected,
+-        onPointerDown() {
+-          send({ type: "TRIGGER.POINTERDOWN" })
+-        },
+-        onPointerEnter() {
+-          queueMicrotask(() => {
+-            if (prop("disableHoverTrigger")) return
+-            send({ type: "TRIGGER.ENTER", value: props.value })
+-          })
+-        },
+-        onPointerMove(event) {
++        onPointerEnter(event) {
+           if (prop("disableHoverTrigger")) return
+           if (event.pointerType !== "mouse") return
+           if (itemState.disabled) return
+-          if (pointerMoveOpenedRef.get() === props.value) return
+-          if (refs.get("clickCloseRef") === props.value) return
+-          if (refs.get("wasEscapeClose")) return
+-          send({ type: "TRIGGER.MOVE", value: props.value })
++          send({ type: "TRIGGER.POINTERENTER", value: props.value })
+         },
+         onPointerLeave(event) {
+           if (prop("disableHoverTrigger")) return
+           if (event.pointerType !== "mouse") return
+-          if (props.disabled) return
+-          if (computed("isSubmenu")) return
+-          send({ type: "TRIGGER.LEAVE", value: props.value })
++          if (itemState.disabled) return
++          send({ type: "TRIGGER.POINTERLEAVE", value: props.value })
+         },
+         onClick() {
+           if (prop("disableClickTrigger")) return
+-          if (pointerMoveOpenedRef.get() === props.value) return
+           send({ type: "TRIGGER.CLICK", value: props.value })
+         },
+         onKeyDown(event) {
+-          const keyMap: EventKeyMap = {
+-            ArrowLeft() {
+-              send({ type: "TRIGGER.FOCUS", target: "prev", value: props.value })
+-            },
+-            ArrowRight() {
+-              send({ type: "TRIGGER.FOCUS", target: "next", value: props.value })
+-            },
+-            Home() {
+-              send({ type: "TRIGGER.FOCUS", target: "first" })
+-            },
+-            End() {
+-              send({ type: "TRIGGER.FOCUS", target: "last" })
+-            },
+-            Enter() {
+-              send({ type: "TRIGGER.CLICK", value: props.value })
+-            },
+-            ArrowDown() {
+-              if (!itemState.selected) return
+-              send({ type: "CONTENT.FOCUS", value })
+-            },
++          const verticalEntryKey = prop("dir") === "rtl" ? "ArrowLeft" : "ArrowRight"
++          const entryKey = {
++            horizontal: "ArrowDown",
++            vertical: verticalEntryKey,
++          }[prop("orientation")]
++
++          // Handle entry key (open menu and focus first link)
++          if (open && event.key === entryKey) {
++            send({ type: "CONTENT.FOCUS", side: "start" })
++            event.preventDefault()
++            event.stopPropagation()
++            return
+           }
+ 
+-          const action = keyMap[getEventKey(event)]
++          // Handle arrow key navigation between triggers
++          const elements = dom.getElements(scope)
++          const currentElement = event.currentTarget as HTMLElement
+ 
+-          if (action) {
+-            action(event)
++          const nextElement = navigate(elements, currentElement, {
++            key: event.key,
++            orientation: prop("orientation"),
++            dir: prop("dir"),
++            loop: false,
++          })
++
++          if (nextElement) {
++            nextElement.focus()
+             event.preventDefault()
++            event.stopPropagation()
++          }
++        },
++      })
++    },
++
++    getTriggerProxyProps(props) {
++      const itemState = getItemState(props)
++
++      return normalize.element({
++        "aria-hidden": true,
++        tabIndex: 0,
++        "data-trigger-proxy": "",
++        id: itemState.triggerProxyId,
++        "data-trigger-id": itemState.triggerId,
++        hidden: !itemState.selected,
++        style: visuallyHiddenStyle,
++        onFocus(event) {
++          const contentEl = dom.getContentEl(scope, props.value)
++          if (!contentEl) return
++          const prevFocusedEl = event.relatedTarget as HTMLElement | null
++
++          const wasTriggerFocused = prevFocusedEl === dom.getTriggerEl(scope, props.value)
++          const wasFocusFromContent = contains(contentEl, prevFocusedEl)
++
++          if (wasTriggerFocused || !wasFocusFromContent) {
++            send({ type: "CONTENT.FOCUS", side: wasTriggerFocused ? "start" : "end" })
+           }
+         },
+       })
+     },
+ 
++    getViewportProxyProps(props) {
++      const itemState = getItemState(props)
++
++      // Only render when item is open and viewport is used
++      if (!itemState.selected || !isViewportRendered) {
++        return { hidden: true }
++      }
++
++      return normalize.element({
++        "aria-owns": dom.getContentId(scope, props.value),
++      })
++    },
++
+     getLinkProps(props) {
+       return normalize.element({
+         ...parts.link.attrs,
+@@ -210,12 +264,11 @@ export function connect<T extends PropTypes>(
+         "aria-current": props.current ? "page" : undefined,
+         "data-ownedby": dom.getContentId(scope, props.value),
+         onClick(event) {
+-          const { currentTarget } = event
++          const target = event.currentTarget
+ 
+-          const win = getWindow(currentTarget)
+-          currentTarget.addEventListener("navigationMenu.linkSelect", (event: any) => props.onSelect?.(event), {
+-            once: true,
+-          })
++          const win = getWindow(target)
++          const onSelect = props.onSelect as EventListener
++          target.addEventListener("link.select", onSelect, { once: true })
+ 
+           const linkSelectEvent = new win.CustomEvent("link.select", {
+             bubbles: true,
+@@ -223,59 +276,34 @@ export function connect<T extends PropTypes>(
+             detail: { originalEvent: event },
+           })
+ 
+-          currentTarget.dispatchEvent(linkSelectEvent)
++          target.dispatchEvent(linkSelectEvent)
+ 
+           if (!linkSelectEvent.defaultPrevented && !event.metaKey) {
+-            send({ type: "CONTENT.DISMISS" })
++            send({ type: "CLOSE" })
+           }
+         },
+         onKeyDown(event) {
+-          const contentMenu = event.currentTarget.closest("[data-scope=navigation-menu][data-part=content]")
+-          const isWithinContent = !!contentMenu
++          // Handle arrow key navigation between triggers and links
++          const currentElement = event.currentTarget as HTMLElement
+ 
+-          const keyMap: EventKeyMap = {
+-            ArrowLeft(event) {
+-              if (isWithinContent) return
+-              send({ type: "TRIGGER.FOCUS", target: "prev", value: props.value })
+-              event.preventDefault()
+-            },
+-            ArrowRight(event) {
+-              if (isWithinContent) return
+-              send({ type: "TRIGGER.FOCUS", target: "next", value: props.value })
+-              event.preventDefault()
+-            },
+-            Home(event) {
+-              if (isWithinContent) return
+-              send({ type: "TRIGGER.FOCUS", target: "first" })
+-              event.preventDefault()
+-            },
+-            End(event) {
+-              if (isWithinContent) return
+-              send({ type: "TRIGGER.FOCUS", target: "last" })
+-              event.preventDefault()
+-            },
+-            ArrowDown(event) {
+-              if (!isWithinContent) return
+-              send({ type: "LINK.FOCUS", target: "next", node: event.currentTarget, value: props.value })
+-              event.preventDefault()
+-            },
+-            ArrowUp(event) {
+-              if (!isWithinContent) return
+-              send({ type: "LINK.FOCUS", target: "prev", node: event.currentTarget, value: props.value })
+-              event.preventDefault()
+-            },
+-          }
++          // Check if this link is inside a content element (vs. direct child of item)
++          const contentEl = currentElement.closest('[data-scope="navigation-menu"][data-part="content"]')
++
++          // If link is inside content, navigate among content links
++          // Otherwise, navigate among top-level elements (triggers and direct child links)
++          const elements = contentEl ? dom.getLinkEls(scope, props.value) : dom.getElements(scope)
+ 
+-          const action =
+-            keyMap[
+-              getEventKey(event, {
+-                orientation: prop("orientation"),
+-                dir: prop("dir"),
+-              })
+-            ]
++          const nextElement = navigate(elements, currentElement, {
++            key: event.key,
++            orientation: prop("orientation"),
++            dir: prop("dir"),
++            loop: false,
++          })
+ 
+-          if (action) {
+-            action(event)
++          if (nextElement) {
++            nextElement.focus()
++            event.preventDefault()
++            event.stopPropagation()
+           }
+         },
+       })
+@@ -284,40 +312,87 @@ export function connect<T extends PropTypes>(
+     getContentProps(props) {
+       const itemState = getItemState(props)
+ 
+-      const currentValue = context.get("value") ?? context.get("previousValue")
++      const currentValue = context.get("value") || context.get("previousValue")
+       const selected = isViewportRendered ? currentValue === props.value : itemState.selected
+ 
+       return normalize.element({
+         ...parts.content.attrs,
+-        id: dom.getContentId(scope, props.value),
++        id: itemState.contentId,
+         dir: prop("dir"),
+         hidden: !selected,
+         "aria-labelledby": itemState.triggerId,
+         "data-uid": prop("id"),
+         "data-state": selected ? "open" : "closed",
+-        "data-type": computed("isSubmenu") ? "submenu" : "root",
++        "data-orientation": prop("orientation"),
+         "data-value": props.value,
+-        onPointerEnter() {
+-          if (computed("isSubmenu")) return
+-          send({ type: "CONTENT.ENTER", value: props.value })
++        onPointerEnter(event) {
++          if (event.pointerType !== "mouse") return
++          send({ type: "CONTENT.POINTERENTER", value: props.value })
+         },
+         onPointerLeave(event) {
+           if (event.pointerType !== "mouse") return
+-          if (computed("isSubmenu")) return
+-          send({ type: "CONTENT.LEAVE", value: props.value })
++          send({ type: "CONTENT.POINTERLEAVE", value: props.value })
++        },
++        onKeyDown(event) {
++          if (event.defaultPrevented) return
++
++          // prevent parent menu triggering keydown event
++          if (event.currentTarget.closest("[data-scope=navigation-menu][data-part=root]") !== dom.getRootEl(scope))
++            return
++
++          const isMetaKey = event.altKey || event.ctrlKey || event.metaKey
++          const isTabKey = event.key === "Tab" && !isMetaKey
++          const candidates = getTabbables(event.currentTarget)
++
++          if (isTabKey) {
++            const focusedElement = scope.getActiveElement()
++            const index = candidates.findIndex((candidate) => candidate === focusedElement)
++            const isMovingBackwards = event.shiftKey
++            const nextCandidates = isMovingBackwards
++              ? candidates.slice(0, index).reverse()
++              : candidates.slice(index + 1, candidates.length)
++
++            if (dom.focusFirst(scope, nextCandidates)) {
++              // prevent browser tab keydown because we've handled focus
++              event.preventDefault()
++            } else {
++              // If we can't focus that means we're at the edges
++              // Focus the trigger proxy and let the browser's Tab continue
++              // to move focus to the next element in natural tab order
++              dom.getTriggerProxyEl(scope, props.value)?.focus()
++              return
++            }
++          }
++
++          if (!isSelfTarget(event)) return
++
++          const el = navigate(candidates, scope.getActiveElement(), {
++            key: event.key,
++            dir: prop("dir"),
++            loop: false,
++          })
++
++          if (el) {
++            el.focus()
++            event.preventDefault()
++            event.stopPropagation()
++          }
+         },
+       })
+     },
+ 
+-    getViewportPositionerProps() {
++    getViewportPositionerProps(props = {}) {
++      const { align = "center" } = props
+       return normalize.element({
+         ...parts.viewportPositioner.attrs,
+         dir: prop("dir"),
+         "data-orientation": prop("orientation"),
++        "data-align": align,
+       })
+     },
+ 
+-    getViewportProps() {
++    getViewportProps(props = {}) {
++      const { align = "center" } = props
+       const open = Boolean(value)
+       return normalize.element({
+         ...parts.viewport.attrs,
+@@ -326,19 +401,22 @@ export function connect<T extends PropTypes>(
+         hidden: !open,
+         "data-state": open ? "open" : "closed",
+         "data-orientation": prop("orientation"),
+-        "data-type": computed("isSubmenu") ? "submenu" : "root",
++        "data-align": align,
+         style: {
+           transition: preventTransition ? "none" : undefined,
+           pointerEvents: !open ? "none" : undefined,
++          "--viewport-width": toPx(viewportSize?.width),
++          "--viewport-height": toPx(viewportSize?.height),
++          "--viewport-x": toPx(viewportPosition?.x),
++          "--viewport-y": toPx(viewportPosition?.y),
+         },
+         onPointerEnter() {
+-          if (computed("isSubmenu")) return
+-          send({ type: "CONTENT.ENTER", src: "viewport" })
++          send({ type: "CONTENT.POINTERENTER" })
+         },
+         onPointerLeave(event) {
++          if (prop("disablePointerLeaveClose")) return
+           if (event.pointerType !== "mouse") return
+-          if (computed("isSubmenu")) return
+-          send({ type: "CONTENT.LEAVE", src: "viewport" })
++          send({ type: "CONTENT.POINTERLEAVE" })
+         },
+       })
+     },
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.dom.ts b/packages/machines/navigation-menu/src/navigation-menu.dom.ts
+index 03942b5c26..f4691137fc 100644
+--- a/packages/machines/navigation-menu/src/navigation-menu.dom.ts
++++ b/packages/machines/navigation-menu/src/navigation-menu.dom.ts
+@@ -1,95 +1,75 @@
+ import type { Scope } from "@zag-js/core"
+ import { getTabbables, getWindow, queryAll } from "@zag-js/dom-query"
+-import { first, last, next, nextIndex, prev, prevIndex } from "@zag-js/utils"
+-import type { NavigationMenuService } from "./navigation-menu.types"
+ 
+ export const getRootId = (ctx: Scope) => ctx.ids?.root ?? `nav-menu:${ctx.id}`
+-
+ export const getTriggerId = (ctx: Scope, value: string) =>
+   ctx.ids?.trigger?.(value) ?? `nav-menu:${ctx.id}:trigger:${value}`
+-
++export const getTriggerProxyId = (ctx: Scope, value: string) =>
++  ctx.ids?.triggerProxy?.(value) ?? `nav-menu:${ctx.id}:trigger-proxy:${value}`
+ export const getContentId = (ctx: Scope, value: string) =>
+   ctx.ids?.content?.(value) ?? `nav-menu:${ctx.id}:content:${value}`
+-
+ export const getViewportId = (ctx: Scope) => ctx.ids?.viewport ?? `nav-menu:${ctx.id}:viewport`
+-
+ export const getListId = (ctx: Scope) => ctx.ids?.list ?? `nav-menu:${ctx.id}:list`
+-
+ export const getIndicatorTrackId = (ctx: Scope) => ctx.ids?.indicatorTrack ?? `nav-menu:${ctx.id}:indicator-track`
++export const getItemId = (ctx: Scope, value: string) => ctx.ids?.item?.(value) ?? `nav-menu:${ctx.id}:item:${value}`
+ 
+-export const getRootMenuEl = (ctx: Scope, parent?: NavigationMenuService) => {
+-  let id = ctx.id
+-  while (parent != null) id = parent.prop("id")
+-  return ctx.getById(`nav-menu:${id}`)
+-}
+-
+-export const getTabbableEls = (ctx: Scope, value: string) => getTabbables(getContentEl(ctx, value))
+ export const getIndicatorTrackEl = (ctx: Scope) => ctx.getById(getIndicatorTrackId(ctx))
+ export const getRootEl = (ctx: Scope) => ctx.getById(getRootId(ctx))
+ export const getViewportEl = (ctx: Scope) => ctx.getById(getViewportId(ctx))
+-export const getTriggerEl = (ctx: Scope, value: string) => ctx.getById(getTriggerId(ctx, value))
+-export const getListEl = (ctx: Scope) => ctx.getById(getListId(ctx))
+ 
+-export const getContentEl = (ctx: Scope, value: string) => ctx.getById(getContentId(ctx, value))
+-export const getContentEls = (ctx: Scope) =>
+-  queryAll(ctx.getDoc(), `[data-scope=navigation-menu][data-part=content][data-uid='${ctx.id}']`)
+-
+-export const getTriggerEls = (ctx: Scope) => queryAll(getListEl(ctx), `[data-part=trigger][data-uid='${ctx.id}']`)
+-export const getTopLevelEls = (ctx: Scope) => {
+-  const topLevelTriggerSelector = `[data-part=trigger][data-uid='${ctx.id}']:not([data-disabled])`
+-  const topLevelLinkSelector = `[data-part=item] > [data-part=link]`
+-  return queryAll(getListEl(ctx), `${topLevelTriggerSelector}, ${topLevelLinkSelector}`)
++export const getTriggerEl = (ctx: Scope, value: string | null) => {
++  if (!value) return null
++  return ctx.getById(getTriggerId(ctx, value))
+ }
++export const getTriggerProxyEl = (ctx: Scope, value: string | null) => {
++  if (!value) return null
++  return ctx.getById(getTriggerProxyId(ctx, value))
++}
++
++export const getListEl = (ctx: Scope) => ctx.getById(getListId(ctx))
+ 
+-export const getFirstTopLevelEl = (ctx: Scope) => first(getTopLevelEls(ctx))
+-export const getLastTopLevelEl = (ctx: Scope) => last(getTopLevelEls(ctx))
+-export const getNextTopLevelEl = (ctx: Scope, value: string) => {
+-  const elements = getTopLevelEls(ctx)
+-  const values = toValues(elements)
+-  const idx = nextIndex(values, values.indexOf(value), { loop: false })
+-  return elements[idx]
++export const getContentEl = (ctx: Scope, value: string | null) => {
++  if (!value) return null
++  return ctx.getById(getContentId(ctx, value))
+ }
+ 
+-export const getPrevTopLevelEl = (ctx: Scope, value: string) => {
+-  const elements = getTopLevelEls(ctx)
+-  const values = toValues(elements)
+-  const idx = prevIndex(values, values.indexOf(value), { loop: false })
+-  return elements[idx]
++export const getContentEls = (ctx: Scope) =>
++  queryAll(ctx.getDoc(), `[data-scope=navigation-menu][data-part=content][data-uid='${ctx.id}']`)
++
++export const getTabbableEls = (ctx: Scope, value: string) => {
++  return getTabbables(getContentEl(ctx, value))
+ }
+ 
++export const getTriggerEls = (ctx: Scope) => queryAll(getListEl(ctx), `[data-part=trigger][data-uid='${ctx.id}']`)
+ export const getLinkEls = (ctx: Scope, value: string) => {
+   const contentEl = getContentEl(ctx, value)
+   return queryAll(contentEl, `[data-part=link][data-ownedby="${getContentId(ctx, value)}"]`)
+ }
+ 
+-export const getFirstLinkEl = (ctx: Scope, value: string) => first(getLinkEls(ctx, value))
+-export const getLastLinkEl = (ctx: Scope, value: string) => last(getLinkEls(ctx, value))
+-export const getNextLinkEl = (ctx: Scope, value: string, node: HTMLElement) => {
+-  const elements = getLinkEls(ctx, value)
+-  return next(elements, elements.indexOf(node), { loop: false })
+-}
+-
+-export const getPrevLinkEl = (ctx: Scope, value: string, node: HTMLElement) => {
+-  const elements = getLinkEls(ctx, value)
+-  return prev(elements, elements.indexOf(node), { loop: false })
++export const getElements = (ctx: Scope) => {
++  const topLevelTriggerSelector = `[data-part=trigger][data-uid='${ctx.id}']:not([data-disabled])`
++  const topLevelLinkSelector = `[data-part=item] > [data-part=link]`
++  return queryAll(getListEl(ctx), `${topLevelTriggerSelector}, ${topLevelLinkSelector}`)
+ }
+ 
+-const toValues = (els: HTMLElement[]) => els.map((el) => el.getAttribute("data-value"))
+-
+-export function trackResizeObserver(element: HTMLElement | null, onResize: () => void) {
+-  if (!element) return null
++export function trackResizeObserver(element: Array<HTMLElement | null>, onResize: () => void) {
++  if (!element.length) return
+   let frame = 0
+-  const win = getWindow(element)
++  const win = getWindow(element[0])
+   const obs = new win.ResizeObserver(() => {
+     cancelAnimationFrame(frame)
+     frame = requestAnimationFrame(onResize)
+   })
+ 
+-  obs.observe(element)
++  element.forEach((el) => {
++    if (el) obs.observe(el)
++  })
+ 
+   return () => {
+     cancelAnimationFrame(frame)
+-    obs.unobserve(element)
++    element.forEach((el) => {
++      if (el) obs.unobserve(el)
++    })
+   }
+ }
+ 
+@@ -134,3 +114,25 @@ export function setMotionAttr(scope: Scope, value: string | null, previousValue:
+     }
+   })
+ }
++
++export function focusFirst(scope: Scope, candidates: HTMLElement[]) {
++  const previouslyFocusedElement = scope.getActiveElement()
++  return candidates.some((candidate) => {
++    if (candidate === previouslyFocusedElement) return true
++    candidate.focus()
++    return scope.getActiveElement() !== previouslyFocusedElement
++  })
++}
++
++export function removeFromTabOrder(candidates: HTMLElement[]) {
++  candidates.forEach((candidate) => {
++    candidate.dataset.tabindex = candidate.getAttribute("tabindex") || ""
++    candidate.setAttribute("tabindex", "-1")
++  })
++  return () => {
++    candidates.forEach((candidate) => {
++      const prevTabIndex = candidate.dataset.tabindex as string
++      candidate.setAttribute("tabindex", prevTabIndex)
++    })
++  }
++}
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.machine.ts b/packages/machines/navigation-menu/src/navigation-menu.machine.ts
+index 3e332c59fd..4f294a8f1e 100644
+--- a/packages/machines/navigation-menu/src/navigation-menu.machine.ts
++++ b/packages/machines/navigation-menu/src/navigation-menu.machine.ts
+@@ -1,15 +1,19 @@
+ import { setup } from "@zag-js/core"
+-import { addDomEvent, contains, proxyTabFocus, raf } from "@zag-js/dom-query"
+-import { trackInteractOutside } from "@zag-js/interact-outside"
+-import type { Rect, Size } from "@zag-js/types"
+-import { callAll, ensureProps, setRafTimeout } from "@zag-js/utils"
+-import { autoReset } from "./auto-reset"
++import { trackDismissableElement } from "@zag-js/dismissable"
++import { addDomEvent, contains, navigate, raf } from "@zag-js/dom-query"
++import type { Point, Rect, Size } from "@zag-js/types"
++import { callAll, ensureProps } from "@zag-js/utils"
+ import * as dom from "./navigation-menu.dom"
+ import type { NavigationMenuSchema } from "./navigation-menu.types"
++import {
++  clearAllOpenTimeouts,
++  clearCloseTimeout,
++  clearOpenTimeout,
++  setCloseTimeout,
++  setOpenTimeout,
++} from "./navigation-menu.utils"
+ 
+-const { createMachine, guards } = setup<NavigationMenuSchema>()
+-
+-const { and } = guards
++const { createMachine } = setup<NavigationMenuSchema>()
+ 
+ export const machine = createMachine({
+   props({ props }) {
+@@ -19,7 +23,7 @@ export const machine = createMachine({
+       openDelay: 200,
+       closeDelay: 300,
+       orientation: "horizontal",
+-      defaultValue: null,
++      defaultValue: "",
+       ...props,
+     }
+   },
+@@ -27,7 +31,7 @@ export const machine = createMachine({
+   context({ prop, bindable }) {
+     return {
+       // value tracking
+-      value: bindable<string | null>(() => ({
++      value: bindable<string>(() => ({
+         defaultValue: prop("defaultValue"),
+         value: prop("value"),
+         sync: true,
+@@ -35,8 +39,8 @@ export const machine = createMachine({
+           prop("onValueChange")?.({ value })
+         },
+       })),
+-      previousValue: bindable<string | null>(() => ({
+-        defaultValue: null,
++      previousValue: bindable<string>(() => ({
++        defaultValue: "",
+         sync: true,
+       })),
+ 
+@@ -48,6 +52,9 @@ export const machine = createMachine({
+       isViewportRendered: bindable<boolean>(() => ({
+         defaultValue: false,
+       })),
++      viewportPosition: bindable<Point | null>(() => ({
++        defaultValue: null,
++      })),
+ 
+       // nodes
+       contentNode: bindable<HTMLElement | null>(() => ({
+@@ -64,393 +71,382 @@ export const machine = createMachine({
+   },
+ 
+   computed: {
+-    isRootMenu: ({ refs }) => refs.get("parent") == null,
+-    isSubmenu: ({ refs }) => refs.get("parent") != null,
++    open: ({ context }) => context.get("value") != null,
+   },
+ 
+   watch({ track, action, context }) {
+     track([() => context.get("value")], () => {
+-      action(["restoreTabOrder", "setTriggerNode", "setContentNode", "syncMotionAttribute"])
++      action(["restoreTabOrder", "setTriggerNode", "syncContentNode", "syncMotionAttribute"])
+     })
+   },
+ 
+   refs() {
+     return {
+-      pointerMoveOpenedRef: autoReset(null, 300),
+-      clickCloseRef: null,
+-      wasEscapeClose: false,
+-      tabOrderCleanup: null,
+-      contentCleanup: null,
+-      triggerCleanup: null,
+-      parent: null,
+-      children: {},
++      restoreContentTabOrder: undefined,
++      contentResizeObserverCleanup: undefined,
++      contentDismissableCleanup: undefined,
++      contentExitCompleteCleanup: undefined,
++      triggerResizeObserverCleanup: undefined,
++      closeTimeoutId: null,
++      openTimeoutIds: {},
+     }
+   },
+ 
+   entry: ["checkViewportNode"],
+ 
+-  exit: ["cleanupObservers", "cleanupAutoResetRef"],
++  exit: ["cleanupObservers"],
++
++  effects: ["trackDocumentResize"],
+ 
+   initialState() {
+-    return "closed"
++    return "idle"
+   },
+ 
+   on: {
+-    "PARENT.SET": {
+-      target: "open",
+-      actions: ["setParentMenu", "setTriggerNode"],
+-    },
+-    "CHILD.SET": {
+-      actions: ["setChildMenu"],
++    "VALUE.SET": {
++      actions: ["setValue"],
+     },
+-    "TRIGGER.FOCUS": {
+-      actions: ["focusTopLevelEl"],
++    "VIEWPORT.POSITION": {
++      actions: ["setViewportPosition"],
+     },
+-    "TRIGGER.ENTER": {
+-      actions: ["clearPreviousValue", "clearCloseRefs"],
++    "TRIGGER.POINTERENTER": {
++      actions: ["clearCloseTimeout", "setValueWithDelay"],
+     },
+-    "TRIGGER.CLICK": [
++    "TRIGGER.POINTERLEAVE": [
+       {
+-        guard: and("isItemOpen", "isRootMenu"),
+-        target: "closed",
+-        actions: ["setPreviousValue", "clearValue", "setClickCloseRef"],
+-      },
+-      {
+-        guard: and("wasItemOpen", "isRootMenu"),
+-        target: "open",
+-        actions: ["setPreviousValue", "setValueOnNextTick"],
+-      },
+-      {
+-        reenter: true,
+-        target: "open",
+-        actions: ["setPreviousValue", "setValue"],
++        actions: ["setCloseTimeout", "resetValueWithDelay"],
+       },
+     ],
+-    "TRIGGER.MOVE": [
++    "TRIGGER.CLICK": [
+       {
+         guard: "isItemOpen",
+-        actions: ["setPreviousValue", "setValue", "setPointerMoveOpenedRef"],
+-      },
+-      {
+-        guard: "isSubmenu",
+-        target: "open",
+-        actions: ["setValue", "setPointerMoveOpenedRef"],
++        actions: ["deselectValue"],
+       },
+       {
+-        target: "opening",
+-        actions: ["setPointerMoveOpenedRef"],
++        actions: ["selectValue"],
+       },
+     ],
+-    "VALUE.SET": {
+-      actions: ["setValue"],
++    "CONTENT.FOCUS": {
++      actions: ["restoreTabOrder", "focusFirstTabbableEl"],
+     },
+-  },
+-
+-  states: {
+-    closed: {
+-      entry: ["cleanupObservers", "propagateClose"],
+-      on: {
+-        "TRIGGER.LEAVE": {
+-          actions: ["clearPointerMoveRef"],
+-        },
+-      },
++    "CONTENT.BLUR": {
++      actions: ["removeFromTabOrder"],
+     },
+-
+-    opening: {
+-      effects: ["waitForOpenDelay"],
+-      on: {
+-        "OPEN.DELAY": {
+-          target: "open",
+-          actions: ["setPreviousValue", "setValue"],
+-        },
+-        "TRIGGER.LEAVE": {
+-          target: "closed",
+-          actions: ["setPreviousValue", "clearValue", "clearPointerMoveRef"],
+-        },
+-        "CONTENT.FOCUS": {
+-          actions: ["focusContent", "restoreTabOrder"],
+-        },
+-        "LINK.FOCUS": {
+-          actions: ["focusLink"],
+-        },
+-      },
++    "CONTENT.POINTERENTER": {
++      actions: ["clearCloseTimeout"],
+     },
+-
+-    open: {
+-      tags: ["open"],
+-      effects: ["trackEscapeKey", "trackInteractionOutside", "preserveTabOrder"],
+-      on: {
+-        "CONTENT.LEAVE": {
+-          target: "closing",
+-        },
+-        "TRIGGER.LEAVE": {
+-          target: "closing",
+-          actions: ["clearPointerMoveRef"],
+-        },
+-        "CONTENT.FOCUS": {
+-          actions: ["focusContent", "restoreTabOrder"],
+-        },
+-        "LINK.FOCUS": {
+-          actions: ["focusLink"],
+-        },
+-        "CONTENT.DISMISS": {
+-          target: "closed",
+-          actions: ["focusTrigger", "clearValue", "clearPointerMoveRef"],
+-        },
+-        "CONTENT.ENTER": {
+-          actions: ["restoreTabOrder"],
+-        },
+-        "ROOT.CLOSE": {
+-          // clear the previous value so indicator doesn't animate
+-          actions: ["clearPreviousValue", "cleanupObservers"],
+-        },
+-      },
++    "CONTENT.POINTERLEAVE": {
++      actions: ["setCloseTimeout"],
+     },
+-
+-    closing: {
+-      tags: ["open"],
+-      effects: ["trackInteractionOutside", "waitForCloseDelay"],
+-      on: {
+-        "CLOSE.DELAY": {
+-          target: "closed",
+-          actions: ["clearValue"],
+-        },
+-        "CONTENT.DISMISS": {
+-          target: "closed",
+-          actions: ["focusTrigger", "clearValue", "clearPointerMoveRef"],
+-        },
+-        "CONTENT.ENTER": {
+-          target: "open",
+-          actions: ["restoreTabOrder"],
+-        },
+-      },
++    "ITEM.NAVIGATE": {
++      actions: ["focusNextLink"],
++    },
++    "ITEM.CLOSE": {
++      actions: ["focusTrigger", "deselectValue"],
++    },
++    CLOSE: {
++      actions: ["clearAllOpenTimeouts", "deselectValue", "focusTriggerIfNeeded", "removeFromTabOrder"],
+     },
+   },
+ 
++  states: {
++    idle: {},
++  },
++
+   implementations: {
+     guards: {
+       isItemOpen: ({ context, event }) => context.get("value") === event.value,
+-      wasItemOpen: ({ context, event }) => context.get("previousValue") === event.value,
+-      isRootMenu: ({ refs }) => refs.get("parent") == null,
+-      isSubmenu: ({ refs }) => refs.get("parent") != null,
+     },
+ 
+     effects: {
+-      waitForOpenDelay: ({ send, prop, event }) => {
+-        return setRafTimeout(() => {
+-          send({ type: "OPEN.DELAY", value: event.value })
+-        }, prop("openDelay"))
+-      },
+-      waitForCloseDelay: ({ send, prop, event }) => {
+-        return setRafTimeout(() => {
+-          send({ type: "CLOSE.DELAY", value: event.value })
+-        }, prop("closeDelay"))
+-      },
+-      preserveTabOrder({ context, scope, refs }) {
+-        if (!context.get("isViewportRendered")) return
+-        const value = context.get("value")
+-        if (value == null) return
+-        const contentEl = () => dom.getContentEl(scope, value)
+-        return proxyTabFocus(contentEl, {
+-          triggerElement: dom.getTriggerEl(scope, value),
+-          onFocusEnter() {
+-            refs.get("tabOrderCleanup")?.()
+-          },
+-        })
+-      },
+-      trackInteractionOutside({ context, computed, refs, send, scope }) {
+-        if (context.get("value") == null) return
+-        if (computed("isSubmenu")) return
+-
+-        const getContentEl = () =>
+-          context.get("isViewportRendered") ? dom.getViewportEl(scope) : dom.getContentEl(scope, context.get("value")!)
+-
+-        return trackInteractOutside(getContentEl, {
+-          defer: true,
+-          onFocusOutside(event) {
+-            // remove tabbable elements from tab order
+-            refs.get("tabOrderCleanup")?.()
+-            refs.set("tabOrderCleanup", removeFromTabOrder(dom.getTabbableEls(scope, context.get("value")!)))
+-
+-            const { target } = event.detail.originalEvent
+-            const rootEl = dom.getRootMenuEl(scope)
+-            if (contains(rootEl, target)) event.preventDefault()
+-          },
+-          onPointerDownOutside(event) {
+-            const { target } = event.detail.originalEvent
+-
+-            const topLevelEls = dom.getTopLevelEls(scope)
+-            const isTrigger = topLevelEls.some((item) => contains(item, target))
+-
+-            const viewportEl = dom.getViewportEl(scope)
+-            const isRootViewport = computed("isRootMenu") && contains(viewportEl, target)
+-            if (isTrigger || isRootViewport) event.preventDefault()
+-          },
+-          onInteractOutside(event) {
+-            if (event.defaultPrevented) return
+-            send({ type: "CONTENT.DISMISS", src: "interact-outside" })
+-          },
++      trackDocumentResize({ scope, send }) {
++        const doc = scope.getDoc()
++        return dom.trackResizeObserver([doc.body, dom.getRootEl(scope)], () => {
++          send({ type: "VIEWPORT.POSITION" })
+         })
+       },
+-
+-      trackEscapeKey({ computed, refs, send, scope }) {
+-        if (computed("isSubmenu")) return
+-        const onKeyDown = (evt: KeyboardEvent) => {
+-          if (evt.isComposing) return
+-          if (evt.key !== "Escape") return
+-          refs.set("wasEscapeClose", true)
+-          send({ type: "CONTENT.DISMISS", src: "key.esc" })
+-        }
+-        return addDomEvent(scope.getDoc(), "keydown", onKeyDown)
+-      },
+     },
+ 
+     actions: {
+-      clearCloseRefs({ refs }) {
+-        refs.set("clickCloseRef", null)
+-        refs.set("wasEscapeClose", false)
++      setValue({ context, event }) {
++        context.set("value", event.value)
+       },
+-      setPointerMoveOpenedRef({ refs, event }) {
+-        refs.get("pointerMoveOpenedRef").set(event.value)
++      clearCloseTimeout({ refs }) {
++        clearCloseTimeout(refs)
+       },
+-      clearPointerMoveRef({ refs }) {
+-        refs.get("pointerMoveOpenedRef").set(null)
++      clearAllOpenTimeouts({ refs }) {
++        clearAllOpenTimeouts(refs)
+       },
+-      cleanupObservers({ refs }) {
+-        refs.get("contentCleanup")?.()
+-        refs.get("triggerCleanup")?.()
+-        refs.get("tabOrderCleanup")?.()
++      setCloseTimeout({ refs, context, prop }) {
++        setCloseTimeout(refs, context, prop)
+       },
+-      cleanupAutoResetRef({ refs }) {
+-        refs.get("pointerMoveOpenedRef").cleanup()
++      resetValueWithDelay({ event, refs }) {
++        clearOpenTimeout(refs, event.value)
+       },
++      setValueWithDelay({ event, prop, context, scope, refs }) {
++        // Skip delay if the menu is already open (within grace period)
++        const shouldSkipDelay = context.get("value") !== ""
+ 
+-      setContentNode({ context, scope, refs }) {
+-        const value = context.get("value")
+-        const node = value != null ? dom.getContentEl(scope, value) : null
++        const openTimeoutId = window.setTimeout(
++          () => {
++            dom.getTriggerEl(scope, event.value)?.focus()
++            setTimeout(() => {
++              context.set("previousValue", context.get("value"))
++              context.set("value", event.value)
++            })
++          },
++          shouldSkipDelay ? 0 : prop("openDelay"),
++        )
+ 
+-        // set node
+-        if (!node) return
+-        context.set("contentNode", node)
++        setOpenTimeout(refs, event.value, openTimeoutId)
++      },
++      selectValue: ({ context, event }) => {
++        // When selecting item we trigger update immediately
++        context.set("previousValue", context.get("value"))
++        context.set("value", event.value)
++      },
++      deselectValue: ({ context }) => {
++        // When deselecting, clear immediately to prevent overlap
++        context.set("value", "")
++        context.set("previousValue", "")
++      },
++
++      syncContentNode({ context, scope, refs, send }) {
++        refs.get("contentResizeObserverCleanup")?.()
++        refs.get("contentDismissableCleanup")?.()
++        refs.get("contentExitCompleteCleanup")?.()
++
++        // If there's a previous value, listen for exitcomplete on its content
++        const previousValue = context.get("previousValue")
++        if (previousValue) {
++          const previousContentEl = dom.getContentEl(scope, previousValue)
++          const viewportEl = dom.getViewportEl(scope)
++          if (previousContentEl) {
++            const onExitComplete = () => context.set("previousValue", "")
++            refs.set(
++              "contentExitCompleteCleanup",
++              callAll(
++                addDomEvent(previousContentEl, "exitcomplete", onExitComplete),
++                addDomEvent(viewportEl, "exitcomplete", onExitComplete),
++              ),
++            )
++          }
++        }
+ 
+-        if (!context.get("isViewportRendered")) return
++        const contentEl = dom.getContentEl(scope, context.get("value"))
+ 
+-        // cleanup
+-        refs.get("contentCleanup")?.()
+-        const exec = () => {
+-          const size = { width: node.offsetWidth, height: node.offsetHeight }
+-          context.set("viewportSize", size)
++        if (!contentEl) return
++        context.set("contentNode", contentEl)
++
++        /////////////////////////////////////////////////////////////////////////////////////////
++
++        if (context.get("isViewportRendered")) {
++          const contentResizeObserver = dom.trackResizeObserver([contentEl], () => {
++            const contentEl = dom.getContentEl(scope, context.get("value"))
++            if (!contentEl) return
++            context.set("viewportSize", { width: contentEl.offsetWidth, height: contentEl.offsetHeight })
++            send({ type: "VIEWPORT.POSITION" })
++          })
++          refs.set("contentResizeObserverCleanup", contentResizeObserver)
++        }
++
++        /////////////////////////////////////////////////////////////////////////////////////////
++
++        const getContentEl = () => {
++          return dom.getViewportEl(scope) || dom.getContentEl(scope, context.get("value"))
+         }
+-        refs.set("contentCleanup", dom.trackResizeObserver(node, exec))
++
++        const contentDismissable = trackDismissableElement(getContentEl, {
++          defer: true,
++          onFocusOutside(event) {
++            const target = event.detail.target as HTMLElement
++
++            if (
++              target.matches("[data-scope=navigation-menu][data-part=trigger]") ||
++              target.matches("[data-trigger-proxy]")
++            ) {
++              event.preventDefault()
++            }
++
++            if (!event.defaultPrevented) {
++              send({ type: "CONTENT.BLUR" })
++              // Only dismiss content when focus moves outside of the menu
++              if (contains(dom.getRootEl(scope), target)) {
++                event.preventDefault()
++              }
++            }
++          },
++
++          onPointerDownOutside(event) {
++            const target = event.detail.target as HTMLElement
++            if (!event.defaultPrevented) {
++              const isTrigger = dom.getTriggerEls(scope).some((node) => node.contains(target))
++              const isRootViewport = contains(dom.getViewportEl(scope), target)
++              if (isTrigger || isRootViewport) {
++                event.preventDefault()
++              }
++            }
++          },
++          onDismiss() {
++            send({ type: "CLOSE", value: context.get("value") })
++          },
++        })
++
++        refs.set("contentDismissableCleanup", contentDismissable)
+       },
+ 
+       setTriggerNode({ context, scope, refs }) {
+-        const value = context.get("value")
+-        const node = value != null ? dom.getTriggerEl(scope, value) : null
++        refs.get("triggerResizeObserverCleanup")?.()
+ 
+-        // set node
++        const node = dom.getTriggerEl(scope, context.get("value"))
+         if (!node) return
++
+         context.set("triggerNode", node)
+ 
+-        // cleanup
+-        refs.get("triggerCleanup")?.()
+         const exec = () => {
+           const rect = { x: node.offsetLeft, y: node.offsetTop, width: node.offsetWidth, height: node.offsetHeight }
+           context.set("triggerRect", rect)
+         }
+ 
+         const indicatorTrackEl = dom.getIndicatorTrackEl(scope)
+-        refs.set(
+-          "triggerCleanup",
+-          callAll(dom.trackResizeObserver(node, exec), dom.trackResizeObserver(indicatorTrackEl, exec)),
+-        )
++        const triggerResizeObserver = dom.trackResizeObserver([node, indicatorTrackEl], exec)
++        refs.set("triggerResizeObserverCleanup", triggerResizeObserver)
+       },
+-      syncMotionAttribute({ context, scope, computed }) {
++      syncMotionAttribute({ context, scope }) {
+         if (!context.get("isViewportRendered")) return
+-        if (computed("isSubmenu")) return
+         dom.setMotionAttr(scope, context.get("value"), context.get("previousValue"))
+       },
+-      setClickCloseRef({ refs, event }) {
+-        refs.set("clickCloseRef", event.value)
+-      },
+-      checkViewportNode({ context, scope }) {
+-        context.set("isViewportRendered", !!dom.getViewportEl(scope))
+-      },
+-      setPreviousValue({ context }) {
+-        context.set("previousValue", context.get("value"))
+-      },
+-      clearPreviousValue({ context }) {
+-        context.set("previousValue", null)
+-      },
+-      setValue({ context, event }) {
+-        context.set("value", event.value)
+-      },
+-      setValueOnNextTick({ context, event }) {
++
++      focusFirstTabbableEl({ event, scope, context }) {
+         raf(() => {
+-          context.set("value", event.value)
++          const value = event.value || context.get("value")
++          const candidates = dom.getTabbableEls(scope, value)
++          const elements = event.side === "start" ? candidates : candidates.reverse()
++          if (elements.length) dom.focusFirst(scope, elements)
+         })
+       },
+-      clearValue({ context }) {
+-        context.set("value", null)
++
++      focusNextLink({ event, scope }) {
++        const activeEl = scope.getActiveElement()
++        const linkEls = dom.getLinkEls(scope, event.value)
++        if (activeEl == null || !linkEls.includes(activeEl)) return
++        const el = navigate(linkEls, activeEl, { key: event.key, loop: false })
++        el?.focus()
+       },
+-      focusTopLevelEl({ event, scope }) {
+-        const value = event.value
+-        if (event.target === "next") dom.getNextTopLevelEl(scope, value)?.focus()
+-        else if (event.target === "prev") dom.getPrevTopLevelEl(scope, value)?.focus()
+-        else if (event.target === "first") dom.getFirstTopLevelEl(scope)?.focus()
+-        else if (event.target === "last") dom.getLastTopLevelEl(scope)?.focus()
+-        else dom.getTriggerEl(scope, value)?.focus()
++
++      focusTrigger({ scope, event, context }) {
++        const value = event.value ?? context.get("value")
++        dom.getTriggerEl(scope, value)?.focus()
+       },
+-      focusLink({ event, scope }) {
++
++      focusTriggerIfNeeded({ event, scope }) {
+         const value = event.value
+-        if (event.target === "next") dom.getNextLinkEl(scope, value, event.node)?.focus()
+-        else if (event.target === "prev") dom.getPrevLinkEl(scope, value, event.node)?.focus()
+-        else if (event.target === "first") dom.getFirstLinkEl(scope, value)?.focus()
+-        else if (event.target === "last") dom.getLastLinkEl(scope, value)?.focus()
+-      },
+-      focusContent({ event, scope }) {
+-        raf(() => {
+-          const tabbableEls = dom.getTabbableEls(scope, event.value)
+-          tabbableEls[0]?.focus()
+-        })
+-      },
+-      focusTrigger({ context, scope }) {
+-        if (context.get("value") == null) return
+-        const contentEl = dom.getContentEl(scope, context.get("value")!)
++        const contentEl = dom.getContentEl(scope, value)
+         if (!contains(contentEl, scope.getActiveElement())) return
+-        context.get("triggerNode")?.focus()
++        dom.getTriggerEl(scope, value)?.focus()
++      },
++
++      removeFromTabOrder({ event, scope, refs, context }) {
++        const value = event.value ?? context.get("value")
++        const candidates = dom.getTabbableEls(scope, value)
++        if (candidates.length) refs.set("restoreContentTabOrder", dom.removeFromTabOrder(candidates))
+       },
+       restoreTabOrder({ refs }) {
+-        refs.get("tabOrderCleanup")?.()
++        refs.get("restoreContentTabOrder")?.()
+       },
+-      setParentMenu({ refs, event }) {
+-        refs.set("parent", event.parent)
++
++      cleanupObservers({ refs }) {
++        refs.get("contentResizeObserverCleanup")?.()
++        refs.get("contentDismissableCleanup")?.()
++        refs.get("triggerResizeObserverCleanup")?.()
++        refs.get("restoreContentTabOrder")?.()
++        refs.get("contentExitCompleteCleanup")?.()
+       },
+-      setChildMenu({ refs, event }) {
+-        refs.set("children", { ...refs.get("children"), [event.id]: event.value })
++
++      checkViewportNode({ context, scope }) {
++        context.set("isViewportRendered", !!dom.getViewportEl(scope))
+       },
+-      propagateClose({ refs, prop }) {
+-        const menus = Object.values(refs.get("children"))
+-        menus.forEach((child) => {
+-          child?.send({ type: "ROOT.CLOSE", src: prop("id")! })
+-        })
++
++      setViewportPosition: ({ context, scope }) => {
++        const triggerNode = context.get("triggerNode")
++        const contentNode = context.get("contentNode")
++        const rootNavigationMenu = dom.getRootEl(scope)
++
++        const viewportEl = dom.getViewportEl(scope)
++        const align = viewportEl?.dataset.align || "center"
++
++        if (contentNode && triggerNode && rootNavigationMenu) {
++          const bodyWidth = document.documentElement.offsetWidth
++          const bodyHeight = document.documentElement.offsetHeight
++          const rootRect = rootNavigationMenu.getBoundingClientRect()
++          const rect = triggerNode.getBoundingClientRect()
++          const { offsetWidth, offsetHeight } = contentNode
++
++          // Find the beginning of the position of the menu item
++          const startPositionLeft = rect.left - rootRect.left
++          const startPositionTop = rect.top - rootRect.top
++
++          // Aligning to specified alignment
++          let x = null
++          let y = null
++          switch (align) {
++            case "start":
++              x = startPositionLeft
++              y = startPositionTop
++              break
++            case "end":
++              x = startPositionLeft - offsetWidth + rect.width
++              y = startPositionTop - offsetHeight + rect.height
++              break
++            default:
++              // center
++              x = startPositionLeft - offsetWidth / 2 + rect.width / 2
++              y = startPositionTop - offsetHeight / 2 + rect.height / 2
++          }
++
++          const screenOffset = 10
++
++          // Do not let go of the left side of the screen
++          if (x + rootRect.left < screenOffset) {
++            x = screenOffset - rootRect.left
++          }
++
++          // Now also check the right side of the screen
++          const rightOffset = x + rootRect.left + offsetWidth
++          if (rightOffset > bodyWidth - screenOffset) {
++            x -= rightOffset - bodyWidth + screenOffset
++
++            // Recheck the left side of the screen
++            if (x < screenOffset - rootRect.left) {
++              // Just set the menu to the full width of the screen
++              x = screenOffset - rootRect.left
++            }
++          }
++
++          // Do not let go of the top side of the screen
++          if (y + rootRect.top < screenOffset) {
++            y = screenOffset - rootRect.top
++          }
++
++          // Now also check the bottom side of the screen
++          const bottomOffset = y + rootRect.top + offsetHeight
++          if (bottomOffset > bodyHeight - screenOffset) {
++            y -= bottomOffset - bodyHeight + screenOffset
++
++            // Recheck the top side of the screen
++            if (y < screenOffset - rootRect.top) {
++              // Just set the menu to the full height of the screen
++              y = screenOffset - rootRect.top
++            }
++          }
++
++          // Possible blurring font with decimal values
++          x = Math.round(x)
++          y = Math.round(y)
++
++          context.set("viewportPosition", { x, y })
++        }
+       },
+     },
+   },
+ })
+-
+-function removeFromTabOrder(nodes: HTMLElement[]) {
+-  nodes.forEach((node) => {
+-    node.dataset.tabindex = node.getAttribute("tabindex") || ""
+-    node.setAttribute("tabindex", "-1")
+-  })
+-  return () => {
+-    nodes.forEach((node) => {
+-      if (node.dataset.tabindex == null) return
+-      const prevTabIndex = node.dataset.tabindex
+-      node.setAttribute("tabindex", prevTabIndex)
+-      delete node.dataset.tabindex
+-      if (node.getAttribute("tabindex") === "") node.removeAttribute("tabindex")
+-    })
+-  }
+-}
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.props.ts b/packages/machines/navigation-menu/src/navigation-menu.props.ts
+index 2c9d119ca8..827e1765e6 100644
+--- a/packages/machines/navigation-menu/src/navigation-menu.props.ts
++++ b/packages/machines/navigation-menu/src/navigation-menu.props.ts
+@@ -15,6 +15,7 @@ export const props = createProps<NavigationMenuProps>()([
+   "ids",
+   "disableClickTrigger",
+   "disableHoverTrigger",
++  "disablePointerLeaveClose",
+ ])
+ 
+ export const splitProps = createSplitProps<Partial<NavigationMenuProps>>(props)
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.types.ts b/packages/machines/navigation-menu/src/navigation-menu.types.ts
+index d1e93489bd..b6ad8faa6a 100644
+--- a/packages/machines/navigation-menu/src/navigation-menu.types.ts
++++ b/packages/machines/navigation-menu/src/navigation-menu.types.ts
+@@ -4,26 +4,25 @@ import type {
+   DirectionProperty,
+   Orientation,
+   OrientationProperty,
++  Point,
+   PropTypes,
+   Rect,
+   RequiredBy,
+   Size,
+ } from "@zag-js/types"
+-import type { AutoReset } from "./auto-reset"
+ 
+ /* -----------------------------------------------------------------------------
+  * Callback details
+  * -----------------------------------------------------------------------------*/
+ 
+ export interface ValueChangeDetails {
+-  value: string | null
++  value: string
+ }
+ 
+ export type ElementIds = Partial<{
+   root: string
+   list: string
+   item: string
+-  indicator: string
+   trigger: (value: string) => string
+   content: (value: string) => string
+   viewport: string
+@@ -41,12 +40,12 @@ export interface NavigationMenuProps extends DirectionProperty, CommonProperties
+   /**
+    * The controlled value of the navigation menu
+    */
+-  value?: string | null | undefined
++  value?: string | undefined
+   /**
+    * The default value of the navigation menu.
+    * Use when you don't want to control the value of the menu.
+    */
+-  defaultValue?: string | null | undefined
++  defaultValue?: string | undefined
+   /**
+    * Function called when the value of the menu changes
+    */
+@@ -69,32 +68,38 @@ export interface NavigationMenuProps extends DirectionProperty, CommonProperties
+    * Whether to disable the hover trigger
+    */
+   disableHoverTrigger?: boolean | undefined
++  /**
++   * Whether to disable the pointer leave close
++   */
++  disablePointerLeaveClose?: boolean | undefined
+ }
+ 
+-type PropsWithDefault = "openDelay" | "closeDelay" | "dir" | "id"
++type PropsWithDefault = "openDelay" | "closeDelay" | "dir" | "id" | "orientation"
+ 
+ export interface NavigationMenuSchema {
+   props: RequiredBy<NavigationMenuProps, PropsWithDefault>
+-  state: "opening" | "open" | "closing" | "closed"
++  state: "idle"
+   computed: {
+-    isRootMenu: boolean
+-    isSubmenu: boolean
++    open: boolean
+   }
+   refs: {
+-    contentCleanup: VoidFunction | null
+-    triggerCleanup: VoidFunction | null
+-    tabOrderCleanup: VoidFunction | null
+-    pointerMoveOpenedRef: AutoReset<string | null>
+-    clickCloseRef: string | null
+-    wasEscapeClose: boolean
+-    parent: NavigationMenuService | null
+-    children: Record<string, NavigationMenuService | null>
++    restoreContentTabOrder: VoidFunction | undefined
++    contentResizeObserverCleanup: VoidFunction | undefined
++    contentDismissableCleanup: VoidFunction | undefined
++    triggerResizeObserverCleanup: VoidFunction | undefined
++    contentExitCompleteCleanup: VoidFunction | undefined
++
++    closeTimeoutId: number | null
++    openTimeoutIds: Record<string, number>
+   }
+   context: {
+-    value: string | null
+-    previousValue: string | null
++    value: string
++    previousValue: string
++
+     viewportSize: Size | null
++    viewportPosition: Point | null
+     isViewportRendered: boolean
++
+     contentNode: HTMLElement | null
+     triggerRect: Rect | null
+     triggerNode: HTMLElement | null
+@@ -146,6 +151,14 @@ export interface LinkProps {
+   onSelect?: ((event: CustomEvent) => void) | undefined
+ }
+ 
++export interface ViewportProps {
++  /**
++   * Placement of the viewport for css variables `(--viewport-x, --viewport-y)`.
++   * @defaultValue 'center'
++   */
++  align?: "start" | "center" | "end"
++}
++
+ export interface NavigationMenuApi<T extends PropTypes = PropTypes> {
+   /**
+    * The current value of the menu
+@@ -160,13 +173,13 @@ export interface NavigationMenuApi<T extends PropTypes = PropTypes> {
+    */
+   open: boolean
+   /**
+-   * Sets the parent of the menu
++   * Whether the viewport is rendered
+    */
+-  setParent: (parent: NavigationMenuService) => void
++  isViewportRendered: boolean
+   /**
+-   * Sets the child of the menu
++   * Gets the viewport node element
+    */
+-  setChild: (child: NavigationMenuService) => void
++  getViewportNode: () => HTMLElement | null
+   /**
+    * The orientation of the menu
+    */
+@@ -178,9 +191,13 @@ export interface NavigationMenuApi<T extends PropTypes = PropTypes> {
+   getIndicatorTrackProps: () => T["element"]
+   getIndicatorProps: () => T["element"]
+   getArrowProps: (props?: ArrowProps) => T["element"]
++
+   getTriggerProps: (props: ItemProps) => T["button"]
++  getTriggerProxyProps: (props: ItemProps) => T["element"]
++  getViewportProxyProps: (props: ItemProps) => T["element"]
++
+   getLinkProps: (props: LinkProps) => T["element"]
+   getContentProps: (props: LinkProps) => T["element"]
+-  getViewportPositionerProps: () => T["element"]
+-  getViewportProps: () => T["element"]
++  getViewportPositionerProps: (props?: ViewportProps) => T["element"]
++  getViewportProps: (props?: ViewportProps) => T["element"]
+ }
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.utils.ts b/packages/machines/navigation-menu/src/navigation-menu.utils.ts
+new file mode 100644
+index 0000000000..ffe66167db
+--- /dev/null
++++ b/packages/machines/navigation-menu/src/navigation-menu.utils.ts
+@@ -0,0 +1,51 @@
++import type { BindableContext, BindableRefs, PropFn } from "@zag-js/core"
++import type { NavigationMenuSchema } from "./navigation-menu.types"
++
++export function setCloseTimeout(
++  refs: BindableRefs<NavigationMenuSchema>,
++  context: BindableContext<NavigationMenuSchema>,
++  prop: PropFn<NavigationMenuSchema>,
++) {
++  clearCloseTimeout(refs)
++
++  const closeTimeoutId = window.setTimeout(() => {
++    context.set("value", "")
++  }, prop("closeDelay"))
++
++  refs.set("closeTimeoutId", closeTimeoutId)
++}
++
++export function clearCloseTimeout(refs: BindableRefs<NavigationMenuSchema>) {
++  const closeTimeoutId = refs.get("closeTimeoutId")
++  if (closeTimeoutId) {
++    clearTimeout(closeTimeoutId)
++    refs.set("closeTimeoutId", null)
++  }
++}
++
++export function setOpenTimeout(refs: BindableRefs<NavigationMenuSchema>, value: string, timeoutId: number) {
++  const openTimeoutIds = refs.get("openTimeoutIds")
++  refs.set("openTimeoutIds", {
++    ...openTimeoutIds,
++    [value]: timeoutId,
++  })
++}
++
++export function clearOpenTimeout(refs: BindableRefs<NavigationMenuSchema>, value: string) {
++  const openTimeoutIds = refs.get("openTimeoutIds")
++  const timeoutId = openTimeoutIds[value]
++  if (timeoutId) {
++    clearTimeout(timeoutId)
++    // Remove the property by destructuring
++    const { [value]: _, ...rest } = openTimeoutIds
++    refs.set("openTimeoutIds", rest)
++  }
++}
++
++export function clearAllOpenTimeouts(refs: BindableRefs<NavigationMenuSchema>) {
++  const openTimeoutIds = refs.get("openTimeoutIds")
++  Object.values(openTimeoutIds).forEach((timeoutId) => {
++    if (timeoutId) clearTimeout(timeoutId)
++  })
++  refs.set("openTimeoutIds", {})
++}
+diff --git a/packages/machines/presence/src/presence.machine.ts b/packages/machines/presence/src/presence.machine.ts
+index a50cd94262..a95cc8b165 100644
+--- a/packages/machines/presence/src/presence.machine.ts
++++ b/packages/machines/presence/src/presence.machine.ts
+@@ -1,5 +1,5 @@
+-import { getComputedStyle, getEventTarget, nextTick, raf, setStyle } from "@zag-js/dom-query"
+ import { createMachine } from "@zag-js/core"
++import { getComputedStyle, getEventTarget, getWindow, nextTick, raf, setStyle } from "@zag-js/dom-query"
+ import type { PresenceSchema } from "./presence.types"
+ 
+ export const machine = createMachine<PresenceSchema>({
+@@ -95,8 +95,16 @@ export const machine = createMachine<PresenceSchema>({
+         context.set("initial", false)
+       },
+ 
+-      invokeOnExitComplete: ({ prop }) => {
++      invokeOnExitComplete: ({ prop, refs }) => {
+         prop("onExitComplete")?.()
++
++        // Emit exitcomplete event on the node
++        const node = refs.get("node")
++        if (!node) return
++
++        const win = getWindow(node)
++        const event = new win.CustomEvent("exitcomplete", { bubbles: false })
++        node.dispatchEvent(event)
+       },
+ 
+       setupNode: ({ refs, event }) => {
+@@ -162,9 +170,8 @@ export const machine = createMachine<PresenceSchema>({
+         }
+ 
+         const onEnd = (event: AnimationEvent) => {
+-          const animationName = getAnimationName(refs.get("styles"))
+           const target = getEventTarget(event)
+-          if (target === node && animationName === context.get("unmountAnimationName") && !prop("present")) {
++          if (target === node && event.animationName === context.get("unmountAnimationName") && !prop("present")) {
+             send({ type: "UNMOUNT", src: "animationend" })
+           }
+         }
+diff --git a/packages/utilities/dom-query/src/event.ts b/packages/utilities/dom-query/src/event.ts
+index ec1e31e000..ea7eef26e6 100644
+--- a/packages/utilities/dom-query/src/event.ts
++++ b/packages/utilities/dom-query/src/event.ts
+@@ -139,7 +139,7 @@ interface DOMEventMap extends DocumentEventMap, WindowEventMap, HTMLElementEvent
+ 
+ export const addDomEvent = <K extends keyof DOMEventMap>(
+   target: MaybeFn<EventTarget | null>,
+-  eventName: K,
++  eventName: K | (string & {}),
+   handler: (event: DOMEventMap[K]) => void,
+   options?: boolean | AddEventListenerOptions,
+ ) => {
+@@ -149,3 +149,9 @@ export const addDomEvent = <K extends keyof DOMEventMap>(
+     node?.removeEventListener(eventName, handler as any, options)
+   }
+ }
++
++export const isSelfTarget = (event: Partial<Pick<UIEvent, "currentTarget" | "target" | "composedPath">>) => {
++  const composedPath = getComposedPath(event)
++  const target = composedPath?.[0] ?? event.target
++  return event.currentTarget === target
++}
+diff --git a/packages/utilities/dom-query/src/navigate.ts b/packages/utilities/dom-query/src/navigate.ts
+index 4a1715e293..70d6d476ba 100644
+--- a/packages/utilities/dom-query/src/navigate.ts
++++ b/packages/utilities/dom-query/src/navigate.ts
+@@ -2,6 +2,54 @@ import { getWindow } from "./node"
+ import { isFirefox } from "./platform"
+ import { queueBeforeEvent } from "./raf"
+ 
++export interface NavigateOptions {
++  key?: string
++  orientation?: "both" | "vertical" | "horizontal"
++  loop?: boolean
++  dir?: "ltr" | "rtl"
++}
++
++export function navigate<T extends HTMLElement>(
++  items: T[],
++  current: T | null,
++  options: NavigateOptions = {},
++): T | null {
++  if (!current) return null
++
++  const { orientation = "both", loop = true, dir = "ltr", key } = options
++
++  if (!items.length || !key) return null
++  const isVertical = key === "ArrowUp" || key === "ArrowDown"
++  const isHorizontal = key === "ArrowLeft" || key === "ArrowRight"
++
++  if (!isVertical && !isHorizontal && key !== "Home" && key !== "End") return null
++  if ((orientation === "vertical" && isHorizontal) || (orientation === "horizontal" && isVertical)) return null
++
++  if (key === "Home") return items[0] || null
++  if (key === "End") return items[items.length - 1] || null
++
++  const idx = items.indexOf(current)
++  if (idx === -1) return null
++
++  let isForward: boolean
++  if (orientation === "both") {
++    // When orientation is both, treat ArrowDown/Right as forward and ArrowUp/Left as backward
++    isForward = key === "ArrowDown" || (dir === "ltr" ? key === "ArrowRight" : key === "ArrowLeft")
++  } else {
++    isForward = isVertical ? key === "ArrowDown" : dir === "ltr" ? key === "ArrowRight" : key === "ArrowLeft"
++  }
++
++  const nextIdx = isForward
++    ? loop
++      ? (idx + 1) % items.length
++      : Math.min(idx + 1, items.length - 1)
++    : loop
++      ? (idx - 1 + items.length) % items.length
++      : Math.max(0, idx - 1)
++
++  return items[nextIdx] || null
++}
++
+ export function clickIfLink(el: HTMLAnchorElement) {
+   const click = () => {
+     const win = getWindow(el)
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 7485875b4c..23d8a60be5 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -2558,12 +2558,12 @@ importers:
+       '@zag-js/core':
+         specifier: workspace:*
+         version: link:../../core
++      '@zag-js/dismissable':
++        specifier: workspace:*
++        version: link:../../utilities/dismissable
+       '@zag-js/dom-query':
+         specifier: workspace:*
+         version: link:../../utilities/dom-query
+-      '@zag-js/interact-outside':
+-        specifier: workspace:*
+-        version: link:../../utilities/interact-outside
+       '@zag-js/types':
+         specifier: workspace:*
+         version: link:../../types
+diff --git a/shared/src/css/navigation-menu-keyframes.css b/shared/src/css/navigation-menu-keyframes.css
+index 62e6fd35b4..7ed1375622 100644
+--- a/shared/src/css/navigation-menu-keyframes.css
++++ b/shared/src/css/navigation-menu-keyframes.css
+@@ -44,22 +44,22 @@
+ 
+ @keyframes nav-menu-scale-in {
+   from {
+-    transform: scale(0.9);
++    transform: rotateX(-30deg) scale(0.9);
+     opacity: 0;
+   }
+   to {
+-    transform: scale(1);
++    transform: rotateX(0deg) scale(1);
+     opacity: 1;
+   }
+ }
+ 
+ @keyframes nav-menu-scale-out {
+   from {
+-    transform: scale(1);
++    transform: rotateX(0deg) scale(1);
+     opacity: 1;
+   }
+   to {
+-    transform: scale(0.95);
++    transform: rotateX(-10deg) scale(0.95);
+     opacity: 0;
+   }
+ }
+diff --git a/shared/src/css/navigation-menu-nested.css b/shared/src/css/navigation-menu-nested.css
+deleted file mode 100644
+index 07342d28fa..0000000000
+--- a/shared/src/css/navigation-menu-nested.css
++++ /dev/null
+@@ -1,206 +0,0 @@
+-@import url(./navigation-menu-keyframes.css);
+-
+-.navigation-menu.nested {
+-  [data-scope="navigation-menu"][data-part="root"] {
+-    --arrow-size: 20px;
+-    --indicator-size: 10px;
+-
+-    &[data-type="submenu"] {
+-      display: grid;
+-      width: 100%;
+-      max-width: 800px;
+-      gap: 20px;
+-
+-      &[data-orientation="vertical"] {
+-        grid-template-columns: 0.3fr 1fr;
+-      }
+-
+-      &[data-orientation="horizontal"] {
+-        justify-items: center;
+-        margin-top: -10px;
+-      }
+-    }
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="list"] {
+-    all: unset;
+-    list-style: none;
+-    display: flex;
+-
+-    &[data-orientation="vertical"] {
+-      flex-direction: column;
+-    }
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="trigger"] {
+-    display: flex;
+-    align-items: center;
+-    justify-content: center;
+-    border: 0;
+-    background: transparent;
+-    font-size: inherit;
+-    gap: 4px;
+-    padding: 10px 16px;
+-    font-weight: bold;
+-
+-    & svg {
+-      transition: rotate 200ms ease;
+-      width: 14px;
+-      height: 14px;
+-    }
+-
+-    &[data-state="open"] svg {
+-      rotate: -180deg;
+-    }
+-
+-    &[data-type="submenu"] {
+-      position: relative;
+-      width: 100%;
+-      border-radius: 4px;
+-
+-      &[data-state="open"] {
+-        background-color: #f3f4f5;
+-      }
+-    }
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="link"] {
+-    padding: 10px;
+-    font-weight: bold;
+-    color: inherit;
+-    display: block;
+-    text-decoration: none;
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="content"] {
+-    &[data-type="root"] {
+-      display: flex;
+-      justify-content: center;
+-      position: absolute;
+-      top: 0;
+-      left: 0;
+-      width: 100%;
+-      padding-top: 35px;
+-      padding-bottom: 35px;
+-      &[data-motion="from-start"] {
+-        animation: nav-menu-from-left 250ms ease;
+-      }
+-
+-      &[data-motion="from-end"] {
+-        animation: nav-menu-from-right 250ms ease;
+-      }
+-
+-      &[data-motion="to-start"] {
+-        animation: nav-menu-to-left 250ms ease;
+-      }
+-
+-      &[data-motion="to-end"] {
+-        animation: nav-menu-to-right 250ms ease;
+-      }
+-    }
+-
+-    &[data-type="submenu"] {
+-      display: grid;
+-      gap: 20px;
+-      width: 100%;
+-    }
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="viewport"] {
+-    overflow: hidden;
+-    width: 100%;
+-
+-    &[data-type="root"] {
+-      position: absolute;
+-      left: 0;
+-      top: 100%;
+-      border-top: 1px solid #dcdfe3;
+-      transform-origin: top center;
+-      background-color: white;
+-      height: var(--viewport-height);
+-      transition: height 300ms ease;
+-      box-shadow:
+-        0 50px 100px -20px rgba(50, 50, 93, 0.1),
+-        0 30px 60px -30px rgba(0, 0, 0, 0.2);
+-
+-      &[data-state="open"] {
+-        animation: fadeIn 250ms ease;
+-      }
+-
+-      &[data-state="closed"] {
+-        animation: fadeOut 250ms ease;
+-      }
+-    }
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="indicator"] {
+-    &[data-orientation="horizontal"] {
+-      left: 0px;
+-      translate: var(--trigger-x) 0;
+-      width: var(--trigger-width);
+-    }
+-
+-    &[data-orientation="vertical"] {
+-      top: 0px;
+-      translate: 0 var(--trigger-y);
+-      height: var(--trigger-height);
+-    }
+-
+-    &[data-type="root"] {
+-      display: flex;
+-      justify-content: center;
+-      height: var(--indicator-size);
+-      z-index: 1;
+-      transition:
+-        translate 250ms ease,
+-        width 250ms ease;
+-      overflow: hidden;
+-      bottom: calc(calc(var(--indicator-size) + var(--arrow-size)) * -1);
+-
+-      &[data-state="open"] {
+-        animation: nav-menu-fade-in 250ms ease;
+-      }
+-
+-      &[data-state="closed"] {
+-        animation: nav-menu-fade-out 250ms ease;
+-      }
+-    }
+-
+-    &[data-type="submenu"] {
+-      background-color: black;
+-      border-radius: 4px;
+-
+-      &[data-orientation="vertical"] {
+-        width: 3px;
+-        transition:
+-          translate 250ms ease,
+-          height 250ms ease;
+-
+-        [dir="ltr"] & {
+-          right: 0;
+-        }
+-        [dir="rtl"] & {
+-          left: 0;
+-        }
+-      }
+-
+-      &[data-orientation="horizontal"] {
+-        height: 3px;
+-        bottom: 0;
+-        transition:
+-          translate 250ms ease,
+-          width 250ms ease;
+-      }
+-    }
+-  }
+-
+-  [data-scope="navigation-menu"][data-part="arrow"] {
+-    position: relative;
+-    top: 4px;
+-    width: var(--arrow-size);
+-    height: var(--arrow-size);
+-    background-color: white;
+-    rotate: 45deg;
+-    border-radius: 3px;
+-  }
+-}
+diff --git a/shared/src/css/navigation-menu-viewport.css b/shared/src/css/navigation-menu-viewport.css
+index d7be31c570..9f129f5468 100644
+--- a/shared/src/css/navigation-menu-viewport.css
++++ b/shared/src/css/navigation-menu-viewport.css
+@@ -52,6 +52,7 @@
+     display: grid;
+     gap: 20px;
+     padding: 40px;
++    will-change: transform, opacity;
+ 
+     &[data-motion="from-start"] {
+       animation: nav-menu-from-left 250ms ease;
+@@ -97,25 +98,28 @@
+     padding: 40px;
+     background-color: white;
+     transition:
+-      width,
+-      height,
+-      300ms ease;
+-    width: var(--viewport-width);
++      width 300ms ease,
++      height 300ms ease;
++    width: 100%;
+     height: var(--viewport-height);
+     transform-origin: top center;
+     overflow: hidden;
+     margin-top: 15px;
+     border-radius: 8px;
+-    box-shadow:
+-      0 50px 100px -20px rgba(50, 50, 93, 0.25),
+-      0 30px 60px -30px rgba(0, 0, 0, 0.3);
++    box-shadow: 
++      hsl(206 22% 7% / 35%) 0px 10px 38px -10px, 
++      hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
++
++    @media (min-width: 600px) {
++      width: var(--viewport-width);
++    }
+ 
+     &[data-state="open"] {
+-      animation: nav-menu-scale-in 300ms ease;
++      animation: nav-menu-scale-in 200ms ease;
+     }
+ 
+     &[data-state="closed"] {
+-      animation: nav-menu-scale-out 300ms ease;
++      animation: nav-menu-scale-out 200ms ease;
+     }
+   }
+ 
+diff --git a/shared/src/routes.ts b/shared/src/routes.ts
+index ef613e1f24..cacdbc53ff 100644
+--- a/shared/src/routes.ts
++++ b/shared/src/routes.ts
+@@ -19,7 +19,6 @@ export const routesData: RouteData[] = [
+   { label: "Listbox (Grid)", path: "/listbox-grid" },
+   { label: "Navigation Menu", path: "/navigation-menu" },
+   { label: "Navigation Menu (Viewport)", path: "/navigation-menu-viewport" },
+-  { label: "Navigation Menu (Nested)", path: "/navigation-menu-nested" },
+   { label: "Toggle", path: "/toggle" },
+   { label: "Angle Slider", path: "/angle-slider" },
+   { label: "Steps", path: "/steps" },
+diff --git a/shared/src/style.css b/shared/src/style.css
+index c9582fa97a..30a0203f57 100644
+--- a/shared/src/style.css
++++ b/shared/src/style.css
+@@ -33,7 +33,6 @@
+ 
+ @import url("./css/navigation-menu.css");
+ @import url("./css/navigation-menu-viewport.css");
+-@import url("./css/navigation-menu-nested.css");
+ 
+ @import url("./css/number-input.css");
+ 

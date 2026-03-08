@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-4460",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4460: feat: tsup build alignment and local setup fixes",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4460,
+    "prUrl": "https://github.com/module-federation/core/pull/4460",
+    "baseSha": "dfbf05ff932c61419751700926d2c68f96a8f075",
+    "headSha": "e7a86322e368fa02fe79139244ac8b6b7e62539d",
+    "selectedFiles": [
+      "packages/dts-plugin/src/plugins/DevPlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:09:10.293Z"
+  },
+  "files": [
+    {
+      "id": "packages/dts-plugin/src/plugins/DevPlugin.ts",
+      "oldPath": "packages/dts-plugin/src/plugins/DevPlugin.ts",
+      "newPath": "packages/dts-plugin/src/plugins/DevPlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/dts-plugin/src/plugins/DevPlugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 65,
+          "endLine": 65
+        },
+        "newRange": {
+          "startLine": 65,
+          "endLine": 65
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

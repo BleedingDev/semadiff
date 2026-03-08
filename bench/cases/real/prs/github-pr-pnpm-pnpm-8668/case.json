@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-pnpm-pnpm-8668",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#8668: fix(license): fix typo of `CC0` license other name",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 8668,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/8668",
+    "baseSha": "54bd7b081d29d2f678d249d44c0359bd73730033",
+    "headSha": "73840e7a35ffe2827336fa79a43883ee9cc41262",
+    "selectedFiles": [
+      "reviewing/license-scanner/src/getPkgInfo.ts"
+    ],
+    "collectedAt": "2026-03-08T02:25:47.601Z"
+  },
+  "files": [
+    {
+      "id": "reviewing/license-scanner/src/getPkgInfo.ts",
+      "oldPath": "reviewing/license-scanner/src/getPkgInfo.ts",
+      "newPath": "reviewing/license-scanner/src/getPkgInfo.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "reviewing/license-scanner/src/getPkgInfo.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 58,
+          "endLine": 58
+        },
+        "newRange": {
+          "startLine": 58,
+          "endLine": 58
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

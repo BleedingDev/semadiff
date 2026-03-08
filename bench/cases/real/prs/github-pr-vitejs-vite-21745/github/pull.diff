@@ -1,0 +1,48 @@
+diff --git a/packages/vite/src/node/plugins/importMetaGlob.ts b/packages/vite/src/node/plugins/importMetaGlob.ts
+index 7f24a0a6ff36e1..ccb2dd5b547fba 100644
+--- a/packages/vite/src/node/plugins/importMetaGlob.ts
++++ b/packages/vite/src/node/plugins/importMetaGlob.ts
+@@ -448,6 +448,7 @@ export async function transformGlobImport(
+               dot: !!options.exhaustive,
+               expandDirectories: false,
+               ignore: options.exhaustive ? [] : ['**/node_modules/**'],
++              extglob: false,
+             })
+           )
+             .filter((file) => file !== id)
+diff --git a/playground/glob-import/__tests__/glob-import.spec.ts b/playground/glob-import/__tests__/glob-import.spec.ts
+index 81125143c69479..c2d4cf00ee9adc 100644
+--- a/playground/glob-import/__tests__/glob-import.spec.ts
++++ b/playground/glob-import/__tests__/glob-import.spec.ts
+@@ -88,15 +88,12 @@ const baseRawResult = {
+ }
+ 
+ test('should work', async () => {
+-  // TODO: extglobs are not supported yet: https://github.com/vitejs/rolldown-vite/issues/365
+-  if (process.env._VITE_TEST_JS_PLUGIN) {
+-    await expect
+-      .poll(async () => JSON.parse(await page.textContent('.result')))
+-      .toStrictEqual(allResult)
+-    await expect
+-      .poll(async () => JSON.parse(await page.textContent('.result-eager')))
+-      .toStrictEqual(allResult)
+-  }
++  await expect
++    .poll(async () => JSON.parse(await page.textContent('.result')))
++    .toStrictEqual(allResult)
++  await expect
++    .poll(async () => JSON.parse(await page.textContent('.result-eager')))
++    .toStrictEqual(allResult)
+   await expect
+     .poll(async () =>
+       JSON.parse(await page.textContent('.result-node_modules')),
+diff --git a/playground/glob-import/dir/index.js b/playground/glob-import/dir/index.js
+index 94ca66f1017093..88f7a86cf05902 100644
+--- a/playground/glob-import/dir/index.js
++++ b/playground/glob-import/dir/index.js
+@@ -1,4 +1,4 @@
+-const modules = import.meta.glob('./*.(js|ts)', { eager: true })
++const modules = import.meta.glob('./*.{js,ts}', { eager: true })
+ const globWithAlias = import.meta.glob('@dir/al*.js', { eager: true })
+ 
+ // test negative glob

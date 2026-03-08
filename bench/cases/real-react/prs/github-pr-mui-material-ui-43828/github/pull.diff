@@ -1,0 +1,139 @@
+diff --git a/packages/mui-base/src/unstable_useModal/ModalManager.test.ts b/packages/mui-base/src/unstable_useModal/ModalManager.test.ts
+index a53aa83068124b..bfbd505f82f8fa 100644
+--- a/packages/mui-base/src/unstable_useModal/ModalManager.test.ts
++++ b/packages/mui-base/src/unstable_useModal/ModalManager.test.ts
+@@ -135,8 +135,8 @@ describe('ModalManager', () => {
+       modalManager.add(modal, container1);
+       modalManager.mount(modal, {});
+       expect(container1.style.overflow).to.equal('hidden');
+-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);
+-      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(document)}px`);
++      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);
++      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(window)}px`);
+       modalManager.remove(modal);
+       expect(container1.style.overflow).to.equal('');
+       expect(container1.style.paddingRight).to.equal('20px');
+@@ -171,8 +171,8 @@ describe('ModalManager', () => {
+       modalManager.add(modal, container1);
+       modalManager.mount(modal, {});
+       expect(container1.style.overflow).to.equal('hidden');
+-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);
+-      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(document)}px`);
++      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);
++      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(window)}px`);
+       modalManager.remove(modal);
+       expect(container1.style.overflow).to.equal('');
+       expect(container1.style.paddingRight).to.equal('20px');
+diff --git a/packages/mui-base/src/unstable_useModal/ModalManager.ts b/packages/mui-base/src/unstable_useModal/ModalManager.ts
+index 4fc0695d96d04c..89a76e61cf9dac 100644
+--- a/packages/mui-base/src/unstable_useModal/ModalManager.ts
++++ b/packages/mui-base/src/unstable_useModal/ModalManager.ts
+@@ -100,7 +100,7 @@ function handleContainer(containerInfo: Container, props: ManagedModalProps) {
+   if (!props.disableScrollLock) {
+     if (isOverflowing(container)) {
+       // Compute the size before applying overflow hidden to avoid any scroll jumps.
+-      const scrollbarSize = getScrollbarSize(ownerDocument(container));
++      const scrollbarSize = getScrollbarSize(ownerWindow(container));
+ 
+       restoreStyle.push({
+         value: container.style.paddingRight,
+diff --git a/packages/mui-material/src/MenuList/MenuList.js b/packages/mui-material/src/MenuList/MenuList.js
+index 595c4849c5ce45..6774b003ad9f00 100644
+--- a/packages/mui-material/src/MenuList/MenuList.js
++++ b/packages/mui-material/src/MenuList/MenuList.js
+@@ -7,6 +7,7 @@ import List from '../List';
+ import getScrollbarSize from '../utils/getScrollbarSize';
+ import useForkRef from '../utils/useForkRef';
+ import useEnhancedEffect from '../utils/useEnhancedEffect';
++import { ownerWindow } from '../utils';
+ 
+ function nextItem(list, item, disableListWrap) {
+   if (list === item) {
+@@ -130,7 +131,7 @@ const MenuList = React.forwardRef(function MenuList(props, ref) {
+         // of the menu.
+         const noExplicitWidth = !listRef.current.style.width;
+         if (containerElement.clientHeight < listRef.current.clientHeight && noExplicitWidth) {
+-          const scrollbarSize = `${getScrollbarSize(ownerDocument(containerElement))}px`;
++          const scrollbarSize = `${getScrollbarSize(ownerWindow(containerElement))}px`;
+           listRef.current.style[direction === 'rtl' ? 'paddingLeft' : 'paddingRight'] =
+             scrollbarSize;
+           listRef.current.style.width = `calc(100% + ${scrollbarSize})`;
+diff --git a/packages/mui-material/src/MenuList/MenuList.test.js b/packages/mui-material/src/MenuList/MenuList.test.js
+index 67eeba715f24af..1b4b7ae33278fb 100644
+--- a/packages/mui-material/src/MenuList/MenuList.test.js
++++ b/packages/mui-material/src/MenuList/MenuList.test.js
+@@ -63,7 +63,7 @@ describe('<MenuList />', () => {
+   });
+ 
+   describe('actions: adjustStyleForScrollbar', () => {
+-    const expectedPadding = `${getScrollbarSize(document)}px`;
++    const expectedPadding = `${getScrollbarSize(window)}px`;
+ 
+     it('should not adjust style when container element height is greater', () => {
+       const menuListActionsRef = React.createRef();
+diff --git a/packages/mui-material/src/Modal/ModalManager.test.ts b/packages/mui-material/src/Modal/ModalManager.test.ts
+index a53aa83068124b..bfbd505f82f8fa 100644
+--- a/packages/mui-material/src/Modal/ModalManager.test.ts
++++ b/packages/mui-material/src/Modal/ModalManager.test.ts
+@@ -135,8 +135,8 @@ describe('ModalManager', () => {
+       modalManager.add(modal, container1);
+       modalManager.mount(modal, {});
+       expect(container1.style.overflow).to.equal('hidden');
+-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);
+-      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(document)}px`);
++      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);
++      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(window)}px`);
+       modalManager.remove(modal);
+       expect(container1.style.overflow).to.equal('');
+       expect(container1.style.paddingRight).to.equal('20px');
+@@ -171,8 +171,8 @@ describe('ModalManager', () => {
+       modalManager.add(modal, container1);
+       modalManager.mount(modal, {});
+       expect(container1.style.overflow).to.equal('hidden');
+-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);
+-      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(document)}px`);
++      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);
++      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(window)}px`);
+       modalManager.remove(modal);
+       expect(container1.style.overflow).to.equal('');
+       expect(container1.style.paddingRight).to.equal('20px');
+diff --git a/packages/mui-material/src/Modal/ModalManager.ts b/packages/mui-material/src/Modal/ModalManager.ts
+index 4fc0695d96d04c..89a76e61cf9dac 100644
+--- a/packages/mui-material/src/Modal/ModalManager.ts
++++ b/packages/mui-material/src/Modal/ModalManager.ts
+@@ -100,7 +100,7 @@ function handleContainer(containerInfo: Container, props: ManagedModalProps) {
+   if (!props.disableScrollLock) {
+     if (isOverflowing(container)) {
+       // Compute the size before applying overflow hidden to avoid any scroll jumps.
+-      const scrollbarSize = getScrollbarSize(ownerDocument(container));
++      const scrollbarSize = getScrollbarSize(ownerWindow(container));
+ 
+       restoreStyle.push({
+         value: container.style.paddingRight,
+diff --git a/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.test.ts b/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.test.ts
+index 99364f03c9fb3f..75409922795a6b 100644
+--- a/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.test.ts
++++ b/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.test.ts
+@@ -28,6 +28,6 @@ describe('getScrollbarSize', () => {
+     document.head.appendChild(styleElement);
+     divElement.style.height = '2000px';
+     document.body.appendChild(divElement);
+-    expect(getScrollbarSize(document)).to.equal(5);
++    expect(getScrollbarSize(window)).to.equal(5);
+   });
+ });
+diff --git a/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.ts b/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.ts
+index 19bd0b7e027874..2cc378ca44a124 100644
+--- a/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.ts
++++ b/packages/mui-utils/src/getScrollbarSize/getScrollbarSize.ts
+@@ -1,7 +1,7 @@
+ // A change of the browser zoom change the scrollbar size.
+ // Credit https://github.com/twbs/bootstrap/blob/488fd8afc535ca3a6ad4dc581f5e89217b6a36ac/js/src/util/scrollbar.js#L14-L18
+-export default function getScrollbarSize(doc: Document): number {
++export default function getScrollbarSize(win: Window = window): number {
+   // https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth#usage_notes
+-  const documentWidth = doc.documentElement.clientWidth;
+-  return Math.abs(doc.defaultView!.innerWidth - documentWidth);
++  const documentWidth = win.document.documentElement.clientWidth;
++  return win.innerWidth - documentWidth;
+ }

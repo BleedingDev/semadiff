@@ -1,0 +1,130 @@
+{
+  "id": "move-with-edit-ts-001",
+  "language": "ts",
+  "kind": "micro",
+  "description": "A moved function with a nested edit keeps move visibility and update detail.",
+  "files": [
+    {
+      "oldPath": "src/example.ts",
+      "newPath": "src/example.ts",
+      "status": "modified",
+      "beforePath": "old.ts",
+      "afterPath": "new.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "type": "move",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 4
+        },
+        "newRange": {
+          "startLine": 5,
+          "endLine": 8
+        }
+      },
+      {
+        "type": "update",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 4
+        },
+        "newRange": {
+          "startLine": 5,
+          "endLine": 8
+        }
+      }
+    ],
+    "moves": [
+      {
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 4
+        },
+        "newRange": {
+          "startLine": 5,
+          "endLine": 8
+        }
+      }
+    ],
+    "renames": [],
+    "entities": [
+      {
+        "side": "old",
+        "kind": "function",
+        "name": "a",
+        "range": {
+          "startLine": 1,
+          "endLine": 4
+        },
+        "exported": true
+      },
+      {
+        "side": "old",
+        "kind": "function",
+        "name": "b",
+        "range": {
+          "startLine": 6,
+          "endLine": 8
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "kind": "function",
+        "name": "b",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "kind": "function",
+        "name": "a",
+        "range": {
+          "startLine": 5,
+          "endLine": 8
+        },
+        "exported": true
+      }
+    ],
+    "entityChanges": [
+      {
+        "kind": "function",
+        "before": {
+          "kind": "function",
+          "name": "a",
+          "range": {
+            "startLine": 1,
+            "endLine": 4
+          },
+          "exported": true
+        },
+        "after": {
+          "kind": "function",
+          "name": "a",
+          "range": {
+            "startLine": 5,
+            "endLine": 8
+          },
+          "exported": true
+        },
+        "changeKinds": [
+          "moved",
+          "modified"
+        ]
+      }
+    ],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": true,
+    "graph": false
+  }
+}

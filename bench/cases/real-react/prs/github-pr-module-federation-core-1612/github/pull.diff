@@ -1,0 +1,13 @@
+diff --git a/packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts b/packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts
+index 0207a56ed64..81933a45981 100644
+--- a/packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts
++++ b/packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts
+@@ -31,7 +31,7 @@ class AsyncEntryStartupPlugin {
+ 
+   private collectRuntimeChunks(compilation: Compilation): void {
+     compilation.hooks.beforeChunkAssets.tap(
+-      'CollectRuntimeChunksPlugin',
++      'AsyncEntryStartupPlugin',
+       () => {
+         for (const chunk of compilation.chunks) {
+           if (chunk.hasRuntime() && chunk.id !== null) {

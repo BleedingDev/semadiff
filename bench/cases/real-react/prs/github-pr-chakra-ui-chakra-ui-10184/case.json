@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10184",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10184: fix(TS): update type definitions for onChange and shouldUpdate in useControllableProp hook",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10184,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10184",
+    "baseSha": "2cafb0ee474fe50e6fb3432ac1dbf02301ffe6ac",
+    "headSha": "86785009990fe390bfff204414b05dc24ad61d7b",
+    "selectedFiles": [
+      "packages/react/src/hooks/use-controllable-state.ts"
+    ],
+    "collectedAt": "2026-03-08T04:00:12.055Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/hooks/use-controllable-state.ts",
+      "oldPath": "packages/react/src/hooks/use-controllable-state.ts",
+      "newPath": "packages/react/src/hooks/use-controllable-state.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/hooks/use-controllable-state.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 20,
+          "endLine": 21
+        },
+        "newRange": {
+          "startLine": 20,
+          "endLine": 21
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

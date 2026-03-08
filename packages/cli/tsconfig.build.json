@@ -13,12 +13,30 @@
     "types": ["node"]
   },
   "references": [
-    { "path": "../core" },
-    { "path": "../parsers" },
-    { "path": "../parser-tree-sitter-wasm" },
-    { "path": "../parser-swc" },
-    { "path": "../parser-lightningcss" },
-    { "path": "../render-terminal" }
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../entity-core"
+    },
+    {
+      "path": "../parsers"
+    },
+    {
+      "path": "../parser-tree-sitter-wasm"
+    },
+    {
+      "path": "../parser-swc"
+    },
+    {
+      "path": "../parser-lightningcss"
+    },
+    {
+      "path": "../pr-backend"
+    },
+    {
+      "path": "../render-terminal"
+    }
   ],
   "include": ["src"]
 }

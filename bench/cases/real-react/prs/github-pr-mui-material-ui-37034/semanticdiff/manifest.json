@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+    "diff": "/gh/mui/material-ui/diff?old_filename=packages%2Fapi-docs-builder%2FApiBuilders%2FHookApiBuilder.ts&old_oid=8e52c6e1c8a67194b09d7d50302148110752bad1&old_mode=33188&new_filename=packages%2Fapi-docs-builder%2FApiBuilders%2FHookApiBuilder.ts&new_oid=78978f75e0660572eebe452914dcb1b89f82810d&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+      "oid": "8e52c6e1c8a67194b09d7d50302148110752bad1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+      "oid": "78978f75e0660572eebe452914dcb1b89f82810d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "076db56372d049f266a7ca21c4054f4baaa06b92b00f9b03a3694592b145e3c5"
+  }
+]

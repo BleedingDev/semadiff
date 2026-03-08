@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/create-vite/src/index.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fcreate-vite%2Fsrc%2Findex.ts&old_oid=80b6700db44fd73f0f59e65a8316f1ff7e8a7f16&old_mode=33261&new_filename=packages%2Fcreate-vite%2Fsrc%2Findex.ts&new_oid=0f28cb399f8773f91db5ed279a686e080239761f&new_mode=33261",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/create-vite/src/index.ts",
+      "oid": "80b6700db44fd73f0f59e65a8316f1ff7e8a7f16",
+      "mode": 33261
+    },
+    "new": {
+      "name": "packages/create-vite/src/index.ts",
+      "oid": "0f28cb399f8773f91db5ed279a686e080239761f",
+      "mode": 33261
+    },
+    "semantic": true,
+    "github_hash": "57fe33f59001ea837a90df8810ae459215ebbf69c6e21ade84c4f10e49395760"
+  }
+]

@@ -1,0 +1,87 @@
+{
+  "id": "function-rename-ts-001",
+  "language": "ts",
+  "kind": "micro",
+  "description": "Simple function rename is exposed through the experimental entity lane.",
+  "files": [
+    {
+      "oldPath": "src/rename.ts",
+      "newPath": "src/rename.ts",
+      "status": "modified",
+      "beforePath": "old.ts",
+      "afterPath": "new.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "type": "update",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "newRange": {
+          "startLine": 1,
+          "endLine": 3
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [
+      {
+        "side": "old",
+        "kind": "function",
+        "name": "foo",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "kind": "function",
+        "name": "bar",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      }
+    ],
+    "entityChanges": [
+      {
+        "kind": "function",
+        "before": {
+          "kind": "function",
+          "name": "foo",
+          "range": {
+            "startLine": 1,
+            "endLine": 3
+          },
+          "exported": true
+        },
+        "after": {
+          "kind": "function",
+          "name": "bar",
+          "range": {
+            "startLine": 1,
+            "endLine": 3
+          },
+          "exported": true
+        },
+        "changeKinds": [
+          "renamed"
+        ]
+      }
+    ],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": true,
+    "graph": false
+  }
+}

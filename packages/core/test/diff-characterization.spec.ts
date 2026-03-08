@@ -111,9 +111,8 @@ describe("diff characterization", () => {
         "operations": [
           {
             "moveId": "move-1",
-            "newStartLine": 4,
-            "newText": "
-      export function a() {
+            "newStartLine": 5,
+            "newText": "export function a() {
         const value = 1;
         return value + 0;
       }
@@ -123,15 +122,13 @@ describe("diff characterization", () => {
         const value = 1;
         return value;
       }
-
       ",
             "type": "move",
           },
           {
             "moveId": "move-1",
-            "newStartLine": 4,
-            "newText": "
-      export function a() {
+            "newStartLine": 5,
+            "newText": "export function a() {
         const value = 1;
         return value + 0;
       }
@@ -141,7 +138,6 @@ describe("diff characterization", () => {
         const value = 1;
         return value;
       }
-
       ",
             "type": "update",
           },

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/machines/cascade-select/src/cascade-select.connect.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts&old_oid=e1b514f769d56f4701dc9405a290e470ae232686&old_mode=33188&new_filename=packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts&new_oid=d88155395b81527071ac13fcd7011efbad2c3290&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/machines/cascade-select/src/cascade-select.connect.ts",
+      "oid": "e1b514f769d56f4701dc9405a290e470ae232686",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/machines/cascade-select/src/cascade-select.connect.ts",
+      "oid": "d88155395b81527071ac13fcd7011efbad2c3290",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a81c690948ff6c454df1c75960b5e761083a392794230917a44c595fa98dc11b"
+  }
+]

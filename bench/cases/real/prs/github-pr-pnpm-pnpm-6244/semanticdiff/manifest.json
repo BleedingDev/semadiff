@@ -1,0 +1,36 @@
+[
+  {
+    "tracking_name": "env/plugin-commands-env/src/env.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fplugin-commands-env%2Fsrc%2Fenv.ts&old_oid=2ce3389216f47ff7d2cc45901f59c9015d126e41&old_mode=33188&new_filename=env%2Fplugin-commands-env%2Fsrc%2Fenv.ts&new_oid=f26ef91f278517ed9ff13294aadba5a0ac01c7ab&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "env/plugin-commands-env/src/env.ts",
+      "oid": "2ce3389216f47ff7d2cc45901f59c9015d126e41",
+      "mode": 33188
+    },
+    "new": {
+      "name": "env/plugin-commands-env/src/env.ts",
+      "oid": "f26ef91f278517ed9ff13294aadba5a0ac01c7ab",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e124f070f37cefb7ef337dc86db34c8d4045f9284b7814a025785dd41526d858"
+  },
+  {
+    "tracking_name": "env/plugin-commands-env/test/env.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=env%2Fplugin-commands-env%2Ftest%2Fenv.test.ts&old_oid=008464bc25a810657b0e056e78d7bcc8bb4d25d9&old_mode=33188&new_filename=env%2Fplugin-commands-env%2Ftest%2Fenv.test.ts&new_oid=b96db869d374dfa574b6675cdcdf3b38c67aa5eb&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "env/plugin-commands-env/test/env.test.ts",
+      "oid": "008464bc25a810657b0e056e78d7bcc8bb4d25d9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "env/plugin-commands-env/test/env.test.ts",
+      "oid": "b96db869d374dfa574b6675cdcdf3b38c67aa5eb",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "91029d15abea734fce3ef298cbcd83f4248e06e674ea40fad3dbb2a36476ce36"
+  }
+]

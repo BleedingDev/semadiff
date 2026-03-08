@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "66f61785ae6645ac7b1dffed9436be9db0200d7b",
+    "filename": "src/test/regression.spec.ts",
+    "status": "modified",
+    "additions": 11,
+    "deletions": 0,
+    "changes": 11,
+    "blob_url": "https://github.com/TypeStrong/ts-node/blob/9be593851d72e44cc8056963d00730ff3e15f748/src%2Ftest%2Fregression.spec.ts",
+    "raw_url": "https://github.com/TypeStrong/ts-node/raw/9be593851d72e44cc8056963d00730ff3e15f748/src%2Ftest%2Fregression.spec.ts",
+    "contents_url": "https://api.github.com/repos/TypeStrong/ts-node/contents/src%2Ftest%2Fregression.spec.ts?ref=9be593851d72e44cc8056963d00730ff3e15f748",
+    "patch": "@@ -14,6 +14,17 @@ const exec = createExecTester({\n   }),\n });\n \n+test('#2076 regression test', async () => {\n+  const r = await exec({\n+    exec: createExec({\n+      cwd: join(TEST_DIR, '2076'),\n+    }),\n+    cmd: `${CMD_TS_NODE_WITHOUT_PROJECT_FLAG} --showConfig`,\n+  });\n+\n+  exp(r.err).toBeNull();\n+});\n+\n test('#1488 regression test', async () => {\n   // Scenario that caused the bug:\n   // `allowJs` turned on"
+  },
+  {
+    "sha": "8df76ccf641ea4a96510a89ebc0fb14bb3e244eb",
+    "filename": "src/ts-compiler-types.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 1,
+    "changes": 3,
+    "blob_url": "https://github.com/TypeStrong/ts-node/blob/9be593851d72e44cc8056963d00730ff3e15f748/src%2Fts-compiler-types.ts",
+    "raw_url": "https://github.com/TypeStrong/ts-node/raw/9be593851d72e44cc8056963d00730ff3e15f748/src%2Fts-compiler-types.ts",
+    "contents_url": "https://api.github.com/repos/TypeStrong/ts-node/contents/src%2Fts-compiler-types.ts?ref=9be593851d72e44cc8056963d00730ff3e15f748",
+    "patch": "@@ -90,7 +90,8 @@ export interface TSInternal {\n     host: _ts.ModuleResolutionHost,\n     cache?: _ts.ModuleResolutionCache,\n     redirectedReference?: _ts.ResolvedProjectReference,\n-    lookupConfig?: boolean\n+    conditionsOrIsConfigLookup?: string[] | boolean, // `conditions` parameter added in TS 5.3\n+    isConfigLookup?: boolean\n   ): _ts.ResolvedModuleWithFailedLookupLocations;\n   // Added in TS 4.7\n   getModeForFileReference?: ("
+  },
+  {
+    "sha": "26d5a3c9d3e0fd40e99afda6b2583d7d35c8f3fd",
+    "filename": "src/ts-internals.ts",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 2,
+    "changes": 6,
+    "blob_url": "https://github.com/TypeStrong/ts-node/blob/9be593851d72e44cc8056963d00730ff3e15f748/src%2Fts-internals.ts",
+    "raw_url": "https://github.com/TypeStrong/ts-node/raw/9be593851d72e44cc8056963d00730ff3e15f748/src%2Fts-internals.ts",
+    "contents_url": "https://api.github.com/repos/TypeStrong/ts-node/contents/src%2Fts-internals.ts?ref=9be593851d72e44cc8056963d00730ff3e15f748",
+    "patch": "@@ -1,5 +1,5 @@\n import { isAbsolute, resolve } from 'path';\n-import { cachedLookup, normalizeSlashes } from './util';\n+import { cachedLookup, normalizeSlashes, versionGteLt } from './util';\n import type * as _ts from 'typescript';\n import type { TSCommon, TSInternal } from './ts-compiler-types';\n \n@@ -40,14 +40,16 @@ function createTsInternalsUncached(_ts: TSCommon) {\n       return extendedConfigPath;\n     }\n     // If the path isn't a rooted or relative path, resolve like a module\n+    const tsGte5_3_0 = versionGteLt(ts.version, '5.3.0');\n     const resolved = ts.nodeModuleNameResolver(\n       extendedConfig,\n       combinePaths(basePath, 'tsconfig.json'),\n       { moduleResolution: ts.ModuleResolutionKind.NodeJs },\n       host,\n       /*cache*/ undefined,\n       /*projectRefs*/ undefined,\n-      /*lookupConfig*/ true\n+      /*conditionsOrIsConfigLookup*/ tsGte5_3_0 ? undefined : true,\n+      /*isConfigLookup*/ tsGte5_3_0 ? true : undefined\n     );\n     if (resolved.resolvedModule) {\n       return resolved.resolvedModule.resolvedFileName;"
+  },
+  {
+    "sha": "0c1a273fd45cd48405bad48f529b56958a5883a7",
+    "filename": "tests/2076/node_modules/custom-tsconfig/tsconfig.json",
+    "status": "added",
+    "additions": 3,
+    "deletions": 0,
+    "changes": 3,
+    "blob_url": "https://github.com/TypeStrong/ts-node/blob/9be593851d72e44cc8056963d00730ff3e15f748/tests%2F2076%2Fnode_modules%2Fcustom-tsconfig%2Ftsconfig.json",
+    "raw_url": "https://github.com/TypeStrong/ts-node/raw/9be593851d72e44cc8056963d00730ff3e15f748/tests%2F2076%2Fnode_modules%2Fcustom-tsconfig%2Ftsconfig.json",
+    "contents_url": "https://api.github.com/repos/TypeStrong/ts-node/contents/tests%2F2076%2Fnode_modules%2Fcustom-tsconfig%2Ftsconfig.json?ref=9be593851d72e44cc8056963d00730ff3e15f748",
+    "patch": "@@ -0,0 +1,3 @@\n+{\n+  \"ts-node\": {}\n+}"
+  },
+  {
+    "sha": "d64b3db67230d99e3ffc92029d94a1da908fc7f6",
+    "filename": "tests/2076/tsconfig.json",
+    "status": "added",
+    "additions": 3,
+    "deletions": 0,
+    "changes": 3,
+    "blob_url": "https://github.com/TypeStrong/ts-node/blob/9be593851d72e44cc8056963d00730ff3e15f748/tests%2F2076%2Ftsconfig.json",
+    "raw_url": "https://github.com/TypeStrong/ts-node/raw/9be593851d72e44cc8056963d00730ff3e15f748/tests%2F2076%2Ftsconfig.json",
+    "contents_url": "https://api.github.com/repos/TypeStrong/ts-node/contents/tests%2F2076%2Ftsconfig.json?ref=9be593851d72e44cc8056963d00730ff3e15f748",
+    "patch": "@@ -0,0 +1,3 @@\n+{\n+  \"extends\": \"custom-tsconfig/tsconfig.json\"\n+}"
+  }
+]

@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-colinhacks-zod-5511",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5511: fix(mini): export ZodMiniJSONSchema types to prevent TS4023",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5511,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5511",
+    "baseSha": "6e968a3b49cbcb3bffc30c68634e80168e8f2a2e",
+    "headSha": "87dae2616304a3e80fe23fb52f68317f2fed361d",
+    "selectedFiles": [
+      "packages/zod/src/v4/mini/schemas.ts"
+    ],
+    "collectedAt": "2026-03-08T02:13:16.725Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/mini/schemas.ts",
+      "oldPath": "packages/zod/src/v4/mini/schemas.ts",
+      "newPath": "packages/zod/src/v4/mini/schemas.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/mini/schemas.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 1652,
+          "endLine": 1652
+        },
+        "newRange": {
+          "startLine": 1652,
+          "endLine": 1652
+        }
+      },
+      {
+        "fileId": "packages/zod/src/v4/mini/schemas.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 1662,
+          "endLine": 1662
+        },
+        "newRange": {
+          "startLine": 1662,
+          "endLine": 1662
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

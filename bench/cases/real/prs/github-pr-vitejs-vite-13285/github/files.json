@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "22ebb5f233fef15bd4754f94044a0e2ff0f01f5b",
+    "filename": "docs/.vitepress/config.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/vitejs/vite/blob/a36c88f971583d06941e45d31316bbfece1c876d/docs%2F.vitepress%2Fconfig.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/a36c88f971583d06941e45d31316bbfece1c876d/docs%2F.vitepress%2Fconfig.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/docs%2F.vitepress%2Fconfig.ts?ref=a36c88f971583d06941e45d31316bbfece1c876d",
+    "patch": "@@ -92,6 +92,7 @@ export default defineConfig({\n     ja: { label: '日本語', link: 'https://ja.vitejs.dev' },\n     es: { label: 'Español', link: 'https://es.vitejs.dev' },\n     pt: { label: 'Português', link: 'https://pt.vitejs.dev' },\n+    ko: { label: '한국어', link: 'https://ko.vitejs.dev' },\n   },\n \n   themeConfig: {"
+  }
+]

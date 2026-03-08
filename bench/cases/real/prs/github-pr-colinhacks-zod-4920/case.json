@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-colinhacks-zod-4920",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#4920: feat: Icelandic translation",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 4920,
+    "prUrl": "https://github.com/colinhacks/zod/pull/4920",
+    "baseSha": "2c333e268c316deef829c736b8c46ec95ee03e39",
+    "headSha": "5c6b15d2bc4ef760005a3db3ee39defb61d78155",
+    "selectedFiles": [
+      "packages/zod/src/v4/locales/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:14:23.794Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/locales/index.ts",
+      "oldPath": "packages/zod/src/v4/locales/index.ts",
+      "newPath": "packages/zod/src/v4/locales/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/locales/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 17,
+          "endLine": 17
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

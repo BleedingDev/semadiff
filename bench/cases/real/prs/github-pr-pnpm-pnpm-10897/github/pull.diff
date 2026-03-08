@@ -1,0 +1,94 @@
+diff --git a/.changeset/fix-global-install-output.md b/.changeset/fix-global-install-output.md
+new file mode 100644
+index 00000000000..7ab0bad2358
+--- /dev/null
++++ b/.changeset/fix-global-install-output.md
+@@ -0,0 +1,6 @@
++---
++"@pnpm/default-reporter": patch
++"pnpm": patch
++---
++
++Fixed the output of global install to show a clean install summary instead of displaying ugly temporary directory paths in progress output.
+diff --git a/cli/default-reporter/src/index.ts b/cli/default-reporter/src/index.ts
+index 52b302bad44..e159e9041f6 100644
+--- a/cli/default-reporter/src/index.ts
++++ b/cli/default-reporter/src/index.ts
+@@ -275,7 +275,7 @@ export function toOutput$ (
+       throttleProgress: opts.reportingOptions?.throttleProgress,
+       width: opts.reportingOptions?.outputMaxWidth,
+       hideAddedPkgsProgress: opts.reportingOptions?.hideAddedPkgsProgress,
+-      hideProgressPrefix: opts.reportingOptions?.hideProgressPrefix ?? (cmd === 'dlx'),
++      hideProgressPrefix: opts.reportingOptions?.hideProgressPrefix ?? (cmd === 'dlx' || opts.context.config?.global === true),
+       hideLifecycleOutput: opts.reportingOptions?.hideLifecycleOutput,
+       hideLifecyclePrefix: opts.reportingOptions?.hideLifecyclePrefix,
+       approveBuildsInstructionText: opts.reportingOptions?.approveBuildsInstructionText,
+diff --git a/cli/default-reporter/src/reporterForClient/pkgsDiff.ts b/cli/default-reporter/src/reporterForClient/pkgsDiff.ts
+index 578d73cf7f5..916c38f6e14 100644
+--- a/cli/default-reporter/src/reporterForClient/pkgsDiff.ts
++++ b/cli/default-reporter/src/reporterForClient/pkgsDiff.ts
+@@ -42,12 +42,12 @@ export function getPkgsDiff (
+     packageManifest: Rx.Observable<logs.PackageManifestLog>
+   },
+   opts: {
+-    prefix: string
++    prefix?: string
+   }
+ ): Rx.Observable<PkgsDiff> {
+   const deprecationSet$ = log$.deprecation
+     .pipe(
+-      filter((log) => log.prefix === opts.prefix),
++      filter((log) => !opts.prefix || log.prefix === opts.prefix),
+       scan((acc, log) => {
+         acc.add(log.pkgId)
+         return acc
+@@ -55,7 +55,9 @@ export function getPkgsDiff (
+       startWith(new Set())
+     )
+ 
+-  const filterPrefix = filter((log: { prefix: string }) => log.prefix === opts.prefix)
++  const filterPrefix = opts.prefix
++    ? filter((log: { prefix: string }) => log.prefix === opts.prefix)
++    : <T>(x: Rx.Observable<T>) => x
+   const pkgsDiff$ = Rx.combineLatest(
+     log$.root.pipe(filterPrefix),
+     deprecationSet$
+diff --git a/cli/default-reporter/src/reporterForClient/reportSummary.ts b/cli/default-reporter/src/reporterForClient/reportSummary.ts
+index 9f5351c8afa..affa96805fa 100644
+--- a/cli/default-reporter/src/reporterForClient/reportSummary.ts
++++ b/cli/default-reporter/src/reporterForClient/reportSummary.ts
+@@ -46,7 +46,7 @@ export function reportSummary (
+     pnpmConfig?: Config
+   }
+ ): Rx.Observable<Rx.Observable<{ msg: string }>> {
+-  const pkgsDiff$ = getPkgsDiff(log$, { prefix: opts.cwd })
++  const pkgsDiff$ = getPkgsDiff(log$, { prefix: opts.pnpmConfig?.global ? undefined : opts.cwd })
+ 
+   const summaryLog$ = log$.summary.pipe(take(1))
+   const _printDiffs = printDiffs.bind(null, { cmd: opts.cmd, prefix: opts.cwd, pnpmConfig: opts.pnpmConfig })
+@@ -68,11 +68,7 @@ export function reportSummary (
+           }
+           if (diffs.length > 0) {
+             msg += EOL
+-            if (opts.pnpmConfig?.global) {
+-              msg += chalk.cyanBright(`${opts.cwd}:`)
+-            } else {
+-              msg += chalk.cyanBright(`${propertyByDependencyType[depType] as string}:`)
+-            }
++            msg += chalk.cyanBright(opts.pnpmConfig?.global ? 'global:' : `${propertyByDependencyType[depType] as string}:`)
+             msg += EOL
+             msg += _printDiffs(diffs, depType)
+             msg += EOL
+diff --git a/cli/default-reporter/test/index.ts b/cli/default-reporter/test/index.ts
+index ea6435bc44b..7d89eada964 100644
+--- a/cli/default-reporter/test/index.ts
++++ b/cli/default-reporter/test/index.ts
+@@ -404,7 +404,7 @@ test('prints summary for global installation', async () => {
+ 
+   const output = await firstValueFrom(output$.pipe(take(1), map(normalizeNewline)))
+   expect(output).toBe(EOL + `\
+-${h1(`${prefix}:`)}
++${h1('global:')}
+ ${ADD} bar ${versionColor('2.0.0')}
+ ${ADD} foo ${versionColor('1.0.0')} ${versionColor('(2.0.0 is available)')}
+ `)

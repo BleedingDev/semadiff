@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-mui-x-1552",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/mui-x#1552: [internal] Simplify component type",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/mui-x",
+    "prNumber": 1552,
+    "prUrl": "https://github.com/mui/mui-x/pull/1552",
+    "baseSha": "00526d79d3cba481021afefe2a2a57591aa9283a",
+    "headSha": "afcd4f123a1a8949f92665d56cddcd79d112a6b0",
+    "selectedFiles": [
+      "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:51:53.728Z"
+  },
+  "files": [
+    {
+      "id": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+      "oldPath": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+      "newPath": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 12,
+          "endLine": 12
+        },
+        "newRange": {
+          "startLine": 12,
+          "endLine": 12
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

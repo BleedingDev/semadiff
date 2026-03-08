@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "73b9022fea6d33a0f3e3717cdacce1f59d4a7fff",
+    "filename": "apps/compositions/src/ui/native-select.tsx",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/dae0c83b71710c2a837074fb9ed63abf313563ff/apps%2Fcompositions%2Fsrc%2Fui%2Fnative-select.tsx",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/dae0c83b71710c2a837074fb9ed63abf313563ff/apps%2Fcompositions%2Fsrc%2Fui%2Fnative-select.tsx",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/apps%2Fcompositions%2Fsrc%2Fui%2Fnative-select.tsx?ref=dae0c83b71710c2a837074fb9ed63abf313563ff",
+    "patch": "@@ -26,13 +26,13 @@ interface NativeSelectItem {\n   disabled?: boolean\n }\n \n-interface NativeSelectField extends Select.FieldProps {\n+interface NativeSelectFieldProps extends Select.FieldProps {\n   items?: Array<string | NativeSelectItem>\n }\n \n export const NativeSelectField = React.forwardRef<\n   HTMLSelectElement,\n-  NativeSelectField\n+  NativeSelectFieldProps\n >(function NativeSelectField(props, ref) {\n   const { items: itemsProp, children, ...rest } = props\n "
+  }
+]

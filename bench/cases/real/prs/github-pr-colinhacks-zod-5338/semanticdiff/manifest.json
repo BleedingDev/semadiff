@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/zod/src/v4/core/schemas.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts&old_oid=65fb1df7200c29aa34564ed79cd4335c93cc4ea8&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts&new_oid=e21879438fc54de44b7037a67d89e74da6b05624&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/zod/src/v4/core/schemas.ts",
+      "oid": "65fb1df7200c29aa34564ed79cd4335c93cc4ea8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/core/schemas.ts",
+      "oid": "e21879438fc54de44b7037a67d89e74da6b05624",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f84405ad925758ccb224a20fe7ca8c6ee375d7faa88431059e008077550f8cd9"
+  }
+]

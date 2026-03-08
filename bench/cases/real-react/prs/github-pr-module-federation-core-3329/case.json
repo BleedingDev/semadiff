@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-3329",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3329: docs: Add documentation for the manifest fetch hook",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3329,
+    "prUrl": "https://github.com/module-federation/core/pull/3329",
+    "baseSha": "cafc5f040274ccb274f13d16910146415e8bd973",
+    "headSha": "db25ef01512e9f758994a7624ca1041dfa8667f3",
+    "selectedFiles": [
+      "packages/runtime/src/core.ts"
+    ],
+    "collectedAt": "2026-03-08T04:15:14.522Z"
+  },
+  "files": [
+    {
+      "id": "packages/runtime/src/core.ts",
+      "oldPath": "packages/runtime/src/core.ts",
+      "newPath": "packages/runtime/src/core.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/runtime/src/core.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 113,
+          "endLine": 113
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

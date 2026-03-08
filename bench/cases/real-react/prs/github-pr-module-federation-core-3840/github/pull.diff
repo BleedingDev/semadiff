@@ -1,0 +1,92 @@
+diff --git a/.changeset/large-actors-fly.md b/.changeset/large-actors-fly.md
+new file mode 100644
+index 00000000000..7c2c3fcb14a
+--- /dev/null
++++ b/.changeset/large-actors-fly.md
+@@ -0,0 +1,6 @@
++---
++'@module-federation/dts-plugin': minor
++'@module-federation/sdk': minor
++---
++
++added flag to fetch types from remote when building in production.
+diff --git a/packages/dts-plugin/src/core/configurations/hostPlugin.test.ts b/packages/dts-plugin/src/core/configurations/hostPlugin.test.ts
+index c7aa232927f..d2ddc196ec9 100644
+--- a/packages/dts-plugin/src/core/configurations/hostPlugin.test.ts
++++ b/packages/dts-plugin/src/core/configurations/hostPlugin.test.ts
+@@ -43,6 +43,7 @@ describe('hostPlugin', () => {
+           runtimePkgs: [],
+           remoteTypeUrls: {},
+           timeout: 60000,
++          typesOnBuild: false,
+         });
+ 
+         expect(mapRemotesToDownload).toStrictEqual({
+@@ -70,6 +71,7 @@ describe('hostPlugin', () => {
+           runtimePkgs: [],
+           remoteTypeUrls: {},
+           timeout: 60000,
++          typesOnBuild: false,
+         };
+ 
+         const { hostOptions, mapRemotesToDownload } =
+diff --git a/packages/dts-plugin/src/core/configurations/hostPlugin.ts b/packages/dts-plugin/src/core/configurations/hostPlugin.ts
+index 19510040d87..b868bb0bcb0 100644
+--- a/packages/dts-plugin/src/core/configurations/hostPlugin.ts
++++ b/packages/dts-plugin/src/core/configurations/hostPlugin.ts
+@@ -19,6 +19,7 @@ const defaultOptions = {
+   runtimePkgs: [],
+   remoteTypeUrls: {},
+   timeout: 60000,
++  typesOnBuild: false,
+ } satisfies Partial<HostOptions>;
+ 
+ const buildZipUrl = (hostOptions: Required<HostOptions>, url: string) => {
+diff --git a/packages/dts-plugin/src/plugins/ConsumeTypesPlugin.ts b/packages/dts-plugin/src/plugins/ConsumeTypesPlugin.ts
+index 4b84aecf437..ae109779452 100644
+--- a/packages/dts-plugin/src/plugins/ConsumeTypesPlugin.ts
++++ b/packages/dts-plugin/src/plugins/ConsumeTypesPlugin.ts
+@@ -15,6 +15,7 @@ import type { Compiler, WebpackPluginInstance } from 'webpack';
+ export const DEFAULT_CONSUME_TYPES = {
+   abortOnError: false,
+   consumeAPITypes: true,
++  typesOnBuild: false,
+ };
+ 
+ export const normalizeConsumeTypesOptions = ({
+@@ -99,11 +100,6 @@ export class ConsumeTypesPlugin implements WebpackPluginInstance {
+   apply(compiler: Compiler) {
+     const { dtsOptions, pluginOptions, fetchRemoteTypeUrlsResolve } = this;
+ 
+-    if (isPrd()) {
+-      fetchRemoteTypeUrlsResolve(undefined);
+-      return;
+-    }
+-
+     const dtsManagerOptions = normalizeConsumeTypesOptions({
+       context: compiler.context,
+       dtsOptions,
+@@ -115,6 +111,11 @@ export class ConsumeTypesPlugin implements WebpackPluginInstance {
+       return;
+     }
+ 
++    if (isPrd() && !dtsManagerOptions.host.typesOnBuild) {
++      fetchRemoteTypeUrlsResolve(undefined);
++      return;
++    }
++
+     logger.debug('start fetching remote types...');
+     const promise = consumeTypesAPI(
+       dtsManagerOptions,
+diff --git a/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts b/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts
+index 597f3fdcc0c..8671cc4f954 100644
+--- a/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts
++++ b/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts
+@@ -156,6 +156,7 @@ export interface DtsHostOptions {
+   runtimePkgs?: string[];
+   remoteTypeUrls?: (() => Promise<RemoteTypeUrls>) | RemoteTypeUrls;
+   timeout?: number;
++  typesOnBuild?: boolean;
+ }
+ 
+ export interface DtsRemoteOptions {

@@ -1,0 +1,26 @@
+diff --git a/packages/docs-v3/README_ZH.md b/packages/docs-v3/README_ZH.md
+index 00b9fc8e61..ece5c22ba7 100644
+--- a/packages/docs-v3/README_ZH.md
++++ b/packages/docs-v3/README_ZH.md
+@@ -1932,7 +1932,7 @@ Tuples
+ Recursive Types
+ Function Schemas
+ 
+-<abbr title="For instance, Yup allows custmo error messages with the syntax yup.number().min(5, 'Number must be more than 5!')">Validation Messages</abbr>
++<abbr title="For instance, Yup allows custom error messages with the syntax yup.number().min(5, 'Number must be more than 5!')">Validation Messages</abbr>
+ Immutable instances
+ Type Guards
+ Validity Checking
+diff --git a/packages/zod/src/v4/classic/tests/codec.test.ts b/packages/zod/src/v4/classic/tests/codec.test.ts
+index ec37aab950..c779744c03 100644
+--- a/packages/zod/src/v4/classic/tests/codec.test.ts
++++ b/packages/zod/src/v4/classic/tests/codec.test.ts
+@@ -503,7 +503,7 @@ test("codec type enforcement - complex types", () => {
+   );
+ });
+ 
+-test("codex with overwrites", () => {
++test("codec with overwrites", () => {
+   const stringPlusA = z.string().overwrite((val) => val + "a");
+   const A = z
+     .codec(stringPlusA, stringPlusA, {

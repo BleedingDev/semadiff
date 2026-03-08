@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "032f2c60b2a402316c767394166201716c2dc66d",
+    "filename": ".changeset/few-dodos-wash.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/5df21f38d6ea209ce5073db7d63b8e650ff16f28/.changeset%2Ffew-dodos-wash.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/5df21f38d6ea209ce5073db7d63b8e650ff16f28/.changeset%2Ffew-dodos-wash.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Ffew-dodos-wash.md?ref=5df21f38d6ea209ce5073db7d63b8e650ff16f28",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@zag-js/bottom-sheet\": patch\n+---\n+\n+Re-export missing types"
+  },
+  {
+    "sha": "bee1fc56fcbcf11fdaa59eb6225777160ff91f80",
+    "filename": "packages/machines/bottom-sheet/src/index.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 0,
+    "changes": 3,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/5df21f38d6ea209ce5073db7d63b8e650ff16f28/packages%2Fmachines%2Fbottom-sheet%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/5df21f38d6ea209ce5073db7d63b8e650ff16f28/packages%2Fmachines%2Fbottom-sheet%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Fbottom-sheet%2Fsrc%2Findex.ts?ref=5df21f38d6ea209ce5073db7d63b8e650ff16f28",
+    "patch": "@@ -10,4 +10,7 @@ export type {\n   BottomSheetService as Service,\n   ElementIds,\n   OpenChangeDetails,\n+  ResolvedSnapPoint,\n+  SnapPointChangeDetails,\n+  ContentProps,\n } from \"./bottom-sheet.types\""
+  }
+]

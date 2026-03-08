@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-1880",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#1880: fix: rename usePlugins to prevent swc react-refresh from throwing errors when replacing variables",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 1880,
+    "prUrl": "https://github.com/module-federation/core/pull/1880",
+    "baseSha": "21fcb2f5cd6f8a20bba387dbf54dcefd31a791d7",
+    "headSha": "7f967b326fa1d992dff8d2c0766c45133c92c971",
+    "selectedFiles": [
+      "packages/runtime/src/utils/plugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:26.619Z"
+  },
+  "files": [
+    {
+      "id": "packages/runtime/src/utils/plugin.ts",
+      "oldPath": "packages/runtime/src/utils/plugin.ts",
+      "newPath": "packages/runtime/src/utils/plugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/runtime/src/utils/plugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 27,
+          "endLine": 27
+        },
+        "newRange": {
+          "startLine": 27,
+          "endLine": 27
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,23 @@
+diff --git a/.changeset/few-dodos-wash.md b/.changeset/few-dodos-wash.md
+new file mode 100644
+index 0000000000..032f2c60b2
+--- /dev/null
++++ b/.changeset/few-dodos-wash.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/bottom-sheet": patch
++---
++
++Re-export missing types
+diff --git a/packages/machines/bottom-sheet/src/index.ts b/packages/machines/bottom-sheet/src/index.ts
+index 5c28a4c1df..bee1fc56fc 100644
+--- a/packages/machines/bottom-sheet/src/index.ts
++++ b/packages/machines/bottom-sheet/src/index.ts
+@@ -10,4 +10,7 @@ export type {
+   BottomSheetService as Service,
+   ElementIds,
+   OpenChangeDetails,
++  ResolvedSnapPoint,
++  SnapPointChangeDetails,
++  ContentProps,
+ } from "./bottom-sheet.types"

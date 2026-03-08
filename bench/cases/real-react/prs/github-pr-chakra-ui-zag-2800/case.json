@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-zag-2800",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/zag#2800: fix(image-cropper): export missing types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/zag",
+    "prNumber": 2800,
+    "prUrl": "https://github.com/chakra-ui/zag/pull/2800",
+    "baseSha": "e82c045bb635850bbf59c38c834a27d6e66ff034",
+    "headSha": "087caad7716a49fe4a9f52dc1fbc7379c71d12ca",
+    "selectedFiles": [
+      "packages/machines/image-cropper/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T04:05:33.568Z"
+  },
+  "files": [
+    {
+      "id": "packages/machines/image-cropper/src/index.ts",
+      "oldPath": "packages/machines/image-cropper/src/index.ts",
+      "newPath": "packages/machines/image-cropper/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/machines/image-cropper/src/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 18,
+          "endLine": 22
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-vitejs-vite-21745",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitejs/vite#21745: fix(dev): disable extglobs for consistency",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitejs/vite",
+    "prNumber": 21745,
+    "prUrl": "https://github.com/vitejs/vite/pull/21745",
+    "baseSha": "8546520927de03dc4f868db5a1cec39a1826f3d0",
+    "headSha": "f249ed9a59bc613c4eecc964c0642b47bcaf7b91",
+    "selectedFiles": [
+      "packages/vite/src/node/plugins/importMetaGlob.ts"
+    ],
+    "collectedAt": "2026-03-08T02:18:26.224Z"
+  },
+  "files": [
+    {
+      "id": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "oldPath": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "newPath": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/vite/src/node/plugins/importMetaGlob.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 451,
+          "endLine": 451
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

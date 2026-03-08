@@ -1,0 +1,23 @@
+diff --git a/.changeset/ninety-owls-sit.md b/.changeset/ninety-owls-sit.md
+new file mode 100644
+index 00000000000..be21898712d
+--- /dev/null
++++ b/.changeset/ninety-owls-sit.md
+@@ -0,0 +1,5 @@
++---
++"@chakra-ui/react": patch
++---
++
++- export `CheckboxRootProviderProps` type
+diff --git a/packages/react/src/components/checkbox/index.ts b/packages/react/src/components/checkbox/index.ts
+index 53ec0f982d8..604a2798ef8 100644
+--- a/packages/react/src/components/checkbox/index.ts
++++ b/packages/react/src/components/checkbox/index.ts
+@@ -16,6 +16,7 @@ export type {
+   CheckboxIndicatorProps,
+   CheckboxLabelProps,
+   CheckboxRootProps,
++  CheckboxRootProviderProps,
+   CheckboxGroupProps,
+   CheckboxCheckedChangeDetails,
+ } from "./checkbox"

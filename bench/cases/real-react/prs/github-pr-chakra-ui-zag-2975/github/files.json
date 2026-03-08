@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "e1b514f769d56f4701dc9405a290e470ae232686",
+    "filename": "packages/machines/cascade-select/src/cascade-select.connect.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/8dcc45551196584f2e2c60220c16e7ed03485c19/packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/8dcc45551196584f2e2c60220c16e7ed03485c19/packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts?ref=8dcc45551196584f2e2c60220c16e7ed03485c19",
+    "patch": "@@ -170,6 +170,7 @@ export function connect<T extends PropTypes, V = TreeNode>(\n         \"data-invalid\": dataAttr(prop(\"invalid\")),\n         \"data-focused\": dataAttr(focused),\n         \"data-placement\": currentPlacement,\n+        \"data-placeholder-shown\": dataAttr(!hasSelectedItems),\n         disabled,\n         onClick(event) {\n           if (event.defaultPrevented) return"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "4b0e9c50439b2cb56478a0b882c6c1a00f3ea5a0",
+    "filename": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/8c20fa6a4895085d8fefb426834e66766add7eb0/packages%2Fmui-base%2Fsrc%2FInputUnstyled%2FInputUnstyled.tsx",
+    "raw_url": "https://github.com/mui/material-ui/raw/8c20fa6a4895085d8fefb426834e66766add7eb0/packages%2Fmui-base%2Fsrc%2FInputUnstyled%2FInputUnstyled.tsx",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-base%2Fsrc%2FInputUnstyled%2FInputUnstyled.tsx?ref=8c20fa6a4895085d8fefb426834e66766add7eb0",
+    "patch": "@@ -145,7 +145,7 @@ const InputUnstyled = React.forwardRef(function InputUnstyled(\n       if (process.env.NODE_ENV !== 'production') {\n         if (minRows || maxRows) {\n           console.warn(\n-            'Material-UI: You can not use the `minRows` or `maxRows` props when the input `rows` prop is set.',\n+            'MUI: You can not use the `minRows` or `maxRows` props when the input `rows` prop is set.',\n           );\n         }\n       }"
+  },
+  {
+    "sha": "548c275982f863e384e66c78d4c9800f19bdddfc",
+    "filename": "packages/mui-material-next/src/Button/Button.js",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/8c20fa6a4895085d8fefb426834e66766add7eb0/packages%2Fmui-material-next%2Fsrc%2FButton%2FButton.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/8c20fa6a4895085d8fefb426834e66766add7eb0/packages%2Fmui-material-next%2Fsrc%2FButton%2FButton.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material-next%2Fsrc%2FButton%2FButton.js?ref=8c20fa6a4895085d8fefb426834e66766add7eb0",
+    "patch": "@@ -404,7 +404,7 @@ const Button = React.forwardRef(function Button(inProps, ref) {\n       if (enableTouchRipple && !rippleRef.current) {\n         console.error(\n           [\n-            'Material-UI: The `component` prop provided to Button is invalid.',\n+            'MUI: The `component` prop provided to Button is invalid.',\n             'Please make sure the children prop is rendered in this custom component.',\n           ].join('\\n'),\n         );"
+  }
+]

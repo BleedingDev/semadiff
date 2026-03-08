@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10072",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10072: fix(system): allow undefined for optional properties in CSS and recipe types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10072,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10072",
+    "baseSha": "cbe51b994104602c914568d2bcb60a0e67d09d14",
+    "headSha": "12df6ca1eda60d6c3846ba4c44b56975884c1bc6",
+    "selectedFiles": [
+      "packages/react/src/styled-system/css.types.ts"
+    ],
+    "collectedAt": "2026-03-08T03:58:39.881Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/styled-system/css.types.ts",
+      "oldPath": "packages/react/src/styled-system/css.types.ts",
+      "newPath": "packages/react/src/styled-system/css.types.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/styled-system/css.types.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 48,
+          "endLine": 48
+        },
+        "newRange": {
+          "startLine": 48,
+          "endLine": 48
+        }
+      },
+      {
+        "fileId": "packages/react/src/styled-system/css.types.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 117,
+          "endLine": 117
+        },
+        "newRange": {
+          "startLine": 117,
+          "endLine": 117
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

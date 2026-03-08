@@ -1,0 +1,31 @@
+{
+  "name": "@semadiff/benchmark-harness",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "benchmark": "node dist/cli.js --cases ../../bench/cases/gold/micro"
+  },
+  "dependencies": {
+    "@semadiff/core": "workspace:*",
+    "@semadiff/entity-core": "workspace:*",
+    "@semadiff/parser-swc": "workspace:*",
+    "@semadiff/render-html": "workspace:*",
+    "effect": "4.0.0-beta.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.15"
+  }
+}

@@ -4,6 +4,33 @@ const LINE_SPLIT_RE = /\r?\n/;
 const TRAILING_COMMA_RE = /,\s*$/;
 const JSON_PAIR_KEY_RE = /^\s*"([^"\\]*)"\s*:/;
 const WHITESPACE_RE = /\s+/g;
+const LOW_SIGNAL_LINE_RE = /^[\]{}(),;]+$/;
+const PAIR_TOKEN_RE = /[A-Za-z_$][\w$-]*/g;
+const PAIR_STOP_WORDS = new Set([
+  "async",
+  "await",
+  "case",
+  "catch",
+  "class",
+  "const",
+  "default",
+  "else",
+  "export",
+  "finally",
+  "for",
+  "from",
+  "function",
+  "if",
+  "import",
+  "let",
+  "new",
+  "return",
+  "switch",
+  "throw",
+  "try",
+  "var",
+  "while",
+]);
 const COSMETIC_LANGUAGES = new Set<NormalizerLanguage>([
   "ts",
   "tsx",
@@ -166,17 +193,84 @@ function extractJsonPairKey(text: string) {
   return match?.[1];
 }
 
+function buildEntryCounts(entries: string[]) {
+  const counts = new Map<string, number>();
+  for (const entry of entries) {
+    counts.set(entry, (counts.get(entry) ?? 0) + 1);
+  }
+  return counts;
+}
+
+function countSharedEntries(left: string[], right: string[]) {
+  const leftCounts = buildEntryCounts(left);
+  const rightCounts = buildEntryCounts(right);
+  let shared = 0;
+  for (const [entry, leftCount] of leftCounts) {
+    const rightCount = rightCounts.get(entry);
+    if (!rightCount) {
+      continue;
+    }
+    shared += Math.min(leftCount, rightCount);
+  }
+  return shared;
+}
+
+function collectComparableLines(
+  text: string,
+  language: NormalizerLanguage | undefined
+) {
+  return text
+    .split(LINE_SPLIT_RE)
+    .map((line) => buildCompareText(line, language, true).trim())
+    .filter((line) => line.length > 0 && !LOW_SIGNAL_LINE_RE.test(line));
+}
+
+function collectComparableTokens(
+  text: string,
+  language: NormalizerLanguage | undefined
+) {
+  return (
+    buildCompareText(text, language, true).match(PAIR_TOKEN_RE) ?? []
+  ).filter((token) => token.length > 1 && !PAIR_STOP_WORDS.has(token));
+}
+
 export function shouldPairDeleteInsert(
   oldText: string,
   newText: string,
   language: NormalizerLanguage | undefined
 ) {
-  if (language !== "json") {
+  if (language === "json") {
+    const oldKey = extractJsonPairKey(oldText);
+    const newKey = extractJsonPairKey(newText);
+    return Boolean(oldKey && newKey && oldKey === newKey);
+  }
+
+  const oldLines = collectComparableLines(oldText, language);
+  const newLines = collectComparableLines(newText, language);
+  const maxLines = Math.max(oldLines.length, newLines.length);
+  if (maxLines <= 3) {
     return true;
   }
-  const oldKey = extractJsonPairKey(oldText);
-  const newKey = extractJsonPairKey(newText);
-  return Boolean(oldKey && newKey && oldKey === newKey);
+
+  const sharedLines = countSharedEntries(oldLines, newLines);
+  const lineOverlapRatio = maxLines > 0 ? sharedLines / maxLines : 0;
+  if (sharedLines >= 2 && lineOverlapRatio >= 0.18) {
+    return true;
+  }
+
+  const oldTokens = collectComparableTokens(oldText, language);
+  const newTokens = collectComparableTokens(newText, language);
+  const maxTokens = Math.max(oldTokens.length, newTokens.length);
+  if (maxTokens === 0) {
+    return lineOverlapRatio > 0;
+  }
+
+  const sharedTokens = countSharedEntries(oldTokens, newTokens);
+  const tokenOverlapRatio = sharedTokens / maxTokens;
+  if (maxLines <= 6) {
+    return sharedTokens >= 3 && tokenOverlapRatio >= 0.2;
+  }
+  return sharedTokens >= 4 && tokenOverlapRatio >= 0.28;
 }
 
 export function isSideEffectImportLine(line: string) {

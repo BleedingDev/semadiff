@@ -1,0 +1,318 @@
+diff --git a/packages/zod/src/v4/core/tests/locales/hr.test.ts b/packages/zod/src/v4/core/tests/locales/hr.test.ts
+new file mode 100644
+index 0000000000..14b5294240
+--- /dev/null
++++ b/packages/zod/src/v4/core/tests/locales/hr.test.ts
+@@ -0,0 +1,163 @@
++import { expect, test } from "vitest";
++import { z } from "../../../../index.js";
++import hr from "../../../locales/hr.js";
++
++test("Croatian locale - type name translations in too_small errors", () => {
++  z.config(hr());
++
++  // Test string type translation
++  const stringSchema = z.string().min(5);
++  const stringResult = stringSchema.safeParse("abc");
++  expect(stringResult.success).toBe(false);
++  if (!stringResult.success) {
++    expect(stringResult.error.issues[0].message).toBe("Premalo: očekivano da tekst ima >=5 znakova");
++  }
++
++  // Test number type translation
++  const numberSchema = z.number().min(10);
++  const numberResult = numberSchema.safeParse(5);
++  expect(numberResult.success).toBe(false);
++  if (!numberResult.success) {
++    expect(numberResult.error.issues[0].message).toBe("Premalo: očekivano da broj bude >=10");
++  }
++
++  // Test array type translation
++  const arraySchema = z.array(z.string()).min(3);
++  const arrayResult = arraySchema.safeParse(["a", "b"]);
++  expect(arrayResult.success).toBe(false);
++  if (!arrayResult.success) {
++    expect(arrayResult.error.issues[0].message).toBe("Premalo: očekivano da niz ima >=3 stavki");
++  }
++
++  // Test set type translation
++  const setSchema = z.set(z.string()).min(2);
++  const setResult = setSchema.safeParse(new Set(["a"]));
++  expect(setResult.success).toBe(false);
++  if (!setResult.success) {
++    expect(setResult.error.issues[0].message).toBe("Premalo: očekivano da skup ima >=2 stavki");
++  }
++});
++
++test("Croatian locale - type name translations in too_big errors", () => {
++  z.config(hr());
++
++  // Test string type translation
++  const stringSchema = z.string().max(3);
++  const stringResult = stringSchema.safeParse("abcde");
++  expect(stringResult.success).toBe(false);
++  if (!stringResult.success) {
++    expect(stringResult.error.issues[0].message).toBe("Preveliko: očekivano da tekst ima <=3 znakova");
++  }
++
++  // Test number type translation
++  const numberSchema = z.number().max(10);
++  const numberResult = numberSchema.safeParse(15);
++  expect(numberResult.success).toBe(false);
++  if (!numberResult.success) {
++    expect(numberResult.error.issues[0].message).toBe("Preveliko: očekivano da broj bude <=10");
++  }
++
++  // Test array type translation
++  const arraySchema = z.array(z.string()).max(2);
++  const arrayResult = arraySchema.safeParse(["a", "b", "c"]);
++  expect(arrayResult.success).toBe(false);
++  if (!arrayResult.success) {
++    expect(arrayResult.error.issues[0].message).toBe("Preveliko: očekivano da niz ima <=2 stavki");
++  }
++});
++
++test("Croatian locale - type name translations in invalid_type errors", () => {
++  z.config(hr());
++
++  // Test string expected, number received
++  const stringSchema = z.string();
++  const stringResult = stringSchema.safeParse(123);
++  expect(stringResult.success).toBe(false);
++  if (!stringResult.success) {
++    expect(stringResult.error.issues[0].message).toBe("Neispravan unos: očekuje se tekst, a primljeno je broj");
++  }
++
++  // Test number expected, string received
++  const numberSchema = z.number();
++  const numberResult = numberSchema.safeParse("abc");
++  expect(numberResult.success).toBe(false);
++  if (!numberResult.success) {
++    expect(numberResult.error.issues[0].message).toBe("Neispravan unos: očekuje se broj, a primljeno je tekst");
++  }
++
++  // Test boolean expected, null received
++  const booleanSchema = z.boolean();
++  const booleanResult = booleanSchema.safeParse(null);
++  expect(booleanResult.success).toBe(false);
++  if (!booleanResult.success) {
++    expect(booleanResult.error.issues[0].message).toBe("Neispravan unos: očekuje se boolean, a primljeno je null");
++  }
++
++  // Test array expected, object received
++  const arraySchema = z.array(z.string());
++  const arrayResult = arraySchema.safeParse({});
++  expect(arrayResult.success).toBe(false);
++  if (!arrayResult.success) {
++    expect(arrayResult.error.issues[0].message).toBe("Neispravan unos: očekuje se niz, a primljeno je objekt");
++  }
++});
++
++test("Croatian locale - other error cases", () => {
++  z.config(hr());
++
++  // Test invalid_element with tuple
++  const tupleSchema = z.tuple([z.string(), z.number()]);
++  const tupleResult = tupleSchema.safeParse(["abc", "not a number"]);
++  expect(tupleResult.success).toBe(false);
++  if (!tupleResult.success) {
++    expect(tupleResult.error.issues[0].message).toContain("Neispravan unos");
++  }
++
++  // Test invalid_value with enum
++  const enumSchema = z.enum(["a", "b"]);
++  const enumResult = enumSchema.safeParse("c");
++  expect(enumResult.success).toBe(false);
++  if (!enumResult.success) {
++    expect(enumResult.error.issues[0].message).toBe('Neispravna opcija: očekivano jedno od "a"|"b"');
++  }
++
++  // Test not_multiple_of
++  const multipleSchema = z.number().multipleOf(3);
++  const multipleResult = multipleSchema.safeParse(10);
++  expect(multipleResult.success).toBe(false);
++  if (!multipleResult.success) {
++    expect(multipleResult.error.issues[0].message).toBe("Neispravan broj: mora biti višekratnik od 3");
++  }
++
++  // Test unrecognized_keys
++  const strictSchema = z.object({ a: z.string() }).strict();
++  const strictResult = strictSchema.safeParse({ a: "test", b: "extra" });
++  expect(strictResult.success).toBe(false);
++  if (!strictResult.success) {
++    expect(strictResult.error.issues[0].message).toBe('Neprepoznat ključ: "b"');
++  }
++
++  // Test invalid_union
++  const unionSchema = z.union([z.string(), z.number()]);
++  const unionResult = unionSchema.safeParse(true);
++  expect(unionResult.success).toBe(false);
++  if (!unionResult.success) {
++    expect(unionResult.error.issues[0].message).toBe("Neispravan unos");
++  }
++
++  // Test invalid_format with regex
++  const regexSchema = z.string().regex(/^[a-z]+$/);
++  const regexResult = regexSchema.safeParse("ABC123");
++  expect(regexResult.success).toBe(false);
++  if (!regexResult.success) {
++    expect(regexResult.error.issues[0].message).toBe("Neispravan tekst: mora odgovarati uzorku /^[a-z]+$/");
++  }
++
++  // Test invalid_format with startsWith
++  const startsWithSchema = z.string().startsWith("hello");
++  const startsWithResult = startsWithSchema.safeParse("world");
++  expect(startsWithResult.success).toBe(false);
++  if (!startsWithResult.success) {
++    expect(startsWithResult.error.issues[0].message).toBe('Neispravan tekst: mora započinjati s "hello"');
++  }
++});
+diff --git a/packages/zod/src/v4/locales/hr.ts b/packages/zod/src/v4/locales/hr.ts
+new file mode 100644
+index 0000000000..124c5a2799
+--- /dev/null
++++ b/packages/zod/src/v4/locales/hr.ts
+@@ -0,0 +1,131 @@
++import type { $ZodStringFormats } from "../core/checks.js";
++import type * as errors from "../core/errors.js";
++import * as util from "../core/util.js";
++
++const error: () => errors.$ZodErrorMap = () => {
++  const Sizable: Record<string, { unit: string; verb: string }> = {
++    string: { unit: "znakova", verb: "imati" },
++    file: { unit: "bajtova", verb: "imati" },
++    array: { unit: "stavki", verb: "imati" },
++    set: { unit: "stavki", verb: "imati" },
++  };
++
++  function getSizing(origin: string): { unit: string; verb: string } | null {
++    return Sizable[origin] ?? null;
++  }
++
++  const FormatDictionary: {
++    [k in $ZodStringFormats | (string & {})]?: string;
++  } = {
++    regex: "unos",
++    email: "email adresa",
++    url: "URL",
++    emoji: "emoji",
++    uuid: "UUID",
++    uuidv4: "UUIDv4",
++    uuidv6: "UUIDv6",
++    nanoid: "nanoid",
++    guid: "GUID",
++    cuid: "cuid",
++    cuid2: "cuid2",
++    ulid: "ULID",
++    xid: "XID",
++    ksuid: "KSUID",
++    datetime: "ISO datum i vrijeme",
++    date: "ISO datum",
++    time: "ISO vrijeme",
++    duration: "ISO trajanje",
++    ipv4: "IPv4 adresa",
++    ipv6: "IPv6 adresa",
++    cidrv4: "IPv4 raspon",
++    cidrv6: "IPv6 raspon",
++    base64: "base64 kodirani tekst",
++    base64url: "base64url kodirani tekst",
++    json_string: "JSON tekst",
++    e164: "E.164 broj",
++    jwt: "JWT",
++    template_literal: "unos",
++  };
++
++  const TypeDictionary: {
++    [k in errors.$ZodInvalidTypeExpected | (string & {})]?: string;
++  } = {
++    nan: "NaN",
++    string: "tekst",
++    number: "broj",
++    boolean: "boolean",
++    array: "niz",
++    object: "objekt",
++    set: "skup",
++    file: "datoteka",
++    date: "datum",
++    bigint: "bigint",
++    symbol: "simbol",
++    undefined: "undefined",
++    null: "null",
++    function: "funkcija",
++    map: "mapa",
++  };
++
++  return (issue) => {
++    switch (issue.code) {
++      case "invalid_type": {
++        const expected = TypeDictionary[issue.expected] ?? issue.expected;
++        const receivedType = util.parsedType(issue.input);
++        const received = TypeDictionary[receivedType] ?? receivedType;
++        if (/^[A-Z]/.test(issue.expected)) {
++          return `Neispravan unos: očekuje se instanceof ${issue.expected}, a primljeno je ${received}`;
++        }
++        return `Neispravan unos: očekuje se ${expected}, a primljeno je ${received}`;
++      }
++      case "invalid_value":
++        if (issue.values.length === 1)
++          return `Neispravna vrijednost: očekivano ${util.stringifyPrimitive(issue.values[0])}`;
++        return `Neispravna opcija: očekivano jedno od ${util.joinValues(issue.values, "|")}`;
++      case "too_big": {
++        const adj = issue.inclusive ? "<=" : "<";
++        const sizing = getSizing(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
++        if (sizing)
++          return `Preveliko: očekivano da ${origin ?? "vrijednost"} ima ${adj}${issue.maximum.toString()} ${sizing.unit ?? "elemenata"}`;
++        return `Preveliko: očekivano da ${origin ?? "vrijednost"} bude ${adj}${issue.maximum.toString()}`;
++      }
++      case "too_small": {
++        const adj = issue.inclusive ? ">=" : ">";
++        const sizing = getSizing(issue.origin);
++        const origin = TypeDictionary[issue.origin] ?? issue.origin;
++        if (sizing) {
++          return `Premalo: očekivano da ${origin} ima ${adj}${issue.minimum.toString()} ${sizing.unit}`;
++        }
++
++        return `Premalo: očekivano da ${origin} bude ${adj}${issue.minimum.toString()}`;
++      }
++      case "invalid_format": {
++        const _issue = issue as errors.$ZodStringFormatIssues;
++        if (_issue.format === "starts_with") return `Neispravan tekst: mora započinjati s "${_issue.prefix}"`;
++        if (_issue.format === "ends_with") return `Neispravan tekst: mora završavati s "${_issue.suffix}"`;
++        if (_issue.format === "includes") return `Neispravan tekst: mora sadržavati "${_issue.includes}"`;
++        if (_issue.format === "regex") return `Neispravan tekst: mora odgovarati uzorku ${_issue.pattern}`;
++        return `Neispravna ${FormatDictionary[_issue.format] ?? issue.format}`;
++      }
++      case "not_multiple_of":
++        return `Neispravan broj: mora biti višekratnik od ${issue.divisor}`;
++      case "unrecognized_keys":
++        return `Neprepoznat${issue.keys.length > 1 ? "i ključevi" : " ključ"}: ${util.joinValues(issue.keys, ", ")}`;
++      case "invalid_key":
++        return `Neispravan ključ u ${TypeDictionary[issue.origin] ?? issue.origin}`;
++      case "invalid_union":
++        return "Neispravan unos";
++      case "invalid_element":
++        return `Neispravna vrijednost u ${TypeDictionary[issue.origin] ?? issue.origin}`;
++      default:
++        return `Neispravan unos`;
++    }
++  };
++};
++
++export default function (): { localeError: errors.$ZodErrorMap } {
++  return {
++    localeError: error(),
++  };
++}
+diff --git a/packages/zod/src/v4/locales/index.ts b/packages/zod/src/v4/locales/index.ts
+index b48028e8b9..38526c336a 100644
+--- a/packages/zod/src/v4/locales/index.ts
++++ b/packages/zod/src/v4/locales/index.ts
+@@ -14,6 +14,7 @@ export { default as fi } from "./fi.js";
+ export { default as fr } from "./fr.js";
+ export { default as frCA } from "./fr-CA.js";
+ export { default as he } from "./he.js";
++export { default as hr } from "./hr.js";
+ export { default as hu } from "./hu.js";
+ export { default as hy } from "./hy.js";
+ export { default as id } from "./id.js";

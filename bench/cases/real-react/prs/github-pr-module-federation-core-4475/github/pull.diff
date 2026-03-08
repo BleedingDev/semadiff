@@ -1,0 +1,40 @@
+diff --git a/packages/dts-plugin/project.json b/packages/dts-plugin/project.json
+index db7c5486b84..c3f2c2e1e40 100644
+--- a/packages/dts-plugin/project.json
++++ b/packages/dts-plugin/project.json
+@@ -25,7 +25,10 @@
+       "options": {
+         "parallel": false,
+         "cwd": "packages/dts-plugin",
+-        "commands": ["rimraf dist-test", "nx run dts-plugin:test-impl"]
++        "commands": [
++          "node -e \"require('fs').rmSync('dist-test',{recursive:true,force:true,maxRetries:20,retryDelay:50})\"",
++          "nx run dts-plugin:test-impl"
++        ]
+       }
+     },
+     "test-impl": {
+diff --git a/packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts b/packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts
+index a8b4aaeed5f..d103436ff60 100644
+--- a/packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts
++++ b/packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts
+@@ -172,8 +172,7 @@ export class GenerateTypesPlugin implements WebpackPluginInstance {
+             compilation.emitAsset(
+               zipName,
+               new compiler.webpack.sources.RawSource(
+-                fs.readFileSync(zipTypesPath),
+-                false,
++                fs.readFileSync(zipTypesPath) as unknown as string,
+               ),
+             );
+           }
+@@ -186,8 +185,7 @@ export class GenerateTypesPlugin implements WebpackPluginInstance {
+             compilation.emitAsset(
+               apiFileName,
+               new compiler.webpack.sources.RawSource(
+-                fs.readFileSync(apiTypesPath),
+-                false,
++                fs.readFileSync(apiTypesPath) as unknown as string,
+               ),
+             );
+           }

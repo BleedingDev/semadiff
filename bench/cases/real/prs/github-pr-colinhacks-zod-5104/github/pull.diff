@@ -1,0 +1,116 @@
+diff --git a/packages/zod/src/v3/tests/object.test.ts b/packages/zod/src/v3/tests/object.test.ts
+index d8772d4f98..1427dc2780 100644
+--- a/packages/zod/src/v3/tests/object.test.ts
++++ b/packages/zod/src/v3/tests/object.test.ts
+@@ -152,13 +152,13 @@ test("catchall overrides strict", () => {
+   });
+ });
+ 
+-test("test that optional keys are unset", async () => {
++test("test that optional keys are unset", () => {
+   const SNamedEntity = z.object({
+     id: z.string(),
+     set: z.string().optional(),
+     unset: z.string().optional(),
+   });
+-  const result = await SNamedEntity.parse({
++  const result = SNamedEntity.parse({
+     id: "asdf",
+     set: undefined,
+   });
+diff --git a/packages/zod/src/v4/classic/tests/array.test.ts b/packages/zod/src/v4/classic/tests/array.test.ts
+index 57cf9e3406..483e25fedd 100644
+--- a/packages/zod/src/v4/classic/tests/array.test.ts
++++ b/packages/zod/src/v4/classic/tests/array.test.ts
+@@ -6,9 +6,9 @@ test("type inference", () => {
+   expectTypeOf<z.infer<typeof schema>>().toEqualTypeOf<string[]>();
+ });
+ 
+-test("array min/max", async () => {
++test("array min/max", () => {
+   const schema = z.array(z.string()).min(2).max(2);
+-  const r1 = await schema.safeParse(["asdf"]);
++  const r1 = schema.safeParse(["asdf"]);
+   expect(r1.success).toEqual(false);
+   expect(r1.error!.issues).toMatchInlineSnapshot(`
+     [
+@@ -23,7 +23,7 @@ test("array min/max", async () => {
+     ]
+   `);
+ 
+-  const r2 = await schema.safeParse(["asdf", "asdf", "asdf"]);
++  const r2 = schema.safeParse(["asdf", "asdf", "asdf"]);
+   expect(r2.success).toEqual(false);
+   expect(r2.error!.issues).toMatchInlineSnapshot(`
+     [
+@@ -39,11 +39,11 @@ test("array min/max", async () => {
+   `);
+ });
+ 
+-test("array length", async () => {
++test("array length", () => {
+   const schema = z.array(z.string()).length(2);
+   schema.parse(["asdf", "asdf"]);
+ 
+-  const r1 = await schema.safeParse(["asdf"]);
++  const r1 = schema.safeParse(["asdf"]);
+   expect(r1.success).toEqual(false);
+   expect(r1.error!.issues).toMatchInlineSnapshot(`
+     [
+@@ -59,7 +59,7 @@ test("array length", async () => {
+     ]
+   `);
+ 
+-  const r2 = await schema.safeParse(["asdf", "asdf", "asdf"]);
++  const r2 = schema.safeParse(["asdf", "asdf", "asdf"]);
+   expect(r2.success).toEqual(false);
+   expect(r2.error!.issues).toMatchInlineSnapshot(`
+     [
+diff --git a/packages/zod/src/v4/classic/tests/object.test.ts b/packages/zod/src/v4/classic/tests/object.test.ts
+index 608b145e4f..3bd5088650 100644
+--- a/packages/zod/src/v4/classic/tests/object.test.ts
++++ b/packages/zod/src/v4/classic/tests/object.test.ts
+@@ -162,13 +162,13 @@ test("catchall overrides strict", () => {
+   });
+ });
+ 
+-test("optional keys are unset", async () => {
++test("optional keys are unset", () => {
+   const SNamedEntity = z.object({
+     id: z.string(),
+     set: z.string().optional(),
+     unset: z.string().optional(),
+   });
+-  const result = await SNamedEntity.parse({
++  const result = SNamedEntity.parse({
+     id: "asdf",
+     set: undefined,
+   });
+diff --git a/packages/zod/src/v4/classic/tests/refine.test.ts b/packages/zod/src/v4/classic/tests/refine.test.ts
+index a528b2a72a..fe312d86db 100644
+--- a/packages/zod/src/v4/classic/tests/refine.test.ts
++++ b/packages/zod/src/v4/classic/tests/refine.test.ts
+@@ -167,8 +167,8 @@ describe("early termination options", () => {
+ });
+ 
+ describe("custom error paths", () => {
+-  test("should use custom path in error message", async () => {
+-    const result = await z
++  test("should use custom path in error message", () => {
++    const result = z
+       .object({ password: z.string(), confirm: z.string() })
+       .refine((data) => data.confirm === data.password, { path: ["confirm"] })
+       .safeParse({ password: "asdf", confirm: "qewr" });
+diff --git a/packages/zod/src/v4/classic/tests/set.test.ts b/packages/zod/src/v4/classic/tests/set.test.ts
+index 3c1c3ec7cf..3338219ed4 100644
+--- a/packages/zod/src/v4/classic/tests/set.test.ts
++++ b/packages/zod/src/v4/classic/tests/set.test.ts
+@@ -39,7 +39,7 @@ test("valid parse async", async () => {
+   expect(result.data!.has("second")).toEqual(true);
+   expect(result.data!.has("third")).toEqual(false);
+ 
+-  const asyncResult = await stringSet.safeParse(new Set(["first", "second"]));
++  const asyncResult = stringSet.safeParse(new Set(["first", "second"]));
+   expect(asyncResult.success).toEqual(true);
+   expect(asyncResult.data!.has("first")).toEqual(true);
+   expect(asyncResult.data!.has("second")).toEqual(true);

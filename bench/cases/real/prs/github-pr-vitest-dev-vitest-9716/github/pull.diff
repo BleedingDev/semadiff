@@ -1,0 +1,336 @@
+diff --git a/packages/browser-playwright/src/index.ts b/packages/browser-playwright/src/index.ts
+index 4500aa701496..b1226751ec81 100644
+--- a/packages/browser-playwright/src/index.ts
++++ b/packages/browser-playwright/src/index.ts
+@@ -1,4 +1,5 @@
+ export {
++  type CDPSession,
+   playwright,
+   PlaywrightBrowserProvider,
+   type PlaywrightProviderOptions,
+diff --git a/packages/browser-playwright/src/playwright.ts b/packages/browser-playwright/src/playwright.ts
+index ab971f45e7b0..d838c00997d1 100644
+--- a/packages/browser-playwright/src/playwright.ts
++++ b/packages/browser-playwright/src/playwright.ts
+@@ -529,18 +529,17 @@ export class PlaywrightBrowserProvider implements BrowserProvider {
+     const page = this.getPage(sessionid)
+     const cdp = await page.context().newCDPSession(page)
+     return {
+-      async send(method: string, params: any) {
+-        const result = await cdp.send(method as 'DOM.querySelector', params)
+-        return result as unknown
++      send(method, params) {
++        return cdp.send(method as any, params)
+       },
+-      on(event: string, listener: (...args: any[]) => void) {
+-        cdp.on(event as 'Accessibility.loadComplete', listener)
++      on(event, listener) {
++        return cdp.on(event as any, listener)
+       },
+-      off(event: string, listener: (...args: any[]) => void) {
+-        cdp.off(event as 'Accessibility.loadComplete', listener)
++      off(event, listener) {
++        return cdp.off(event as any, listener)
+       },
+-      once(event: string, listener: (...args: any[]) => void) {
+-        cdp.once(event as 'Accessibility.loadComplete', listener)
++      once(event, listener) {
++        return cdp.once(event as any, listener)
+       },
+     }
+   }
+@@ -638,7 +637,9 @@ type PWSelectOptions = NonNullable<Parameters<Page['selectOption']>[2]>
+ type PWDragAndDropOptions = NonNullable<Parameters<Page['dragAndDrop']>[2]>
+ type PWSetInputFiles = NonNullable<Parameters<Page['setInputFiles']>[2]>
+ // Must be re-aliased here or rollup-plugin-dts removes the import alias and you end up with a circular reference
+-type PWCDPSession = PlaywrightCDPSession
++type PWCDPSession = Pick<PlaywrightCDPSession, 'send' | 'on' | 'off' | 'once'>
++
++export { type PWCDPSession as CDPSession }
+ 
+ declare module 'vitest/browser' {
+   export interface UserEventHoverOptions extends PWHoverOptions {}
+diff --git a/packages/browser-webdriverio/src/webdriverio.ts b/packages/browser-webdriverio/src/webdriverio.ts
+index 8e24d4503da2..796390080370 100644
+--- a/packages/browser-webdriverio/src/webdriverio.ts
++++ b/packages/browser-webdriverio/src/webdriverio.ts
+@@ -269,7 +269,7 @@ export class WebdriverBrowserProvider implements BrowserProvider {
+ 
+   async getCDPSession(_sessionId: string): Promise<CDPSession> {
+     return {
+-      send: (method: string, params: any) => {
++      send: (method, params) => {
+         if (!this.browser) {
+           throw new Error(`The environment was torn down.`)
+         }
+@@ -308,6 +308,13 @@ declare module 'vitest/browser' {
+   export interface LocatorScreenshotOptions extends SelectorOptions {}
+ }
+ 
++interface WebdriverCDPSession {
++  send: (method: string, params?: Record<string, unknown>) => Promise<unknown>
++  on: (event: string, listener: (...args: unknown[]) => void) => void
++  once: (event: string, listener: (...args: unknown[]) => void) => void
++  off: (event: string, listener: (...args: unknown[]) => void) => void
++}
++
+ declare module 'vitest/node' {
+   export interface BrowserCommandContext {
+     browser: WebdriverIO.Browser
+@@ -325,4 +332,6 @@ declare module 'vitest/node' {
+ 
+   export interface ToMatchScreenshotComparators
+     extends ScreenshotComparatorRegistry {}
++
++  export interface CDPSession extends WebdriverCDPSession {}
+ }
+diff --git a/packages/browser/context.d.ts b/packages/browser/context.d.ts
+index 23fd3dd359d5..d867b07a8838 100644
+--- a/packages/browser/context.d.ts
++++ b/packages/browser/context.d.ts
+@@ -1,5 +1,5 @@
+ import { SerializedConfig } from 'vitest'
+-import { StringifyOptions, BrowserCommands } from 'vitest/internal/browser'
++import { StringifyOptions, CDPSession, BrowserCommands } from 'vitest/internal/browser'
+ import { ARIARole } from './aria-role.js'
+ import {} from './matchers.js'
+ 
+@@ -17,9 +17,7 @@ export type BufferEncoding =
+   | 'binary'
+   | 'hex'
+ 
+-export interface CDPSession {
+-  // methods are defined by the provider type augmentation
+-}
++export { CDPSession };
+ 
+ export interface ScreenshotOptions extends SelectorOptions {
+   /**
+@@ -497,7 +495,7 @@ export interface LocatorByRoleOptions extends LocatorOptions {
+   selected?: boolean
+ }
+ 
+-interface LocatorScreenshotOptions extends Omit<ScreenshotOptions, 'element'> {}
++export interface LocatorScreenshotOptions extends Omit<ScreenshotOptions, 'element'> {}
+ 
+ export interface LocatorSelectors {
+   /**
+diff --git a/packages/browser/src/node/cdp.ts b/packages/browser/src/node/cdp.ts
+index 40c23797fadb..1654b1a44196 100644
+--- a/packages/browser/src/node/cdp.ts
++++ b/packages/browser/src/node/cdp.ts
+@@ -12,7 +12,7 @@ export class BrowserServerCDPHandler {
+   ) {}
+ 
+   send(method: string, params?: Record<string, unknown>): Promise<unknown> {
+-    return this.session.send(method, params)
++    return this.session.send(method as any, params)
+   }
+ 
+   on(event: string, id: string, once = false): void {
+@@ -32,7 +32,7 @@ export class BrowserServerCDPHandler {
+         }
+       }
+ 
+-      this.session.on(event, this.listeners[event])
++      this.session.on(event as any, this.listeners[event])
+     }
+   }
+ 
+@@ -43,7 +43,7 @@ export class BrowserServerCDPHandler {
+     this.listenerIds[event] = this.listenerIds[event].filter(l => l !== id)
+ 
+     if (!this.listenerIds[event].length) {
+-      this.session.off(event, this.listeners[event])
++      this.session.off(event as any, this.listeners[event])
+       delete this.listeners[event]
+     }
+   }
+diff --git a/packages/coverage-v8/package.json b/packages/coverage-v8/package.json
+index c5843821cf7d..b47e956f012e 100644
+--- a/packages/coverage-v8/package.json
++++ b/packages/coverage-v8/package.json
+@@ -70,6 +70,7 @@
+     "@types/istanbul-lib-report": "catalog:",
+     "@types/istanbul-reports": "catalog:",
+     "@vitest/browser": "workspace:*",
++    "@vitest/browser-playwright": "workspace:*",
+     "pathe": "catalog:",
+     "vitest": "workspace:*"
+   }
+diff --git a/packages/coverage-v8/src/browser.ts b/packages/coverage-v8/src/browser.ts
+index 701d83910af8..87ec6e5c3c98 100644
+--- a/packages/coverage-v8/src/browser.ts
++++ b/packages/coverage-v8/src/browser.ts
+@@ -1,9 +1,10 @@
++import type { CDPSession } from '@vitest/browser-playwright'
+ import type { CoverageProviderModule } from 'vitest/node'
+ import type { V8CoverageProvider } from './provider'
+ import { cdp } from 'vitest/browser'
+ import { loadProvider } from './load-provider'
+ 
+-const session = cdp()
++const session = cdp() as CDPSession
+ let enabled = false
+ 
+ type ScriptCoverage = Awaited<ReturnType<typeof session.send<'Profiler.takePreciseCoverage'>>>
+diff --git a/packages/vitest/browser/context.d.ts b/packages/vitest/browser/context.d.ts
+index a0f9bc61d33a..ad0a691696bb 100644
+--- a/packages/vitest/browser/context.d.ts
++++ b/packages/vitest/browser/context.d.ts
+@@ -4,4 +4,4 @@ export * from '@vitest/browser-playwright/context'
+ export * from '@vitest/browser-webdriverio/context'
+ // @ts-ignore -- @vitest/browser-preview might not be installed
+ export * from '@vitest/browser-preview/context'
+-export { BrowserCommands, FsOptions } from 'vitest/internal/browser'
++export { BrowserCommands, CDPSession, FsOptions } from 'vitest/internal/browser'
+diff --git a/packages/vitest/src/node/types/browser.ts b/packages/vitest/src/node/types/browser.ts
+index dada8b46f418..624e3ca7359a 100644
+--- a/packages/vitest/src/node/types/browser.ts
++++ b/packages/vitest/src/node/types/browser.ts
+@@ -3,18 +3,13 @@ import type { CancelReason } from '@vitest/runner'
+ import type { Awaitable, ParsedStack, TestError } from '@vitest/utils'
+ import type { StackTraceParserOptions } from '@vitest/utils/source-map'
+ import type { Plugin, ViteDevServer } from 'vite'
+-import type { BrowserCommands } from 'vitest/browser'
++import type { BrowserCommands, CDPSession } from 'vitest/browser'
+ import type { BrowserTraceViewMode } from '../../runtime/config'
+ import type { BrowserTesterOptions } from '../../types/browser'
+ import type { TestProject } from '../project'
+ import type { ApiConfig, ProjectConfig } from './config'
+ 
+-export interface CDPSession {
+-  send: (method: string, params?: Record<string, unknown>) => Promise<unknown>
+-  on: (event: string, listener: (...args: unknown[]) => void) => void
+-  once: (event: string, listener: (...args: unknown[]) => void) => void
+-  off: (event: string, listener: (...args: unknown[]) => void) => void
+-}
++export type { CDPSession }
+ 
+ export interface BrowserModuleMocker {
+   register: (sessionId: string, module: MockedModule) => Promise<void>
+diff --git a/packages/vitest/src/public/browser.ts b/packages/vitest/src/public/browser.ts
+index 64ee91c05172..c0e5316e2d41 100644
+--- a/packages/vitest/src/public/browser.ts
++++ b/packages/vitest/src/public/browser.ts
+@@ -43,6 +43,11 @@ export interface BrowserCommands {
+   ) => Promise<void>
+   removeFile: (path: string) => Promise<void>
+ }
++
++export interface CDPSession {
++  // methods are defined by the provider type augmentation
++}
++
+ /**
+  * @internal
+  */
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 90fd71363941..c50e0dbb125a 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -718,6 +718,9 @@ importers:
+       '@vitest/browser':
+         specifier: workspace:*
+         version: link:../browser
++      '@vitest/browser-playwright':
++        specifier: workspace:*
++        version: link:../browser-playwright
+       pathe:
+         specifier: 'catalog:'
+         version: 2.0.3
+diff --git a/test/browser/specs/utils.ts b/test/browser/specs/utils.ts
+index 736d3fade0a1..c243a33af557 100644
+--- a/test/browser/specs/utils.ts
++++ b/test/browser/specs/utils.ts
+@@ -35,11 +35,13 @@ export async function runBrowserTests(
+   viteOverrides?: Partial<ViteUserConfig>,
+   runnerOptions?: VitestRunnerCLIOptions,
+ ) {
+-  return runVitest({
++  const result = await runVitest({
+     watch: false,
+     reporters: 'none',
+     ...config,
+     browser: { headless: true, ...config?.browser },
+     $viteConfig: viteOverrides,
+   }, include, runnerOptions)
++
++  return { ...result, stderr: result.stderr.replace('Testing types with tsc and vue-tsc is an experimental feature.\nBreaking changes might not follow SemVer, please pin Vitest\'s version when using it.\n', '') }
+ }
+diff --git a/test/browser/test/cdp.test-d.ts b/test/browser/test/cdp.test-d.ts
+new file mode 100644
+index 000000000000..22dcc0a912cc
+--- /dev/null
++++ b/test/browser/test/cdp.test-d.ts
+@@ -0,0 +1,54 @@
++import { PlaywrightBrowserProvider } from '@vitest/browser-playwright'
++import { expectTypeOf, test } from 'vitest'
++import { cdp } from 'vitest/browser'
++import { } from 'vitest/config'
++
++test('server side cdp', async () => {
++  const session = await (new PlaywrightBrowserProvider('project' as any, {}).getCDPSession(''))
++
++  expectTypeOf(session).toHaveProperty('on')
++  expectTypeOf(session).toHaveProperty('off')
++  expectTypeOf(session).toHaveProperty('once')
++  expectTypeOf(session).toHaveProperty('send')
++  expectTypeOf(session).not.toHaveProperty('emit')
++
++  session.on('Profiler.preciseCoverageDeltaUpdate', (event) => {
++    expectTypeOf(event).toHaveProperty('result').items.toHaveProperty('functions').items.toHaveProperty('ranges').items.toHaveProperty('startOffset')
++  })
++
++  expectTypeOf(session.send('Profiler.startPreciseCoverage', {
++    allowTriggeredUpdates: true,
++    callCount: true,
++    detailed: true,
++  })).resolves.toHaveProperty('timestamp')
++
++  expectTypeOf(session.send).toBeCallableWith('Fetch.enable')
++
++  // @ts-expect-error -- not.toBeCallableWith() does not work
++  expectTypeOf(session.send).toBeCallableWith('Some.NonExisting.Command')
++})
++
++test('client side cdps', async () => {
++  const session = cdp()
++
++  expectTypeOf(session).toHaveProperty('on')
++  expectTypeOf(session).toHaveProperty('off')
++  expectTypeOf(session).toHaveProperty('once')
++  expectTypeOf(session).toHaveProperty('send')
++  expectTypeOf(session).not.toHaveProperty('emit')
++
++  session.on('Profiler.preciseCoverageDeltaUpdate', (event) => {
++    expectTypeOf(event).toHaveProperty('result').items.toHaveProperty('functions').items.toHaveProperty('ranges').items.toHaveProperty('startOffset')
++  })
++
++  expectTypeOf(session.send('Profiler.startPreciseCoverage', {
++    allowTriggeredUpdates: true,
++    callCount: true,
++    detailed: true,
++  })).resolves.toHaveProperty('timestamp')
++
++  expectTypeOf(session.send).toBeCallableWith('Fetch.enable')
++
++  // @ts-expect-error -- not.toBeCallableWith() does not work
++  expectTypeOf(session.send).toBeCallableWith('Some.NonExisting.Command')
++})
+diff --git a/test/browser/vitest.config.mts b/test/browser/vitest.config.mts
+index 61ba1aed8ad5..5f221683491c 100644
+--- a/test/browser/vitest.config.mts
++++ b/test/browser/vitest.config.mts
+@@ -87,6 +87,11 @@ export default defineConfig({
+         return false
+       }
+     },
++    typecheck: {
++      enabled: true,
++      include: ['test/*.test-d.ts'],
++      ignoreSourceErrors: true,
++    },
+   },
+   plugins: [
+     {

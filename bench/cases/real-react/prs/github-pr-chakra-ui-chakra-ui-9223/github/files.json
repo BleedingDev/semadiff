@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "4ae6eb6e40c15213763fc2b875e5e8038094a44e",
+    "filename": "packages/react/src/styled-system/factory.types.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/5b8c20629530b09cc27c3039bb876d58ba3081d2/packages%2Freact%2Fsrc%2Fstyled-system%2Ffactory.types.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/5b8c20629530b09cc27c3039bb876d58ba3081d2/packages%2Freact%2Fsrc%2Fstyled-system%2Ffactory.types.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fstyled-system%2Ffactory.types.ts?ref=5b8c20629530b09cc27c3039bb876d58ba3081d2",
+    "patch": "@@ -48,9 +48,9 @@ export type HtmlProp =\n   | \"height\"\n   | \"content\"\n \n-type PatchHtmlProps<T> = DistributiveOmit<T, HtmlProp> & HtmlProps\n+export type PatchHtmlProps<T> = DistributiveOmit<T, HtmlProp> & HtmlProps\n \n-type JsxHtmlProps<T extends Dict, P extends Dict = {}> = Assign<\n+export type JsxHtmlProps<T extends Dict, P extends Dict = {}> = Assign<\n   PatchHtmlProps<T>,\n   P\n >"
+  },
+  {
+    "sha": "6ce1f7c539dbc3a338d214a0607d557126a3d920",
+    "filename": "packages/react/src/styled-system/index.ts",
+    "status": "modified",
+    "additions": 12,
+    "deletions": 1,
+    "changes": 13,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/5b8c20629530b09cc27c3039bb876d58ba3081d2/packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/5b8c20629530b09cc27c3039bb876d58ba3081d2/packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts?ref=5b8c20629530b09cc27c3039bb876d58ba3081d2",
+    "patch": "@@ -4,7 +4,7 @@ export { createSlotRecipeContext } from \"./create-slot-recipe-context\"\n export type {\n   ConditionalValue,\n   GlobalStyleObject,\n-  JsxStyleProps,\n+  // JsxStyleProps,\n   SystemStyleObject,\n   CssKeyframes,\n } from \"./css.types\"\n@@ -24,6 +24,17 @@ export type {\n   HTMLChakraProps,\n   InferRecipeProps,\n   UnstyledProp,\n+  JsxStyleProps,\n+  DataAttr,\n+  JsxFactory,\n+  JsxElement,\n+  PolymorphicProps,\n+  HtmlProp,\n+  HtmlProps,\n+  JsxFactoryOptions,\n+  JsxHtmlProps,\n+  PatchHtmlProps,\n+  StyledFactoryFn,\n } from \"./factory.types\"\n export type {\n   RecipeProps,"
+  }
+]

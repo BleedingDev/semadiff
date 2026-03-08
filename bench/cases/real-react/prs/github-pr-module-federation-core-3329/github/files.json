@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "e05846a7aa6b42bf36b4bf5c48b7bc232bddc7ce",
+    "filename": "apps/website-new/docs/en/plugin/dev/index.mdx",
+    "status": "modified",
+    "additions": 30,
+    "deletions": 0,
+    "changes": 30,
+    "blob_url": "https://github.com/module-federation/core/blob/db25ef01512e9f758994a7624ca1041dfa8667f3/apps%2Fwebsite-new%2Fdocs%2Fen%2Fplugin%2Fdev%2Findex.mdx",
+    "raw_url": "https://github.com/module-federation/core/raw/db25ef01512e9f758994a7624ca1041dfa8667f3/apps%2Fwebsite-new%2Fdocs%2Fen%2Fplugin%2Fdev%2Findex.mdx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/apps%2Fwebsite-new%2Fdocs%2Fen%2Fplugin%2Fdev%2Findex.mdx?ref=db25ef01512e9f758994a7624ca1041dfa8667f3",
+    "patch": "@@ -534,6 +534,36 @@ const changeScriptAttributePlugin: () => FederationRuntimePlugin = function () {\n };\n ```\n \n+### fetch\n+The `fetch` function allows customizing the request that fetches the manifest JSON. A successful `Response` must yield a valid JSON.\n+\n+`AsyncHook`\n+\n+- **Type**\n+\n+```typescript\n+function fetch(manifestUrl: string, requestInit: RequestInit): Promise<Response> | void | false;\n+```\n+\n+- Example for including the credentials when fetching the manifest JSON:\n+\n+```typescript\n+// fetch-manifest-with-credentials-plugin.ts\n+import type { FederationRuntimePlugin } from '@module-federation/enhanced/runtime';\n+\n+export default function (): FederationRuntimePlugin {\n+  return {\n+    name: 'fetch-manifest-with-credentials-plugin',\n+    fetch(manifestUrl, requestInit) {\n+      return fetch(manifestUrl, {\n+        ...requestInit,\n+        credentials: 'include'\n+      });\n+    },\n+  }\n+};\n+```\n+\n ### loadEntry\n The `loadEntry` function allows for full customization of remotes, enabling you to extend and create new remote types. The following two simple examples demonstrate loading JSON data and module delegation.\n "
+  },
+  {
+    "sha": "941a400d6e3861ecc13d457d2612e44e2fe3bf7f",
+    "filename": "packages/runtime/src/core.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/module-federation/core/blob/db25ef01512e9f758994a7624ca1041dfa8667f3/packages%2Fruntime%2Fsrc%2Fcore.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/db25ef01512e9f758994a7624ca1041dfa8667f3/packages%2Fruntime%2Fsrc%2Fcore.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Fcore.ts?ref=db25ef01512e9f758994a7624ca1041dfa8667f3",
+    "patch": "@@ -110,7 +110,6 @@ export class FederationHost {\n       ],\n       HTMLLinkElement | void\n     >(),\n-    // only work for manifest , so not open to the public yet\n     fetch: new AsyncHook<\n       [string, RequestInit],\n       Promise<Response> | void | false"
+  }
+]

@@ -1,0 +1,1859 @@
+diff --git a/packages/toolkit/src/dynamicMiddleware/tests/index.test-d.ts b/packages/toolkit/src/dynamicMiddleware/tests/index.test-d.ts
+index 7273273530..35bfc1b5e1 100644
+--- a/packages/toolkit/src/dynamicMiddleware/tests/index.test-d.ts
++++ b/packages/toolkit/src/dynamicMiddleware/tests/index.test-d.ts
+@@ -1,7 +1,10 @@
+-import type { Action, Middleware, UnknownAction } from 'redux'
+-import type { ThunkDispatch } from 'redux-thunk'
+-import { configureStore } from '../../configureStore'
+-import { createDynamicMiddleware } from '../index'
++import type {
++  Action,
++  Middleware,
++  ThunkDispatch,
++  UnknownAction,
++} from '@reduxjs/toolkit'
++import { configureStore, createDynamicMiddleware } from '@reduxjs/toolkit'
+ 
+ const untypedInstance = createDynamicMiddleware()
+ 
+diff --git a/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts b/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts
+index 33eaae96dd..9061d88bdd 100644
+--- a/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts
++++ b/packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts
+@@ -1,8 +1,12 @@
++import type {
++  Action,
++  Middleware,
++  ThunkDispatch,
++  UnknownAction,
++} from '@reduxjs/toolkit'
++import { createDynamicMiddleware } from '@reduxjs/toolkit/react'
+ import type { Context } from 'react'
+ import type { ReactReduxContextValue } from 'react-redux'
+-import type { Action, Middleware, UnknownAction } from 'redux'
+-import type { ThunkDispatch } from 'redux-thunk'
+-import { createDynamicMiddleware } from '../react'
+ 
+ interface AppDispatch extends ThunkDispatch<number, undefined, UnknownAction> {
+   (n: 1): 1
+diff --git a/packages/toolkit/src/entities/tests/state_selectors.test.ts b/packages/toolkit/src/entities/tests/state_selectors.test.ts
+index 3afba41ac6..9775f77fbf 100644
+--- a/packages/toolkit/src/entities/tests/state_selectors.test.ts
++++ b/packages/toolkit/src/entities/tests/state_selectors.test.ts
+@@ -1,12 +1,14 @@
+-import { createDraftSafeSelectorCreator } from '../../createDraftSafeSelector'
+-import type { EntityAdapter, EntityState } from '../index'
+-import { createEntityAdapter } from '../index'
+-import type { EntitySelectors } from '../models'
++import type {
++  EntityAdapter,
++  EntitySelectors,
++  EntityState,
++} from '@reduxjs/toolkit'
++import {
++  createDraftSafeSelectorCreator,
++  createEntityAdapter,
++} from '@reduxjs/toolkit'
+ import type { BookModel } from './fixtures/book'
+ import { AClockworkOrange, AnimalFarm, TheGreatGatsby } from './fixtures/book'
+-import type { Selector } from 'reselect'
+-import { createSelector, weakMapMemoize } from 'reselect'
+-import { vi } from 'vitest'
+ 
+ describe('Entity State Selectors', () => {
+   describe('Composed Selectors', () => {
+@@ -103,12 +105,6 @@ describe('Entity State Selectors', () => {
+       expect(entities).toEqual(state.entities)
+     })
+ 
+-    it('should type single entity from Dictionary as entity type or undefined', () => {
+-      expectType<
+-        Selector<EntityState<BookModel, string>, BookModel | undefined>
+-      >(createSelector(selectors.selectEntities, (entities) => entities[0]))
+-    })
+-
+     it('should create a selector for selecting the list of models', () => {
+       const models = selectors.selectAll(state)
+ 
+@@ -148,7 +144,3 @@ describe('Entity State Selectors', () => {
+     })
+   })
+ })
+-
+-function expectType<T>(t: T) {
+-  return t
+-}
+diff --git a/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.test-d.ts b/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.test-d.ts
+index 8ac4c11549..7c536dfb00 100644
+--- a/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.test-d.ts
++++ b/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.test-d.ts
+@@ -77,7 +77,7 @@ describe('type tests', () => {
+       effect: (action, listenerApi) => {
+         foundExtra = listenerApi.extra
+ 
+-        expectTypeOf(listenerApi.extra).toMatchTypeOf(originalExtra)
++        expectTypeOf(listenerApi.extra).toExtend<typeof originalExtra>()
+       },
+     })
+ 
+@@ -121,7 +121,7 @@ describe('type tests', () => {
+         takeResult = await listenerApi.take(increment.match, timeout)
+         expect(takeResult).toBeNull()
+ 
+-        expectTypeOf(takeResult).toMatchTypeOf<ExpectedTakeResultType>()
++        expectTypeOf(takeResult).toExtend<ExpectedTakeResultType>()
+ 
+         done = true
+       },
+@@ -242,14 +242,14 @@ describe('type tests', () => {
+     startListening({
+       actionCreator: incrementByAmount,
+       effect: (action, listenerApi) => {
+-        expectTypeOf(action).toMatchTypeOf<PayloadAction<number>>()
++        expectTypeOf(action).toExtend<PayloadAction<number>>()
+       },
+     })
+ 
+     startListening({
+       matcher: incrementByAmount.match,
+       effect: (action, listenerApi) => {
+-        expectTypeOf(action).toMatchTypeOf<PayloadAction<number>>()
++        expectTypeOf(action).toExtend<PayloadAction<number>>()
+       },
+     })
+ 
+@@ -292,7 +292,7 @@ describe('type tests', () => {
+       addListener({
+         actionCreator: incrementByAmount,
+         effect: (action, listenerApi) => {
+-          expectTypeOf(action).toMatchTypeOf<PayloadAction<number>>()
++          expectTypeOf(action).toExtend<PayloadAction<number>>()
+         },
+       }),
+     )
+@@ -301,7 +301,7 @@ describe('type tests', () => {
+       addListener({
+         matcher: incrementByAmount.match,
+         effect: (action, listenerApi) => {
+-          expectTypeOf(action).toMatchTypeOf<PayloadAction<number>>()
++          expectTypeOf(action).toExtend<PayloadAction<number>>()
+         },
+       }),
+     )
+diff --git a/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test-d.ts b/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test-d.ts
+index ae6fd6c46d..7729a2a70a 100644
+--- a/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test-d.ts
++++ b/packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test-d.ts
+@@ -115,7 +115,11 @@ describe('listenerMiddleware.withTypes<RootState, AppDispatch>()', () => {
+   })
+ 
+   test('addListener.withTypes', () => {
+-    const addAppListener = addListener.withTypes<RootState, AppDispatch, ExtraArgument>()
++    const addAppListener = addListener.withTypes<
++      RootState,
++      AppDispatch,
++      ExtraArgument
++    >()
+ 
+     expectTypeOf(addAppListener).toEqualTypeOf<
+       TypedAddListener<RootState, AppDispatch, ExtraArgument>
+@@ -138,7 +142,11 @@ describe('listenerMiddleware.withTypes<RootState, AppDispatch>()', () => {
+   })
+ 
+   test('removeListener.withTypes', () => {
+-    const removeAppListener = removeListener.withTypes<RootState, AppDispatch, ExtraArgument>()
++    const removeAppListener = removeListener.withTypes<
++      RootState,
++      AppDispatch,
++      ExtraArgument
++    >()
+ 
+     expectTypeOf(removeAppListener).toEqualTypeOf<
+       TypedRemoveListener<RootState, AppDispatch, ExtraArgument>
+diff --git a/packages/toolkit/src/query/tests/buildHooks.test-d.tsx b/packages/toolkit/src/query/tests/buildHooks.test-d.tsx
+index 7ed864d3e6..8537a7d57e 100644
+--- a/packages/toolkit/src/query/tests/buildHooks.test-d.tsx
++++ b/packages/toolkit/src/query/tests/buildHooks.test-d.tsx
+@@ -1,12 +1,7 @@
+-import type {
+-  QueryStateSelector,
+-  UseMutation,
+-  UseQuery,
+-} from '@internal/query/react/buildHooks'
++import type { UseMutation, UseQuery } from '@internal/query/react/buildHooks'
+ import { ANY } from '@internal/tests/utils/helpers'
+ import type { SerializedError } from '@reduxjs/toolkit'
+ import type {
+-  QueryDefinition,
+   SubscriptionOptions,
+   TypedQueryStateSelector,
+ } from '@reduxjs/toolkit/query/react'
+@@ -111,7 +106,7 @@ describe('type tests', () => {
+         // no-op simply for clearer type assertions
+         res.then((result) => {
+           if (result.isSuccess) {
+-            expectTypeOf(result).toMatchTypeOf<{
++            expectTypeOf(result).toMatchObjectType<{
+               data: {
+                 name: string
+               }
+@@ -119,7 +114,7 @@ describe('type tests', () => {
+           }
+ 
+           if (result.isError) {
+-            expectTypeOf(result).toMatchTypeOf<{
++            expectTypeOf(result).toExtend<{
+               error: { status: number; data: unknown } | SerializedError
+             }>()
+           }
+@@ -137,7 +132,7 @@ describe('type tests', () => {
+           (options: SubscriptionOptions) => void
+         >()
+ 
+-        expectTypeOf(res.refetch).toMatchTypeOf<() => void>()
++        expectTypeOf(res.refetch).toExtend<() => void>()
+ 
+         expectTypeOf(res.unwrap()).resolves.toEqualTypeOf<{ name: string }>()
+       }
+@@ -164,7 +159,7 @@ describe('type tests', () => {
+       const handleClick = async () => {
+         const res = updateUser({ name: 'Banana' })
+ 
+-        expectTypeOf(res).resolves.toMatchTypeOf<
++        expectTypeOf(res).resolves.toExtend<
+           | {
+               error: { status: number; data: unknown } | SerializedError
+             }
+@@ -175,7 +170,7 @@ describe('type tests', () => {
+             }
+         >()
+ 
+-        expectTypeOf(res.arg).toMatchTypeOf<{
++        expectTypeOf(res.arg).toMatchObjectType<{
+           endpointName: string
+           originalArgs: { name: string }
+           track?: boolean
+diff --git a/packages/toolkit/src/query/tests/buildSelector.test-d.ts b/packages/toolkit/src/query/tests/buildSelector.test-d.ts
+index 2f117b661a..03042c6e0d 100644
+--- a/packages/toolkit/src/query/tests/buildSelector.test-d.ts
++++ b/packages/toolkit/src/query/tests/buildSelector.test-d.ts
+@@ -1,6 +1,5 @@
+-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+-
+ import { configureStore, createSelector } from '@reduxjs/toolkit'
++import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+ 
+ describe('type tests', () => {
+   test('buildSelector type test', () => {
+diff --git a/packages/toolkit/src/query/tests/cacheLifecycle.test-d.ts b/packages/toolkit/src/query/tests/cacheLifecycle.test-d.ts
+index 3133bbc879..42b678d110 100644
+--- a/packages/toolkit/src/query/tests/cacheLifecycle.test-d.ts
++++ b/packages/toolkit/src/query/tests/cacheLifecycle.test-d.ts
+@@ -19,7 +19,7 @@ describe('type tests', () => {
+           ) {
+             const firstValue = await cacheDataLoaded
+ 
+-            expectTypeOf(firstValue).toMatchTypeOf<{
++            expectTypeOf(firstValue).toExtend<{
+               data: number
+               meta?: FetchBaseQueryMeta
+             }>()
+diff --git a/packages/toolkit/src/query/tests/createApi.test-d.ts b/packages/toolkit/src/query/tests/createApi.test-d.ts
+index ad86da1473..af0271169d 100644
+--- a/packages/toolkit/src/query/tests/createApi.test-d.ts
++++ b/packages/toolkit/src/query/tests/createApi.test-d.ts
+@@ -111,7 +111,7 @@ describe('type tests', () => {
+               },
+             })
+ 
+-            expectTypeOf(query).toMatchTypeOf<
++            expectTypeOf(query).toExtend<
+               QueryDefinition<'Arg', any, any, 'RetVal'>
+             >()
+ 
+@@ -178,7 +178,7 @@ describe('type tests', () => {
+               },
+             })
+ 
+-            expectTypeOf(query).toMatchTypeOf<
++            expectTypeOf(query).toExtend<
+               MutationDefinition<'Arg', any, any, 'RetVal'>
+             >()
+ 
+@@ -362,15 +362,13 @@ describe('type tests', () => {
+           enhancedApi.endpoints.query1.initiate(),
+         )
+ 
+-        expectTypeOf(queryResponse.data).toMatchTypeOf<
+-          Transformed | undefined
+-        >()
++        expectTypeOf(queryResponse.data).toExtend<Transformed | undefined>()
+ 
+         const mutationResponse = await storeRef.store.dispatch(
+           enhancedApi.endpoints.mutation1.initiate(),
+         )
+ 
+-        expectTypeOf(mutationResponse).toMatchTypeOf<
++        expectTypeOf(mutationResponse).toExtend<
+           | { data: Transformed }
+           | { error: FetchBaseQueryError | SerializedError }
+         >()
+@@ -508,7 +506,7 @@ describe('type tests', () => {
+         ).toEqualTypeOf<Post>()
+         expectTypeOf(api.endpoints.query2.Types.RawResultType).toBeAny()
+ 
+-        expectTypeOf(api.endpoints.query3.Types.QueryArg).toEqualTypeOf<void>()
++        expectTypeOf(api.endpoints.query3.Types.QueryArg).toBeVoid()
+         expectTypeOf(api.endpoints.query3.Types.ResultType).toEqualTypeOf<
+           EntityState<Post, Post['id']>
+         >()
+diff --git a/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx b/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx
+index 1b48e4badc..c96a07c32a 100644
+--- a/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx
++++ b/packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx
+@@ -854,7 +854,6 @@ describe('fetchBaseQuery', () => {
+       const prepare = vitest.fn()
+       const baseQuery = fetchBaseQuery({
+         prepareHeaders(headers, api) {
+-          expectTypeOf(api.extraOptions).toEqualTypeOf<unknown>()
+           prepare.apply(undefined, arguments as unknown as any[])
+         },
+       })
+diff --git a/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts b/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts
+index 12dbc0140a..509b62a17e 100644
+--- a/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts
++++ b/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts
+@@ -1,11 +1,11 @@
+-import type { skipToken, InfiniteData } from '@reduxjs/toolkit/query/react'
++import { createSlice } from '@reduxjs/toolkit'
++import type { InfiniteData, skipToken } from '@reduxjs/toolkit/query/react'
+ import {
+   createApi,
+   fetchBaseQuery,
+   QueryStatus,
+ } from '@reduxjs/toolkit/query/react'
+ import { setupApiStore } from '../../tests/utils/helpers'
+-import { createSlice } from '@internal/createSlice'
+ 
+ describe('Infinite queries', () => {
+   test('Basic infinite query behavior', async () => {
+diff --git a/packages/toolkit/src/query/tests/queryLifecycle.test-d.tsx b/packages/toolkit/src/query/tests/queryLifecycle.test-d.tsx
+index 82e71d202b..d537186408 100644
+--- a/packages/toolkit/src/query/tests/queryLifecycle.test-d.tsx
++++ b/packages/toolkit/src/query/tests/queryLifecycle.test-d.tsx
+@@ -26,7 +26,7 @@ describe('type tests', () => {
+             // unfortunately we cannot test for that in jest.
+             const result = await queryFulfilled
+ 
+-            expectTypeOf(result).toMatchTypeOf<{
++            expectTypeOf(result).toExtend<{
+               data: number
+               meta?: FetchBaseQueryMeta
+             }>()
+@@ -45,7 +45,7 @@ describe('type tests', () => {
+           async onQueryStarted(arg, { queryFulfilled }) {
+             queryFulfilled.then(
+               (result) => {
+-                expectTypeOf(result).toMatchTypeOf<{
++                expectTypeOf(result).toExtend<{
+                   data: number
+                   meta?: FetchBaseQueryMeta
+                 }>()
+@@ -85,7 +85,7 @@ describe('type tests', () => {
+ 
+             const result = await queryFulfilled
+ 
+-            expectTypeOf(result).toMatchTypeOf<{
++            expectTypeOf(result).toExtend<{
+               data: number
+               meta?: FetchBaseQueryMeta
+             }>()
+@@ -104,7 +104,7 @@ describe('type tests', () => {
+           async onQueryStarted(arg, { queryFulfilled }) {
+             queryFulfilled.then(
+               (result) => {
+-                expectTypeOf(result).toMatchTypeOf<{
++                expectTypeOf(result).toExtend<{
+                   data: number
+                   meta?: FetchBaseQueryMeta
+                 }>()
+@@ -144,7 +144,7 @@ describe('type tests', () => {
+ 
+             const result = await queryFulfilled
+ 
+-            expectTypeOf(result).toMatchTypeOf<{
++            expectTypeOf(result).toExtend<{
+               data: number
+               meta?: FetchBaseQueryMeta
+             }>()
+diff --git a/packages/toolkit/src/query/tests/retry.test-d.ts b/packages/toolkit/src/query/tests/retry.test-d.ts
+index ef8aee5f7f..72c859aefd 100644
+--- a/packages/toolkit/src/query/tests/retry.test-d.ts
++++ b/packages/toolkit/src/query/tests/retry.test-d.ts
+@@ -1,36 +1,36 @@
+-import { retry, type RetryOptions } from '@internal/query/retry'
+-import {
+-  fetchBaseQuery,
+-  type FetchBaseQueryError,
+-  type FetchBaseQueryMeta,
+-} from '@internal/query/fetchBaseQuery'
++import type {
++  FetchBaseQueryError,
++  FetchBaseQueryMeta,
++  RetryOptions,
++} from '@reduxjs/toolkit/query/react'
++import { fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react'
+ 
+ describe('type tests', () => {
+   test('RetryOptions only accepts one of maxRetries or retryCondition', () => {
+     // Should not complain if only `maxRetries` exists
+-    expectTypeOf({ maxRetries: 5 }).toMatchTypeOf<RetryOptions>()
++    expectTypeOf({ maxRetries: 5 }).toExtend<RetryOptions>()
+ 
+     // Should not complain if only `retryCondition` exists
+-    expectTypeOf({ retryCondition: () => false }).toMatchTypeOf<RetryOptions>()
++    expectTypeOf({ retryCondition: () => false }).toExtend<RetryOptions>()
+ 
+     // Should complain if both `maxRetries` and `retryCondition` exist at once
+     expectTypeOf({
+       maxRetries: 5,
+       retryCondition: () => false,
+-    }).not.toMatchTypeOf<RetryOptions>()
++    }).not.toExtend<RetryOptions>()
+   })
+   test('fail can be pretyped to only accept correct error and meta', () => {
+-    expectTypeOf(retry.fail).parameter(0).toEqualTypeOf<unknown>()
++    expectTypeOf(retry.fail).parameter(0).toBeUnknown()
+     expectTypeOf(retry.fail).parameter(1).toEqualTypeOf<{} | undefined>()
+     expectTypeOf(retry.fail).toBeCallableWith('Literally anything', {})
+ 
+     const myBaseQuery = fetchBaseQuery()
+     const typedFail = retry.fail<typeof myBaseQuery>
+ 
+-    expectTypeOf(typedFail).parameter(0).toMatchTypeOf<FetchBaseQueryError>()
++    expectTypeOf(typedFail).parameter(0).toExtend<FetchBaseQueryError>()
+     expectTypeOf(typedFail)
+       .parameter(1)
+-      .toMatchTypeOf<FetchBaseQueryMeta | undefined>()
++      .toExtend<FetchBaseQueryMeta | undefined>()
+ 
+     expectTypeOf(typedFail).toBeCallableWith(
+       {
+@@ -40,7 +40,7 @@ describe('type tests', () => {
+       { request: new Request('http://localhost') },
+     )
+ 
+-    expectTypeOf(typedFail).parameter(0).not.toMatchTypeOf<string>()
+-    expectTypeOf(typedFail).parameter(1).not.toMatchTypeOf<{}>()
++    expectTypeOf(typedFail).parameter(0).not.toBeString()
++    expectTypeOf(typedFail).parameter(1).not.toExtend<{}>()
+   })
+ })
+diff --git a/packages/toolkit/src/query/tests/unionTypes.test-d.ts b/packages/toolkit/src/query/tests/unionTypes.test-d.ts
+index 819a150d56..fea96450be 100644
+--- a/packages/toolkit/src/query/tests/unionTypes.test-d.ts
++++ b/packages/toolkit/src/query/tests/unionTypes.test-d.ts
+@@ -3,20 +3,20 @@ import type { SerializedError } from '@reduxjs/toolkit'
+ import type {
+   FetchBaseQueryError,
+   QueryDefinition,
+-  TypedUseMutationResult,
+-  TypedUseQueryHookResult,
+-  TypedUseQueryState,
+-  TypedUseQueryStateResult,
+-  TypedUseQuerySubscriptionResult,
+   TypedLazyQueryTrigger,
+-  TypedUseLazyQueryStateResult,
++  TypedMutationTrigger,
+   TypedUseLazyQuery,
++  TypedUseLazyQueryStateResult,
+   TypedUseLazyQuerySubscription,
+   TypedUseMutation,
+-  TypedMutationTrigger,
+-  TypedUseQuerySubscription,
++  TypedUseMutationResult,
+   TypedUseQuery,
++  TypedUseQueryHookResult,
++  TypedUseQueryState,
+   TypedUseQueryStateOptions,
++  TypedUseQueryStateResult,
++  TypedUseQuerySubscription,
++  TypedUseQuerySubscriptionResult,
+ } from '@reduxjs/toolkit/query/react'
+ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+ 
+@@ -490,13 +490,13 @@ describe('union types', () => {
+ 
+     assertType<typeof useQueryResultWithoutMethods>(useQueryStateResult)
+ 
+-    expectTypeOf(useQueryStateResult).toMatchTypeOf(
+-      useQueryResultWithoutMethods,
+-    )
++    expectTypeOf(useQueryStateResult).toExtend<
++      typeof useQueryResultWithoutMethods
++    >()
+ 
+     expectTypeOf(useQueryStateWithSelectFromResult)
+       .parameter(0)
+-      .not.toMatchTypeOf(useQueryResultWithoutMethods)
++      .not.toExtend<typeof useQueryResultWithoutMethods>()
+ 
+     expectTypeOf(api.endpoints.getTest.select).returns.returns.toEqualTypeOf<
+       Awaited<ReturnType<typeof refetch>>
+@@ -663,7 +663,7 @@ describe('union types', () => {
+       isSuccess: false,
+       isError: false,
+       reset: () => {},
+-    }).toMatchTypeOf(result)
++    }).toExtend<typeof result>()
+   })
+ 
+   test('useMutation TS4.1 union', () => {
+@@ -737,9 +737,9 @@ describe('union types', () => {
+ 
+ describe('"Typed" helper types', () => {
+   test('useQuery', () => {
+-    expectTypeOf<TypedUseQuery<string, void, typeof baseQuery>>().toMatchTypeOf(
+-      api.endpoints.getTest.useQuery,
+-    )
++    expectTypeOf<TypedUseQuery<string, void, typeof baseQuery>>().toExtend<
++      typeof api.endpoints.getTest.useQuery
++    >()
+ 
+     const result = api.endpoints.getTest.useQuery()
+ 
+@@ -759,9 +759,9 @@ describe('"Typed" helper types', () => {
+   })
+ 
+   test('useQueryState', () => {
+-    expectTypeOf<
+-      TypedUseQueryState<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(api.endpoints.getTest.useQueryState)
++    expectTypeOf<TypedUseQueryState<string, void, typeof baseQuery>>().toExtend<
++      typeof api.endpoints.getTest.useQueryState
++    >()
+ 
+     const result = api.endpoints.getTest.useQueryState()
+ 
+@@ -783,9 +783,7 @@ describe('"Typed" helper types', () => {
+   test('useQueryState options', () => {
+     expectTypeOf<
+       TypedUseQueryStateOptions<string, void, typeof baseQuery>
+-    >().toMatchTypeOf<
+-      Parameters<typeof api.endpoints.getTest.useQueryState>[1]
+-    >()
++    >().toExtend<Parameters<typeof api.endpoints.getTest.useQueryState>[1]>()
+ 
+     expectTypeOf<
+       UseQueryStateOptions<
+@@ -800,7 +798,7 @@ describe('"Typed" helper types', () => {
+   test('useQuerySubscription', () => {
+     expectTypeOf<
+       TypedUseQuerySubscription<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(api.endpoints.getTest.useQuerySubscription)
++    >().toExtend<typeof api.endpoints.getTest.useQuerySubscription>()
+ 
+     const result = api.endpoints.getTest.useQuerySubscription()
+ 
+@@ -810,19 +808,19 @@ describe('"Typed" helper types', () => {
+   })
+ 
+   test('useLazyQuery', () => {
+-    expectTypeOf<
+-      TypedUseLazyQuery<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(api.endpoints.getTest.useLazyQuery)
++    expectTypeOf<TypedUseLazyQuery<string, void, typeof baseQuery>>().toExtend<
++      typeof api.endpoints.getTest.useLazyQuery
++    >()
+ 
+     const [trigger, result] = api.endpoints.getTest.useLazyQuery()
+ 
+     expectTypeOf<
+       TypedLazyQueryTrigger<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(trigger)
++    >().toExtend<typeof trigger>()
+ 
+     expectTypeOf<
+       TypedUseLazyQueryStateResult<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(result)
++    >().toExtend<typeof result>()
+   })
+ 
+   test('useLazyQuery with selectFromResult', () => {
+@@ -832,7 +830,7 @@ describe('"Typed" helper types', () => {
+ 
+     expectTypeOf<
+       TypedLazyQueryTrigger<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(trigger)
++    >().toExtend<typeof trigger>()
+ 
+     expectTypeOf<
+       TypedUseLazyQueryStateResult<
+@@ -841,35 +839,35 @@ describe('"Typed" helper types', () => {
+         typeof baseQuery,
+         { x: boolean }
+       >
+-    >().toMatchTypeOf(result)
++    >().toExtend<typeof result>()
+   })
+ 
+   test('useLazyQuerySubscription', () => {
+     expectTypeOf<
+       TypedUseLazyQuerySubscription<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(api.endpoints.getTest.useLazyQuerySubscription)
++    >().toExtend<typeof api.endpoints.getTest.useLazyQuerySubscription>()
+ 
+     const [trigger] = api.endpoints.getTest.useLazyQuerySubscription()
+ 
+     expectTypeOf<
+       TypedLazyQueryTrigger<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(trigger)
++    >().toExtend<typeof trigger>()
+   })
+ 
+   test('useMutation', () => {
+-    expectTypeOf<
+-      TypedUseMutation<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(api.endpoints.mutation.useMutation)
++    expectTypeOf<TypedUseMutation<string, void, typeof baseQuery>>().toExtend<
++      typeof api.endpoints.mutation.useMutation
++    >()
+ 
+     const [trigger, result] = api.endpoints.mutation.useMutation()
+ 
+     expectTypeOf<
+       TypedMutationTrigger<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(trigger)
++    >().toExtend<typeof trigger>()
+ 
+     expectTypeOf<
+       TypedUseMutationResult<string, void, typeof baseQuery>
+-    >().toMatchTypeOf(result)
++    >().toExtend<typeof result>()
+   })
+ 
+   test('useQuery - defining selectFromResult separately', () => {
+diff --git a/packages/toolkit/src/tests/Tuple.test-d.ts b/packages/toolkit/src/tests/Tuple.test-d.ts
+index 9433634323..37eee23279 100644
+--- a/packages/toolkit/src/tests/Tuple.test-d.ts
++++ b/packages/toolkit/src/tests/Tuple.test-d.ts
+@@ -6,13 +6,13 @@ describe('type tests', () => {
+ 
+     expectTypeOf(stringTuple).toEqualTypeOf<Tuple<[string]>>()
+ 
+-    expectTypeOf(stringTuple).toMatchTypeOf<Tuple<string[]>>()
++    expectTypeOf(stringTuple).toExtend<Tuple<string[]>>()
+ 
+-    expectTypeOf(stringTuple).not.toMatchTypeOf<Tuple<[string, string]>>()
++    expectTypeOf(stringTuple).not.toExtend<Tuple<[string, string]>>()
+ 
+     const numberTuple = new Tuple(0, 1)
+ 
+-    expectTypeOf(numberTuple).not.toMatchTypeOf<Tuple<string[]>>()
++    expectTypeOf(numberTuple).not.toExtend<Tuple<string[]>>()
+   })
+ 
+   test('concat is inferred properly', () => {
+@@ -24,7 +24,7 @@ describe('type tests', () => {
+       Tuple<[string, string]>
+     >()
+ 
+-    expectTypeOf(singleString.concat([''] as const)).toMatchTypeOf<
++    expectTypeOf(singleString.concat([''] as const)).toExtend<
+       Tuple<[string, string]>
+     >()
+   })
+@@ -38,7 +38,7 @@ describe('type tests', () => {
+       Tuple<[string, string]>
+     >()
+ 
+-    expectTypeOf(singleString.prepend([''] as const)).toMatchTypeOf<
++    expectTypeOf(singleString.prepend([''] as const)).toExtend<
+       Tuple<[string, string]>
+     >()
+   })
+@@ -72,11 +72,11 @@ describe('type tests', () => {
+       Tuple<[string, number, number]>
+     >()
+ 
+-    expectTypeOf(stringTuple.prepend(numberTuple)).not.toMatchTypeOf<
++    expectTypeOf(stringTuple.prepend(numberTuple)).not.toExtend<
+       Tuple<[string, number, number]>
+     >()
+ 
+-    expectTypeOf(stringTuple.concat(numberTuple)).not.toMatchTypeOf<
++    expectTypeOf(stringTuple.concat(numberTuple)).not.toExtend<
+       Tuple<[number, number, string]>
+     >()
+   })
+diff --git a/packages/toolkit/src/tests/combineSlices.test-d.ts b/packages/toolkit/src/tests/combineSlices.test-d.ts
+index 5d25e00977..76149beab5 100644
+--- a/packages/toolkit/src/tests/combineSlices.test-d.ts
++++ b/packages/toolkit/src/tests/combineSlices.test-d.ts
+@@ -199,10 +199,10 @@ describe('type tests', () => {
+     expectTypeOf(selector).toBeCallableWith(state, 0)
+ 
+     // required argument
+-    expectTypeOf(selector).parameters.not.toMatchTypeOf([state])
++    expectTypeOf(selector).parameters.not.toExtend<[typeof state]>()
+ 
+     // number not string
+-    expectTypeOf(selector).parameters.not.toMatchTypeOf([state, ''])
++    expectTypeOf(selector).parameters.not.toExtend<[typeof state, string]>()
+   })
+ 
+   test('nested calls inferred correctly', () => {
+@@ -220,7 +220,7 @@ describe('type tests', () => {
+ 
+     type RootState = ReturnType<typeof outerReducer>
+ 
+-    expectTypeOf(outerReducer(undefined, { type: '' })).toMatchTypeOf<{
++    expectTypeOf(outerReducer(undefined, { type: '' })).toMatchObjectType<{
+       inner: { string: string }
+     }>()
+ 
+@@ -277,8 +277,6 @@ describe('type tests', () => {
+       number: number
+     }>()
+ 
+-    expectTypeOf(
+-      withNumber(undefined, { type: '' }).number,
+-    ).toMatchTypeOf<number>()
++    expectTypeOf(withNumber(undefined, { type: '' }).number).toBeNumber()
+   })
+ })
+diff --git a/packages/toolkit/src/tests/configureStore.test-d.ts b/packages/toolkit/src/tests/configureStore.test-d.ts
+index 2bf27f4bdc..8e7fa2ad1a 100644
+--- a/packages/toolkit/src/tests/configureStore.test-d.ts
++++ b/packages/toolkit/src/tests/configureStore.test-d.ts
+@@ -51,9 +51,9 @@ describe('type tests', () => {
+ 
+     const store = configureStore({ reducer })
+ 
+-    expectTypeOf(store).toMatchTypeOf<Store<number, UnknownAction>>()
++    expectTypeOf(store).toExtend<Store<number, UnknownAction>>()
+ 
+-    expectTypeOf(store).not.toMatchTypeOf<Store<string, UnknownAction>>()
++    expectTypeOf(store).not.toExtend<Store<string, UnknownAction>>()
+   })
+ 
+   test('configureStore() infers the store action type.', () => {
+@@ -61,11 +61,9 @@ describe('type tests', () => {
+ 
+     const store = configureStore({ reducer })
+ 
+-    expectTypeOf(store).toMatchTypeOf<Store<number, PayloadAction<number>>>()
++    expectTypeOf(store).toExtend<Store<number, PayloadAction<number>>>()
+ 
+-    expectTypeOf(store).not.toMatchTypeOf<
+-      Store<number, PayloadAction<string>>
+-    >()
++    expectTypeOf(store).not.toExtend<Store<number, PayloadAction<string>>>()
+   })
+ 
+   test('configureStore() accepts Tuple for middleware, but not plain array.', () => {
+@@ -150,7 +148,7 @@ describe('type tests', () => {
+       enhancers: () => [enhancer],
+     })
+ 
+-    expectTypeOf(store.dispatch).toMatchTypeOf<
++    expectTypeOf(store.dispatch).toExtend<
+       Dispatch & ThunkDispatch<number, undefined, UnknownAction>
+     >()
+ 
+@@ -202,7 +200,7 @@ describe('type tests', () => {
+           .concat(somePropertyStoreEnhancer),
+     })
+ 
+-    expectTypeOf(store3.dispatch).toMatchTypeOf<
++    expectTypeOf(store3.dispatch).toExtend<
+       Dispatch & ThunkDispatch<number, undefined, UnknownAction>
+     >()
+ 
+@@ -470,7 +468,7 @@ describe('type tests', () => {
+ 
+       const dispatchResult = store.dispatch(action)
+ 
+-      expectTypeOf(dispatchResult).toMatchTypeOf<{
++      expectTypeOf(dispatchResult).toExtend<{
+         type: string
+         payload: number
+       }>()
+@@ -495,7 +493,7 @@ describe('type tests', () => {
+ 
+       const dispatchResult2 = store2.dispatch(action)
+ 
+-      expectTypeOf(dispatchResult2).toMatchTypeOf<{
++      expectTypeOf(dispatchResult2).toExtend<{
+         type: string
+         payload: number
+       }>()
+@@ -507,9 +505,13 @@ describe('type tests', () => {
+         middleware: () => new Tuple(),
+       })
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkA())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkA>>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkB())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkB>>()
+     })
+ 
+     test('adding the thunk middleware by hand', () => {
+@@ -606,7 +608,9 @@ describe('type tests', () => {
+ 
+       expectTypeOf(store.dispatch(thunkA())).toEqualTypeOf<Promise<'A'>>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkB())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkB>>()
+     })
+ 
+     test('custom middleware and getDefaultMiddleware, using prepend', () => {
+@@ -618,7 +622,7 @@ describe('type tests', () => {
+         middleware: (gDM) => {
+           const concatenated = gDM().prepend(otherMiddleware)
+ 
+-          expectTypeOf(concatenated).toMatchTypeOf<
++          expectTypeOf(concatenated).toExtend<
+             ReadonlyArray<
+               typeof otherMiddleware | ThunkMiddleware | Middleware<{}>
+             >
+@@ -632,7 +636,9 @@ describe('type tests', () => {
+ 
+       expectTypeOf(store.dispatch(thunkA())).toEqualTypeOf<Promise<'A'>>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkB())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkB>>()
+     })
+ 
+     test('custom middleware and getDefaultMiddleware, using concat', () => {
+@@ -644,7 +650,7 @@ describe('type tests', () => {
+         middleware: (gDM) => {
+           const concatenated = gDM().concat(otherMiddleware)
+ 
+-          expectTypeOf(concatenated).toMatchTypeOf<
++          expectTypeOf(concatenated).toExtend<
+             ReadonlyArray<
+               typeof otherMiddleware | ThunkMiddleware | Middleware<{}>
+             >
+@@ -658,7 +664,9 @@ describe('type tests', () => {
+ 
+       expectTypeOf(store.dispatch(thunkA())).toEqualTypeOf<Promise<'A'>>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkB())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkB>>()
+     })
+ 
+     test('middlewareBuilder notation, getDefaultMiddleware (unconfigured)', () => {
+@@ -675,7 +683,9 @@ describe('type tests', () => {
+ 
+       expectTypeOf(store.dispatch(thunkA())).toEqualTypeOf<Promise<'A'>>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkB())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkB>>()
+     })
+ 
+     test('middlewareBuilder notation, getDefaultMiddleware, concat & prepend', () => {
+@@ -699,7 +709,9 @@ describe('type tests', () => {
+ 
+       expectTypeOf(store.dispatch('b')).toEqualTypeOf<'B'>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkB())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkB>>()
+     })
+ 
+     test('middlewareBuilder notation, getDefaultMiddleware (thunk: false)', () => {
+@@ -713,7 +725,9 @@ describe('type tests', () => {
+ 
+       expectTypeOf(store.dispatch('a')).toEqualTypeOf<'A'>()
+ 
+-      expectTypeOf(store.dispatch).parameter(0).not.toMatchTypeOf(thunkA())
++      expectTypeOf(store.dispatch)
++        .parameter(0)
++        .not.toExtend<ReturnType<typeof thunkA>>()
+     })
+ 
+     test("badly typed middleware won't make `dispatch` `any`", () => {
+diff --git a/packages/toolkit/src/tests/createAction.test-d.tsx b/packages/toolkit/src/tests/createAction.test-d.tsx
+index c7af7ffab2..c429198e72 100644
+--- a/packages/toolkit/src/tests/createAction.test-d.tsx
++++ b/packages/toolkit/src/tests/createAction.test-d.tsx
+@@ -23,7 +23,7 @@ describe('type tests', () => {
+     })
+ 
+     test('PayloadAction type parameter is required.', () => {
+-      expectTypeOf({ type: '', payload: 5 }).not.toMatchTypeOf<PayloadAction>()
++      expectTypeOf({ type: '', payload: 5 }).not.toExtend<PayloadAction>()
+     })
+ 
+     test('PayloadAction has a string type tag.', () => {
+@@ -31,13 +31,13 @@ describe('type tests', () => {
+         PayloadAction<number>
+       >()
+ 
+-      expectTypeOf({ type: 1, payload: 5 }).not.toMatchTypeOf<PayloadAction>()
++      expectTypeOf({ type: 1, payload: 5 }).not.toExtend<PayloadAction>()
+     })
+ 
+     test('PayloadAction is compatible with Action<string>', () => {
+       const action: PayloadAction<number> = { type: '', payload: 5 }
+ 
+-      expectTypeOf(action).toMatchTypeOf<Action<string>>()
++      expectTypeOf(action).toMatchObjectType<Action<string>>()
+     })
+   })
+ 
+@@ -63,11 +63,9 @@ describe('type tests', () => {
+         PayloadAction<number | undefined>
+       >()
+ 
+-      expectTypeOf(actionCreator()).not.toMatchTypeOf<PayloadAction<number>>()
++      expectTypeOf(actionCreator()).not.toExtend<PayloadAction<number>>()
+ 
+-      expectTypeOf(actionCreator(1)).not.toMatchTypeOf<
+-        PayloadAction<undefined>
+-      >()
++      expectTypeOf(actionCreator(1)).not.toExtend<PayloadAction<undefined>>()
+     })
+ 
+     test('PayloadActionCreator is compatible with ActionCreator.', () => {
+@@ -79,7 +77,7 @@ describe('type tests', () => {
+         { type: 'action' },
+       ) as PayloadActionCreator
+ 
+-      expectTypeOf(payloadActionCreator).toMatchTypeOf<
++      expectTypeOf(payloadActionCreator).toExtend<
+         ActionCreator<UnknownAction>
+       >()
+ 
+@@ -91,7 +89,7 @@ describe('type tests', () => {
+         { type: 'action' },
+       ) as PayloadActionCreator<number>
+ 
+-      expectTypeOf(payloadActionCreator2).toMatchTypeOf<
++      expectTypeOf(payloadActionCreator2).toExtend<
+         ActionCreator<PayloadAction<number>>
+       >()
+     })
+@@ -120,7 +118,7 @@ describe('type tests', () => {
+ 
+     expectTypeOf(increment(1).type).toEqualTypeOf<'increment'>()
+ 
+-    expectTypeOf(increment(1).type).not.toMatchTypeOf<'other'>()
++    expectTypeOf(increment(1).type).not.toExtend<'other'>()
+ 
+     expectTypeOf(increment(1).type).not.toBeNumber()
+   })
+@@ -189,7 +187,7 @@ describe('type tests', () => {
+ 
+     expectTypeOf(action({ input: '' }).payload.input).not.toBeNumber()
+ 
+-    expectTypeOf(action).parameter(0).not.toMatchTypeOf({ input: 3 })
++    expectTypeOf(action).parameter(0).not.toExtend<{ input: number }>()
+   })
+ 
+   test('regression test for https://github.com/reduxjs/redux-toolkit/issues/224', () => {
+@@ -217,7 +215,7 @@ describe('type tests', () => {
+ 
+         expectTypeOf(x.payload).toBeString()
+       } else {
+-        expectTypeOf(x.type).not.toMatchTypeOf<'test'>()
++        expectTypeOf(x.type).not.toExtend<'test'>()
+ 
+         expectTypeOf(x).not.toHaveProperty('payload')
+       }
+@@ -243,7 +241,7 @@ describe('type tests', () => {
+       if (actionCreator.match(x)) {
+         expectTypeOf(x.type).toEqualTypeOf<'test'>()
+ 
+-        expectTypeOf(x.payload).not.toMatchTypeOf<{}>()
++        expectTypeOf(x.payload).not.toExtend<{}>()
+       }
+     })
+ 
+diff --git a/packages/toolkit/src/tests/createAsyncThunk.test-d.ts b/packages/toolkit/src/tests/createAsyncThunk.test-d.ts
+index 19163f50a0..4dd98bf847 100644
+--- a/packages/toolkit/src/tests/createAsyncThunk.test-d.ts
++++ b/packages/toolkit/src/tests/createAsyncThunk.test-d.ts
+@@ -1,5 +1,7 @@
++import type { TSVersion } from '@phryneas/ts-version'
+ import type {
+   AsyncThunk,
++  AsyncThunkDispatchConfig,
+   SerializedError,
+   ThunkDispatch,
+   UnknownAction,
+@@ -11,11 +13,8 @@ import {
+   createSlice,
+   unwrapResult,
+ } from '@reduxjs/toolkit'
+-
+-import type { TSVersion } from '@phryneas/ts-version'
+ import type { AxiosError } from 'axios'
+ import apiRequest from 'axios'
+-import type { AsyncThunkDispatchConfig } from '@internal/createAsyncThunk'
+ 
+ const defaultDispatch = (() => {}) as ThunkDispatch<{}, any, UnknownAction>
+ const unknownAction = { type: 'foo' } as UnknownAction
+@@ -47,7 +46,7 @@ describe('type tests', () => {
+             ReturnType<(typeof asyncThunk)['rejected']>
+           >()
+ 
+-          expectTypeOf(action.error).toMatchTypeOf<Partial<Error> | undefined>()
++          expectTypeOf(action.error).toExtend<Partial<Error> | undefined>()
+         }),
+     )
+ 
+@@ -76,7 +75,7 @@ describe('type tests', () => {
+       .then((result) => {
+         expectTypeOf(result).toBeNumber()
+ 
+-        expectTypeOf(result).not.toMatchTypeOf<Error>()
++        expectTypeOf(result).not.toExtend<Error>()
+       })
+       .catch((error) => {
+         // catch is always any-typed, nothing we can do here
+@@ -156,7 +155,7 @@ describe('type tests', () => {
+ 
+     expectTypeOf(unwrapResult(returned)).toEqualTypeOf<ReturnValue>()
+ 
+-    expectTypeOf(unwrapResult(returned)).not.toMatchTypeOf<RejectValue>()
++    expectTypeOf(unwrapResult(returned)).not.toExtend<RejectValue>()
+   })
+ 
+   test('regression #1156: union return values fall back to allowing only single member', () => {
+@@ -259,7 +258,9 @@ describe('type tests', () => {
+         .then((unwrapped) => {
+           expectTypeOf(unwrapped).toEqualTypeOf<Item[]>()
+ 
+-          expectTypeOf(unwrapResult).parameter(0).not.toMatchTypeOf(unwrapped)
++          expectTypeOf(unwrapResult)
++            .parameter(0)
++            .not.toExtend<typeof unwrapped>()
+         })
+     })
+   })
+@@ -268,7 +269,7 @@ describe('type tests', () => {
+     test('asyncThunk has no argument', () => {
+       const asyncThunk = createAsyncThunk('test', () => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<() => any>()
++      expectTypeOf(asyncThunk).toExtend<() => any>()
+ 
+       expectTypeOf(asyncThunk).parameters.toEqualTypeOf<
+         [undefined?, AsyncThunkDispatchConfig?]
+@@ -280,7 +281,7 @@ describe('type tests', () => {
+     test('one argument, specified as undefined: asyncThunk has no argument', () => {
+       const asyncThunk = createAsyncThunk('test', (arg: undefined) => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<() => any>()
++      expectTypeOf(asyncThunk).toExtend<() => any>()
+ 
+       expectTypeOf(asyncThunk).parameters.toEqualTypeOf<
+         [undefined?, AsyncThunkDispatchConfig?]
+@@ -290,7 +291,7 @@ describe('type tests', () => {
+     test('one argument, specified as void: asyncThunk has no argument', () => {
+       const asyncThunk = createAsyncThunk('test', (arg: void) => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<() => any>()
++      expectTypeOf(asyncThunk).toExtend<() => any>()
+     })
+ 
+     test('one argument, specified as optional number: asyncThunk has optional number argument', () => {
+@@ -310,14 +311,14 @@ describe('type tests', () => {
+         ? (arg: number) => any
+         : (arg?: number) => any
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<expectedType>()
++      expectTypeOf(asyncThunk).toExtend<expectedType>()
+ 
+       // We _should_ be able to call this with no arguments, but we run into that error in 5.1 and 5.2.
+       // Disabling this for now.
+       // asyncThunk()
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[string]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[string]>()
+     })
+ 
+     test('one argument, specified as number|undefined: asyncThunk has optional number argument', () => {
+@@ -328,7 +329,7 @@ describe('type tests', () => {
+         (arg: number | undefined) => 0,
+       )
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<(arg?: number) => any>()
++      expectTypeOf(asyncThunk).toExtend<(arg?: number) => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith()
+ 
+@@ -336,13 +337,13 @@ describe('type tests', () => {
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[string]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[string]>()
+     })
+ 
+     test('one argument, specified as number|void: asyncThunk has optional number argument', () => {
+       const asyncThunk = createAsyncThunk('test', (arg: number | void) => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<(arg?: number) => any>()
++      expectTypeOf(asyncThunk).toExtend<(arg?: number) => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith()
+ 
+@@ -350,7 +351,7 @@ describe('type tests', () => {
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[string]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[string]>()
+     })
+ 
+     test('one argument, specified as any: asyncThunk has required any argument', () => {
+@@ -360,7 +361,7 @@ describe('type tests', () => {
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[]>()
+     })
+ 
+     test('one argument, specified as unknown: asyncThunk has required unknown argument', () => {
+@@ -370,17 +371,17 @@ describe('type tests', () => {
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[]>()
+     })
+ 
+     test('one argument, specified as number: asyncThunk has required number argument', () => {
+       const asyncThunk = createAsyncThunk('test', (arg: number) => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<(arg: number) => any>()
++      expectTypeOf(asyncThunk).toExtend<(arg: number) => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[]>()
+     })
+ 
+     test('two arguments, first specified as undefined: asyncThunk has no argument', () => {
+@@ -389,7 +390,7 @@ describe('type tests', () => {
+         (arg: undefined, thunkApi) => 0,
+       )
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<() => any>()
++      expectTypeOf(asyncThunk).toExtend<() => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith()
+ 
+@@ -406,7 +407,7 @@ describe('type tests', () => {
+     test('two arguments, first specified as void: asyncThunk has no argument', () => {
+       const asyncThunk = createAsyncThunk('test', (arg: void, thunkApi) => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<() => any>()
++      expectTypeOf(asyncThunk).toExtend<() => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith()
+ 
+@@ -428,7 +429,7 @@ describe('type tests', () => {
+         (arg: number | undefined, thunkApi) => 0,
+       )
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<(arg?: number) => any>()
++      expectTypeOf(asyncThunk).toExtend<(arg?: number) => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith()
+ 
+@@ -445,7 +446,7 @@ describe('type tests', () => {
+         (arg: number | void, thunkApi) => 0,
+       )
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<(arg?: number) => any>()
++      expectTypeOf(asyncThunk).toExtend<(arg?: number) => any>()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith()
+ 
+@@ -463,7 +464,7 @@ describe('type tests', () => {
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[]>()
+     })
+ 
+     test('two arguments, first specified as unknown: asyncThunk has required unknown argument', () => {
+@@ -473,19 +474,19 @@ describe('type tests', () => {
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[]>()
+     })
+ 
+     test('two arguments, first specified as number: asyncThunk has required number argument', () => {
+       const asyncThunk = createAsyncThunk('test', (arg: number, thunkApi) => 0)
+ 
+-      expectTypeOf(asyncThunk).toMatchTypeOf<(arg: number) => any>()
++      expectTypeOf(asyncThunk).toExtend<(arg: number) => any>()
+ 
+       expectTypeOf(asyncThunk).parameter(0).toBeNumber()
+ 
+       expectTypeOf(asyncThunk).toBeCallableWith(5)
+ 
+-      expectTypeOf(asyncThunk).parameters.not.toMatchTypeOf<[]>()
++      expectTypeOf(asyncThunk).parameters.not.toExtend<[]>()
+     })
+   })
+ 
+diff --git a/packages/toolkit/src/tests/createEntityAdapter.test-d.ts b/packages/toolkit/src/tests/createEntityAdapter.test-d.ts
+index 0e8a4c54f4..958cb8ad13 100644
+--- a/packages/toolkit/src/tests/createEntityAdapter.test-d.ts
++++ b/packages/toolkit/src/tests/createEntityAdapter.test-d.ts
+@@ -31,71 +31,71 @@ describe('type tests', () => {
+       },
+     })
+ 
+-    expectTypeOf(slice.actions.addOne).toMatchTypeOf<
++    expectTypeOf(slice.actions.addOne).toExtend<
+       ActionCreatorWithPayload<Entity>
+     >()
+ 
+-    expectTypeOf(slice.actions.addMany).toMatchTypeOf<
++    expectTypeOf(slice.actions.addMany).toExtend<
+       ActionCreatorWithPayload<ReadonlyArray<Entity> | Record<string, Entity>>
+     >()
+ 
+-    expectTypeOf(slice.actions.setAll).toMatchTypeOf<
++    expectTypeOf(slice.actions.setAll).toExtend<
+       ActionCreatorWithPayload<ReadonlyArray<Entity> | Record<string, Entity>>
+     >()
+ 
+-    expectTypeOf(slice.actions.removeOne).toMatchTypeOf<
++    expectTypeOf(slice.actions.removeOne).toExtend<
+       ActionCreatorWithPayload<Id>
+     >()
+ 
+-    expectTypeOf(slice.actions.addMany).not.toMatchTypeOf<
++    expectTypeOf(slice.actions.addMany).not.toExtend<
+       ActionCreatorWithPayload<Entity[] | Record<string, Entity>>
+     >()
+ 
+-    expectTypeOf(slice.actions.setAll).not.toMatchTypeOf<
++    expectTypeOf(slice.actions.setAll).not.toExtend<
+       ActionCreatorWithPayload<ReadonlyArray<Id>>
+     >()
+ 
+-    expectTypeOf(slice.actions.removeOne).toMatchTypeOf<
++    expectTypeOf(slice.actions.removeOne).toExtend<
+       ActionCreatorWithPayload<Id>
+     >()
+ 
+-    expectTypeOf(slice.actions.removeMany).toMatchTypeOf<
++    expectTypeOf(slice.actions.removeMany).toExtend<
+       ActionCreatorWithPayload<ReadonlyArray<Id>>
+     >()
+ 
+-    expectTypeOf(slice.actions.removeMany).not.toMatchTypeOf<
++    expectTypeOf(slice.actions.removeMany).not.toExtend<
+       ActionCreatorWithPayload<EntityId[]>
+     >()
+ 
+     expectTypeOf(
+       slice.actions.removeAll,
+-    ).toMatchTypeOf<ActionCreatorWithoutPayload>()
++    ).toExtend<ActionCreatorWithoutPayload>()
+ 
+-    expectTypeOf(slice.actions.updateOne).toMatchTypeOf<
++    expectTypeOf(slice.actions.updateOne).toExtend<
+       ActionCreatorWithPayload<Update<Entity, Id>>
+     >()
+ 
+-    expectTypeOf(slice.actions.updateMany).not.toMatchTypeOf<
++    expectTypeOf(slice.actions.updateMany).not.toExtend<
+       ActionCreatorWithPayload<Update<Entity, Id>[]>
+     >()
+ 
+-    expectTypeOf(slice.actions.upsertOne).toMatchTypeOf<
++    expectTypeOf(slice.actions.upsertOne).toExtend<
+       ActionCreatorWithPayload<Entity>
+     >()
+ 
+-    expectTypeOf(slice.actions.updateMany).toMatchTypeOf<
++    expectTypeOf(slice.actions.updateMany).toExtend<
+       ActionCreatorWithPayload<ReadonlyArray<Update<Entity, Id>>>
+     >()
+ 
+-    expectTypeOf(slice.actions.upsertOne).toMatchTypeOf<
++    expectTypeOf(slice.actions.upsertOne).toExtend<
+       ActionCreatorWithPayload<Entity>
+     >()
+ 
+-    expectTypeOf(slice.actions.upsertMany).toMatchTypeOf<
++    expectTypeOf(slice.actions.upsertMany).toExtend<
+       ActionCreatorWithPayload<ReadonlyArray<Entity> | Record<string, Entity>>
+     >()
+ 
+-    expectTypeOf(slice.actions.upsertMany).not.toMatchTypeOf<
++    expectTypeOf(slice.actions.upsertMany).not.toExtend<
+       ActionCreatorWithPayload<Entity[] | Record<string, Entity>>
+     >()
+   })
+diff --git a/packages/toolkit/src/tests/createReducer.test-d.ts b/packages/toolkit/src/tests/createReducer.test-d.ts
+index cfc0c899fb..41dea6d629 100644
+--- a/packages/toolkit/src/tests/createReducer.test-d.ts
++++ b/packages/toolkit/src/tests/createReducer.test-d.ts
+@@ -19,9 +19,9 @@ describe('type tests', () => {
+         .addCase('decrement', decrementHandler)
+     })
+ 
+-    expectTypeOf(reducer).toMatchTypeOf<Reducer<number>>()
++    expectTypeOf(reducer).toExtend<Reducer<number>>()
+ 
+-    expectTypeOf(reducer).not.toMatchTypeOf<Reducer<string>>()
++    expectTypeOf(reducer).not.toExtend<Reducer<string>>()
+   })
+ 
+   test('createReducer() state type can be specified explicitly.', () => {
+@@ -45,11 +45,11 @@ describe('type tests', () => {
+     createReducer<string>(0 as number, (builder) => {
+       expectTypeOf(builder.addCase)
+         .parameter(1)
+-        .not.toMatchTypeOf(incrementHandler)
++        .not.toExtend<typeof incrementHandler>()
+ 
+       expectTypeOf(builder.addCase)
+         .parameter(1)
+-        .not.toMatchTypeOf(decrementHandler)
++        .not.toExtend<typeof decrementHandler>()
+     })
+   })
+ 
+diff --git a/packages/toolkit/src/tests/createSlice.test-d.ts b/packages/toolkit/src/tests/createSlice.test-d.ts
+index 8666497007..a8a182652c 100644
+--- a/packages/toolkit/src/tests/createSlice.test-d.ts
++++ b/packages/toolkit/src/tests/createSlice.test-d.ts
+@@ -15,7 +15,6 @@ import type {
+   SerializedError,
+   SliceCaseReducers,
+   ThunkDispatch,
+-  UnknownAction,
+   ValidateSliceCaseReducers,
+ } from '@reduxjs/toolkit'
+ import {
+@@ -80,13 +79,9 @@ describe('type tests', () => {
+     })
+ 
+     test('Reducer', () => {
+-      expectTypeOf(slice.reducer).toMatchTypeOf<
+-        Reducer<number, PayloadAction>
+-      >()
++      expectTypeOf(slice.reducer).toExtend<Reducer<number, PayloadAction>>()
+ 
+-      expectTypeOf(slice.reducer).not.toMatchTypeOf<
+-        Reducer<string, PayloadAction>
+-      >()
++      expectTypeOf(slice.reducer).not.toExtend<Reducer<string, PayloadAction>>()
+     })
+ 
+     test('Actions', () => {
+@@ -122,37 +117,35 @@ describe('type tests', () => {
+ 
+     expectTypeOf(
+       counter.actions.increment,
+-    ).toMatchTypeOf<ActionCreatorWithoutPayload>()
++    ).toExtend<ActionCreatorWithoutPayload>()
+ 
+     counter.actions.increment()
+ 
+-    expectTypeOf(counter.actions.decrement).toMatchTypeOf<
++    expectTypeOf(counter.actions.decrement).toExtend<
+       ActionCreatorWithOptionalPayload<number | undefined>
+     >()
+ 
+     counter.actions.decrement()
+     counter.actions.decrement(2)
+ 
+-    expectTypeOf(counter.actions.multiply).toMatchTypeOf<
++    expectTypeOf(counter.actions.multiply).toExtend<
+       ActionCreatorWithPayload<number | number[]>
+     >()
+ 
+     counter.actions.multiply(2)
+     counter.actions.multiply([2, 3, 4])
+ 
+-    expectTypeOf(counter.actions.addTwo).toMatchTypeOf<
++    expectTypeOf(counter.actions.addTwo).toExtend<
+       ActionCreatorWithPreparedPayload<[number, number], number>
+     >()
+ 
+     counter.actions.addTwo(1, 2)
+ 
+-    expectTypeOf(counter.actions.multiply).parameters.not.toMatchTypeOf<[]>()
++    expectTypeOf(counter.actions.multiply).parameters.not.toExtend<[]>()
+ 
+     expectTypeOf(counter.actions.multiply).parameter(0).not.toBeString()
+ 
+-    expectTypeOf(counter.actions.addTwo).parameters.not.toMatchTypeOf<
+-      [number]
+-    >()
++    expectTypeOf(counter.actions.addTwo).parameters.not.toExtend<[number]>()
+ 
+     expectTypeOf(counter.actions.addTwo).parameters.toEqualTypeOf<
+       [number, number]
+@@ -197,9 +190,7 @@ describe('type tests', () => {
+       counter.actions.multiply(1).type,
+     ).toEqualTypeOf<'counter/multiply'>()
+ 
+-    expectTypeOf(
+-      counter.actions.increment.type,
+-    ).not.toMatchTypeOf<'increment'>()
++    expectTypeOf(counter.actions.increment.type).not.toExtend<'increment'>()
+   })
+ 
+   test('Slice action creator types are inferred for enhanced reducers.', () => {
+@@ -323,25 +314,25 @@ describe('type tests', () => {
+     })
+ 
+     test('Should match positively', () => {
+-      expectTypeOf(counter.caseReducers.increment).toMatchTypeOf<
++      expectTypeOf(counter.caseReducers.increment).toExtend<
+         (state: number, action: PayloadAction<number>) => number | void
+       >()
+     })
+ 
+     test('Should match positively for reducers with prepare callback', () => {
+-      expectTypeOf(counter.caseReducers.decrement).toMatchTypeOf<
++      expectTypeOf(counter.caseReducers.decrement).toExtend<
+         (state: number, action: PayloadAction<number>) => number | void
+       >()
+     })
+ 
+     test("Should not mismatch the payload if it's a simple reducer", () => {
+-      expectTypeOf(counter.caseReducers.increment).not.toMatchTypeOf<
++      expectTypeOf(counter.caseReducers.increment).not.toExtend<
+         (state: number, action: PayloadAction<string>) => number | void
+       >()
+     })
+ 
+     test("Should not mismatch the payload if it's a reducer with a prepare callback", () => {
+-      expectTypeOf(counter.caseReducers.decrement).not.toMatchTypeOf<
++      expectTypeOf(counter.caseReducers.decrement).not.toExtend<
+         (state: number, action: PayloadAction<string>) => number | void
+       >()
+     })
+@@ -392,7 +383,7 @@ describe('type tests', () => {
+ 
+     expectTypeOf(
+       mySlice.actions.setName,
+-    ).toMatchTypeOf<ActionCreatorWithNonInferrablePayload>()
++    ).toExtend<ActionCreatorWithNonInferrablePayload>()
+ 
+     const x = mySlice.actions.setName
+ 
+@@ -418,7 +409,7 @@ describe('type tests', () => {
+ 
+       expectTypeOf(x.payload).toBeString()
+     } else {
+-      expectTypeOf(x.type).not.toMatchTypeOf<'name/setName'>()
++      expectTypeOf(x.type).not.toExtend<'name/setName'>()
+ 
+       expectTypeOf(x).not.toHaveProperty('payload')
+     }
+@@ -476,7 +467,7 @@ describe('type tests', () => {
+         magic(state) {
+           expectTypeOf(state).toEqualTypeOf<GenericState<string>>()
+ 
+-          expectTypeOf(state).not.toMatchTypeOf<GenericState<number>>()
++          expectTypeOf(state).not.toExtend<GenericState<number>>()
+ 
+           state.status = 'finished'
+           state.data = 'hocus pocus'
+@@ -484,11 +475,11 @@ describe('type tests', () => {
+       },
+     })
+ 
+-    expectTypeOf(wrappedSlice.actions.success).toMatchTypeOf<
++    expectTypeOf(wrappedSlice.actions.success).toExtend<
+       ActionCreatorWithPayload<string>
+     >()
+ 
+-    expectTypeOf(wrappedSlice.actions.magic).toMatchTypeOf<
++    expectTypeOf(wrappedSlice.actions.magic).toExtend<
+       ActionCreatorWithoutPayload<string>
+     >()
+   })
+@@ -732,7 +723,7 @@ describe('type tests', () => {
+               // here would be a circular reference
+               expectTypeOf(api.getState()).toBeUnknown()
+               // here would be a circular reference
+-              expectTypeOf(api.dispatch).toMatchTypeOf<
++              expectTypeOf(api.dispatch).toExtend<
+                 ThunkDispatch<any, any, any>
+               >()
+ 
+@@ -742,7 +733,7 @@ describe('type tests', () => {
+ 
+               expectTypeOf(arg).toEqualTypeOf<TestArg>()
+ 
+-              expectTypeOf(api.rejectWithValue).toMatchTypeOf<
++              expectTypeOf(api.rejectWithValue).toExtend<
+                 (value: TestReject) => any
+               >()
+ 
+@@ -791,7 +782,7 @@ describe('type tests', () => {
+           ),
+           testPreTyped: preTypedAsyncThunk(
+             function payloadCreator(arg: TestArg, api) {
+-              expectTypeOf(api.rejectWithValue).toMatchTypeOf<
++              expectTypeOf(api.rejectWithValue).toExtend<
+                 (value: TestReject) => any
+               >()
+ 
+@@ -848,19 +839,19 @@ describe('type tests', () => {
+ 
+     type StoreDispatch = typeof store.dispatch
+ 
+-    expectTypeOf(slice.actions.normalReducer).toMatchTypeOf<
++    expectTypeOf(slice.actions.normalReducer).toExtend<
+       PayloadActionCreator<string>
+     >()
+ 
+     expectTypeOf(slice.actions.normalReducer).toBeCallableWith('')
+ 
+-    expectTypeOf(slice.actions.normalReducer).parameters.not.toMatchTypeOf<[]>()
++    expectTypeOf(slice.actions.normalReducer).parameters.not.toExtend<[]>()
+ 
+-    expectTypeOf(slice.actions.normalReducer).parameters.not.toMatchTypeOf<
++    expectTypeOf(slice.actions.normalReducer).parameters.not.toExtend<
+       [number]
+     >()
+ 
+-    expectTypeOf(slice.actions.optionalReducer).toMatchTypeOf<
++    expectTypeOf(slice.actions.optionalReducer).toExtend<
+       ActionCreatorWithOptionalPayload<string | undefined>
+     >()
+ 
+@@ -872,7 +863,7 @@ describe('type tests', () => {
+ 
+     expectTypeOf(
+       slice.actions.noActionReducer,
+-    ).toMatchTypeOf<ActionCreatorWithoutPayload>()
++    ).toExtend<ActionCreatorWithoutPayload>()
+ 
+     expectTypeOf(slice.actions.noActionReducer).toBeCallableWith()
+ 
+@@ -958,7 +949,7 @@ describe('type tests', () => {
+         magic: create.reducer((state) => {
+           expectTypeOf(state).toEqualTypeOf<GenericState<string>>()
+ 
+-          expectTypeOf(state).not.toMatchTypeOf<GenericState<number>>()
++          expectTypeOf(state).not.toExtend<GenericState<number>>()
+ 
+           state.status = 'finished'
+           state.data = 'hocus pocus'
+@@ -966,11 +957,11 @@ describe('type tests', () => {
+       }),
+     })
+ 
+-    expectTypeOf(wrappedSlice.actions.success).toMatchTypeOf<
++    expectTypeOf(wrappedSlice.actions.success).toExtend<
+       ActionCreatorWithPayload<string>
+     >()
+ 
+-    expectTypeOf(wrappedSlice.actions.magic).toMatchTypeOf<
++    expectTypeOf(wrappedSlice.actions.magic).toExtend<
+       ActionCreatorWithoutPayload<string>
+     >()
+   })
+@@ -978,8 +969,8 @@ describe('type tests', () => {
+   test('selectSlice', () => {
+     expectTypeOf(counterSlice.selectSlice({ counter: 0 })).toBeNumber()
+ 
+-    // We use `not.toEqualTypeOf` instead of `not.toMatchTypeOf`
+-    // because `toMatchTypeOf` allows missing properties
++    // We use `not.toEqualTypeOf` instead of `not.toMatchObjectType`
++    // because `toMatchObjectType` allows missing properties
+     expectTypeOf(counterSlice.selectSlice).parameter(0).not.toEqualTypeOf<{}>()
+   })
+ 
+diff --git a/packages/toolkit/src/tests/getDefaultMiddleware.test-d.ts b/packages/toolkit/src/tests/getDefaultMiddleware.test-d.ts
+index 50680a09ce..56577369c2 100644
+--- a/packages/toolkit/src/tests/getDefaultMiddleware.test-d.ts
++++ b/packages/toolkit/src/tests/getDefaultMiddleware.test-d.ts
+@@ -133,7 +133,7 @@ describe('type tests', () => {
+       thunk: false,
+     })
+ 
+-    expectTypeOf(m2).toMatchTypeOf<Tuple<[]>>()
++    expectTypeOf(m2).toExtend<Tuple<[]>>()
+ 
+     const dummyMiddleware: Middleware<
+       {
+@@ -170,7 +170,7 @@ describe('type tests', () => {
+ 
+         const m3 = middleware.concat(dummyMiddleware, dummyMiddleware2)
+ 
+-        expectTypeOf(m3).toMatchTypeOf<
++        expectTypeOf(m3).toExtend<
+           Tuple<
+             [
+               ThunkMiddleware<any, UnknownAction, 42>,
+@@ -190,7 +190,7 @@ describe('type tests', () => {
+       },
+     })
+ 
+-    expectTypeOf(store.dispatch).toMatchTypeOf<
++    expectTypeOf(store.dispatch).toExtend<
+       ThunkDispatch<any, 42, UnknownAction> & Dispatch<UnknownAction>
+     >()
+ 
+diff --git a/packages/toolkit/src/tests/mapBuilders.test-d.ts b/packages/toolkit/src/tests/mapBuilders.test-d.ts
+index d2ec028ccf..938b103fd9 100644
+--- a/packages/toolkit/src/tests/mapBuilders.test-d.ts
++++ b/packages/toolkit/src/tests/mapBuilders.test-d.ts
+@@ -1,7 +1,6 @@
+-import type { SerializedError } from '@internal/createAsyncThunk'
+ import { createAsyncThunk } from '@internal/createAsyncThunk'
+ import { executeReducerBuilderCallback } from '@internal/mapBuilders'
+-import type { UnknownAction } from '@reduxjs/toolkit'
++import type { SerializedError, UnknownAction } from '@reduxjs/toolkit'
+ import { createAction } from '@reduxjs/toolkit'
+ 
+ describe('type tests', () => {
+@@ -21,12 +20,12 @@ describe('type tests', () => {
+ 
+         expectTypeOf(state).not.toBeString()
+ 
+-        expectTypeOf(action).not.toMatchTypeOf<{
++        expectTypeOf(action).not.toExtend<{
+           type: 'increment'
+           payload: string
+         }>()
+ 
+-        expectTypeOf(action).not.toMatchTypeOf<{
++        expectTypeOf(action).not.toExtend<{
+           type: 'decrement'
+           payload: number
+         }>()
+@@ -39,10 +38,10 @@ describe('type tests', () => {
+ 
+         expectTypeOf(state).not.toBeString()
+ 
+-        expectTypeOf(action).not.toMatchTypeOf<{ type: 'decrement' }>()
++        expectTypeOf(action).not.toExtend<{ type: 'decrement' }>()
+ 
+         // this cannot be inferred and has to be manually specified
+-        expectTypeOf(action).not.toMatchTypeOf<{
++        expectTypeOf(action).not.toExtend<{
+           type: 'increment'
+           payload: number
+         }>()
+@@ -83,9 +82,11 @@ describe('type tests', () => {
+         builder.addMatcher(
+           (action): action is PredicateWithoutTypeProperty => true,
+           (state, action) => {
+-            expectTypeOf(action).toMatchTypeOf<PredicateWithoutTypeProperty>()
++            expectTypeOf(
++              action,
++            ).toMatchObjectType<PredicateWithoutTypeProperty>()
+ 
+-            expectTypeOf(action).toMatchTypeOf<UnknownAction>()
++            expectTypeOf(action).toExtend<UnknownAction>()
+           },
+         )
+       })
+@@ -94,7 +95,7 @@ describe('type tests', () => {
+       builder.addMatcher(
+         () => true,
+         (state, action) => {
+-          expectTypeOf(action).toMatchTypeOf<UnknownAction>()
++          expectTypeOf(action).toExtend<UnknownAction>()
+         },
+       )
+ 
+@@ -102,9 +103,9 @@ describe('type tests', () => {
+       builder.addMatcher<{ foo: boolean }>(
+         () => true,
+         (state, action) => {
+-          expectTypeOf(action).toMatchTypeOf<{ foo: boolean }>()
++          expectTypeOf(action).toMatchObjectType<{ foo: boolean }>()
+ 
+-          expectTypeOf(action).toMatchTypeOf<UnknownAction>()
++          expectTypeOf(action).toExtend<UnknownAction>()
+         },
+       )
+ 
+@@ -125,7 +126,7 @@ describe('type tests', () => {
+           (state, action: ReturnType<typeof increment>) => state,
+         )
+         .addDefaultCase((state, action) => {
+-          expectTypeOf(action).toMatchTypeOf<UnknownAction>()
++          expectTypeOf(action).toExtend<UnknownAction>()
+         })
+ 
+       test('addAsyncThunk() should prevent further calls to addCase() ', () => {
+@@ -175,7 +176,7 @@ describe('type tests', () => {
+             return 'ret' as const
+           })
+           builder.addCase(thunk.pending, (_, action) => {
+-            expectTypeOf(action).toMatchTypeOf<{
++            expectTypeOf(action).toMatchObjectType<{
+               payload: undefined
+               meta: {
+                 arg: void
+@@ -186,7 +187,7 @@ describe('type tests', () => {
+           })
+ 
+           builder.addCase(thunk.rejected, (_, action) => {
+-            expectTypeOf(action).toMatchTypeOf<{
++            expectTypeOf(action).toExtend<{
+               payload: unknown
+               error: SerializedError
+               meta: {
+@@ -200,7 +201,7 @@ describe('type tests', () => {
+             }>()
+           })
+           builder.addCase(thunk.fulfilled, (_, action) => {
+-            expectTypeOf(action).toMatchTypeOf<{
++            expectTypeOf(action).toMatchObjectType<{
+               payload: 'ret'
+               meta: {
+                 arg: void
+@@ -212,7 +213,7 @@ describe('type tests', () => {
+ 
+           builder.addAsyncThunk(thunk, {
+             pending(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<{
++              expectTypeOf(action).toMatchObjectType<{
+                 payload: undefined
+                 meta: {
+                   arg: void
+@@ -222,7 +223,7 @@ describe('type tests', () => {
+               }>()
+             },
+             rejected(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<{
++              expectTypeOf(action).toExtend<{
+                 payload: unknown
+                 error: SerializedError
+                 meta: {
+@@ -236,7 +237,7 @@ describe('type tests', () => {
+               }>()
+             },
+             fulfilled(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<{
++              expectTypeOf(action).toMatchObjectType<{
+                 payload: 'ret'
+                 meta: {
+                   arg: void
+@@ -246,7 +247,7 @@ describe('type tests', () => {
+               }>()
+             },
+             settled(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<
++              expectTypeOf(action).toExtend<
+                 | {
+                     payload: 'ret'
+                     meta: {
+@@ -302,7 +303,7 @@ describe('type tests', () => {
+           )
+ 
+           builder.addCase(thunk.pending, (_, action) => {
+-            expectTypeOf(action).toMatchTypeOf<{
++            expectTypeOf(action).toMatchObjectType<{
+               payload: undefined
+               meta: {
+                 arg: void
+@@ -314,7 +315,7 @@ describe('type tests', () => {
+           })
+ 
+           builder.addCase(thunk.rejected, (_, action) => {
+-            expectTypeOf(action).toMatchTypeOf<{
++            expectTypeOf(action).toExtend<{
+               payload: unknown
+               error: SerializedError
+               meta: {
+@@ -333,7 +334,7 @@ describe('type tests', () => {
+             }
+           })
+           builder.addCase(thunk.fulfilled, (_, action) => {
+-            expectTypeOf(action).toMatchTypeOf<{
++            expectTypeOf(action).toMatchObjectType<{
+               payload: 'ret'
+               meta: {
+                 arg: void
+@@ -346,7 +347,7 @@ describe('type tests', () => {
+ 
+           builder.addAsyncThunk(thunk, {
+             pending(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<{
++              expectTypeOf(action).toMatchObjectType<{
+                 payload: undefined
+                 meta: {
+                   arg: void
+@@ -357,7 +358,7 @@ describe('type tests', () => {
+               }>()
+             },
+             rejected(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<{
++              expectTypeOf(action).toExtend<{
+                 payload: unknown
+                 error: SerializedError
+                 meta: {
+@@ -372,7 +373,7 @@ describe('type tests', () => {
+               }>()
+             },
+             fulfilled(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<{
++              expectTypeOf(action).toMatchObjectType<{
+                 payload: 'ret'
+                 meta: {
+                   arg: void
+@@ -383,7 +384,7 @@ describe('type tests', () => {
+               }>()
+             },
+             settled(_, action) {
+-              expectTypeOf(action).toMatchTypeOf<
++              expectTypeOf(action).toExtend<
+                 | {
+                     payload: 'ret'
+                     meta: {
+diff --git a/packages/toolkit/src/tests/matchers.test-d.ts b/packages/toolkit/src/tests/matchers.test-d.ts
+index b31b556fd2..0871cecc5f 100644
+--- a/packages/toolkit/src/tests/matchers.test-d.ts
++++ b/packages/toolkit/src/tests/matchers.test-d.ts
+@@ -1,5 +1,4 @@
+-import type { UnknownAction } from 'redux'
+-import type { SerializedError } from '../../src'
++import type { SerializedError, UnknownAction } from '@reduxjs/toolkit'
+ import {
+   createAction,
+   createAsyncThunk,
+@@ -10,7 +9,7 @@ import {
+   isPending,
+   isRejected,
+   isRejectedWithValue,
+-} from '../../src'
++} from '@reduxjs/toolkit'
+ 
+ const action: UnknownAction = { type: 'foo' }
+ 

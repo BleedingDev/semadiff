@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "src/index.spec.ts",
+    "diff": "/gh/typeStrong/ts-node/diff?old_filename=src%2Findex.spec.ts&old_oid=725bb8b1deb4133ab2c6e4b250808f2039b084ed&old_mode=33188&new_filename=src%2Findex.spec.ts&new_oid=29b90495a250941773ff440e9b141953ecbb832d&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "src/index.spec.ts",
+      "oid": "725bb8b1deb4133ab2c6e4b250808f2039b084ed",
+      "mode": 33188
+    },
+    "new": {
+      "name": "src/index.spec.ts",
+      "oid": "29b90495a250941773ff440e9b141953ecbb832d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "18466f9d870e2151722b884f1cb0df6c1530517bde9468ec2a5abbbb8f655210"
+  }
+]

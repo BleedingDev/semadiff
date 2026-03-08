@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-module-federation-core-3474",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3474: feat(runtime): allow errorLoadRemote hook catch remote entry resource loading error",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3474,
+    "prUrl": "https://github.com/module-federation/core/pull/3474",
+    "baseSha": "7407daf6e0d2fda8cef232f3a50ae65e0d19d1aa",
+    "headSha": "8945d3df03aad168e7179b475b6d5ab8ed729660",
+    "selectedFiles": [
+      "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts"
+    ],
+    "collectedAt": "2026-03-08T04:15:07.747Z"
+  },
+  "files": [
+    {
+      "id": "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts",
+      "oldPath": "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts",
+      "newPath": "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 9,
+          "endLine": 9
+        },
+        "newRange": {
+          "startLine": 9,
+          "endLine": 9
+        }
+      },
+      {
+        "fileId": "apps/router-demo/router-host-2000/cypress/e2e/remote-resource-error.cy.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 19,
+          "endLine": 19
+        },
+        "newRange": {
+          "startLine": 19,
+          "endLine": 19
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

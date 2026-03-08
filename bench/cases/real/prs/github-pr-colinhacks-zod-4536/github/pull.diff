@@ -1,0 +1,26 @@
+diff --git a/packages/zod/src/v4/classic/tests/recursive-types.test.ts b/packages/zod/src/v4/classic/tests/recursive-types.test.ts
+index ad4256fc80..5b85c1d8b5 100644
+--- a/packages/zod/src/v4/classic/tests/recursive-types.test.ts
++++ b/packages/zod/src/v4/classic/tests/recursive-types.test.ts
+@@ -1,7 +1,7 @@
+ import { expect, expectTypeOf, test } from "vitest";
+ import { z } from "zod/v4";
+ 
+-test("recursion with z.lazy", () => {
++test("recursive types using getter property", () => {
+   const data = {
+     name: "I",
+     subcategories: [
+diff --git a/packages/zod/src/v4/mini/tests/recursive-types.test.ts b/packages/zod/src/v4/mini/tests/recursive-types.test.ts
+index d57b4b312e..7ef490fce6 100644
+--- a/packages/zod/src/v4/mini/tests/recursive-types.test.ts
++++ b/packages/zod/src/v4/mini/tests/recursive-types.test.ts
+@@ -1,7 +1,7 @@
+ import { expect, expectTypeOf, test } from "vitest";
+ import { z } from "zod/v4-mini";
+ 
+-test("recursion with z.lazy", () => {
++test("recursive types using getter property", () => {
+   const data = {
+     name: "I",
+     subcategories: [

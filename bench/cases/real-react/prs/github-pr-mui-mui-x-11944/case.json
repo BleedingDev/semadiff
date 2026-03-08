@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-mui-x-11944",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/mui-x#11944: [internal] Fix `test_types` failing on the `next` branch",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/mui-x",
+    "prNumber": 11944,
+    "prUrl": "https://github.com/mui/mui-x/pull/11944",
+    "baseSha": "cc20ad95b43e7b8a8cf29418fac12f151744bf18",
+    "headSha": "f97bdc9811d43095a1fb2c10b569a3c06583c34c",
+    "selectedFiles": [
+      "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:50:47.154Z"
+  },
+  "files": [
+    {
+      "id": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+      "oldPath": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+      "newPath": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 39,
+          "endLine": 39
+        },
+        "newRange": {
+          "startLine": 39,
+          "endLine": 39
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

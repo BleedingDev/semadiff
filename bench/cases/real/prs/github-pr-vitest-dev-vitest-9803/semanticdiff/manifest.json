@@ -1,0 +1,31 @@
+[
+  {
+    "tracking_name": "packages/browser/src/node/plugin.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?old_filename=packages%2Fbrowser%2Fsrc%2Fnode%2Fplugin.ts&old_oid=6d04d71c253f8a22abd6d6c215668aa05bee008b&old_mode=33188&new_filename=packages%2Fbrowser%2Fsrc%2Fnode%2Fplugin.ts&new_oid=cec8f16a0f13392ac6e199068154aaf2b7ca0cb2&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/browser/src/node/plugin.ts",
+      "oid": "6d04d71c253f8a22abd6d6c215668aa05bee008b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/browser/src/node/plugin.ts",
+      "oid": "cec8f16a0f13392ac6e199068154aaf2b7ca0cb2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "929cb96abb1c2e297c6711af0875db4ecdc700c54b824cc4ce7e0716657b28ae"
+  },
+  {
+    "tracking_name": "test/cli/test/oxc.test.ts",
+    "diff": "/gh/vitest-dev/vitest/diff?new_filename=test%2Fcli%2Ftest%2Foxc.test.ts&new_oid=35f197ccfb9345b53d88eb42e5e45238cb064c8e&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "new": {
+      "name": "test/cli/test/oxc.test.ts",
+      "oid": "35f197ccfb9345b53d88eb42e5e45238cb064c8e",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "a5eedc61b69e83ad2e2d380ef4cf4a2d96760f35b15f65e3cd480e36d0df39ea"
+  }
+]

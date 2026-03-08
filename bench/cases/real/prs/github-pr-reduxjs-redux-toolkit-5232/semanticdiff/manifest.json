@@ -1,0 +1,495 @@
+[
+  {
+    "tracking_name": "packages/toolkit/src/dynamicMiddleware/tests/index.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2FdynamicMiddleware%2Ftests%2Findex.test.ts&old_oid=5c97d834d33b2a74c0e59b0f0b7fc85485d66dc3&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2FdynamicMiddleware%2Ftests%2Findex.test.ts&new_oid=7cc57f782d783342fc739cab91954c8dc1d51ce2&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/toolkit/src/dynamicMiddleware/tests/index.test.ts",
+      "oid": "5c97d834d33b2a74c0e59b0f0b7fc85485d66dc3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/dynamicMiddleware/tests/index.test.ts",
+      "oid": "7cc57f782d783342fc739cab91954c8dc1d51ce2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "745f669ba714e6462e31d83a61860cfca17a8a5081f422d40fac850f14a15092"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2FdynamicMiddleware%2Ftests%2Freact.test-d.ts&old_oid=9061d88bdd3ce43fd01514f6f5ce5b40893ef568&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2FdynamicMiddleware%2Ftests%2Freact.test-d.ts&new_oid=4f5d54b7532f6b48dda268b0c7444547d082ccb0&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts",
+      "oid": "9061d88bdd3ce43fd01514f6f5ce5b40893ef568",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/dynamicMiddleware/tests/react.test-d.ts",
+      "oid": "4f5d54b7532f6b48dda268b0c7444547d082ccb0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "bfba0bb0f3a247174400646baaaa83405dda1f10e6bbcf8135f60b1079999079"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2FdynamicMiddleware%2Ftests%2Freact.test.tsx&old_oid=91fb579567cbb3c1a0e10d68b8795607022ccb53&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2FdynamicMiddleware%2Ftests%2Freact.test.tsx&new_oid=72cc58aa11894688e864a529627dc96b43592545&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx",
+      "oid": "91fb579567cbb3c1a0e10d68b8795607022ccb53",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/dynamicMiddleware/tests/react.test.tsx",
+      "oid": "72cc58aa11894688e864a529627dc96b43592545",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "53fffe03aba7190060c80f8ae2a1302d6356229e51661ac7de131e2572abf224"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fentity_slice_enhancer.test.ts&old_oid=f6b0c7bd222dc5efa47ca1bc4f6a6c4b8cd929c1&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fentity_slice_enhancer.test.ts&new_oid=c15e75da6e6c13cc715ffc7cbb68c89252843256&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts",
+      "oid": "f6b0c7bd222dc5efa47ca1bc4f6a6c4b8cd929c1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/entities/tests/entity_slice_enhancer.test.ts",
+      "oid": "c15e75da6e6c13cc715ffc7cbb68c89252843256",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "29c723936b37b37508aabc99d4850e01b0eabc3d1ec8c3f1e93b12119d8b2ced"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/entities/tests/entity_state.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fentity_state.test.ts&old_oid=999ee502b934a2212c2c471e1ab7d98b7f00c952&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fentity_state.test.ts&new_oid=b65a4daf5e0f193afd9c1998f342c286baa350fa&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/toolkit/src/entities/tests/entity_state.test.ts",
+      "oid": "999ee502b934a2212c2c471e1ab7d98b7f00c952",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/entities/tests/entity_state.test.ts",
+      "oid": "b65a4daf5e0f193afd9c1998f342c286baa350fa",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e0fec31bf50f01a9417ae8914e1d528678562889c43514dbddb744b58b394a92"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fsorted_state_adapter.test.ts&old_oid=4361f9d973a95f2f69d9f0f3ac1be91150d3b522&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fsorted_state_adapter.test.ts&new_oid=addb21171c5bc982280ad4d9953aeefddc273d89&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts",
+      "oid": "4361f9d973a95f2f69d9f0f3ac1be91150d3b522",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/entities/tests/sorted_state_adapter.test.ts",
+      "oid": "addb21171c5bc982280ad4d9953aeefddc273d89",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ddbb0b4a519c1c6f13c94376d5c3c5151b172155336257211fe7605796b923ad"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/entities/tests/state_adapter.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fstate_adapter.test.ts&old_oid=a05b715ff9fb0d677f1c6703ee7c24eb25c370f8&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Fstate_adapter.test.ts&new_oid=6807ebbafc68011e6bee931a01d10419a17874ca&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "packages/toolkit/src/entities/tests/state_adapter.test.ts",
+      "oid": "a05b715ff9fb0d677f1c6703ee7c24eb25c370f8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/entities/tests/state_adapter.test.ts",
+      "oid": "6807ebbafc68011e6bee931a01d10419a17874ca",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e01c77aff8bad63257f92d593151f5235ebe96357fa352296aaac93a43c527a1"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Funsorted_state_adapter.test.ts&old_oid=6249f5706d22718c5bd77b101af780fe39180ce8&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fentities%2Ftests%2Funsorted_state_adapter.test.ts&new_oid=98838a316a9247c5fdf3afff5f0ab9031f8948f6&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts",
+      "oid": "6249f5706d22718c5bd77b101af780fe39180ce8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/entities/tests/unsorted_state_adapter.test.ts",
+      "oid": "98838a316a9247c5fdf3afff5f0ab9031f8948f6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5d9c86c8b63b1b90f53e8d83aeaf16ee7b266ee86958a4ae50ed5b65818c5da0"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/listenerMiddleware/tests/fork.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2FlistenerMiddleware%2Ftests%2Ffork.test.ts&old_oid=7172e5c13db0c1c01e39bb7967befd19ee3b0d17&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2FlistenerMiddleware%2Ftests%2Ffork.test.ts&new_oid=8ad909e229057df3a8f67ceea58adf1ec64169ee&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "packages/toolkit/src/listenerMiddleware/tests/fork.test.ts",
+      "oid": "7172e5c13db0c1c01e39bb7967befd19ee3b0d17",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/listenerMiddleware/tests/fork.test.ts",
+      "oid": "8ad909e229057df3a8f67ceea58adf1ec64169ee",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ed1f624743b0de24333293244fda48da9dedf708bfd60f44ae6b3632de97440c"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2FlistenerMiddleware%2Ftests%2FlistenerMiddleware.withTypes.test.ts&old_oid=8d9da271f86e68129a8dd790b278204a674734ea&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2FlistenerMiddleware%2Ftests%2FlistenerMiddleware.withTypes.test.ts&new_oid=3c9d83b4527a2e3f377e99e5ff9bdb731bdd1c40&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts",
+      "oid": "8d9da271f86e68129a8dd790b278204a674734ea",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/listenerMiddleware/tests/listenerMiddleware.withTypes.test.ts",
+      "oid": "3c9d83b4527a2e3f377e99e5ff9bdb731bdd1c40",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0e171d805b425a501d5213da052813967123425fd437a3662e1bc8ccbcff3b06"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2FlistenerMiddleware%2Ftests%2FuseCases.test.ts&old_oid=7517f9071dbd47cb495f662dc19f4825c2f451d8&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2FlistenerMiddleware%2Ftests%2FuseCases.test.ts&new_oid=d7960e94ac50286986eeea7b50dbc2f7735fda4e&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts",
+      "oid": "7517f9071dbd47cb495f662dc19f4825c2f451d8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/listenerMiddleware/tests/useCases.test.ts",
+      "oid": "d7960e94ac50286986eeea7b50dbc2f7735fda4e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ba9de3f8d9cad28919deb5a3a4375d84fe89841ca85201b02e97b91492c3f970"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/buildHooks.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildHooks.test.tsx&old_oid=f97951756b8ab40f2e1760e3bf6d7a446855f88e&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildHooks.test.tsx&new_oid=5dbfa130cc6e5ce9756e4a5ef53e482fc4ac8d7a&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/buildHooks.test.tsx",
+      "oid": "f97951756b8ab40f2e1760e3bf6d7a446855f88e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/buildHooks.test.tsx",
+      "oid": "5dbfa130cc6e5ce9756e4a5ef53e482fc4ac8d7a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "db590c69227289229ac752af81445def0df4934f53b5c3a00d7428161a2f5f99"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/buildInitiate.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildInitiate.test.tsx&old_oid=54d1b42bf8a1d006b8a31b8a8a71ea743dd0a5d7&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildInitiate.test.tsx&new_oid=7d491b2340a02bdee42076790f7ec6fbf77efd78&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/buildInitiate.test.tsx",
+      "oid": "54d1b42bf8a1d006b8a31b8a8a71ea743dd0a5d7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/buildInitiate.test.tsx",
+      "oid": "7d491b2340a02bdee42076790f7ec6fbf77efd78",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e642dcd9465b674da61588546d4b248401a4ce4920d231f50e4ab6c01fbbd6cd"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/buildThunks.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildThunks.test.tsx&old_oid=66eca2795ba0231702c01a6af226f66f5258d9ff&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildThunks.test.tsx&new_oid=fa60e51b8e017f9d2597ffdf94c47a37e87d7a56&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/buildThunks.test.tsx",
+      "oid": "66eca2795ba0231702c01a6af226f66f5258d9ff",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/buildThunks.test.tsx",
+      "oid": "fa60e51b8e017f9d2597ffdf94c47a37e87d7a56",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1df5ef66ad310b3af82dcedbd7ca6e0ad124a5e8f969db9ce98e8c6a8d5bc5c8"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/cacheCollection.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FcacheCollection.test.ts&old_oid=9905e32e49a5b7df5e2ef27179e7af065e1c1d23&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FcacheCollection.test.ts&new_oid=9ebb03e90c0722e7d73047a9d164e7be032a7cd2&new_mode=33188",
+    "file": "diffs/diff-015.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/cacheCollection.test.ts",
+      "oid": "9905e32e49a5b7df5e2ef27179e7af065e1c1d23",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/cacheCollection.test.ts",
+      "oid": "9ebb03e90c0722e7d73047a9d164e7be032a7cd2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1e91434a2486df47c1052d33a1887139ffe87774c468d37ade66448e1be6576d"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/createApi.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FcreateApi.test.ts&old_oid=a45316fab5183a867a5b9d97a8f89354af57b3ab&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FcreateApi.test.ts&new_oid=5824d85fe306f13391ba50476b2b5b2c0552e00f&new_mode=33188",
+    "file": "diffs/diff-016.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/createApi.test.ts",
+      "oid": "a45316fab5183a867a5b9d97a8f89354af57b3ab",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/createApi.test.ts",
+      "oid": "5824d85fe306f13391ba50476b2b5b2c0552e00f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "710f18be900327c4e918f001294b6e1fde09eb406088c9f2595e6f254ac9b830"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FdefaultSerializeQueryArgs.test.ts&old_oid=13b8ae1067b3faf77c33e1f585a4f1a81b67a7e2&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FdefaultSerializeQueryArgs.test.ts&new_oid=a6dd2d628b8ae16580feb113535091d73ea4cb65&new_mode=33188",
+    "file": "diffs/diff-017.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts",
+      "oid": "13b8ae1067b3faf77c33e1f585a4f1a81b67a7e2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/defaultSerializeQueryArgs.test.ts",
+      "oid": "a6dd2d628b8ae16580feb113535091d73ea4cb65",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c97f8f24139a480dc77e38484b2e96318cce6f7753307c3abe39f704677f3e40"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FfetchBaseQuery.test.tsx&old_oid=c96a07c32a1f94c1908d8fd48fa9e9b761c1fb9c&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FfetchBaseQuery.test.tsx&new_oid=56414bb9dda871a152b1813a682e713d0dc59344&new_mode=33188",
+    "file": "diffs/diff-018.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "oid": "c96a07c32a1f94c1908d8fd48fa9e9b761c1fb9c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "oid": "56414bb9dda871a152b1813a682e713d0dc59344",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "156822f88a24f4b4ac050654a74f1f6f5c780ca50bdb8cab6e04e3e8990a4a4b"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/injectEndpoints.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinjectEndpoints.test.tsx&old_oid=2f00e37cecabb1f7942902b1a59533df3a479169&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinjectEndpoints.test.tsx&new_oid=6ec5a0de7dc1c646c1087d042a33333764d19f9f&new_mode=33188",
+    "file": "diffs/diff-019.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/injectEndpoints.test.tsx",
+      "oid": "2f00e37cecabb1f7942902b1a59533df3a479169",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/injectEndpoints.test.tsx",
+      "oid": "6ec5a0de7dc1c646c1087d042a33333764d19f9f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7d951cb106f3c37a11998e840e8a31751b1ab1a4a9e22cf0e3672d11c3354bf6"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/invalidation.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Finvalidation.test.tsx&old_oid=03a763866371d64f6447241f4ecb84484e107d8f&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Finvalidation.test.tsx&new_oid=22d6c34062446031873e356cd822206643a87bd2&new_mode=33188",
+    "file": "diffs/diff-020.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/invalidation.test.tsx",
+      "oid": "03a763866371d64f6447241f4ecb84484e107d8f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/invalidation.test.tsx",
+      "oid": "22d6c34062446031873e356cd822206643a87bd2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a1346cab5b3de96b0265db5fbdbf46e323da874e591397b10b02b55e57973a2b"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/queryFn.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FqueryFn.test.tsx&old_oid=ceba81ff1a8f80b3c784b6f17e573ea0390edcbc&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FqueryFn.test.tsx&new_oid=3105404a0453f527ce2c1d0de017eb2d1d8f6848&new_mode=33188",
+    "file": "diffs/diff-021.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/queryFn.test.tsx",
+      "oid": "ceba81ff1a8f80b3c784b6f17e573ea0390edcbc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/queryFn.test.tsx",
+      "oid": "3105404a0453f527ce2c1d0de017eb2d1d8f6848",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "467b32aee03c0f592d42b7454c72f653975f7af88fe853692700d540ed69f859"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FrefetchingBehaviors.test.tsx&old_oid=5a8bacbd125e4e3a72dd0c18ca72341472401f9e&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FrefetchingBehaviors.test.tsx&new_oid=ab269ffcf26ecc51634bdcb2a50cee2252cbfecc&new_mode=33188",
+    "file": "diffs/diff-022.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx",
+      "oid": "5a8bacbd125e4e3a72dd0c18ca72341472401f9e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx",
+      "oid": "ab269ffcf26ecc51634bdcb2a50cee2252cbfecc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ee2c397d7e95176a4e3cf392f23a8925044197207e5b11419e12df4b1c2a3928"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/retry.test-d.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Fretry.test-d.ts&old_oid=72c859aefd03eee917988f7e93c8c4157c22a67a&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Fretry.test-d.ts&new_oid=4c8d1168812d088118d46a7f88a104ac97d72f07&new_mode=33188",
+    "file": "diffs/diff-023.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/retry.test-d.ts",
+      "oid": "72c859aefd03eee917988f7e93c8c4157c22a67a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/retry.test-d.ts",
+      "oid": "4c8d1168812d088118d46a7f88a104ac97d72f07",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "41445c9c4461e8ce74780ff557c57013da646463db21e9a58f999412fd01a809"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FactionCreatorInvariantMiddleware.test.ts&old_oid=25d5df956881900c98113ce96813ca912bbabd7a&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FactionCreatorInvariantMiddleware.test.ts&new_oid=568c55fbf0a3fb27cf15229894c91240d407243a&new_mode=33188",
+    "file": "diffs/diff-024.json",
+    "old": {
+      "name": "packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts",
+      "oid": "25d5df956881900c98113ce96813ca912bbabd7a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/tests/actionCreatorInvariantMiddleware.test.ts",
+      "oid": "568c55fbf0a3fb27cf15229894c91240d407243a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "83892d79ccbc879cf12603ff936553ac0cb0ce283a05f017d3db5120631fa6c0"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/tests/autoBatchEnhancer.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FautoBatchEnhancer.test.ts&old_oid=e1b820c90871d2a63c423fbf49b2c34ff999b29c&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FautoBatchEnhancer.test.ts&new_oid=cc18b047b8c6058065a067aaa1f25f6ef25ea1ef&new_mode=33188",
+    "file": "diffs/diff-025.json",
+    "old": {
+      "name": "packages/toolkit/src/tests/autoBatchEnhancer.test.ts",
+      "oid": "e1b820c90871d2a63c423fbf49b2c34ff999b29c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/tests/autoBatchEnhancer.test.ts",
+      "oid": "cc18b047b8c6058065a067aaa1f25f6ef25ea1ef",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9367f01ed233a8c27e91625474d5758b22d4b08104d9c7647efd6384fc0a58ea"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/tests/combinedTest.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FcombinedTest.test.ts&old_oid=a130df7a1d811fb6200a79346dc8bd8e0850df50&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FcombinedTest.test.ts&new_oid=eabf8b8c52bc9e73c34953013b9e4921fc36f523&new_mode=33188",
+    "file": "diffs/diff-026.json",
+    "old": {
+      "name": "packages/toolkit/src/tests/combinedTest.test.ts",
+      "oid": "a130df7a1d811fb6200a79346dc8bd8e0850df50",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/tests/combinedTest.test.ts",
+      "oid": "eabf8b8c52bc9e73c34953013b9e4921fc36f523",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "bc4cca627b1da7cbcc7f0557125181cd8d359ac9ac15839a8b32ecc6487a7484"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/tests/createDraftSafeSelector.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FcreateDraftSafeSelector.test.ts&old_oid=e25ac95d5e32f0b5757a6040a542d0cd07fa8522&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FcreateDraftSafeSelector.test.ts&new_oid=4bd5f62a7a0f8c34b2ecccdafc4407c8ab3a9035&new_mode=33188",
+    "file": "diffs/diff-027.json",
+    "old": {
+      "name": "packages/toolkit/src/tests/createDraftSafeSelector.test.ts",
+      "oid": "e25ac95d5e32f0b5757a6040a542d0cd07fa8522",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/tests/createDraftSafeSelector.test.ts",
+      "oid": "4bd5f62a7a0f8c34b2ecccdafc4407c8ab3a9035",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "013c054d33fa9c94b7630489d0b638c602571ac7fde52bf5a3703f11a7e21b31"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/tests/createReducer.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FcreateReducer.test.ts&old_oid=114096c0698c2c00b20c9f508ae88dd8ed05a731&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FcreateReducer.test.ts&new_oid=d54bcc30a26e8ab572d418fdd0b48ce9a1aa952d&new_mode=33188",
+    "file": "diffs/diff-028.json",
+    "old": {
+      "name": "packages/toolkit/src/tests/createReducer.test.ts",
+      "oid": "114096c0698c2c00b20c9f508ae88dd8ed05a731",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/tests/createReducer.test.ts",
+      "oid": "d54bcc30a26e8ab572d418fdd0b48ce9a1aa952d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2bb3beecddc69e6e6a2f1399a3827786f17ac884ea67f2a565cabe7cabf11a9d"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/tests/getDefaultMiddleware.test.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FgetDefaultMiddleware.test.ts&old_oid=74e5e7b49992b9b2e3ebb597682dee2967a08bdd&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Ftests%2FgetDefaultMiddleware.test.ts&new_oid=48b6999a7232b8bc6623988f85df9c450ecc153b&new_mode=33188",
+    "file": "diffs/diff-029.json",
+    "old": {
+      "name": "packages/toolkit/src/tests/getDefaultMiddleware.test.ts",
+      "oid": "74e5e7b49992b9b2e3ebb597682dee2967a08bdd",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/tests/getDefaultMiddleware.test.ts",
+      "oid": "48b6999a7232b8bc6623988f85df9c450ecc153b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "991229298655cbda610cda75490b51218e9d3af077f487fafb795c654808010c"
+  }
+]

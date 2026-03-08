@@ -1,0 +1,178 @@
+diff --git a/website/components/machines/accordion.tsx b/website/components/machines/accordion.tsx
+index 75add8f53c..0fab3a0cf9 100644
+--- a/website/components/machines/accordion.tsx
++++ b/website/components/machines/accordion.tsx
+@@ -14,7 +14,7 @@ const items = [
+     content: "Sample accordion content",
+   },
+   {
+-    title: "Aircrafts",
++    title: "Aircraft",
+     desc: "Airplanes, Helicopters and Rockets",
+     content: "Sample accordion content",
+   },
+@@ -29,7 +29,7 @@ type AccordionProps = {
+ 
+ export function Accordion(props: AccordionProps) {
+   const [state, send] = useMachine(
+-    accordion.machine({ id: useId(), value: ["Aircrafts"] }),
++    accordion.machine({ id: useId(), value: ["Aircraft"] }),
+     {
+       context: props.controls,
+     },
+diff --git a/website/components/mutli-framework.tsx b/website/components/multi-framework.tsx
+similarity index 100%
+rename from website/components/mutli-framework.tsx
+rename to website/components/multi-framework.tsx
+diff --git a/website/data/components/date-picker.mdx b/website/data/components/date-picker.mdx
+index 57611686b4..d36585e665 100644
+--- a/website/data/components/date-picker.mdx
++++ b/website/data/components/date-picker.mdx
+@@ -116,7 +116,7 @@ api.setOpen(false)
+ 
+ ## Setting the min and max dates
+ 
+-To contrain the date range that can be selected by the user, set the `min` and
++To constrain the date range that can be selected by the user, set the `min` and
+ `max` properties in the machine context.
+ 
+ ```jsx
+diff --git a/website/data/components/file-upload.mdx b/website/data/components/file-upload.mdx
+index b244564585..14790c1f5a 100644
+--- a/website/data/components/file-upload.mdx
++++ b/website/data/components/file-upload.mdx
+@@ -227,7 +227,7 @@ const [state, send] = useMachine(
+ 
+ ## Disabling drag and drop
+ 
+-To disable the drag and drop functionalty, set the `allowDrop` context property
++To disable the drag and drop functionality, set the `allowDrop` context property
+ to `false`.
+ 
+ ```jsx
+diff --git a/website/data/components/popover.mdx b/website/data/components/popover.mdx
+index c0ee114897..19e5a5a87c 100644
+--- a/website/data/components/popover.mdx
++++ b/website/data/components/popover.mdx
+@@ -152,7 +152,7 @@ return (
+ 
+ ## Changing the placement
+ 
+-To change the placment of the popover, set the `positioning.placement` property
++To change the placement of the popover, set the `positioning.placement` property
+ in the machine's context.
+ 
+ ```jsx {3-5}
+diff --git a/website/data/components/qr-code.mdx b/website/data/components/qr-code.mdx
+index 3d9f5b9b94..be6047cdd9 100644
+--- a/website/data/components/qr-code.mdx
++++ b/website/data/components/qr-code.mdx
+@@ -77,7 +77,7 @@ const [state, send] = useMachine(
+ ## Setting the correction level
+ 
+ Error correction allows for the QR code to be blocked or resized while still
+-recoganizable. In some cases where the link is too long or the logo overlay
++recognizable. In some cases where the link is too long or the logo overlay
+ covers a significant area, the error correction level can be increased.
+ 
+ The QR code machine accepts the following error correction levels:
+diff --git a/website/data/overview/composition.mdx b/website/data/overview/composition.mdx
+index 14db6ecfa9..02ceccbf54 100644
+--- a/website/data/overview/composition.mdx
++++ b/website/data/overview/composition.mdx
+@@ -71,7 +71,7 @@ component. For example, you want to use the same trigger as a popover and
+ tooltip trigger at the same time.
+ 
+ To achieve this, you will need to pass custom `ids` to the machine's context.
+-This will ensure that calling `document.getElementById(...)` within the toolip
++This will ensure that calling `document.getElementById(...)` within the tooltip
+ and/or popover will return the same element.
+ 
+ ```js {7,12}
+@@ -120,7 +120,7 @@ import Frame, { useFrame } from "react-frame-component"
+ const data = [
+   { title: "Watercraft", content: "Sample accordion content" },
+   { title: "Automobiles", content: "Sample accordion content" },
+-  { title: "Aircrafts", content: "Sample accordion content" },
++  { title: "Aircraft", content: "Sample accordion content" },
+ ]
+ 
+ function Accordion({ id }) {
+diff --git a/website/data/snippets/react/accordion/usage.mdx b/website/data/snippets/react/accordion/usage.mdx
+index b46ec818ba..7300f10667 100644
+--- a/website/data/snippets/react/accordion/usage.mdx
++++ b/website/data/snippets/react/accordion/usage.mdx
+@@ -5,7 +5,7 @@ import { useMachine, normalizeProps } from "@zag-js/react"
+ const data = [
+   { title: "Watercraft", content: "Sample accordion content" },
+   { title: "Automobiles", content: "Sample accordion content" },
+-  { title: "Aircrafts", content: "Sample accordion content" },
++  { title: "Aircraft", content: "Sample accordion content" },
+ ]
+ 
+ function Accordion() {
+diff --git a/website/data/snippets/solid/accordion/usage.mdx b/website/data/snippets/solid/accordion/usage.mdx
+index 43079d4b91..197beb78d0 100644
+--- a/website/data/snippets/solid/accordion/usage.mdx
++++ b/website/data/snippets/solid/accordion/usage.mdx
+@@ -6,7 +6,7 @@ import { createMemo, createUniqueId, For } from "solid-js"
+ const data = [
+   { title: "Watercraft", content: "Sample accordion content" },
+   { title: "Automobiles", content: "Sample accordion content" },
+-  { title: "Aircrafts", content: "Sample accordion content" },
++  { title: "Aircraft", content: "Sample accordion content" },
+ ]
+ 
+ function Accordion() {
+diff --git a/website/data/snippets/svelte/accordion/usage.mdx b/website/data/snippets/svelte/accordion/usage.mdx
+index a016625f63..89f71428a2 100644
+--- a/website/data/snippets/svelte/accordion/usage.mdx
++++ b/website/data/snippets/svelte/accordion/usage.mdx
+@@ -6,7 +6,7 @@
+   const data = [
+     { title: "Watercraft", content: "Sample accordion content" },
+     { title: "Automobiles", content: "Sample accordion content" },
+-    { title: "Aircrafts", content: "Sample accordion content" },
++    { title: "Aircraft", content: "Sample accordion content" },
+   ]
+ 
+   const [snapshot, send] = useMachine(accordion.machine({ id: "1" }))
+diff --git a/website/data/snippets/vue/accordion/usage.mdx b/website/data/snippets/vue/accordion/usage.mdx
+index 38a84b2c6b..c334ac1222 100644
+--- a/website/data/snippets/vue/accordion/usage.mdx
++++ b/website/data/snippets/vue/accordion/usage.mdx
+@@ -7,7 +7,7 @@
+   const data = [
+     { title: "Watercraft", content: "Sample accordion content" },
+     { title: "Automobiles", content: "Sample accordion content" },
+-    { title: "Aircrafts", content: "Sample accordion content" },
++    { title: "Aircraft", content: "Sample accordion content" },
+   ]
+ 
+   const [state, send] = useMachine(accordion.machine({ id: "1" }))
+diff --git a/website/data/snippets/vue/collapsible/usage.mdx b/website/data/snippets/vue/collapsible/usage.mdx
+index 096d14c389..237b4df29a 100644
+--- a/website/data/snippets/vue/collapsible/usage.mdx
++++ b/website/data/snippets/vue/collapsible/usage.mdx
+@@ -14,7 +14,7 @@
+ <template>
+   <div v-bind="api.getRootProps()">
+     <button v-bind="api.getTriggerProps()">Collapse Trigger</button>
+-    <div v-bind="api.getContentProps()">Collape Content</div>
++    <div v-bind="api.getContentProps()">Collapse Content</div>
+   </div>
+ </template>
+ ```
+diff --git a/website/pages/index.tsx b/website/pages/index.tsx
+index 80088c14a2..043bc3645e 100644
+--- a/website/pages/index.tsx
++++ b/website/pages/index.tsx
+@@ -28,7 +28,7 @@ import {
+   VueIcon,
+ } from "components/icons"
+ import { Illustration } from "components/illustration"
+-import { MultiframeworkTabs } from "components/mutli-framework"
++import { MultiframeworkTabs } from "components/multi-framework"
+ import { TopNavigation } from "components/top-navigation"
+ import { NextSeo } from "next-seo"
+ import Image from "next/image"

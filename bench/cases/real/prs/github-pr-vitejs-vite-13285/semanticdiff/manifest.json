@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "docs/.vitepress/config.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=docs%2F.vitepress%2Fconfig.ts&old_oid=62d5e110698150322d8f70ff270483e2bdc53c0c&old_mode=33188&new_filename=docs%2F.vitepress%2Fconfig.ts&new_oid=22ebb5f233fef15bd4754f94044a0e2ff0f01f5b&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/.vitepress/config.ts",
+      "oid": "62d5e110698150322d8f70ff270483e2bdc53c0c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/.vitepress/config.ts",
+      "oid": "22ebb5f233fef15bd4754f94044a0e2ff0f01f5b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3def678deb1b1d5a53948eb8491817dde4dc881e032e785fc61cc93d334eefcd"
+  }
+]

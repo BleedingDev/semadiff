@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "9a8eb1b39d7fea29fb7460965e3d89121d727df3",
+    "filename": "packages/react/src/hooks/use-controllable-state.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/86785009990fe390bfff204414b05dc24ad61d7b/packages%2Freact%2Fsrc%2Fhooks%2Fuse-controllable-state.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/86785009990fe390bfff204414b05dc24ad61d7b/packages%2Freact%2Fsrc%2Fhooks%2Fuse-controllable-state.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fhooks%2Fuse-controllable-state.ts?ref=86785009990fe390bfff204414b05dc24ad61d7b",
+    "patch": "@@ -17,8 +17,8 @@ export function useControllableProp<T>(prop: T | undefined, state: T) {\n export interface UseControllableStateProps<T> {\n   value?: T | undefined\n   defaultValue?: T | (() => T) | undefined\n-  onChange?: (value: T) => void | undefined\n-  shouldUpdate?: (prev: T, next: T) => boolean | undefined\n+  onChange?: ((value: T) => void) | undefined\n+  shouldUpdate?: ((prev: T, next: T) => boolean) | undefined\n }\n \n /**"
+  }
+]

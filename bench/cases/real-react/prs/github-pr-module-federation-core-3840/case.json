@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-3840",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3840: feat(dts-plugin): added flag to fetch types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3840,
+    "prUrl": "https://github.com/module-federation/core/pull/3840",
+    "baseSha": "1fd6f65b2d2c62b23d6b4a7721f0ceac61fec853",
+    "headSha": "d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+    "selectedFiles": [
+      "packages/dts-plugin/src/core/configurations/hostPlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:13:10.582Z"
+  },
+  "files": [
+    {
+      "id": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+      "oldPath": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+      "newPath": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 22,
+          "endLine": 22
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

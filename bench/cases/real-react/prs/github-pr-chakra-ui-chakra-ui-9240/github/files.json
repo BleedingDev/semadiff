@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "5354a6683f934815b5562ffcaa817c076dd2e2e8",
+    "filename": ".changeset/large-queens-cover.md",
+    "status": "added",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/dc5e143b28b7f883762e4c2a7a3664ff784cafb7/.changeset%2Flarge-queens-cover.md",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/dc5e143b28b7f883762e4c2a7a3664ff784cafb7/.changeset%2Flarge-queens-cover.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/.changeset%2Flarge-queens-cover.md?ref=dc5e143b28b7f883762e4c2a7a3664ff784cafb7",
+    "patch": "@@ -0,0 +1,6 @@\n+---\n+\"@chakra-ui/react\": patch\n+---\n+\n+Fixed issue where exporting withProvider and withContext would result in type\n+error"
+  },
+  {
+    "sha": "cc96e88dbd98b121c0552c5a0b8e9d5c71c81fba",
+    "filename": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/dc5e143b28b7f883762e4c2a7a3664ff784cafb7/packages%2Freact%2Fsrc%2Fstyled-system%2Fcreate-slot-recipe-context.tsx",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/dc5e143b28b7f883762e4c2a7a3664ff784cafb7/packages%2Freact%2Fsrc%2Fstyled-system%2Fcreate-slot-recipe-context.tsx",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fstyled-system%2Fcreate-slot-recipe-context.tsx?ref=dc5e143b28b7f883762e4c2a7a3664ff784cafb7",
+    "patch": "@@ -23,11 +23,11 @@ interface WithRootProviderOptions<P> extends WrapElementProps<P> {\n   defaultProps?: Partial<P>\n }\n \n-interface WithProviderOptions<P>\n+export interface WithProviderOptions<P>\n   extends JsxFactoryOptions<P>,\n     WrapElementProps<P> {}\n \n-interface WithContextOptions<P> extends JsxFactoryOptions<P> {}\n+export interface WithContextOptions<P> extends JsxFactoryOptions<P> {}\n \n const upperFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)\n "
+  },
+  {
+    "sha": "8813113423c28f011a1c4d1d0a1d253253ab058c",
+    "filename": "packages/react/src/styled-system/index.ts",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/dc5e143b28b7f883762e4c2a7a3664ff784cafb7/packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/dc5e143b28b7f883762e4c2a7a3664ff784cafb7/packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts?ref=dc5e143b28b7f883762e4c2a7a3664ff784cafb7",
+    "patch": "@@ -1,6 +1,10 @@\n export * from \"./config\"\n export { createRecipeContext } from \"./create-recipe-context\"\n export { createSlotRecipeContext } from \"./create-slot-recipe-context\"\n+export type {\n+  WithProviderOptions,\n+  WithContextOptions,\n+} from \"./create-slot-recipe-context\"\n export type {\n   ConditionalValue,\n   GlobalStyleObject,\n@@ -39,6 +43,7 @@ export type {\n   RecipeProps,\n   SlotRecipeProps,\n   SlotRecipeRecord,\n+  ConfigRecipeSlots,\n } from \"./generated/recipes.gen\"\n export type { ColorPalette, Token, Tokens } from \"./generated/token.gen\"\n export * from \"./provider\""
+  }
+]

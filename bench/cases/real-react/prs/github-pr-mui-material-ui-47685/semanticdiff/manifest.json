@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/mui-joy/src/Menu/MenuProps.ts",
+    "diff": "/gh/mui/material-ui/diff?old_filename=packages%2Fmui-joy%2Fsrc%2FMenu%2FMenuProps.ts&old_oid=99549a7b9291bdd016daf6b7939acb97c03ba703&old_mode=33188&new_filename=packages%2Fmui-joy%2Fsrc%2FMenu%2FMenuProps.ts&new_oid=bd7d5f5ab0ad4e3192b61ad9bd61bdc805085b54&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/mui-joy/src/Menu/MenuProps.ts",
+      "oid": "99549a7b9291bdd016daf6b7939acb97c03ba703",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/mui-joy/src/Menu/MenuProps.ts",
+      "oid": "bd7d5f5ab0ad4e3192b61ad9bd61bdc805085b54",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "442d54dddef6a1393631d56d691b6e885a232a198cb134ceb2500b5188084ceb"
+  }
+]

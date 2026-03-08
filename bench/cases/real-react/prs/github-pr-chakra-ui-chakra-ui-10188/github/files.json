@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "3b9af80493ff41af57211f58de64f9df3e75fc9f",
+    "filename": "apps/compositions/src/ui/password-input.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/bc38757b5c8d0d75ecb23aecba1d1736d49d6c1f/apps%2Fcompositions%2Fsrc%2Fui%2Fpassword-input.tsx",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/bc38757b5c8d0d75ecb23aecba1d1736d49d6c1f/apps%2Fcompositions%2Fsrc%2Fui%2Fpassword-input.tsx",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/apps%2Fcompositions%2Fsrc%2Fui%2Fpassword-input.tsx?ref=bc38757b5c8d0d75ecb23aecba1d1736d49d6c1f",
+    "patch": "@@ -125,7 +125,7 @@ export const PasswordStrengthMeter = React.forwardRef<\n \n   return (\n     <Stack align=\"flex-end\" gap=\"1\" ref={ref} {...rest}>\n-      <HStack width=\"full\" ref={ref} {...rest}>\n+      <HStack width=\"full\" {...rest}>\n         {Array.from({ length: max }).map((_, index) => (\n           <Box\n             key={index}"
+  }
+]

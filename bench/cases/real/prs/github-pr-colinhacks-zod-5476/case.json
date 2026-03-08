@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-5476",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5476: fix(implementasync): Inferred type should always be a promise",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5476,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5476",
+    "baseSha": "4063e802d539d04182fc3e66a543ae6d1ba5658e",
+    "headSha": "f8781da4397a8be1ece410c802acfd0ff20d8f4f",
+    "selectedFiles": [
+      "packages/zod/src/v4/core/schemas.ts"
+    ],
+    "collectedAt": "2026-03-08T02:11:30.180Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/core/schemas.ts",
+      "oldPath": "packages/zod/src/v4/core/schemas.ts",
+      "newPath": "packages/zod/src/v4/core/schemas.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/core/schemas.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 3975,
+          "endLine": 3975
+        },
+        "newRange": {
+          "startLine": 3975,
+          "endLine": 3975
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

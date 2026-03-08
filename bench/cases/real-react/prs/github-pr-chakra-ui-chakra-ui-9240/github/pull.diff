@@ -1,0 +1,53 @@
+diff --git a/.changeset/large-queens-cover.md b/.changeset/large-queens-cover.md
+new file mode 100644
+index 00000000000..5354a6683f9
+--- /dev/null
++++ b/.changeset/large-queens-cover.md
+@@ -0,0 +1,6 @@
++---
++"@chakra-ui/react": patch
++---
++
++Fixed issue where exporting withProvider and withContext would result in type
++error
+diff --git a/packages/react/src/styled-system/create-slot-recipe-context.tsx b/packages/react/src/styled-system/create-slot-recipe-context.tsx
+index 9cbc20c78e0..cc96e88dbd9 100644
+--- a/packages/react/src/styled-system/create-slot-recipe-context.tsx
++++ b/packages/react/src/styled-system/create-slot-recipe-context.tsx
+@@ -23,11 +23,11 @@ interface WithRootProviderOptions<P> extends WrapElementProps<P> {
+   defaultProps?: Partial<P>
+ }
+ 
+-interface WithProviderOptions<P>
++export interface WithProviderOptions<P>
+   extends JsxFactoryOptions<P>,
+     WrapElementProps<P> {}
+ 
+-interface WithContextOptions<P> extends JsxFactoryOptions<P> {}
++export interface WithContextOptions<P> extends JsxFactoryOptions<P> {}
+ 
+ const upperFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1)
+ 
+diff --git a/packages/react/src/styled-system/index.ts b/packages/react/src/styled-system/index.ts
+index cd7b4fa3588..8813113423c 100644
+--- a/packages/react/src/styled-system/index.ts
++++ b/packages/react/src/styled-system/index.ts
+@@ -1,6 +1,10 @@
+ export * from "./config"
+ export { createRecipeContext } from "./create-recipe-context"
+ export { createSlotRecipeContext } from "./create-slot-recipe-context"
++export type {
++  WithProviderOptions,
++  WithContextOptions,
++} from "./create-slot-recipe-context"
+ export type {
+   ConditionalValue,
+   GlobalStyleObject,
+@@ -39,6 +43,7 @@ export type {
+   RecipeProps,
+   SlotRecipeProps,
+   SlotRecipeRecord,
++  ConfigRecipeSlots,
+ } from "./generated/recipes.gen"
+ export type { ColorPalette, Token, Tokens } from "./generated/token.gen"
+ export * from "./provider"

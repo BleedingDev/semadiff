@@ -1,0 +1,13 @@
+diff --git a/docs/src/components/pricing/PricingTable.tsx b/docs/src/components/pricing/PricingTable.tsx
+index 4063303dd933d5..ee3528373ca17d 100644
+--- a/docs/src/components/pricing/PricingTable.tsx
++++ b/docs/src/components/pricing/PricingTable.tsx
+@@ -1287,7 +1287,7 @@ export default function PricingTable({
+ 
+   return (
+     <ThemeProvider theme={transitionTheme}>
+-      <Box ref={tableRef} {...props} sx={{ pt: 8, width: '100%', ...props.sx }}>
++      <Box ref={tableRef} {...props} sx={{ pt: 8, width: '100%', contain: 'paint', ...props.sx }}>
+         <StickyHead container={tableRef} disableCalculation={columnHeaderHidden} />
+         {!columnHeaderHidden && (
+           <Box sx={gridSx}>

@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "1427dc27802201cf7e550222a0ff1f5e33c6cc14",
+    "filename": "packages/zod/src/v3/tests/object.test.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/colinhacks/zod/blob/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv3%2Ftests%2Fobject.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv3%2Ftests%2Fobject.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv3%2Ftests%2Fobject.test.ts?ref=6c9e285ebcf17b8d820d315b02b7231b5468f789",
+    "patch": "@@ -152,13 +152,13 @@ test(\"catchall overrides strict\", () => {\n   });\n });\n \n-test(\"test that optional keys are unset\", async () => {\n+test(\"test that optional keys are unset\", () => {\n   const SNamedEntity = z.object({\n     id: z.string(),\n     set: z.string().optional(),\n     unset: z.string().optional(),\n   });\n-  const result = await SNamedEntity.parse({\n+  const result = SNamedEntity.parse({\n     id: \"asdf\",\n     set: undefined,\n   });"
+  },
+  {
+    "sha": "483e25fedd7cec842d48347b3017da9624bc8104",
+    "filename": "packages/zod/src/v4/classic/tests/array.test.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 6,
+    "changes": 12,
+    "blob_url": "https://github.com/colinhacks/zod/blob/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Farray.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Farray.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Farray.test.ts?ref=6c9e285ebcf17b8d820d315b02b7231b5468f789",
+    "patch": "@@ -6,9 +6,9 @@ test(\"type inference\", () => {\n   expectTypeOf<z.infer<typeof schema>>().toEqualTypeOf<string[]>();\n });\n \n-test(\"array min/max\", async () => {\n+test(\"array min/max\", () => {\n   const schema = z.array(z.string()).min(2).max(2);\n-  const r1 = await schema.safeParse([\"asdf\"]);\n+  const r1 = schema.safeParse([\"asdf\"]);\n   expect(r1.success).toEqual(false);\n   expect(r1.error!.issues).toMatchInlineSnapshot(`\n     [\n@@ -23,7 +23,7 @@ test(\"array min/max\", async () => {\n     ]\n   `);\n \n-  const r2 = await schema.safeParse([\"asdf\", \"asdf\", \"asdf\"]);\n+  const r2 = schema.safeParse([\"asdf\", \"asdf\", \"asdf\"]);\n   expect(r2.success).toEqual(false);\n   expect(r2.error!.issues).toMatchInlineSnapshot(`\n     [\n@@ -39,11 +39,11 @@ test(\"array min/max\", async () => {\n   `);\n });\n \n-test(\"array length\", async () => {\n+test(\"array length\", () => {\n   const schema = z.array(z.string()).length(2);\n   schema.parse([\"asdf\", \"asdf\"]);\n \n-  const r1 = await schema.safeParse([\"asdf\"]);\n+  const r1 = schema.safeParse([\"asdf\"]);\n   expect(r1.success).toEqual(false);\n   expect(r1.error!.issues).toMatchInlineSnapshot(`\n     [\n@@ -59,7 +59,7 @@ test(\"array length\", async () => {\n     ]\n   `);\n \n-  const r2 = await schema.safeParse([\"asdf\", \"asdf\", \"asdf\"]);\n+  const r2 = schema.safeParse([\"asdf\", \"asdf\", \"asdf\"]);\n   expect(r2.success).toEqual(false);\n   expect(r2.error!.issues).toMatchInlineSnapshot(`\n     ["
+  },
+  {
+    "sha": "3bd5088650fad4d8e1c30db284d4efa505e2873a",
+    "filename": "packages/zod/src/v4/classic/tests/object.test.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/colinhacks/zod/blob/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fobject.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fobject.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fobject.test.ts?ref=6c9e285ebcf17b8d820d315b02b7231b5468f789",
+    "patch": "@@ -162,13 +162,13 @@ test(\"catchall overrides strict\", () => {\n   });\n });\n \n-test(\"optional keys are unset\", async () => {\n+test(\"optional keys are unset\", () => {\n   const SNamedEntity = z.object({\n     id: z.string(),\n     set: z.string().optional(),\n     unset: z.string().optional(),\n   });\n-  const result = await SNamedEntity.parse({\n+  const result = SNamedEntity.parse({\n     id: \"asdf\",\n     set: undefined,\n   });"
+  },
+  {
+    "sha": "fe312d86db6c82dd95fed60f9c4f4d62ef0138e9",
+    "filename": "packages/zod/src/v4/classic/tests/refine.test.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/colinhacks/zod/blob/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frefine.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frefine.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frefine.test.ts?ref=6c9e285ebcf17b8d820d315b02b7231b5468f789",
+    "patch": "@@ -167,8 +167,8 @@ describe(\"early termination options\", () => {\n });\n \n describe(\"custom error paths\", () => {\n-  test(\"should use custom path in error message\", async () => {\n-    const result = await z\n+  test(\"should use custom path in error message\", () => {\n+    const result = z\n       .object({ password: z.string(), confirm: z.string() })\n       .refine((data) => data.confirm === data.password, { path: [\"confirm\"] })\n       .safeParse({ password: \"asdf\", confirm: \"qewr\" });"
+  },
+  {
+    "sha": "3338219ed4652cb1bf80aba609caf0da8e3296f9",
+    "filename": "packages/zod/src/v4/classic/tests/set.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fset.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/6c9e285ebcf17b8d820d315b02b7231b5468f789/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fset.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fset.test.ts?ref=6c9e285ebcf17b8d820d315b02b7231b5468f789",
+    "patch": "@@ -39,7 +39,7 @@ test(\"valid parse async\", async () => {\n   expect(result.data!.has(\"second\")).toEqual(true);\n   expect(result.data!.has(\"third\")).toEqual(false);\n \n-  const asyncResult = await stringSet.safeParse(new Set([\"first\", \"second\"]));\n+  const asyncResult = stringSet.safeParse(new Set([\"first\", \"second\"]));\n   expect(asyncResult.success).toEqual(true);\n   expect(asyncResult.data!.has(\"first\")).toEqual(true);\n   expect(asyncResult.data!.has(\"second\")).toEqual(true);"
+  }
+]

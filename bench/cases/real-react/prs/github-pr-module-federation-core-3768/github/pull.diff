@@ -1,0 +1,46 @@
+diff --git a/.changeset/silly-experts-begin.md b/.changeset/silly-experts-begin.md
+new file mode 100644
+index 00000000000..feb81a1fd9f
+--- /dev/null
++++ b/.changeset/silly-experts-begin.md
+@@ -0,0 +1,5 @@
++---
++'@module-federation/dts-plugin': patch
++---
++
++chore(dts-plugin): check types archive url and optimize the error msg
+diff --git a/packages/dts-plugin/src/core/lib/archiveHandler.test.ts b/packages/dts-plugin/src/core/lib/archiveHandler.test.ts
+index a48a3405094..f78f70557a9 100644
+--- a/packages/dts-plugin/src/core/lib/archiveHandler.test.ts
++++ b/packages/dts-plugin/src/core/lib/archiveHandler.test.ts
+@@ -298,7 +298,7 @@ describe('archiveHandler', () => {
+       // Only verify the URL and responseType
+       const axiosGetMock = vi.mocked(axios.get);
+       const [[url, options]] = axiosGetMock.mock.calls;
+-      expect(url).toBe(fileToDownload);
++      expect(url).toBe(new URL(fileToDownload).href);
+       expect(options.responseType).toBe('arraybuffer');
+     });
+ 
+diff --git a/packages/dts-plugin/src/core/lib/archiveHandler.ts b/packages/dts-plugin/src/core/lib/archiveHandler.ts
+index 0f47d7defb5..c5aa0a2bbe1 100644
+--- a/packages/dts-plugin/src/core/lib/archiveHandler.ts
++++ b/packages/dts-plugin/src/core/lib/archiveHandler.ts
+@@ -60,7 +60,7 @@ export const downloadTypesArchive = (hostOptions: Required<HostOptions>) => {
+ 
+     while (retries++ < hostOptions.maxRetries) {
+       try {
+-        const url = fileToDownload;
++        const url = new URL(fileToDownload).href;
+         const response = await axiosGet(url, {
+           responseType: 'arraybuffer',
+           timeout: hostOptions.timeout,
+@@ -107,7 +107,7 @@ export const downloadTypesArchive = (hostOptions: Required<HostOptions>) => {
+         );
+         if (retries >= hostOptions.maxRetries) {
+           logger.error(
+-            `Failed to download ${fileToDownload}, you can set FEDERATION_DEBUG=true to see detail message.`,
++            `Failed to download types archive from "${fileToDownload}". Set FEDERATION_DEBUG=true for details.`,
+           );
+           if (hostOptions.abortOnError !== false) {
+             throw error;

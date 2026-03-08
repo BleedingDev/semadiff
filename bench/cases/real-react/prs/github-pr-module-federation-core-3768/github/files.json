@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "feb81a1fd9fe637143a5b3339d0e5247b6036715",
+    "filename": ".changeset/silly-experts-begin.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/module-federation/core/blob/7210cefa1ec56382352842438e1156af055f7108/.changeset%2Fsilly-experts-begin.md",
+    "raw_url": "https://github.com/module-federation/core/raw/7210cefa1ec56382352842438e1156af055f7108/.changeset%2Fsilly-experts-begin.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/.changeset%2Fsilly-experts-begin.md?ref=7210cefa1ec56382352842438e1156af055f7108",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+'@module-federation/dts-plugin': patch\n+---\n+\n+chore(dts-plugin): check types archive url and optimize the error msg"
+  },
+  {
+    "sha": "f78f70557a961200b574a99b41dceefec0e8c793",
+    "filename": "packages/dts-plugin/src/core/lib/archiveHandler.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/7210cefa1ec56382352842438e1156af055f7108/packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.test.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/7210cefa1ec56382352842438e1156af055f7108/packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.test.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.test.ts?ref=7210cefa1ec56382352842438e1156af055f7108",
+    "patch": "@@ -298,7 +298,7 @@ describe('archiveHandler', () => {\n       // Only verify the URL and responseType\n       const axiosGetMock = vi.mocked(axios.get);\n       const [[url, options]] = axiosGetMock.mock.calls;\n-      expect(url).toBe(fileToDownload);\n+      expect(url).toBe(new URL(fileToDownload).href);\n       expect(options.responseType).toBe('arraybuffer');\n     });\n "
+  },
+  {
+    "sha": "c5aa0a2bbe1804328ea20d625e5af972112fb4d7",
+    "filename": "packages/dts-plugin/src/core/lib/archiveHandler.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/module-federation/core/blob/7210cefa1ec56382352842438e1156af055f7108/packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/7210cefa1ec56382352842438e1156af055f7108/packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fsrc%2Fcore%2Flib%2FarchiveHandler.ts?ref=7210cefa1ec56382352842438e1156af055f7108",
+    "patch": "@@ -60,7 +60,7 @@ export const downloadTypesArchive = (hostOptions: Required<HostOptions>) => {\n \n     while (retries++ < hostOptions.maxRetries) {\n       try {\n-        const url = fileToDownload;\n+        const url = new URL(fileToDownload).href;\n         const response = await axiosGet(url, {\n           responseType: 'arraybuffer',\n           timeout: hostOptions.timeout,\n@@ -107,7 +107,7 @@ export const downloadTypesArchive = (hostOptions: Required<HostOptions>) => {\n         );\n         if (retries >= hostOptions.maxRetries) {\n           logger.error(\n-            `Failed to download ${fileToDownload}, you can set FEDERATION_DEBUG=true to see detail message.`,\n+            `Failed to download types archive from \"${fileToDownload}\". Set FEDERATION_DEBUG=true for details.`,\n           );\n           if (hostOptions.abortOnError !== false) {\n             throw error;"
+  }
+]

@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-9240",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#9240: fix: export missing slot recipe context types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 9240,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9240",
+    "baseSha": "6ab2ea3720cb4dd5af185f548a307d8307cea977",
+    "headSha": "dc5e143b28b7f883762e4c2a7a3664ff784cafb7",
+    "selectedFiles": [
+      "packages/react/src/styled-system/create-slot-recipe-context.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:58:49.366Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+      "oldPath": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+      "newPath": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 26,
+          "endLine": 26
+        },
+        "newRange": {
+          "startLine": 26,
+          "endLine": 26
+        }
+      },
+      {
+        "fileId": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 30,
+          "endLine": 30
+        },
+        "newRange": {
+          "startLine": 30,
+          "endLine": 30
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

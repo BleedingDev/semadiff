@@ -1,0 +1,1128 @@
+diff --git a/apps/website-new/docs/en/guide/framework/modernjs.mdx b/apps/website-new/docs/en/guide/framework/modernjs.mdx
+index af969eb0d18..021c94caacb 100644
+--- a/apps/website-new/docs/en/guide/framework/modernjs.mdx
++++ b/apps/website-new/docs/en/guide/framework/modernjs.mdx
+@@ -91,7 +91,7 @@ The Modern.js plugin re-exports `@module-federation/bridge-react` from `@module-
+ ### createRemoteComponent <Badge type="danger">Deprecated</Badge>
+ 
+ ::: danger
+-This API has been deprecated. Please use [createLazyComponent](/practice/bridge/react-bridge/load-component.html#createlazycomponent-vs-createremoteappcomponent) instead.
++This API has been deprecated. Please use [createLazyComponent](/practice/bridge/react-bridge/load-component.html#what-is-createlazycomponent) instead.
+ :::
+ 
+ #### Migration Guide
+diff --git a/apps/website-new/docs/en/practice/bridge/react-bridge/load-app.mdx b/apps/website-new/docs/en/practice/bridge/react-bridge/load-app.mdx
+index 1bb921d7db8..007b8182522 100644
+--- a/apps/website-new/docs/en/practice/bridge/react-bridge/load-app.mdx
++++ b/apps/website-new/docs/en/practice/bridge/react-bridge/load-app.mdx
+@@ -310,4 +310,112 @@ interface RemoteComponentProps<T = Record<string, unknown>> {
+     loader: () => loadRemote('remote1/export-app'),
+     export: 'dashboard'
+   })
+-  ```
+\ No newline at end of file
++  ```
++
++## Bundle Size Optimization
++
++### React Router Dependency Explanation
++
++By default, `@module-federation/bridge-react` includes `react-router-dom` in your bundle to provide the following out-of-the-box capabilities:
++
++- ✅ Automatic basename injection - No manual route base path configuration needed
++- ✅ Router context passing - Automatic React Router context handling
++- ✅ Nested routing support - Complete router integration capabilities
++
++**However**, if your project meets any of these conditions:
++- Doesn't need routing functionality (pure component loading)
++- Uses a non-react-router routing framework (e.g., TanStack Router)
++- Wants to minimize bundle size
++
++**We recommend** disabling the `enableBridgeRouter` configuration to turn off this capability, which will:
++- ✅ Reduce bundle size by ~3KB (gzipped)
++- ✅ Avoid unnecessary dependency injection
++- ✅ Eliminate potential version conflict risks
++
++### How to Disable Router Dependency
++
++You can control whether to include router support through the `bridge.enableBridgeRouter` configuration:
++
++```ts title="rsbuild.config.ts"
++import { pluginModuleFederation } from '@module-federation/rsbuild-plugin';
++
++export default {
++  plugins: [
++    pluginModuleFederation({
++      name: 'host-app',
++      remotes: {
++        remote1: 'remote1@http://localhost:3001/mf-manifest.json',
++      },
++      bridge: {
++        // Disable router support to reduce bundle size
++        enableBridgeRouter: false,
++      },
++    }),
++  ],
++};
++```
++
++:::tip Configuration Behavior
++- **`enableBridgeRouter: false`**: Automatically aliases to `/base` entry point (no react-router-dom code)
++- **`enableBridgeRouter: true`** or **`undefined`**: Includes router support (default behavior)
++:::
++
++### When to Disable Router?
++
++**Disable router** (`enableBridgeRouter: false`) when:
++- ✅ Your application doesn't use react-router
++- ✅ You want to minimize bundle size
++- ✅ You can manually manage basename if needed
++
++**Keep router enabled** (default) when:
++- ✅ Your application uses react-router
++- ✅ You need automatic basename injection
++- ✅ You need routing context integration
++
++### Migration Example
++
++#### Before: With Router (Default)
++```tsx
++import { createRemoteAppComponent } from '@module-federation/bridge-react';
++
++const RemoteApp = createRemoteAppComponent({
++  loader: () => loadRemote('remote1/app'),
++  loading: <div>Loading...</div>,
++  fallback: ErrorBoundary,
++});
++
++// basename automatically retrieved from router context
++<RemoteApp />
++```
++
++#### After: Without Router (Optimized)
++```ts title="rsbuild.config.ts"
++// Configuration
++pluginModuleFederation({
++  bridge: {
++    enableBridgeRouter: false, // Disable router
++  },
++})
++```
++
++```tsx
++import { createRemoteAppComponent } from '@module-federation/bridge-react';
++
++const RemoteApp = createRemoteAppComponent({
++  loader: () => loadRemote('remote1/app'),
++  loading: <div>Loading...</div>,
++  fallback: ErrorBoundary,
++});
++
++// No changes needed! The plugin automatically aliases to /base entry
++<RemoteApp basename="/" />  // Manually pass basename if needed
++```
++
++:::info How It Works
++When `enableBridgeRouter: false`, the Module Federation plugin automatically sets up a webpack alias:
++```
++'@module-federation/bridge-react' → '@module-federation/bridge-react/base'
++```
++
++This means your imports automatically resolve to the router-free version without changing any code!
++:::
+diff --git a/apps/website-new/docs/zh/guide/framework/modernjs.mdx b/apps/website-new/docs/zh/guide/framework/modernjs.mdx
+index 338da794e66..18c29e4fd74 100644
+--- a/apps/website-new/docs/zh/guide/framework/modernjs.mdx
++++ b/apps/website-new/docs/zh/guide/framework/modernjs.mdx
+@@ -127,7 +127,7 @@ export default App;
+ ### createRemoteSSRComponent <Badge type="danger">废弃</Badge>
+ 
+ ::: danger
+-此 API 已被废弃，请使用[createLazyComponent](../../practice/bridge/react-bridge#createlazycomponent) 。
++此 API 已被废弃，请使用[createLazyComponent](/practice/bridge/react-bridge/load-component.html#什么是-createlazycomponent) 。
+ :::
+ 
+ #### 如何迁移
+diff --git a/apps/website-new/docs/zh/practice/bridge/react-bridge.mdx b/apps/website-new/docs/zh/practice/bridge/react-bridge.mdx
+deleted file mode 100644
+index e69de29bb2d..00000000000
+diff --git a/apps/website-new/docs/zh/practice/bridge/react-bridge/load-app.mdx b/apps/website-new/docs/zh/practice/bridge/react-bridge/load-app.mdx
+index 08b8a5c05cd..f8d021cc3a7 100644
+--- a/apps/website-new/docs/zh/practice/bridge/react-bridge/load-app.mdx
++++ b/apps/website-new/docs/zh/practice/bridge/react-bridge/load-app.mdx
+@@ -183,7 +183,7 @@ function createRemoteAppComponent<T = Record<string, unknown>, E extends keyof T
+ >
+ ```
+ 
+-### RemoteComponentParams\<T, E\>
++#### RemoteComponentParams\<T, E\>
+ 
+ 配置参数接口：
+ 
+@@ -206,7 +206,7 @@ interface RemoteComponentParams<T = Record<string, unknown>, E extends keyof T =
+ }
+ ```
+ 
+-### RemoteComponentProps\<T\>
++#### RemoteComponentProps\<T\>
+ 
+ 返回组件的属性接口：
+ 
+@@ -241,7 +241,7 @@ interface RemoteComponentProps<T = Record<string, unknown>> {
+ 
+ ### 参数详解
+ 
+-### loader
++#### loader
+ 
+ - **类型**: `() => Promise<T>`
+ - **必需**: 是
+@@ -252,7 +252,7 @@ interface RemoteComponentProps<T = Record<string, unknown>> {
+   loader: () => import('remote1/export-app')
+   ```
+ 
+-### loading
++#### loading
+ 
+ - **类型**: `React.ReactNode`
+ - **必需**: 是
+@@ -264,7 +264,7 @@ interface RemoteComponentProps<T = Record<string, unknown>> {
+   loading: <Spinner />
+   ```
+ 
+-### fallback
++#### fallback
+ 
+ - **类型**: `React.ComponentType<{ error: Error }>`
+ - **必需**: 是
+@@ -275,7 +275,7 @@ interface RemoteComponentProps<T = Record<string, unknown>> {
+   fallback: ErrorBoundaryComponent
+   ```
+ 
+-### export
++#### export
+ 
+ - **类型**: `E extends keyof T` (泛型约束，通常是 `string`)
+ - **必需**: 否
+@@ -310,4 +310,114 @@ interface RemoteComponentProps<T = Record<string, unknown>> {
+     loader: () => loadRemote('remote1/export-app'),
+     export: 'dashboard'
+   })
+-  ```
+\ No newline at end of file
++  ```
++
++
++## Bundle 体积优化
++
++### React Router 依赖说明
++
++默认情况下，`@module-federation/bridge-react` 会将 `react-router-dom` 打包到你的 bundle 中，这是为了提供以下开箱即用的能力：
++
++- ✅ 自动 basename 注入 - 无需手动配置路由基础路径
++- ✅ 路由上下文传递 - 自动处理 React Router 上下文
++- ✅ 嵌套路由支持 - 完整的路由集成能力
++
++**但是**，如果你的项目满足以下任一条件：
++- 不需要路由功能（纯组件加载）
++- 使用非 react-router 的路由框架（如 TanStack Router）
++- 希望最小化 bundle 体积
++
++**建议关闭** `enableBridgeRouter` 配置来禁用此能力，这将：
++- ✅ 减小 bundle 体积约 3KB (gzipped)
++- ✅ 避免不必要的依赖注入
++- ✅ 消除潜在的版本冲突风险
++
++### 如何禁用 Router 依赖
++
++你可以通过 `bridge.enableBridgeRouter` 配置来控制是否包含路由支持：
++
++```ts title="rsbuild.config.ts"
++import { pluginModuleFederation } from '@module-federation/rsbuild-plugin';
++
++export default {
++  plugins: [
++    pluginModuleFederation({
++      name: 'host-app',
++      remotes: {
++        remote1: 'remote1@http://localhost:3001/mf-manifest.json',
++      },
++      bridge: {
++        // 禁用路由支持以减小 bundle 体积
++        enableBridgeRouter: false,
++      },
++    }),
++  ],
++};
++```
++
++:::tip 配置行为
++- **`enableBridgeRouter: false`**: 自动 alias 到 `/base` 入口（不包含 react-router-dom 代码）
++- **`enableBridgeRouter: true`** 或 **`undefined`**: 包含路由支持（默认行为）
++
++:::
++
++### 何时禁用 Router？
++
++**禁用 router** (`enableBridgeRouter: false`) 适用于：
++- ✅ 应用不使用 react-router
++- ✅ 想要最小化 bundle 体积
++- ✅ 可以手动管理 basename（如果需要）
++
++**保持 router 启用**（默认）适用于：
++- ✅ 应用使用 react-router
++- ✅ 需要自动 basename 注入
++- ✅ 需要路由上下文集成
++
++### 迁移示例
++
++#### 迁移前：启用 Router（默认）
++```tsx
++import { createRemoteAppComponent } from '@module-federation/bridge-react';
++
++const RemoteApp = createRemoteAppComponent({
++  loader: () => loadRemote('remote1/app'),
++  loading: <div>Loading...</div>,
++  fallback: ErrorBoundary,
++});
++
++// basename 自动从路由上下文获取
++<RemoteApp />
++```
++
++#### 迁移后：禁用 Router（优化）
++```ts title="rsbuild.config.ts"
++// 配置
++pluginModuleFederation({
++  bridge: {
++    enableBridgeRouter: false, // 禁用 router
++  },
++})
++```
++
++```tsx
++import { createRemoteAppComponent } from '@module-federation/bridge-react';
++
++const RemoteApp = createRemoteAppComponent({
++  loader: () => loadRemote('remote1/app'),
++  loading: <div>Loading...</div>,
++  fallback: ErrorBoundary,
++});
++
++// 无需修改代码！插件会自动 alias 到 /base 入口
++<RemoteApp basename="/" />  // 如果需要，手动传递 basename
++```
++
++:::info 工作原理
++当设置 `enableBridgeRouter: false` 时，Module Federation 插件会自动设置 webpack alias：
++```
++'@module-federation/bridge-react' → '@module-federation/bridge-react/base'
++```
++
++这意味着你的导入会自动解析到无路由版本，无需修改任何代码！
++:::
+diff --git a/packages/bridge/bridge-react-webpack-plugin/src/index.ts b/packages/bridge/bridge-react-webpack-plugin/src/index.ts
+index fdc850c894b..345f888ec65 100644
+--- a/packages/bridge/bridge-react-webpack-plugin/src/index.ts
++++ b/packages/bridge/bridge-react-webpack-plugin/src/index.ts
+@@ -41,8 +41,8 @@ class ReactBridgeAliasChangerPlugin {
+         const originalResolve = compiler.options.resolve || {};
+         const originalAlias = originalResolve.alias || {};
+ 
+-        // Update alias
+-        const updatedAlias = {
++        // Update alias - set up router version alias
++        const updatedAlias: Record<string, string> = {
+           // allow `alias` can be override
+           // [this.alias]: targetFilePath,
+           ...getBridgeRouterAlias(originalAlias['react-router-dom']),
+diff --git a/packages/bridge/bridge-react/package.json b/packages/bridge/bridge-react/package.json
+index 501f89f8da0..956a427745b 100644
+--- a/packages/bridge/bridge-react/package.json
++++ b/packages/bridge/bridge-react/package.json
+@@ -21,6 +21,11 @@
+       "import": "./dist/index.es.js",
+       "require": "./dist/index.cjs.js"
+     },
++    "./base": {
++      "types": "./dist/base.d.ts",
++      "import": "./dist/base.es.js",
++      "require": "./dist/base.cjs.js"
++    },
+     "./v18": {
+       "types": "./dist/v18.d.ts",
+       "import": "./dist/v18.es.js",
+@@ -83,6 +88,9 @@
+       ".": [
+         "./dist/index.d.ts"
+       ],
++      "base": [
++        "./dist/base.d.ts"
++      ],
+       "v18": [
+         "./dist/v18.d.ts"
+       ],
+diff --git a/packages/bridge/bridge-react/src/base.ts b/packages/bridge/bridge-react/src/base.ts
+new file mode 100644
+index 00000000000..11e4aa58ff5
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/base.ts
+@@ -0,0 +1,50 @@
++export { createBridgeComponent } from './provider/versions/legacy';
++
++// Export router-free versions of remote component creators
++export {
++  createRemoteComponent,
++  createRemoteAppComponent,
++} from './remote/base-component';
++export type { LazyRemoteComponentInfo } from './remote/base-component';
++
++// Export all lazy loading and data fetching utilities (no router dependencies)
++export {
++  ERROR_TYPE,
++  createLazyComponent,
++  collectSSRAssets,
++  callDataFetch,
++  setSSREnv,
++  autoFetchDataPlugin,
++  CacheSize,
++  CacheTime,
++  configureCache,
++  generateKey,
++  cache,
++  revalidateTag,
++  clearStore,
++  prefetch,
++} from './lazy';
++
++export { lazyLoadComponentPlugin } from './plugins/lazy-load-component-plugin';
++
++// Export all types
++export type { CreateRootOptions, Root } from './provider/versions/legacy';
++export type {
++  ProviderParams,
++  ProviderFnParams,
++  RootType,
++  DestroyParams,
++  RenderParams,
++  RemoteComponentParams,
++  RenderFnParams,
++  RemoteComponentProps,
++  RemoteModule,
++} from './types';
++export type {
++  DataFetchParams,
++  NoSSRRemoteInfo,
++  CollectSSRAssetsOptions,
++  CreateLazyComponentOptions,
++  CacheStatus,
++  CacheStatsInfo,
++} from './lazy';
+diff --git a/packages/bridge/bridge-react/src/index.ts b/packages/bridge/bridge-react/src/index.ts
+index 0c30c931c77..0899925815b 100644
+--- a/packages/bridge/bridge-react/src/index.ts
++++ b/packages/bridge/bridge-react/src/index.ts
+@@ -6,8 +6,8 @@ export { createBridgeComponent } from './provider/versions/legacy';
+ export {
+   createRemoteComponent,
+   createRemoteAppComponent,
+-} from './remote/create';
+-export type { LazyRemoteComponentInfo } from './remote/create';
++} from './remote/router-component';
++export type { LazyRemoteComponentInfo } from './remote/router-component';
+ export {
+   ERROR_TYPE,
+   createLazyComponent,
+diff --git a/packages/bridge/bridge-react/src/remote/RemoteAppWrapper.tsx b/packages/bridge/bridge-react/src/remote/RemoteAppWrapper.tsx
+new file mode 100644
+index 00000000000..44b6887f43c
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/RemoteAppWrapper.tsx
+@@ -0,0 +1,108 @@
++/**
++ * Shared RemoteAppWrapper component used by both base and router versions
++ * This component handles the lifecycle of remote Module Federation apps
++ */
++import React, { useEffect, useRef, useState, forwardRef } from 'react';
++import { LoggerInstance, getRootDomDefaultClassName } from '../utils';
++import { federationRuntime } from '../provider/plugin';
++import { RemoteComponentProps, RemoteAppParams } from '../types';
++
++export const RemoteAppWrapper = forwardRef(function (
++  props: RemoteAppParams & RemoteComponentProps,
++  ref,
++) {
++  const {
++    moduleName,
++    memoryRoute,
++    basename,
++    providerInfo,
++    className,
++    style,
++    fallback,
++    loading,
++    ...resProps
++  } = props;
++
++  const instance = federationRuntime.instance;
++  const rootRef: React.MutableRefObject<HTMLDivElement | null> =
++    ref && 'current' in ref
++      ? (ref as React.MutableRefObject<HTMLDivElement | null>)
++      : useRef(null);
++
++  const renderDom: React.MutableRefObject<HTMLElement | null> = useRef(null);
++  const providerInfoRef = useRef<any>(null);
++  const [initialized, setInitialized] = useState(false);
++
++  LoggerInstance.debug(`RemoteAppWrapper instance from props >>>`, instance);
++
++  // 初始化远程组件
++  useEffect(() => {
++    if (initialized) return;
++    const providerReturn = providerInfo();
++    providerInfoRef.current = providerReturn;
++    setInitialized(true);
++
++    return () => {
++      if (providerInfoRef.current?.destroy) {
++        LoggerInstance.debug(
++          `createRemoteAppComponent LazyComponent destroy >>>`,
++          { moduleName, basename, dom: renderDom.current },
++        );
++
++        instance?.bridgeHook?.lifecycle?.beforeBridgeDestroy?.emit({
++          moduleName,
++          dom: renderDom.current,
++          basename,
++          memoryRoute,
++          fallback,
++          ...resProps,
++        });
++
++        providerInfoRef.current?.destroy({
++          moduleName,
++          dom: renderDom.current,
++        });
++
++        instance?.bridgeHook?.lifecycle?.afterBridgeDestroy?.emit({
++          moduleName,
++          dom: renderDom.current,
++          basename,
++          memoryRoute,
++          fallback,
++          ...resProps,
++        });
++      }
++    };
++  }, [moduleName]);
++
++  // trigger render after props updated
++  useEffect(() => {
++    if (!initialized || !providerInfoRef.current) return;
++
++    let renderProps = {
++      moduleName,
++      dom: rootRef.current,
++      basename,
++      memoryRoute,
++      fallback,
++      ...resProps,
++    };
++    renderDom.current = rootRef.current;
++
++    const beforeBridgeRenderRes =
++      instance?.bridgeHook?.lifecycle?.beforeBridgeRender?.emit(renderProps) ||
++      {};
++    // @ts-ignore
++    renderProps = { ...renderProps, ...beforeBridgeRenderRes.extraProps };
++    providerInfoRef.current.render(renderProps);
++    instance?.bridgeHook?.lifecycle?.afterBridgeRender?.emit(renderProps);
++  }, [initialized, ...Object.values(props)]);
++
++  // bridge-remote-root
++  const rootComponentClassName = `${getRootDomDefaultClassName(moduleName)} ${className || ''}`;
++  return (
++    <div className={rootComponentClassName} style={style} ref={rootRef}>
++      {loading}
++    </div>
++  );
++});
+diff --git a/packages/bridge/bridge-react/src/remote/base-component/component.tsx b/packages/bridge/bridge-react/src/remote/base-component/component.tsx
+new file mode 100644
+index 00000000000..2055b0d597b
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/base-component/component.tsx
+@@ -0,0 +1,2 @@
++import { RemoteAppWrapper } from '../RemoteAppWrapper';
++export default RemoteAppWrapper;
+diff --git a/packages/bridge/bridge-react/src/remote/base-component/create.tsx b/packages/bridge/bridge-react/src/remote/base-component/create.tsx
+new file mode 100644
+index 00000000000..9c3493dddee
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/base-component/create.tsx
+@@ -0,0 +1,23 @@
++import RemoteApp from './component';
++import {
++  createLazyRemoteComponentFactory,
++  createRemoteAppComponentFactory,
++  createDeprecatedRemoteComponentFactory,
++  type LazyRemoteComponentInfo,
++} from '../createHelpers';
++
++export type { LazyRemoteComponentInfo };
++
++const createLazyRemoteComponent = createLazyRemoteComponentFactory(RemoteApp);
++
++export const createRemoteAppComponent =
++  createRemoteAppComponentFactory(RemoteApp);
++
++/**
++ * @deprecated createRemoteComponent is deprecated, please use createRemoteAppComponent instead!
++ */
++export const createRemoteComponent = createDeprecatedRemoteComponentFactory(
++  createRemoteAppComponent,
++);
++
++export { createLazyRemoteComponent };
+diff --git a/packages/bridge/bridge-react/src/remote/base-component/index.tsx b/packages/bridge/bridge-react/src/remote/base-component/index.tsx
+new file mode 100644
+index 00000000000..470fe8b25f1
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/base-component/index.tsx
+@@ -0,0 +1,10 @@
++/**
++ * Base entry point without React Router dependencies
++ * Re-exports from base/create.tsx
++ */
++export {
++  createRemoteAppComponent,
++  createRemoteComponent,
++  createLazyRemoteComponent,
++  type LazyRemoteComponentInfo,
++} from './create';
+diff --git a/packages/bridge/bridge-react/src/remote/create.tsx b/packages/bridge/bridge-react/src/remote/create.tsx
+deleted file mode 100644
+index 67ab5dd84e7..00000000000
+--- a/packages/bridge/bridge-react/src/remote/create.tsx
++++ /dev/null
+@@ -1,106 +0,0 @@
+-import React, { forwardRef } from 'react';
+-import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
+-import { LoggerInstance } from '../utils';
+-import RemoteApp from './component';
+-import {
+-  RemoteComponentParams,
+-  RemoteComponentProps,
+-  RemoteModule,
+-} from '../types';
+-
+-export type LazyRemoteComponentInfo<
+-  T,
+-  _E extends keyof T,
+-> = RemoteComponentParams<T>;
+-
+-function createLazyRemoteComponent<
+-  T = Record<string, unknown>,
+-  E extends keyof T = keyof T,
+->(info: LazyRemoteComponentInfo<T, E>) {
+-  const exportName = info?.export || 'default';
+-  return React.lazy(async () => {
+-    LoggerInstance.debug(`createRemoteAppComponent LazyComponent create >>>`, {
+-      lazyComponent: info.loader,
+-      exportName,
+-    });
+-
+-    try {
+-      const m = (await info.loader()) as RemoteModule;
+-      // @ts-ignore
+-      const moduleName = m && m[Symbol.for('mf_module_id')];
+-      LoggerInstance.debug(
+-        `createRemoteAppComponent LazyComponent loadRemote info >>>`,
+-        { name: moduleName, module: m, exportName },
+-      );
+-
+-      // @ts-ignore
+-      const exportFn = m[exportName];
+-      if (exportName in m && typeof exportFn === 'function') {
+-        const RemoteAppComponent = forwardRef<
+-          HTMLDivElement,
+-          RemoteComponentProps
+-        >((props, ref) => {
+-          return (
+-            <RemoteApp
+-              // change `name` key to `moduleName` to avoid same property `name` passed by user's props which may cause unexpected issues.
+-              moduleName={moduleName}
+-              providerInfo={exportFn}
+-              exportName={info.export || 'default'}
+-              fallback={info.fallback}
+-              loading={info.loading}
+-              ref={ref}
+-              {...props}
+-            />
+-          );
+-        });
+-
+-        return {
+-          default: RemoteAppComponent,
+-        };
+-      } else {
+-        LoggerInstance.debug(
+-          `createRemoteAppComponent LazyComponent module not found >>>`,
+-          { name: moduleName, module: m, exportName },
+-        );
+-        throw Error(
+-          `Make sure that ${moduleName} has the correct export when export is ${String(
+-            exportName,
+-          )}`,
+-        );
+-      }
+-    } catch (error) {
+-      throw error;
+-    }
+-  });
+-}
+-
+-export function createRemoteAppComponent<
+-  T = Record<string, unknown>,
+-  E extends keyof T = keyof T,
+->(info: LazyRemoteComponentInfo<T, E>) {
+-  const LazyComponent = createLazyRemoteComponent(info);
+-  return forwardRef<HTMLDivElement, RemoteComponentProps>((props, ref) => {
+-    return (
+-      <ErrorBoundary
+-        FallbackComponent={info.fallback as React.ComponentType<FallbackProps>}
+-      >
+-        <React.Suspense fallback={info.loading}>
+-          <LazyComponent {...props} ref={ref} />
+-        </React.Suspense>
+-      </ErrorBoundary>
+-    );
+-  });
+-}
+-
+-/**
+- * @deprecated createRemoteAppComponent is deprecated, please use createRemoteAppComponent instead!
+- */
+-export function createRemoteComponent<
+-  T = Record<string, unknown>,
+-  E extends keyof T = keyof T,
+->(info: LazyRemoteComponentInfo<T, E>) {
+-  LoggerInstance.warn(
+-    `createRemoteComponent is deprecated, please use createRemoteAppComponent instead!`,
+-  );
+-  return createRemoteAppComponent(info);
+-}
+diff --git a/packages/bridge/bridge-react/src/remote/createHelpers.tsx b/packages/bridge/bridge-react/src/remote/createHelpers.tsx
+new file mode 100644
+index 00000000000..068bcee52b7
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/createHelpers.tsx
+@@ -0,0 +1,130 @@
++import React, { forwardRef } from 'react';
++import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
++import { LoggerInstance } from '../utils';
++import {
++  RemoteComponentParams,
++  RemoteComponentProps,
++  RemoteModule,
++} from '../types';
++
++export type LazyRemoteComponentInfo<
++  T,
++  _E extends keyof T,
++> = RemoteComponentParams<T>;
++
++/**
++ * Creates a factory function for creating lazy remote components
++ * @param RemoteApp The RemoteAppWrapper component to use (with or without router)
++ */
++export function createLazyRemoteComponentFactory(
++  RemoteApp: React.ComponentType<any>,
++) {
++  return function createLazyRemoteComponent<
++    T = Record<string, unknown>,
++    E extends keyof T = keyof T,
++  >(info: LazyRemoteComponentInfo<T, E>) {
++    const exportName = info?.export || 'default';
++    return React.lazy(async () => {
++      LoggerInstance.debug(
++        `createRemoteAppComponent LazyComponent create >>>`,
++        {
++          lazyComponent: info.loader,
++          exportName,
++        },
++      );
++
++      try {
++        const m = (await info.loader()) as RemoteModule;
++        // @ts-ignore
++        const moduleName = m && m[Symbol.for('mf_module_id')];
++        LoggerInstance.debug(
++          `createRemoteAppComponent LazyComponent loadRemote info >>>`,
++          { name: moduleName, module: m, exportName },
++        );
++
++        // @ts-ignore
++        const exportFn = m[exportName];
++        if (exportName in m && typeof exportFn === 'function') {
++          const RemoteAppComponent = forwardRef<
++            HTMLDivElement,
++            RemoteComponentProps
++          >((props, ref) => {
++            return (
++              <RemoteApp
++                // change `name` key to `moduleName` to avoid same property `name` passed by user's props which may cause unexpected issues.
++                moduleName={moduleName}
++                providerInfo={exportFn}
++                exportName={info.export || 'default'}
++                fallback={info.fallback}
++                loading={info.loading}
++                ref={ref}
++                {...props}
++              />
++            );
++          });
++
++          return {
++            default: RemoteAppComponent,
++          };
++        } else {
++          LoggerInstance.debug(
++            `createRemoteAppComponent LazyComponent module not found >>>`,
++            { name: moduleName, module: m, exportName },
++          );
++          throw Error(
++            `Make sure that ${moduleName} has the correct export when export is ${String(
++              exportName,
++            )}`,
++          );
++        }
++      } catch (error) {
++        throw error;
++      }
++    });
++  };
++}
++
++/**
++ * Creates a factory function for creating remote app components
++ * @param RemoteApp The RemoteAppWrapper component to use (with or without router)
++ */
++export function createRemoteAppComponentFactory(
++  RemoteApp: React.ComponentType<any>,
++) {
++  const createLazyRemoteComponent = createLazyRemoteComponentFactory(RemoteApp);
++
++  return function createRemoteAppComponent<
++    T = Record<string, unknown>,
++    E extends keyof T = keyof T,
++  >(info: LazyRemoteComponentInfo<T, E>) {
++    const LazyComponent = createLazyRemoteComponent(info);
++    return forwardRef<HTMLDivElement, RemoteComponentProps>((props, ref) => {
++      return (
++        <ErrorBoundary
++          FallbackComponent={
++            info.fallback as React.ComponentType<FallbackProps>
++          }
++        >
++          <React.Suspense fallback={info.loading}>
++            <LazyComponent {...props} ref={ref} />
++          </React.Suspense>
++        </ErrorBoundary>
++      );
++    });
++  };
++}
++
++/**
++ * Creates the deprecated createRemoteComponent function
++ */
++export function createDeprecatedRemoteComponentFactory<
++  T = Record<string, unknown>,
++  E extends keyof T = keyof T,
++>(createFn: (info: LazyRemoteComponentInfo<T, E>) => any) {
++  return function createRemoteComponent(info: LazyRemoteComponentInfo<T, E>) {
++    LoggerInstance.warn(
++      `createRemoteComponent is deprecated, please use createRemoteAppComponent instead!`,
++    );
++    return createFn(info);
++  };
++}
+diff --git a/packages/bridge/bridge-react/src/remote/component.tsx b/packages/bridge/bridge-react/src/remote/router-component/component.tsx
+similarity index 53%
+rename from packages/bridge/bridge-react/src/remote/component.tsx
+rename to packages/bridge/bridge-react/src/remote/router-component/component.tsx
+index a7ae62d841d..f499fc3ad20 100644
+--- a/packages/bridge/bridge-react/src/remote/component.tsx
++++ b/packages/bridge/bridge-react/src/remote/router-component/component.tsx
+@@ -1,115 +1,8 @@
+-import React, {
+-  useContext,
+-  useEffect,
+-  useRef,
+-  useState,
+-  forwardRef,
+-} from 'react';
++import React, { useContext, useEffect, useState, forwardRef } from 'react';
+ import * as ReactRouterDOM from 'react-router-dom';
+ import { dispatchPopstateEnv } from '@module-federation/bridge-shared';
+-import { LoggerInstance, pathJoin, getRootDomDefaultClassName } from '../utils';
+-import { federationRuntime } from '../provider/plugin';
+-import { RemoteComponentProps, RemoteAppParams } from '../types';
+-
+-const RemoteAppWrapper = forwardRef(function (
+-  props: RemoteAppParams & RemoteComponentProps,
+-  ref,
+-) {
+-  const {
+-    moduleName,
+-    memoryRoute,
+-    basename,
+-    providerInfo,
+-    className,
+-    style,
+-    fallback,
+-    loading,
+-    ...resProps
+-  } = props;
+-
+-  const instance = federationRuntime.instance;
+-  const rootRef: React.MutableRefObject<HTMLDivElement | null> =
+-    ref && 'current' in ref
+-      ? (ref as React.MutableRefObject<HTMLDivElement | null>)
+-      : useRef(null);
+-
+-  const renderDom: React.MutableRefObject<HTMLElement | null> = useRef(null);
+-  const providerInfoRef = useRef<any>(null);
+-  const [initialized, setInitialized] = useState(false);
+-
+-  LoggerInstance.debug(`RemoteAppWrapper instance from props >>>`, instance);
+-
+-  // 初始化远程组件
+-  useEffect(() => {
+-    if (initialized) return;
+-    const providerReturn = providerInfo();
+-    providerInfoRef.current = providerReturn;
+-    setInitialized(true);
+-
+-    return () => {
+-      if (providerInfoRef.current?.destroy) {
+-        LoggerInstance.debug(
+-          `createRemoteAppComponent LazyComponent destroy >>>`,
+-          { moduleName, basename, dom: renderDom.current },
+-        );
+-
+-        instance?.bridgeHook?.lifecycle?.beforeBridgeDestroy?.emit({
+-          moduleName,
+-          dom: renderDom.current,
+-          basename,
+-          memoryRoute,
+-          fallback,
+-          ...resProps,
+-        });
+-
+-        providerInfoRef.current?.destroy({
+-          moduleName,
+-          dom: renderDom.current,
+-        });
+-
+-        instance?.bridgeHook?.lifecycle?.afterBridgeDestroy?.emit({
+-          moduleName,
+-          dom: renderDom.current,
+-          basename,
+-          memoryRoute,
+-          fallback,
+-          ...resProps,
+-        });
+-      }
+-    };
+-  }, [moduleName]);
+-
+-  // trigger render after props updated
+-  useEffect(() => {
+-    if (!initialized || !providerInfoRef.current) return;
+-
+-    let renderProps = {
+-      moduleName,
+-      dom: rootRef.current,
+-      basename,
+-      memoryRoute,
+-      fallback,
+-      ...resProps,
+-    };
+-    renderDom.current = rootRef.current;
+-
+-    const beforeBridgeRenderRes =
+-      instance?.bridgeHook?.lifecycle?.beforeBridgeRender?.emit(renderProps) ||
+-      {};
+-    // @ts-ignore
+-    renderProps = { ...renderProps, ...beforeBridgeRenderRes.extraProps };
+-    providerInfoRef.current.render(renderProps);
+-    instance?.bridgeHook?.lifecycle?.afterBridgeRender?.emit(renderProps);
+-  }, [initialized, ...Object.values(props)]);
+-
+-  // bridge-remote-root
+-  const rootComponentClassName = `${getRootDomDefaultClassName(moduleName)} ${className || ''}`;
+-  return (
+-    <div className={rootComponentClassName} style={style} ref={rootRef}>
+-      {loading}
+-    </div>
+-  );
+-});
++import { LoggerInstance, pathJoin } from '../../utils';
++import { RemoteAppWrapper } from '../RemoteAppWrapper';
+ 
+ interface ExtraDataProps {
+   basename?: string;
+diff --git a/packages/bridge/bridge-react/src/remote/router-component/create.tsx b/packages/bridge/bridge-react/src/remote/router-component/create.tsx
+new file mode 100644
+index 00000000000..9c3493dddee
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/router-component/create.tsx
+@@ -0,0 +1,23 @@
++import RemoteApp from './component';
++import {
++  createLazyRemoteComponentFactory,
++  createRemoteAppComponentFactory,
++  createDeprecatedRemoteComponentFactory,
++  type LazyRemoteComponentInfo,
++} from '../createHelpers';
++
++export type { LazyRemoteComponentInfo };
++
++const createLazyRemoteComponent = createLazyRemoteComponentFactory(RemoteApp);
++
++export const createRemoteAppComponent =
++  createRemoteAppComponentFactory(RemoteApp);
++
++/**
++ * @deprecated createRemoteComponent is deprecated, please use createRemoteAppComponent instead!
++ */
++export const createRemoteComponent = createDeprecatedRemoteComponentFactory(
++  createRemoteAppComponent,
++);
++
++export { createLazyRemoteComponent };
+diff --git a/packages/bridge/bridge-react/src/remote/router-component/index.tsx b/packages/bridge/bridge-react/src/remote/router-component/index.tsx
+new file mode 100644
+index 00000000000..6b197fd3cda
+--- /dev/null
++++ b/packages/bridge/bridge-react/src/remote/router-component/index.tsx
+@@ -0,0 +1,10 @@
++/**
++ * Default entry point with React Router support
++ * Re-exports from router/create.tsx
++ */
++export {
++  createRemoteAppComponent,
++  createRemoteComponent,
++  createLazyRemoteComponent,
++  type LazyRemoteComponentInfo,
++} from './create';
+diff --git a/packages/bridge/bridge-react/vite.config.ts b/packages/bridge/bridge-react/vite.config.ts
+index be2badcdafd..2e3b5cfc243 100644
+--- a/packages/bridge/bridge-react/vite.config.ts
++++ b/packages/bridge/bridge-react/vite.config.ts
+@@ -20,6 +20,7 @@ export default defineConfig({
+     lib: {
+       entry: {
+         index: path.resolve(__dirname, 'src/index.ts'),
++        base: path.resolve(__dirname, 'src/base.ts'),
+         plugin: path.resolve(__dirname, 'src/provider/plugin.ts'),
+         router: path.resolve(__dirname, 'src/router/default.tsx'),
+         'router-v5': path.resolve(__dirname, 'src/router/v5.tsx'),
+diff --git a/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts b/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts
+index 857ecc309ba..f53fcfe92d6 100644
+--- a/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts
++++ b/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts
+@@ -105,7 +105,42 @@ export default class ModuleFederationPlugin implements WebpackPluginInstance {
+       return false;
+     };
+ 
+-    if (shouldEnableBridgePlugin()) {
++    const enableBridgePlugin = shouldEnableBridgePlugin();
++
++    // When bridge plugin is disabled (router disabled), alias to /base entry
++    if (!enableBridgePlugin && hasBridgeReact) {
++      compiler.hooks.afterPlugins.tap('BridgeReactBaseAliasPlugin', () => {
++        try {
++          const path = require('path');
++          const fs = require('fs');
++          const bridgeReactBasePath = path.resolve(
++            compiler.context,
++            'node_modules/@module-federation/bridge-react/dist/base.es.js',
++          );
++
++          if (!fs.existsSync(bridgeReactBasePath)) {
++            infrastructureLogger.warn(
++              '⚠️  [ModuleFederationPlugin] bridge-react /base entry not found, falling back to default entry',
++            );
++            return;
++          }
++
++          compiler.options.resolve.alias = {
++            ...compiler.options.resolve.alias,
++            '@module-federation/bridge-react$': bridgeReactBasePath,
++          };
++          infrastructureLogger.info(
++            '✅ [ModuleFederationPlugin] Router disabled - using /base entry (no react-router-dom)',
++          );
++        } catch (error) {
++          infrastructureLogger.warn(
++            '⚠️  [ModuleFederationPlugin] Failed to set /base alias, using default entry',
++          );
++        }
++      });
++    }
++
++    if (enableBridgePlugin) {
+       new ReactBridgePlugin({
+         moduleFederationOptions: this._options,
+       }).apply(compiler);
+diff --git a/packages/rspack/src/ModuleFederationPlugin.ts b/packages/rspack/src/ModuleFederationPlugin.ts
+index c7c6a119af4..821831bd2b1 100644
+--- a/packages/rspack/src/ModuleFederationPlugin.ts
++++ b/packages/rspack/src/ModuleFederationPlugin.ts
+@@ -250,7 +250,41 @@ export class ModuleFederationPlugin implements RspackPluginInstance {
+       return false;
+     };
+ 
+-    if (shouldEnableBridgePlugin()) {
++    const enableBridgePlugin = shouldEnableBridgePlugin();
++
++    // When bridge plugin is disabled (router disabled), alias to /base entry
++    if (!enableBridgePlugin && hasBridgeReact) {
++      compiler.hooks.afterPlugins.tap('BridgeReactBaseAliasPlugin', () => {
++        try {
++          const bridgeReactBasePath = path.resolve(
++            compiler.context,
++            'node_modules/@module-federation/bridge-react/dist/base.es.js',
++          );
++
++          if (!fs.existsSync(bridgeReactBasePath)) {
++            logger.warn(
++              '⚠️  [ModuleFederationPlugin] bridge-react /base entry not found, falling back to default entry',
++            );
++            return;
++          }
++
++          compiler.options.resolve.alias = {
++            ...compiler.options.resolve.alias,
++            '@module-federation/bridge-react$': bridgeReactBasePath,
++          };
++
++          logger.info(
++            '✅ [ModuleFederationPlugin] Router disabled - using /base entry (no react-router-dom)',
++          );
++        } catch (error) {
++          logger.warn(
++            '⚠️  [ModuleFederationPlugin] Failed to set /base alias, using default entry',
++          );
++        }
++      });
++    }
++
++    if (enableBridgePlugin) {
+       new ReactBridgePlugin({
+         moduleFederationOptions: this._options,
+       }).apply(compiler);

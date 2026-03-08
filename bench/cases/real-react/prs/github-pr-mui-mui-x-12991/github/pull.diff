@@ -1,0 +1,13 @@
+diff --git a/packages/x-data-grid-pro/src/tests/rowEditing.DataGridPro.test.tsx b/packages/x-data-grid-pro/src/tests/rowEditing.DataGridPro.test.tsx
+index 2f67660728258..fa67b53ae0f15 100644
+--- a/packages/x-data-grid-pro/src/tests/rowEditing.DataGridPro.test.tsx
++++ b/packages/x-data-grid-pro/src/tests/rowEditing.DataGridPro.test.tsx
+@@ -1384,7 +1384,7 @@ describe('<DataGridPro /> - Row editing', () => {
+       }, [hasFocus, inputRef]);
+       return (
+         <Portal>
+-          <input ref={(ref) => setInputRef(ref)} data-testid="input" />
++          <input ref={setInputRef} data-testid="input" />
+         </Portal>
+       );
+     }

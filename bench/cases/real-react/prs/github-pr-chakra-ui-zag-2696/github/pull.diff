@@ -1,0 +1,93 @@
+diff --git a/.changeset/silver-stars-cross.md b/.changeset/silver-stars-cross.md
+new file mode 100644
+index 0000000000..4bb71d7213
+--- /dev/null
++++ b/.changeset/silver-stars-cross.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/menu": patch
++---
++
++Make child and parent menu service types more precise
+diff --git a/packages/machines/menu/src/menu.machine.ts b/packages/machines/menu/src/menu.machine.ts
+index 44da33ac07..4da034c09f 100644
+--- a/packages/machines/menu/src/menu.machine.ts
++++ b/packages/machines/menu/src/menu.machine.ts
+@@ -1,4 +1,4 @@
+-import { createGuards, createMachine, type Scope, type Service } from "@zag-js/core"
++import { createGuards, createMachine, type Scope } from "@zag-js/core"
+ import { trackDismissableElement } from "@zag-js/dismissable"
+ import {
+   addDomEvent,
+@@ -16,7 +16,7 @@ import { getPlacement, getPlacementSide, type Placement } from "@zag-js/popper"
+ import { getElementPolygon, isPointInPolygon, type Point } from "@zag-js/rect-utils"
+ import { isEqual } from "@zag-js/utils"
+ import * as dom from "./menu.dom"
+-import type { MenuSchema, MenuService } from "./menu.types"
++import type { ChildMenuService, MenuSchema, ParentMenuService } from "./menu.types"
+ 
+ const { not, and, or } = createGuards<MenuSchema>()
+ 
+@@ -838,7 +838,7 @@ export const machine = createMachine<MenuSchema>({
+   },
+ })
+ 
+-function closeRootMenu(ctx: { parent: Service<MenuSchema> | null }) {
++function closeRootMenu(ctx: { parent: ParentMenuService | null }) {
+   let parent = ctx.parent
+   while (parent && parent.context.get("isSubmenu")) {
+     parent = parent.refs.get("parent")
+@@ -851,7 +851,7 @@ function isWithinPolygon(polygon: Point[] | null, point: Point) {
+   return isPointInPolygon(polygon, point)
+ }
+ 
+-function resolveItemId(children: Record<string, MenuService>, value: string | null, scope: Scope) {
++function resolveItemId(children: Record<string, ChildMenuService>, value: string | null, scope: Scope) {
+   const hasChildren = Object.keys(children).length > 0
+   if (!value) return null
+   if (!hasChildren) {
+diff --git a/packages/machines/menu/src/menu.types.ts b/packages/machines/menu/src/menu.types.ts
+index 4f628f4ca9..2116069db0 100644
+--- a/packages/machines/menu/src/menu.types.ts
++++ b/packages/machines/menu/src/menu.types.ts
+@@ -142,8 +142,8 @@ export interface MenuSchema {
+     highlightedId: string | null
+   }
+   refs: {
+-    parent: Service<MenuSchema> | null
+-    children: Record<string, Service<MenuSchema>>
++    parent: ParentMenuService | null
++    children: Record<string, ChildMenuService>
+     typeaheadState: TypeaheadState
+     positioningOverride: Partial<PositioningOptions>
+   }
+@@ -162,6 +162,15 @@ export type MenuService = Service<MenuSchema>
+ 
+ export type MenuMachine = Machine<MenuSchema>
+ 
++/**
++ * Minimal interface required for child menu relationship.
++ */
++export type ChildMenuService = Pick<MenuService, "prop" | "send" | "scope">
++/**
++ * Minimal interface required for parent menu relationship.
++ */
++export type ParentMenuService = Pick<MenuService, "prop" | "send" | "refs" | "context">
++
+ /* -----------------------------------------------------------------------------
+  * Component API
+  * -----------------------------------------------------------------------------*/
+@@ -284,11 +293,11 @@ export interface MenuApi<T extends PropTypes = PropTypes> {
+   /**
+    * Function to register a parent menu. This is used for submenus
+    */
+-  setParent: (parent: MenuService) => void
++  setParent: (parent: ParentMenuService) => void
+   /**
+    * Function to register a child menu. This is used for submenus
+    */
+-  setChild: (child: MenuService) => void
++  setChild: (child: ChildMenuService) => void
+   /**
+    * Function to reposition the popover
+    */

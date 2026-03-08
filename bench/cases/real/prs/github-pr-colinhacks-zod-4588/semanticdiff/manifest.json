@@ -1,0 +1,53 @@
+[
+  {
+    "tracking_name": "packages/bench/error-handling.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fbench%2Ferror-handling.ts&old_oid=010ff8c61acf7986a7b4ee6804cbf81a6ac3a50f&old_mode=33188&new_filename=packages%2Fbench%2Ferror-handling.ts&new_oid=3976fb393fde30e400e76e88d0e5a8443ef7c265&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/bench/error-handling.ts",
+      "oid": "010ff8c61acf7986a7b4ee6804cbf81a6ac3a50f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/bench/error-handling.ts",
+      "oid": "3976fb393fde30e400e76e88d0e5a8443ef7c265",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "37e4d00924882581295cfaf072ea40481052e26d9633b1b506815d6cadde8fc6"
+  },
+  {
+    "tracking_name": "packages/bench/object.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fbench%2Fobject.ts&old_oid=bde9a0f3fe9fcbf948a5bfb82d8621e74b3aa69a&old_mode=33188&new_filename=packages%2Fbench%2Fobject.ts&new_oid=620d1fd39ad00d6d56cc2084c0457f6a887762bf&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/bench/object.ts",
+      "oid": "bde9a0f3fe9fcbf948a5bfb82d8621e74b3aa69a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/bench/object.ts",
+      "oid": "620d1fd39ad00d6d56cc2084c0457f6a887762bf",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2a77e8054d1c2523b616fe9ac2fdf8e5b199a5a52e088de7071e1f945b87ae53"
+  },
+  {
+    "tracking_name": "packages/tsc/generate.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Ftsc%2Fgenerate.ts&old_oid=c55d81638636473772560aaf82acac67145f4a8e&old_mode=33188&new_filename=packages%2Ftsc%2Fgenerate.ts&new_oid=1e5f8a718cc1bf65f729bed37cc7de476fac643e&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/tsc/generate.ts",
+      "oid": "c55d81638636473772560aaf82acac67145f4a8e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/tsc/generate.ts",
+      "oid": "1e5f8a718cc1bf65f729bed37cc7de476fac643e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "87a6364c4fd031561fe62bc3199359ce9107e17b059270b077dd3b3af659e733"
+  }
+]

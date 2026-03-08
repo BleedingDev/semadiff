@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-1754",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#1754: refactor(runtime): rename hooks",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 1754,
+    "prUrl": "https://github.com/module-federation/core/pull/1754",
+    "baseSha": "aeb94df355ba27e201f1ba5b8ed7d3913e67f3db",
+    "headSha": "171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+    "selectedFiles": [
+      "packages/runtime/src/plugins/snapshot/index.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:32.659Z"
+  },
+  "files": [
+    {
+      "id": "packages/runtime/src/plugins/snapshot/index.ts",
+      "oldPath": "packages/runtime/src/plugins/snapshot/index.ts",
+      "newPath": "packages/runtime/src/plugins/snapshot/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/runtime/src/plugins/snapshot/index.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 29,
+          "endLine": 29
+        },
+        "newRange": {
+          "startLine": 29,
+          "endLine": 29
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

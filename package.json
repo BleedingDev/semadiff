@@ -5,6 +5,11 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
+    "benchmark:compare": "pnpm --filter @semadiff/benchmark-harness build && node packages/benchmark-harness/dist/cli.js --cases bench/cases/gold/micro --tools semadiff,git-diff,git-diff-color-moved,difftastic",
+    "benchmark:compare:sem": "pnpm --filter @semadiff/benchmark-harness build && SEM_BIN=tmp/sem-install/bin/sem node packages/benchmark-harness/dist/cli.js --cases bench/cases/gold/micro --tools semadiff,sem",
+    "benchmark:gold": "pnpm --filter @semadiff/benchmark-harness build && node packages/benchmark-harness/dist/cli.js --cases bench/cases/gold/micro",
+    "benchmark:real:compare": "pnpm --filter @semadiff/benchmark-harness build && node packages/benchmark-harness/dist/cli.js --cases bench/cases/real/prs --tools semadiff,git-diff,git-diff-color-moved,difftastic,semanticdiff",
+    "benchmark:real:refresh": "pnpm --filter @semadiff/benchmark-harness build && node scripts/refresh-real-pr-corpus.mjs",
     "dev": "pnpm --filter @semadiff/github-extension dev",
     "lint": "biome lint .",
     "format": "biome format . --write",

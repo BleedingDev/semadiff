@@ -1,0 +1,20 @@
+diff --git a/packages/vitest/src/node/types/benchmark.ts b/packages/vitest/src/node/types/benchmark.ts
+index e3620aa7ee70..567f85e0025a 100644
+--- a/packages/vitest/src/node/types/benchmark.ts
++++ b/packages/vitest/src/node/types/benchmark.ts
+@@ -25,12 +25,12 @@ export interface BenchmarkUserOptions {
+   includeSource?: string[]
+ 
+   /**
+-   * Custom reporter for output. Can contain one or more built-in report names, reporter instances,
+-   * and/or paths to custom reporters
++   * Custom reporters to use for output. Can contain one or more built-in reporter names, reporter instances,
++   * and/or paths to custom reporter files to import.
+    *
+    * @default ['default']
+    */
+-  reporters?: Arrayable<BenchmarkBuiltinReporters | Reporter>
++  reporters?: Arrayable<BenchmarkBuiltinReporters | Reporter | (string & {})>
+ 
+   /**
+    * @deprecated Use `benchmark.outputJson` instead

@@ -1,0 +1,86 @@
+{
+  "id": "cross-file-move-ts-001",
+  "language": "ts",
+  "kind": "micro",
+  "description": "An identical function moved to a new file is captured by the entity sidecar without changing review output.",
+  "files": [
+    {
+      "id": "src/a.ts",
+      "oldPath": "src/a.ts",
+      "newPath": null,
+      "status": "deleted",
+      "beforePath": "old-a.ts"
+    },
+    {
+      "id": "src/b.ts",
+      "oldPath": null,
+      "newPath": "src/b.ts",
+      "status": "added",
+      "afterPath": "new-b.ts"
+    }
+  ],
+  "truth": {
+    "operations": [],
+    "moves": [],
+    "renames": [],
+    "entities": [
+      {
+        "side": "old",
+        "fileId": "src/a.ts",
+        "kind": "function",
+        "name": "helper",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "fileId": "src/b.ts",
+        "kind": "function",
+        "name": "helper",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      }
+    ],
+    "entityChanges": [
+      {
+        "kind": "function",
+        "before": {
+          "fileId": "src/a.ts",
+          "kind": "function",
+          "name": "helper",
+          "range": {
+            "startLine": 1,
+            "endLine": 3
+          },
+          "exported": true
+        },
+        "after": {
+          "fileId": "src/b.ts",
+          "kind": "function",
+          "name": "helper",
+          "range": {
+            "startLine": 1,
+            "endLine": 3
+          },
+          "exported": true
+        },
+        "changeKinds": [
+          "moved"
+        ]
+      }
+    ],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": false,
+    "entity": true,
+    "graph": false
+  }
+}

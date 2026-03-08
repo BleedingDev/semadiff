@@ -1,0 +1,733 @@
+diff --git a/.github/renovate.json5 b/.github/renovate.json5
+index 1177e90b4f30a5..b9baefa8850eb1 100644
+--- a/.github/renovate.json5
++++ b/.github/renovate.json5
+@@ -32,7 +32,6 @@
+     "node",
+     "typescript",
+     "@rollup/plugin-dynamic-import-vars", // prefer version using tinyglobby
+-    "@oxc-project/types", // align version with rolldown
+ 
+     // pinned
+     "slash3",
+diff --git a/package.json b/package.json
+index 17aee98d36d333..8ae6b92d9a76c3 100644
+--- a/package.json
++++ b/package.json
+@@ -46,7 +46,6 @@
+     "@types/babel__preset-env": "^7.10.0",
+     "@types/convert-source-map": "^2.0.3",
+     "@types/cross-spawn": "^6.0.6",
+-    "@types/estree": "^1.0.8",
+     "@types/etag": "^1.8.4",
+     "@types/less": "^3.0.8",
+     "@types/node": "^24.10.15",
+diff --git a/packages/vite/package.json b/packages/vite/package.json
+index 62c26be12bbd50..bf4d360559be9d 100644
+--- a/packages/vite/package.json
++++ b/packages/vite/package.json
+@@ -87,7 +87,6 @@
+     "@babel/parser": "^7.29.0",
+     "@jridgewell/remapping": "^2.3.5",
+     "@jridgewell/trace-mapping": "^0.3.31",
+-    "@oxc-project/types": "0.115.0",
+     "@polka/compression": "^1.0.0-next.25",
+     "@rollup/plugin-alias": "^6.0.0",
+     "@rollup/plugin-dynamic-import-vars": "2.1.4",
+@@ -103,7 +102,6 @@
+     "convert-source-map": "^2.0.0",
+     "cors": "^2.8.6",
+     "cross-spawn": "^7.0.6",
+-    "obug": "^1.0.2",
+     "dotenv-expand": "^12.0.3",
+     "es-module-lexer": "^1.7.0",
+     "esbuild": "^0.27.3",
+@@ -117,6 +115,7 @@
+     "mlly": "^1.8.0",
+     "mrmime": "^2.0.1",
+     "nanoid": "^5.1.6",
++    "obug": "^1.0.2",
+     "open": "^10.2.0",
+     "parse5": "^8.0.0",
+     "pathe": "^2.0.3",
+diff --git a/packages/vite/rolldown.dts.config.ts b/packages/vite/rolldown.dts.config.ts
+index c0b20d6aeb9acb..cf03e42bb5926a 100644
+--- a/packages/vite/rolldown.dts.config.ts
++++ b/packages/vite/rolldown.dts.config.ts
+@@ -7,17 +7,17 @@ import type {
+   PluginContext,
+   RenderedChunk,
+ } from 'rolldown'
++import type { ESTree } from 'rolldown/utils'
+ import { parseAst } from 'rolldown/parseAst'
+ import { dts } from 'rolldown-plugin-dts'
+ import { parse as parseWithBabel } from '@babel/parser'
+ import { walk } from 'estree-walker'
+ import MagicString from 'magic-string'
+-import type {
+-  Directive,
+-  ModuleExportName,
+-  Program,
+-  Statement,
+-} from '@oxc-project/types'
++
++type Directive = ESTree.Directive
++type ModuleExportName = ESTree.ModuleExportName
++type Program = ESTree.Program
++type Statement = ESTree.Statement
+ 
+ const pkg = JSON.parse(
+   readFileSync(new URL('./package.json', import.meta.url)).toString(),
+diff --git a/packages/vite/src/node/plugins/importAnalysis.ts b/packages/vite/src/node/plugins/importAnalysis.ts
+index c02166958aef13..d15038b477574b 100644
+--- a/packages/vite/src/node/plugins/importAnalysis.ts
++++ b/packages/vite/src/node/plugins/importAnalysis.ts
+@@ -14,7 +14,7 @@ import type { StaticImport } from 'mlly'
+ import { ESM_STATIC_IMPORT_RE, parseStaticImport } from 'mlly'
+ import { makeLegalIdentifier } from '@rollup/pluginutils'
+ import type { PartialResolvedId, RollupError } from 'rolldown'
+-import type { Identifier, Literal, Program } from 'estree'
++import type { ESTree } from 'rolldown/utils'
+ import {
+   CLIENT_DIR,
+   CLIENT_PUBLIC_PATH,
+@@ -1010,7 +1010,7 @@ export function transformCjsImport(
+   isNodeMode: boolean,
+   config: ResolvedConfig,
+ ): string | undefined {
+-  const node = (parseAst(importExp) as Program).body[0]
++  const node = parseAst(importExp).body[0]
+ 
+   // `export * from '...'` may cause unexpected problem, so give it a warning
+   if (
+@@ -1036,9 +1036,7 @@ export function transformCjsImport(
+     let defaultExports: string = ''
+     for (const spec of node.specifiers) {
+       if (spec.type === 'ImportSpecifier') {
+-        const importedName = getIdentifierNameOrLiteralValue(
+-          spec.imported,
+-        ) as string
++        const importedName = getIdentifierNameOrLiteralValue(spec.imported)
+         const localName = spec.local.name
+         importNames.push({ importedName, localName })
+       } else if (spec.type === 'ImportDefaultSpecifier') {
+@@ -1051,13 +1049,9 @@ export function transformCjsImport(
+       } else if (spec.type === 'ExportSpecifier') {
+         // for ExportSpecifier, local name is same as imported name
+         // prefix the variable name to avoid clashing with other local variables
+-        const importedName = getIdentifierNameOrLiteralValue(
+-          spec.local,
+-        ) as string
++        const importedName = getIdentifierNameOrLiteralValue(spec.local)
+         // we want to specify exported name as variable and re-export it
+-        const exportedName = getIdentifierNameOrLiteralValue(
+-          spec.exported,
+-        ) as string
++        const exportedName = getIdentifierNameOrLiteralValue(spec.exported)
+         if (exportedName === 'default') {
+           defaultExports = makeLegalIdentifier(
+             `__vite__cjsExportDefault_${importIndex}`,
+@@ -1066,7 +1060,7 @@ export function transformCjsImport(
+         } else {
+           const localName = `__vite__cjsExport${
+             spec.exported.type === 'Literal'
+-              ? `L_${getHash(spec.exported.value as string)}`
++              ? `L_${getHash(spec.exported.value)}`
+               : 'I_' + spec.exported.name
+           }`
+           importNames.push({ importedName, localName })
+@@ -1111,7 +1105,7 @@ export function transformCjsImport(
+   }
+ }
+ 
+-function getIdentifierNameOrLiteralValue(node: Identifier | Literal) {
++function getIdentifierNameOrLiteralValue(node: ESTree.ModuleExportName) {
+   return node.type === 'Identifier' ? node.name : node.value
+ }
+ 
+diff --git a/packages/vite/src/node/plugins/importMetaGlob.ts b/packages/vite/src/node/plugins/importMetaGlob.ts
+index 955c3f0766e4d6..7f24a0a6ff36e1 100644
+--- a/packages/vite/src/node/plugins/importMetaGlob.ts
++++ b/packages/vite/src/node/plugins/importMetaGlob.ts
+@@ -2,14 +2,7 @@ import { isAbsolute, posix } from 'node:path'
+ import picomatch from 'picomatch'
+ import { stripLiteral } from 'strip-literal'
+ import colors from 'picocolors'
+-import type {
+-  ArrayExpression,
+-  Expression,
+-  Literal,
+-  Node,
+-  SpreadElement,
+-  TemplateLiteral,
+-} from 'estree'
++import type { ESTree } from 'rolldown/utils'
+ import type { CustomPluginOptions, RollupError } from 'rolldown'
+ import MagicString from 'magic-string'
+ import { stringifyQuery } from 'ufo'
+@@ -289,14 +282,14 @@ export async function parseImportGlob(
+     if (ast.arguments.length < 1 || ast.arguments.length > 2)
+       throw err(`Expected 1-2 arguments, but got ${ast.arguments.length}`)
+ 
+-    const arg1 = ast.arguments[0] as ArrayExpression | Literal | TemplateLiteral
+-    const arg2 = ast.arguments[1] as
+-      | (Node & { start: number; end: number })
+-      | undefined
++    const arg1 = ast.arguments[0]
++    const arg2 = ast.arguments[1]
+ 
+     const globs: string[] = []
+ 
+-    const validateLiteral = (element: Expression | SpreadElement | null) => {
++    const validateLiteral = (
++      element: ESTree.Expression | ESTree.SpreadElement | null,
++    ) => {
+       if (!element) return
+       if (element.type === 'Literal') {
+         if (typeof element.value !== 'string')
+diff --git a/packages/vite/src/node/plugins/workerImportMetaUrl.ts b/packages/vite/src/node/plugins/workerImportMetaUrl.ts
+index 5cf5e06e985513..27932b5df751d6 100644
+--- a/packages/vite/src/node/plugins/workerImportMetaUrl.ts
++++ b/packages/vite/src/node/plugins/workerImportMetaUrl.ts
+@@ -3,7 +3,7 @@ import MagicString from 'magic-string'
+ import type { RollupError } from 'rolldown'
+ import { parseAstAsync } from 'rolldown/parseAst'
+ import { stripLiteral } from 'strip-literal'
+-import type { Expression, ExpressionStatement } from 'estree'
++import type { ESTree } from 'rolldown/utils'
+ import type { ResolvedConfig } from '../config'
+ import type { Plugin } from '../plugin'
+ import { evalValue, injectQuery, transformStableResult } from '../utils'
+@@ -40,7 +40,7 @@ function findClosingParen(input: string, fromIndex: number) {
+ }
+ 
+ function extractWorkerTypeFromAst(
+-  expression: Expression,
++  expression: ESTree.Expression,
+   optsStartIndex: number,
+ ): 'classic' | 'module' | undefined {
+   if (expression.type !== 'ObjectExpression') {
+@@ -102,7 +102,8 @@ async function parseWorkerOptions(
+     opts = evalValue<WorkerOptions>(rawOpts)
+   } catch {
+     const optsNode = (
+-      (await parseAstAsync(`(${rawOpts})`)).body[0] as ExpressionStatement
++      (await parseAstAsync(`(${rawOpts})`))
++        .body[0] as ESTree.ExpressionStatement
+     ).expression
+ 
+     const type = extractWorkerTypeFromAst(optsNode, optsStartIndex)
+diff --git a/packages/vite/src/node/server/pluginContainer.ts b/packages/vite/src/node/server/pluginContainer.ts
+index f653a00b8811f7..73404b4743e68f 100644
+--- a/packages/vite/src/node/server/pluginContainer.ts
++++ b/packages/vite/src/node/server/pluginContainer.ts
+@@ -34,7 +34,7 @@ import fsp from 'node:fs/promises'
+ import { join } from 'node:path'
+ import { performance } from 'node:perf_hooks'
+ import { parseAst as rolldownParseAst } from 'rolldown/parseAst'
+-import type { Program } from '@oxc-project/types'
++import type { ESTree } from 'rolldown/utils'
+ import type {
+   AsyncPluginHooks,
+   CustomPluginOptions,
+@@ -765,7 +765,7 @@ class PluginContext
+ 
+   fs: RollupFsModule = fsModule
+ 
+-  parse(code: string, opts: any): Program {
++  parse(code: string, opts: any): ESTree.Program {
+     return rolldownParseAst(code, opts)
+   }
+ 
+diff --git a/packages/vite/src/node/ssr/ssrTransform.ts b/packages/vite/src/node/ssr/ssrTransform.ts
+index a6ba429e0f78d6..6a4e615884c0bf 100644
+--- a/packages/vite/src/node/ssr/ssrTransform.ts
++++ b/packages/vite/src/node/ssr/ssrTransform.ts
+@@ -1,19 +1,7 @@
+ import path from 'node:path'
+ import MagicString from 'magic-string'
+ import type { SourceMap } from 'rolldown'
+-import type {
+-  ExportAllDeclaration,
+-  ExportDefaultDeclaration,
+-  ExportNamedDeclaration,
+-  Function as FunctionNode,
+-  Identifier,
+-  ImportDeclaration,
+-  Literal,
+-  Pattern,
+-  Property,
+-  VariableDeclaration,
+-  Node as _Node,
+-} from 'estree'
++import type { ESTree } from 'rolldown/utils'
+ import { extract_names as extractNames } from 'periscopic'
+ import { walk as eswalk } from 'estree-walker'
+ import type { RawSourceMap } from '@jridgewell/remapping'
+@@ -28,16 +16,6 @@ import {
+ import { isJSONRequest } from '../plugins/json'
+ import type { DefineImportMetadata } from '../../shared/ssrTransform'
+ 
+-type Node = _Node & {
+-  start: number
+-  end: number
+-}
+-
+-type OxcAstNode<T extends _Node> = T & {
+-  start: number
+-  end: number
+-}
+-
+ export interface ModuleRunnerTransformOptions {
+   json?: {
+     stringify?: boolean
+@@ -87,7 +65,7 @@ async function ssrTransformScript(
+ ): Promise<TransformResult | null> {
+   const s = new MagicString(code)
+ 
+-  let ast: any
++  let ast: ESTree.Program
+   try {
+     ast = await rolldownParseAstAsync(code)
+   } catch (err) {
+@@ -121,16 +99,16 @@ async function ssrTransformScript(
+   function defineImport(
+     index: number,
+     importNode: (
+-      | ImportDeclaration
+-      | (ExportNamedDeclaration & { source: Literal })
+-      | ExportAllDeclaration
++      | ESTree.ImportDeclaration
++      | (ESTree.ExportNamedDeclaration & { source: ESTree.StringLiteral })
++      | ESTree.ExportAllDeclaration
+     ) & {
+       start: number
+       end: number
+     },
+     metadata?: DefineImportMetadata,
+   ) {
+-    const source = importNode.source.value as string
++    const source = importNode.source.value
+     deps.add(source)
+ 
+     // Reduce metadata to undefined if it's all default values
+@@ -167,21 +145,21 @@ async function ssrTransformScript(
+   }
+ 
+   const imports: (
+-    | OxcAstNode<ImportDeclaration>
+-    | OxcAstNode<ExportNamedDeclaration>
+-    | OxcAstNode<ExportAllDeclaration>
++    | ESTree.ImportDeclaration
++    | ESTree.ExportNamedDeclaration
++    | ESTree.ExportAllDeclaration
+   )[] = []
+   const exports: (
+-    | OxcAstNode<ExportNamedDeclaration>
+-    | OxcAstNode<ExportDefaultDeclaration>
+-    | OxcAstNode<ExportAllDeclaration>
++    | ESTree.ExportNamedDeclaration
++    | ESTree.ExportDefaultDeclaration
++    | ESTree.ExportAllDeclaration
+   )[] = []
+   const reExportImportIdMap = new Map<
+-    OxcAstNode<ExportNamedDeclaration> | OxcAstNode<ExportAllDeclaration>,
++    ESTree.ExportNamedDeclaration | ESTree.ExportAllDeclaration,
+     string
+   >()
+ 
+-  for (const node of ast.body as Node[]) {
++  for (const node of ast.body) {
+     if (node.type === 'ImportDeclaration') {
+       imports.push(node)
+     } else if (node.type === 'ExportDefaultDeclaration') {
+@@ -203,10 +181,12 @@ async function ssrTransformScript(
+         // export { foo, bar } from './foo'
+         const importId = defineImport(
+           hoistIndex,
+-          node as OxcAstNode<ExportNamedDeclaration & { source: Literal }>,
++          node as ESTree.ExportNamedDeclaration & {
++            source: ESTree.StringLiteral
++          },
+           {
+-            importedNames: node.specifiers.map(
+-              (s) => getIdentifierNameOrLiteralValue(s.local) as string,
++            importedNames: node.specifiers.map((s) =>
++              getIdentifierNameOrLiteralValue(s.local),
+             ),
+           },
+         )
+@@ -230,7 +210,7 @@ async function ssrTransformScript(
+       importedNames: node.specifiers
+         .map((s) => {
+           if (s.type === 'ImportSpecifier')
+-            return getIdentifierNameOrLiteralValue(s.imported) as string
++            return getIdentifierNameOrLiteralValue(s.imported)
+           else if (s.type === 'ImportDefaultSpecifier') return 'default'
+         })
+         .filter(isDefined),
+@@ -245,7 +225,7 @@ async function ssrTransformScript(
+         } else {
+           idToImportMap.set(
+             spec.local.name,
+-            `${importId}[${JSON.stringify(spec.imported.value as string)}]`,
++            `${importId}[${JSON.stringify(spec.imported.value)}]`,
+           )
+         }
+       } else if (spec.type === 'ImportDefaultSpecifier') {
+@@ -269,30 +249,29 @@ async function ssrTransformScript(
+           // export function foo() {}
+           defineExport(node.declaration.id!.name)
+         } else {
++          const declaration = node.declaration as ESTree.VariableDeclaration
+           // export const foo = 1, bar = 2
+-          for (const declaration of node.declaration.declarations) {
+-            const names = extractNames(declaration.id as any)
++          for (const decl of declaration.declarations) {
++            const names = extractNames(decl.id as any)
+             for (const name of names) {
+               defineExport(name)
+             }
+           }
+         }
+-        s.remove(node.start, (node.declaration as Node).start)
++        s.remove(node.start, node.declaration.start)
+       } else {
+         if (node.source) {
+           // export { foo, bar } from './foo'
+           const importId = reExportImportIdMap.get(node)!
+           for (const spec of node.specifiers) {
+-            const exportedAs = getIdentifierNameOrLiteralValue(
+-              spec.exported,
+-            ) as string
++            const exportedAs = getIdentifierNameOrLiteralValue(spec.exported)
+ 
+             if (spec.local.type === 'Identifier') {
+               defineExport(exportedAs, `${importId}.${spec.local.name}`)
+             } else {
+               defineExport(
+                 exportedAs,
+-                `${importId}[${JSON.stringify(spec.local.value as string)}]`,
++                `${importId}[${JSON.stringify(spec.local.value)}]`,
+               )
+             }
+           }
+@@ -301,11 +280,9 @@ async function ssrTransformScript(
+           // export { foo, bar }
+           for (const spec of node.specifiers) {
+             // spec.local can be Literal only when it has "from 'something'"
+-            const local = (spec.local as Identifier).name
++            const local = (spec.local as ESTree.IdentifierReference).name
+             const binding = idToImportMap.get(local)
+-            const exportedAs = getIdentifierNameOrLiteralValue(
+-              spec.exported,
+-            ) as string
++            const exportedAs = getIdentifierNameOrLiteralValue(spec.exported)
+ 
+             defineExport(exportedAs, binding || local)
+           }
+@@ -343,9 +320,7 @@ async function ssrTransformScript(
+     if (node.type === 'ExportAllDeclaration') {
+       const importId = reExportImportIdMap.get(node)!
+       if (node.exported) {
+-        const exportedAs = getIdentifierNameOrLiteralValue(
+-          node.exported,
+-        ) as string
++        const exportedAs = getIdentifierNameOrLiteralValue(node.exported)
+         defineExport(exportedAs, `${importId}`)
+       } else {
+         s.appendLeft(node.end, `${ssrExportAllKey}(${importId});\n`)
+@@ -452,27 +427,26 @@ async function ssrTransformScript(
+   }
+ }
+ 
+-function getIdentifierNameOrLiteralValue(node: Identifier | Literal) {
++function getIdentifierNameOrLiteralValue(node: ESTree.ModuleExportName) {
+   return node.type === 'Identifier' ? node.name : node.value
+ }
+ 
+ interface Visitors {
+   onIdentifier: (
+-    node: Identifier & {
+-      start: number
+-      end: number
+-    },
+-    parent: Node,
+-    parentStack: Node[],
++    node: ESTree.IdentifierReference,
++    parent: ESTree.Node,
++    parentStack: ESTree.Node[],
+   ) => void
+-  onImportMeta: (node: Node) => void
+-  onDynamicImport: (node: Node) => void
+-  onStatements: (statements: Node[]) => void
++  onImportMeta: (node: ESTree.Node) => void
++  onDynamicImport: (node: ESTree.Node) => void
++  onStatements: (statements: ESTree.Node[]) => void
+ }
+ 
+-const isNodeInPatternWeakSet = new WeakSet<_Node>()
+-const setIsNodeInPattern = (node: Property) => isNodeInPatternWeakSet.add(node)
+-const isNodeInPattern = (node: _Node): node is Property =>
++type ESTreeProperty = ESTree.Node & { type: 'Property' }
++const isNodeInPatternWeakSet = new WeakSet<ESTree.Node>()
++const setIsNodeInPattern = (node: ESTreeProperty) =>
++  isNodeInPatternWeakSet.add(node)
++const isNodeInPattern = (node: ESTree.Node): node is ESTreeProperty =>
+   isNodeInPatternWeakSet.has(node)
+ 
+ /**
+@@ -480,15 +454,15 @@ const isNodeInPattern = (node: _Node): node is Property =>
+  * Except this is using acorn AST
+  */
+ function walk(
+-  root: Node,
++  root: ESTree.Node,
+   { onIdentifier, onImportMeta, onDynamicImport, onStatements }: Visitors,
+ ) {
+-  const parentStack: Node[] = []
+-  const varKindStack: VariableDeclaration['kind'][] = []
+-  const scopeMap = new WeakMap<_Node, Set<string>>()
+-  const identifiers: [id: any, stack: Node[]][] = []
++  const parentStack: ESTree.Node[] = []
++  const varKindStack: ESTree.VariableDeclaration['kind'][] = []
++  const scopeMap = new WeakMap<ESTree.Node, Set<string>>()
++  const identifiers: [id: any, stack: ESTree.Node[]][] = []
+ 
+-  const setScope = (node: _Node, name: string) => {
++  const setScope = (node: ESTree.Node, name: string) => {
+     let scopeIds = scopeMap.get(node)
+     if (scopeIds && scopeIds.has(name)) {
+       return
+@@ -500,10 +474,10 @@ function walk(
+     scopeIds.add(name)
+   }
+ 
+-  function isInScope(name: string, parents: Node[]) {
++  function isInScope(name: string, parents: ESTree.Node[]) {
+     return parents.some((node) => scopeMap.get(node)?.has(name))
+   }
+-  function handlePattern(p: Pattern, parentScope: _Node) {
++  function handlePattern(p: ESTree.ParamPattern, parentScope: ESTree.Node) {
+     if (p.type === 'Identifier') {
+       setScope(parentScope, p.name)
+     } else if (p.type === 'RestElement') {
+@@ -511,7 +485,10 @@ function walk(
+     } else if (p.type === 'ObjectPattern') {
+       p.properties.forEach((property) => {
+         if (property.type === 'RestElement') {
+-          setScope(parentScope, (property.argument as Identifier).name)
++          setScope(
++            parentScope,
++            (property.argument as ESTree.IdentifierName).name,
++          )
+         } else {
+           handlePattern(property.value, parentScope)
+         }
+@@ -530,7 +507,7 @@ function walk(
+   }
+ 
+   ;(eswalk as any)(root, {
+-    enter(node: Node, parent: Node | null) {
++    enter(node: ESTree.Node, parent: ESTree.Node | null) {
+       if (node.type === 'ImportDeclaration') {
+         return this.skip()
+       }
+@@ -541,9 +518,9 @@ function walk(
+         node.type === 'BlockStatement' ||
+         node.type === 'StaticBlock'
+       ) {
+-        onStatements(node.body as Node[])
++        onStatements(node.body)
+       } else if (node.type === 'SwitchCase') {
+-        onStatements(node.consequent as Node[])
++        onStatements(node.consequent)
+       }
+ 
+       // track parent stack, skip for "else-if"/"else" branches as acorn nests
+@@ -580,7 +557,7 @@ function walk(
+         if (node.type === 'FunctionDeclaration') {
+           const parentScope = findParentScope(parentStack)
+           if (parentScope) {
+-            setScope(parentScope, node.id.name)
++            setScope(parentScope, node.id!.name)
+           }
+         }
+         // If it is a function expression, its name (if exist) could also be
+@@ -596,7 +573,7 @@ function walk(
+             return
+           }
+           ;(eswalk as any)(p.type === 'AssignmentPattern' ? p.left : p, {
+-            enter(child: Node, parent: Node | undefined) {
++            enter(child: ESTree.Node, parent: ESTree.Node | undefined) {
+               // skip params default value of destructure
+               if (
+                 parent?.type === 'AssignmentPattern' &&
+@@ -611,7 +588,7 @@ function walk(
+               // assignment of a destructuring variable
+               if (
+                 (parent?.type === 'TemplateLiteral' &&
+-                  parent.expressions.includes(child)) ||
++                  parent.expressions.includes(child as ESTree.Expression)) ||
+                 (parent?.type === 'CallExpression' && parent.callee === child)
+               ) {
+                 return
+@@ -624,7 +601,7 @@ function walk(
+         // A class declaration name could shadow an import, so add its name to the parent scope
+         const parentScope = findParentScope(parentStack)
+         if (parentScope) {
+-          setScope(parentScope, node.id.name)
++          setScope(parentScope, node.id!.name)
+         }
+       } else if (node.type === 'ClassExpression' && node.id) {
+         // A class expression name could shadow an import, so add its name to the scope
+@@ -645,7 +622,7 @@ function walk(
+       }
+     },
+ 
+-    leave(node: Node, parent: Node | null) {
++    leave(node: ESTree.Node, parent: ESTree.Node | null) {
+       // untrack parent stack from above
+       if (
+         parent &&
+@@ -667,7 +644,11 @@ function walk(
+   })
+ }
+ 
+-function isRefIdentifier(id: Identifier, parent: _Node, parentStack: _Node[]) {
++function isRefIdentifier(
++  id: ESTree.Node & { type: 'Identifier' },
++  parent: ESTree.Node,
++  parentStack: ESTree.Node[],
++) {
+   // declaration id
+   if (
+     parent.type === 'CatchClause' ||
+@@ -680,11 +661,18 @@ function isRefIdentifier(id: Identifier, parent: _Node, parentStack: _Node[]) {
+ 
+   if (isFunction(parent)) {
+     // function declaration/expression id
+-    if ((parent as any).id === id) {
++    if (parent.id === id) {
+       return false
+     }
+     // params list
+-    if (parent.params.includes(id)) {
++    if (
++      parent.params.includes(
++        id as Exclude<
++          typeof id,
++          ESTree.TSThisParameter | ESTree.TSIndexSignatureName
++        >,
++      )
++    ) {
+       return false
+     }
+   }
+@@ -738,32 +726,42 @@ function isRefIdentifier(id: Identifier, parent: _Node, parentStack: _Node[]) {
+   return true
+ }
+ 
+-const isStaticProperty = (node: _Node): node is Property =>
++const isStaticProperty = (
++  node: ESTree.Node,
++): node is ESTree.Node & { type: 'Property' } =>
+   node.type === 'Property' && !node.computed
+ 
+-const isStaticPropertyKey = (node: _Node, parent: _Node | undefined) =>
+-  parent && isStaticProperty(parent) && parent.key === node
++const isStaticPropertyKey = (
++  node: ESTree.Node,
++  parent: ESTree.Node | undefined,
++) => parent && isStaticProperty(parent) && parent.key === node
+ 
+ const functionNodeTypeRE = /Function(?:Expression|Declaration)$|Method$/
+-function isFunction(node: _Node): node is FunctionNode {
++type FunctionNodes = ESTree.Node & {
++  type:
++    | `Function${'Expression' | 'Declaration'}`
++    | `${string}Function${'Expression' | 'Declaration'}`
++    | `${string}Method`
++}
++function isFunction(node: ESTree.Node): node is FunctionNodes {
+   return functionNodeTypeRE.test(node.type)
+ }
+ 
+ const blockNodeTypeRE = /^BlockStatement$|^For(?:In|Of)?Statement$/
+-function isBlock(node: _Node) {
++function isBlock(node: ESTree.Node) {
+   return blockNodeTypeRE.test(node.type)
+ }
+ 
+ function findParentScope(
+-  parentStack: _Node[],
++  parentStack: ESTree.Node[],
+   isVar = false,
+-): _Node | undefined {
++): ESTree.Node | undefined {
+   return parentStack.find(isVar ? isFunction : isBlock)
+ }
+ 
+ function isInDestructuringAssignment(
+-  parent: _Node,
+-  parentStack: _Node[],
++  parent: ESTree.Node,
++  parentStack: ESTree.Node[],
+ ): boolean {
+   if (parent.type === 'Property' || parent.type === 'ArrayPattern') {
+     return parentStack.some((i) => i.type === 'AssignmentExpression')
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index b0abed932b892b..f8eb5f0aa91cf4 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -9,7 +9,7 @@ overrides:
+   vite: workspace:*
+   debug: npm:obug@^1.0.2
+ 
+-packageExtensionsChecksum: sha256-BLDZCgUIohvBXMHo3XFOlGLzGXRyK3sDU0nMBRk9APY=
++packageExtensionsChecksum: sha256-Tldxs3DhJEw/FFBonUidqhCBqApA0zxQnop3Y+BTO3U=
+ 
+ patchedDependencies:
+   chokidar@3.6.0:
+@@ -44,9 +44,6 @@ importers:
+       '@types/cross-spawn':
+         specifier: ^6.0.6
+         version: 6.0.6
+-      '@types/estree':
+-        specifier: ^1.0.8
+-        version: 1.0.8
+       '@types/etag':
+         specifier: ^1.8.4
+         version: 1.8.4
+@@ -262,9 +259,6 @@ importers:
+       '@jridgewell/trace-mapping':
+         specifier: ^0.3.31
+         version: 0.3.31
+-      '@oxc-project/types':
+-        specifier: 0.115.0
+-        version: 0.115.0
+       '@polka/compression':
+         specifier: ^1.0.0-next.25
+         version: 1.0.0-next.25
+@@ -9252,6 +9246,7 @@ snapshots:
+   '@rollup/plugin-dynamic-import-vars@2.1.4(rollup@4.57.1)':
+     dependencies:
+       '@rollup/pluginutils': 5.3.0(rollup@4.57.1)
++      '@types/estree': 1.0.8
+       astring: 1.9.0
+       estree-walker: 2.0.2
+       magic-string: 0.30.21
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index 46886cf6c132f3..9e80a8e2705655 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -29,6 +29,9 @@ packageExtensions:
+     peerDependenciesMeta:
+       source-map-js:
+         optional: true
++  '@rollup/plugin-dynamic-import-vars':
++    dependencies:
++      '@types/estree': ^1.0.0
+ ignoredBuiltDependencies:
+   - core-js
+ onlyBuiltDependencies:

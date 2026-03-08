@@ -1,0 +1,3903 @@
+diff --git a/.changeset/metal-frogs-shake.md b/.changeset/metal-frogs-shake.md
+new file mode 100644
+index 0000000000..9331f3afa8
+--- /dev/null
++++ b/.changeset/metal-frogs-shake.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/scroll-snap": minor
++---
++
++Initial release
+diff --git a/.xstate/carousel.js b/.xstate/carousel.js
+index 75caf895ef..7c75f61e5e 100644
+--- a/.xstate/carousel.js
++++ b/.xstate/carousel.js
+@@ -11,23 +11,32 @@ const {
+ } = actions;
+ const fetchMachine = createMachine({
+   id: "carousel",
+-  initial: "idle",
++  initial: ctx.autoplay ? "autoplay" : "idle",
+   context: {},
+   on: {
+-    NEXT: {
+-      actions: ["scrollToNext"]
++    "PAGE.NEXT": {
++      target: "idle",
++      actions: ["clearScrollEndTimer", "setNextPage"]
+     },
+-    PREV: {
+-      actions: ["scrollToPrev"]
++    "PAGE.PREV": {
++      target: "idle",
++      actions: ["clearScrollEndTimer", "setPrevPage"]
+     },
+-    GOTO: {
+-      actions: ["scrollTo"]
++    "PAGE.SET": {
++      target: "idle",
++      actions: ["clearScrollEndTimer", "setPage"]
+     },
+-    MEASURE_DOM: {
+-      actions: ["measureElements", "setScrollSnaps"]
++    "INDEX.SET": {
++      target: "idle",
++      actions: ["clearScrollEndTimer", "setMatchingPage"]
+     },
+-    PLAY: "autoplay"
++    "SNAP.REFRESH": {
++      actions: ["setSnapPoints", "clampPage"]
++    }
+   },
++  activities: ["trackSlideMutation", "trackSlideIntersections", "trackSlideResize"],
++  entry: ["resetScrollPosition", "setSnapPoints", "setPage"],
++  exit: ["clearScrollEndTimer"],
+   on: {
+     UPDATE_CONTEXT: {
+       actions: "updateContext"
+@@ -35,31 +44,47 @@ const fetchMachine = createMachine({
+   },
+   states: {
+     idle: {
++      activities: ["trackScroll"],
+       on: {
+-        POINTER_DOWN: "dragging"
++        "DRAGGING.START": {
++          target: "dragging",
++          actions: ["invokeDragStart"]
++        },
++        "AUTOPLAY.START": {
++          target: "autoplay",
++          actions: ["invokeAutoplayStart"]
++        }
++      }
++    },
++    dragging: {
++      activities: ["trackPointerMove"],
++      entry: ["disableScrollSnap"],
++      on: {
++        DRAGGING: {
++          actions: ["scrollSlides", "invokeDragging"]
++        },
++        "DRAGGING.END": {
++          target: "idle",
++          actions: ["endDragging", "invokeDraggingEnd"]
++        }
+       }
+     },
+     autoplay: {
+-      activities: ["trackDocumentVisibility"],
++      activities: ["trackDocumentVisibility", "trackScroll"],
++      exit: ["invokeAutoplayEnd"],
+       invoke: {
+         src: "interval",
+         id: "interval"
+       },
+       on: {
+-        PAUSE: "idle"
+-      }
+-    },
+-    dragging: {
+-      on: {
+-        POINTER_UP: "idle",
+-        POINTER_MOVE: {
+-          actions: ["setScrollSnaps"]
+-        }
++        "DRAGGING.START": {
++          target: "dragging",
++          actions: ["invokeDragStart"]
++        },
++        "AUTOPLAY.PAUSE": "idle"
+       }
+     }
+-  },
+-  activities: ["trackContainerResize", "trackSlideMutation"],
+-  entry: ["measureElements", "setScrollSnaps"]
++  }
+ }, {
+   actions: {
+     updateContext: assign((context, event) => {
+diff --git a/e2e/_utils.ts b/e2e/_utils.ts
+index 83006720fb..54314a6165 100644
+--- a/e2e/_utils.ts
++++ b/e2e/_utils.ts
+@@ -114,3 +114,50 @@ export const pointer = {
+ export const textSelection = (page: Page) => {
+   return page.evaluate(() => window.getSelection()?.toString())
+ }
++
++export type SwipeDirection = "left" | "right" | "up" | "down"
++
++export async function swipe(
++  page: Page,
++  locator: Locator,
++  direction: SwipeDirection,
++  distance: number = 100,
++  duration: number = 500,
++): Promise<void> {
++  if (!["left", "right", "up", "down"].includes(direction)) {
++    throw new Error("Invalid direction. Use 'left', 'right', 'up', or 'down'.")
++  }
++
++  const box = await rect(locator)
++  if (!box) {
++    throw new Error("Could not determine the element bounding box.")
++  }
++
++  // Calculate start and end points for the swipe
++  const startX = box.midX
++  const startY = box.midY
++
++  let endX = startX
++  let endY = startY
++
++  switch (direction) {
++    case "left":
++      endX = startX - distance
++      break
++    case "right":
++      endX = startX + distance
++      break
++    case "up":
++      endY = startY - distance
++      break
++    case "down":
++      endY = startY + distance
++      break
++  }
++
++  // Perform the swipe action using mouse drag
++  await page.mouse.move(startX, startY)
++  await page.mouse.down()
++  await page.mouse.move(endX, endY, { steps: Math.max(duration / 10, 1) }) // Smoothness based on duration
++  await page.mouse.up()
++}
+diff --git a/e2e/carousel.e2e.ts b/e2e/carousel.e2e.ts
+new file mode 100644
+index 0000000000..7232b5ac1a
+--- /dev/null
++++ b/e2e/carousel.e2e.ts
+@@ -0,0 +1,84 @@
++import { test } from "@playwright/test"
++import { CarouselModel } from "./models/carousel.model"
++
++let I: CarouselModel
++
++test.describe("carousel", () => {
++  test.beforeEach(async ({ page }) => {
++    I = new CarouselModel(page)
++    await I.goto()
++  })
++
++  test("should have no accessibility violations", async () => {
++    await I.checkAccessibility()
++  })
++
++  test("renders correctly", async () => {
++    await I.seeNumOfItems(6)
++    await I.seeIndicatorIsActive(0)
++    await I.seeItemInView(0)
++    await I.seeItemInView(1)
++    await I.dontSeeItemInView(2)
++  })
++
++  test("next/prev buttons navigate carousel", async () => {
++    await I.seePrevTriggerIsDisabled()
++    await I.clickNextTrigger()
++    await I.seeIndicatorIsActive(1)
++    await I.seePrevTriggerIsEnabled()
++  })
++
++  test("autoplay start/stop", async ({ page }) => {
++    await page.clock.install()
++
++    await I.clickAutoplayTrigger()
++    await I.seeAutoplayIsOn()
++
++    await page.clock.fastForward(5000)
++    await I.seeIndicatorIsActive(1)
++
++    await I.clickAutoplayTrigger()
++    await I.seeAutoplayIsOff()
++
++    await page.clock.fastForward(5000)
++    await I.seeIndicatorIsActive(1)
++  })
++
++  test("clicking indicator scrolls to correct slide", async () => {
++    await I.clickIndicator(2)
++    await I.seeIndicatorIsActive(2)
++
++    await I.seeItemInView(4)
++    await I.seeItemInView(5)
++  })
++
++  test("scroll to a specific index via button", async () => {
++    await I.clickScrollToButton(4)
++    await I.seeItemInView(4)
++  })
++
++  test("dragging behavior", async () => {
++    await I.swipeCarousel("left", 400)
++    await I.seeItemInView(3)
++    await I.dontSeeItemInView(0)
++    await I.dontSeeItemInView(1)
++  })
++
++  test("indicator keyboard navigation", async () => {
++    await I.focusIndicator(0)
++    await I.pressKey("ArrowRight")
++    await I.seeItemInView(1)
++  })
++
++  test("[loop=true] should loop slides", async () => {
++    await I.controls.bool("loop")
++    await I.seePrevTriggerIsEnabled()
++
++    await I.clickNextTrigger()
++    await I.clickNextTrigger()
++    await I.seeItemInView(5)
++
++    await I.clickNextTrigger()
++    await I.seeItemInView(0)
++  })
++})
+diff --git a/e2e/models/carousel.model.ts b/e2e/models/carousel.model.ts
+new file mode 100644
+index 0000000000..8c3900fc52
+--- /dev/null
++++ b/e2e/models/carousel.model.ts
+@@ -0,0 +1,114 @@
++import { expect, type Page } from "@playwright/test"
++import { a11y, part, swipe, type SwipeDirection } from "../_utils"
++import { Model } from "./model"
++
++export class CarouselModel extends Model {
++  constructor(public page: Page) {
++    super(page)
++  }
++
++  goto(url = "/carousel") {
++    return this.page.goto(url)
++  }
++
++  checkAccessibility(selector?: string): Promise<void> {
++    return a11y(this.page, selector)
++  }
++
++  getItem(index: number) {
++    return this.page.locator(part("item")).nth(index)
++  }
++
++  getIndicator(index: number) {
++    return this.page.locator(part("indicator")).nth(index)
++  }
++
++  get prevTrigger() {
++    return this.page.locator(part("prev-trigger"))
++  }
++
++  get nextTrigger() {
++    return this.page.locator(part("next-trigger"))
++  }
++
++  get autoplayTrigger() {
++    return this.page.locator(part("autoplay-trigger"))
++  }
++
++  get carousel() {
++    return this.page.locator(part("item-group"))
++  }
++
++  async clickPrevTrigger() {
++    await this.prevTrigger.click()
++  }
++
++  async clickNextTrigger() {
++    await this.nextTrigger.click()
++  }
++
++  async clickAutoplayTrigger() {
++    await this.autoplayTrigger.click()
++  }
++
++  async clickIndicator(index: number) {
++    await this.getIndicator(index).click()
++  }
++
++  async focusIndicator(index: number) {
++    await this.getIndicator(index).focus()
++  }
++
++  async swipeCarousel(direction: SwipeDirection, distance: number = 100, duration: number = 500) {
++    await swipe(this.page, this.carousel, direction, distance, duration)
++  }
++
++  async clickScrollToButton(index: number) {
++    await this.page.getByRole("button", { name: `Scroll to ${index}` }).click()
++  }
++
++  async seeAutoplayIsOn() {
++    await expect(this.autoplayTrigger).toHaveText("Stop")
++  }
++
++  async seeAutoplayIsOff() {
++    await expect(this.autoplayTrigger).toHaveText("Play")
++  }
++
++  async seeNumOfItems(count: number) {
++    const items = this.page.locator(part("item"))
++    await expect(items).toHaveCount(count)
++  }
++
++  async seeItemInView(index: number) {
++    await expect(this.getItem(index)).toHaveAttribute("data-inview", "")
++  }
++
++  async seePrevTriggerIsDisabled() {
++    await expect(this.prevTrigger).toBeDisabled()
++  }
++
++  async seePrevTriggerIsEnabled() {
++    await expect(this.prevTrigger).toBeEnabled()
++  }
++
++  async seeNextTriggerIsDisabled() {
++    await expect(this.nextTrigger).toBeDisabled()
++  }
++
++  async seeNextTriggerIsEnabled() {
++    await expect(this.nextTrigger).toBeEnabled()
++  }
++
++  async dontSeeItemInView(index: number) {
++    await expect(this.getItem(index)).not.toHaveAttribute("data-inview", "")
++  }
++
++  async seeIndicatorIsActive(index: number) {
++    await expect(this.getIndicator(index)).toHaveAttribute("data-current", "")
++  }
++
++  async seeIndicatorIsInactive(index: number) {
++    await expect(this.getIndicator(index)).not.toHaveAttribute("data-current", "")
++  }
++}
+diff --git a/examples/lit-ts/package.json b/examples/lit-ts/package.json
+index 356ff6f0c2..1f5af62084 100644
+--- a/examples/lit-ts/package.json
++++ b/examples/lit-ts/package.json
+@@ -65,6 +65,7 @@
+     "@zag-js/rating-group": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+diff --git a/examples/next-ts/package.json b/examples/next-ts/package.json
+index 82b6567888..bee423d476 100644
+--- a/examples/next-ts/package.json
++++ b/examples/next-ts/package.json
+@@ -66,6 +66,7 @@
+     "@zag-js/react": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+diff --git a/examples/next-ts/pages/carousel.tsx b/examples/next-ts/pages/carousel.tsx
+index 26c17a72b0..e5cf2632e1 100644
+--- a/examples/next-ts/pages/carousel.tsx
++++ b/examples/next-ts/pages/carousel.tsx
+@@ -1,5 +1,5 @@
+ import * as carousel from "@zag-js/carousel"
+-import { useMachine, normalizeProps } from "@zag-js/react"
++import { normalizeProps, useMachine } from "@zag-js/react"
+ import { carouselControls, carouselData } from "@zag-js/shared"
+ import { useId } from "react"
+ import { StateVisualizer } from "../components/state-visualizer"
+@@ -12,12 +12,13 @@ export default function Page() {
+   const [state, send] = useMachine(
+     carousel.machine({
+       id: useId(),
+-      index: 0,
+       spacing: "20px",
+-      slidesPerView: 2,
++      slidesPerPage: 2,
++      slideCount: carouselData.length,
++      allowMouseDrag: true,
+     }),
+     {
+-      // context: controls.context,
++      context: controls.context,
+     },
+   )
+ 
+@@ -27,22 +28,31 @@ export default function Page() {
+     <>
+       <main className="carousel">
+         <div {...api.getRootProps()}>
+-          <button {...api.getPrevTriggerProps()}>Prev</button>
+-          <button {...api.getNextTriggerProps()}>Next</button>
+-          <div {...api.getViewportProps()}>
+-            <div {...api.getItemGroupProps()}>
+-              {carouselData.map((image, index) => (
+-                <div {...api.getItemProps({ index })} key={index}>
+-                  <img src={image} alt="" style={{ height: "300px", width: "100%", objectFit: "cover" }} />
+-                </div>
+-              ))}
+-            </div>
++          <button onClick={() => api.scrollToIndex(4)}>Scroll to 4</button>
++          <div {...api.getControlProps()}>
++            <button {...api.getAutoplayTriggerProps()}>{api.isPlaying ? "Stop" : "Play"}</button>
++            <div className="carousel-spacer" />
++            <button {...api.getPrevTriggerProps()}>Prev</button>
++            <button {...api.getNextTriggerProps()}>Next</button>
++          </div>
++
++          <div {...api.getItemGroupProps()}>
++            {carouselData.map((image, index) => (
++              <div {...api.getItemProps({ index })} key={index}>
++                <img src={image} alt="" width="188px" />
++              </div>
++            ))}
++          </div>
++          <div {...api.getIndicatorGroupProps()}>
++            {api.pageSnapPoints.map((_, index) => (
++              <button {...api.getIndicatorProps({ index })} key={index} />
++            ))}
+           </div>
+         </div>
+       </main>
+ 
+-      <Toolbar viz controls={controls.ui}>
+-        <StateVisualizer state={state} />
++      <Toolbar controls={controls.ui}>
++        <StateVisualizer state={state} omit={["translations"]} />
+       </Toolbar>
+     </>
+   )
+diff --git a/examples/next-ts/pages/compositions b/examples/next-ts/pages/compositions
+index 8d1c39ab27..e3a903747d 160000
+--- a/examples/next-ts/pages/compositions
++++ b/examples/next-ts/pages/compositions
+@@ -1 +1 @@
+-Subproject commit 8d1c39ab2795754d3745460ac32ee71853395405
++Subproject commit e3a903747d9fae463fc6dae9770da7b17f86dadb
+diff --git a/examples/nuxt-ts/package.json b/examples/nuxt-ts/package.json
+index b30e4270c1..2ea9675211 100644
+--- a/examples/nuxt-ts/package.json
++++ b/examples/nuxt-ts/package.json
+@@ -62,6 +62,7 @@
+     "@zag-js/rating-group": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+diff --git a/examples/nuxt-ts/pages/carousel.vue b/examples/nuxt-ts/pages/carousel.vue
+new file mode 100644
+index 0000000000..27a5b4929c
+--- /dev/null
++++ b/examples/nuxt-ts/pages/carousel.vue
+@@ -0,0 +1,57 @@
++<script setup lang="ts">
++import * as carousel from "@zag-js/carousel"
++import { carouselControls, carouselData } from "@zag-js/shared"
++import { normalizeProps, useMachine } from "@zag-js/vue"
++
++const controls = useControls(carouselControls)
++
++const [state, send] = useMachine(
++  carousel.machine({
++    id: "1",
++    spacing: "20px",
++    slidesPerPage: 2,
++    slideCount: carouselData.length,
++    allowMouseDrag: true,
++  }),
++  {
++    context: controls.context,
++  },
++)
++
++const api = computed(() => carousel.connect(state.value, send, normalizeProps))
++</script>
++
++<template>
++  <main class="carousel">
++    <div v-bind="api.getRootProps()">
++      <button @click="() => api.scrollToIndex(4)">Scroll to 4</button>
++      <div v-bind="api.getControlProps()">
++        <button v-bind="api.getAutoplayTriggerProps()">{{ api.isPlaying ? "Stop" : "Play" }}</button>
++        <div class="carousel-spacer"></div>
++        <button v-bind="api.getPrevTriggerProps()">Prev</button>
++        <button v-bind="api.getNextTriggerProps()">Next</button>
++      </div>
++
++      <div v-bind="api.getItemGroupProps()">
++        <div v-for="(image, index) in carouselData" :key="index" v-bind="api.getItemProps({ index })">
++          <img :src="image" alt="" />
++        </div>
++      </div>
++
++      <div v-bind="api.getIndicatorGroupProps()">
++        <button
++          v-for="(_, index) in api.pageSnapPoints"
++          :key="index"
++          v-bind="api.getIndicatorProps({ index })"
++        ></button>
++      </div>
++    </div>
++  </main>
++
++  <Toolbar>
++    <StateVisualizer :state="state" />
++    <template #controls>
++      <Controls :control="controls" />
++    </template>
++  </Toolbar>
++</template>
+diff --git a/examples/preact-ts/package.json b/examples/preact-ts/package.json
+index 03583b91fa..93fb44e58b 100644
+--- a/examples/preact-ts/package.json
++++ b/examples/preact-ts/package.json
+@@ -62,6 +62,7 @@
+     "@zag-js/rating-group": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+diff --git a/examples/react-19/package.json b/examples/react-19/package.json
+index ad2d1f8ea1..5dfd423a46 100644
+--- a/examples/react-19/package.json
++++ b/examples/react-19/package.json
+@@ -63,6 +63,7 @@
+     "@zag-js/react": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+diff --git a/examples/solid-ts/package.json b/examples/solid-ts/package.json
+index 095faaf438..5eac74b4fd 100644
+--- a/examples/solid-ts/package.json
++++ b/examples/solid-ts/package.json
+@@ -65,6 +65,7 @@
+     "@zag-js/rating-group": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+@@ -90,7 +91,7 @@
+     "form-serialize": "0.7.2",
+     "lucide-solid": "0.462.0",
+     "match-sorter": "8.0.0",
+-    "solid-js": "1.9.1",
++    "solid-js": "1.9.3",
+     "vinxi": "0.4.3"
+   },
+   "engines": {
+diff --git a/examples/solid-ts/src/routes/carousel.tsx b/examples/solid-ts/src/routes/carousel.tsx
+index 09d10c6b01..3bd8c4ea6a 100644
+--- a/examples/solid-ts/src/routes/carousel.tsx
++++ b/examples/solid-ts/src/routes/carousel.tsx
+@@ -1,7 +1,7 @@
+ import * as carousel from "@zag-js/carousel"
+ import { carouselControls, carouselData } from "@zag-js/shared"
+ import { normalizeProps, useMachine } from "@zag-js/solid"
+-import { For, createMemo, createUniqueId } from "solid-js"
++import { Index, Show, createMemo, createUniqueId } from "solid-js"
+ import { StateVisualizer } from "~/components/state-visualizer"
+ import { Toolbar } from "~/components/toolbar"
+ import { useControls } from "~/hooks/use-controls"
+@@ -9,9 +9,18 @@ import { useControls } from "~/hooks/use-controls"
+ export default function Page() {
+   const controls = useControls(carouselControls)
+ 
+-  const [state, send] = useMachine(carousel.machine({ id: createUniqueId() }), {
+-    context: controls.context,
+-  })
++  const [state, send] = useMachine(
++    carousel.machine({
++      id: createUniqueId(),
++      spacing: "20px",
++      slidesPerPage: 2,
++      slideCount: carouselData.length,
++      allowMouseDrag: true,
++    }),
++    {
++      context: controls.context,
++    },
++  )
+ 
+   const api = createMemo(() => carousel.connect(state, send, normalizeProps))
+ 
+@@ -19,18 +28,31 @@ export default function Page() {
+     <>
+       <main class="carousel">
+         <div {...api().getRootProps()}>
+-          <button {...api().getPrevTriggerProps()}>Prev</button>
+-          <button {...api().getNextTriggerProps()}>Next</button>
+-          <div {...api().getViewportProps()}>
+-            <div {...api().getItemGroupProps()}>
+-              <For each={carouselData}>
+-                {(image, index) => (
+-                  <div {...api().getItemProps({ index: index() })}>
+-                    <img src={image} alt="" style={{ height: "300px", width: "100%", "object-fit": "cover" }} />
+-                  </div>
+-                )}
+-              </For>
+-            </div>
++          <button onClick={() => api().scrollToIndex(4)}>Scroll to 4</button>
++          <div {...api().getControlProps()}>
++            <button {...api().getAutoplayTriggerProps()}>
++              <Show when={api().isPlaying} fallback="Play">
++                Stop
++              </Show>
++            </button>
++            <div class="carousel-spacer" />
++            <button {...api().getPrevTriggerProps()}>Prev</button>
++            <button {...api().getNextTriggerProps()}>Next</button>
++          </div>
++          <div {...api().getItemGroupProps()}>
++            <Index each={carouselData}>
++              {(image, index) => (
++                <div {...api().getItemProps({ index })}>
++                  <img src={image()} alt="" />
++                </div>
++              )}
++            </Index>
++          </div>
++
++          <div {...api().getIndicatorGroupProps()}>
++            <Index each={api().pageSnapPoints}>
++              {(_, index) => <button {...api().getIndicatorProps({ index })} />}
++            </Index>
+           </div>
+         </div>
+       </main>
+diff --git a/examples/svelte-ts/package.json b/examples/svelte-ts/package.json
+index d8c9fea943..51e213cc88 100644
+--- a/examples/svelte-ts/package.json
++++ b/examples/svelte-ts/package.json
+@@ -63,6 +63,7 @@
+     "@zag-js/rating-group": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/shared": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+diff --git a/examples/svelte-ts/src/routes/carousel.svelte b/examples/svelte-ts/src/routes/carousel.svelte
+index d46035a77a..33e8ab54c8 100644
+--- a/examples/svelte-ts/src/routes/carousel.svelte
++++ b/examples/svelte-ts/src/routes/carousel.svelte
+@@ -8,25 +8,44 @@
+ 
+   const controls = useControls(carouselControls)
+ 
+-  const [snapshot, send] = useMachine(carousel.machine({ id: "1", index: 0, spacing: "20px", slidesPerView: 2 }), {
+-    // context: controls.context,
+-  })
++  const [snapshot, send] = useMachine(
++    carousel.machine({
++      id: "1",
++      spacing: "20px",
++      slidesPerPage: 2,
++      slideCount: carouselData.length,
++      allowMouseDrag: true,
++    }),
++    {
++      context: controls.context,
++    },
++  )
+ 
+   const api = $derived(carousel.connect(snapshot, send, normalizeProps))
+ </script>
+ 
+ <main class="carousel">
+   <div {...api.getRootProps()}>
+-    <button {...api.getPrevTriggerProps()}>Prev</button>
+-    <button {...api.getNextTriggerProps()}>Next</button>
+-    <div {...api.getViewportProps()}>
+-      <div {...api.getItemGroupProps()}>
+-        {#each carouselData as image, index}
+-          <div {...api.getItemProps({ index })}>
+-            <img src={image} alt="" style="height:300px;width:100%;object-fit:cover;" />
+-          </div>
+-        {/each}
+-      </div>
++    <button onclick={() => api.scrollToIndex(4)}>Scroll to 4</button>
++    <div {...api.getControlProps()}>
++      <button {...api.getAutoplayTriggerProps()}>{api.isPlaying ? "Stop" : "Play"}</button>
++      <div class="carousel-spacer"></div>
++      <button {...api.getPrevTriggerProps()}>Prev</button>
++      <button {...api.getNextTriggerProps()}>Next</button>
++    </div>
++
++    <div {...api.getItemGroupProps()}>
++      {#each carouselData as image, index}
++        <div {...api.getItemProps({ index })}>
++          <img src={image} alt="" />
++        </div>
++      {/each}
++    </div>
++    <div {...api.getIndicatorGroupProps()}>
++      {#each api.pageSnapPoints as _, index}
++        <!-- svelte-ignore a11y_consider_explicit_label -->
++        <button {...api.getIndicatorProps({ index })}></button>
++      {/each}
+     </div>
+   </div>
+ </main>
+diff --git a/examples/vanilla-ts/package.json b/examples/vanilla-ts/package.json
+index 8d90c706ed..7e800198e5 100644
+--- a/examples/vanilla-ts/package.json
++++ b/examples/vanilla-ts/package.json
+@@ -66,6 +66,7 @@
+     "@zag-js/rating-group": "workspace:*",
+     "@zag-js/rect-utils": "workspace:*",
+     "@zag-js/remove-scroll": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/select": "workspace:*",
+     "@zag-js/signature-pad": "workspace:*",
+     "@zag-js/slider": "workspace:*",
+diff --git a/packages/core/src/index.ts b/packages/core/src/index.ts
+index 352870079a..085ccdb978 100644
+--- a/packages/core/src/index.ts
++++ b/packages/core/src/index.ts
+@@ -3,5 +3,5 @@ export { deepMerge } from "./deep-merge"
+ export { choose, guards } from "./guard-utils"
+ export * from "./machine"
+ export { mergeProps } from "./merge-props"
+-export type { ContextFrom, EventFrom, StateFrom } from "./type-utils"
++export type { ContextFrom, EventFrom, StateFrom, ContextRef } from "./type-utils"
+ export type { StateMachine } from "./types"
+diff --git a/packages/core/src/type-utils.ts b/packages/core/src/type-utils.ts
+index ec95850ece..344bb5c83c 100644
+--- a/packages/core/src/type-utils.ts
++++ b/packages/core/src/type-utils.ts
+@@ -16,3 +16,5 @@ export type ContextFrom<T> =
+ 
+ export type EventFrom<T> =
+   ReturnTypeOrValue<T> extends infer R ? (R extends Machine<any, any, infer TEvent> ? TEvent : never) : never
++
++export type ContextRef<T> = { current: T | undefined }
+diff --git a/packages/docs/data/api.json b/packages/docs/data/api.json
+index 4cbcdb66ed..b294046c09 100644
+--- a/packages/docs/data/api.json
++++ b/packages/docs/data/api.json
+@@ -187,41 +187,49 @@
+   },
+   "carousel": {
+     "api": {
+-      "index": {
++      "page": {
+         "type": "number",
+         "description": "The current index of the carousel"
+       },
+-      "scrollProgress": {
+-        "type": "number",
+-        "description": "The current scroll progress of the carousel"
++      "pageSnapPoints": {
++        "type": "number[]",
++        "description": "The current snap points of the carousel"
+       },
+-      "autoPlaying": {
++      "isPlaying": {
+         "type": "boolean",
+         "description": "Whether the carousel is auto playing"
+       },
++      "isDragging": {
++        "type": "boolean",
++        "description": "Whether the carousel is being dragged. This only works when `draggable` is true."
++      },
+       "canScrollNext": {
+         "type": "boolean",
+-        "description": "Whether the carousel is can scroll to the next slide"
++        "description": "Whether the carousel is can scroll to the next view"
+       },
+       "canScrollPrev": {
+         "type": "boolean",
+-        "description": "Whether the carousel is can scroll to the previous slide"
++        "description": "Whether the carousel is can scroll to the previous view"
++      },
++      "scrollToIndex": {
++        "type": "(index: number, instant?: boolean) => void",
++        "description": "Function to scroll to a specific item index"
+       },
+       "scrollTo": {
+-        "type": "(index: number, jump?: boolean) => void",
+-        "description": "Function to scroll to a specific slide index"
++        "type": "(page: number, instant?: boolean) => void",
++        "description": "Function to scroll to a specific page"
+       },
+-      "scrollToNext": {
+-        "type": "() => void",
+-        "description": "Function to scroll to the next slide"
++      "scrollNext": {
++        "type": "(instant?: boolean) => void",
++        "description": "Function to scroll to the next page"
+       },
+-      "scrollToPrevious": {
+-        "type": "() => void",
+-        "description": "Function to scroll to the previous slide"
++      "scrollPrev": {
++        "type": "(instant?: boolean) => void",
++        "description": "Function to scroll to the previous page"
+       },
+-      "getItemState": {
+-        "type": "(props: ItemProps) => ItemState",
+-        "description": "Returns the state of a specific slide"
++      "getProgress": {
++        "type": "() => number",
++        "description": "Returns the current scroll progress as a percentage"
+       },
+       "play": {
+         "type": "() => void",
+@@ -230,45 +238,88 @@
+       "pause": {
+         "type": "() => void",
+         "description": "Function to pause autoplay"
++      },
++      "isInView": {
++        "type": "(index: number) => boolean",
++        "description": "Whether the item is in view"
++      },
++      "refresh": {
++        "type": "() => void",
++        "description": "Function to re-compute the snap points\nand clamp the page"
+       }
+     },
+     "context": {
+-      "orientation": {
+-        "type": "\"horizontal\" | \"vertical\"",
+-        "description": "The orientation of the carousel.",
+-        "defaultValue": "\"horizontal\""
++      "ids": {
++        "type": "Partial<{ root: string; item(index: number): string; itemGroup: string; nextTrigger: string; prevTrigger: string; indicatorGroup: string; indicator(index: number): string; }>",
++        "description": "The ids of the elements in the carousel. Useful for composition."
+       },
+-      "align": {
+-        "type": "\"start\" | \"center\" | \"end\"",
+-        "description": "The alignment of the slides in the carousel.",
+-        "defaultValue": "\"start\""
++      "translations": {
++        "type": "IntlTranslations",
++        "description": "The localized messages to use."
+       },
+-      "slidesPerView": {
+-        "type": "number | \"auto\"",
++      "slidesPerPage": {
++        "type": "number",
+         "description": "The number of slides to show at a time.",
+         "defaultValue": "1"
+       },
++      "slidesPerMove": {
++        "type": "number | \"auto\"",
++        "description": "The number of slides to scroll at a time.\n\nWhen set to `auto`, the number of slides to scroll is determined by the\n`slidesPerPage` property.",
++        "defaultValue": "\"auto\""
++      },
++      "autoplay": {
++        "type": "boolean | { delay: number; }",
++        "description": "Whether to scroll automatically. The default delay is 4000ms.",
++        "defaultValue": "false"
++      },
++      "allowMouseDrag": {
++        "type": "boolean",
++        "description": "Whether to allow scrolling via dragging with mouse",
++        "defaultValue": "false"
++      },
+       "loop": {
+         "type": "boolean",
+         "description": "Whether the carousel should loop around.",
+         "defaultValue": "false"
+       },
+-      "index": {
++      "page": {
+         "type": "number",
+-        "description": "The current slide index."
++        "description": "The index of the active page."
+       },
+       "spacing": {
+         "type": "string",
+-        "description": "The amount of space between slides.",
++        "description": "The amount of space between items.",
+         "defaultValue": "\"0px\""
+       },
+-      "onIndexChange": {
+-        "type": "(details: SlideChangeDetails) => void",
+-        "description": "Function called when the slide changes."
++      "padding": {
++        "type": "string",
++        "description": "Defines the extra space added around the scrollable area,\nenabling nearby items to remain partially in view."
+       },
+-      "ids": {
+-        "type": "Partial<{ root: string; viewport: string; item(index: number): string; itemGroup: string; nextTrigger: string; prevTrigger: string; indicatorGroup: string; indicator(index: number): string; }>",
+-        "description": "The ids of the elements in the carousel. Useful for composition."
++      "onPageChange": {
++        "type": "(details: PageChangeDetails) => void",
++        "description": "Function called when the page changes."
++      },
++      "inViewThreshold": {
++        "type": "number | number[]",
++        "description": "The threshold for determining if an item is in view.",
++        "defaultValue": "0.6"
++      },
++      "snapType": {
++        "type": "\"proximity\" | \"mandatory\"",
++        "description": "The snap type of the item.",
++        "defaultValue": "\"mandatory\""
++      },
++      "slideCount": {
++        "type": "number",
++        "description": "The total number of slides.\nUseful for SSR to render the initial ating the snap points."
++      },
++      "onDragStatusChange": {
++        "type": "(details: DragStatusDetails) => void",
++        "description": "Function called when the drag status changes."
++      },
++      "onAutoplayStatusChange": {
++        "type": "(details: AutoplayStatusDetails) => void",
++        "description": "Function called when the autoplay status changes."
+       },
+       "dir": {
+         "type": "\"ltr\" | \"rtl\"",
+@@ -282,6 +333,11 @@
+       "getRootNode": {
+         "type": "() => ShadowRoot | Node | Document",
+         "description": "A root node to correctly resolve document in custom environments. E.x.: Iframes, Electron."
++      },
++      "orientation": {
++        "type": "Orientation",
++        "description": "The orientation of the element.",
++        "defaultValue": "\"horizontal\""
+       }
+     }
+   },
+@@ -1153,10 +1209,6 @@
+         "description": "The view of the calendar",
+         "defaultValue": "\"day\""
+       },
+-      "modal": {
+-        "type": "boolean",
+-        "description": "Whether the calendar should be modal. This means that the calendar will\nblock interaction with the rest of the page, and trap focus within it."
+-      },
+       "positioning": {
+         "type": "PositioningOptions",
+         "description": "The user provided options used to position the date picker content"
+diff --git a/packages/docs/data/data-attr.json b/packages/docs/data/data-attr.json
+index 16ad879532..fc53d71118 100644
+--- a/packages/docs/data/data-attr.json
++++ b/packages/docs/data/data-attr.json
+@@ -91,23 +91,24 @@
+       "data-part": "root",
+       "data-orientation": "The orientation of the carousel"
+     },
+-    "Viewport": {
+-      "data-scope": "carousel",
+-      "data-part": "viewport",
+-      "data-orientation": "The orientation of the viewport"
+-    },
+     "ItemGroup": {
+       "data-scope": "carousel",
+       "data-part": "item-group",
+-      "data-orientation": "The orientation of the item"
++      "data-orientation": "The orientation of the item",
++      "data-dragging": "Present when in the dragging state"
+     },
+     "Item": {
+       "data-scope": "carousel",
+       "data-part": "item",
+-      "data-current": "Present when current",
++      "data-index": "The index of the item",
+       "data-inview": "Present when in viewport",
+       "data-orientation": "The orientation of the item"
+     },
++    "Control": {
++      "data-scope": "carousel",
++      "data-part": "control",
++      "data-orientation": "The orientation of the control"
++    },
+     "PrevTrigger": {
+       "data-scope": "carousel",
+       "data-part": "prev-trigger",
+@@ -130,6 +131,12 @@
+       "data-index": "The index of the item",
+       "data-readonly": "Present when read-only",
+       "data-current": "Present when current"
++    },
++    "AutoplayTrigger": {
++      "data-scope": "carousel",
++      "data-part": "autoplay-trigger",
++      "data-orientation": "The orientation of the autoplaytrigger",
++      "data-pressed": "Present when pressed"
+     }
+   },
+   "checkbox": {
+diff --git a/packages/machines/carousel/package.json b/packages/machines/carousel/package.json
+index 83fbf3977b..2005a3d8a1 100644
+--- a/packages/machines/carousel/package.json
++++ b/packages/machines/carousel/package.json
+@@ -37,7 +37,9 @@
+     "@zag-js/anatomy": "workspace:*",
+     "@zag-js/core": "workspace:*",
+     "@zag-js/types": "workspace:*",
++    "@zag-js/dom-event": "workspace:*",
+     "@zag-js/dom-query": "workspace:*",
++    "@zag-js/scroll-snap": "workspace:*",
+     "@zag-js/utils": "workspace:*"
+   },
+   "devDependencies": {
+diff --git a/packages/machines/carousel/src/carousel.anatomy.ts b/packages/machines/carousel/src/carousel.anatomy.ts
+index 2c96e68028..7a9f3c6c1e 100644
+--- a/packages/machines/carousel/src/carousel.anatomy.ts
++++ b/packages/machines/carousel/src/carousel.anatomy.ts
+@@ -2,13 +2,14 @@ import { createAnatomy } from "@zag-js/anatomy"
+ 
+ export const anatomy = createAnatomy("carousel").parts(
+   "root",
+-  "viewport",
+   "itemGroup",
+   "item",
++  "control",
+   "nextTrigger",
+   "prevTrigger",
+   "indicatorGroup",
+   "indicator",
++  "autoplayTrigger",
+ )
+ 
+ export const parts = anatomy.build()
+diff --git a/packages/machines/carousel/src/carousel.connect.ts b/packages/machines/carousel/src/carousel.connect.ts
+index f85071ca28..113989c75b 100644
+--- a/packages/machines/carousel/src/carousel.connect.ts
++++ b/packages/machines/carousel/src/carousel.connect.ts
+@@ -1,50 +1,58 @@
+-import { dataAttr, isDom } from "@zag-js/dom-query"
++import { getEventKey, type EventKeyMap } from "@zag-js/dom-event"
++import { ariaAttr, dataAttr, getEventTarget, isFocusable } from "@zag-js/dom-query"
+ import type { NormalizeProps, PropTypes } from "@zag-js/types"
+ import { parts } from "./carousel.anatomy"
+ import { dom } from "./carousel.dom"
+-import type { ItemProps, ItemState, MachineApi, Send, State } from "./carousel.types"
+-import { getSlidesInView } from "./utils/get-slide-in-view"
++import type { ItemProps, MachineApi, MachineContext, Send, State } from "./carousel.types"
+ 
+ export function connect<T extends PropTypes>(state: State, send: Send, normalize: NormalizeProps<T>): MachineApi<T> {
++  const isPlaying = state.matches("autoplay")
++  const isDragging = state.matches("dragging")
++
+   const canScrollNext = state.context.canScrollNext
+   const canScrollPrev = state.context.canScrollPrev
+   const horizontal = state.context.isHorizontal
+-  const autoPlaying = state.matches("autoplay")
+-
+-  const activeSnap = state.context.scrollSnaps[state.context.index]
+-  const slidesInView = isDom() ? getSlidesInView(state.context)(activeSnap) : []
+-
+-  function getItemState(props: ItemProps): ItemState {
+-    return {
+-      valueText: `Slide ${props.index + 1}`,
+-      current: props.index === state.context.index,
+-      next: props.index === state.context.index + 1,
+-      previous: props.index === state.context.index - 1,
+-      inView: slidesInView.includes(props.index),
+-    }
+-  }
++
++  const pageSnapPoints = Array.from(state.context.pageSnapPoints)
++  const page = state.context.page
++  const slidesPerPage = state.context.slidesPerPage
++
++  const padding = state.context.padding
++  const translations = state.context.translations
+ 
+   return {
+-    index: state.context.index,
+-    scrollProgress: state.context.scrollProgress,
+-    autoPlaying,
++    isPlaying,
++    isDragging,
++    page,
++    pageSnapPoints,
+     canScrollNext,
+     canScrollPrev,
+-    scrollTo(index, jump) {
+-      send({ type: "GOTO", index, jump })
++    getProgress() {
++      return page / pageSnapPoints.length
++    },
++    scrollToIndex(index, instant) {
++      send({ type: "INDEX.SET", index, instant })
+     },
+-    scrollToNext() {
+-      send("NEXT")
++    scrollTo(index, instant) {
++      send({ type: "PAGE.SET", index, instant })
+     },
+-    scrollToPrevious() {
+-      send("PREV")
++    scrollNext(instant) {
++      send({ type: "PAGE.NEXT", instant })
++    },
++    scrollPrev(instant) {
++      send({ type: "PAGE.PREV", instant })
+     },
+-    getItemState: getItemState,
+     play() {
+-      send("PLAY")
++      send("AUTOPLAY.START")
+     },
+     pause() {
+-      send("PAUSE")
++      send("AUTOPLAY.PAUSE")
++    },
++    isInView(index) {
++      return Array.from(state.context.slidesInView).includes(index)
++    },
++    refresh() {
++      send({ type: "SNAP.REFRESH" })
+     },
+ 
+     getRootProps() {
+@@ -55,77 +63,89 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         "aria-roledescription": "carousel",
+         "data-orientation": state.context.orientation,
+         dir: state.context.dir,
+-        "aria-label": "Carousel",
+         style: {
++          "--slides-per-page": slidesPerPage,
+           "--slide-spacing": state.context.spacing,
+-          "--slide-size": `calc(100% / ${state.context.slidesPerView} - var(--slide-spacing))`,
++          "--slide-item-size":
++            "calc(100% / var(--slides-per-page) - var(--slide-spacing) * (var(--slides-per-page) - 1) / var(--slides-per-page))",
+         },
+       })
+     },
+ 
+-    getViewportProps() {
+-      return normalize.element({
+-        ...parts.viewport.attrs,
+-        dir: state.context.dir,
+-        id: dom.getViewportId(state.context),
+-        "data-orientation": state.context.orientation,
+-      })
+-    },
+-
+     getItemGroupProps() {
+       return normalize.element({
+         ...parts.itemGroup.attrs,
+         id: dom.getItemGroupId(state.context),
+         "data-orientation": state.context.orientation,
++        "data-dragging": dataAttr(isDragging),
+         dir: state.context.dir,
++        "aria-live": isPlaying ? "off" : "polite",
++        onMouseDown(event) {
++          if (!state.context.allowMouseDrag) return
++          if (event.button !== 0) return
++          if (event.defaultPrevented) return
++
++          const target = getEventTarget<HTMLElement>(event)
++          if (isFocusable(target) && target !== event.currentTarget) return
++
++          event.preventDefault()
++          send({ type: "DRAGGING.START" })
++        },
++
+         style: {
+-          display: "flex",
+-          flexDirection: horizontal ? "row" : "column",
+-          [horizontal ? "height" : "width"]: "auto",
++          display: "grid",
+           gap: "var(--slide-spacing)",
+-          transform: state.context.translateValue,
+-          transitionProperty: "transform",
+-          willChange: "transform",
+-          transitionTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+-          transitionDuration: "0.3s",
++          scrollSnapType: [horizontal ? "x" : "y", state.context.snapType].join(" "),
++          gridAutoFlow: horizontal ? "column" : "row",
++          scrollbarWidth: "none",
++          overscrollBehavior: "contain",
++          [horizontal ? "gridAutoColumns" : "gridAutoRows"]: "var(--slide-item-size)",
++          [horizontal ? "scrollPaddingInline" : "scrollPaddingBlock"]: padding,
++          [horizontal ? "paddingInline" : "paddingBlock"]: padding,
++          [horizontal ? "overflowX" : "overflowY"]: "auto",
+         },
+       })
+     },
+ 
+     getItemProps(props) {
+-      const itemState = getItemState(props)
+-
++      const isInView = state.context.slidesInView.includes(props.index)
+       return normalize.element({
+         ...parts.item.attrs,
+         id: dom.getItemId(state.context, props.index),
+         dir: state.context.dir,
+-        "data-current": dataAttr(itemState.current),
+-        "data-inview": dataAttr(itemState.inView),
+         role: "group",
++        "data-index": props.index,
++        "data-inview": dataAttr(isInView),
+         "aria-roledescription": "slide",
+         "data-orientation": state.context.orientation,
+-        "aria-label": itemState.valueText,
++        "aria-label": state.context.slideCount ? translations.item(props.index, state.context.slideCount) : undefined,
++        "aria-hidden": ariaAttr(!isInView),
+         style: {
+-          position: "relative",
+-          flex: "0 0 var(--slide-size)",
+-          [horizontal ? "minWidth" : "minHeight"]: "0px",
++          scrollSnapAlign: getSnapAlign(state.context, props),
+         },
+       })
+     },
+ 
++    getControlProps() {
++      return normalize.element({
++        ...parts.control.attrs,
++        "data-orientation": state.context.orientation,
++      })
++    },
++
+     getPrevTriggerProps() {
+       return normalize.button({
+         ...parts.prevTrigger.attrs,
+         id: dom.getPrevTriggerId(state.context),
+         type: "button",
+-        tabIndex: -1,
+         disabled: !canScrollPrev,
+         dir: state.context.dir,
+-        "aria-label": "Previous Slide",
++        "aria-label": translations.prevTrigger,
+         "data-orientation": state.context.orientation,
+         "aria-controls": dom.getItemGroupId(state.context),
+-        onClick() {
+-          send("PREV")
++        onClick(event) {
++          if (event.defaultPrevented) return
++          send({ type: "PAGE.PREV", src: "trigger" })
+         },
+       })
+     },
+@@ -136,13 +156,13 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         dir: state.context.dir,
+         id: dom.getNextTriggerId(state.context),
+         type: "button",
+-        tabIndex: -1,
+-        "aria-label": "Next Slide",
++        "aria-label": translations.nextTrigger,
+         "data-orientation": state.context.orientation,
+         "aria-controls": dom.getItemGroupId(state.context),
+         disabled: !canScrollNext,
+-        onClick() {
+-          send("NEXT")
++        onClick(event) {
++          if (event.defaultPrevented) return
++          send({ type: "PAGE.NEXT", src: "trigger" })
+         },
+       })
+     },
+@@ -153,6 +173,48 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         dir: state.context.dir,
+         id: dom.getIndicatorGroupId(state.context),
+         "data-orientation": state.context.orientation,
++        onKeyDown(event) {
++          if (event.defaultPrevented) return
++          const src = "indicator"
++          const keyMap: EventKeyMap = {
++            ArrowDown(event) {
++              if (horizontal) return
++              send({ type: "PAGE.NEXT", src })
++              event.preventDefault()
++            },
++            ArrowUp(event) {
++              if (horizontal) return
++              send({ type: "PAGE.PREV", src })
++              event.preventDefault()
++            },
++            ArrowRight(event) {
++              if (!horizontal) return
++              send({ type: "PAGE.NEXT", src })
++              event.preventDefault()
++            },
++            ArrowLeft(event) {
++              if (!horizontal) return
++              send({ type: "PAGE.PREV", src })
++              event.preventDefault()
++            },
++            Home(event) {
++              send({ type: "PAGE.SET", index: 0, src })
++              event.preventDefault()
++            },
++            End(event) {
++              send({ type: "PAGE.SET", index: pageSnapPoints.length - 1, src })
++              event.preventDefault()
++            },
++          }
++
++          const key = getEventKey(event, {
++            dir: state.context.dir,
++            orientation: state.context.orientation,
++          })
++
++          const exec = keyMap[key]
++          exec?.(event)
++        },
+       })
+     },
+ 
+@@ -165,12 +227,35 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         "data-orientation": state.context.orientation,
+         "data-index": props.index,
+         "data-readonly": dataAttr(props.readOnly),
+-        "data-current": dataAttr(props.index === state.context.index),
+-        onClick() {
++        "data-current": dataAttr(props.index === state.context.page),
++        "aria-label": translations.indicator(props.index),
++        onClick(event) {
++          if (event.defaultPrevented) return
+           if (props.readOnly) return
+-          send({ type: "GOTO", index: props.index })
++          send({ type: "PAGE.SET", index: props.index, src: "indicator" })
++        },
++      })
++    },
++
++    getAutoplayTriggerProps() {
++      return normalize.button({
++        ...parts.autoplayTrigger.attrs,
++        type: "button",
++        "data-orientation": state.context.orientation,
++        "data-pressed": dataAttr(isPlaying),
++        "aria-label": isPlaying ? translations.autoplayStop : translations.autoplayStart,
++        onClick(event) {
++          if (event.defaultPrevented) return
++          send({ type: isPlaying ? "AUTOPLAY.PAUSE" : "AUTOPLAY.START" })
+         },
+       })
+     },
+   }
+ }
++
++function getSnapAlign(ctx: MachineContext, props: ItemProps) {
++  const { snapAlign = "start", index } = props
++  const perMove = ctx.slidesPerMove === "auto" ? Math.floor(ctx.slidesPerPage) : ctx.slidesPerMove
++  const shouldSnap = (index + perMove) % perMove === 0
++  return shouldSnap ? snapAlign : undefined
++}
+diff --git a/packages/machines/carousel/src/carousel.dom.ts b/packages/machines/carousel/src/carousel.dom.ts
+index 9b0117ff39..bb2feebe3a 100644
+--- a/packages/machines/carousel/src/carousel.dom.ts
++++ b/packages/machines/carousel/src/carousel.dom.ts
+@@ -1,9 +1,8 @@
+-import { createScope, queryAll } from "@zag-js/dom-query"
++import { createScope, getTabbables, queryAll } from "@zag-js/dom-query"
+ import type { MachineContext as Ctx } from "./carousel.types"
+ 
+ export const dom = createScope({
+   getRootId: (ctx: Ctx) => ctx.ids?.root ?? `carousel:${ctx.id}`,
+-  getViewportId: (ctx: Ctx) => ctx.ids?.viewport ?? `carousel:${ctx.id}:viewport`,
+   getItemId: (ctx: Ctx, index: number) => ctx.ids?.item?.(index) ?? `carousel:${ctx.id}:item:${index}`,
+   getItemGroupId: (ctx: Ctx) => ctx.ids?.itemGroup ?? `carousel:${ctx.id}:item-group`,
+   getNextTriggerId: (ctx: Ctx) => ctx.ids?.nextTrigger ?? `carousel:${ctx.id}:next-trigger`,
+@@ -12,7 +11,19 @@ export const dom = createScope({
+   getIndicatorId: (ctx: Ctx, index: number) => ctx.ids?.indicator?.(index) ?? `carousel:${ctx.id}:indicator:${index}`,
+ 
+   getRootEl: (ctx: Ctx) => dom.getById(ctx, dom.getRootId(ctx)),
+-  getViewportEl: (ctx: Ctx) => dom.getById(ctx, dom.getViewportId(ctx)),
+-  getSlideGroupEl: (ctx: Ctx) => dom.getById(ctx, dom.getItemGroupId(ctx)),
+-  getSlideEls: (ctx: Ctx) => queryAll(dom.getSlideGroupEl(ctx), `[data-part=item]`),
++  getItemGroupEl: (ctx: Ctx) => dom.getById(ctx, dom.getItemGroupId(ctx))!,
++  getItemEl: (ctx: Ctx, index: number) => dom.getById(ctx, dom.getItemId(ctx, index)),
++  getItemEls: (ctx: Ctx) => queryAll(dom.getItemGroupEl(ctx), `[data-part=item]`),
++  getActiveIndicatorEl: (ctx: Ctx) => dom.getById(ctx, dom.getIndicatorId(ctx, ctx.page))!,
++
++  syncTabIndex(ctx: Ctx) {
++    const el = dom.getItemGroupEl(ctx)
++    if (!el) return
++    const tabbables = getTabbables(el)
++    if (tabbables.length > 0) {
++      el.removeAttribute("tabindex")
++    } else {
++      el.setAttribute("tabindex", "0")
++    }
++  },
+ })
+diff --git a/packages/machines/carousel/src/carousel.machine.ts b/packages/machines/carousel/src/carousel.machine.ts
+index 5a4ae372dc..2a6b2810f4 100644
+--- a/packages/machines/carousel/src/carousel.machine.ts
++++ b/packages/machines/carousel/src/carousel.machine.ts
+@@ -1,185 +1,380 @@
+ import { createMachine, ref } from "@zag-js/core"
+-import { compact, isEqual, nextIndex, prevIndex } from "@zag-js/utils"
++import { addDomEvent, trackPointerMove } from "@zag-js/dom-event"
++import { raf } from "@zag-js/dom-query"
++import { findSnapPoint, getScrollSnapPositions } from "@zag-js/scroll-snap"
++import { add, compact, isEqual, isObject, nextIndex, prevIndex, remove, uniq } from "@zag-js/utils"
+ import { dom } from "./carousel.dom"
+ import type { MachineContext, MachineState, UserDefinedContext } from "./carousel.types"
+-import { getScrollSnaps } from "./utils/get-scroll-snaps"
++
++const DEFAULT_SLIDES_PER_PAGE = 1
++const DEFAULT_SLIDES_PER_MOVE = "auto"
+ 
+ export function machine(userContext: UserDefinedContext) {
+   const ctx = compact(userContext)
+   return createMachine<MachineContext, MachineState>(
+     {
+       id: "carousel",
+-      initial: "idle",
++      initial: ctx.autoplay ? "autoplay" : "idle",
+       context: {
+-        index: 0,
++        dir: "ltr",
++        page: 0,
+         orientation: "horizontal",
+-        align: "start",
++        snapType: "mandatory",
+         loop: false,
+-        slidesPerView: 1,
++        slidesPerPage: DEFAULT_SLIDES_PER_PAGE,
++        slidesPerMove: DEFAULT_SLIDES_PER_MOVE,
+         spacing: "0px",
++        autoplay: false,
++        allowMouseDrag: false,
++        inViewThreshold: 0.6,
+         ...ctx,
+-        scrollSnaps: [],
+-        scrollProgress: 0,
+-        containerSize: 0,
+-        slideRects: [],
++        timeoutRef: ref({ current: undefined }),
++        translations: {
++          nextTrigger: "Next slide",
++          prevTrigger: "Previous slide",
++          indicator: (index) => `Go to slide ${index + 1}`,
++          item: (index, count) => `${index + 1} of ${count}`,
++          autoplayStart: "Start slide rotation",
++          autoplayStop: "Stop slide rotation",
++          ...ctx.translations,
++        },
++        pageSnapPoints: getPageSnapPoints(
++          ctx.slideCount,
++          ctx.slidesPerMove ?? DEFAULT_SLIDES_PER_MOVE,
++          ctx.slidesPerPage ?? DEFAULT_SLIDES_PER_PAGE,
++        ),
++        slidesInView: [],
++      },
++
++      computed: {
++        isRtl: (ctx) => ctx.dir === "rtl",
++        isHorizontal: (ctx) => ctx.orientation === "horizontal",
++        canScrollNext: (ctx) => ctx.loop || ctx.page < ctx.pageSnapPoints.length - 1,
++        canScrollPrev: (ctx) => ctx.loop || ctx.page > 0,
++        autoplayInterval: (ctx) => (isObject(ctx.autoplay) ? ctx.autoplay.delay : 4000),
+       },
+ 
+       watch: {
+-        index: ["setScrollSnaps"],
++        slidesPerPage: ["setSnapPoints"],
++        slidesPerMove: ["setSnapPoints"],
++        page: ["scrollToPage", "focusIndicatorEl"],
++        orientation: ["setSnapPoints", "scrollToPage"],
+       },
+ 
+       on: {
+-        NEXT: {
+-          actions: ["scrollToNext"],
++        "PAGE.NEXT": {
++          target: "idle",
++          actions: ["clearScrollEndTimer", "setNextPage"],
++        },
++        "PAGE.PREV": {
++          target: "idle",
++          actions: ["clearScrollEndTimer", "setPrevPage"],
+         },
+-        PREV: {
+-          actions: ["scrollToPrev"],
++        "PAGE.SET": {
++          target: "idle",
++          actions: ["clearScrollEndTimer", "setPage"],
+         },
+-        GOTO: {
+-          actions: ["scrollTo"],
++        "INDEX.SET": {
++          target: "idle",
++          actions: ["clearScrollEndTimer", "setMatchingPage"],
+         },
+-        MEASURE_DOM: {
+-          actions: ["measureElements", "setScrollSnaps"],
++        "SNAP.REFRESH": {
++          actions: ["setSnapPoints", "clampPage"],
+         },
+-        PLAY: "autoplay",
+       },
+ 
++      activities: ["trackSlideMutation", "trackSlideIntersections", "trackSlideResize"],
++
++      entry: ["resetScrollPosition", "setSnapPoints", "setPage"],
++
++      exit: ["clearScrollEndTimer"],
++
+       states: {
+         idle: {
++          activities: ["trackScroll"],
+           on: {
+-            POINTER_DOWN: "dragging",
++            "DRAGGING.START": {
++              target: "dragging",
++              actions: ["invokeDragStart"],
++            },
++            "AUTOPLAY.START": {
++              target: "autoplay",
++              actions: ["invokeAutoplayStart"],
++            },
+           },
+         },
+-        autoplay: {
+-          activities: ["trackDocumentVisibility"],
+-          every: {
+-            2000: ["scrollToNext"],
+-          },
++
++        dragging: {
++          activities: ["trackPointerMove"],
++          entry: ["disableScrollSnap"],
+           on: {
+-            PAUSE: "idle",
++            DRAGGING: {
++              actions: ["scrollSlides", "invokeDragging"],
++            },
++            "DRAGGING.END": {
++              target: "idle",
++              actions: ["endDragging", "invokeDraggingEnd"],
++            },
+           },
+         },
+-        dragging: {
++
++        autoplay: {
++          activities: ["trackDocumentVisibility", "trackScroll"],
++          exit: ["invokeAutoplayEnd"],
++          every: {
++            AUTOPLAY_INTERVAL: ["setNextPage", "invokeAutoplay"],
++          },
+           on: {
+-            POINTER_UP: "idle",
+-            POINTER_MOVE: {
+-              actions: ["setScrollSnaps"],
++            "DRAGGING.START": {
++              target: "dragging",
++              actions: ["invokeDragStart"],
+             },
++            "AUTOPLAY.PAUSE": "idle",
+           },
+         },
+       },
+-      activities: ["trackContainerResize", "trackSlideMutation"],
+-      entry: ["measureElements", "setScrollSnaps"],
+-      computed: {
+-        isRtl: (ctx) => ctx.dir === "rtl",
+-        isHorizontal: (ctx) => ctx.orientation === "horizontal",
+-        isVertical: (ctx) => ctx.orientation === "vertical",
+-        canScrollNext: (ctx) => ctx.loop || ctx.index < ctx.scrollSnaps.length - 1,
+-        canScrollPrev: (ctx) => ctx.loop || ctx.index > 0,
+-        startEdge(ctx) {
+-          if (ctx.isVertical) return "top"
+-          return ctx.isRtl ? "right" : "left"
+-        },
+-        endEdge(ctx) {
+-          if (ctx.isVertical) return "bottom"
+-          return ctx.isRtl ? "left" : "right"
+-        },
+-        translateValue: (ctx) => {
+-          const scrollSnap = ctx.scrollSnaps[ctx.index]
+-          return ctx.isHorizontal ? `translate3d(${scrollSnap}px, 0, 0)` : `translate3d(0, ${scrollSnap}px, 0)`
+-        },
+-      },
+     },
+     {
+       activities: {
+         trackSlideMutation(ctx, _evt, { send }) {
+-          const slideGroupEl = dom.getSlideGroupEl(ctx)
+-          if (!slideGroupEl) return
++          const el = dom.getItemGroupEl(ctx)
++          if (!el) return
+           const win = dom.getWin(ctx)
+           const observer = new win.MutationObserver(() => {
+-            send({ type: "MEASURE_DOM", src: "mutation" })
++            send({ type: "SNAP.REFRESH", src: "slide.mutation" })
++            dom.syncTabIndex(ctx)
+           })
+-          observer.observe(slideGroupEl, { childList: true })
+-          return () => {
+-            observer.disconnect()
+-          }
++          dom.syncTabIndex(ctx)
++          observer.observe(el, { childList: true, subtree: true })
++          return () => observer.disconnect()
+         },
+-        trackContainerResize(ctx, _evt, { send }) {
+-          const slideGroupEl = dom.getSlideGroupEl(ctx)
+-          if (!slideGroupEl) return
++
++        trackSlideResize(ctx, _evt, { send }) {
++          const el = dom.getItemGroupEl(ctx)
++          if (!el) return
+           const win = dom.getWin(ctx)
+-          const observer = new win.ResizeObserver((entries) => {
+-            entries.forEach((entry) => {
+-              if (entry.target === slideGroupEl) {
+-                send({ type: "MEASURE_DOM", src: "resize" })
+-              }
+-            })
++          const observer = new win.ResizeObserver(() => {
++            send({ type: "SNAP.REFRESH", src: "slide.resize" })
+           })
+-          observer.observe(slideGroupEl)
+-          return () => {
+-            observer.disconnect()
++          dom.getItemEls(ctx).forEach((slide) => observer.observe(slide))
++          return () => observer.disconnect()
++        },
++
++        trackSlideIntersections(ctx) {
++          const el = dom.getItemGroupEl(ctx)
++          const win = dom.getWin(ctx)
++
++          const observer = new win.IntersectionObserver(
++            (entries) => {
++              const slidesInView = entries.reduce((acc, entry) => {
++                const target = entry.target as HTMLElement
++                const index = Number(target.dataset.index ?? "-1")
++                if (index == null || Number.isNaN(index) || index === -1) return acc
++                return entry.isIntersecting ? add(acc, index) : remove(acc, index)
++              }, ctx.slidesInView)
++
++              ctx.slidesInView = uniq(slidesInView)
++            },
++            {
++              root: el,
++              threshold: ctx.inViewThreshold,
++            },
++          )
++
++          dom.getItemEls(ctx).forEach((slide) => observer.observe(slide))
++          return () => observer.disconnect()
++        },
++
++        trackScroll(ctx) {
++          const el = dom.getItemGroupEl(ctx)
++          if (!el) return
++
++          const onScrollEnd = () => {
++            if (ctx.slidesInView.length === 0) return
++            const scrollPosition = ctx.isHorizontal ? el.scrollLeft : el.scrollTop
++            const page = ctx.pageSnapPoints.findIndex((point) => Math.abs(point - scrollPosition) < 1)
++            if (page === -1) return
++            set.page(ctx, page)
+           }
++
++          // Not using `scrollend` as some browsers trigger it before snapping finishes
++          const onScroll = () => {
++            clearTimeout(ctx.timeoutRef.current)
++            ctx.timeoutRef.current = setTimeout(() => {
++              onScrollEnd?.()
++            }, 150)
++          }
++
++          return addDomEvent(el, "scroll", onScroll, { passive: true })
+         },
++
+         trackDocumentVisibility(ctx, _evt, { send }) {
+           const doc = dom.getDoc(ctx)
+           const onVisibilityChange = () => {
+-            if (doc.visibilityState !== "visible") {
+-              send({ type: "PAUSE", src: "document-hidden" })
+-            }
+-          }
+-          doc.addEventListener("visibilitychange", onVisibilityChange)
+-          return () => {
+-            doc.removeEventListener("visibilitychange", onVisibilityChange)
++            if (doc.visibilityState === "visible") return
++            send({ type: "AUTOPLAY.PAUSE", src: "doc.hidden" })
+           }
++          return addDomEvent(doc, "visibilitychange", onVisibilityChange)
++        },
++
++        trackPointerMove(ctx, _evt, { send }) {
++          const doc = dom.getDoc(ctx)
++          return trackPointerMove(doc, {
++            onPointerMove({ event }) {
++              send({ type: "DRAGGING", left: -event.movementX, top: -event.movementY })
++            },
++            onPointerUp() {
++              send({ type: "DRAGGING.END" })
++            },
++          })
+         },
+       },
+-      guards: {
+-        loop: (ctx) => ctx.loop,
+-        isLastSlide: (ctx) => ctx.index === ctx.scrollSnaps.length - 1,
+-        isFirstSlide: (ctx) => ctx.index === 0,
+-      },
++
+       actions: {
+-        scrollToNext(ctx) {
+-          const index = nextIndex(ctx.scrollSnaps, ctx.index)
+-          set.index(ctx, index)
++        resetScrollPosition(ctx) {
++          const el = dom.getItemGroupEl(ctx)
++          el.scrollTo(0, 0)
++        },
++        clearScrollEndTimer(ctx) {
++          if (ctx.timeoutRef.current == null) return
++          clearTimeout(ctx.timeoutRef.current)
++          ctx.timeoutRef.current = undefined
++        },
++        scrollToPage(ctx, evt) {
++          const behavior = evt.instant ? "instant" : "smooth"
++          const index = clamp(evt.index ?? ctx.page, 0, ctx.pageSnapPoints.length - 1)
++          const el = dom.getItemGroupEl(ctx)
++          const axis = ctx.isHorizontal ? "left" : "top"
++          el.scrollTo({ [axis]: ctx.pageSnapPoints[index], behavior })
++        },
++        setNextPage(ctx) {
++          const page = nextIndex(ctx.pageSnapPoints, ctx.page, { loop: ctx.loop })
++          set.page(ctx, page)
++        },
++        setPrevPage(ctx) {
++          const page = prevIndex(ctx.pageSnapPoints, ctx.page, { loop: ctx.loop })
++          set.page(ctx, page)
+         },
+-        scrollToPrev(ctx) {
+-          const index = prevIndex(ctx.scrollSnaps, ctx.index)
+-          set.index(ctx, index)
++        setMatchingPage(ctx, evt) {
++          const snapPoint = findSnapPoint(
++            dom.getItemGroupEl(ctx),
++            ctx.isHorizontal ? "x" : "y",
++            (node) => node.dataset.index === evt.index.toString(),
++          )
++          if (snapPoint == null) return
++
++          const page = ctx.pageSnapPoints.indexOf(snapPoint)
++          set.page(ctx, page)
++        },
++        setPage(ctx, evt) {
++          set.page(ctx, evt.index ?? ctx.page)
++        },
++        clampPage(ctx) {
++          const index = clamp(ctx.page, 0, ctx.pageSnapPoints.length - 1)
++          set.page(ctx, index)
++        },
++        setSnapPoints(ctx) {
++          queueMicrotask(() => {
++            const el = dom.getItemGroupEl(ctx)
++            const scrollSnapPoints = getScrollSnapPositions(el)
++            ctx.pageSnapPoints = ctx.isHorizontal ? scrollSnapPoints.x : scrollSnapPoints.y
++          })
+         },
+-        setScrollSnaps(ctx) {
+-          const { snapsAligned, scrollProgress } = getScrollSnaps(ctx)
+-          ctx.scrollSnaps = snapsAligned
+-          ctx.scrollProgress = scrollProgress
++        disableScrollSnap(ctx) {
++          const el = dom.getItemGroupEl(ctx)
++          const styles = getComputedStyle(el)
++          el.dataset.scrollSnapType = styles.getPropertyValue("scroll-snap-type")
++          el.style.setProperty("scroll-snap-type", "none")
+         },
+-        scrollTo(ctx, evt) {
+-          const index = Math.max(0, Math.min(evt.index, ctx.scrollSnaps.length - 1))
+-          set.index(ctx, index)
++        scrollSlides(ctx, evt) {
++          const el = dom.getItemGroupEl(ctx)
++          el.scrollBy({ left: evt.left, top: evt.top, behavior: "instant" })
++        },
++        endDragging(ctx) {
++          const el = dom.getItemGroupEl(ctx)
++          const startX = el.scrollLeft
++          const startY = el.scrollTop
++
++          const snapPositions = getScrollSnapPositions(el)
++
++          // Find closest x snap point
++          const closestX = snapPositions.x.reduce((closest, curr) => {
++            return Math.abs(curr - startX) < Math.abs(closest - startX) ? curr : closest
++          }, snapPositions.x[0])
++
++          // Find closest y snap point
++          const closestY = snapPositions.y.reduce((closest, curr) => {
++            return Math.abs(curr - startY) < Math.abs(closest - startY) ? curr : closest
++          }, snapPositions.y[0])
++
++          raf(() => {
++            // Scroll to closest snap points
++            el.scrollTo({ left: closestX, top: closestY, behavior: "smooth" })
++            const scrollSnapType = el.dataset.scrollSnapType
++            if (scrollSnapType) {
++              el.style.removeProperty("scroll-snap-type")
++              delete el.dataset.scrollSnapType
++            }
++          })
++        },
++        focusIndicatorEl(ctx, evt) {
++          if (evt.src !== "indicator") return
++          const el = dom.getActiveIndicatorEl(ctx)
++          raf(() => el.focus({ preventScroll: true }))
++        },
++        invokeDragStart(ctx) {
++          ctx.onDragStatusChange?.({ type: "dragging.start", isDragging: true, page: ctx.page })
++        },
++        invokeDragging(ctx) {
++          ctx.onDragStatusChange?.({ type: "dragging", isDragging: true, page: ctx.page })
++        },
++        invokeDraggingEnd(ctx) {
++          ctx.onDragStatusChange?.({ type: "dragging.end", isDragging: false, page: ctx.page })
++        },
++        invokeAutoplay(ctx) {
++          ctx.onAutoplayStatusChange?.({ type: "autoplay", isPlaying: true, page: ctx.page })
++        },
++        invokeAutoplayStart(ctx) {
++          ctx.onAutoplayStatusChange?.({ type: "autoplay.start", isPlaying: true, page: ctx.page })
++        },
++        invokeAutoplayEnd(ctx) {
++          ctx.onAutoplayStatusChange?.({ type: "autoplay.stop", isPlaying: false, page: ctx.page })
+         },
+-        measureElements,
++      },
++
++      delays: {
++        AUTOPLAY_INTERVAL: (ctx) => ctx.autoplayInterval,
+       },
+     },
+   )
+ }
+ 
+-const measureElements = (ctx: MachineContext) => {
+-  const slideGroupEl = dom.getSlideGroupEl(ctx)
+-  if (!slideGroupEl) return
+-  ctx.containerRect = ref(slideGroupEl.getBoundingClientRect())
+-  ctx.containerSize = ctx.isHorizontal ? ctx.containerRect.width : ctx.containerRect.height
+-  ctx.slideRects = ref(dom.getSlideEls(ctx).map((slide) => slide.getBoundingClientRect()))
+-}
+-
+ const invoke = {
+-  change: (ctx: MachineContext) => {
+-    ctx.onIndexChange?.({ index: ctx.index })
++  pageChange: (ctx: MachineContext) => {
++    ctx.onPageChange?.({
++      page: ctx.page,
++      pageSnapPoint: ctx.pageSnapPoints[ctx.page],
++    })
+   },
+ }
+ 
+ const set = {
+-  index: (ctx: MachineContext, index: number) => {
+-    if (isEqual(ctx.index, index)) return
+-    ctx.index = index
+-    invoke.change(ctx)
++  page: (ctx: MachineContext, value: number) => {
++    const page = clamp(value, 0, ctx.pageSnapPoints.length - 1)
++    if (isEqual(ctx.page, page)) return
++    ctx.page = page
++    invoke.pageChange(ctx)
+   },
+ }
++
++function clamp(value: number, min: number, max: number) {
++  return Math.min(Math.max(value, min), max)
++}
++
++function getPageSnapPoints(totalSlides: number | undefined, slidesPerMove: number | "auto", slidesPerPage: number) {
++  if (totalSlides == null) return []
++  const snapPoints: number[] = []
++  const perMove = slidesPerMove === "auto" ? Math.floor(slidesPerPage) : slidesPerMove
++  for (let i = 0; i < totalSlides - 1; i += perMove) snapPoints.push(i)
++  return snapPoints
++}
+diff --git a/packages/machines/carousel/src/carousel.props.ts b/packages/machines/carousel/src/carousel.props.ts
+index 4a5cee43cf..e88eb6b2c5 100644
+--- a/packages/machines/carousel/src/carousel.props.ts
++++ b/packages/machines/carousel/src/carousel.props.ts
+@@ -1,21 +1,33 @@
+ import { createProps } from "@zag-js/types"
+ import { createSplitProps } from "@zag-js/utils"
+-import type { IndicatorProps, UserDefinedContext } from "./carousel.types"
++import type { IndicatorProps, ItemProps, UserDefinedContext } from "./carousel.types"
+ 
+ export const props = createProps<UserDefinedContext>()([
+-  "align",
+   "dir",
+   "getRootNode",
+   "id",
+   "ids",
+-  "index",
+   "loop",
+-  "onIndexChange",
++  "page",
++  "onPageChange",
+   "orientation",
+-  "slidesPerView",
++  "slideCount",
++  "slidesPerPage",
++  "slidesPerMove",
+   "spacing",
++  "padding",
++  "autoplay",
++  "allowMouseDrag",
++  "inViewThreshold",
++  "translations",
++  "snapType",
++  "onDragStatusChange",
++  "onAutoplayStatusChange",
+ ])
+ export const splitProps = createSplitProps<Partial<UserDefinedContext>>(props)
+ 
+ export const indicatorProps = createProps<IndicatorProps>()(["index", "readOnly"])
+ export const splitIndicatorProps = createSplitProps<IndicatorProps>(indicatorProps)
++
++export const itemProps = createProps<ItemProps>()(["index", "snapAlign"])
++export const splitItemProps = createSplitProps<ItemProps>(itemProps)
+diff --git a/packages/machines/carousel/src/carousel.types.ts b/packages/machines/carousel/src/carousel.types.ts
+index 082fc8501e..913a7a0f74 100644
+--- a/packages/machines/carousel/src/carousel.types.ts
++++ b/packages/machines/carousel/src/carousel.types.ts
+@@ -1,23 +1,42 @@
+-import type { Machine, StateMachine as S } from "@zag-js/core"
+-import type { CommonProperties, DirectionProperty, PropTypes, RequiredBy } from "@zag-js/types"
++import type { ContextRef, Machine, StateMachine as S } from "@zag-js/core"
++import type { CommonProperties, DirectionProperty, OrientationProperty, PropTypes, RequiredBy } from "@zag-js/types"
+ 
+ /* -----------------------------------------------------------------------------
+  * Callback details
+  * -----------------------------------------------------------------------------*/
+ 
+-export interface SlideChangeDetails {
+-  index: number
++export interface PageChangeDetails {
++  page: number
++  pageSnapPoint: number
++}
++
++export interface DragStatusDetails {
++  type: "dragging.start" | "dragging" | "dragging.end"
++  page: number
++  isDragging: boolean
++}
++
++export interface AutoplayStatusDetails {
++  type: "autoplay.start" | "autoplay" | "autoplay.stop"
++  page: number
++  isPlaying: boolean
+ }
+ 
+ /* -----------------------------------------------------------------------------
+  * Machine context
+  * -----------------------------------------------------------------------------*/
+ 
+-type RectEdge = "top" | "right" | "bottom" | "left"
++export interface IntlTranslations {
++  nextTrigger: string
++  prevTrigger: string
++  indicator: (index: number) => string
++  item: (index: number, count: number) => string
++  autoplayStart: string
++  autoplayStop: string
++}
+ 
+ export type ElementIds = Partial<{
+   root: string
+-  viewport: string
+   item(index: number): string
+   itemGroup: string
+   nextTrigger: string
+@@ -26,63 +45,99 @@ export type ElementIds = Partial<{
+   indicator(index: number): string
+ }>
+ 
+-interface PublicContext extends DirectionProperty, CommonProperties {
++interface PublicContext extends DirectionProperty, CommonProperties, OrientationProperty {
+   /**
+-   * The orientation of the carousel.
+-   * @default "horizontal"
++   * The ids of the elements in the carousel. Useful for composition.
+    */
+-  orientation: "horizontal" | "vertical"
++  ids?: ElementIds | undefined
+   /**
+-   * The alignment of the slides in the carousel.
+-   * @default "start"
++   * The localized messages to use.
+    */
+-  align: "start" | "center" | "end"
++  translations: IntlTranslations
+   /**
+    * The number of slides to show at a time.
+    * @default 1
+    */
+-  slidesPerView: number | "auto"
++  slidesPerPage: number
++  /**
++   * The number of slides to scroll at a time.
++   *
++   * When set to `auto`, the number of slides to scroll is determined by the
++   * `slidesPerPage` property.
++   *
++   * @default "auto"
++   */
++  slidesPerMove: number | "auto"
++  /**
++   * Whether to scroll automatically. The default delay is 4000ms.
++   * @default false
++   */
++  autoplay?: boolean | { delay: number } | undefined
++  /**
++   * Whether to allow scrolling via dragging with mouse
++   * @default false
++   */
++  allowMouseDrag: boolean
+   /**
+    * Whether the carousel should loop around.
+    * @default false
+    */
+   loop: boolean
+   /**
+-   * The current slide index.
++   * The index of the active page.
+    */
+-  index: number
++  page: number
+   /**
+-   * The amount of space between slides.
++   * The amount of space between items.
+    * @default "0px"
+    */
+   spacing: string
+   /**
+-   * Function called when the slide changes.
++   * Defines the extra space added around the scrollable area,
++   * enabling nearby items to remain partially in view.
+    */
+-  onIndexChange?: ((details: SlideChangeDetails) => void) | undefined
++  padding?: string
+   /**
+-   * The ids of the elements in the carousel. Useful for composition.
++   * Function called when the page changes.
+    */
+-  ids?: ElementIds | undefined
++  onPageChange?: ((details: PageChangeDetails) => void) | undefined
++  /**
++   * The threshold for determining if an item is in view.
++   * @default 0.6
++   */
++  inViewThreshold: number | number[]
++  /**
++   * The snap type of the item.
++   * @default "mandatory"
++   */
++  snapType: "proximity" | "mandatory"
++  /**
++   * The total number of slides.
++   * Useful for SSR to render the initial ating the snap points.
++   */
++  slideCount?: number | undefined
++  /**
++   * Function called when the drag status changes.
++   */
++  onDragStatusChange?: ((details: DragStatusDetails) => void) | undefined
++  /**
++   * Function called when the autoplay status changes.
++   */
++  onAutoplayStatusChange?: ((details: AutoplayStatusDetails) => void) | undefined
+ }
+ 
+ interface PrivateContext {
+-  slideRects: DOMRect[]
+-  containerRect?: DOMRect | undefined
+-  containerSize: number
+-  scrollSnaps: number[]
+-  scrollProgress: number
++  pageSnapPoints: number[]
++  slidesInView: number[]
++  timeoutRef: ContextRef<ReturnType<typeof setTimeout>>
+ }
+ 
+ type ComputedContext = Readonly<{
+   isRtl: boolean
+   isHorizontal: boolean
+-  isVertical: boolean
+-  startEdge: RectEdge
+-  endEdge: RectEdge
+-  translateValue: string
+   canScrollNext: boolean
+   canScrollPrev: boolean
++  autoplayInterval: number
+ }>
+ 
+ export type UserDefinedContext = RequiredBy<PublicContext, "id">
+@@ -108,33 +163,22 @@ export interface ItemProps {
+    * The index of the item.
+    */
+   index: number
+-}
+-
+-export interface ItemState {
+-  /**
+-   * The text value of the item. Used for accessibility.
+-   */
+-  valueText: string
+-  /**
+-   * Whether the item is the current item in the carousel
+-   */
+-  current: boolean
+   /**
+-   * Whether the item is the next item in the carousel
+-   */
+-  next: boolean
+-  /**
+-   * Whether the item is the previous item in the carousel
+-   */
+-  previous: boolean
+-  /**
+-   * Whether the item is in view
++   * The snap alignment of the item.
++   * @default "start"
+    */
+-  inView: boolean
++  snapAlign?: "start" | "end" | "center" | undefined
+ }
+ 
+ export interface IndicatorProps {
++  /**
++   * The index of the indicator.
++   */
+   index: number
++  /**
++   * Whether the indicator is read only.
++   * @default false
++   */
+   readOnly?: boolean | undefined
+ }
+ 
+@@ -142,39 +186,47 @@ export interface MachineApi<T extends PropTypes = PropTypes> {
+   /**
+    * The current index of the carousel
+    */
+-  index: number
++  page: number
+   /**
+-   * The current scroll progress of the carousel
++   * The current snap points of the carousel
+    */
+-  scrollProgress: number
++  pageSnapPoints: number[]
+   /**
+    * Whether the carousel is auto playing
+    */
+-  autoPlaying: boolean
++  isPlaying: boolean
++  /**
++   * Whether the carousel is being dragged. This only works when `draggable` is true.
++   */
++  isDragging: boolean
+   /**
+-   * Whether the carousel is can scroll to the next slide
++   * Whether the carousel is can scroll to the next view
+    */
+   canScrollNext: boolean
+   /**
+-   * Whether the carousel is can scroll to the previous slide
++   * Whether the carousel is can scroll to the previous view
+    */
+   canScrollPrev: boolean
+   /**
+-   * Function to scroll to a specific slide index
++   * Function to scroll to a specific item index
+    */
+-  scrollTo(index: number, jump?: boolean): void
++  scrollToIndex(index: number, instant?: boolean): void
+   /**
+-   * Function to scroll to the next slide
++   * Function to scroll to a specific page
+    */
+-  scrollToNext(): void
++  scrollTo(page: number, instant?: boolean): void
+   /**
+-   * Function to scroll to the previous slide
++   * Function to scroll to the next page
+    */
+-  scrollToPrevious(): void
++  scrollNext(instant?: boolean): void
+   /**
+-   *  Returns the state of a specific slide
++   * Function to scroll to the previous page
+    */
+-  getItemState(props: ItemProps): ItemState
++  scrollPrev(instant?: boolean): void
++  /**
++   * Returns the current scroll progress as a percentage
++   */
++  getProgress(): number
+   /**
+    * Function to start/resume autoplay
+    */
+@@ -183,13 +235,23 @@ export interface MachineApi<T extends PropTypes = PropTypes> {
+    * Function to pause autoplay
+    */
+   pause(): void
++  /**
++   * Whether the item is in view
++   */
++  isInView(index: number): boolean
++  /**
++   * Function to re-compute the snap points
++   * and clamp the page
++   */
++  refresh(): void
+ 
+   getRootProps(): T["element"]
+-  getViewportProps(): T["element"]
++  getControlProps(): T["element"]
+   getItemGroupProps(): T["element"]
+   getItemProps(props: ItemProps): T["element"]
+   getPrevTriggerProps(): T["button"]
+   getNextTriggerProps(): T["button"]
++  getAutoplayTriggerProps(): T["button"]
+   getIndicatorGroupProps(): T["element"]
+   getIndicatorProps(props: IndicatorProps): T["button"]
+ }
+diff --git a/packages/machines/carousel/src/index.ts b/packages/machines/carousel/src/index.ts
+index d2b7622877..68b34476f8 100644
+--- a/packages/machines/carousel/src/index.ts
++++ b/packages/machines/carousel/src/index.ts
+@@ -4,11 +4,13 @@ export { machine } from "./carousel.machine"
+ export * from "./carousel.props"
+ export type {
+   MachineApi as Api,
++  AutoplayStatusDetails,
+   UserDefinedContext as Context,
++  DragStatusDetails,
+   ElementIds,
+   IndicatorProps,
++  IntlTranslations,
+   ItemProps,
+-  ItemState,
+-  SlideChangeDetails,
++  PageChangeDetails,
+   Service,
+ } from "./carousel.types"
+diff --git a/packages/machines/carousel/src/utils/get-alignment.ts b/packages/machines/carousel/src/utils/get-alignment.ts
+deleted file mode 100644
+index b9e77c2fb5..0000000000
+--- a/packages/machines/carousel/src/utils/get-alignment.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import { isNumber } from "@zag-js/utils"
+-
+-export type AlignmentOptionType = "start" | "center" | "end" | number
+-
+-export const getAlignment = (align: AlignmentOptionType, containerSize: number) => {
+-  const predefined = { start, center, end }
+-
+-  function start(): number {
+-    return 0
+-  }
+-
+-  function center(n: number): number {
+-    return end(n) / 2
+-  }
+-
+-  function end(n: number): number {
+-    return containerSize - n
+-  }
+-
+-  function percent(): number {
+-    return containerSize * Number(align)
+-  }
+-
+-  return (n: number) => {
+-    if (isNumber(align)) return percent()
+-    return predefined[align](n)
+-  }
+-}
+diff --git a/packages/machines/carousel/src/utils/get-counter.ts b/packages/machines/carousel/src/utils/get-counter.ts
+deleted file mode 100644
+index 622b4805e8..0000000000
+--- a/packages/machines/carousel/src/utils/get-counter.ts
++++ /dev/null
+@@ -1,47 +0,0 @@
+-import { getLimit } from "./get-limit"
+-
+-export type CounterType = {
+-  get: () => number
+-  set: (n: number) => CounterType
+-  add: (n: number) => CounterType
+-  clone: () => CounterType
+-  min: number
+-  max: number
+-}
+-
+-export function getCounter(max: number, start: number, loop: boolean): CounterType {
+-  const { min, constrain } = getLimit(0, max)
+-  const loopEnd = max + 1
+-  let counter = withinLimit(start)
+-
+-  function withinLimit(n: number): number {
+-    return !loop ? constrain(n) : Math.abs((loopEnd + n) % loopEnd)
+-  }
+-
+-  function get(): number {
+-    return counter
+-  }
+-
+-  function set(n: number): CounterType {
+-    counter = withinLimit(n)
+-    return self
+-  }
+-
+-  function add(n: number): CounterType {
+-    return set(get() + n)
+-  }
+-
+-  function clone(): CounterType {
+-    return getCounter(max, get(), loop)
+-  }
+-
+-  const self: CounterType = {
+-    add,
+-    clone,
+-    get,
+-    set,
+-    min,
+-    max,
+-  }
+-  return self
+-}
+diff --git a/packages/machines/carousel/src/utils/get-limit.ts b/packages/machines/carousel/src/utils/get-limit.ts
+deleted file mode 100644
+index 54ac236d8b..0000000000
+--- a/packages/machines/carousel/src/utils/get-limit.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-export function getLimit(min: number, max: number) {
+-  const length = Math.abs(min - max)
+-
+-  function reachedMin(n: number): boolean {
+-    return n < min
+-  }
+-
+-  function reachedMax(n: number): boolean {
+-    return n > max
+-  }
+-
+-  function reachedAny(n: number): boolean {
+-    return reachedMin(n) || reachedMax(n)
+-  }
+-
+-  function constrain(n: number): number {
+-    if (!reachedAny(n)) return n
+-    return reachedMin(n) ? min : max
+-  }
+-
+-  function removeOffset(n: number): number {
+-    if (!length) return n
+-    return n - length * Math.ceil((n - max) / length)
+-  }
+-
+-  return {
+-    length,
+-    max,
+-    min,
+-    constrain,
+-    reachedAny,
+-    reachedMax,
+-    reachedMin,
+-    removeOffset,
+-  }
+-}
+diff --git a/packages/machines/carousel/src/utils/get-scroll-limit.ts b/packages/machines/carousel/src/utils/get-scroll-limit.ts
+deleted file mode 100644
+index 06401daf1f..0000000000
+--- a/packages/machines/carousel/src/utils/get-scroll-limit.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-import { getLimit } from "./get-limit"
+-
+-const arrayLast = <T>(array: T[]): T => array[array.length - 1]
+-
+-export function getScrollLimit(contentSize: number, scrollSnaps: number[], loop: boolean) {
+-  const startSnap = scrollSnaps[0]
+-  const endSnap = arrayLast(scrollSnaps)
+-  const min = loop ? startSnap - contentSize : endSnap
+-  const max = startSnap
+-  return getLimit(min, max)
+-}
+diff --git a/packages/machines/carousel/src/utils/get-scroll-snaps.ts b/packages/machines/carousel/src/utils/get-scroll-snaps.ts
+deleted file mode 100644
+index 3981635a39..0000000000
+--- a/packages/machines/carousel/src/utils/get-scroll-snaps.ts
++++ /dev/null
+@@ -1,53 +0,0 @@
+-import type { MachineContext } from "../carousel.types"
+-import { getAlignment } from "./get-alignment"
+-import { getLimit } from "./get-limit"
+-import { getSlidesToScroll } from "./get-slide-groups"
+-import { getSlideSizes } from "./get-slide-sizes"
+-
+-const arrayLast = <T>(array: T[]): T => array[arrayLastIndex(array)]
+-const arrayLastIndex = <T>(array: T[]): number => Math.max(0, array.length - 1)
+-
+-export function getScrollSnaps(ctx: MachineContext) {
+-  const { slideSizes, slideSizesWithGaps } = getSlideSizes(ctx)
+-
+-  const groupSlides = getSlidesToScroll(ctx.containerSize!, slideSizesWithGaps, ctx.slidesPerView)
+-
+-  function measureSizes(): number[] {
+-    return groupSlides(ctx.slideRects)
+-      .map((rects) => arrayLast(rects)[ctx.endEdge] - rects[0][ctx.startEdge])
+-      .map(Math.abs)
+-  }
+-
+-  function measureUnaligned(): number[] {
+-    return ctx.slideRects
+-      .map((slideRect) => ctx.containerRect![ctx.startEdge] - slideRect[ctx.startEdge])
+-      .map((snap) => -Math.abs(snap))
+-  }
+-
+-  function measureAligned(): number[] {
+-    const measureFn = getAlignment(ctx.align, ctx.containerSize!)
+-    const alignments = measureSizes().map(measureFn)
+-
+-    return groupSlides(snaps)
+-      .map((snap) => snap[0])
+-      .map((snap, index) => snap + alignments[index])
+-  }
+-
+-  const snaps = measureUnaligned()
+-  const snapsAligned = measureAligned()
+-
+-  const contentSize = -arrayLast(snaps) + arrayLast(slideSizesWithGaps)
+-
+-  const scrollLimit = getLimit(snaps[snaps.length - 1], snaps[0])
+-  const scrollProgress = (snapsAligned[ctx.index] - scrollLimit.max) / -scrollLimit.length
+-
+-  return {
+-    snaps,
+-    snapsAligned,
+-    slideSizes,
+-    slideSizesWithGaps,
+-    contentSize,
+-    scrollLimit,
+-    scrollProgress: Math.abs(scrollProgress),
+-  }
+-}
+diff --git a/packages/machines/carousel/src/utils/get-slide-groups.ts b/packages/machines/carousel/src/utils/get-slide-groups.ts
+deleted file mode 100644
+index cb64f6092d..0000000000
+--- a/packages/machines/carousel/src/utils/get-slide-groups.ts
++++ /dev/null
+@@ -1,28 +0,0 @@
+-import { isNumber } from "@zag-js/utils"
+-import type { MachineContext } from "../carousel.types"
+-
+-export function getSlidesToScroll(
+-  containerSize: number,
+-  slideSizesWithGaps: number[],
+-  slidesPerView: MachineContext["slidesPerView"],
+-) {
+-  function byNumber<T>(array: T[], groupSize: number): T[][] {
+-    return Array.from(array.keys())
+-      .filter((i) => i % groupSize === 0)
+-      .map((i) => array.slice(i, i + groupSize))
+-  }
+-
+-  function bySize<T>(array: T[]): T[][] {
+-    return Array.from(array.keys())
+-      .reduce((groups: number[], i) => {
+-        const chunk = slideSizesWithGaps.slice(groups.at(-1), i + 1)
+-        const chunkSize = chunk.reduce((a, s) => a + s, 0)
+-        return !i || chunkSize > containerSize ? groups.concat(i) : groups
+-      }, [])
+-      .map((start, i, groups) => array.slice(start, groups[i + 1]))
+-  }
+-
+-  return function groupSlides<T>(array: T[]): T[][] {
+-    return isNumber(slidesPerView) ? byNumber(array, slidesPerView) : bySize(array)
+-  }
+-}
+diff --git a/packages/machines/carousel/src/utils/get-slide-in-view.ts b/packages/machines/carousel/src/utils/get-slide-in-view.ts
+deleted file mode 100644
+index ceab8aced1..0000000000
+--- a/packages/machines/carousel/src/utils/get-slide-in-view.ts
++++ /dev/null
+@@ -1,42 +0,0 @@
+-import type { MachineContext } from "../carousel.types"
+-import { getLimit } from "./get-limit"
+-import { getScrollSnaps } from "./get-scroll-snaps"
+-
+-type Bound = {
+-  start: number
+-  end: number
+-  index: number
+-}
+-
+-const slideThreshold = 0
+-
+-export function getSlidesInView(ctx: MachineContext) {
+-  const roundingSafety = 0.5
+-  const slideOffsets = [0]
+-
+-  const { snaps, slideSizes, scrollLimit } = getScrollSnaps(ctx)
+-
+-  const slideThresholds = slideSizes.map((slideSize) => {
+-    const thresholdLimit = getLimit(roundingSafety, slideSize - roundingSafety)
+-    return thresholdLimit.constrain(slideSize * slideThreshold)
+-  })
+-
+-  const slideBounds = slideOffsets.reduce((acc: Bound[], offset) => {
+-    const bounds = snaps.map((snap, index) => ({
+-      start: snap - slideSizes[index] + slideThresholds[index] + offset,
+-      end: snap + ctx.containerSize - slideThresholds[index] + offset,
+-      index,
+-    }))
+-    return acc.concat(bounds)
+-  }, [])
+-
+-  return (location: number) => {
+-    const loc = scrollLimit.constrain(location)
+-    return slideBounds.reduce((list: number[], bound) => {
+-      const { index, start, end } = bound
+-      const inList = list.includes(index)
+-      const inView = start < loc && end > loc
+-      return !inList && inView ? list.concat([index]) : list
+-    }, [])
+-  }
+-}
+diff --git a/packages/machines/carousel/src/utils/get-slide-sizes.ts b/packages/machines/carousel/src/utils/get-slide-sizes.ts
+deleted file mode 100644
+index 13c250b6e4..0000000000
+--- a/packages/machines/carousel/src/utils/get-slide-sizes.ts
++++ /dev/null
+@@ -1,38 +0,0 @@
+-import type { MachineContext } from "../carousel.types"
+-
+-export type SlideSizesType = {
+-  slideSizes: number[]
+-  slideSizesWithGaps: number[]
+-}
+-
+-export function getSlideSizes(ctx: MachineContext): SlideSizesType {
+-  const startGap = measureStartGap()
+-
+-  function measureStartGap(): number {
+-    if (!ctx.containerRect) return 0
+-    const slideRect = ctx.slideRects[0]
+-    return Math.abs(ctx.containerRect[ctx.startEdge] - slideRect[ctx.startEdge])
+-  }
+-
+-  function measureWithGaps(): number[] {
+-    return ctx.slideRects.map((rect, index, rects) => {
+-      const isFirst = !index
+-      if (isFirst) return Math.abs(slideSizes[index] + startGap)
+-
+-      const isLast = index === rects.length - 1
+-      if (isLast) return Math.abs(slideSizes[index])
+-
+-      return Math.abs(rects[index + 1][ctx.startEdge] - rect[ctx.startEdge])
+-    })
+-  }
+-
+-  const slideSizes = ctx.slideRects.map((slideRect) => {
+-    return ctx.isVertical ? slideRect.height : slideRect.width
+-  })
+-  const slideSizesWithGaps = measureWithGaps()
+-
+-  return {
+-    slideSizes,
+-    slideSizesWithGaps,
+-  }
+-}
+diff --git a/packages/types/src/index.ts b/packages/types/src/index.ts
+index ced14dc508..844a7b294a 100644
+--- a/packages/types/src/index.ts
++++ b/packages/types/src/index.ts
+@@ -19,7 +19,7 @@ export interface OrientationProperty {
+    * The orientation of the element.
+    * @default "horizontal"
+    */
+-  orientation?: Orientation | undefined
++  orientation: Orientation
+ }
+ 
+ export interface DirectionProperty {
+diff --git a/packages/utilities/scroll-snap/README.md b/packages/utilities/scroll-snap/README.md
+new file mode 100644
+index 0000000000..e27973bfff
+--- /dev/null
++++ b/packages/utilities/scroll-snap/README.md
+@@ -0,0 +1,19 @@
++# @zag-js/scroll-snap
++
++Scroll snap utilities
++
++## Installation
++
++```sh
++yarn add @zag-js/scroll-snap
++# or
++npm i @zag-js/scroll-snap
++```
++
++## Contribution
++
++Yes please! See the [contributing guidelines](https://github.com/chakra-ui/zag/blob/main/CONTRIBUTING.md) for details.
++
++## Licence
++
++This project is licensed under the terms of the [MIT license](https://github.com/chakra-ui/zag/blob/main/LICENSE).
+diff --git a/packages/utilities/scroll-snap/package.json b/packages/utilities/scroll-snap/package.json
+new file mode 100644
+index 0000000000..9ddf6de33c
+--- /dev/null
++++ b/packages/utilities/scroll-snap/package.json
+@@ -0,0 +1,39 @@
++{
++  "name": "@zag-js/scroll-snap",
++  "version": "0.0.0",
++  "description": "Scroll snap utilities",
++  "keywords": [
++    "js",
++    "utils",
++    "scroll-snap"
++  ],
++  "author": "Segun Adebayo <sage@adebayosegun.com>",
++  "homepage": "https://github.com/chakra-ui/zag#readme",
++  "license": "MIT",
++  "main": "src/index.ts",
++  "repository": "https://github.com/chakra-ui/zag/tree/main/packages/utilities/scroll-snap",
++  "sideEffects": false,
++  "files": [
++    "dist/**/*"
++  ],
++  "scripts": {
++    "build": "tsup",
++    "lint": "eslint src",
++    "typecheck": "tsc --noEmit",
++    "prepack": "clean-package",
++    "postpack": "clean-package restore"
++  },
++  "publishConfig": {
++    "access": "public"
++  },
++  "bugs": {
++    "url": "https://github.com/chakra-ui/zag/issues"
++  },
++  "clean-package": "../../../clean-package.config.json",
++  "devDependencies": {
++    "clean-package": "2.2.0"
++  },
++  "dependencies": {
++    "@zag-js/dom-query": "workspace:*"
++  }
++}
+diff --git a/packages/utilities/scroll-snap/src/index.ts b/packages/utilities/scroll-snap/src/index.ts
+new file mode 100644
+index 0000000000..0d03ef79fa
+--- /dev/null
++++ b/packages/utilities/scroll-snap/src/index.ts
+@@ -0,0 +1,196 @@
++// Modified from https://github.com/LachlanArthur/scroll-snap-api
++// MIT License
++
++import { getComputedStyle } from "@zag-js/dom-query"
++
++export type ScrollAxis = "x" | "y"
++
++export type ScrollDirection = "left" | "right" | "up" | "down"
++
++export type ScrollSnapAlignment = "start" | "end" | "center" | "none"
++
++function getScrollPadding(element: HTMLElement): Record<ScrollAxis, { before: number; after: number }> {
++  const style = getComputedStyle(element)
++  const rect = element.getBoundingClientRect()
++
++  let xBeforeRaw = style.getPropertyValue("scroll-padding-left").replace("auto", "0px")
++  let yBeforeRaw = style.getPropertyValue("scroll-padding-top").replace("auto", "0px")
++  let xAfterRaw = style.getPropertyValue("scroll-padding-right").replace("auto", "0px")
++  let yAfterRaw = style.getPropertyValue("scroll-padding-bottom").replace("auto", "0px")
++
++  function convert(raw: string, size: number): number {
++    let n = parseFloat(raw)
++    if (/%/.test(raw)) {
++      n /= 100
++      n *= size
++    }
++    return n
++  }
++
++  let xBefore = convert(xBeforeRaw, rect.width)
++  let yBefore = convert(yBeforeRaw, rect.height)
++  let xAfter = convert(xAfterRaw, rect.width)
++  let yAfter = convert(yAfterRaw, rect.height)
++
++  return {
++    x: { before: xBefore, after: xAfter },
++    y: { before: yBefore, after: yAfter },
++  }
++}
++
++function isRectIntersecting(a: DOMRect, b: DOMRect, axis: ScrollAxis | "both" = "both"): boolean {
++  return (
++    (axis === "x" && a.right >= b.left && a.left <= b.right) ||
++    (axis === "y" && a.bottom >= b.top && a.top <= b.bottom) ||
++    (axis === "both" && a.right >= b.left && a.left <= b.right && a.bottom >= b.top && a.top <= b.bottom)
++  )
++}
++
++function getDescendants(parent: HTMLElement): HTMLElement[] {
++  let children: HTMLElement[] = []
++  for (const child of parent.children) {
++    children = children.concat(child as HTMLElement, getDescendants(child as HTMLElement))
++  }
++  return children
++}
++
++export type SnapPositionList = Record<Exclude<ScrollSnapAlignment, "none">, Array<{ node: Element; position: number }>>
++
++export function getSnapPositions(parent: HTMLElement, subtree = false): Record<ScrollAxis, SnapPositionList> {
++  const parentRect = parent.getBoundingClientRect()
++
++  const positions: Record<ScrollAxis, SnapPositionList> = {
++    x: { start: [], center: [], end: [] },
++    y: { start: [], center: [], end: [] },
++  }
++
++  const children = subtree ? getDescendants(parent) : parent.children
++
++  for (const axis of ["x", "y"] as ScrollAxis[]) {
++    const orthogonalAxis = axis === "x" ? "y" : "x"
++    const axisStart = axis === "x" ? "left" : "top"
++    const axisSize = axis === "x" ? "width" : "height"
++    const axisScroll = axis === "x" ? "scrollLeft" : "scrollTop"
++
++    for (const child of children) {
++      const childRect = child.getBoundingClientRect()
++
++      // Skip child if it doesn't intersect the parent's opposite axis (it can never be in view)
++      if (!isRectIntersecting(parentRect, childRect, orthogonalAxis)) {
++        continue
++      }
++
++      const childStyle = getComputedStyle(child)
++
++      let [childAlignY, childAlignX] = childStyle
++        .getPropertyValue("scroll-snap-align")
++        .split(" ") as ScrollSnapAlignment[]
++
++      if (typeof childAlignX === "undefined") {
++        childAlignX = childAlignY
++      }
++
++      const childAlign = axis === "x" ? childAlignX : childAlignY
++      const childOffsetStart = childRect[axisStart] - parentRect[axisStart] + parent[axisScroll]
++
++      switch (childAlign) {
++        case "none":
++          break
++
++        case "start":
++          positions[axis].start.push({ node: child, position: childOffsetStart })
++          break
++
++        case "center":
++          positions[axis].center.push({ node: child, position: childOffsetStart + childRect[axisSize] / 2 })
++          break
++
++        case "end":
++          positions[axis].end.push({ node: child, position: childOffsetStart + childRect[axisSize] })
++          break
++      }
++    }
++  }
++
++  return positions
++}
++
++export function getScrollSnapPositions(element: HTMLElement): Record<ScrollAxis, number[]> {
++  const rect = element.getBoundingClientRect()
++  const scrollPadding = getScrollPadding(element)
++  const snapPositions = getSnapPositions(element)
++
++  const maxScroll = {
++    x: element.scrollWidth - element.offsetWidth,
++    y: element.scrollHeight - element.offsetHeight,
++  }
++
++  return {
++    x: uniq(
++      [
++        ...snapPositions.x.start.map((v) => v.position - scrollPadding.x.before),
++        ...snapPositions.x.center.map((v) => v.position - rect.width / 2),
++        ...snapPositions.x.end.map((v) => v.position - rect.width + scrollPadding.x.after),
++      ].map(clamp(0, maxScroll.x)),
++    ),
++
++    y: uniq(
++      [
++        ...snapPositions.y.start.map((v) => v.position - scrollPadding.y.before),
++        ...snapPositions.y.center.map((v) => v.position - rect.height / 2),
++        ...snapPositions.y.end.map((v) => v.position - rect.height + scrollPadding.y.after),
++      ].map(clamp(0, maxScroll.y)),
++    ),
++  }
++}
++
++export function findSnapPoint(
++  parent: HTMLElement,
++  axis: ScrollAxis,
++  predicate: (node: HTMLElement) => boolean,
++): number | undefined {
++  const snapPositions = getSnapPositions(parent)
++  const items = [...snapPositions[axis].start, ...snapPositions[axis].center, ...snapPositions[axis].end]
++  for (const item of items) {
++    if (predicate(item.node as HTMLElement)) {
++      return item.position
++    }
++  }
++}
++
++export function getSnapPointTarget(parent: HTMLElement, snapPoint: number): HTMLElement {
++  const rect = parent.getBoundingClientRect()
++  const scrollPadding = getScrollPadding(parent)
++  const children = Array.from(parent.children) as HTMLElement[]
++
++  for (const child of children) {
++    const childRect = child.getBoundingClientRect()
++    const childOffsetStart = {
++      x: childRect.left - rect.left + parent.scrollLeft,
++      y: childRect.top - rect.top + parent.scrollTop,
++    }
++
++    // Check if any of the child's snap positions match the target snapPoint
++    const matchesX = [
++      childOffsetStart.x - scrollPadding.x.before, // start
++      childOffsetStart.x + childRect.width / 2 - rect.width / 2, // center
++      childOffsetStart.x + childRect.width - rect.width + scrollPadding.x.after, // end
++    ].some((pos) => Math.abs(pos - snapPoint) < 1)
++
++    const matchesY = [
++      childOffsetStart.y - scrollPadding.y.before,
++      childOffsetStart.y + childRect.height / 2 - rect.height / 2,
++      childOffsetStart.y + childRect.height - rect.height + scrollPadding.y.after,
++    ].some((pos) => Math.abs(pos - snapPoint) < 1)
++
++    if (matchesX || matchesY) {
++      return child
++    }
++  }
++
++  // If no match found, return first child
++  return children[0]
++}
++
++const uniq = <T>(arr: T[]): T[] => [...new Set(arr)]
++const clamp = (min: number, max: number) => (value: number) => Math.max(min, Math.min(max, value))
+diff --git a/packages/utilities/scroll-snap/tsconfig.json b/packages/utilities/scroll-snap/tsconfig.json
+new file mode 100644
+index 0000000000..8e781cd154
+--- /dev/null
++++ b/packages/utilities/scroll-snap/tsconfig.json
+@@ -0,0 +1,7 @@
++{
++  "extends": "../../../tsconfig.json",
++  "include": ["src"],
++  "compilerOptions": {
++    "tsBuildInfoFile": "node_modules/.cache/.tsbuildinfo"
++  }
++}
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 3baa7febc8..3a445bee23 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -308,6 +308,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -564,6 +567,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -850,6 +856,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -1112,6 +1121,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -1368,6 +1380,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -1482,13 +1497,13 @@ importers:
+         version: 3.6.0
+       '@solidjs/meta':
+         specifier: 0.29.4
+-        version: 0.29.4(solid-js@1.9.1)
++        version: 0.29.4(solid-js@1.9.3)
+       '@solidjs/router':
+         specifier: 0.14.7
+-        version: 0.14.7(solid-js@1.9.1)
++        version: 0.14.7(solid-js@1.9.3)
+       '@solidjs/start':
+         specifier: 1.0.8
+-        version: 1.0.8(solid-js@1.9.1)(vinxi@0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0))(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))
++        version: 1.0.8(solid-js@1.9.3)(vinxi@0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0))(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))
+       '@zag-js/accordion':
+         specifier: workspace:*
+         version: link:../../packages/machines/accordion
+@@ -1645,6 +1660,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -1716,13 +1734,13 @@ importers:
+         version: 0.7.2
+       lucide-solid:
+         specifier: 0.462.0
+-        version: 0.462.0(solid-js@1.9.1)
++        version: 0.462.0(solid-js@1.9.3)
+       match-sorter:
+         specifier: 8.0.0
+         version: 8.0.0
+       solid-js:
+-        specifier: 1.9.1
+-        version: 1.9.1
++        specifier: 1.9.3
++        version: 1.9.3
+       vinxi:
+         specifier: 0.4.3
+         version: 0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0)
+@@ -1888,6 +1906,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -2156,6 +2177,9 @@ importers:
+       '@zag-js/remove-scroll':
+         specifier: workspace:*
+         version: link:../../packages/utilities/remove-scroll
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../packages/utilities/scroll-snap
+       '@zag-js/select':
+         specifier: workspace:*
+         version: link:../../packages/machines/select
+@@ -2497,9 +2521,15 @@ importers:
+       '@zag-js/core':
+         specifier: workspace:*
+         version: link:../../core
++      '@zag-js/dom-event':
++        specifier: workspace:*
++        version: link:../../utilities/dom-event
+       '@zag-js/dom-query':
+         specifier: workspace:*
+         version: link:../../utilities/dom-query
++      '@zag-js/scroll-snap':
++        specifier: workspace:*
++        version: link:../../utilities/scroll-snap
+       '@zag-js/types':
+         specifier: workspace:*
+         version: link:../../types
+@@ -3842,6 +3872,16 @@ importers:
+         specifier: 2.2.0
+         version: 2.2.0
+ 
++  packages/utilities/scroll-snap:
++    dependencies:
++      '@zag-js/dom-query':
++        specifier: workspace:*
++        version: link:../dom-query
++    devDependencies:
++      clean-package:
++        specifier: 2.2.0
++        version: 2.2.0
++
+   packages/utilities/stringify-state:
+     dependencies:
+       json-format-highlight:
+@@ -12058,9 +12098,6 @@ packages:
+   snake-case@3.0.4:
+     resolution: {integrity: sha512-LAOh4z89bGQvl9pFfNF8V146i7o7/CqFPbqzYgP+yYzDIDeS9HaNFtXABamRW+AQzEVODcvE79ljJ+8a9YSdMg==}
+ 
+-  solid-js@1.9.1:
+-    resolution: {integrity: sha512-Gd6QWRFfO2XKKZqVK4YwbhWZkr0jWw1dYHOt+VYebomeyikGP0SuMflf42XcDuU9HAEYDArFJIYsBNjlE7iZsw==}
+-
+   solid-js@1.9.3:
+     resolution: {integrity: sha512-5ba3taPoZGt9GY3YlsCB24kCg0Lv/rie/HTD4kG6h4daZZz7+yK02xn8Vx8dLYBc9i6Ps5JwAbEiqjmKaLB3Ag==}
+ 
+@@ -15946,15 +15983,15 @@ snapshots:
+ 
+   '@sindresorhus/merge-streams@2.3.0': {}
+ 
+-  '@solidjs/meta@0.29.4(solid-js@1.9.1)':
++  '@solidjs/meta@0.29.4(solid-js@1.9.3)':
+     dependencies:
+-      solid-js: 1.9.1
++      solid-js: 1.9.3
+ 
+-  '@solidjs/router@0.14.7(solid-js@1.9.1)':
++  '@solidjs/router@0.14.7(solid-js@1.9.3)':
+     dependencies:
+-      solid-js: 1.9.1
++      solid-js: 1.9.3
+ 
+-  '@solidjs/start@1.0.8(solid-js@1.9.1)(vinxi@0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0))(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))':
++  '@solidjs/start@1.0.8(solid-js@1.9.3)(vinxi@0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0))(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))':
+     dependencies:
+       '@vinxi/plugin-directives': 0.4.3(vinxi@0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0))
+       '@vinxi/server-components': 0.4.3(vinxi@0.4.3(@types/node@22.10.1)(ioredis@5.4.1)(magicast@0.3.5)(terser@5.36.0))
+@@ -15968,8 +16005,8 @@ snapshots:
+       seroval-plugins: 1.1.1(seroval@1.1.1)
+       shikiji: 0.9.19
+       source-map-js: 1.2.1
+-      terracotta: 1.0.6(solid-js@1.9.1)
+-      vite-plugin-solid: 2.10.2(solid-js@1.9.1)(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))
++      terracotta: 1.0.6(solid-js@1.9.3)
++      vite-plugin-solid: 2.10.2(solid-js@1.9.3)(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))
+     transitivePeerDependencies:
+       - '@testing-library/jest-dom'
+       - solid-js
+@@ -20426,9 +20463,9 @@ snapshots:
+     dependencies:
+       react: 18.3.1
+ 
+-  lucide-solid@0.462.0(solid-js@1.9.1):
++  lucide-solid@0.462.0(solid-js@1.9.3):
+     dependencies:
+-      solid-js: 1.9.1
++      solid-js: 1.9.3
+ 
+   lucide-svelte@0.462.0(svelte@5.4.0):
+     dependencies:
+@@ -22893,30 +22930,24 @@ snapshots:
+       dot-case: 3.0.4
+       tslib: 2.7.0
+ 
+-  solid-js@1.9.1:
+-    dependencies:
+-      csstype: 3.1.3
+-      seroval: 1.1.1
+-      seroval-plugins: 1.1.1(seroval@1.1.1)
+-
+   solid-js@1.9.3:
+     dependencies:
+       csstype: 3.1.3
+       seroval: 1.1.1
+       seroval-plugins: 1.1.1(seroval@1.1.1)
+ 
+-  solid-refresh@0.6.3(solid-js@1.9.1):
++  solid-refresh@0.6.3(solid-js@1.9.3):
+     dependencies:
+       '@babel/generator': 7.26.2
+       '@babel/helper-module-imports': 7.25.9
+       '@babel/types': 7.26.0
+-      solid-js: 1.9.1
++      solid-js: 1.9.3
+     transitivePeerDependencies:
+       - supports-color
+ 
+-  solid-use@0.9.0(solid-js@1.9.1):
++  solid-use@0.9.0(solid-js@1.9.3):
+     dependencies:
+-      solid-js: 1.9.1
++      solid-js: 1.9.3
+ 
+   sort-keys@4.2.0:
+     dependencies:
+@@ -23234,10 +23265,10 @@ snapshots:
+ 
+   term-size@2.2.1: {}
+ 
+-  terracotta@1.0.6(solid-js@1.9.1):
++  terracotta@1.0.6(solid-js@1.9.3):
+     dependencies:
+-      solid-js: 1.9.1
+-      solid-use: 0.9.0(solid-js@1.9.1)
++      solid-js: 1.9.3
++      solid-use: 0.9.0(solid-js@1.9.3)
+ 
+   terser@5.36.0:
+     dependencies:
+@@ -24021,14 +24052,14 @@ snapshots:
+       - rollup
+       - supports-color
+ 
+-  vite-plugin-solid@2.10.2(solid-js@1.9.1)(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0)):
++  vite-plugin-solid@2.10.2(solid-js@1.9.3)(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0)):
+     dependencies:
+       '@babel/core': 7.26.0
+       '@types/babel__core': 7.20.5
+       babel-preset-solid: 1.9.3(@babel/core@7.26.0)
+       merge-anything: 5.1.7
+-      solid-js: 1.9.1
+-      solid-refresh: 0.6.3(solid-js@1.9.1)
++      solid-js: 1.9.3
++      solid-refresh: 0.6.3(solid-js@1.9.3)
+       vite: 6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0)
+       vitefu: 0.2.5(vite@6.0.2(@types/node@22.10.1)(jiti@2.4.0)(terser@5.36.0)(tsx@4.19.2)(yaml@2.6.0))
+     transitivePeerDependencies:
+diff --git a/shared/src/controls.ts b/shared/src/controls.ts
+index 4b7d014783..89ef0dfe95 100644
+--- a/shared/src/controls.ts
++++ b/shared/src/controls.ts
+@@ -200,8 +200,7 @@ export const transitionControls = defineControls({
+ 
+ export const carouselControls = defineControls({
+   orientation: { type: "select", options: ["horizontal", "vertical"] as const, defaultValue: "horizontal" },
+-  slidesPerView: { type: "number", defaultValue: 1 },
+-  align: { type: "select", options: ["start", "center", "end"] as const, defaultValue: "start" },
++  slidesPerPage: { type: "number", defaultValue: 2 },
+   loop: { type: "boolean", defaultValue: false },
+ })
+ 
+diff --git a/shared/src/css/carousel.css b/shared/src/css/carousel.css
+index 708a78d300..2709664a43 100644
+--- a/shared/src/css/carousel.css
++++ b/shared/src/css/carousel.css
+@@ -1,5 +1,94 @@
+-[data-scope="carousel"][data-part="viewport"] {
+-  width: 600px;
+-  margin-top: 40px;
+-  overflow-x: hidden;
++[data-scope="carousel"][data-part="root"] {
++  display: flex;
++  align-items: flex-start;
++  flex-direction: column;
++  gap: 16px;
++}
++
++[data-scope="carousel"][data-part="root"][data-orientation="horizontal"] {
++  max-width: 400px;
++}
++
++[data-scope="carousel"][data-part="root"][data-orientation="vertical"] {
++  max-height: 400px;
++}
++
++[data-scope="carousel"][data-part="control"] {
++  display: flex;
++  gap: 8px;
++  align-self: stretch;
++}
++
++[data-scope="carousel"][data-part="item-group"] {
++  align-self: stretch;
++  /* Hide scrollbar */
++  scrollbar-width: none;
++  -webkit-scrollbar-width: none;
++  -ms-overflow-style: none;
++  &::-webkit-scrollbar {
++    display: none;
++  }
++}
++
++[data-scope="carousel"][data-part="item"] {
++  display: flex;
++  justify-content: center;
++  align-items: center;
++  font-size: 24px;
++  border: 1px solid lightgray;
++}
++
++[data-scope="carousel"][data-part="item"] img {
++  margin: 0;
++  object-fit: cover;
++}
++
++[data-scope="carousel"][data-part="item"][data-orientation="horizontal"] img {
++  height: 300px;
++  width: 100%;
++}
++
++[data-scope="carousel"][data-part="item"][data-orientation="vertical"] img {
++  height: 100%;
++  width: 400px;
++}
++
++[data-scope="carousel"][data-part="indicator-group"] {
++  display: flex;
++  justify-content: center;
++  align-items: center;
++  margin-block: 8px;
++  gap: 8px;
++}
++
++[data-scope="carousel"][data-part="indicator"] {
++  display: flex;
++  border: none;
++  justify-content: center;
++  align-items: center;
++  height: 12px;
++  width: 12px;
++  border-radius: 6px;
++  cursor: pointer;
++  background-color: lightgray;
++  transition: background-color 0.2s ease-in-out;
++}
++
++[data-scope="carousel"][data-part="indicator"][data-current] {
++  background-color: blue;
++}
++
++[data-scope="carousel"][data-part="autoplay-trigger"] {
++  display: flex;
++  justify-content: center;
++  align-items: center;
++}
++
++.carousel-spacer {
++  flex-grow: 1;
++}
++
++[data-scope="carousel"][data-part="autoplay-trigger"] svg {
++  width: 12px;
++  height: 12px;
+ }
+diff --git a/shared/src/css/layout.css b/shared/src/css/layout.css
+index 95d7fd480f..44c37c557d 100644
+--- a/shared/src/css/layout.css
++++ b/shared/src/css/layout.css
+@@ -18,6 +18,10 @@ input::-webkit-inner-spin-button {
+   outline-offset: 2px;
+ }
+ 
++button {
++  flex-shrink: 0;
++}
++
+ .root {
+   margin: 24px;
+ }
+diff --git a/shared/src/data.ts b/shared/src/data.ts
+index ab8de4322a..4919f19ee1 100644
+--- a/shared/src/data.ts
++++ b/shared/src/data.ts
+@@ -130,11 +130,12 @@ export const radioData = [
+ ]
+ 
+ export const carouselData = [
+-  "https://tinyurl.com/5b6ka8jd",
+-  "https://tinyurl.com/7rmccdn5",
+-  "https://tinyurl.com/59jxz9uu",
+-  "https://tinyurl.com/6jurv23t",
+-  "https://tinyurl.com/yp4rfum7",
++  "https://picsum.photos/seed/a/500/300",
++  "https://picsum.photos/seed/b/500/300",
++  "https://picsum.photos/seed/c/500/300",
++  "https://picsum.photos/seed/d/500/300",
++  "https://picsum.photos/seed/e/500/300",
++  "https://picsum.photos/seed/f/500/300",
+ ]
+ 
+ export const toggleGroupData = [
+diff --git a/website/components/machines/carousel.tsx b/website/components/machines/carousel.tsx
+index d4d830158b..9d0499c91c 100644
+--- a/website/components/machines/carousel.tsx
++++ b/website/components/machines/carousel.tsx
+@@ -12,9 +12,12 @@ const items = [
+ ]
+ 
+ export function Carousel(props: any) {
+-  const [state, send] = useMachine(carousel.machine({ id: useId() }), {
+-    context: props.controls,
+-  })
++  const [state, send] = useMachine(
++    carousel.machine({ id: useId(), slideCount: items.length }),
++    {
++      context: props.controls,
++    },
++  )
+ 
+   const api = carousel.connect(state, send, normalizeProps)
+ 
+@@ -22,32 +25,26 @@ export function Carousel(props: any) {
+     <>
+       <main className="carousel">
+         <div {...api.getRootProps()}>
+-          <div {...api.getViewportProps()}>
+-            <div {...api.getItemGroupProps()}>
+-              {items.map((image, index) => (
+-                <div {...api.getItemProps({ index })} key={index}>
+-                  <img src={image} alt={`Slide Image ${index}`} />
+-                </div>
+-              ))}
+-            </div>
+-
+-            <div data-scope="carousel" data-part="control">
+-              <button aria-label="Previous Slide" {...api.getPrevTriggerProps()}>
+-                <HiChevronLeft />
+-              </button>
+-              <div {...api.getIndicatorGroupProps()}>
+-                {items.map((_, index) => (
+-                  <button
+-                    key={index}
+-                    aria-label={`Goto slide ${index + 1}`}
+-                    {...api.getIndicatorProps({ index })}
+-                  />
+-                ))}
++          <div {...api.getItemGroupProps()}>
++            {items.map((image, index) => (
++              <div {...api.getItemProps({ index })} key={index}>
++                <img src={image} alt={`Slide Image ${index}`} />
+               </div>
+-              <button aria-label="Previous Slide" {...api.getNextTriggerProps()}>
+-                <HiChevronRight />
+-              </button>
++            ))}
++          </div>
++
++          <div {...api.getControlProps()}>
++            <button {...api.getPrevTriggerProps()}>
++              <HiChevronLeft />
++            </button>
++            <div {...api.getIndicatorGroupProps()}>
++              {api.pageSnapPoints.map((_, index) => (
++                <button key={index} {...api.getIndicatorProps({ index })} />
++              ))}
+             </div>
++            <button {...api.getNextTriggerProps()}>
++              <HiChevronRight />
++            </button>
+           </div>
+         </div>
+       </main>
+diff --git a/website/components/showcase.tsx b/website/components/showcase.tsx
+index 2421831634..8b0b3cff04 100644
+--- a/website/components/showcase.tsx
++++ b/website/components/showcase.tsx
+@@ -81,11 +81,7 @@ const components = {
+       name="carousel"
+       component={Carousel}
+       defaultProps={{
+-        align: {
+-          default: "start",
+-          options: ["start", "center", "end"],
+-        },
+-        index: 0,
++        slidesPerPage: 1,
+         loop: false,
+         spacing: "0px",
+       }}
+diff --git a/website/data/components/carousel.mdx b/website/data/components/carousel.mdx
+index d12eb67e0a..818c28357f 100644
+--- a/website/data/components/carousel.mdx
++++ b/website/data/components/carousel.mdx
+@@ -6,7 +6,8 @@ package: "@zag-js/carousel"
+ 
+ # Carousel
+ 
+-A slideshow component that cycles through elements.
++an accessible carousel component that leverages native CSS Scroll Snap for
++smooth, performant scrolling between slides.
+ 
+ <Resources pkg="@zag-js/carousel" />
+ 
+@@ -14,10 +15,11 @@ A slideshow component that cycles through elements.
+ 
+ **Features**
+ 
+-- Support for horizontal and vertical orientations.
++- Uses native CSS Scroll Snap.
++- Supports horizontal and vertical orientations.
+ - Supports alignment of slides (start, center or end alignment).
+-- Supports custom number of slides to show at a time.
+-- Supports looping of slides.
++- Show multiple slides at a time.
++- Supports looping and auto-playing.
+ - Supports custom spacing between slides.
+ 
+ ## Installation
+@@ -61,17 +63,10 @@ carousel machine in your project 🔥
+ 
+ <CodeSnippet id="carousel/usage.mdx" />
+ 
+-## Changing the orientation
++## Vertical carousel
+ 
+-By default, the carousel is assumed to be horizontal. To change the orientation
+-to vertical, set the `orientation` property in the machine's context to
+-`vertical`.
+-
+-In this mode, the carousel will use the arrow up and down keys to
+-increment/decrement its value.
+-
+-> Don't forget to change the styles of the vertical carousel by specifying its
+-> height.
++To create a vertical carousel, set the `orientation` property in the machine's
++context to `vertical`.
+ 
+ ```jsx {3}
+ const [state, send] = useMachine(
+@@ -83,43 +78,52 @@ const [state, send] = useMachine(
+ 
+ ## Setting the initial slide
+ 
+-To set the initial slide of the carousel, pass the `index` property to the
++To set the initial slide of the carousel, pass the `page` property to the
+ machine's context.
+ 
++The `page` corresponds to the scroll snap position index based on the layout. It
++does not necessarily correspond to the index of the slide in the carousel.
++
+ ```jsx {3}
+ const [state, send] = useMachine(
+   carousel.machine({
+-    index: 2,
++    page: 2,
+   }),
+ )
+ ```
+ 
+-## Setting the alignment of the slides
++## Setting the number of slides to show at a time
+ 
+-To set the alignment, set the `align` property in the machine's context to the
+-`start`, `center`, or `end` value.
++To customize number of slides to show at a time, set the `slidesPerPage`
++property in the machine's context. The value must be an integer.
+ 
+ ```jsx {3}
+ const [state, send] = useMachine(
+   carousel.machine({
+-    align: "center",
++    slidesPerPage: 2,
+   }),
+ )
+ ```
+ 
+-## Setting the number of slides to show at a time
++## Setting the number of slides to move at a time
+ 
+-To customize number of slides to show, set the `slidesPerView` property in the
+-machine's context to a number value or `auto` string.
++To customize number of slides to move at a time, set the `slidesPerMove`
++property in the machine's context. The value must be an integer or `auto`.
++
++> If the value is `auto`, the carousel will move the number of slides equal to
++> the number of slides per page.
+ 
+ ```jsx {3}
+ const [state, send] = useMachine(
+   carousel.machine({
+-    slidesPerView: 2,
++    slidesPerMove: 2,
+   }),
+ )
+ ```
+ 
++> Ensure the `slidesPerMove` is less than or equal to the `slidesPerPage` to
++> avoid skipping slides.
++
+ ## Setting the carousel should loop around
+ 
+ To allow looping of slides, set the `loop` property in the machine's context to
+@@ -133,7 +137,7 @@ const [state, send] = useMachine(
+ )
+ ```
+ 
+-## Setting the amount of space between slides
++## Setting the gap between slides
+ 
+ To customize spacing between slides, set the `spacing` property in the machine's
+ context to a valid CSS unit.
+@@ -146,21 +150,58 @@ const [state, send] = useMachine(
+ )
+ ```
+ 
+-## Listening for changes
++## Listening for page changes
+ 
+-When the carousel slide changes, the `onIndexChange` callback is invoked.
++When the carousel page changes, the `onPageChange` callback is invoked.
+ 
+ ```jsx {3-6}
+ const [state, send] = useMachine(
+   carousel.machine({
+-    onIndexChange(details) {
+-      // details => { index: number }
+-      console.log("selected slide:", details.index)
++    onPageChange(details) {
++      // details => { page: number }
++      console.log("selected page:", details.page)
+     },
+   }),
+ )
+ ```
+ 
++## Dragging the carousel
++
++To allow dragging the carousel with the mouse, set the `allowMouseDrag` property
++in the machine's context to `true`.
++
++```jsx {3}
++const [state, send] = useMachine(
++  carousel.machine({
++    allowMouseDrag: true,
++  }),
++)
++```
++
++## Autoplaying the carousel
++
++To allow the carousel to autoplay, set the `autoplay` property in the machine's
++context to `true`.
++
++```jsx {3}
++const [state, send] = useMachine(
++  carousel.machine({
++    autoplay: true,
++  }),
++)
++```
++
++Alternatively, you can configure the autoplay interval by setting the `delay`
++property in the machine's context.
++
++```jsx {3}
++const [state, send] = useMachine(
++  carousel.machine({
++    autoplay: { delay: 2000 },
++  }),
++)
++```
++
+ ## Styling guide
+ 
+ Earlier, we mentioned that each carousel part has a `data-part` attribute added
+diff --git a/website/data/snippets/react/carousel/usage.mdx b/website/data/snippets/react/carousel/usage.mdx
+index d68cbe58e7..f8f16c05da 100644
+--- a/website/data/snippets/react/carousel/usage.mdx
++++ b/website/data/snippets/react/carousel/usage.mdx
+@@ -2,35 +2,37 @@
+ import * as carousel from "@zag-js/carousel"
+ import { normalizeProps, useMachine } from "@zag-js/react"
+ 
++const items = [
++  "https://tinyurl.com/5b6ka8jd",
++  "https://tinyurl.com/7rmccdn5",
++  "https://tinyurl.com/59jxz9uu",
++]
++
+ export function Carousel() {
+-  const [state, send] = useMachine(carousel.machine({ id: "1" }))
++  const [state, send] = useMachine(
++    carousel.machine({ id: "1", slideCount: items.length }),
++  )
+ 
+   const api = carousel.connect(state, send, normalizeProps)
+ 
+   return (
+     <div {...api.getRootProps()}>
+-      <button {...api.getPrevTriggerProps()}>Prev</button>
+-      <button {...api.getNextTriggerProps()}>Next</button>
+-      <div {...api.getViewportProps()}>
+-        <div {...api.getItemGroupProps()}>
+-          {items.map((image, index) => (
+-            <div {...api.getItemProps({ index })} key={index}>
+-              <img
+-                src={image}
+-                alt=""
+-                style={{ height: "300px", width: "100%", objectFit: "cover" }}
+-              />
+-            </div>
+-          ))}
+-        </div>
++      <div {...api.getControlProps()}>
++        <button {...api.getPrevTriggerProps()}>Prev</button>
++        <button {...api.getNextTriggerProps()}>Next</button>
++      </div>
++      <div {...api.getItemGroupProps()}>
++        {items.map((image, index) => (
++          <div {...api.getItemProps({ index })} key={index}>
++            <img
++              src={image}
++              alt=""
++              style={{ height: "300px", width: "100%", objectFit: "cover" }}
++            />
++          </div>
++        ))}
+       </div>
+     </div>
+   )
+ }
+-
+-const items = [
+-  "https://tinyurl.com/5b6ka8jd",
+-  "https://tinyurl.com/7rmccdn5",
+-  "https://tinyurl.com/59jxz9uu",
+-]
+ ```
+diff --git a/website/data/snippets/solid/carousel/usage.mdx b/website/data/snippets/solid/carousel/usage.mdx
+index 26bdb95406..e7e9414c99 100644
+--- a/website/data/snippets/solid/carousel/usage.mdx
++++ b/website/data/snippets/solid/carousel/usage.mdx
+@@ -3,37 +3,44 @@ import * as carousel from "@zag-js/carousel"
+ import { normalizeProps, useMachine } from "@zag-js/solid"
+ import { createMemo, createUniqueId, For } from "solid-js"
+ 
++const items = [
++  "https://tinyurl.com/5b6ka8jd",
++  "https://tinyurl.com/7rmccdn5",
++  "https://tinyurl.com/59jxz9uu",
++]
++
+ export function Carousel() {
+-  const [state, send] = useMachine(carousel.machine({ id: createUniqueId() }))
++  const [state, send] = useMachine(
++    carousel.machine({ id: createUniqueId(), slideCount: items.length }),
++  )
+ 
+   const api = createMemo(() => carousel.connect(state, send, normalizeProps))
+ 
+   return (
+-    <div {...api().getRootProps()}>
+-      <button {...api().getPrevTriggerProps()}>Prev</button>
+-      <button {...api().getNextTriggerProps()}>Next</button>
+-      <div {...api().getViewportProps()}>
++    <main class="carousel">
++      <div {...api().getRootProps()}>
++        <div {...api().getControlProps()}>
++          <button {...api().getPrevTriggerProps()}>Prev</button>
++          <button {...api().getNextTriggerProps()}>Next</button>
++        </div>
++
+         <div {...api().getItemGroupProps()}>
+-          <For each={items}>
++          <Index each={items}>
+             {(image, index) => (
+-              <div {...api().getItemProps({ index() })}>
+-                <img
+-                  src={image}
+-                  alt=""
+-                  style={{ height: "300px", width: "100%", "object-fit": "cover" }}
+-                />
++              <div {...api().getItemProps({ index })}>
++                <img src={image()} alt="" />
+               </div>
+             )}
+-          </For>
++          </Index>
++        </div>
++
++        <div {...api().getIndicatorGroupProps()}>
++          <Index each={api().pageSnapPoints}>
++            {(_, index) => <button {...api().getIndicatorProps({ index })} />}
++          </Index>
+         </div>
+       </div>
+-    </div>
++    </main>
+   )
+ }
+-
+-const items = [
+-  "https://tinyurl.com/5b6ka8jd",
+-  "https://tinyurl.com/7rmccdn5",
+-  "https://tinyurl.com/59jxz9uu",
+-]
+ ```
+diff --git a/website/data/snippets/svelte/carousel/usage.mdx b/website/data/snippets/svelte/carousel/usage.mdx
+index 082740844c..1d22831114 100644
+--- a/website/data/snippets/svelte/carousel/usage.mdx
++++ b/website/data/snippets/svelte/carousel/usage.mdx
+@@ -3,27 +3,30 @@
+   import * as carousel from "@zag-js/carousel"
+   import { normalizeProps, useMachine } from "@zag-js/svelte"
+ 
+-  const [snapshot, send] = useMachine(carousel.machine({ id: "1" }))
+-  const api = $derived(carousel.connect(snapshot, send, normalizeProps))
+-
+   const items = [
+   "https://tinyurl.com/5b6ka8jd",
+   "https://tinyurl.com/7rmccdn5",
+   "https://tinyurl.com/59jxz9uu",
+-]
++ ]
++
++  const [snapshot, send] = useMachine(
++    carousel.machine({ id: "1", slideCount: items.length }),
++  )
++
++  const api = $derived(carousel.connect(snapshot, send, normalizeProps))
+ </script>
+ 
+ <div {...api.getRootProps()}>
+-  <button {...api.getPrevTriggerProps()}>Prev</button>
+-  <button {...api.getNextTriggerProps()}>Next</button>
+-  <div {...api.getViewportProps()}>
+-    <div {...api.getItemGroupProps()}>
+-      {#each items as image, index}
+-        <div {...api.getItemProps({ index })}>
+-          <img src={image} alt="" style="height:300px;width:100%;object-fit:cover;" />
+-        </div>
+-      {/each}
+-    </div>
++  <div {...api.getControlProps()}>
++    <button {...api.getPrevTriggerProps()}>Prev</button>
++    <button {...api.getNextTriggerProps()}>Next</button>
++  </div>
++  <div {...api.getItemGroupProps()}>
++    {#each items as image, index}
++      <div {...api.getItemProps({ index })}>
++        <img src={image} alt="" />
++      </div>
++    {/each}
+   </div>
+ </div>
+ ```
+diff --git a/website/data/snippets/vue/carousel/usage.mdx b/website/data/snippets/vue/carousel/usage.mdx
+index f91b24ceb8..7fd3ef03d4 100644
+--- a/website/data/snippets/vue/carousel/usage.mdx
++++ b/website/data/snippets/vue/carousel/usage.mdx
+@@ -10,35 +10,39 @@
+     "https://tinyurl.com/59jxz9uu",
+   ]
+ 
+-  const [state, send] = useMachine(carousel.machine({ id: "1" }))
++  const [state, send] = useMachine(
++    carousel.machine({ id: "1", slideCount: items.length }),
++  )
++
+   const api = computed(() =>
+     carousel.connect(state.value, send, normalizeProps),
+   )
+ </script>
+ 
+ <template>
+-  <div ref="ref" v-bind="api.getRootProps()">
+-    <button v-bind="api.getPrevTriggerProps()">Prev</button>
+-    <button v-bind="api.getNextTriggerProps()">Next</button>
+-    <div v-bind="api.getViewportProps()">
+-      <div v-bind="api.getItemGroupProps()">
+-        <div
+-          v-for="(image, index) in items"
+-          :key="index"
+-          v-bind="api.getItemProps({ index: index })"
+-        >
+-          <img
+-            :src="image"
+-            alt=""
+-            :style="{
+-                height: '300px',
+-                width: '100%',
+-                objectFit: 'cover',
+-              }"
+-          />
+-        </div>
++  <div v-bind="api.getRootProps()">
++    <div v-bind="api.getControlProps()">
++      <button v-bind="api.getPrevTriggerProps()">Prev</button>
++      <button v-bind="api.getNextTriggerProps()">Next</button>
++    </div>
++
++    <div v-bind="api.getItemGroupProps()">
++      <div
++        v-for="(image, index) in items"
++        :key="index"
++        v-bind="api.getItemProps({ index })"
++      >
++        <img :src="image" alt="" />
+       </div>
+     </div>
++
++    <div v-bind="api.getIndicatorGroupProps()">
++      <button
++        v-for="(_, index) in api.pageSnapPoints"
++        :key="index"
++        v-bind="api.getIndicatorProps({ index })"
++      ></button>
++    </div>
+   </div>
+ </template>
+ ```
+diff --git a/website/styles/machines/carousel.css b/website/styles/machines/carousel.css
+index d181baeb60..d749823467 100644
+--- a/website/styles/machines/carousel.css
++++ b/website/styles/machines/carousel.css
+@@ -2,11 +2,16 @@
+   width: 400px;
+   border-width: 2px;
+   border-color: var(--colors-border-subtle);
++  position: relative;
+ }
+ 
+-[data-scope="carousel"][data-part="viewport"] {
+-  overflow-x: hidden;
+-  position: relative;
++[data-scope="carousel"][data-part="item-group"] {
++  scrollbar-width: none;
++  -webkit-scrollbar-width: none;
++  -ms-overflow-style: none;
++  &::-webkit-scrollbar {
++    display: none;
++  }
+ }
+ 
+ [data-scope="carousel"][data-part="item"] > img {

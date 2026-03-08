@@ -104,7 +104,7 @@ importers:
         version: 0.561.0(react@19.2.3)
       nitro:
         specifier: npm:nitro-nightly@latest
-        version: nitro-nightly@3.0.1-20260219-081345-4df7aab2(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
+        version: nitro-nightly@3.0.1-20260227-181935-bfbb207c(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2))
       react:
         specifier: ^19.2.0
         version: 19.2.3
@@ -152,14 +152,42 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
 
+  packages/benchmark-harness:
+    dependencies:
+      '@semadiff/core':
+        specifier: workspace:*
+        version: link:../core
+      '@semadiff/entity-core':
+        specifier: workspace:*
+        version: link:../entity-core
+      '@semadiff/parser-swc':
+        specifier: workspace:*
+        version: link:../parser-swc
+      '@semadiff/render-html':
+        specifier: workspace:*
+        version: link:../render-html
+      effect:
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5
+    devDependencies:
+      '@types/node':
+        specifier: ^20.14.15
+        version: 20.19.30
+
   packages/cli:
     dependencies:
       '@effect/platform-node':
         specifier: 4.0.0-beta.5
         version: 4.0.0-beta.5(effect@4.0.0-beta.5)(ioredis@5.9.3)
+      '@effect/platform-node-shared':
+        specifier: 4.0.0-beta.5
+        version: 4.0.0-beta.5(effect@4.0.0-beta.5)
       '@semadiff/core':
         specifier: workspace:*
         version: link:../core
+      '@semadiff/entity-core':
+        specifier: workspace:*
+        version: link:../entity-core
       '@semadiff/parser-lightningcss':
         specifier: workspace:*
         version: link:../parser-lightningcss
@@ -190,6 +218,22 @@ importers:
     dependencies:
       effect:
         specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
+
+  packages/entity-core:
+    dependencies:
+      '@semadiff/core':
+        specifier: workspace:*
+        version: link:../core
+    devDependencies:
+      '@semadiff/parser-swc':
+        specifier: workspace:*
+        version: link:../parser-swc
+      '@types/node':
+        specifier: ^20.14.15
+        version: 20.19.30
+      effect:
+        specifier: 4.0.0-beta.5
         version: 4.0.0-beta.5
 
   packages/github-extension:
@@ -2680,15 +2724,15 @@ packages:
   nf3@0.3.10:
     resolution: {integrity: sha512-UlqmHkZiHGgSkRj17yrOXEsSu5ECvtlJ3Xm1W5WsWrTKgu9m7OjrMZh9H/ME2LcWrTlMD0/vmmNVpyBG4yRdGg==}
 
-  nitro-nightly@3.0.1-20260219-081345-4df7aab2:
-    resolution: {integrity: sha512-H32F+NLO4/SNrkLcE6Xe1fJElF6UuMynL7Mi6uUynOb2v52ee5KpZ8WEuOqm+DvHzmafFUrrVag+01Ti15j/hA==}
+  nitro-nightly@3.0.1-20260227-181935-bfbb207c:
+    resolution: {integrity: sha512-J9dNAHHuZqzDra4Zr9N6+4hkRPgfrUVw++9I32BHDmwo6MkyRdvmqucWTB5T+J8G3xAMc4+XskExmUEEqxpbZw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
       dotenv: '*'
       giget: '*'
       jiti: ^2.6.1
-      rollup: ^4.57.1
+      rollup: ^4.59.0
       vite: ^7 || ^8 || >=8.0.0-0
       xml2js: ^0.6.2
     peerDependenciesMeta:
@@ -5758,7 +5802,7 @@ snapshots:
 
   nf3@0.3.10: {}
 
-  nitro-nightly@3.0.1-20260219-081345-4df7aab2(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)):
+  nitro-nightly@3.0.1-20260227-181935-bfbb207c(ioredis@5.9.3)(jiti@2.6.1)(lru-cache@11.2.4)(vite@7.3.1(@types/node@22.19.7)(jiti@2.6.1)(lightningcss@1.31.0)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       consola: 3.4.2
       crossws: 0.4.4(srvx@0.11.7)

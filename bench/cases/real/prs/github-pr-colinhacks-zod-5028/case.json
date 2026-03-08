@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-colinhacks-zod-5028",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5028: chore: upgrade vitest to v4",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5028,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5028",
+    "baseSha": "62bf4e439e287e55c843245b49f8d34b1ad024ee",
+    "headSha": "1f5677e1ae23a7b4da93d3626cc8f7df71ff2831",
+    "selectedFiles": [
+      "vitest.config.ts"
+    ],
+    "collectedAt": "2026-03-08T02:12:22.420Z"
+  },
+  "files": [
+    {
+      "id": "vitest.config.ts",
+      "oldPath": "vitest.root.mts",
+      "newPath": "vitest.config.ts",
+      "status": "renamed",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "vitest.config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 12,
+          "endLine": 12
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+    "diff": "/gh/mui/material-ui/diff?old_filename=packages%2Fmui-docs%2Fsrc%2FMarkdownElement%2FMarkdownElement.tsx&old_oid=53736b5c73b96b859747420b797cdd539c5b1d47&old_mode=33188&new_filename=packages%2Fmui-docs%2Fsrc%2FMarkdownElement%2FMarkdownElement.tsx&new_oid=b92212f961aae79db81e536d0473e1833396cebd&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+      "oid": "53736b5c73b96b859747420b797cdd539c5b1d47",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+      "oid": "b92212f961aae79db81e536d0473e1833396cebd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "43e0575dff7664be1dd970fae41c1899df631b033aef0e9c0ed801b12caee22b"
+  }
+]

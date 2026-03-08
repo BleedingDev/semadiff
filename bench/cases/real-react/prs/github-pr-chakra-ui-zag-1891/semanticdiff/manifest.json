@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "e2e/dialog.e2e.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=e2e%2Fdialog.e2e.ts&old_oid=b6979c24a714430ee2b53a151a2dfffe409073b5&old_mode=33188&new_filename=e2e%2Fdialog.e2e.ts&new_oid=58e3abe64bfaa6876df67826a924dab0ce3eceea&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "e2e/dialog.e2e.ts",
+      "oid": "b6979c24a714430ee2b53a151a2dfffe409073b5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "e2e/dialog.e2e.ts",
+      "oid": "58e3abe64bfaa6876df67826a924dab0ce3eceea",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "931d5b9514940f58c0303d6d9c604c95f9c4bf34a1e85fa6b4a2a5957ff9e058"
+  }
+]

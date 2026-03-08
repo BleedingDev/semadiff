@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-4536",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#4536: test: clarify test description for recursive types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 4536,
+    "prUrl": "https://github.com/colinhacks/zod/pull/4536",
+    "baseSha": "4a259687c30a0dd774dc755cdedfc3f521919dd0",
+    "headSha": "593c1dd22ab43162dff79cc28f7af87f24350080",
+    "selectedFiles": [
+      "packages/zod/src/v4/classic/tests/recursive-types.test.ts"
+    ],
+    "collectedAt": "2026-03-08T02:13:41.816Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+      "oldPath": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+      "newPath": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 4,
+          "endLine": 4
+        },
+        "newRange": {
+          "startLine": 4,
+          "endLine": 4
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

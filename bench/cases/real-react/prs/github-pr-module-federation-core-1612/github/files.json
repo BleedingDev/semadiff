@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "81933a45981ecae283ca48bf9c92ca18debc90ac",
+    "filename": "packages/enhanced/src/lib/container/AsyncBoundaryPlugin.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/1faae38d3bb0eefa3066ed0ffa0f2f4a2a46c43a/packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2FAsyncBoundaryPlugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/1faae38d3bb0eefa3066ed0ffa0f2f4a2a46c43a/packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2FAsyncBoundaryPlugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fenhanced%2Fsrc%2Flib%2Fcontainer%2FAsyncBoundaryPlugin.ts?ref=1faae38d3bb0eefa3066ed0ffa0f2f4a2a46c43a",
+    "patch": "@@ -31,7 +31,7 @@ class AsyncEntryStartupPlugin {\n \n   private collectRuntimeChunks(compilation: Compilation): void {\n     compilation.hooks.beforeChunkAssets.tap(\n-      'CollectRuntimeChunksPlugin',\n+      'AsyncEntryStartupPlugin',\n       () => {\n         for (const chunk of compilation.chunks) {\n           if (chunk.hasRuntime() && chunk.id !== null) {"
+  }
+]

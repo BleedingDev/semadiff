@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-8332",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#8332: feat: rename is* props",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 8332,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/8332",
+    "baseSha": "bb3ce6671d4b857ebe79ce968c4acbc0b32cff42",
+    "headSha": "d4fa3222ef1683621b03a5626a282d2dd68a46cf",
+    "selectedFiles": [
+      "packages/components/src/accordion/accordion-content.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:57:54.317Z"
+  },
+  "files": [
+    {
+      "id": "packages/components/src/accordion/accordion-content.tsx",
+      "oldPath": "packages/components/src/accordion/accordion-content.tsx",
+      "newPath": "packages/components/src/accordion/accordion-content.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/components/src/accordion/accordion-content.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 49,
+          "endLine": 49
+        },
+        "newRange": {
+          "startLine": 49,
+          "endLine": 49
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

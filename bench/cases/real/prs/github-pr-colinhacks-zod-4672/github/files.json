@@ -1,0 +1,98 @@
+[
+  {
+    "sha": "1076ad9de1418b0fee118cd210f041060a1e132a",
+    "filename": "packages/zod/src/v3/helpers/parseUtil.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv3%2Fhelpers%2FparseUtil.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv3%2Fhelpers%2FparseUtil.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv3%2Fhelpers%2FparseUtil.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -28,7 +28,7 @@ export const makeIssue = (params: {\n   const maps = errorMaps\n     .filter((m) => !!m)\n     .slice()\n-    .reverse() as ZodErrorMap[];\n+    .reverse();\n   for (const map of maps) {\n     errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;\n   }\n@@ -80,7 +80,7 @@ export function addIssueToContext(ctx: ParseContext, issueData: IssueData): void\n       ctx.schemaErrorMap, // then schema-bound map if available\n       overrideMap, // then global override map\n       overrideMap === defaultErrorMap ? undefined : defaultErrorMap, // then global default map\n-    ].filter((x) => !!x) as ZodErrorMap[],\n+    ].filter((x) => !!x),\n   });\n   ctx.common.issues.push(issue);\n }"
+  },
+  {
+    "sha": "030ea821b694ed03e210b418c8742c7a535ac816",
+    "filename": "packages/zod/src/v3/helpers/util.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv3%2Fhelpers%2Futil.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv3%2Fhelpers%2Futil.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv3%2Fhelpers%2Futil.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -18,7 +18,7 @@ export namespace util {\n     for (const item of items) {\n       obj[item] = item;\n     }\n-    return obj as any;\n+    return obj;\n   };\n \n   export const getValidEnumValues = (obj: any): any[] => {"
+  },
+  {
+    "sha": "37b3dc1cb0b2cc509c9d5b1491d8a2330494954c",
+    "filename": "packages/zod/src/v3/types.ts",
+    "status": "modified",
+    "additions": 9,
+    "deletions": 9,
+    "changes": 18,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv3%2Ftypes.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv3%2Ftypes.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv3%2Ftypes.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -2804,7 +2804,7 @@ export class ZodObject<\n    * @deprecated\n    */\n   deepPartial(): partialUtil.DeepPartial<this> {\n-    return deepPartialify(this) as any;\n+    return deepPartialify(this);\n   }\n \n   partial(): ZodObject<{ [k in keyof T]: ZodOptional<T[k]> }, UnknownKeys, Catchall>;\n@@ -3072,7 +3072,7 @@ const getDiscriminator = <T extends ZodTypeAny>(type: T): Primitive[] => {\n     return type.options;\n   } else if (type instanceof ZodNativeEnum) {\n     // eslint-disable-next-line ban/ban\n-    return util.objectValues(type.enum as any);\n+    return util.objectValues(type.enum);\n   } else if (type instanceof ZodDefault) {\n     return getDiscriminator(type._def.innerType);\n   } else if (type instanceof ZodUndefined) {\n@@ -3309,7 +3309,7 @@ export class ZodIntersection<T extends ZodTypeAny, U extends ZodTypeAny> extends\n         status.dirty();\n       }\n \n-      return { status: status.value, value: merged.data as any };\n+      return { status: status.value, value: merged.data };\n     };\n \n     if (ctx.common.async) {\n@@ -3833,7 +3833,7 @@ export class ZodFunction<Args extends ZodTuple<any, any>, Returns extends ZodTyp\n         path: ctx.path,\n         errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), defaultErrorMap].filter(\n           (x) => !!x\n-        ) as ZodErrorMap[],\n+        ),\n         issueData: {\n           code: ZodIssueCode.invalid_arguments,\n           argumentsError: error,\n@@ -3847,7 +3847,7 @@ export class ZodFunction<Args extends ZodTuple<any, any>, Returns extends ZodTyp\n         path: ctx.path,\n         errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), defaultErrorMap].filter(\n           (x) => !!x\n-        ) as ZodErrorMap[],\n+        ),\n         issueData: {\n           code: ZodIssueCode.invalid_return_type,\n           returnTypeError: error,\n@@ -4115,23 +4115,23 @@ export class ZodEnum<T extends [string, ...string[]]> extends ZodType<T[number],\n     for (const val of this._def.values) {\n       enumValues[val] = val;\n     }\n-    return enumValues as any;\n+    return enumValues;\n   }\n \n   get Values(): Values<T> {\n     const enumValues: any = {};\n     for (const val of this._def.values) {\n       enumValues[val] = val;\n     }\n-    return enumValues as any;\n+    return enumValues;\n   }\n \n   get Enum(): Values<T> {\n     const enumValues: any = {};\n     for (const val of this._def.values) {\n       enumValues[val] = val;\n     }\n-    return enumValues as any;\n+    return enumValues;\n   }\n \n   extract<ToExtract extends readonly [T[number], ...T[number][]]>(\n@@ -4201,7 +4201,7 @@ export class ZodNativeEnum<T extends EnumLike> extends ZodType<T[keyof T], ZodNa\n       });\n       return INVALID;\n     }\n-    return OK(input.data as any);\n+    return OK(input.data);\n   }\n \n   get enum() {"
+  },
+  {
+    "sha": "f1a958f6c332128ebca4dd57b3037756f5dab7d5",
+    "filename": "packages/zod/src/v4/classic/tests/to-json-schema.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fto-json-schema.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fto-json-schema.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fto-json-schema.test.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -825,7 +825,7 @@ describe(\"toJSONSchema\", () => {\n       z.toJSONSchema(a, {\n         io: \"input\",\n         override(ctx) {\n-          const def = (ctx.zodSchema as z.core.$ZodTypes)._zod.def;\n+          const def = ctx.zodSchema._zod.def;\n           if (def.type === \"object\" && !def.catchall) {\n             (ctx.jsonSchema as z.core.JSONSchema.ObjectSchema).additionalProperties = false;\n           }"
+  },
+  {
+    "sha": "7055652405d070fc139d6f9cb4af4136d94b68f0",
+    "filename": "packages/zod/src/v4/core/checks.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fchecks.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fchecks.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fchecks.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -346,9 +346,9 @@ export const $ZodCheckNumberFormat: core.$constructor<$ZodCheckNumberFormat> = /\n       if (input < minimum) {\n         payload.issues.push({\n           origin: \"number\",\n-          input: input as number,\n+          input,\n           code: \"too_small\",\n-          minimum: minimum as number,\n+          minimum,\n           inclusive: true,\n           inst,\n           continue: !def.abort,"
+  },
+  {
+    "sha": "693f8ce1be9359e60ad42b85d3ae0b5d962cbae3",
+    "filename": "packages/zod/src/v4/core/core.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fcore.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fcore.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fcore.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -26,7 +26,7 @@ export /*@__NO_SIDE_EFFECTS__*/ function $constructor<T extends ZodTrait, D = T[\n     initializer(inst, def);\n     // support prototype modifications\n     for (const k in _.prototype) {\n-      if (!(k in inst)) Object.defineProperty(inst, k, { value: (_.prototype as any)[k].bind(inst) });\n+      if (!(k in inst)) Object.defineProperty(inst, k, { value: _.prototype[k].bind(inst) });\n     }\n     inst._zod.constr = _;\n     inst._zod.def = def;"
+  },
+  {
+    "sha": "e11125f6543965646aeb36fedf4f40653046682c",
+    "filename": "packages/zod/src/v4/core/schemas.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Fschemas.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -1105,7 +1105,7 @@ export const $ZodBigInt: core.$constructor<$ZodBigInt> = /*@__PURE__*/ core.$con\n   inst._zod.parse = (payload, _ctx) => {\n     if (def.coerce)\n       try {\n-        payload.value = BigInt(payload.value as any);\n+        payload.value = BigInt(payload.value);\n       } catch (_) {}\n     const { value: input } = payload;\n     if (typeof input === \"bigint\") return payload;\n@@ -2663,7 +2663,7 @@ export const $ZodEnum: core.$constructor<$ZodEnum> = /*@__PURE__*/ core.$constru\n \n   inst._zod.parse = (payload, _ctx) => {\n     const input = payload.value;\n-    if (inst._zod.values.has(input as any)) {\n+    if (inst._zod.values.has(input)) {\n       return payload;\n     }\n     payload.issues.push({\n@@ -2715,7 +2715,7 @@ export const $ZodLiteral: core.$constructor<$ZodLiteral> = /*@__PURE__*/ core.$c\n \n     inst._zod.parse = (payload, _ctx) => {\n       const input = payload.value;\n-      if (inst._zod.values.has(input as any)) {\n+      if (inst._zod.values.has(input)) {\n         return payload;\n       }\n       payload.issues.push({"
+  },
+  {
+    "sha": "8ff767e7fd0f2114890afb0b9ecbd3d79674d8b1",
+    "filename": "packages/zod/src/v4/core/util.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Futil.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/f03f722fce2d02c98f3b341a453f700256c7474b/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Futil.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Futil.ts?ref=f03f722fce2d02c98f3b341a453f700256c7474b",
+    "patch": "@@ -457,7 +457,7 @@ export function normalizeParams<T>(_params: T): Normalize<T> {\n   }\n   delete params.message;\n   if (typeof params.error === \"string\") return { ...params, error: () => params.error } as any;\n-  return params as any;\n+  return params;\n }\n \n export function createTransparentProxy<T extends object>(getter: () => T): T {"
+  }
+]

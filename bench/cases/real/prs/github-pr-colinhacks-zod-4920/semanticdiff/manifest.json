@@ -1,0 +1,48 @@
+[
+  {
+    "tracking_name": "packages/docs/content/error-customization.mdx",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fdocs%2Fcontent%2Ferror-customization.mdx&old_oid=9940e202698e39273f8ce7b60cbedd651a62e007&old_mode=33188&new_filename=packages%2Fdocs%2Fcontent%2Ferror-customization.mdx&new_oid=c2d3ddf4416fb84e3f44130a0621ee5fc205b973&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/docs/content/error-customization.mdx",
+      "oid": "9940e202698e39273f8ce7b60cbedd651a62e007",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/docs/content/error-customization.mdx",
+      "oid": "c2d3ddf4416fb84e3f44130a0621ee5fc205b973",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "d07735721e01f93dc78c05aa7424270d6d7e443dc50f71fde8f4d7cbbeea5600"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/locales/index.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts&old_oid=d81663f2b88ac27532eec0fb8591d539395662d0&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts&new_oid=d9559b7683970dae8bca6513102920d25be32d5d&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/zod/src/v4/locales/index.ts",
+      "oid": "d81663f2b88ac27532eec0fb8591d539395662d0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/locales/index.ts",
+      "oid": "d9559b7683970dae8bca6513102920d25be32d5d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b046c4e8feda08b3e5335f6aafc816adfd09b3a323b23646c32e22ac2c9946e0"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/locales/is.ts",
+    "diff": "/gh/colinhacks/zod/diff?new_filename=packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Fis.ts&new_oid=57e0b68ea38faffaa4cb2293e144bb9a0aed478e&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "new": {
+      "name": "packages/zod/src/v4/locales/is.ts",
+      "oid": "57e0b68ea38faffaa4cb2293e144bb9a0aed478e",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "db9826e1ba5d7fed3178a6df27a00f3b095df23144c12333962e6b9b14a5cf7a"
+  }
+]

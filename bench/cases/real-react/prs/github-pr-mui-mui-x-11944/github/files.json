@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "642d410d54ed9699bb87031018bf8fec99bea5e3",
+    "filename": "packages/grid/x-data-grid/src/components/cell/GridActionsCellItem.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/mui-x/blob/f97bdc9811d43095a1fb2c10b569a3c06583c34c/packages%2Fgrid%2Fx-data-grid%2Fsrc%2Fcomponents%2Fcell%2FGridActionsCellItem.tsx",
+    "raw_url": "https://github.com/mui/mui-x/raw/f97bdc9811d43095a1fb2c10b569a3c06583c34c/packages%2Fgrid%2Fx-data-grid%2Fsrc%2Fcomponents%2Fcell%2FGridActionsCellItem.tsx",
+    "contents_url": "https://api.github.com/repos/mui/mui-x/contents/packages%2Fgrid%2Fx-data-grid%2Fsrc%2Fcomponents%2Fcell%2FGridActionsCellItem.tsx?ref=f97bdc9811d43095a1fb2c10b569a3c06583c34c",
+    "patch": "@@ -36,7 +36,7 @@ const GridActionsCellItem = React.forwardRef<HTMLElement, GridActionsCellItemPro\n \n       return (\n         <rootProps.slots.baseIconButton\n-          ref={ref}\n+          ref={ref as React.MutableRefObject<HTMLButtonElement>}\n           size=\"small\"\n           role=\"menuitem\"\n           aria-label={label}"
+  }
+]

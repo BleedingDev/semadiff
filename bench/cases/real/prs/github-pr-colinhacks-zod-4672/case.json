@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-4672",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#4672: refactor: remove unnecessary assertion",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 4672,
+    "prUrl": "https://github.com/colinhacks/zod/pull/4672",
+    "baseSha": "82b43fa9ff832b80e249b944fefb8177827136e6",
+    "headSha": "f03f722fce2d02c98f3b341a453f700256c7474b",
+    "selectedFiles": [
+      "packages/zod/src/v3/helpers/util.ts"
+    ],
+    "collectedAt": "2026-03-08T02:14:55.674Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v3/helpers/util.ts",
+      "oldPath": "packages/zod/src/v3/helpers/util.ts",
+      "newPath": "packages/zod/src/v3/helpers/util.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v3/helpers/util.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 21,
+          "endLine": 21
+        },
+        "newRange": {
+          "startLine": 21,
+          "endLine": 21
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

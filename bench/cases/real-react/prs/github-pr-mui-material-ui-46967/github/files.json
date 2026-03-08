@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "16aad38df254bdd48bbed06cc32272e266dae76d",
+    "filename": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 6,
+    "changes": 12,
+    "blob_url": "https://github.com/mui/material-ui/blob/b3e0cb3f49e1e6acae45ca7ef9539d6d9ae95862/packages%2Fmui-utils%2Fsrc%2FuseForkRef%2FuseForkRef.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/b3e0cb3f49e1e6acae45ca7ef9539d6d9ae95862/packages%2Fmui-utils%2Fsrc%2FuseForkRef%2FuseForkRef.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-utils%2Fsrc%2FuseForkRef%2FuseForkRef.ts?ref=b3e0cb3f49e1e6acae45ca7ef9539d6d9ae95862",
+    "patch": "@@ -19,9 +19,9 @@ import * as React from 'react';\n export default function useForkRef<Instance>(\n   ...refs: Array<React.Ref<Instance> | undefined>\n ): React.RefCallback<Instance> | null {\n-  const cleanupRef = React.useRef<void | (() => void)>(undefined);\n+  const cleanupRef = React.useRef<() => void>(undefined);\n \n-  const refEffect = React.useCallback((instance: Instance | null) => {\n+  const refEffect = React.useCallback((instance: Instance) => {\n     const cleanups = refs.map((ref) => {\n       if (ref == null) {\n         return null;\n@@ -37,9 +37,9 @@ export default function useForkRef<Instance>(\n             };\n       }\n \n-      (ref as React.RefObject<Instance | null>).current = instance;\n+      ref.current = instance;\n       return () => {\n-        (ref as React.RefObject<Instance | null>).current = null;\n+        ref.current = null;\n       };\n     });\n \n@@ -57,11 +57,11 @@ export default function useForkRef<Instance>(\n     return (value) => {\n       if (cleanupRef.current) {\n         cleanupRef.current();\n-        (cleanupRef as React.RefObject<void | (() => void)>).current = undefined;\n+        cleanupRef.current = undefined;\n       }\n \n       if (value != null) {\n-        (cleanupRef as React.RefObject<void | (() => void)>).current = refEffect(value);\n+        cleanupRef.current = refEffect(value);\n       }\n     };\n     // TODO: uncomment once we enable eslint-plugin-react-compiler // eslint-disable-next-line react-compiler/react-compiler -- intentionally ignoring that the dependency array must be an array literal"
+  }
+]

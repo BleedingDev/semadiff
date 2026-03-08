@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.ts&old_oid=19510040d871f0cce67555e52ee715d00033d21a&old_mode=33188&new_filename=packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.ts&new_oid=b868bb0bcb02005b33a741defef6d24a60edefd6&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+      "oid": "19510040d871f0cce67555e52ee715d00033d21a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+      "oid": "b868bb0bcb02005b33a741defef6d24a60edefd6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1e353dcd8af4297e621ed2df9619f64034576339e444efd926f99cf44f626c18"
+  }
+]

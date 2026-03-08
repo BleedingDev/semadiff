@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "31fbe2d67d2207c73842193a72cb959b3b85a359",
+    "filename": ".changeset/twenty-taxis-feel.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/9a56b1f23edc2898c3e2afe3bd15e99e412098de/.changeset%2Ftwenty-taxis-feel.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/9a56b1f23edc2898c3e2afe3bd15e99e412098de/.changeset%2Ftwenty-taxis-feel.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Ftwenty-taxis-feel.md?ref=9a56b1f23edc2898c3e2afe3bd15e99e412098de",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@zag-js/listbox\": patch\n+---\n+\n+Fix listbox dom ids."
+  },
+  {
+    "sha": "1b7a27a156e3a502e17492ee7617d58ddede30bc",
+    "filename": "packages/machines/listbox/src/listbox.dom.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 6,
+    "changes": 12,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/9a56b1f23edc2898c3e2afe3bd15e99e412098de/packages%2Fmachines%2Flistbox%2Fsrc%2Flistbox.dom.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/9a56b1f23edc2898c3e2afe3bd15e99e412098de/packages%2Fmachines%2Flistbox%2Fsrc%2Flistbox.dom.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Flistbox%2Fsrc%2Flistbox.dom.ts?ref=9a56b1f23edc2898c3e2afe3bd15e99e412098de",
+    "patch": "@@ -1,13 +1,13 @@\n import type { Scope } from \"@zag-js/core\"\n \n-export const getRootId = (ctx: Scope) => ctx.ids?.root ?? `select:${ctx.id}`\n-export const getContentId = (ctx: Scope) => ctx.ids?.content ?? `select:${ctx.id}:content`\n-export const getLabelId = (ctx: Scope) => ctx.ids?.label ?? `select:${ctx.id}:label`\n-export const getItemId = (ctx: Scope, id: string | number) => ctx.ids?.item?.(id) ?? `select:${ctx.id}:option:${id}`\n+export const getRootId = (ctx: Scope) => ctx.ids?.root ?? `listbox:${ctx.id}`\n+export const getContentId = (ctx: Scope) => ctx.ids?.content ?? `listbox:${ctx.id}:content`\n+export const getLabelId = (ctx: Scope) => ctx.ids?.label ?? `listbox:${ctx.id}:label`\n+export const getItemId = (ctx: Scope, id: string | number) => ctx.ids?.item?.(id) ?? `listbox:${ctx.id}:item:${id}`\n export const getItemGroupId = (ctx: Scope, id: string | number) =>\n-  ctx.ids?.itemGroup?.(id) ?? `select:${ctx.id}:optgroup:${id}`\n+  ctx.ids?.itemGroup?.(id) ?? `listbox:${ctx.id}:item-group:${id}`\n export const getItemGroupLabelId = (ctx: Scope, id: string | number) =>\n-  ctx.ids?.itemGroupLabel?.(id) ?? `select:${ctx.id}:optgroup-label:${id}`\n+  ctx.ids?.itemGroupLabel?.(id) ?? `listbox:${ctx.id}:item-group-label:${id}`\n \n export const getContentEl = (ctx: Scope) => ctx.getById(getContentId(ctx))\n export const getItemEl = (ctx: Scope, id: string | number) => ctx.getById(getItemId(ctx, id))"
+  }
+]

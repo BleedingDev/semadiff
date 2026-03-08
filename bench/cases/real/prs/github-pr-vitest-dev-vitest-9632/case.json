@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-vitest-dev-vitest-9632",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitest-dev/vitest#9632: refactor: copy attachmentsDir in html reporter output",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitest-dev/vitest",
+    "prNumber": 9632,
+    "prUrl": "https://github.com/vitest-dev/vitest/pull/9632",
+    "baseSha": "5cf83019e305fcc041f89378fca8383bf4597e69",
+    "headSha": "5d042c09f86314c700e46cd6554c49bf0dcb0de0",
+    "selectedFiles": [
+      "test/ui/playwright.config.ts"
+    ],
+    "collectedAt": "2026-03-08T02:24:20.874Z"
+  },
+  "files": [
+    {
+      "id": "test/ui/playwright.config.ts",
+      "oldPath": "test/ui/playwright.config.ts",
+      "newPath": "test/ui/playwright.config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "test/ui/playwright.config.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 8,
+          "endLine": 8
+        },
+        "newRange": {
+          "startLine": 8,
+          "endLine": 9
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

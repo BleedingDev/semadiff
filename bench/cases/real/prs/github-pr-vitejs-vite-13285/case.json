@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-vitejs-vite-13285",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitejs/vite#13285: docs: link to ko translation",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitejs/vite",
+    "prNumber": 13285,
+    "prUrl": "https://github.com/vitejs/vite/pull/13285",
+    "baseSha": "e3db7712657232fbb9ea2499a2c6f277d2bb96a3",
+    "headSha": "a36c88f971583d06941e45d31316bbfece1c876d",
+    "selectedFiles": [
+      "docs/.vitepress/config.ts"
+    ],
+    "collectedAt": "2026-03-08T02:20:14.916Z"
+  },
+  "files": [
+    {
+      "id": "docs/.vitepress/config.ts",
+      "oldPath": "docs/.vitepress/config.ts",
+      "newPath": "docs/.vitepress/config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/.vitepress/config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 95,
+          "endLine": 95
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

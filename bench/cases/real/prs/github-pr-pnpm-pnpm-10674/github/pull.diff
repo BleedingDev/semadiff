@@ -1,0 +1,63 @@
+diff --git a/config/config/src/configFileKey.ts b/config/config/src/configFileKey.ts
+index 34bdf7c2a83..b997960989a 100644
+--- a/config/config/src/configFileKey.ts
++++ b/config/config/src/configFileKey.ts
+@@ -132,7 +132,6 @@ export const excludedPnpmKeys = [
+   'trust-policy',
+   'trust-policy-exclude',
+   'trust-policy-ignore-after',
+-  'use-node-version',
+   'use-stderr',
+   'verify-deps-before-run',
+   'verify-store-integrity',
+diff --git a/config/config/src/types.ts b/config/config/src/types.ts
+index 9c2073e001c..6f034276750 100644
+--- a/config/config/src/types.ts
++++ b/config/config/src/types.ts
+@@ -118,7 +118,6 @@ export const pnpmTypes = {
+   'trust-policy-exclude': [String, Array],
+   'trust-policy-ignore-after': Number,
+   'use-beta-cli': Boolean,
+-  'use-node-version': String,
+   'use-stderr': Boolean,
+   'verify-deps-before-run': Boolean,
+   'verify-store-integrity': Boolean,
+diff --git a/exec/plugin-commands-script-runners/src/create.ts b/exec/plugin-commands-script-runners/src/create.ts
+index 9b4f505b9ff..bc24703bdf0 100644
+--- a/exec/plugin-commands-script-runners/src/create.ts
++++ b/exec/plugin-commands-script-runners/src/create.ts
+@@ -1,8 +1,6 @@
+ import renderHelp from 'render-help'
+ import { docsUrl } from '@pnpm/cli-utils'
+-import { types } from '@pnpm/config'
+ import { PnpmError } from '@pnpm/error'
+-import { pick } from 'ramda'
+ import * as dlx from './dlx.js'
+ 
+ export const commandNames = ['create']
+@@ -28,11 +26,7 @@ export async function handler (_opts: dlx.DlxCommandOptions, params: string[]):
+ }
+ 
+ export function rcOptionsTypes (): Record<string, unknown> {
+-  return {
+-    ...pick([
+-      'use-node-version',
+-    ], types),
+-  }
++  return {}
+ }
+ 
+ export function cliOptionsTypes (): Record<string, unknown> {
+diff --git a/pnpm/src/main.ts b/pnpm/src/main.ts
+index 55e9feedadd..46d0ccbf0ea 100644
+--- a/pnpm/src/main.ts
++++ b/pnpm/src/main.ts
+@@ -297,8 +297,6 @@ export async function main (inputArgv: string[]): Promise<void> {
+         result = await result
+       }
+     } finally {
+-      // When use-node-version is set and "pnpm run" is executed,
+-      // this will be the only place where the tarball worker pool is finished.
+       await finishWorkers()
+     }
+     executionTimeLogger.debug({

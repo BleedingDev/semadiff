@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-5164",
+  "language": "tsx",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#5164: chore: update type tests to use `toMatchObjectType` and `toExtend`",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 5164,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5164",
+    "baseSha": "f6cc1a3a3e25c1e1919db2d24a4fef98568c3137",
+    "headSha": "b0ce647d90ae945dda384e85cbda2aea55209bc9",
+    "selectedFiles": [
+      "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx"
+    ],
+    "collectedAt": "2026-03-08T02:16:28.828Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "oldPath": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "newPath": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 857,
+          "endLine": 857
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-42833",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#42833: [code-infra] Cleanup `@mui/docs` usage and legacy re-exports",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 42833,
+    "prUrl": "https://github.com/mui/material-ui/pull/42833",
+    "baseSha": "48cac390050585326d9259fc902fc7bc419da419",
+    "headSha": "4583bc0aa91c6f535729813046a0f144f1c3b8c2",
+    "selectedFiles": [
+      "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:40:33.403Z"
+  },
+  "files": [
+    {
+      "id": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+      "oldPath": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+      "newPath": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 13
+        },
+        "newRange": {
+          "startLine": 13,
+          "endLine": 13
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

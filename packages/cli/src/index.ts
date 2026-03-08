@@ -19,12 +19,15 @@ import {
   Telemetry,
   TelemetryLive,
 } from "@semadiff/core";
+import {
+  buildEntityDocumentFromSources,
+  buildHybridDiffDocument,
+} from "@semadiff/entity-core";
 import { lightningCssParsers } from "@semadiff/parser-lightningcss";
 import { swcParsers } from "@semadiff/parser-swc";
 import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
 import type { LanguageId } from "@semadiff/parsers";
 import { makeRegistry } from "@semadiff/parsers";
-import type * as PrBackend from "@semadiff/pr-backend";
 import {
   renderTerminal,
   renderTerminalLinesFromHtml,
@@ -32,6 +35,13 @@ import {
 import { Cause, Console, Effect, Exit, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
 import { resolveConfig } from "./config/resolve.js";
+import {
+  type CollectedGitHybridInput,
+  collectGitFileChanges,
+  parseStdinFileChanges,
+  type ResolvedFileChange,
+  resolveGitHybridMode,
+} from "./git-hybrid.js";
 import { cliRuntimeLayer } from "./runtime-layer.js";
 
 const Args = {
@@ -57,11 +67,12 @@ const Options = {
 const isSourceRun = fileURLToPath(import.meta.url).includes(
   `${path.sep}packages${path.sep}cli${path.sep}src${path.sep}`
 );
+type PrBackendModule = typeof import("../../pr-backend/src/index.js");
 const prBackendModule = (await import(
   isSourceRun
     ? new URL("../../pr-backend/src/index.ts", import.meta.url).href
     : "@semadiff/pr-backend"
-)) as typeof PrBackend;
+)) as PrBackendModule;
 const { FileDiffDocumentSchema, PrDiffLive, PrDiffService, PrSummarySchema } =
   prBackendModule;
 
@@ -71,8 +82,46 @@ interface DiffArgs {
   format: "ansi" | "plain" | "json";
   layout: "unified" | "side-by-side";
   view: "semantic" | "lines";
+  experimentalHybrid: boolean;
   language?: LanguageId;
 }
+
+interface GitHybridFileOutput {
+  id: string;
+  status: string;
+  oldPath: string | null;
+  newPath: string | null;
+  language: string;
+  diff: ReturnType<typeof structuralDiff>;
+}
+
+interface GitHybridWarning {
+  kind: "binary-skipped";
+  path: string;
+  message: string;
+}
+
+interface GitHybridEntitySource {
+  oldText: string;
+  newText: string;
+  language?: string | undefined;
+  oldRoot?: unknown;
+  newRoot?: unknown;
+  oldPath?: string | undefined;
+  newPath?: string | undefined;
+  diff: ReturnType<typeof structuralDiff>;
+}
+
+type GitHybridProcessedChange =
+  | {
+      kind: "warning";
+      warning: GitHybridWarning;
+    }
+  | {
+      kind: "file";
+      file: GitHybridFileOutput;
+      entitySource: GitHybridEntitySource;
+    };
 
 function readInput(path: string): string {
   if (path === "-") {
@@ -299,6 +348,12 @@ const languageOption = Options.choice("language", languageChoices).pipe(
   Options.withDefault("auto"),
   Options.withDescription("Language hint (auto to infer).")
 );
+const experimentalHybridOption = Options.boolean("experimental-hybrid").pipe(
+  Options.withDefault(false),
+  Options.withDescription(
+    "Emit experimental hybrid sidecar data when --format json."
+  )
+);
 const prContextOption = Options.integer("context").pipe(
   Options.withDefault(3),
   Options.withDescription("Line context for diff caching (default 3).")
@@ -310,6 +365,34 @@ const prMovesOption = Options.boolean("moves").pipe(
 const prSummaryCompactOption = Options.boolean("compact").pipe(
   Options.withDefault(false),
   Options.withDescription("Print compact JSON (no whitespace).")
+);
+const gitHybridCwdOption = Options.text("cwd").pipe(
+  Options.withDefault("."),
+  Options.withDescription("Directory to resolve the git repository from.")
+);
+const gitHybridWorkingTreeOption = Options.boolean("working-tree").pipe(
+  Options.withDefault(false),
+  Options.withDescription("Compare HEAD against the current working tree.")
+);
+const gitHybridStagedOption = Options.boolean("staged").pipe(
+  Options.withDefault(false),
+  Options.withDescription("Compare HEAD against the staged index.")
+);
+const gitHybridCommitOption = Options.text("commit").pipe(
+  Options.withDefault(""),
+  Options.withDescription("Analyze a single commit against its first parent.")
+);
+const gitHybridFromOption = Options.text("from").pipe(
+  Options.withDefault(""),
+  Options.withDescription("Start revision for a git range.")
+);
+const gitHybridToOption = Options.text("to").pipe(
+  Options.withDefault(""),
+  Options.withDescription("End revision for a git range.")
+);
+const gitHybridStdinOption = Options.boolean("stdin-file-changes").pipe(
+  Options.withDefault(false),
+  Options.withDescription("Read JSON FileChange[] from stdin instead of git.")
 );
 
 function inferLanguageFromPath(path?: string): LanguageId | undefined {
@@ -343,6 +426,192 @@ function inferLanguageFromPath(path?: string): LanguageId | undefined {
   }
 }
 
+function readLanguageHint(value?: string | undefined): LanguageId | undefined {
+  if (!(value && value !== "auto")) {
+    return undefined;
+  }
+  if ((languageChoices as readonly string[]).includes(value)) {
+    return value as LanguageId;
+  }
+  throw new Error(`Unsupported language hint: ${value}`);
+}
+
+function collectGitHybridInput(params: {
+  cwd: string;
+  workingTree: boolean;
+  staged: boolean;
+  commit: string;
+  from: string;
+  to: string;
+  stdinFileChanges: boolean;
+}): CollectedGitHybridInput {
+  const mode = resolveGitHybridMode({
+    workingTree: params.workingTree,
+    staged: params.staged,
+    commit: params.commit,
+    from: params.from,
+    to: params.to,
+    stdinFileChanges: params.stdinFileChanges,
+  });
+  return mode.kind === "stdin-file-changes"
+    ? {
+        source: { kind: "stdin-file-changes" },
+        changes: parseStdinFileChanges(readFileSync(0, "utf8")),
+      }
+    : collectGitFileChanges({ cwd: params.cwd, mode });
+}
+
+function processGitHybridChangeEffect(params: {
+  change: ResolvedFileChange;
+  normalizers: NormalizerSettings;
+}) {
+  return Effect.gen(function* () {
+    const preferredPath =
+      params.change.newPath ?? params.change.oldPath ?? "<stdin>";
+    if (isBinary(params.change.oldText) || isBinary(params.change.newText)) {
+      return {
+        kind: "warning",
+        warning: {
+          kind: "binary-skipped",
+          path: preferredPath,
+          message: "Binary file skipped from experimental git-hybrid output.",
+        },
+      } satisfies GitHybridProcessedChange;
+    }
+    const requestedLanguage =
+      readLanguageHint(params.change.language) ??
+      inferLanguageFromPath(
+        params.change.newPath ?? params.change.oldPath ?? undefined
+      );
+    const makeParseInput = (content: string, filePath?: string) => ({
+      content,
+      ...(filePath ? { path: filePath } : {}),
+      ...(requestedLanguage ? { language: requestedLanguage } : {}),
+    });
+    const telemetry = yield* Telemetry;
+    const parsedOld = yield* telemetry.span(
+      "parse",
+      {
+        command: "git-hybrid",
+        side: "old",
+        path: params.change.oldPath,
+        id: params.change.id,
+      },
+      parserRegistry.parse(
+        makeParseInput(
+          params.change.oldText,
+          params.change.oldPath ?? undefined
+        )
+      )
+    );
+    const parsedNew = yield* telemetry.span(
+      "parse",
+      {
+        command: "git-hybrid",
+        side: "new",
+        path: params.change.newPath,
+        id: params.change.id,
+      },
+      parserRegistry.parse(
+        makeParseInput(
+          params.change.newText,
+          params.change.newPath ?? undefined
+        )
+      )
+    );
+    const effectiveLanguage =
+      requestedLanguage ?? parsedOld.language ?? parsedNew.language;
+    const diff = yield* telemetry.span(
+      "diff",
+      {
+        command: "git-hybrid",
+        id: params.change.id,
+        status: params.change.status,
+        language: effectiveLanguage,
+      },
+      Effect.sync(() =>
+        structuralDiff(params.change.oldText, params.change.newText, {
+          normalizers: params.normalizers,
+          language: effectiveLanguage,
+          oldRoot: parsedOld.root,
+          newRoot: parsedNew.root,
+          ...(parsedOld.tokens !== undefined
+            ? { oldTokens: parsedOld.tokens }
+            : {}),
+          ...(parsedNew.tokens !== undefined
+            ? { newTokens: parsedNew.tokens }
+            : {}),
+        })
+      )
+    );
+    return {
+      kind: "file",
+      file: {
+        id: params.change.id,
+        status: params.change.status,
+        oldPath: params.change.oldPath,
+        newPath: params.change.newPath,
+        language: effectiveLanguage,
+        diff,
+      },
+      entitySource: {
+        oldText: params.change.oldText,
+        newText: params.change.newText,
+        language: effectiveLanguage,
+        oldRoot: parsedOld.root,
+        newRoot: parsedNew.root,
+        ...(params.change.oldPath ? { oldPath: params.change.oldPath } : {}),
+        ...(params.change.newPath ? { newPath: params.change.newPath } : {}),
+        diff,
+      },
+    } satisfies GitHybridProcessedChange;
+  });
+}
+
+function runGitHybridEffect(params: {
+  compact: boolean;
+  collected: CollectedGitHybridInput;
+  normalizers: NormalizerSettings;
+}) {
+  return Effect.gen(function* () {
+    const files: GitHybridFileOutput[] = [];
+    const warnings: GitHybridWarning[] = [];
+    const entitySources: GitHybridEntitySource[] = [];
+    for (const change of params.collected.changes) {
+      const processed = yield* processGitHybridChangeEffect({
+        change,
+        normalizers: params.normalizers,
+      });
+      if (processed.kind === "warning") {
+        warnings.push(processed.warning);
+        continue;
+      }
+      files.push(processed.file);
+      entitySources.push(processed.entitySource);
+    }
+    const entities = buildEntityDocumentFromSources({
+      sources: entitySources,
+    });
+    const telemetry = yield* Telemetry;
+    yield* telemetry.log("git_hybrid_complete", {
+      source: params.collected.source.kind,
+      fileCount: files.length,
+      warningCount: warnings.length,
+    });
+    return encodeJson(
+      null,
+      {
+        version: "0.1.0",
+        source: params.collected.source,
+        files,
+        ...(entities ? { entities } : {}),
+        ...(warnings.length > 0 ? { warnings } : {}),
+      },
+      params.compact ? undefined : 2
+    );
+  });
+}
+
 const parserRegistry = makeRegistry([
   ...swcParsers,
   ...lightningCssParsers,
@@ -355,6 +624,7 @@ function runDiffEffect(params: {
   format: DiffArgs["format"];
   layout: DiffArgs["layout"];
   view: DiffArgs["view"];
+  experimentalHybrid: boolean;
   language?: LanguageId;
   normalizers: NormalizerSettings;
   oldPath?: string;
@@ -455,6 +725,22 @@ function runDiffEffect(params: {
       },
       Effect.sync(() => {
         if (params.format === "json") {
+          if (params.experimentalHybrid) {
+            return JSON.stringify(
+              buildHybridDiffDocument({
+                diff,
+                oldText: params.oldText,
+                newText: params.newText,
+                language: effectiveLanguage,
+                oldRoot: parsedOld.root,
+                newRoot: parsedNew.root,
+                ...(params.oldPath ? { oldPath: params.oldPath } : {}),
+                ...(params.newPath ? { newPath: params.newPath } : {}),
+              }),
+              null,
+              2
+            );
+          }
           return renderJson(diff);
         }
         return renderTerminal(diff, {
@@ -480,9 +766,10 @@ const diffCommand = Command.make(
     format: formatOption,
     layout: layoutOption,
     view: viewOption,
+    experimentalHybrid: experimentalHybridOption,
     language: languageOption,
   },
-  ({ oldPath, newPath, format, layout, view, language }) =>
+  ({ oldPath, newPath, format, layout, view, experimentalHybrid, language }) =>
     resolveConfig.pipe(
       Effect.flatMap((resolved) => {
         const telemetryOptions = {
@@ -521,6 +808,7 @@ const diffCommand = Command.make(
             format,
             layout,
             view,
+            experimentalHybrid,
             normalizers: resolved.config.normalizers,
             oldPath,
             newPath,
@@ -538,6 +826,54 @@ const diffCommand = Command.make(
       })
     )
 ).pipe(Command.withDescription("Run a semantic diff between two files."));
+
+const gitHybridCommand = Command.make(
+  "git-hybrid",
+  {
+    cwd: gitHybridCwdOption,
+    compact: prSummaryCompactOption,
+    workingTree: gitHybridWorkingTreeOption,
+    staged: gitHybridStagedOption,
+    commit: gitHybridCommitOption,
+    from: gitHybridFromOption,
+    to: gitHybridToOption,
+    stdinFileChanges: gitHybridStdinOption,
+  },
+  ({ cwd, compact, workingTree, staged, commit, from, to, stdinFileChanges }) =>
+    resolveConfig.pipe(
+      Effect.flatMap((resolved) => {
+        const telemetryOptions = {
+          enabled: resolved.config.telemetry.enabled,
+          exporter: resolved.config.telemetry.exporter,
+          ...(resolved.config.telemetry.endpoint
+            ? { endpoint: resolved.config.telemetry.endpoint }
+            : {}),
+        };
+        const telemetryLayer = TelemetryLive(telemetryOptions);
+        return Effect.gen(function* () {
+          const collected = collectGitHybridInput({
+            cwd,
+            workingTree,
+            staged,
+            commit,
+            from,
+            to,
+            stdinFileChanges,
+          });
+          const output = yield* runGitHybridEffect({
+            compact,
+            collected,
+            normalizers: resolved.config.normalizers,
+          });
+          yield* Console.log(output);
+        }).pipe(Effect.provide(telemetryLayer));
+      })
+    )
+).pipe(
+  Command.withDescription(
+    "Emit experimental multi-file hybrid JSON from git or stdin file changes."
+  )
+);
 
 const prSummaryCommand = Command.make(
   "summary",
@@ -693,6 +1029,7 @@ const gitExternalCommand = Command.make(
             format: resolved.config.renderer.format,
             layout: resolved.config.renderer.layout,
             view: "lines",
+            experimentalHybrid: false,
             normalizers: resolved.config.normalizers,
             oldPath: oldFile,
             newPath: newFile,
@@ -760,6 +1097,7 @@ const difftoolCommand = Command.make(
               format: resolved.config.renderer.format,
               layout: resolved.config.renderer.layout,
               view: "lines",
+              experimentalHybrid: false,
               normalizers: resolved.config.normalizers,
               oldPath: localPath,
               newPath: remotePath,
@@ -1078,6 +1416,7 @@ const configCommand = Command.make("config", {}, () =>
 const app = Command.make("semadiff", {}, () => Effect.void).pipe(
   Command.withSubcommands([
     diffCommand,
+    gitHybridCommand,
     gitExternalCommand,
     difftoolCommand,
     installGitCommand,
@@ -1150,10 +1489,8 @@ const cli = Command.runWith(app, {
 
 const runMain = async () => {
   const argv = normalizeArgv(process.argv).slice(2);
-  const exit = await cli(argv).pipe(
-    Effect.provide(cliRuntimeLayer),
-    Effect.runPromiseExit
-  );
+  const main = Effect.provide(cli(argv), cliRuntimeLayer);
+  const exit = await Effect.runPromiseExit(main);
   if (Exit.isFailure(exit)) {
     process.exitCode = 1;
     process.stderr.write(`${Cause.pretty(exit.cause)}\n`);

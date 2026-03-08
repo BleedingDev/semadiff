@@ -1,0 +1,453 @@
+diff --git a/.changeset/three-beers-clap.md b/.changeset/three-beers-clap.md
+new file mode 100644
+index 0000000000..176d1daf1d
+--- /dev/null
++++ b/.changeset/three-beers-clap.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/collapsible": patch
++---
++
++Fix issue where initial height animation can sometimes run.
+diff --git a/.xstate/collapsible.js b/.xstate/collapsible.js
+index 0f5befbcb2..08df78beb1 100644
+--- a/.xstate/collapsible.js
++++ b/.xstate/collapsible.js
+@@ -18,7 +18,7 @@ const fetchMachine = createMachine({
+     "isOpenControlled": false,
+     "isOpenControlled": false
+   },
+-  entry: ["computeSize"],
++  exit: ["clearInitial"],
+   on: {
+     UPDATE_CONTEXT: {
+       actions: "updateContext"
+@@ -27,18 +27,14 @@ const fetchMachine = createMachine({
+   states: {
+     closed: {
+       tags: ["closed"],
+-      entry: ["computeSize"],
+       on: {
+-        "CONTROLLED.OPEN": {
+-          target: "open",
+-          actions: ["computeSize"]
+-        },
++        "CONTROLLED.OPEN": "open",
+         OPEN: [{
+           cond: "isOpenControlled",
+           actions: ["invokeOnOpen"]
+         }, {
+           target: "open",
+-          actions: ["allowAnimation", "invokeOnOpen", "computeSize"]
++          actions: ["setInitial", "computeSize", "invokeOnOpen"]
+         }]
+       }
+     },
+@@ -46,24 +42,21 @@ const fetchMachine = createMachine({
+       tags: ["open"],
+       activities: ["trackAnimationEvents"],
+       on: {
+-        "CONTROLLED.CLOSE": {
+-          target: "closed",
+-          actions: ["invokeOnExitComplete"]
+-        },
++        "CONTROLLED.CLOSE": "closed",
+         "CONTROLLED.OPEN": "open",
+         OPEN: [{
+           cond: "isOpenControlled",
+           actions: ["invokeOnOpen"]
+         }, {
+           target: "open",
+-          actions: ["allowAnimation", "invokeOnOpen"]
++          actions: ["setInitial", "invokeOnOpen"]
+         }],
+         CLOSE: [{
+           cond: "isOpenControlled",
+-          actions: ["invokeOnClose"]
++          actions: ["invokeOnExitComplete"]
+         }, {
+           target: "closed",
+-          actions: ["allowAnimation", "computeSize", "invokeOnExitComplete"]
++          actions: ["setInitial", "computeSize", "invokeOnExitComplete"]
+         }],
+         "ANIMATION.END": {
+           target: "closed",
+@@ -74,16 +67,13 @@ const fetchMachine = createMachine({
+     open: {
+       tags: ["open"],
+       on: {
+-        "CONTROLLED.CLOSE": {
+-          target: "closing",
+-          actions: ["computeSize"]
+-        },
++        "CONTROLLED.CLOSE": "closing",
+         CLOSE: [{
+           cond: "isOpenControlled",
+           actions: ["invokeOnClose"]
+         }, {
+           target: "closing",
+-          actions: ["allowAnimation", "computeSize"]
++          actions: ["setInitial", "computeSize", "invokeOnClose"]
+         }]
+       }
+     }
+diff --git a/.xstate/presence.js b/.xstate/presence.js
+index 4ea72cbb69..1614fadc65 100644
+--- a/.xstate/presence.js
++++ b/.xstate/presence.js
+@@ -12,6 +12,7 @@ const {
+ const fetchMachine = createMachine({
+   initial: initialState,
+   context: {},
++  exit: ["clearInitial"],
+   on: {
+     "NODE.SET": {
+       actions: ["setNode", "setStyles"]
+diff --git a/packages/machines/collapsible/src/collapsible.connect.ts b/packages/machines/collapsible/src/collapsible.connect.ts
+index 7034c3daf5..d6fd6bb5ac 100644
+--- a/packages/machines/collapsible/src/collapsible.connect.ts
++++ b/packages/machines/collapsible/src/collapsible.connect.ts
+@@ -12,7 +12,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+   const width = state.context.width
+   const disabled = !!state.context.disabled
+ 
+-  const skipMountAnimation = state.context.isMountAnimationPrevented && open
++  const skip = !state.context.initial && open
+ 
+   return {
+     disabled,
+@@ -32,7 +32,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+ 
+     contentProps: normalize.element({
+       ...parts.content.attrs,
+-      "data-state": skipMountAnimation ? undefined : open ? "open" : "closed",
++      "data-state": skip ? undefined : open ? "open" : "closed",
+       id: dom.getContentId(state.context),
+       "data-disabled": dataAttr(disabled),
+       hidden: !visible,
+@@ -51,7 +51,8 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+       "data-disabled": dataAttr(disabled),
+       "aria-controls": dom.getContentId(state.context),
+       "aria-expanded": visible || false,
+-      onClick() {
++      onClick(event) {
++        if (event.defaultPrevented) return
+         if (disabled) return
+         send({ type: open ? "CLOSE" : "OPEN", src: "trigger.click" })
+       },
+diff --git a/packages/machines/collapsible/src/collapsible.machine.ts b/packages/machines/collapsible/src/collapsible.machine.ts
+index 0a5dec0bdb..3e7ab11b31 100644
+--- a/packages/machines/collapsible/src/collapsible.machine.ts
++++ b/packages/machines/collapsible/src/collapsible.machine.ts
+@@ -15,25 +15,22 @@ export function machine(userContext: UserDefinedContext) {
+         ...ctx,
+         height: 0,
+         width: 0,
+-        isMountAnimationPrevented: !!ctx.open,
++        initial: false,
+         stylesRef: null,
++        unmountAnimationName: null,
+       },
+ 
+       watch: {
+-        open: ["allowAnimation", "toggleVisibility"],
++        open: ["setInitial", "computeSize", "toggleVisibility"],
+       },
+ 
+-      entry: ["computeSize"],
++      exit: ["clearInitial"],
+ 
+       states: {
+         closed: {
+           tags: ["closed"],
+-          entry: ["computeSize"],
+           on: {
+-            "CONTROLLED.OPEN": {
+-              target: "open",
+-              actions: ["computeSize"],
+-            },
++            "CONTROLLED.OPEN": "open",
+             OPEN: [
+               {
+                 guard: "isOpenControlled",
+@@ -41,7 +38,7 @@ export function machine(userContext: UserDefinedContext) {
+               },
+               {
+                 target: "open",
+-                actions: ["allowAnimation", "invokeOnOpen", "computeSize"],
++                actions: ["setInitial", "computeSize", "invokeOnOpen"],
+               },
+             ],
+           },
+@@ -51,10 +48,7 @@ export function machine(userContext: UserDefinedContext) {
+           tags: ["open"],
+           activities: ["trackAnimationEvents"],
+           on: {
+-            "CONTROLLED.CLOSE": {
+-              target: "closed",
+-              actions: ["invokeOnExitComplete"],
+-            },
++            "CONTROLLED.CLOSE": "closed",
+             "CONTROLLED.OPEN": "open",
+             OPEN: [
+               {
+@@ -63,17 +57,17 @@ export function machine(userContext: UserDefinedContext) {
+               },
+               {
+                 target: "open",
+-                actions: ["allowAnimation", "invokeOnOpen"],
++                actions: ["setInitial", "invokeOnOpen"],
+               },
+             ],
+             CLOSE: [
+               {
+                 guard: "isOpenControlled",
+-                actions: ["invokeOnClose"],
++                actions: ["invokeOnExitComplete"],
+               },
+               {
+                 target: "closed",
+-                actions: ["allowAnimation", "computeSize", "invokeOnExitComplete"],
++                actions: ["setInitial", "computeSize", "invokeOnExitComplete"],
+               },
+             ],
+             "ANIMATION.END": {
+@@ -82,13 +76,11 @@ export function machine(userContext: UserDefinedContext) {
+             },
+           },
+         },
++
+         open: {
+           tags: ["open"],
+           on: {
+-            "CONTROLLED.CLOSE": {
+-              target: "closing",
+-              actions: ["computeSize"],
+-            },
++            "CONTROLLED.CLOSE": "closing",
+             CLOSE: [
+               {
+                 guard: "isOpenControlled",
+@@ -96,7 +88,7 @@ export function machine(userContext: UserDefinedContext) {
+               },
+               {
+                 target: "closing",
+-                actions: ["allowAnimation", "computeSize"],
++                actions: ["setInitial", "computeSize", "invokeOnClose"],
+               },
+             ],
+           },
+@@ -118,22 +110,23 @@ export function machine(userContext: UserDefinedContext) {
+             // if there's no animation, send ANIMATION.END immediately
+             const animationName = getComputedStyle(contentEl).animationName
+             const hasNoAnimation = !animationName || animationName === "none"
++
+             if (hasNoAnimation) {
+               send({ type: "ANIMATION.END" })
+               return
+             }
+ 
+             const onEnd = (event: AnimationEvent) => {
+-              if (event.target !== contentEl) return
+-              send({ type: "ANIMATION.END" })
++              const win = contentEl.ownerDocument.defaultView || window
++              const animationName = win.getComputedStyle(contentEl).animationName
++              if (event.target === contentEl && animationName === ctx.unmountAnimationName) {
++                send({ type: "ANIMATION.END" })
++              }
+             }
+ 
+             contentEl.addEventListener("animationend", onEnd)
+-            contentEl.addEventListener("animationcancel", onEnd)
+-
+             cleanup = () => {
+               contentEl.removeEventListener("animationend", onEnd)
+-              contentEl.removeEventListener("animationcancel", onEnd)
+             }
+           })
+ 
+@@ -144,11 +137,16 @@ export function machine(userContext: UserDefinedContext) {
+         },
+       },
+       actions: {
+-        allowAnimation(ctx) {
+-          ctx.isMountAnimationPrevented = false
++        setInitial(ctx) {
++          ctx.initial = true
++        },
++        clearInitial(ctx) {
++          ctx.initial = false
+         },
+-        computeSize: (ctx) => {
+-          raf(() => {
++        computeSize(ctx, evt) {
++          ctx._rafCleanup?.()
++
++          ctx._rafCleanup = raf(() => {
+             const contentEl = dom.getContentEl(ctx)
+             if (!contentEl) return
+ 
+@@ -157,6 +155,11 @@ export function machine(userContext: UserDefinedContext) {
+               animationDuration: contentEl.style.animationDuration,
+             })
+ 
++            if (evt.type === "CLOSE" || !ctx.open) {
++              const win = contentEl.ownerDocument.defaultView || window
++              ctx.unmountAnimationName = win.getComputedStyle(contentEl).animationName
++            }
++
+             const hidden = contentEl.hidden
+ 
+             // block any animations/transitions so the element renders at its full dimensions
+@@ -169,7 +172,7 @@ export function machine(userContext: UserDefinedContext) {
+             ctx.width = rect.width
+ 
+             // kick off any animations/transitions that were originally set up if it isn't the initial mount
+-            if (!ctx.isMountAnimationPrevented) {
++            if (ctx.initial) {
+               contentEl.style.animationName = ctx.stylesRef.animationName
+               contentEl.style.animationDuration = ctx.stylesRef.animationDuration
+             }
+diff --git a/packages/machines/collapsible/src/collapsible.types.ts b/packages/machines/collapsible/src/collapsible.types.ts
+index a203963455..f29ff054a1 100644
+--- a/packages/machines/collapsible/src/collapsible.types.ts
++++ b/packages/machines/collapsible/src/collapsible.types.ts
+@@ -66,9 +66,19 @@ interface PrivateContext {
+   stylesRef: Record<string, any> | null
+   /**
+    * @internal
+-   * Whether the mount animation is prevented
++   * Whether the initial animation is allowed
+    */
+-  isMountAnimationPrevented: boolean
++  initial: boolean
++  /**
++   * @internal
++   * The requestAnimationFrame id
++   */
++  _rafCleanup?: VoidFunction
++  /**
++   * @internal
++   * The unmount animation name
++   */
++  unmountAnimationName: string | null
+ }
+ 
+ export type UserDefinedContext = RequiredBy<PublicContext, "id">
+diff --git a/packages/machines/presence/src/presence.machine.ts b/packages/machines/presence/src/presence.machine.ts
+index 28455c9ac8..287bb39988 100644
+--- a/packages/machines/presence/src/presence.machine.ts
++++ b/packages/machines/presence/src/presence.machine.ts
+@@ -21,6 +21,8 @@ export function machine(ctx: Partial<UserDefinedContext>) {
+         ...ctx,
+       },
+ 
++      exit: ["clearInitial"],
++
+       watch: {
+         present: ["setInitial", "syncPresence"],
+       },
+@@ -74,6 +76,9 @@ export function machine(ctx: Partial<UserDefinedContext>) {
+         setInitial(ctx) {
+           ctx.initial = true
+         },
++        clearInitial(ctx) {
++          ctx.initial = false
++        },
+         invokeOnExitComplete(ctx) {
+           ctx.onExitComplete?.()
+         },
+diff --git a/shared/src/css/collapsible.css b/shared/src/css/collapsible.css
+index 1c8b5e5d62..1b6a81e61c 100644
+--- a/shared/src/css/collapsible.css
++++ b/shared/src/css/collapsible.css
+@@ -4,11 +4,11 @@
+ }
+ 
+ [data-scope="collapsible"][data-part="content"][data-state="open"] {
+-  animation: slideDown 250ms cubic-bezier(0, 0, 0.38, 0.9);
++  animation: slideDown 200ms ease;
+ }
+ 
+ [data-scope="collapsible"][data-part="content"][data-state="closed"] {
+-  animation: slideUp 200ms cubic-bezier(0, 0, 0.38, 0.9);
++  animation: slideUp 200ms ease;
+ }
+ 
+ @keyframes slideDown {
+diff --git a/starters/react/app/accordion/collapsible/page.tsx b/starters/react/app/accordion/collapsible/page.tsx
+index 2495c45d2c..1f6a68d05c 100644
+--- a/starters/react/app/accordion/collapsible/page.tsx
++++ b/starters/react/app/accordion/collapsible/page.tsx
+@@ -4,7 +4,7 @@ import { Accordion } from "@/components/accordion"
+ 
+ export default function Page() {
+   return (
+-    <div style={{ padding: "40px", height: "200vh" }}>
++    <div style={{ padding: "40px", height: "200vh", maxWidth: "640px" }}>
+       <h1>Accordion / Collapsible</h1>
+       <Accordion
+         multiple
+@@ -12,18 +12,30 @@ export default function Page() {
+         items={[
+           {
+             value: "home",
+-            title: "Home",
+-            description: "Home description",
++            title: "Lorem Ipsum",
++            description: `
++              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
++              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis eget.
++              proin in nisi elementum, egestas libero sed, pretium mi.
++            `,
+           },
+           {
+             value: "about",
+-            title: "About",
+-            description: "About description",
++            title: "Cake Ipsum",
++            description: `
++             Cake icing topping. I love sugar plum I love oat cake sweet.
++              I love oat cake sweet. I love oat cake sweet.
++              I love oat cake sweet. I love oat cake sweet.
++            `,
+           },
+           {
+             value: "contact",
+-            title: "Contact",
+-            description: "Contact description",
++            title: "Hummingbird Ipsum",
++            description: `
++            The humble cupcake. Tiramisu gingerbread jujubes sugar plum.
++            Sweet roll sweet roll I love marzipan I love.
++            fruitcake I love I love fruitcake.
++            `,
+           },
+         ]}
+       />
+diff --git a/starters/react/app/collapsible/controlled/page.tsx b/starters/react/app/collapsible/controlled/page.tsx
+index b7c9effb74..fcbf54b93d 100644
+--- a/starters/react/app/collapsible/controlled/page.tsx
++++ b/starters/react/app/collapsible/controlled/page.tsx
+@@ -4,7 +4,7 @@ import { Collapsible } from "@/components/collapsible"
+ import { useState } from "react"
+ 
+ export default function Page() {
+-  const [open, setOpen] = useState(false)
++  const [open, setOpen] = useState(true)
+ 
+   return (
+     <div style={{ padding: "40px", height: "200vh" }}>
+diff --git a/starters/react/components/accordion.tsx b/starters/react/components/accordion.tsx
+index 363e36bb4f..7dc49ba57d 100644
+--- a/starters/react/components/accordion.tsx
++++ b/starters/react/components/accordion.tsx
+@@ -30,7 +30,7 @@ export const Accordion = (props: Props) => {
+               {...itemContentProps}
+               dir={context.dir}
+               ids={{ content: itemContentProps.id }}
+-              open={itemState.open}
++              open={itemState.expanded}
+             >
+               {item.description}
+             </Collapsible>

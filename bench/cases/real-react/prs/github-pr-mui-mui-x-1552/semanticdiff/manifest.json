@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+    "diff": "/gh/mui/mui-x/diff?old_filename=packages%2Fgrid%2F_modules_%2Fgrid%2Fcomponents%2Fmenu%2FcolumnMenu%2FGridColumnHeaderMenu.tsx&old_oid=cdfbc681ba5612412b4b2c48a984cff3cca64f03&old_mode=33188&new_filename=packages%2Fgrid%2F_modules_%2Fgrid%2Fcomponents%2Fmenu%2FcolumnMenu%2FGridColumnHeaderMenu.tsx&new_oid=ba90bed78b2452e68a26166764a1febeeae5218b&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+      "oid": "cdfbc681ba5612412b4b2c48a984cff3cca64f03",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/grid/_modules_/grid/components/menu/columnMenu/GridColumnHeaderMenu.tsx",
+      "oid": "ba90bed78b2452e68a26166764a1febeeae5218b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ac3c8d72bf2d6735fd89cf6d93298a21dce356400957fac9b93263b7c61eb381"
+  }
+]

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/frameworks/react/src/index.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=packages%2Fframeworks%2Freact%2Fsrc%2Findex.ts&old_oid=7a6c2083c9700244ca70b4c86e28b6c35a810147&old_mode=33188&new_filename=packages%2Fframeworks%2Freact%2Fsrc%2Findex.ts&new_oid=21c0efcb0898a4500026332f0ad8b099bbd8cb4d&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/frameworks/react/src/index.ts",
+      "oid": "7a6c2083c9700244ca70b4c86e28b6c35a810147",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/frameworks/react/src/index.ts",
+      "oid": "21c0efcb0898a4500026332f0ad8b099bbd8cb4d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e7709da09f67552081cbf13b11e2a63efc87ceb2b12ae406bd1f446c6dd086d4"
+  }
+]

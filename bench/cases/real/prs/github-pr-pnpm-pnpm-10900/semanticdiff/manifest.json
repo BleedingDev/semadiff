@@ -1,0 +1,65 @@
+[
+  {
+    "tracking_name": ".meta-updater/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=.meta-updater%2Fsrc%2Findex.ts&old_oid=67730929f61238bc18e8773d8cdeb5a1d8f32fe9&old_mode=33188&new_filename=.meta-updater%2Fsrc%2Findex.ts&new_oid=893381d6f3a8bc33cccb25149f8259ed2fac0ae1&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": ".meta-updater/src/index.ts",
+      "oid": "67730929f61238bc18e8773d8cdeb5a1d8f32fe9",
+      "mode": 33188
+    },
+    "new": {
+      "name": ".meta-updater/src/index.ts",
+      "oid": "893381d6f3a8bc33cccb25149f8259ed2fac0ae1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e3c95ff9d56a7df3c9c560c7c65f35562a766ffb4fd2e791249b3959f3e45fd8"
+  },
+  {
+    "tracking_name": "modules-mounter/daemon/__mocks__/fuse-native.js",
+    "diff": "/gh/pnpm/pnpm/diff?new_filename=modules-mounter%2Fdaemon%2F__mocks__%2Ffuse-native.js&new_oid=e0259b2b7568cfb360a3ed8437192e52fe53351f&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "new": {
+      "name": "modules-mounter/daemon/__mocks__/fuse-native.js",
+      "oid": "e0259b2b7568cfb360a3ed8437192e52fe53351f",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "9959a16739ce86acf6abc0fa2f4af92bf18f27057017bdde9a938e2dd3c61513"
+  },
+  {
+    "tracking_name": "modules-mounter/daemon/package.json",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=modules-mounter%2Fdaemon%2Fpackage.json&old_oid=c882f9c31cfad88c6ba37278158863f1c0feefdc&old_mode=33188&new_filename=modules-mounter%2Fdaemon%2Fpackage.json&new_oid=9727413c0f6401f8b1c73b9f68670db8f6fbf8dd&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "modules-mounter/daemon/package.json",
+      "oid": "c882f9c31cfad88c6ba37278158863f1c0feefdc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "modules-mounter/daemon/package.json",
+      "oid": "9727413c0f6401f8b1c73b9f68670db8f6fbf8dd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "187f41601c49f5001641dc45d31d3d04baaabd33082ac83afc7fc1811906da0c"
+  },
+  {
+    "tracking_name": "modules-mounter/daemon/test/createFuseHandlers.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=modules-mounter%2Fdaemon%2Ftest%2FcreateFuseHandlers.test.ts&old_oid=e7b2c3a04621b8949f9a120a862812ff1f60834e&old_mode=33188&new_filename=modules-mounter%2Fdaemon%2Ftest%2FcreateFuseHandlers.test.ts&new_oid=caeafa9dcc2b289e3234bf1b0d901885d30f2962&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "modules-mounter/daemon/test/createFuseHandlers.test.ts",
+      "oid": "e7b2c3a04621b8949f9a120a862812ff1f60834e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "modules-mounter/daemon/test/createFuseHandlers.test.ts",
+      "oid": "caeafa9dcc2b289e3234bf1b0d901885d30f2962",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5d328a43cd24d0d167cecd8c6603755c21d5ab5aab93bb8f79fdac8611a7f52f"
+  }
+]

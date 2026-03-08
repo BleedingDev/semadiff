@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "76fc81d1e3fbd6d2149abff23e97be71ffce62ec",
+    "filename": ".changeset/honest-peas-dress.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/module-federation/core/blob/7f967b326fa1d992dff8d2c0766c45133c92c971/.changeset%2Fhonest-peas-dress.md",
+    "raw_url": "https://github.com/module-federation/core/raw/7f967b326fa1d992dff8d2c0766c45133c92c971/.changeset%2Fhonest-peas-dress.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/.changeset%2Fhonest-peas-dress.md?ref=7f967b326fa1d992dff8d2c0766c45133c92c971",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+'@module-federation/runtime': patch\n+---\n+\n+fix: rename usePlugins to prevent swc react-refresh from throwing errors when replacing variables"
+  },
+  {
+    "sha": "b53518c667b94995f487572968333ae98ef5295d",
+    "filename": "packages/runtime/src/utils/hooks/pluginSystem.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/module-federation/core/blob/7f967b326fa1d992dff8d2c0766c45133c92c971/packages%2Fruntime%2Fsrc%2Futils%2Fhooks%2FpluginSystem.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/7f967b326fa1d992dff8d2c0766c45133c92c971/packages%2Fruntime%2Fsrc%2Futils%2Fhooks%2FpluginSystem.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Futils%2Fhooks%2FpluginSystem.ts?ref=7f967b326fa1d992dff8d2c0766c45133c92c971",
+    "patch": "@@ -17,7 +17,7 @@ export class PluginSystem<T extends Record<string, any>> {\n     this.lifecycleKeys = Object.keys(lifecycle);\n   }\n \n-  usePlugin(plugin: Plugin<T>): void {\n+  applyPlugin(plugin: Plugin<T>): void {\n     assert(isPlainObject(plugin), 'Plugin configuration is invalid.');\n     // The plugin's name is mandatory and must be unique\n     const pluginName = plugin.name;\n@@ -67,7 +67,7 @@ export class PluginSystem<T extends Record<string, any>> {\n         !this.registerPlugins[pluginName],\n         `The plugin \"${pluginName}\" has a conflict and cannot be inherited.`,\n       );\n-      this.usePlugin(registerPlugins[pluginName]);\n+      this.applyPlugin(registerPlugins[pluginName]);\n     });\n   }\n }"
+  },
+  {
+    "sha": "79693d5991c90c01c3a95b3cde0644eb1a30c51e",
+    "filename": "packages/runtime/src/utils/plugin.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/7f967b326fa1d992dff8d2c0766c45133c92c971/packages%2Fruntime%2Fsrc%2Futils%2Fplugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/7f967b326fa1d992dff8d2c0766c45133c92c971/packages%2Fruntime%2Fsrc%2Futils%2Fplugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Futils%2Fplugin.ts?ref=7f967b326fa1d992dff8d2c0766c45133c92c971",
+    "patch": "@@ -24,7 +24,7 @@ export function registerPlugins(\n   if (plugins && plugins.length > 0) {\n     plugins.forEach((plugin) => {\n       hookInstances.forEach((hookInstance) => {\n-        hookInstance.usePlugin(plugin);\n+        hookInstance.applyPlugin(plugin);\n       });\n     });\n   }"
+  }
+]

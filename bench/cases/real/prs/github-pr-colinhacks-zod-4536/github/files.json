@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "5b85c1d8b54969725c85761f2ee66006f4ac1fd0",
+    "filename": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/593c1dd22ab43162dff79cc28f7af87f24350080/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frecursive-types.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/593c1dd22ab43162dff79cc28f7af87f24350080/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frecursive-types.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frecursive-types.test.ts?ref=593c1dd22ab43162dff79cc28f7af87f24350080",
+    "patch": "@@ -1,7 +1,7 @@\n import { expect, expectTypeOf, test } from \"vitest\";\n import { z } from \"zod/v4\";\n \n-test(\"recursion with z.lazy\", () => {\n+test(\"recursive types using getter property\", () => {\n   const data = {\n     name: \"I\",\n     subcategories: ["
+  },
+  {
+    "sha": "7ef490fce66ce23cb9160667d053cc3bcdc68840",
+    "filename": "packages/zod/src/v4/mini/tests/recursive-types.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/593c1dd22ab43162dff79cc28f7af87f24350080/packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Ftests%2Frecursive-types.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/593c1dd22ab43162dff79cc28f7af87f24350080/packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Ftests%2Frecursive-types.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Ftests%2Frecursive-types.test.ts?ref=593c1dd22ab43162dff79cc28f7af87f24350080",
+    "patch": "@@ -1,7 +1,7 @@\n import { expect, expectTypeOf, test } from \"vitest\";\n import { z } from \"zod/v4-mini\";\n \n-test(\"recursion with z.lazy\", () => {\n+test(\"recursive types using getter property\", () => {\n   const data = {\n     name: \"I\",\n     subcategories: ["
+  }
+]

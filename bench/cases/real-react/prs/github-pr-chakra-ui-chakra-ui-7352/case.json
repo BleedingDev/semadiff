@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-7352",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#7352: Export \"useEditableContext\" hook",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 7352,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/7352",
+    "baseSha": "b2b5d35452bf8a7a6ed16fba0f76e1037ce9986d",
+    "headSha": "635104057de5320b969ba3f10ffef6b98713a1af",
+    "selectedFiles": [
+      "packages/components/editable/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T04:00:45.393Z"
+  },
+  "files": [
+    {
+      "id": "packages/components/editable/src/index.ts",
+      "oldPath": "packages/components/editable/src/index.ts",
+      "newPath": "packages/components/editable/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/components/editable/src/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 4,
+          "endLine": 4
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

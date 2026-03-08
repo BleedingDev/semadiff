@@ -1,0 +1,168 @@
+diff --git a/apps/runtime-demo/host/src/runtimePlugin.ts b/apps/runtime-demo/host/src/runtimePlugin.ts
+index 6e7033cddc7..e162b7b84f3 100644
+--- a/apps/runtime-demo/host/src/runtimePlugin.ts
++++ b/apps/runtime-demo/host/src/runtimePlugin.ts
+@@ -6,8 +6,8 @@ export default function (): FederationRuntimePlugin {
+       console.log('beforeInit: ', args);
+       return args;
+     },
+-    beforeLoadRemote(args) {
+-      console.log('beforeLoadRemote: ', args);
++    beforeRequest(args) {
++      console.log('beforeRequest: ', args);
+       return args;
+     },
+     //@ts-ignore
+@@ -20,8 +20,8 @@ export default function (): FederationRuntimePlugin {
+         });
+       });
+     },
+-    loadRemoteMatch(args) {
+-      console.log('loadRemoteMatch', args);
++    afterResolve(args) {
++      console.log('afterResolve', args);
+       // randomly switch between different modules
+       if (Math.random() > 0.5) {
+         args.expose = './Button1';
+@@ -30,8 +30,8 @@ export default function (): FederationRuntimePlugin {
+ 
+       return args;
+     },
+-    loadRemote(args) {
+-      console.log('loadRemote: ', args);
++    onLoad(args) {
++      console.log('onLoad: ', args);
+       return args;
+     },
+     async loadShare(args) {
+diff --git a/packages/runtime/README.md b/packages/runtime/README.md
+index 8f510fb5c0f..1cc06d0e354 100644
+--- a/packages/runtime/README.md
++++ b/packages/runtime/README.md
+@@ -203,7 +203,7 @@ function getDataConfig() {
+ function RemotesDataPlugin() {
+   return {
+     name: 'data-config',
+-    async beforeLoadRemote(args) {
++    async beforeRequest(args) {
+       const remotes = await getDataConfig();
+       origin.initOptions({
+         remotes,
+@@ -230,7 +230,7 @@ loadRemote('sub/utils').then((m) => {
+ type Plugin = {
+   name: string;
+   core: {
+-    beforeLoadRemote: AsyncWaterfallHook<{
++    beforeRequest: AsyncWaterfallHook<{
+       id: string;
+       options: Options;
+       origin: VmokHost;
+diff --git a/packages/runtime/__tests__/hooks.spec.ts b/packages/runtime/__tests__/hooks.spec.ts
+index 67e94b4401c..90fca5f9c9b 100644
+--- a/packages/runtime/__tests__/hooks.spec.ts
++++ b/packages/runtime/__tests__/hooks.spec.ts
+@@ -29,7 +29,7 @@ describe('hooks', () => {
+       init(args) {
+         initArgs = args;
+       },
+-      beforeLoadRemote(args) {
++      beforeRequest(args) {
+         return new Promise((resolve) => {
+           beforeLoadRemoteArgs = args;
+           setTimeout(
+@@ -42,7 +42,7 @@ describe('hooks', () => {
+           );
+         });
+       },
+-      loadRemote(args) {
++      onLoad(args) {
+         loadRemoteArgs = args;
+       },
+     });
+diff --git a/packages/runtime/src/core.ts b/packages/runtime/src/core.ts
+index 5c0c95fafb2..9da03a08154 100644
+--- a/packages/runtime/src/core.ts
++++ b/packages/runtime/src/core.ts
+@@ -71,13 +71,13 @@ export class FederationHost {
+       ],
+       void
+     >(),
+-    beforeLoadRemote: new AsyncWaterfallHook<{
++    beforeRequest: new AsyncWaterfallHook<{
+       id: string;
+       options: Options;
+       origin: FederationHost;
+-    }>('beforeLoadRemote'),
+-    loadRemoteMatch: new AsyncWaterfallHook<LoadRemoteMatch>('loadRemoteMatch'),
+-    loadRemote: new AsyncHook<
++    }>('beforeRequest'),
++    afterResolve: new AsyncWaterfallHook<LoadRemoteMatch>('afterResolve'),
++    onLoad: new AsyncHook<
+       [
+         {
+           id: string;
+@@ -92,7 +92,7 @@ export class FederationHost {
+         },
+       ],
+       void
+-    >('loadRemote'),
++    >('onLoad'),
+     handlePreloadModule: new SyncHook<
+       {
+         id: string;
+@@ -355,7 +355,7 @@ export class FederationHost {
+     moduleOptions: ModuleOptions;
+     remoteMatchInfo: LoadRemoteMatch;
+   }> {
+-    const loadRemoteArgs = await this.hooks.lifecycle.beforeLoadRemote.emit({
++    const loadRemoteArgs = await this.hooks.lifecycle.beforeRequest.emit({
+       id,
+       options: this.options,
+       origin: this,
+@@ -382,13 +382,13 @@ export class FederationHost {
+         } with either 'name' or 'alias' attributes.
+         3. ${idRes} is not online, injected, or loaded.
+         4. ${idRes}  cannot be accessed on the expected.
+-        5. The 'beforeLoadRemote' hook was provided but did not return the correct 'remoteInfo' when attempting to load ${idRes}.
++        5. The 'beforeRequest' hook was provided but did not return the correct 'remoteInfo' when attempting to load ${idRes}.
+       `,
+     );
+ 
+     const { remote: rawRemote } = remoteSplitInfo;
+     const remoteInfo = getRemoteInfo(rawRemote);
+-    const matchInfo = await this.hooks.lifecycle.loadRemoteMatch.emit({
++    const matchInfo = await this.hooks.lifecycle.afterResolve.emit({
+       id: idRes,
+       ...remoteSplitInfo,
+       options: this.options,
+@@ -399,7 +399,7 @@ export class FederationHost {
+     const { remote, expose } = matchInfo;
+     assert(
+       remote && expose,
+-      `The 'beforeLoadRemote' hook was executed, but it failed to return the correct 'remote' and 'expose' values while loading ${idRes}.`,
++      `The 'beforeRequest' hook was executed, but it failed to return the correct 'remote' and 'expose' values while loading ${idRes}.`,
+     );
+ 
+     let module: Module | undefined = this.moduleCache.get(remote.name);
+@@ -446,7 +446,7 @@ export class FederationHost {
+       const { pkgNameOrAlias, remote, expose, id: idRes } = remoteMatchInfo;
+       const moduleOrFactory = (await module.get(expose, options)) as T;
+ 
+-      await this.hooks.lifecycle.loadRemote.emit({
++      await this.hooks.lifecycle.onLoad.emit({
+         id: idRes,
+         pkgNameOrAlias,
+         expose,
+diff --git a/packages/runtime/src/plugins/snapshot/index.ts b/packages/runtime/src/plugins/snapshot/index.ts
+index 9ebcfaa060e..43f74babf18 100644
+--- a/packages/runtime/src/plugins/snapshot/index.ts
++++ b/packages/runtime/src/plugins/snapshot/index.ts
+@@ -26,7 +26,7 @@ export function assignRemoteInfo(
+ export function snapshotPlugin(): FederationRuntimePlugin {
+   return {
+     name: 'snapshot-plugin',
+-    async loadRemoteMatch(args) {
++    async afterResolve(args) {
+       const { remote, pkgNameOrAlias, expose, origin, remoteInfo } = args;
+ 
+       if (!isRemoteInfoWithEntry(remote) || !isPureRemoteEntry(remote)) {

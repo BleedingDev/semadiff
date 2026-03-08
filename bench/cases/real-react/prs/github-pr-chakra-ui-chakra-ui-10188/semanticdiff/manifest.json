@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "apps/compositions/src/ui/password-input.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fcompositions%2Fsrc%2Fui%2Fpassword-input.tsx&old_oid=05dc9cd052109ae78c333c4812cdc640a25055a9&old_mode=33188&new_filename=apps%2Fcompositions%2Fsrc%2Fui%2Fpassword-input.tsx&new_oid=3b9af80493ff41af57211f58de64f9df3e75fc9f&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "apps/compositions/src/ui/password-input.tsx",
+      "oid": "05dc9cd052109ae78c333c4812cdc640a25055a9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/compositions/src/ui/password-input.tsx",
+      "oid": "3b9af80493ff41af57211f58de64f9df3e75fc9f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "781f147bc0284963c75495f553952b29455461e14d5edd2458dfe6a6037bf309"
+  }
+]

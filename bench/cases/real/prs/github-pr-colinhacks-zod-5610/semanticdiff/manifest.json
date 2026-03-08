@@ -1,0 +1,43 @@
+[
+  {
+    "tracking_name": "packages/zod/src/v4/core/tests/locales/hr.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fcore%2Ftests%2Flocales%2Fhr.test.ts&new_oid=14b529424091e7785c7f5998bea9f6d734c0c081&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": "packages/zod/src/v4/core/tests/locales/hr.test.ts",
+      "oid": "14b529424091e7785c7f5998bea9f6d734c0c081",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "93c4e37e767bf87478fbabbb3ad2f3a5a1431b22947f714fe9ba86ad58283330"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/locales/hr.ts",
+    "diff": "/gh/colinhacks/zod/diff?new_filename=packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Fhr.ts&new_oid=124c5a27994a538ce33b44f29a424098b20306d8&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "new": {
+      "name": "packages/zod/src/v4/locales/hr.ts",
+      "oid": "124c5a27994a538ce33b44f29a424098b20306d8",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "fd8ac3c1920be0da2074dfa4d9d31ff5984f8339719e3b78dc7c40b88ff655b0"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/locales/index.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts&old_oid=b48028e8b9d9b19fbc81e2196c16f2860255127f&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Flocales%2Findex.ts&new_oid=38526c336a7a1d619bb1a2a09c41bd692dcd4ce9&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/zod/src/v4/locales/index.ts",
+      "oid": "b48028e8b9d9b19fbc81e2196c16f2860255127f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/locales/index.ts",
+      "oid": "38526c336a7a1d619bb1a2a09c41bd692dcd4ce9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b046c4e8feda08b3e5335f6aafc816adfd09b3a323b23646c32e22ac2c9946e0"
+  }
+]

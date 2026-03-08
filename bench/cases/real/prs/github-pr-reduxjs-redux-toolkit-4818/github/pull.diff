@@ -1,0 +1,222 @@
+diff --git a/packages/toolkit/src/query/core/apiState.ts b/packages/toolkit/src/query/core/apiState.ts
+index 187208f824..307706ded9 100644
+--- a/packages/toolkit/src/query/core/apiState.ts
++++ b/packages/toolkit/src/query/core/apiState.ts
+@@ -30,34 +30,31 @@ export type RefetchConfigOptions = {
+   refetchOnFocus: boolean
+ }
+ 
+-export type GetNextPageParamFunction<TPageParam, TQueryFnData> = (
+-  lastPage: TQueryFnData,
+-  allPages: Array<TQueryFnData>,
+-  lastPageParam: TPageParam,
+-  allPageParams: Array<TPageParam>,
+-) => TPageParam | undefined | null
++export type PageParamFunction<DataType, PageParam> = (
++  firstPage: DataType,
++  allPages: Array<DataType>,
++  firstPageParam: PageParam,
++  allPageParams: Array<PageParam>,
++) => PageParam | undefined | null
+ 
+-export type GetPreviousPageParamFunction<TPageParam, TQueryFnData> = (
+-  firstPage: TQueryFnData,
+-  allPages: Array<TQueryFnData>,
+-  firstPageParam: TPageParam,
+-  allPageParams: Array<TPageParam>,
+-) => TPageParam | undefined | null
+-
+-export type InfiniteQueryConfigOptions<TQueryFnData, TPageParam> = {
+-  initialPageParam: TPageParam
++export type InfiniteQueryConfigOptions<DataType, PageParam> = {
++  initialPageParam: PageParam
+   maxPages?: number
+   /**
+    * This function can be set to automatically get the previous cursor for infinite queries.
+    * The result will also be used to determine the value of `hasPreviousPage`.
+    */
+-  getPreviousPageParam?: GetPreviousPageParamFunction<TPageParam, TQueryFnData>
+-  getNextPageParam: GetNextPageParamFunction<TPageParam, TQueryFnData>
++  getPreviousPageParam?: PageParamFunction<DataType, PageParam>
++  /**
++   * This function is required to automatically get the next cursor for infinite queries.
++   * The result will also be used to determine the value of `hasNextPage`.
++   */
++  getNextPageParam: PageParamFunction<DataType, PageParam>
+ }
+ 
+-export interface InfiniteData<TData, TPageParam> {
+-  pages: Array<TData>
+-  pageParams: Array<TPageParam>
++export interface InfiniteData<DataType, PageParam> {
++  pages: Array<DataType>
++  pageParams: Array<PageParam>
+ }
+ 
+ /**
+diff --git a/packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts b/packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts
+index edf435d8a9..6783ab8a4e 100644
+--- a/packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts
++++ b/packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts
+@@ -355,7 +355,7 @@ export const buildCacheLifecycleHandler: InternalHandlerBuilder = ({
+       cacheEntryRemoved,
+     }
+ 
+-    const runningHandler = onCacheEntryAdded(originalArgs, lifecycleApi)
++    const runningHandler = onCacheEntryAdded(originalArgs, lifecycleApi as any)
+     // if a `neverResolvedError` was thrown, but not handled in the running handler, do not let it leak out further
+     Promise.resolve(runningHandler).catch((e) => {
+       if (e === neverResolvedError) return
+diff --git a/packages/toolkit/src/query/core/buildMiddleware/queryLifecycle.ts b/packages/toolkit/src/query/core/buildMiddleware/queryLifecycle.ts
+index 4cb55a36dc..e2b91f7c1f 100644
+--- a/packages/toolkit/src/query/core/buildMiddleware/queryLifecycle.ts
++++ b/packages/toolkit/src/query/core/buildMiddleware/queryLifecycle.ts
+@@ -483,7 +483,7 @@ export const buildQueryLifecycleHandler: InternalHandlerBuilder = ({
+             : undefined) as any,
+           queryFulfilled,
+         }
+-        onQueryStarted(originalArgs, lifecycleApi)
++        onQueryStarted(originalArgs, lifecycleApi as any)
+       }
+     } else if (isFullfilledThunk(action)) {
+       const { requestId, baseQueryMeta } = action.meta
+diff --git a/packages/toolkit/src/query/endpointDefinitions.ts b/packages/toolkit/src/query/endpointDefinitions.ts
+index a80c11f4ca..aabeba6c02 100644
+--- a/packages/toolkit/src/query/endpointDefinitions.ts
++++ b/packages/toolkit/src/query/endpointDefinitions.ts
+@@ -21,6 +21,7 @@ import type {
+   QueryLifecycleQueryExtraOptions,
+ } from './core/buildMiddleware/queryLifecycle'
+ import type {
++  InfiniteData,
+   InfiniteQueryConfigOptions,
+   QuerySubState,
+   RootState,
+@@ -580,13 +581,13 @@ export interface InfiniteQueryExtraOptions<
+   BaseQuery extends BaseQueryFn,
+   ReducerPath extends string = string,
+ > extends CacheLifecycleInfiniteQueryExtraOptions<
+-      ResultType,
++      InfiniteData<ResultType, PageParam>,
+       QueryArg,
+       BaseQuery,
+       ReducerPath
+     >,
+     QueryLifecycleInfiniteQueryExtraOptions<
+-      ResultType,
++      InfiniteData<ResultType, PageParam>,
+       QueryArg,
+       BaseQuery,
+       ReducerPath
+diff --git a/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts b/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts
+index 1657534339..bfce2ca5db 100644
+--- a/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts
++++ b/packages/toolkit/src/query/tests/infiniteQueries.test-d.ts
+@@ -41,6 +41,18 @@ describe('Infinite queries', () => {
+ 
+             return `https://example.com/listItems?page=${pageParam}`
+           },
++          async onCacheEntryAdded(arg, api) {
++            const data = await api.cacheDataLoaded
++            expectTypeOf(data.data).toEqualTypeOf<
++              InfiniteData<Pokemon[], number>
++            >()
++          },
++          async onQueryStarted(arg, api) {
++            const data = await api.queryFulfilled
++            expectTypeOf(data.data).toEqualTypeOf<
++              InfiniteData<Pokemon[], number>
++            >()
++          },
+         }),
+       }),
+     })
+diff --git a/packages/toolkit/src/query/tests/infiniteQueries.test.ts b/packages/toolkit/src/query/tests/infiniteQueries.test.ts
+index 91ef76b653..41d787b0fc 100644
+--- a/packages/toolkit/src/query/tests/infiniteQueries.test.ts
++++ b/packages/toolkit/src/query/tests/infiniteQueries.test.ts
+@@ -621,4 +621,84 @@ describe('Infinite queries', () => {
+       pageParams: [3, 4],
+     })
+   })
++
++  test('Cache lifecycle methods are called', async () => {
++    const cacheEntryAddedCallback = vi.fn()
++    const queryStartedCallback = vi.fn()
++
++    const pokemonApi = createApi({
++      baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),
++      endpoints: (builder) => ({
++        getInfinitePokemonWithLifecycles: builder.infiniteQuery<
++          Pokemon[],
++          string,
++          number
++        >({
++          infiniteQueryOptions: {
++            initialPageParam: 0,
++            getNextPageParam: (
++              lastPage,
++              allPages,
++              // Page param type should be `number`
++              lastPageParam,
++              allPageParams,
++            ) => lastPageParam + 1,
++            getPreviousPageParam: (
++              firstPage,
++              allPages,
++              firstPageParam,
++              allPageParams,
++            ) => {
++              return firstPageParam > 0 ? firstPageParam - 1 : undefined
++            },
++          },
++          query(pageParam) {
++            return `https://example.com/listItems?page=${pageParam}`
++          },
++          async onCacheEntryAdded(arg, api) {
++            const data = await api.cacheDataLoaded
++            cacheEntryAddedCallback(arg, data)
++          },
++          async onQueryStarted(arg, api) {
++            const data = await api.queryFulfilled
++            queryStartedCallback(arg, data)
++          },
++        }),
++      }),
++    })
++
++    const storeRef = setupApiStore(
++      pokemonApi,
++      { ...actionsReducer },
++      {
++        withoutTestLifecycles: true,
++      },
++    )
++
++    const res1 = storeRef.store.dispatch(
++      pokemonApi.endpoints.getInfinitePokemonWithLifecycles.initiate(
++        'fire',
++        {},
++      ),
++    )
++
++    const entry1InitialLoad = await res1
++    checkResultData(entry1InitialLoad, [[{ id: '0', name: 'Pokemon 0' }]])
++
++    expect(cacheEntryAddedCallback).toHaveBeenCalledWith('fire', {
++      data: {
++        pages: [[{ id: '0', name: 'Pokemon 0' }]],
++        pageParams: [0],
++      },
++      meta: undefined,
++    })
++
++    expect(queryStartedCallback).toHaveBeenCalledWith('fire', {
++      data: {
++        pages: [[{ id: '0', name: 'Pokemon 0' }]],
++        pageParams: [0],
++      },
++      meta: undefined,
++    })
++  })
+ })

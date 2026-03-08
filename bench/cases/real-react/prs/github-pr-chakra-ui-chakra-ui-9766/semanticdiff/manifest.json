@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/react/__stories__/radio-card.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2F__stories__%2Fradio-card.stories.tsx&old_oid=860c0ab1b36b376eb7d790aff498e7c5ced1d4a3&old_mode=33188&new_filename=packages%2Freact%2F__stories__%2Fradio-card.stories.tsx&new_oid=68e1a2e52cf0ef646dc72dd8924bc2fb00188b0c&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/react/__stories__/radio-card.stories.tsx",
+      "oid": "860c0ab1b36b376eb7d790aff498e7c5ced1d4a3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/__stories__/radio-card.stories.tsx",
+      "oid": "68e1a2e52cf0ef646dc72dd8924bc2fb00188b0c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "38e1f724b40306ccc9ff98b77cc1a17635e83cadee32639b41eab064a3c01e54"
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-vitest-dev-vitest-9716",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitest-dev/vitest#9716: fix(browser): types of `getCDPSession` and `cdp()`",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitest-dev/vitest",
+    "prNumber": 9716,
+    "prUrl": "https://github.com/vitest-dev/vitest/pull/9716",
+    "baseSha": "94eb73b519cb5ecd06c9aa178a3f0e161c96236f",
+    "headSha": "3c13cdbfae1dd3362e63fde394e26c526379eec4",
+    "selectedFiles": [
+      "packages/browser-playwright/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:23:22.725Z"
+  },
+  "files": [
+    {
+      "id": "packages/browser-playwright/src/index.ts",
+      "oldPath": "packages/browser-playwright/src/index.ts",
+      "newPath": "packages/browser-playwright/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/browser-playwright/src/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 2,
+          "endLine": 2
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

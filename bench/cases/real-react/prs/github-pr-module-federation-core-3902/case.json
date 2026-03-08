@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-3902",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3902: refactor: rename container hooks for clarity and consistency",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3902,
+    "prUrl": "https://github.com/module-federation/core/pull/3902",
+    "baseSha": "1825b9d768aeeb01dea4160184d9c3457d225e2f",
+    "headSha": "22eaadc5e3e4e728bfc0ae3780691e3e2f709e47",
+    "selectedFiles": [
+      "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts"
+    ],
+    "collectedAt": "2026-03-08T04:12:09.479Z"
+  },
+  "files": [
+    {
+      "id": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+      "oldPath": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+      "newPath": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/enhanced/src/lib/container/runtime/EmbedFederationRuntimePlugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 127,
+          "endLine": 127
+        },
+        "newRange": {
+          "startLine": 127,
+          "endLine": 127
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,2032 @@
+diff --git a/.changeset/swift-lamps-guess.md b/.changeset/swift-lamps-guess.md
+new file mode 100644
+index 00000000000..46279b1ab8f
+--- /dev/null
++++ b/.changeset/swift-lamps-guess.md
+@@ -0,0 +1,5 @@
++---
++"@chakra-ui/react": minor
++---
++
++Add new Marquee component
+diff --git a/apps/compositions/src/examples/marquee-auto-fill.tsx b/apps/compositions/src/examples/marquee-auto-fill.tsx
+new file mode 100644
+index 00000000000..8f0eaa0c07f
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-auto-fill.tsx
+@@ -0,0 +1,54 @@
++import { Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeAutoFill = () => (
++  <Marquee.Root autoFill spacing="2rem">
++    <Marquee.Viewport>
++      <Marquee.Content>
++        {items.map((item, i) => (
++          <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++            {item.icon && (
++              <item.icon
++                size="3rem"
++                aria-label={item.label}
++                color={item.color}
++              />
++            )}
++          </Marquee.Item>
++        ))}
++      </Marquee.Content>
++    </Marquee.Viewport>
++  </Marquee.Root>
++)
+diff --git a/apps/compositions/src/examples/marquee-custom-speed.tsx b/apps/compositions/src/examples/marquee-custom-speed.tsx
+new file mode 100644
+index 00000000000..7a4f70ab7c1
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-custom-speed.tsx
+@@ -0,0 +1,102 @@
++"use client"
++import { Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeCustomSpeed = () => (
++  <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
++    <div>
++      <h3>Slow (25px/s)</h3>
++      <Marquee.Root speed={25}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {items.map((item, i) => (
++              <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++                {item.icon && (
++                  <item.icon
++                    size="3rem"
++                    aria-label={item.label}
++                    color={item.color}
++                  />
++                )}
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </div>
++
++    <div>
++      <h3>Normal (50px/s)</h3>
++      <Marquee.Root speed={50}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {items.map((item, i) => (
++              <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++                {item.icon && (
++                  <item.icon
++                    size="3rem"
++                    aria-label={item.label}
++                    color={item.color}
++                  />
++                )}
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </div>
++
++    <div>
++      <h3>Fast (100px/s)</h3>
++      <Marquee.Root speed={100}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {items.map((item, i) => (
++              <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++                {item.icon && (
++                  <item.icon
++                    size="3rem"
++                    aria-label={item.label}
++                    color={item.color}
++                  />
++                )}
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </div>
++  </div>
++)
+diff --git a/apps/compositions/src/examples/marquee-diagonal.tsx b/apps/compositions/src/examples/marquee-diagonal.tsx
+new file mode 100644
+index 00000000000..809dec891b4
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-diagonal.tsx
+@@ -0,0 +1,34 @@
++"use client"
++import { Box, Marquee, Text } from "@chakra-ui/react"
++
++export const MarqueeDiagonal = () => {
++  return (
++    <Box
++      position="relative"
++      top="25%"
++      overflow="hidden"
++      transform="rotate(-2deg)"
++      bg="yellow.400"
++      py="4"
++    >
++      <Marquee.Root style={{ "--marquee-duration": "40s" } as any}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {[...Array(10)].map((_, i) => (
++              <Marquee.Item key={i} padding="0 3rem">
++                <Text
++                  color="black"
++                  fontSize="3xl"
++                  fontWeight="bold"
++                  textTransform="uppercase"
++                >
++                  Kigali Convention Conference 2026 •
++                </Text>
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </Box>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-edge-gradient.tsx b/apps/compositions/src/examples/marquee-edge-gradient.tsx
+new file mode 100644
+index 00000000000..ce6acd6c4f8
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-edge-gradient.tsx
+@@ -0,0 +1,57 @@
++"use client"
++import { Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeEdgeGradient = () => (
++  <Marquee.Root>
++    <Marquee.Edge side="start" />
++    <Marquee.Viewport>
++      <Marquee.Content>
++        {items.map((item, i) => (
++          <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++            {item.icon && (
++              <item.icon
++                size="3rem"
++                aria-label={item.label}
++                color={item.color}
++              />
++            )}
++          </Marquee.Item>
++        ))}
++      </Marquee.Content>
++    </Marquee.Viewport>
++    <Marquee.Edge side="end" />
++  </Marquee.Root>
++)
+diff --git a/apps/compositions/src/examples/marquee-finite-loop.tsx b/apps/compositions/src/examples/marquee-finite-loop.tsx
+new file mode 100644
+index 00000000000..e90805e97a0
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-finite-loop.tsx
+@@ -0,0 +1,72 @@
++"use client"
++import { Marquee } from "@chakra-ui/react"
++import { useState } from "react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeFiniteLoop = () => {
++  const [loopCount, setLoopCount] = useState(0)
++  const [completedCount, setCompletedCount] = useState(0)
++
++  return (
++    <>
++      <Marquee.Root
++        loopCount={3}
++        onLoopComplete={() => setLoopCount((prev) => prev + 1)}
++        onComplete={() => setCompletedCount((prev) => prev + 1)}
++      >
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {items.map((item, i) => (
++              <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++                {item.icon && (
++                  <item.icon
++                    size="3rem"
++                    aria-label={item.label}
++                    color={item.color}
++                  />
++                )}
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++
++      <div style={{ marginTop: "1rem" }}>
++        <p>Loop completed: {loopCount} times</p>
++        <p>Animation completed: {completedCount} times</p>
++      </div>
++    </>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-hover-expand.tsx b/apps/compositions/src/examples/marquee-hover-expand.tsx
+new file mode 100644
+index 00000000000..d7965b3684a
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-hover-expand.tsx
+@@ -0,0 +1,73 @@
++"use client"
++import { Box, Center, Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const logos = [
++  { icon: IoLogoBehance, color: "#1769ff" },
++  { icon: IoLogoFigma, color: "#F24E1E" },
++  { icon: IoLogoTwitter, color: "#1da1f2" },
++  { icon: IoLogoLinkedin, color: "#0077b5" },
++  { icon: IoLogoReact, color: "#61dafb" },
++  { icon: IoLogoNodejs, color: "#339933" },
++  { icon: IoLogoPython, color: "#3776ab" },
++  { icon: IoLogoAngular, color: "#dd0031" },
++  { icon: IoLogoAmazon, color: "#FF9900" },
++  { icon: IoLogoGitlab, color: "#fc6d26" },
++  { icon: IoLogoVimeo, color: "#1ab7ea" },
++  { icon: IoLogoVue, color: "#42b883" },
++  { icon: IoLogoJavascript, color: "#f7df1e" },
++  { icon: IoLogoAndroid, color: "#3ddc84" },
++]
++
++export const MarqueeHoverExpand = () => {
++  return (
++    <Box py="20">
++      <Marquee.Root pauseOnInteraction>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {logos.map((src, i) => (
++              <Marquee.Item
++                key={i}
++                height={"140px"}
++                display={"flex"}
++                alignItems="center"
++                justifyContent="center"
++              >
++                <Center
++                  boxSize="100px"
++                  bg="gray.100"
++                  borderRadius="xl"
++                  cursor="pointer"
++                  transition="transform 0.3s ease"
++                  _hover={{
++                    transform: "scale(1.2)",
++                    boxShadow: "sm",
++                    zIndex: 10,
++                    bg: "white",
++                  }}
++                >
++                  <Box as={src.icon} color={src.color} w="60px" h="60px" />
++                </Center>
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </Box>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-multiple.tsx b/apps/compositions/src/examples/marquee-multiple.tsx
+new file mode 100644
+index 00000000000..8ef4bf48f4d
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-multiple.tsx
+@@ -0,0 +1,72 @@
++"use client"
++import { Marquee, Stack } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++import type { IconType } from "react-icons/lib"
++
++interface Item {
++  icon: IconType
++  color: string
++}
++
++const items: Item[] = [
++  { icon: IoLogoBehance, color: "#1769ff" },
++  { icon: IoLogoFigma, color: "#F24E1E" },
++  { icon: IoLogoTwitter, color: "#1da1f2" },
++  { icon: IoLogoLinkedin, color: "#0077b5" },
++  { icon: IoLogoReact, color: "#61dafb" },
++  { icon: IoLogoNodejs, color: "#339933" },
++  { icon: IoLogoPython, color: "#3776ab" },
++  { icon: IoLogoAngular, color: "#dd0031" },
++  { icon: IoLogoAmazon, color: "#FF9900" },
++  { icon: IoLogoGitlab, color: "#fc6d26" },
++  { icon: IoLogoVimeo, color: "#1ab7ea" },
++  { icon: IoLogoVue, color: "#42b883" },
++  { icon: IoLogoJavascript, color: "#f7df1e" },
++  { icon: IoLogoAndroid, color: "#3ddc84" },
++]
++
++export const MarqueeMultiple = () => {
++  return (
++    <Stack gap="8" py="8">
++      <MarqueeRow items={items} />
++      <MarqueeRow items={items} reverse />
++    </Stack>
++  )
++}
++
++interface MarqueeRowProps {
++  items: Item[]
++  reverse?: boolean
++}
++
++const MarqueeRow = (props: MarqueeRowProps) => {
++  const { items, reverse = false } = props
++  return (
++    <Marquee.Root reverse={reverse}>
++      <Marquee.Viewport>
++        <Marquee.Content>
++          {items.map((item, i) => (
++            <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++              <item.icon size="3rem" color={item.color} />
++            </Marquee.Item>
++          ))}
++        </Marquee.Content>
++      </Marquee.Viewport>
++    </Marquee.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-news-ticker.tsx b/apps/compositions/src/examples/marquee-news-ticker.tsx
+new file mode 100644
+index 00000000000..f59dbd3ab1f
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-news-ticker.tsx
+@@ -0,0 +1,55 @@
++"use client"
++import { Box, Flex, Marquee, Text } from "@chakra-ui/react"
++import { IoEllipse } from "react-icons/io5"
++
++const newsItems = [
++  "Bitcoin hits all-time high",
++  "New React version released",
++  "SpaceX successfully lands rocket",
++  "Global markets rally today",
++  "AI regulation talks begin in EU",
++]
++
++export const MarqueeNewsTicker = () => {
++  return (
++    <Flex
++      align="center"
++      bg="red.600"
++      color="white"
++      borderY="2px solid"
++      borderColor="red.800"
++    >
++      <Box
++        bg="red.800"
++        px="4"
++        py="2"
++        fontWeight="bold"
++        zIndex={2}
++        boxShadow="5px 0 10px rgba(0,0,0,0.2)"
++      >
++        LATEST NEWS
++      </Box>
++
++      <Marquee.Root style={{ "--marquee-duration": "40s" } as any}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {newsItems.map((item, i) => (
++              <Marquee.Item key={i} padding="0 2rem">
++                <Flex align="center" gap="3">
++                  <Text
++                    fontWeight="medium"
++                    fontFamily="mono"
++                    textTransform="uppercase"
++                  >
++                    {item}
++                  </Text>
++                  <Box as={IoEllipse} color="red.200" />
++                </Flex>
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </Flex>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-parallax.tsx b/apps/compositions/src/examples/marquee-parallax.tsx
+new file mode 100644
+index 00000000000..964ebd91c1c
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-parallax.tsx
+@@ -0,0 +1,60 @@
++"use client"
++import { Marquee, Stack, Text } from "@chakra-ui/react"
++
++const words = ["DESIGN", "DEVELOP", "SHIP", "SCALE", "ITERATE"]
++
++export const MarqueeParallax = () => {
++  return (
++    <Stack gap="0" py="10" overflow="hidden" bg="black" color="white">
++      <Marquee.Root
++        opacity="0.4"
++        style={{ "--marquee-duration": "60s" } as any}
++      >
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {words.map((text, i) => (
++              <MarqueeItem key={i} text={text} fontSize="4xl" />
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++
++      <Marquee.Root
++        reverse
++        opacity="0.7"
++        style={
++          {
++            "--marquee-duration": "30s",
++            "--marquee-direction": "reverse",
++          } as any
++        }
++      >
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {words.map((text, i) => (
++              <MarqueeItem key={i} text={text} fontSize="6xl" />
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++
++      <Marquee.Root style={{ "--marquee-duration": "15s" } as any}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {words.map((text, i) => (
++              <MarqueeItem key={i} text={text} fontSize="8xl" />
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.Root>
++    </Stack>
++  )
++}
++
++const MarqueeItem = ({ text, fontSize }: any) => (
++  <Marquee.Item padding="0 2rem">
++    <Text fontSize={fontSize} fontWeight="black" letterSpacing="tighter">
++      {text}
++    </Text>
++  </Marquee.Item>
++)
+diff --git a/apps/compositions/src/examples/marquee-pause-interactions.tsx b/apps/compositions/src/examples/marquee-pause-interactions.tsx
+new file mode 100644
+index 00000000000..1b3bb3b41f6
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-pause-interactions.tsx
+@@ -0,0 +1,54 @@
++"use client"
++import { Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++export const MarqueePauseInteractions = () => (
++  <Marquee.Root pauseOnInteraction>
++    <Marquee.Viewport>
++      <Marquee.Content>
++        {items.map((item, i) => (
++          <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++            {item.icon && (
++              <item.icon
++                size="3rem"
++                aria-label={item.label}
++                color={item.color}
++              />
++            )}
++          </Marquee.Item>
++        ))}
++      </Marquee.Content>
++    </Marquee.Viewport>
++  </Marquee.Root>
++)
+diff --git a/apps/compositions/src/examples/marquee-programmatic-control.tsx b/apps/compositions/src/examples/marquee-programmatic-control.tsx
+new file mode 100644
+index 00000000000..0374f333b44
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-programmatic-control.tsx
+@@ -0,0 +1,78 @@
++"use client"
++import { Button, HStack, Marquee, useMarquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeProgrammaticControl = () => {
++  const marquee = useMarquee()
++
++  return (
++    <>
++      <Marquee.RootProvider value={marquee}>
++        <Marquee.Viewport>
++          <Marquee.Content>
++            {items.map((item, i) => (
++              <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++                {item.icon && (
++                  <item.icon
++                    size="3rem"
++                    aria-label={item.label}
++                    color={item.color}
++                  />
++                )}
++              </Marquee.Item>
++            ))}
++          </Marquee.Content>
++        </Marquee.Viewport>
++      </Marquee.RootProvider>
++
++      <HStack marginTop="1rem">
++        <Button
++          variant="outline"
++          hidden={marquee.paused}
++          onClick={() => marquee.pause()}
++        >
++          Pause
++        </Button>
++        <Button
++          variant="outline"
++          hidden={!marquee.paused}
++          onClick={() => marquee.resume()}
++        >
++          Resume
++        </Button>
++      </HStack>
++    </>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-reverse-direction.tsx b/apps/compositions/src/examples/marquee-reverse-direction.tsx
+new file mode 100644
+index 00000000000..42439f2a281
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-reverse-direction.tsx
+@@ -0,0 +1,55 @@
++"use client"
++import { Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeReverseDirection = () => (
++  <Marquee.Root reverse>
++    <Marquee.Viewport>
++      <Marquee.Content>
++        {items.map((item, i) => (
++          <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++            {item.icon && (
++              <item.icon
++                size="3rem"
++                aria-label={item.label}
++                color={item.color}
++              />
++            )}
++          </Marquee.Item>
++        ))}
++      </Marquee.Content>
++    </Marquee.Viewport>
++  </Marquee.Root>
++)
+diff --git a/apps/compositions/src/examples/marquee-testimonials.tsx b/apps/compositions/src/examples/marquee-testimonials.tsx
+new file mode 100644
+index 00000000000..00b99405a5c
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-testimonials.tsx
+@@ -0,0 +1,109 @@
++"use client"
++import { Avatar, Box, HStack, Marquee, Stack, Text } from "@chakra-ui/react"
++import { IoStar } from "react-icons/io5"
++
++const testimonials = [
++  {
++    name: "Sarah Chen",
++    role: "Product Designer",
++    rating: 5,
++    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
++    content:
++      "This library saved me weeks of work. The components are accessible and easy to customize.",
++  },
++  {
++    name: "Michael Torres",
++    role: "Frontend Dev",
++    rating: 4,
++    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026704d",
++    content:
++      "The animations are buttery smooth. I love how easy it is to implement the marquee.",
++  },
++  {
++    name: "Emily Wang",
++    role: "CTO",
++    rating: 5,
++    avatar: "https://i.pravatar.cc/150?u=a04258114e29026302d",
++    content:
++      "Scalable, reliable, and beautiful. Highly recommended for any modern web project.",
++  },
++  {
++    name: "David Smith",
++    role: "Marketing Lead",
++    rating: 5,
++    avatar: "https://i.pravatar.cc/150?u=a042581f4e29026024d",
++    content:
++      "Our conversion rates increased by 15% after switching to this UI system.",
++  },
++  {
++    name: "Jessica Lee",
++    role: "Indie Hacker",
++    rating: 4,
++    avatar: "https://i.pravatar.cc/150?u=a04258a2462d826712d",
++    content:
++      "Documentation is top-notch. I was able to build my MVP in a single weekend.",
++  },
++]
++
++export const MarqueeTestimonials = () => (
++  <Box py="10">
++    <Marquee.Root pauseOnInteraction>
++      <Marquee.Edge side="start" />
++      <Marquee.Viewport>
++        <Marquee.Content>
++          {testimonials.map((item, i) => (
++            <Marquee.Item key={i} style={{ padding: "0 1rem" }}>
++              <TestimonialCard item={item} />
++            </Marquee.Item>
++          ))}
++        </Marquee.Content>
++      </Marquee.Viewport>
++      <Marquee.Edge side="end" />
++    </Marquee.Root>
++  </Box>
++)
++
++const TestimonialCard = ({ item }: { item: (typeof testimonials)[0] }) => (
++  <Box
++    w="320px"
++    p="6"
++    bg="white"
++    borderRadius="xl"
++    boxShadow="sm"
++    borderWidth="1px"
++    borderColor="gray.100"
++    whiteSpace="normal"
++    h="full"
++  >
++    <Stack gap="3">
++      <HStack gap="1">
++        {[...Array(5)].map((_, i) => (
++          <Box
++            as={IoStar}
++            key={i}
++            color={i < item.rating ? "orange.400" : "gray.200"}
++          />
++        ))}
++      </HStack>
++
++      <Text color="gray.600" fontSize="md" lineHeight="tall">
++        "{item.content}"
++      </Text>
++
++      <HStack gap="3" mt="1">
++        <Avatar.Root size="sm">
++          <Avatar.Image src={item.avatar} />
++          <Avatar.Fallback name={item.name} />
++        </Avatar.Root>
++        <Box>
++          <Text fontWeight="bold" fontSize="sm" color="gray.900">
++            {item.name}
++          </Text>
++          <Text fontSize="xs" color="gray.500">
++            {item.role}
++          </Text>
++        </Box>
++      </HStack>
++    </Stack>
++  </Box>
++)
+diff --git a/apps/compositions/src/examples/marquee-velocity.tsx b/apps/compositions/src/examples/marquee-velocity.tsx
+new file mode 100644
+index 00000000000..2fc52c92ba9
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-velocity.tsx
+@@ -0,0 +1,102 @@
++"use client"
++import { Box, Marquee, Text } from "@chakra-ui/react"
++import { useEffect, useRef } from "react"
++
++export const MarqueeVelocity = () => {
++  return (
++    <Box height="30vh" pt="10">
++      <Text textAlign="center" mb="10" color="gray.500">
++        Scroll down quickly to see effect
++      </Text>
++      <VelocityRow baseSpeed={0.05}>Chakra-UI Velocity</VelocityRow>
++      <VelocityRow baseSpeed={-0.05}>Marquee Component Velocity</VelocityRow>
++    </Box>
++  )
++}
++
++const VelocityRow = ({
++  children,
++  baseSpeed = 0.05,
++}: {
++  children: string
++  baseSpeed: number
++}) => {
++  const contentRef = useRef<HTMLDivElement>(null)
++
++  const position = useRef(0)
++  const scrollVelocity = useRef(0)
++  const lastScrollY = useRef(0)
++  const rafId = useRef<number | null>(null)
++
++  useEffect(() => {
++    const handleScroll = () => {
++      const currentScrollY = window.scrollY
++      const delta = currentScrollY - lastScrollY.current
++
++      scrollVelocity.current += delta * 0.5
++      lastScrollY.current = currentScrollY
++    }
++
++    const animate = () => {
++      if (!contentRef.current) return
++      scrollVelocity.current *= 0.95
++      let moveBy = baseSpeed + scrollVelocity.current
++      position.current += moveBy
++      if (position.current <= -50) {
++        position.current = 0
++      } else if (position.current >= 0) {
++        position.current = -50
++      }
++
++      contentRef.current.style.transform = `translate3d(${position.current}%, 0, 0)`
++
++      rafId.current = requestAnimationFrame(animate)
++    }
++
++    window.addEventListener("scroll", handleScroll)
++    rafId.current = requestAnimationFrame(animate)
++
++    return () => {
++      window.removeEventListener("scroll", handleScroll)
++      if (rafId.current) cancelAnimationFrame(rafId.current)
++    }
++  }, [baseSpeed])
++
++  return (
++    <Marquee.Root>
++      <Marquee.Viewport>
++        <Marquee.Content
++          ref={contentRef}
++          style={{
++            animation: "none",
++            width: "200%",
++            display: "flex",
++          }}
++        >
++          {[...Array(4)].map((_, i) => (
++            <Marquee.Item
++              key={i}
++              style={{
++                width: "25%", // Each item is 1/4 of the 200% container
++                flexShrink: 0,
++                padding: "0 2rem",
++                display: "flex",
++                justifyContent: "center",
++              }}
++            >
++              <Text
++                fontSize="8xl"
++                fontWeight="900"
++                textTransform="uppercase"
++                lineHeight="0.8"
++                whiteSpace="nowrap"
++              >
++                {children}
++              </Text>
++            </Marquee.Item>
++          ))}
++        </Marquee.Content>
++      </Marquee.Viewport>
++    </Marquee.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/marquee-vertical-orientation.tsx b/apps/compositions/src/examples/marquee-vertical-orientation.tsx
+new file mode 100644
+index 00000000000..e9bafa335eb
+--- /dev/null
++++ b/apps/compositions/src/examples/marquee-vertical-orientation.tsx
+@@ -0,0 +1,55 @@
++"use client"
++import { Marquee } from "@chakra-ui/react"
++import {
++  IoLogoAmazon,
++  IoLogoAndroid,
++  IoLogoAngular,
++  IoLogoBehance,
++  IoLogoFigma,
++  IoLogoGitlab,
++  IoLogoJavascript,
++  IoLogoLinkedin,
++  IoLogoNodejs,
++  IoLogoPython,
++  IoLogoReact,
++  IoLogoTwitter,
++  IoLogoVimeo,
++  IoLogoVue,
++} from "react-icons/io5"
++
++const items = [
++  { icon: IoLogoBehance, label: "Behance", color: "#1769ff" },
++  { icon: IoLogoFigma, label: "Figma", color: "#F24E1E" },
++  { icon: IoLogoTwitter, label: "Twitter", color: "#1da1f2" },
++  { icon: IoLogoLinkedin, label: "LinkedIn", color: "#0077b5" },
++  { icon: IoLogoReact, label: "React", color: "#61dafb" },
++  { icon: IoLogoNodejs, label: "Node.js", color: "#339933" },
++  { icon: IoLogoPython, label: "Python", color: "#3776ab" },
++  { icon: IoLogoAngular, label: "Angular", color: "#dd0031" },
++  { icon: IoLogoAmazon, label: "Amazon", color: "#FF9900" },
++  { icon: IoLogoGitlab, label: "GitLab", color: "#fc6d26" },
++  { icon: IoLogoVimeo, label: "Vimeo", color: "#1ab7ea" },
++  { icon: IoLogoVue, label: "Vue.js", color: "#42b883" },
++  { icon: IoLogoJavascript, label: "JavaScript", color: "#f7df1e" },
++  { icon: IoLogoAndroid, label: "Android", color: "#3ddc84" },
++]
++
++export const MarqueeVerticalOrientation = () => (
++  <Marquee.Root side="bottom" height="300px">
++    <Marquee.Viewport>
++      <Marquee.Content>
++        {items.map((item, i) => (
++          <Marquee.Item key={i} style={{ padding: "0 2rem" }}>
++            {item.icon && (
++              <item.icon
++                size="3rem"
++                aria-label={item.label}
++                color={item.color}
++              />
++            )}
++          </Marquee.Item>
++        ))}
++      </Marquee.Content>
++    </Marquee.Viewport>
++  </Marquee.Root>
++)
+diff --git a/apps/www/content/docs/components/marquee.mdx b/apps/www/content/docs/components/marquee.mdx
+new file mode 100644
+index 00000000000..f316e21a5f8
+--- /dev/null
++++ b/apps/www/content/docs/components/marquee.mdx
+@@ -0,0 +1,146 @@
++---
++title: Marquee
++description:
++  Animate content horizontally or vertically with a customizable, accessible
++  marquee component.
++links:
++  source: components/marquee
++  storybook: components-marquee--auto-fill
++  recipe: marquee
++  ark: https://ark-ui.com/docs/components/marquee
++---
++
++<ExampleTabs name="marquee-auto-fill" />
++
++## Usage
++
++```js
++import { Marquee } from "@chakra-ui/react"
++```
++
++```jsx
++<Marquee.Root>
++  <Marquee.Viewport>
++    <Marquee.Content>
++      <Marquee.Item></Marquee.Item>
++    </Marquee.Content>
++  </Marquee.Viewport>
++</Marquee.Root>
++```
++
++## Examples
++
++### Reverse Direction
++
++Set the <code>direction?: "normal" | "reverse"</code> prop on
++
++<code>Marquee.Root</code> to <code>"reverse"</code> to animate content in the
++opposite direction.
++
++<ExampleTabs name="marquee-reverse-direction" />
++
++### Vertical Orientation
++
++Set the <code>orientation?: "horizontal" | "vertical"</code> prop on
++
++<code>Marquee.Root</code> to <code>"vertical"</code> to animate content along
++the Y axis.
++
++<ExampleTabs name="marquee-vertical-orientation" />
++
++### Custom Speed
++
++Control the animation speed by passing a numeric <code>speed?: number</code>
++prop (pixels per second) to <code>Marquee.Root</code>.
++
++<ExampleTabs name="marquee-custom-speed" />
++
++### Pause On Interaction
++
++Enable <code>pauseOnHover?: boolean</code> and/or <code>pauseOnFocus?:
++boolean</code> on <code>Marquee.Root</code> to pause animation when hovered or
++focused.
++
++<ExampleTabs name="marquee-pause-interactions" />
++
++### Programmatic Control
++
++Set <code>paused?: boolean</code> on <code>Marquee.Root</code> to control
++animation state, or use a ref to call imperative methods for advanced control.
++
++<ExampleTabs name="marquee-programmatic-control" />
++
++### Finite Loops
++
++Specify <code>loop?: number</code> on <code>Marquee.Root</code> to define a
++finite number of animation cycles before stopping.
++
++<ExampleTabs name="marquee-finite-loop" />
++
++### Edge Gradient
++
++Apply an edge fade by setting <code>edgeGradient?: boolean |
++EdgeGradientProps</code> on <code>Marquee.Root</code>.
++
++<ExampleTabs name="marquee-edge-gradient" />
++
++### Multiple Marquees
++
++Render multiple <code>Marquee.Root</code> components in parallel, each with
++independent prop configurations, to display several marquees simultaneously.
++
++<ExampleTabs name="marquee-multiple" />
++
++### Hover Expand
++
++Combine <code>pauseOnHover</code> with custom CSS transitions on
++
++<code>Marquee.Viewport</code> or <code>Marquee.Content</code> to implement
++hover-based expansion effects.
++
++<ExampleTabs name="marquee-hover-expand" />
++
++### Parallax
++
++Stack multiple <code>Marquee.Root</code> components with distinct
++
++<code>speed</code> prop values to achieve a parallax scrolling effect.
++
++<ExampleTabs name="marquee-parallax" />
++
++### Diagonal
++
++Combine <code>direction</code>, <code>orientation</code>, and custom CSS
++transforms on <code>Marquee.Content</code> to animate content diagonally.
++
++<ExampleTabs name="marquee-diagonal" />
++
++### News Ticker
++
++Implement a news ticker by passing a list of items as <code>Marquee.Item</code>
++children and configuring <code>speed</code> and <code>pauseOnHover</code> on
++
++<code>Marquee.Root</code>.
++
++<ExampleTabs name="marquee-news-ticker" />
++
++### Testimonials
++
++Display testimonials by mapping testimonial data to <code>Marquee.Item</code>
++children and controlling animation with <code>speed</code> and <code>loop</code>
++props.
++
++<ExampleTabs name="marquee-testimonials" />
++
++### Velocity
++
++Fine-tune animation velocity by adjusting the <code>speed?: number</code> prop
++on <code>Marquee.Root</code>.
++
++<ExampleTabs name="marquee-velocity" />
++
++## Props
++
++<PropTable component="Marquee" part="Root" />
++
++---
+diff --git a/apps/www/public/r/types/action-bar.json b/apps/www/public/r/types/action-bar.json
+index 66d5f2ca91e..3ccc60d546c 100644
+--- a/apps/www/public/r/types/action-bar.json
++++ b/apps/www/public/r/types/action-bar.json
+@@ -188,6 +188,18 @@
+         "isRequired": false,
+         "defaultValue": "false",
+         "description": "Whether to unmount on exit."
++      },
++      "colorPalette": {
++        "defaultValue": "gray",
++        "type": "\"gray\" | \"red\" | \"orange\" | \"yellow\" | \"green\" | \"teal\" | \"blue\" | \"cyan\" | \"purple\" | \"pink\"",
++        "isRequired": false,
++        "description": "The color palette of the component"
++      },
++      "placement": {
++        "type": "\"bottom\" | \"bottom-start\" | \"bottom-end\"",
++        "defaultValue": "bottom",
++        "isRequired": false,
++        "description": "The placement of the component"
+       }
+     }
+   },
+diff --git a/apps/www/public/r/types/breadcrumb.json b/apps/www/public/r/types/breadcrumb.json
+index 94621505ad1..f662a5f8dde 100644
+--- a/apps/www/public/r/types/breadcrumb.json
++++ b/apps/www/public/r/types/breadcrumb.json
+@@ -71,14 +71,6 @@
+   },
+   "Root": {
+     "props": {
+-      "separator": {
+-        "type": "React.ReactNode",
+-        "isRequired": false
+-      },
+-      "separatorGap": {
+-        "type": "SystemStyleObject[\"gap\"]",
+-        "isRequired": false
+-      },
+       "as": {
+         "type": "React.ElementType",
+         "isRequired": false,
+diff --git a/apps/www/public/r/types/index.json b/apps/www/public/r/types/index.json
+index b78a950e018..f51a137b1b6 100644
+--- a/apps/www/public/r/types/index.json
++++ b/apps/www/public/r/types/index.json
+@@ -62,6 +62,7 @@
+     "loader",
+     "locale",
+     "mark",
++    "marquee",
+     "menu",
+     "native-select",
+     "number-input",
+diff --git a/apps/www/public/r/types/marquee.json b/apps/www/public/r/types/marquee.json
+new file mode 100644
+index 00000000000..b9828117b86
+--- /dev/null
++++ b/apps/www/public/r/types/marquee.json
+@@ -0,0 +1,190 @@
++{
++  "Content": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      }
++    },
++    "element": "HTMLDivElement"
++  },
++  "Root": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      },
++      "unstyled": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Whether to remove the component's style."
++      },
++      "autoFill": {
++        "type": "boolean",
++        "isRequired": false,
++        "defaultValue": "false",
++        "description": "Whether to automatically duplicate content to fill the container."
++      },
++      "defaultPaused": {
++        "type": "boolean",
++        "isRequired": false,
++        "defaultValue": "false",
++        "description": "Whether the marquee is paused by default."
++      },
++      "delay": {
++        "type": "number",
++        "isRequired": false,
++        "defaultValue": "0",
++        "description": "The delay before the animation starts (in seconds)."
++      },
++      "ids": {
++        "type": "Partial<{ root: string; viewport: string; content: (index: number) => string }>",
++        "isRequired": false,
++        "description": "The ids of the elements in the marquee. Useful for composition."
++      },
++      "loopCount": {
++        "type": "number",
++        "isRequired": false,
++        "defaultValue": "0",
++        "description": "The number of times to loop the animation (0 = infinite)."
++      },
++      "onComplete": {
++        "type": "() => void",
++        "isRequired": false,
++        "description": "Function called when the marquee completes all loops and stops.\nOnly fires for finite loops (loopCount > 0)."
++      },
++      "onLoopComplete": {
++        "type": "() => void",
++        "isRequired": false,
++        "description": "Function called when the marquee completes one loop iteration."
++      },
++      "onPauseChange": {
++        "type": "(details: PauseStatusDetails) => void",
++        "isRequired": false,
++        "description": "Function called when the pause status changes."
++      },
++      "paused": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Whether the marquee is paused."
++      },
++      "pauseOnInteraction": {
++        "type": "boolean",
++        "isRequired": false,
++        "defaultValue": "false",
++        "description": "Whether to pause the marquee on user interaction (hover, focus)."
++      },
++      "reverse": {
++        "type": "boolean",
++        "isRequired": false,
++        "defaultValue": "false",
++        "description": "Whether to reverse the animation direction."
++      },
++      "side": {
++        "type": "Side",
++        "isRequired": false,
++        "defaultValue": "\"start\"",
++        "description": "The side/direction the marquee scrolls towards."
++      },
++      "spacing": {
++        "type": "string",
++        "isRequired": false,
++        "defaultValue": "\"1rem\"",
++        "description": "The spacing between marquee items."
++      },
++      "speed": {
++        "type": "number",
++        "isRequired": false,
++        "defaultValue": "50",
++        "description": "The speed of the marquee animation in pixels per second."
++      },
++      "translations": {
++        "type": "IntlTranslations",
++        "isRequired": false,
++        "description": "The localized messages to use."
++      }
++    },
++    "element": "HTMLDivElement"
++  },
++  "RootProvider": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      },
++      "value": {
++        "type": "UseMarqueeReturn",
++        "isRequired": true
++      }
++    },
++    "element": "HTMLDivElement"
++  },
++  "Viewport": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      }
++    },
++    "element": "HTMLDivElement"
++  },
++  "Item": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      }
++    },
++    "element": "HTMLDivElement"
++  },
++  "Edge": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      },
++      "side": {
++        "type": "Side",
++        "isRequired": true,
++        "description": "The side where the edge gradient should appear."
++      }
++    },
++    "element": "HTMLDivElement"
++  }
++}
+\ No newline at end of file
+diff --git a/apps/www/public/r/types/native-select.json b/apps/www/public/r/types/native-select.json
+index 83231599732..5efd7ae49d7 100644
+--- a/apps/www/public/r/types/native-select.json
++++ b/apps/www/public/r/types/native-select.json
+@@ -31,7 +31,7 @@
+         "description": "The color palette of the component"
+       },
+       "variant": {
+-        "type": "\"outline\" | \"subtle\" | \"plain\"",
++        "type": "\"outline\" | \"subtle\" | \"plain\" | \"ghost\"",
+         "defaultValue": "outline",
+         "isRequired": false,
+         "description": "The variant of the component"
+diff --git a/apps/www/public/r/types/radio-card.json b/apps/www/public/r/types/radio-card.json
+index 1ad98af4703..d5bdca8bdd8 100644
+--- a/apps/www/public/r/types/radio-card.json
++++ b/apps/www/public/r/types/radio-card.json
+@@ -16,34 +16,6 @@
+   },
+   "Item": {
+     "props": {
+-      "icon": {
+-        "type": "React.ReactElement",
+-        "isRequired": false
+-      },
+-      "label": {
+-        "type": "React.ReactNode",
+-        "isRequired": false
+-      },
+-      "description": {
+-        "type": "React.ReactNode",
+-        "isRequired": false
+-      },
+-      "addon": {
+-        "type": "React.ReactNode",
+-        "isRequired": false
+-      },
+-      "indicator": {
+-        "type": "React.ReactNode | null",
+-        "isRequired": false
+-      },
+-      "indicatorPlacement": {
+-        "type": "\"start\" | \"end\" | \"inside\"",
+-        "isRequired": false
+-      },
+-      "inputProps": {
+-        "type": "React.InputHTMLAttributes<HTMLInputElement>",
+-        "isRequired": false
+-      },
+       "as": {
+         "type": "React.ElementType",
+         "isRequired": false,
+diff --git a/apps/www/public/r/types/select.json b/apps/www/public/r/types/select.json
+index 6e9fc2ab894..bce70f401fe 100644
+--- a/apps/www/public/r/types/select.json
++++ b/apps/www/public/r/types/select.json
+@@ -393,7 +393,7 @@
+         "description": "The color palette of the component"
+       },
+       "variant": {
+-        "type": "\"outline\" | \"subtle\"",
++        "type": "\"outline\" | \"subtle\" | \"ghost\"",
+         "defaultValue": "outline",
+         "isRequired": false,
+         "description": "The variant of the component"
+diff --git a/apps/www/public/r/types/slider.json b/apps/www/public/r/types/slider.json
+index 322eff982a2..d72f44510b1 100644
+--- a/apps/www/public/r/types/slider.json
++++ b/apps/www/public/r/types/slider.json
+@@ -62,6 +62,20 @@
+       }
+     }
+   },
++  "MarkerLabel": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      }
++    }
++  },
+   "Range": {
+     "props": {
+       "as": {
+diff --git a/apps/www/public/r/types/toast.json b/apps/www/public/r/types/toast.json
+index 06b129cfe71..d44c1755c38 100644
+--- a/apps/www/public/r/types/toast.json
++++ b/apps/www/public/r/types/toast.json
+@@ -121,6 +121,20 @@
+       }
+     }
+   },
++  "Store": {
++    "props": {
++      "as": {
++        "type": "React.ElementType",
++        "isRequired": false,
++        "description": "The underlying element to render."
++      },
++      "asChild": {
++        "type": "boolean",
++        "isRequired": false,
++        "description": "Use the provided child element as the default rendered element, combining their props and behavior."
++      }
++    }
++  },
+   "Toaster": {
+     "props": {
+       "toaster": {
+diff --git a/packages/react/__stories__/marquee.stories.tsx b/packages/react/__stories__/marquee.stories.tsx
+new file mode 100644
+index 00000000000..a12de0c36a0
+--- /dev/null
++++ b/packages/react/__stories__/marquee.stories.tsx
+@@ -0,0 +1,29 @@
++import type { Meta } from "@storybook/react-vite"
++import { Box } from "../src"
++
++export default {
++  title: "Components / Marquee",
++  decorators: [
++    (Story) => (
++      <Box p="10">
++        <Story />
++      </Box>
++    ),
++  ],
++} satisfies Meta
++
++export { MarqueeAutoFill as AutoFill } from "compositions/examples/marquee-auto-fill"
++export { MarqueeReverseDirection as ReverseDirection } from "compositions/examples/marquee-reverse-direction"
++export { MarqueeVerticalOrientation as Vertical } from "compositions/examples/marquee-vertical-orientation"
++export { MarqueeCustomSpeed as Speed } from "compositions/examples/marquee-custom-speed"
++export { MarqueePauseInteractions as PauseOnInteraction } from "compositions/examples/marquee-pause-interactions"
++export { MarqueeProgrammaticControl as ProgrammaticControl } from "compositions/examples/marquee-programmatic-control"
++export { MarqueeFiniteLoop as FiniteLoops } from "compositions/examples/marquee-finite-loop"
++export { MarqueeEdgeGradient as WithEdges } from "compositions/examples/marquee-edge-gradient"
++export { MarqueeMultiple as Multiple } from "compositions/examples/marquee-multiple"
++export { MarqueeHoverExpand as HoverExpand } from "compositions/examples/marquee-hover-expand"
++export { MarqueeParallax as Parallax } from "compositions/examples/marquee-parallax"
++export { MarqueeDiagonal as Diagonal } from "compositions/examples/marquee-diagonal"
++export { MarqueeNewsTicker as NewsTicker } from "compositions/examples/marquee-news-ticker"
++export { MarqueeTestimonials as Testimonials } from "compositions/examples/marquee-testimonials"
++export { MarqueeVelocity as Velocity } from "compositions/examples/marquee-velocity"
+diff --git a/packages/react/src/anatomy.ts b/packages/react/src/anatomy.ts
+index da320fa2f8a..c6f05f1ae00 100644
+--- a/packages/react/src/anatomy.ts
++++ b/packages/react/src/anatomy.ts
+@@ -275,3 +275,4 @@ export { carouselAnatomy } from "@ark-ui/react/carousel"
+ 
+ export const clipboardAnatomy = arkClipboardAnatomy.extendWith("valueText")
+ export const listboxAnatomy = arkListboxAnatomy
++export { marqueeAnatomy } from "@ark-ui/react/marquee"
+diff --git a/packages/react/src/components/index.ts b/packages/react/src/components/index.ts
+index a1a81c6d390..9fb5709a498 100644
+--- a/packages/react/src/components/index.ts
++++ b/packages/react/src/components/index.ts
+@@ -111,3 +111,4 @@ export * from "./tooltip"
+ export * from "./tree-view"
+ export * from "./visually-hidden"
+ export * from "./wrap"
++export * from "./marquee"
+diff --git a/packages/react/src/components/marquee/index.ts b/packages/react/src/components/marquee/index.ts
+new file mode 100644
+index 00000000000..f233118c005
+--- /dev/null
++++ b/packages/react/src/components/marquee/index.ts
+@@ -0,0 +1,29 @@
++export {
++  MarqueeContent,
++  MarqueePropsProvider,
++  MarqueeRoot,
++  MarqueeRootProvider,
++  MarqueeViewport,
++  MarqueeItem,
++  MarqueeEdge,
++  useMarqueeStyles,
++} from "./marquee"
++
++export type {
++  MarqueeContentProps,
++  MarqueeRootProps,
++  MarqueeRootProviderProps,
++  MarqueeViewportProps,
++  MarqueeItemProps,
++  MarqueeEdgeProps,
++} from "./marquee"
++
++export * as Marquee from "./namespace"
++
++export { useMarquee, useMarqueeContext } from "@ark-ui/react/marquee"
++
++export type {
++  UseMarqueeProps,
++  UseMarqueeReturn,
++  UseMarqueeContext,
++} from "@ark-ui/react/marquee"
+diff --git a/packages/react/src/components/marquee/marquee.ts b/packages/react/src/components/marquee/marquee.ts
+new file mode 100644
+index 00000000000..371658e70bd
+--- /dev/null
++++ b/packages/react/src/components/marquee/marquee.ts
+@@ -0,0 +1,112 @@
++"use client"
++
++import type { Assign } from "@ark-ui/react"
++import { Marquee as ArkMarquee } from "@ark-ui/react/marquee"
++import {
++  type HTMLChakraProps,
++  type SlotRecipeProps,
++  type UnstyledProp,
++  createSlotRecipeContext,
++} from "../../styled-system"
++
++////////////////////////////////////////////////////////////////////////////////////
++
++const {
++  withContext,
++  useStyles: useMarqueeStyles,
++  PropsProvider,
++  withProvider,
++} = createSlotRecipeContext({ key: "marquee" })
++
++export { useMarqueeStyles }
++
++//////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeRootProviderBaseProps
++  extends Assign<ArkMarquee.RootProviderBaseProps, SlotRecipeProps<"marquee">>,
++    UnstyledProp {}
++
++export interface MarqueeRootProviderProps extends MarqueeRootProviderBaseProps {
++  children: React.ReactNode
++}
++
++export const MarqueeRootProvider = withProvider<
++  HTMLDivElement,
++  MarqueeRootProviderProps
++>(ArkMarquee.RootProvider, "root")
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeRootBaseProps
++  extends Assign<ArkMarquee.RootBaseProps, SlotRecipeProps<"marquee">>,
++    UnstyledProp {}
++
++export interface MarqueeRootProps
++  extends HTMLChakraProps<"div", MarqueeRootBaseProps> {}
++
++export const MarqueeRoot = withProvider<HTMLDivElement, MarqueeRootProps>(
++  ArkMarquee.Root,
++  "root",
++)
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export const MarqueePropsProvider =
++  PropsProvider as React.Provider<MarqueeRootBaseProps>
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeContentProps
++  extends HTMLChakraProps<"div", ArkMarquee.ContentBaseProps>,
++    UnstyledProp {}
++
++export const MarqueeContent = withContext<HTMLDivElement, MarqueeContentProps>(
++  ArkMarquee.Content,
++  "content",
++  { forwardAsChild: true },
++)
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeViewportProps
++  extends HTMLChakraProps<"div", ArkMarquee.ViewportBaseProps>,
++    UnstyledProp {}
++
++export const MarqueeViewport = withContext<
++  HTMLDivElement,
++  MarqueeViewportProps
++>(ArkMarquee.Viewport, "viewport", { forwardAsChild: true })
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeItemProps
++  extends HTMLChakraProps<"div", ArkMarquee.ItemBaseProps>,
++    UnstyledProp {}
++
++export const MarqueeItem = withContext<HTMLDivElement, MarqueeItemProps>(
++  ArkMarquee.Item,
++  "item",
++  { forwardAsChild: true },
++)
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeEdgeProps
++  extends HTMLChakraProps<"div">,
++    Assign<ArkMarquee.EdgeBaseProps, UnstyledProp> {}
++
++export const MarqueeEdge = withContext<HTMLDivElement, MarqueeEdgeProps>(
++  ArkMarquee.Edge,
++  "edge",
++)
++
++////////////////////////////////////////////////////////////////////////////////////
++
++export interface MarqueeControlProps
++  extends HTMLChakraProps<"div">,
++    UnstyledProp {}
++
++export const MarqueeControl = withContext<HTMLDivElement, MarqueeControlProps>(
++  "div",
++  "control",
++)
+diff --git a/packages/react/src/components/marquee/namespace.ts b/packages/react/src/components/marquee/namespace.ts
+new file mode 100644
+index 00000000000..ef4df548261
+--- /dev/null
++++ b/packages/react/src/components/marquee/namespace.ts
+@@ -0,0 +1,18 @@
++export {
++  MarqueeRoot as Root,
++  MarqueeRootProvider as RootProvider,
++  MarqueePropsProvider as PropsProvider,
++  MarqueeContent as Content,
++  MarqueeViewport as Viewport,
++  MarqueeItem as Item,
++  MarqueeEdge as Edge,
++} from "./marquee"
++
++export type {
++  MarqueeRootProps as RootProps,
++  MarqueeRootProviderProps as RootProviderProps,
++  MarqueeContentProps as ContentProps,
++  MarqueeViewportProps as ViewportProps,
++  MarqueeItemProps as ItemProps,
++  MarqueeEdgeProps as EdgeProps,
++} from "./marquee"
+diff --git a/packages/react/src/theme/recipes/marquee.ts b/packages/react/src/theme/recipes/marquee.ts
+new file mode 100644
+index 00000000000..fd9756c3a83
+--- /dev/null
++++ b/packages/react/src/theme/recipes/marquee.ts
+@@ -0,0 +1,99 @@
++import { marqueeAnatomy } from "../../anatomy"
++import { defineSlotRecipe } from "../../styled-system"
++
++export const marqueeSlotRecipe = defineSlotRecipe({
++  className: "chakra-marquee",
++  slots: marqueeAnatomy.keys(),
++  base: {
++    root: {
++      position: "relative",
++      width: "100%",
++      maxWidth: "100%",
++      "&[data-paused]": {
++        animationPlayState: "paused !important",
++        "& *": {
++          animationPlayState: "paused !important",
++        },
++      },
++    },
++    viewport: {
++      overflow: "hidden",
++      display: "flex",
++      width: "100%",
++      height: "100%",
++    },
++    content: {
++      display: "flex",
++      minWidth: "max-content",
++      animationTimingFunction: "linear",
++      animationFillMode: "forwards",
++      animationDuration: "var(--marquee-duration)",
++      animationDelay: "var(--marquee-delay)",
++      animationIterationCount: "var(--marquee-loop-count)",
++      "@media (prefers-reduced-motion: reduce)": {
++        animation: "none !important",
++      },
++      _motionReduce: {
++        animation: "none !important",
++      },
++      "&[data-side='start'], &[data-side='end']": {
++        animationName: "marqueeX",
++      },
++      "&[data-side='top'], &[data-side='bottom']": {
++        animationName: "marqueeY",
++      },
++      "&[data-reverse]": {
++        animationDirection: "reverse",
++      },
++      "&[data-orientation='horizontal']": {
++        flexDirection: "row",
++      },
++      "&[data-orientation='vertical']": {
++        flexDirection: "column",
++      },
++    },
++    edge: {
++      position: "absolute",
++      zIndex: 10,
++      pointerEvents: "none",
++      "&[data-side='start']": {
++        width: "20%",
++        insetY: "0",
++        insetInlineStart: "0",
++        background:
++          "linear-gradient(to right, var(--chakra-colors-bg, white), transparent)",
++        _rtl: {
++          background:
++            "linear-gradient(to left, var(--chakra-colors-bg, white), transparent)",
++        },
++      },
++      "&[data-side='end']": {
++        width: "20%",
++        insetY: "0",
++        insetInlineEnd: "0",
++        background:
++          "linear-gradient(to left, var(--chakra-colors-bg, white), transparent)",
++        _rtl: {
++          background:
++            "linear-gradient(to right, var(--chakra-colors-bg, white), transparent)",
++        },
++      },
++      "&[data-side='top']": {
++        height: "20%",
++        insetX: "0",
++        top: "0",
++        background:
++          "linear-gradient(to bottom, var(--chakra-colors-bg, white), transparent)",
++      },
++      "&[data-side='bottom']": {
++        height: "20%",
++        insetX: "0",
++        bottom: "0",
++        background:
++          "linear-gradient(to top, var(--chakra-colors-bg, white), transparent)",
++      },
++    },
++  },
++  variants: {},
++  defaultVariants: {},
++})
+diff --git a/packages/react/src/theme/slot-recipes.export.ts b/packages/react/src/theme/slot-recipes.export.ts
+index ec015f85350..43eac989cf7 100644
+--- a/packages/react/src/theme/slot-recipes.export.ts
++++ b/packages/react/src/theme/slot-recipes.export.ts
+@@ -51,3 +51,4 @@ export { timelineSlotRecipe } from "./recipes/timeline"
+ export { toastSlotRecipe } from "./recipes/toast"
+ export { tooltipSlotRecipe } from "./recipes/tooltip"
+ export { treeViewSlotRecipe } from "./recipes/tree-view"
++export { marqueeSlotRecipe } from "./recipes/marquee"
+diff --git a/packages/react/src/theme/slot-recipes.ts b/packages/react/src/theme/slot-recipes.ts
+index 56f49c03647..eb0cf3400ab 100644
+--- a/packages/react/src/theme/slot-recipes.ts
++++ b/packages/react/src/theme/slot-recipes.ts
+@@ -23,6 +23,7 @@ import { fileUploadSlotRecipe } from "./recipes/file-upload"
+ import { hoverCardSlotRecipe } from "./recipes/hover-card"
+ import { listSlotRecipe } from "./recipes/list"
+ import { listboxSlotRecipe } from "./recipes/listbox"
++import { marqueeSlotRecipe } from "./recipes/marquee"
+ import { menuSlotRecipe } from "./recipes/menu"
+ import { nativeSelectSlotRecipe } from "./recipes/native-select"
+ import { numberInputSlotRecipe } from "./recipes/number-input"
+@@ -106,4 +107,5 @@ export const slotRecipes = {
+   colorPicker: colorPickerSlotRecipe,
+   qrCode: qrCodeSlotRecipe,
+   treeView: treeViewSlotRecipe,
++  marquee: marqueeSlotRecipe,
+ }
+diff --git a/packages/react/src/theme/tokens/keyframes.ts b/packages/react/src/theme/tokens/keyframes.ts
+index cd1d4389f8b..6466c0b1d27 100644
+--- a/packages/react/src/theme/tokens/keyframes.ts
++++ b/packages/react/src/theme/tokens/keyframes.ts
+@@ -168,4 +168,14 @@ export const keyframes = defineKeyframes({
+     from: { scale: "1" },
+     to: { scale: "0.95" },
+   },
++
++  // marquee
++  marqueeX: {
++    from: { transform: "translateX(0%)" },
++    to: { transform: "translateX(var(--marquee-translate))" },
++  },
++  marqueeY: {
++    from: { transform: "translateY(0%)" },
++    to: { transform: "translateY(var(--marquee-translate))" },
++  },
+ })

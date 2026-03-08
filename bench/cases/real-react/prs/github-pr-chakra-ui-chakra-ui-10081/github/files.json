@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "be21898712d42da77c948c508b79fb8998ce11f9",
+    "filename": ".changeset/ninety-owls-sit.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/2cfef3dae6f86ed59cf894a5fa59288c7eef8860/.changeset%2Fninety-owls-sit.md",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/2cfef3dae6f86ed59cf894a5fa59288c7eef8860/.changeset%2Fninety-owls-sit.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/.changeset%2Fninety-owls-sit.md?ref=2cfef3dae6f86ed59cf894a5fa59288c7eef8860",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@chakra-ui/react\": patch\n+---\n+\n+- export `CheckboxRootProviderProps` type"
+  },
+  {
+    "sha": "604a2798ef843f16a2555781d1012600bc11d412",
+    "filename": "packages/react/src/components/checkbox/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/2cfef3dae6f86ed59cf894a5fa59288c7eef8860/packages%2Freact%2Fsrc%2Fcomponents%2Fcheckbox%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/2cfef3dae6f86ed59cf894a5fa59288c7eef8860/packages%2Freact%2Fsrc%2Fcomponents%2Fcheckbox%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fcomponents%2Fcheckbox%2Findex.ts?ref=2cfef3dae6f86ed59cf894a5fa59288c7eef8860",
+    "patch": "@@ -16,6 +16,7 @@ export type {\n   CheckboxIndicatorProps,\n   CheckboxLabelProps,\n   CheckboxRootProps,\n+  CheckboxRootProviderProps,\n   CheckboxGroupProps,\n   CheckboxCheckedChangeDetails,\n } from \"./checkbox\""
+  }
+]

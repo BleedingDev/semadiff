@@ -1,0 +1,1913 @@
+diff --git a/docs/data/visual-regression-tests/airportData.js b/docs/data/charts/dataset/airportData.js
+similarity index 100%
+rename from docs/data/visual-regression-tests/airportData.js
+rename to docs/data/charts/dataset/airportData.js
+diff --git a/docs/data/visual-regression-tests/airportData.ts b/docs/data/charts/dataset/airportData.ts
+similarity index 100%
+rename from docs/data/visual-regression-tests/airportData.ts
+rename to docs/data/charts/dataset/airportData.ts
+diff --git a/docs/data/visual-regression-tests/BarBorderRadius.js b/docs/data/visual-regression-tests/BarBorderRadius.js
+deleted file mode 100644
+index 98a1feb797147..0000000000000
+--- a/docs/data/visual-regression-tests/BarBorderRadius.js
++++ /dev/null
+@@ -1,92 +0,0 @@
+-import * as React from 'react';
+-import { BarChart } from '@mui/x-charts/BarChart';
+-import Typography from '@mui/material/Typography';
+-
+-const dataset = [
+-  [3, -7, 'First'],
+-  [0, -5, 'Second'],
+-  [10, 0, 'Third'],
+-  [9, 6, 'Fourth'],
+-  [1, 0, 'Fifth'],
+-  [0, -1, 'Sixth'],
+-  [1, -1, 'Seventh'],
+-  [2, -2, 'Eighth'],
+-].map(([high, low, order]) => ({
+-  high,
+-  low,
+-  order,
+-}));
+-const seriesH = [
+-  { dataKey: 'high', label: 'High', layout: 'horizontal', stack: 'stack' },
+-  { dataKey: 'low', label: 'Low', layout: 'horizontal', stack: 'stack' },
+-];
+-
+-const seriesV = [
+-  { dataKey: 'high', label: 'High', stack: 'stack' },
+-  { dataKey: 'low', label: 'Low', stack: 'stack' },
+-];
+-
+-const chartSettingsH = {
+-  margin: { left: 32 },
+-  dataset,
+-  width: 400,
+-  height: 400,
+-  series: seriesH,
+-  yAxis: [{ scaleType: 'band', dataKey: 'order', width: 12 }],
+-  hideLegend: true,
+-};
+-const chartSettingsV = {
+-  ...chartSettingsH,
+-  margin: { left: 0 },
+-  xAxis: [{ dataKey: 'order', height: 8 }],
+-  yAxis: undefined,
+-  series: seriesV,
+-};
+-
+-export default function BarBorderRadius() {
+-  return (
+-    <div
+-      style={{ display: 'grid', gap: 2, gridTemplateColumns: 'auto repeat(2, 1fr)' }}
+-    >
+-      <div />
+-      <Typography sx={{ justifySelf: 'center' }}>Layout: Vertical</Typography>
+-      <Typography sx={{ justifySelf: 'center' }}>Layout: Horizontal</Typography>
+-      <Typography
+-        sx={{
+-          writingMode: 'vertical-lr',
+-          rotate: '180deg',
+-          alignSelf: 'center',
+-          justifySelf: 'center',
+-        }}
+-      >
+-        Border Radius: 4px
+-      </Typography>
+-      <BarChart {...chartSettingsV} borderRadius={4} />
+-      <BarChart {...chartSettingsH} borderRadius={4} />
+-      <Typography
+-        sx={{
+-          writingMode: 'vertical-lr',
+-          rotate: '180deg',
+-          alignSelf: 'center',
+-          justifySelf: 'center',
+-        }}
+-      >
+-        Border Radius: 16px
+-      </Typography>
+-      <BarChart {...chartSettingsV} borderRadius={16} />
+-      <BarChart {...chartSettingsH} borderRadius={16} />
+-      <Typography
+-        sx={{
+-          writingMode: 'vertical-lr',
+-          rotate: '180deg',
+-          alignSelf: 'center',
+-          justifySelf: 'center',
+-        }}
+-      >
+-        Border Radius: 100px
+-      </Typography>
+-      <BarChart {...chartSettingsV} borderRadius={100} />
+-      <BarChart {...chartSettingsH} borderRadius={100} />
+-    </div>
+-  );
+-}
+diff --git a/docs/data/visual-regression-tests/PiecewiseRestrictedAxis.js b/docs/data/visual-regression-tests/PiecewiseRestrictedAxis.js
+deleted file mode 100644
+index 7ce04fb43afc2..0000000000000
+--- a/docs/data/visual-regression-tests/PiecewiseRestrictedAxis.js
++++ /dev/null
+@@ -1,47 +0,0 @@
+-import * as React from 'react';
+-import { ScatterChart } from '@mui/x-charts/ScatterChart';
+-import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
+-import Typography from '@mui/material/Typography';
+-import Stack from '@mui/material/Stack';
+-
+-const data = [
+-  { x: -6, y: 14, id: 0 },
+-  { x: 24, y: -16, id: 1 },
+-  { x: 12, y: 14, id: 2 },
+-  { x: 5, y: 5, id: 3 },
+-  { x: -18, y: -3, id: 4 },
+-  { x: -17, y: -21, id: 5 },
+-  { x: -22, y: -2, id: 6 },
+-  { x: 18, y: -8, id: 7 },
+-  { x: 5, y: -17, id: 8 },
+-  { x: 10, y: 7, id: 9 },
+-];
+-
+-export default function PiecewiseRestrictedAxis() {
+-  return (
+-    <Stack maxWidth={500}>
+-      <ScatterChart
+-        xAxis={[{ min: -25, max: 23 }]}
+-        yAxis={[
+-          {
+-            colorMap: {
+-              type: 'piecewise',
+-              thresholds: [-20, 0],
+-              colors: ['red', 'blue', 'green'],
+-            },
+-          },
+-        ]}
+-        series={[{ data }]}
+-        height={300}
+-        width={500}
+-      >
+-        <ChartsReferenceLine y={-20} lineStyle={{ stroke: 'blue' }} />
+-        <ChartsReferenceLine y={0} lineStyle={{ stroke: 'green' }} />
+-      </ScatterChart>
+-      <Typography>
+-        All blue points should be above the blue line, all green points above the
+-        green line.
+-      </Typography>
+-    </Stack>
+-  );
+-}
+diff --git a/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.js b/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.js
+deleted file mode 100644
+index 5eeab143f7163..0000000000000
+--- a/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.js
++++ /dev/null
+@@ -1,145 +0,0 @@
+-import * as React from 'react';
+-import { BarChart } from '@mui/x-charts/BarChart';
+-
+-const defaultXAxis = { dataKey: 'code', height: 45 };
+-
+-const degrees = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
+-
+-const xAxes = degrees
+-  .map((angle) => ({
+-    ...defaultXAxis,
+-    position: 'bottom',
+-    id: `angle${angle}`,
+-    tickLabelStyle: { angle },
+-  }))
+-  .concat(
+-    degrees.map((angle) => ({
+-      ...defaultXAxis,
+-      id: `top-angle${angle}`,
+-      position: 'top',
+-      tickLabelStyle: { angle },
+-    })),
+-  );
+-
+-export default function XAxisAnchorBaselineDefaults() {
+-  return (
+-    <BarChart
+-      xAxis={xAxes}
+-      // Other props
+-      width={600}
+-      height={900}
+-      dataset={usAirportPassengers}
+-      series={[{ dataKey: '2022', label: '2022' }]}
+-      hideLegend
+-      yAxis={[
+-        {
+-          valueFormatter: (value) => `${(value / 1000).toLocaleString()}k`,
+-          width: 60,
+-        },
+-      ]}
+-    />
+-  );
+-}
+-
+-const usAirportPassengers = [
+-  {
+-    fullName: 'Hartsfield–Jackson Atlanta International Airport',
+-    code: 'ATL',
+-    2022: 45396001,
+-  },
+-  {
+-    fullName: 'Dallas/Fort Worth International Airport',
+-    code: 'DFW',
+-    2022: 35345138,
+-  },
+-  {
+-    fullName: 'Denver International Airport',
+-    code: 'DEN',
+-    2022: 33773832,
+-  },
+-  {
+-    fullName: "O'Hare International Airport",
+-    code: 'ORD',
+-    2022: 33120474,
+-  },
+-  {
+-    fullName: 'Los Angeles International Airport',
+-    code: 'LAX',
+-    2022: 32326616,
+-  },
+-  {
+-    fullName: 'John F. Kennedy International Airport',
+-    code: 'JFK',
+-    2022: 26919982,
+-  },
+-  {
+-    fullName: 'Harry Reid International Airport',
+-    code: 'LAS',
+-    2022: 25480500,
+-  },
+-  {
+-    fullName: 'Orlando International Airport',
+-    code: 'MCO',
+-    2022: 24469733,
+-  },
+-  {
+-    fullName: 'Miami International Airport',
+-    code: 'MIA',
+-    2022: 23949892,
+-  },
+-  {
+-    fullName: 'Charlotte Douglas International Airport',
+-    code: 'CLT',
+-    2022: 23100300,
+-  },
+-  {
+-    fullName: 'Seattle–Tacoma International Airport',
+-    code: 'SEA',
+-    2022: 22157862,
+-  },
+-  {
+-    fullName: 'Phoenix Sky Harbor International Airport',
+-    code: 'PHX',
+-    2022: 21852586,
+-  },
+-  {
+-    fullName: 'Newark Liberty International Airport',
+-    code: 'EWR',
+-    2022: 21572147,
+-  },
+-  {
+-    fullName: 'San Francisco International Airport',
+-    code: 'SFO',
+-    2022: 20411420,
+-  },
+-  {
+-    fullName: 'George Bush Intercontinental Airport',
+-    code: 'IAH',
+-    2022: 19814052,
+-  },
+-  {
+-    fullName: 'Logan International Airport',
+-    code: 'BOS',
+-    2022: 17443775,
+-  },
+-  {
+-    fullName: 'Fort Lauderdale–Hollywood International Airport',
+-    code: 'FLL',
+-    2022: 15370165,
+-  },
+-  {
+-    fullName: 'Minneapolis–Saint Paul International Airport',
+-    code: 'MSP',
+-    2022: 15242089,
+-  },
+-  {
+-    fullName: 'LaGuardia Airport',
+-    code: 'LGA',
+-    2022: 14367463,
+-  },
+-  {
+-    fullName: 'Detroit Metropolitan Airport',
+-    code: 'DTW',
+-    2022: 13751197,
+-  },
+-];
+diff --git a/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.tsx.preview b/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.tsx.preview
+deleted file mode 100644
+index f345c7a68453a..0000000000000
+--- a/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.tsx.preview
++++ /dev/null
+@@ -1,15 +0,0 @@
+-<BarChart
+-  xAxis={xAxes}
+-  // Other props
+-  width={600}
+-  height={900}
+-  dataset={usAirportPassengers}
+-  series={[{ dataKey: '2022', label: '2022' }]}
+-  hideLegend
+-  yAxis={[
+-    {
+-      valueFormatter: (value: number) => `${(value / 1000).toLocaleString()}k`,
+-      width: 60,
+-    },
+-  ]}
+-/>
+\ No newline at end of file
+diff --git a/docs/data/visual-regression-tests/XAxisTickLabelOverflow.js b/docs/data/visual-regression-tests/XAxisTickLabelOverflow.js
+deleted file mode 100644
+index 3d0620f60e7be..0000000000000
+--- a/docs/data/visual-regression-tests/XAxisTickLabelOverflow.js
++++ /dev/null
+@@ -1,57 +0,0 @@
+-import * as React from 'react';
+-import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+-
+-import { usAirportPassengersData } from './airportData';
+-
+-const defaultXAxis = {
+-  dataKey: 'code',
+-  height: 80,
+-  valueFormatter: (value) =>
+-    usAirportPassengersData.find((item) => item.code === value).fullName,
+-  label: '0deg Axis Title',
+-};
+-
+-const degrees = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
+-
+-const xAxes = degrees
+-  .map((angle) => ({
+-    ...defaultXAxis,
+-    position: 'bottom',
+-    id: `angle${angle}`,
+-    label: `${angle}deg Axis Title`,
+-    tickLabelStyle: { angle },
+-  }))
+-  .concat(
+-    degrees.map((angle) => ({
+-      ...defaultXAxis,
+-      id: `top-angle${angle}`,
+-      label: `${angle}deg Axis Title`,
+-      position: 'top',
+-      tickLabelStyle: { angle },
+-    })),
+-  );
+-
+-export default function XAxisTickLabelOverflow() {
+-  return (
+-    <BarChartPro
+-      xAxis={xAxes}
+-      // Other props
+-      height={1600}
+-      dataset={usAirportPassengersData}
+-      series={[
+-        { dataKey: '2018', label: '2018' },
+-        { dataKey: '2019', label: '2019' },
+-        { dataKey: '2020', label: '2020' },
+-        { dataKey: '2021', label: '2021' },
+-        { dataKey: '2022', label: '2022' },
+-      ]}
+-      hideLegend
+-      yAxis={[
+-        {
+-          valueFormatter: (value) => `${(value / 1000).toLocaleString()}k`,
+-          width: 60,
+-        },
+-      ]}
+-    />
+-  );
+-}
+diff --git a/docs/data/visual-regression-tests/YAxisTickLabelOverflow.js b/docs/data/visual-regression-tests/YAxisTickLabelOverflow.js
+deleted file mode 100644
+index a2c3e85af2680..0000000000000
+--- a/docs/data/visual-regression-tests/YAxisTickLabelOverflow.js
++++ /dev/null
+@@ -1,58 +0,0 @@
+-import * as React from 'react';
+-import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+-
+-import { usAirportPassengersData } from './airportData';
+-
+-const defaultYAxis = {
+-  dataKey: 'code',
+-  width: 80,
+-  valueFormatter: (value) =>
+-    usAirportPassengersData.find((item) => item.code === value).fullName,
+-  label: '0deg Axis Title',
+-};
+-
+-const degrees = [-135, -45, 0, 45, 135];
+-
+-const yAxes = degrees
+-  .map((angle) => ({
+-    ...defaultYAxis,
+-    position: 'left',
+-    id: `angle${angle}`,
+-    label: `${angle}deg Axis Title`,
+-    tickLabelStyle: { angle },
+-  }))
+-  .concat(
+-    degrees.map((angle) => ({
+-      ...defaultYAxis,
+-      id: `right-angle${angle}`,
+-      label: `${angle}deg Axis Title`,
+-      position: 'right',
+-      tickLabelStyle: { angle },
+-    })),
+-  );
+-
+-export default function YAxisTickLabelOverflow() {
+-  return (
+-    <BarChartPro
+-      yAxis={yAxes}
+-      // Other props
+-      width={850}
+-      height={400}
+-      dataset={usAirportPassengersData}
+-      layout="horizontal"
+-      series={[
+-        { dataKey: '2018', label: '2018' },
+-        { dataKey: '2019', label: '2019' },
+-        { dataKey: '2020', label: '2020' },
+-        { dataKey: '2021', label: '2021' },
+-        { dataKey: '2022', label: '2022' },
+-      ]}
+-      hideLegend
+-      xAxis={[
+-        {
+-          valueFormatter: (value) => `${(value / 1000).toLocaleString()}k`,
+-        },
+-      ]}
+-    />
+-  );
+-}
+diff --git a/docs/data/visual-regression-tests/ZoomSliderPreview.js b/docs/data/visual-regression-tests/ZoomSliderPreview.js
+deleted file mode 100644
+index e3e9b6f34d174..0000000000000
+--- a/docs/data/visual-regression-tests/ZoomSliderPreview.js
++++ /dev/null
+@@ -1,45 +0,0 @@
+-import * as React from 'react';
+-
+-import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+-import { countryData } from '../charts/dataset/countryData';
+-import { shareOfRenewables } from '../charts/dataset/shareOfRenewables';
+-
+-const percentageFormatter = new Intl.NumberFormat(undefined, {
+-  style: 'percent',
+-  minimumSignificantDigits: 1,
+-  maximumSignificantDigits: 3,
+-});
+-
+-const sortedShareOfRenewables = shareOfRenewables.toSorted(
+-  (a, b) => a.renewablesPercentage - b.renewablesPercentage,
+-);
+-const barXAxis = {
+-  id: 'x',
+-  data: sortedShareOfRenewables.map((d) => countryData[d.code].country),
+-  tickLabelStyle: { angle: -45 },
+-  height: 90,
+-};
+-const barSettings = {
+-  series: [
+-    {
+-      data: sortedShareOfRenewables.map((d) => d.renewablesPercentage / 100),
+-      valueFormatter: (v) => percentageFormatter.format(v),
+-    },
+-  ],
+-  height: 400,
+-};
+-
+-export default function ZoomSliderPreview() {
+-  return (
+-    <BarChartPro
+-      {...barSettings}
+-      xAxis={[
+-        {
+-          ...barXAxis,
+-          zoom: { filterMode: 'discard', slider: { enabled: true, preview: true } },
+-        },
+-      ]}
+-      zoomData={[{ axisId: 'x', start: 10, end: 30 }]}
+-    />
+-  );
+-}
+diff --git a/docs/data/visual-regression-tests/ZoomSliderPreview.tsx.preview b/docs/data/visual-regression-tests/ZoomSliderPreview.tsx.preview
+deleted file mode 100644
+index 0ff428cc19145..0000000000000
+--- a/docs/data/visual-regression-tests/ZoomSliderPreview.tsx.preview
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<BarChartPro
+-  {...barSettings}
+-  xAxis={[
+-    {
+-      ...barXAxis,
+-      zoom: { filterMode: 'discard', slider: { enabled: true, preview: true } },
+-    },
+-  ]}
+-  zoomData={[{ axisId: 'x', start: 10, end: 30 }]}
+-/>
+\ No newline at end of file
+diff --git a/docs/data/visual-regression-tests/BarBorderRadius.tsx b/test/regressions/charts/BarBorderRadius.tsx
+similarity index 96%
+rename from docs/data/visual-regression-tests/BarBorderRadius.tsx
+rename to test/regressions/charts/BarBorderRadius.tsx
+index d76e7991e428f..50c39a1cf99cf 100644
+--- a/docs/data/visual-regression-tests/BarBorderRadius.tsx
++++ b/test/regressions/charts/BarBorderRadius.tsx
+@@ -43,9 +43,7 @@ const chartSettingsV = {
+ 
+ export default function BarBorderRadius() {
+   return (
+-    <div
+-      style={{ display: 'grid', gap: 2, gridTemplateColumns: 'auto repeat(2, 1fr)' }}
+-    >
++    <div style={{ display: 'grid', gap: 2, gridTemplateColumns: 'auto repeat(2, 1fr)' }}>
+       <div />
+       <Typography sx={{ justifySelf: 'center' }}>Layout: Vertical</Typography>
+       <Typography sx={{ justifySelf: 'center' }}>Layout: Horizontal</Typography>
+diff --git a/test/regressions/charts/FunnelBump.js b/test/regressions/charts/FunnelBump.tsx
+similarity index 87%
+rename from test/regressions/charts/FunnelBump.js
+rename to test/regressions/charts/FunnelBump.tsx
+index f95e52b0fa166..afb6b8ec260a2 100644
+--- a/test/regressions/charts/FunnelBump.js
++++ b/test/regressions/charts/FunnelBump.tsx
+@@ -9,7 +9,7 @@ export default function FunnelBumpAndDirection() {
+     curveType: 'bump',
+     borderRadius: 10,
+     gap: 0,
+-  };
++  } as const;
+ 
+   return (
+     <Stack sx={{ width: '100%' }} flexDirection={'row'}>
+@@ -28,7 +28,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -43,7 +42,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -58,7 +56,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -73,7 +70,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -90,7 +86,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -104,7 +99,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -118,7 +112,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -132,7 +125,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -150,7 +142,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -165,7 +156,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -180,7 +170,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -195,7 +184,6 @@ export default function FunnelBumpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -212,7 +200,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -226,7 +213,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -240,7 +226,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -254,7 +239,6 @@ export default function FunnelBumpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotconfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+     </Stack>
+diff --git a/test/regressions/charts/FunnelLinear.js b/test/regressions/charts/FunnelLinear.tsx
+similarity index 87%
+rename from test/regressions/charts/FunnelLinear.js
+rename to test/regressions/charts/FunnelLinear.tsx
+index f71274ae1fec5..4a090caac86be 100644
+--- a/test/regressions/charts/FunnelLinear.js
++++ b/test/regressions/charts/FunnelLinear.tsx
+@@ -9,7 +9,7 @@ export default function FunnelLinearAndDirection() {
+     curveType: 'linear',
+     borderRadius: 10,
+     gap: 0,
+-  };
++  } as const;
+ 
+   return (
+     <Stack sx={{ width: '100%' }} flexDirection={'row'}>
+@@ -28,7 +28,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -43,7 +42,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -58,7 +56,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -73,7 +70,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -90,7 +86,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -104,7 +99,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -118,7 +112,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -132,7 +125,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -150,7 +142,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -165,7 +156,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -180,7 +170,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -195,7 +184,6 @@ export default function FunnelLinearAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -212,7 +200,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -226,7 +213,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -240,7 +226,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -254,7 +239,6 @@ export default function FunnelLinearAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+     </Stack>
+diff --git a/test/regressions/charts/FunnelLinearSharp.js b/test/regressions/charts/FunnelLinearSharp.tsx
+similarity index 87%
+rename from test/regressions/charts/FunnelLinearSharp.js
+rename to test/regressions/charts/FunnelLinearSharp.tsx
+index 85e471de14769..728c88c19bf79 100644
+--- a/test/regressions/charts/FunnelLinearSharp.js
++++ b/test/regressions/charts/FunnelLinearSharp.tsx
+@@ -9,7 +9,7 @@ export default function FunnelLinearSharpAndDirection() {
+     curveType: 'linear-sharp',
+     borderRadius: 10,
+     gap: 0,
+-  };
++  } as const;
+ 
+   return (
+     <Stack sx={{ width: '100%' }} flexDirection={'row'}>
+@@ -28,7 +28,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -43,7 +42,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -58,7 +56,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -73,7 +70,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -90,7 +86,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -104,7 +99,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -118,7 +112,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -132,7 +125,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -150,7 +142,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -165,7 +156,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -180,7 +170,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -195,7 +184,6 @@ export default function FunnelLinearSharpAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -212,7 +200,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -226,7 +213,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -240,7 +226,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -254,7 +239,6 @@ export default function FunnelLinearSharpAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+     </Stack>
+diff --git a/test/regressions/charts/FunnelPyramid.js b/test/regressions/charts/FunnelPyramid.tsx
+similarity index 87%
+rename from test/regressions/charts/FunnelPyramid.js
+rename to test/regressions/charts/FunnelPyramid.tsx
+index 71f1229e6809e..d883aaedd9197 100644
+--- a/test/regressions/charts/FunnelPyramid.js
++++ b/test/regressions/charts/FunnelPyramid.tsx
+@@ -9,7 +9,7 @@ export default function FunnelPyramidAndDirection() {
+     curveType: 'pyramid',
+     borderRadius: 10,
+     gap: 0,
+-  };
++  } as const;
+ 
+   return (
+     <Stack sx={{ width: '100%' }} flexDirection={'row'}>
+@@ -28,7 +28,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -43,7 +42,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -58,7 +56,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -73,7 +70,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -90,7 +86,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -104,7 +99,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -118,7 +112,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -132,7 +125,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -150,7 +142,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -165,7 +156,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -180,7 +170,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -195,7 +184,6 @@ export default function FunnelPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -212,7 +200,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -226,7 +213,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -240,7 +226,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -254,7 +239,6 @@ export default function FunnelPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+     </Stack>
+diff --git a/test/regressions/charts/FunnelStep.js b/test/regressions/charts/FunnelStep.tsx
+similarity index 87%
+rename from test/regressions/charts/FunnelStep.js
+rename to test/regressions/charts/FunnelStep.tsx
+index 9234be05004d5..828726df12daf 100644
+--- a/test/regressions/charts/FunnelStep.js
++++ b/test/regressions/charts/FunnelStep.tsx
+@@ -9,7 +9,7 @@ export default function FunnelStepAndDirection() {
+     curveType: 'step',
+     borderRadius: 10,
+     gap: 0,
+-  };
++  } as const;
+ 
+   return (
+     <Stack sx={{ width: '100%' }} flexDirection={'row'}>
+@@ -28,7 +28,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -43,7 +42,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -58,7 +56,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -73,7 +70,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -90,7 +86,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -104,7 +99,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -118,7 +112,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -132,7 +125,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -150,7 +142,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -165,7 +156,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -180,7 +170,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -195,7 +184,6 @@ export default function FunnelStepAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -212,7 +200,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -226,7 +213,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -240,7 +226,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -254,7 +239,6 @@ export default function FunnelStepAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+     </Stack>
+diff --git a/test/regressions/charts/FunnelStepPyramid.js b/test/regressions/charts/FunnelStepPyramid.tsx
+similarity index 87%
+rename from test/regressions/charts/FunnelStepPyramid.js
+rename to test/regressions/charts/FunnelStepPyramid.tsx
+index fd165d0f98f92..e69a6439b38d3 100644
+--- a/test/regressions/charts/FunnelStepPyramid.js
++++ b/test/regressions/charts/FunnelStepPyramid.tsx
+@@ -9,7 +9,7 @@ export default function FunnelStepPyramidAndDirection() {
+     curveType: 'step-pyramid',
+     borderRadius: 10,
+     gap: 0,
+-  };
++  } as const;
+ 
+   return (
+     <Stack sx={{ width: '100%' }} flexDirection={'row'}>
+@@ -28,7 +28,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -43,7 +42,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -58,7 +56,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -73,7 +70,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -90,7 +86,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -104,7 +99,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -118,7 +112,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -132,7 +125,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -150,7 +142,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -165,7 +156,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -180,7 +170,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -195,7 +184,6 @@ export default function FunnelStepPyramidAndDirection() {
+           gap={config.gap}
+           categoryAxis={{ scaleType: 'linear' }}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+       <Stack flex={1}>
+@@ -212,7 +200,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -226,7 +213,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -240,7 +226,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+         <FunnelChart
+           series={[
+@@ -254,7 +239,6 @@ export default function FunnelStepPyramidAndDirection() {
+           ]}
+           gap={config.gap}
+           height={180}
+-          slotConfig={{ legend: { direction: 'vertical' } }}
+         />
+       </Stack>
+     </Stack>
+diff --git a/docs/data/visual-regression-tests/PiecewiseRestrictedAxis.tsx b/test/regressions/charts/PiecewiseRestrictedAxis.tsx
+similarity index 97%
+rename from docs/data/visual-regression-tests/PiecewiseRestrictedAxis.tsx
+rename to test/regressions/charts/PiecewiseRestrictedAxis.tsx
+index 7ce04fb43afc2..9f2934e8f19b7 100644
+--- a/docs/data/visual-regression-tests/PiecewiseRestrictedAxis.tsx
++++ b/test/regressions/charts/PiecewiseRestrictedAxis.tsx
+@@ -39,8 +39,7 @@ export default function PiecewiseRestrictedAxis() {
+         <ChartsReferenceLine y={0} lineStyle={{ stroke: 'green' }} />
+       </ScatterChart>
+       <Typography>
+-        All blue points should be above the blue line, all green points above the
+-        green line.
++        All blue points should be above the blue line, all green points above the green line.
+       </Typography>
+     </Stack>
+   );
+diff --git a/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.tsx b/test/regressions/charts/XAxisAnchorBaselineDefaults.tsx
+similarity index 100%
+rename from docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.tsx
+rename to test/regressions/charts/XAxisAnchorBaselineDefaults.tsx
+index 7012851c528b0..33e8c027d953f 100644
+--- a/docs/data/visual-regression-tests/XAxisAnchorBaselineDefaults.tsx
++++ b/test/regressions/charts/XAxisAnchorBaselineDefaults.tsx
+@@ -7,42 +7,6 @@ const degrees = [-180, -135, -90, -45, 0, 45, 90, 135, 180];
+ 
+ type AxisPosition = NonNullable<BarChartProps['xAxis']>[number]['position'];
+ 
+-const xAxes = degrees
+-  .map((angle) => ({
+-    ...defaultXAxis,
+-    position: 'bottom' as AxisPosition,
+-    id: `angle${angle}`,
+-    tickLabelStyle: { angle },
+-  }))
+-  .concat(
+-    degrees.map((angle) => ({
+-      ...defaultXAxis,
+-      id: `top-angle${angle}`,
+-      position: 'top',
+-      tickLabelStyle: { angle },
+-    })),
+-  ) satisfies BarChartProps['xAxis'];
+-
+-export default function XAxisAnchorBaselineDefaults() {
+-  return (
+-    <BarChart
+-      xAxis={xAxes}
+-      // Other props
+-      width={600}
+-      height={900}
+-      dataset={usAirportPassengers}
+-      series={[{ dataKey: '2022', label: '2022' }]}
+-      hideLegend
+-      yAxis={[
+-        {
+-          valueFormatter: (value: number) => `${(value / 1000).toLocaleString()}k`,
+-          width: 60,
+-        },
+-      ]}
+-    />
+-  );
+-}
+-
+ const usAirportPassengers = [
+   {
+     fullName: 'Hartsfield–Jackson Atlanta International Airport',
+@@ -145,3 +109,39 @@ const usAirportPassengers = [
+     2022: 13751197,
+   },
+ ];
++
++const xAxes = degrees
++  .map((angle) => ({
++    ...defaultXAxis,
++    position: 'bottom' as AxisPosition,
++    id: `angle${angle}`,
++    tickLabelStyle: { angle },
++  }))
++  .concat(
++    degrees.map((angle) => ({
++      ...defaultXAxis,
++      id: `top-angle${angle}`,
++      position: 'top',
++      tickLabelStyle: { angle },
++    })),
++  ) satisfies BarChartProps['xAxis'];
++
++export default function XAxisAnchorBaselineDefaults() {
++  return (
++    <BarChart
++      xAxis={xAxes}
++      // Other props
++      width={600}
++      height={900}
++      dataset={usAirportPassengers}
++      series={[{ dataKey: '2022', label: '2022' }]}
++      hideLegend
++      yAxis={[
++        {
++          valueFormatter: (value: number) => `${(value / 1000).toLocaleString()}k`,
++          width: 60,
++        },
++      ]}
++    />
++  );
++}
+diff --git a/docs/data/visual-regression-tests/XAxisTickLabelOverflow.tsx b/test/regressions/charts/XAxisTickLabelOverflow.tsx
+similarity index 95%
+rename from docs/data/visual-regression-tests/XAxisTickLabelOverflow.tsx
+rename to test/regressions/charts/XAxisTickLabelOverflow.tsx
+index 1aebcd00dec42..273a5cb6c73d2 100644
+--- a/docs/data/visual-regression-tests/XAxisTickLabelOverflow.tsx
++++ b/test/regressions/charts/XAxisTickLabelOverflow.tsx
+@@ -1,7 +1,7 @@
+ import * as React from 'react';
+ import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+ import { BarChartProps } from '@mui/x-charts/BarChart';
+-import { usAirportPassengersData } from './airportData';
++import { usAirportPassengersData } from 'docsx/data/charts/dataset/airportData';
+ 
+ const defaultXAxis = {
+   dataKey: 'code',
+diff --git a/docs/data/visual-regression-tests/YAxisTickLabelOverflow.tsx b/test/regressions/charts/YAxisTickLabelOverflow.tsx
+similarity index 95%
+rename from docs/data/visual-regression-tests/YAxisTickLabelOverflow.tsx
+rename to test/regressions/charts/YAxisTickLabelOverflow.tsx
+index 0d69ea4e4d4b7..d0182a9a9e295 100644
+--- a/docs/data/visual-regression-tests/YAxisTickLabelOverflow.tsx
++++ b/test/regressions/charts/YAxisTickLabelOverflow.tsx
+@@ -1,7 +1,7 @@
+ import * as React from 'react';
+ import { BarChartPro } from '@mui/x-charts-pro/BarChartPro';
+ import { BarChartProps } from '@mui/x-charts/BarChart';
+-import { usAirportPassengersData } from './airportData';
++import { usAirportPassengersData } from 'docsx/data/charts/dataset/airportData';
+ 
+ const defaultYAxis = {
+   dataKey: 'code',
+diff --git a/docs/data/visual-regression-tests/ZoomSliderPreview.tsx b/test/regressions/charts/ZoomSliderPreview.tsx
+similarity index 88%
+rename from docs/data/visual-regression-tests/ZoomSliderPreview.tsx
+rename to test/regressions/charts/ZoomSliderPreview.tsx
+index b1cd0eb94b2d5..cefff1dbd792e 100644
+--- a/docs/data/visual-regression-tests/ZoomSliderPreview.tsx
++++ b/test/regressions/charts/ZoomSliderPreview.tsx
+@@ -1,8 +1,8 @@
+ import * as React from 'react';
+ import { XAxis } from '@mui/x-charts/models';
+ import { BarChartPro, BarChartProProps } from '@mui/x-charts-pro/BarChartPro';
+-import { countryData } from '../charts/dataset/countryData';
+-import { shareOfRenewables } from '../charts/dataset/shareOfRenewables';
++import { shareOfRenewables } from 'docsx/data/charts/dataset/shareOfRenewables';
++import { countryData } from 'docsx/data/charts/dataset/countryData';
+ 
+ const percentageFormatter = new Intl.NumberFormat(undefined, {
+   style: 'percent',
+diff --git a/test/regressions/pickers/DateCalendarYearOnly.tsx b/test/regressions/pickers/DateCalendarYearOnly.tsx
+deleted file mode 100644
+index 18d3f88db3652..0000000000000
+--- a/test/regressions/pickers/DateCalendarYearOnly.tsx
++++ /dev/null
+@@ -1,14 +0,0 @@
+-import * as React from 'react';
+-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+-
+-const adapterToUse = new AdapterDateFns();
+-
+-export default function DateCalendarYearOnly() {
+-  return (
+-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+-      <DateCalendar views={['year']} value={adapterToUse.date('2019-01-01T00:00:00.000')} />
+-    </LocalizationProvider>
+-  );
+-}
+diff --git a/test/regressions/pickers/OpenDatePicker.tsx b/test/regressions/pickers/OpenDatePicker.tsx
+deleted file mode 100644
+index 63bdce3cf2ff1..0000000000000
+--- a/test/regressions/pickers/OpenDatePicker.tsx
++++ /dev/null
+@@ -1,43 +0,0 @@
+-import * as React from 'react';
+-import { TransitionProps } from '@mui/material/transitions';
+-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+-
+-const adapterToUse = new AdapterDateFns();
+-
+-const NoTransition = React.forwardRef(function NoTransition(
+-  props: TransitionProps & { children?: React.ReactNode },
+-  ref: React.Ref<HTMLDivElement>,
+-) {
+-  const { children, in: inProp } = props;
+-
+-  if (!inProp) {
+-    return null;
+-  }
+-  return (
+-    <div ref={ref} tabIndex={-1}>
+-      {children}
+-    </div>
+-  );
+-});
+-
+-export default function OpenDatePicker() {
+-  return (
+-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+-      <DatePicker
+-        open
+-        slots={{
+-          desktopTransition: NoTransition,
+-        }}
+-        slotProps={{
+-          popper: {
+-            // @ts-expect-error
+-            'data-testid': 'screenshot-target',
+-          },
+-        }}
+-        value={adapterToUse.date('2019-01-01T00:00:00.000')}
+-      />
+-    </LocalizationProvider>
+-  );
+-}
+diff --git a/test/regressions/pickers/OpenDateTimePicker.tsx b/test/regressions/pickers/OpenDateTimePicker.tsx
+deleted file mode 100644
+index b5636fa160468..0000000000000
+--- a/test/regressions/pickers/OpenDateTimePicker.tsx
++++ /dev/null
+@@ -1,43 +0,0 @@
+-import * as React from 'react';
+-import { TransitionProps } from '@mui/material/transitions';
+-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+-
+-const adapterToUse = new AdapterDateFns();
+-
+-const NoTransition = React.forwardRef(function NoTransition(
+-  props: TransitionProps & { children?: React.ReactNode },
+-  ref: React.Ref<HTMLDivElement>,
+-) {
+-  const { children, in: inProp } = props;
+-
+-  if (!inProp) {
+-    return null;
+-  }
+-  return (
+-    <div ref={ref} tabIndex={-1}>
+-      {children}
+-    </div>
+-  );
+-});
+-
+-export default function OpenDateTimePicker() {
+-  return (
+-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+-      <DateTimePicker
+-        open
+-        slots={{
+-          desktopTransition: NoTransition,
+-        }}
+-        slotProps={{
+-          popper: {
+-            // @ts-expect-error
+-            'data-testid': 'screenshot-target',
+-          },
+-        }}
+-        value={adapterToUse.date('2019-01-01T00:00:00.000')}
+-      />
+-    </LocalizationProvider>
+-  );
+-}
+diff --git a/test/regressions/pickers/OpenDateTimePickerClock.tsx b/test/regressions/pickers/OpenDateTimePickerClock.tsx
+deleted file mode 100644
+index c83ca0d5684c2..0000000000000
+--- a/test/regressions/pickers/OpenDateTimePickerClock.tsx
++++ /dev/null
+@@ -1,44 +0,0 @@
+-import * as React from 'react';
+-import { TransitionProps } from '@mui/material/transitions';
+-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+-
+-const adapterToUse = new AdapterDateFns();
+-
+-const NoTransition = React.forwardRef(function NoTransition(
+-  props: TransitionProps & { children?: React.ReactNode },
+-  ref: React.Ref<HTMLDivElement>,
+-) {
+-  const { children, in: inProp } = props;
+-
+-  if (!inProp) {
+-    return null;
+-  }
+-  return (
+-    <div ref={ref} tabIndex={-1}>
+-      {children}
+-    </div>
+-  );
+-});
+-
+-export default function OpenDateTimePicker() {
+-  return (
+-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+-      <DateTimePicker
+-        open
+-        openTo="hours"
+-        slots={{
+-          desktopTransition: NoTransition,
+-        }}
+-        slotProps={{
+-          popper: {
+-            // @ts-expect-error
+-            'data-testid': 'screenshot-target',
+-          },
+-        }}
+-        value={adapterToUse.date('2019-01-01T00:00:00.000')}
+-      />
+-    </LocalizationProvider>
+-  );
+-}
+diff --git a/test/regressions/pickers/OpenTimePicker.tsx b/test/regressions/pickers/OpenTimePicker.tsx
+deleted file mode 100644
+index 6b6d1ad00544f..0000000000000
+--- a/test/regressions/pickers/OpenTimePicker.tsx
++++ /dev/null
+@@ -1,43 +0,0 @@
+-import * as React from 'react';
+-import { TransitionProps } from '@mui/material/transitions';
+-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+-
+-const adapterToUse = new AdapterDateFns();
+-
+-const NoTransition = React.forwardRef(function NoTransition(
+-  props: TransitionProps & { children?: React.ReactNode },
+-  ref: React.Ref<HTMLDivElement>,
+-) {
+-  const { children, in: inProp } = props;
+-
+-  if (!inProp) {
+-    return null;
+-  }
+-  return (
+-    <div ref={ref} tabIndex={-1}>
+-      {children}
+-    </div>
+-  );
+-});
+-
+-export default function OpenTimePicker() {
+-  return (
+-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+-      <TimePicker
+-        open
+-        slots={{
+-          desktopTransition: NoTransition,
+-        }}
+-        slotProps={{
+-          popper: {
+-            // @ts-expect-error
+-            'data-testid': 'screenshot-target',
+-          },
+-        }}
+-        value={adapterToUse.date('2019-01-01T00:00:00.000')}
+-      />
+-    </LocalizationProvider>
+-  );
+-}
+diff --git a/test/regressions/pickers/UncontrolledDateTimePicker.tsx b/test/regressions/pickers/UncontrolledDateTimePicker.tsx
+deleted file mode 100644
+index a48726bd3f0fe..0000000000000
+--- a/test/regressions/pickers/UncontrolledDateTimePicker.tsx
++++ /dev/null
+@@ -1,55 +0,0 @@
+-import * as React from 'react';
+-import { TransitionProps } from '@mui/material/transitions';
+-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+-
+-const NoTransition = React.forwardRef(function NoTransition(
+-  props: TransitionProps & { children?: React.ReactNode },
+-  ref: React.Ref<HTMLDivElement>,
+-) {
+-  const { children, in: inProp } = props;
+-
+-  if (!inProp) {
+-    return null;
+-  }
+-  return (
+-    <div ref={ref} tabIndex={-1}>
+-      {children}
+-    </div>
+-  );
+-});
+-
+-export default function UncontrolledDateTimePicker() {
+-  const [mode, toggleMode] = React.useReducer(
+-    (state) => (state === 'desktop' ? 'mobile' : 'desktop'),
+-    'desktop',
+-  );
+-  React.useEffect(() => {
+-    (window as any).muiTogglePickerMode = toggleMode;
+-    return () => {
+-      delete (window as any).muiTogglePickerMode;
+-    };
+-  }, []);
+-  const desktopMediaQuery = '(pointer: fine)';
+-
+-  return (
+-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+-      <DateTimePicker
+-        // Simulating what would happen if the media query matches/not matches
+-        // Simpler to implement than mocking window.matchMedia
+-        desktopModeMediaQuery={mode === 'desktop' ? desktopMediaQuery : `not(${desktopMediaQuery})`}
+-        slots={{
+-          desktopTransition: NoTransition,
+-        }}
+-        slotProps={{
+-          popper: {
+-            // @ts-expect-error
+-            'data-testid': 'screenshot-target',
+-          },
+-        }}
+-        value={null}
+-      />
+-    </LocalizationProvider>
+-  );
+-}
+diff --git a/test/regressions/testsBySuite.ts b/test/regressions/testsBySuite.ts
+index 319281765f216..da51b94056ab2 100644
+--- a/test/regressions/testsBySuite.ts
++++ b/test/regressions/testsBySuite.ts
+@@ -7,6 +7,11 @@ export interface Test {
+ 
+ const tests: Test[] = [];
+ 
++const removeExtension = (filePath: string) => {
++  const extStart = filePath.lastIndexOf('.');
++  return extStart >= 0 ? filePath.slice(0, extStart) : filePath;
++};
++
+ // Also use some of the demos to avoid code duplication.
+ const docsImports = import.meta.glob<React.ComponentType>(
+   [
+@@ -59,12 +64,12 @@ Object.keys(docsImports).forEach((path: string) => {
+   });
+ });
+ 
+-const regressionsImports = import.meta.glob<React.ComponentType>('./data-grid/**/*.js', {
++const regressionsImports = import.meta.glob<React.ComponentType>('./data-grid/**/*.{js,tsx}', {
+   eager: true,
+   import: 'default',
+ });
+ Object.keys(regressionsImports).forEach((path: string) => {
+-  const name = path.replace('./data-grid/', '').replace('.js', '');
++  const name = removeExtension(path.replace('./data-grid/', ''));
+   const suite = `test-regressions-data-grid`;
+ 
+   tests.push({
+@@ -75,12 +80,12 @@ Object.keys(regressionsImports).forEach((path: string) => {
+   });
+ });
+ 
+-const chartsImports = import.meta.glob<React.ComponentType>('./charts/**/*.js', {
++const chartsImports = import.meta.glob<React.ComponentType>('./charts/**/*.{js,tsx}', {
+   eager: true,
+   import: 'default',
+ });
+ Object.keys(chartsImports).forEach((path: string) => {
+-  const name = path.replace('./charts/', '').replace('.js', '');
++  const name = removeExtension(path.replace('./charts/', ''));
+   const suite = `test-regressions-charts`;
+ 
+   tests.push({
+@@ -91,6 +96,22 @@ Object.keys(chartsImports).forEach((path: string) => {
+   });
+ });
+ 
++const pickersImports = import.meta.glob<React.ComponentType>('./pickers/**/*.{js,tsx}', {
++  eager: true,
++  import: 'default',
++});
++Object.keys(pickersImports).forEach((path: string) => {
++  const name = removeExtension(path.replace('./pickers/', ''));
++  const suite = `test-regressions-pickers`;
++
++  tests.push({
++    path,
++    suite,
++    name,
++    case: pickersImports[path],
++  });
++});
++
+ export const testsBySuite = tests.reduce(
+   (acc, test) => {
+     if (!acc[test.suite]) {

@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "e162b7b84f393aeacdc3b477146806fa4c1b41ca",
+    "filename": "apps/runtime-demo/host/src/runtimePlugin.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 6,
+    "changes": 12,
+    "blob_url": "https://github.com/module-federation/core/blob/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/apps%2Fruntime-demo%2Fhost%2Fsrc%2FruntimePlugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/apps%2Fruntime-demo%2Fhost%2Fsrc%2FruntimePlugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/apps%2Fruntime-demo%2Fhost%2Fsrc%2FruntimePlugin.ts?ref=171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+    "patch": "@@ -6,8 +6,8 @@ export default function (): FederationRuntimePlugin {\n       console.log('beforeInit: ', args);\n       return args;\n     },\n-    beforeLoadRemote(args) {\n-      console.log('beforeLoadRemote: ', args);\n+    beforeRequest(args) {\n+      console.log('beforeRequest: ', args);\n       return args;\n     },\n     //@ts-ignore\n@@ -20,8 +20,8 @@ export default function (): FederationRuntimePlugin {\n         });\n       });\n     },\n-    loadRemoteMatch(args) {\n-      console.log('loadRemoteMatch', args);\n+    afterResolve(args) {\n+      console.log('afterResolve', args);\n       // randomly switch between different modules\n       if (Math.random() > 0.5) {\n         args.expose = './Button1';\n@@ -30,8 +30,8 @@ export default function (): FederationRuntimePlugin {\n \n       return args;\n     },\n-    loadRemote(args) {\n-      console.log('loadRemote: ', args);\n+    onLoad(args) {\n+      console.log('onLoad: ', args);\n       return args;\n     },\n     async loadShare(args) {"
+  },
+  {
+    "sha": "1cc06d0e3549b8d55d271517e45cc9e5630e5a78",
+    "filename": "packages/runtime/README.md",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/module-federation/core/blob/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2FREADME.md",
+    "raw_url": "https://github.com/module-federation/core/raw/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2FREADME.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2FREADME.md?ref=171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+    "patch": "@@ -203,7 +203,7 @@ function getDataConfig() {\n function RemotesDataPlugin() {\n   return {\n     name: 'data-config',\n-    async beforeLoadRemote(args) {\n+    async beforeRequest(args) {\n       const remotes = await getDataConfig();\n       origin.initOptions({\n         remotes,\n@@ -230,7 +230,7 @@ loadRemote('sub/utils').then((m) => {\n type Plugin = {\n   name: string;\n   core: {\n-    beforeLoadRemote: AsyncWaterfallHook<{\n+    beforeRequest: AsyncWaterfallHook<{\n       id: string;\n       options: Options;\n       origin: VmokHost;"
+  },
+  {
+    "sha": "90fca5f9c9ba5165450e4942f9805dfa0ed2f661",
+    "filename": "packages/runtime/__tests__/hooks.spec.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/module-federation/core/blob/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2F__tests__%2Fhooks.spec.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2F__tests__%2Fhooks.spec.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2F__tests__%2Fhooks.spec.ts?ref=171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+    "patch": "@@ -29,7 +29,7 @@ describe('hooks', () => {\n       init(args) {\n         initArgs = args;\n       },\n-      beforeLoadRemote(args) {\n+      beforeRequest(args) {\n         return new Promise((resolve) => {\n           beforeLoadRemoteArgs = args;\n           setTimeout(\n@@ -42,7 +42,7 @@ describe('hooks', () => {\n           );\n         });\n       },\n-      loadRemote(args) {\n+      onLoad(args) {\n         loadRemoteArgs = args;\n       },\n     });"
+  },
+  {
+    "sha": "9da03a0815498d3fc60c2431aa44b1cf7e08cf1a",
+    "filename": "packages/runtime/src/core.ts",
+    "status": "modified",
+    "additions": 10,
+    "deletions": 10,
+    "changes": 20,
+    "blob_url": "https://github.com/module-federation/core/blob/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2Fsrc%2Fcore.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2Fsrc%2Fcore.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Fcore.ts?ref=171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+    "patch": "@@ -71,13 +71,13 @@ export class FederationHost {\n       ],\n       void\n     >(),\n-    beforeLoadRemote: new AsyncWaterfallHook<{\n+    beforeRequest: new AsyncWaterfallHook<{\n       id: string;\n       options: Options;\n       origin: FederationHost;\n-    }>('beforeLoadRemote'),\n-    loadRemoteMatch: new AsyncWaterfallHook<LoadRemoteMatch>('loadRemoteMatch'),\n-    loadRemote: new AsyncHook<\n+    }>('beforeRequest'),\n+    afterResolve: new AsyncWaterfallHook<LoadRemoteMatch>('afterResolve'),\n+    onLoad: new AsyncHook<\n       [\n         {\n           id: string;\n@@ -92,7 +92,7 @@ export class FederationHost {\n         },\n       ],\n       void\n-    >('loadRemote'),\n+    >('onLoad'),\n     handlePreloadModule: new SyncHook<\n       {\n         id: string;\n@@ -355,7 +355,7 @@ export class FederationHost {\n     moduleOptions: ModuleOptions;\n     remoteMatchInfo: LoadRemoteMatch;\n   }> {\n-    const loadRemoteArgs = await this.hooks.lifecycle.beforeLoadRemote.emit({\n+    const loadRemoteArgs = await this.hooks.lifecycle.beforeRequest.emit({\n       id,\n       options: this.options,\n       origin: this,\n@@ -382,13 +382,13 @@ export class FederationHost {\n         } with either 'name' or 'alias' attributes.\n         3. ${idRes} is not online, injected, or loaded.\n         4. ${idRes}  cannot be accessed on the expected.\n-        5. The 'beforeLoadRemote' hook was provided but did not return the correct 'remoteInfo' when attempting to load ${idRes}.\n+        5. The 'beforeRequest' hook was provided but did not return the correct 'remoteInfo' when attempting to load ${idRes}.\n       `,\n     );\n \n     const { remote: rawRemote } = remoteSplitInfo;\n     const remoteInfo = getRemoteInfo(rawRemote);\n-    const matchInfo = await this.hooks.lifecycle.loadRemoteMatch.emit({\n+    const matchInfo = await this.hooks.lifecycle.afterResolve.emit({\n       id: idRes,\n       ...remoteSplitInfo,\n       options: this.options,\n@@ -399,7 +399,7 @@ export class FederationHost {\n     const { remote, expose } = matchInfo;\n     assert(\n       remote && expose,\n-      `The 'beforeLoadRemote' hook was executed, but it failed to return the correct 'remote' and 'expose' values while loading ${idRes}.`,\n+      `The 'beforeRequest' hook was executed, but it failed to return the correct 'remote' and 'expose' values while loading ${idRes}.`,\n     );\n \n     let module: Module | undefined = this.moduleCache.get(remote.name);\n@@ -446,7 +446,7 @@ export class FederationHost {\n       const { pkgNameOrAlias, remote, expose, id: idRes } = remoteMatchInfo;\n       const moduleOrFactory = (await module.get(expose, options)) as T;\n \n-      await this.hooks.lifecycle.loadRemote.emit({\n+      await this.hooks.lifecycle.onLoad.emit({\n         id: idRes,\n         pkgNameOrAlias,\n         expose,"
+  },
+  {
+    "sha": "43f74babf18f66743149fcf33bf262e1c81929b2",
+    "filename": "packages/runtime/src/plugins/snapshot/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2Fsrc%2Fplugins%2Fsnapshot%2Findex.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/171165def6dcc69d5ce41d2d240ac3193ffa7d8c/packages%2Fruntime%2Fsrc%2Fplugins%2Fsnapshot%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Fplugins%2Fsnapshot%2Findex.ts?ref=171165def6dcc69d5ce41d2d240ac3193ffa7d8c",
+    "patch": "@@ -26,7 +26,7 @@ export function assignRemoteInfo(\n export function snapshotPlugin(): FederationRuntimePlugin {\n   return {\n     name: 'snapshot-plugin',\n-    async loadRemoteMatch(args) {\n+    async afterResolve(args) {\n       const { remote, pkgNameOrAlias, expose, origin, remoteInfo } = args;\n \n       if (!isRemoteInfoWithEntry(remote) || !isPureRemoteEntry(remote)) {"
+  }
+]

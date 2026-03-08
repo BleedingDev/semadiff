@@ -1,0 +1,1833 @@
+diff --git a/.changeset/env-cross-platform-musl.md b/.changeset/env-cross-platform-musl.md
+index 72706efc154..9aabb1ecd21 100644
+--- a/.changeset/env-cross-platform-musl.md
++++ b/.changeset/env-cross-platform-musl.md
+@@ -4,4 +4,8 @@
+ "pnpm": minor
+ ---
+ 
+-On systems using the musl C library (e.g. Alpine Linux), `pnpm env` now automatically downloads the musl variant of Node.js from [unofficial-builds.nodejs.org](https://unofficial-builds.nodejs.org).
++On systems using the musl C library (e.g. Alpine Linux), `pnpm env use` now automatically downloads the musl variant of Node.js from [unofficial-builds.nodejs.org](https://unofficial-builds.nodejs.org).
++
++`pnpm env use` now installs Node.js via `pnpm add --global`, so Node.js versions are managed as regular global packages. Running `pnpm store prune` will clean up unused Node.js versions automatically.
++
++The `pnpm env add` and `pnpm env remove` subcommands have been removed. Use `pnpm env use` to install and activate a Node.js version. `pnpm env list` now only lists remote Node.js versions (the `--remote` flag is no longer required).
+diff --git a/.changeset/fix-windows-node-npm-shims.md b/.changeset/fix-windows-node-npm-shims.md
+new file mode 100644
+index 00000000000..3ba004f023c
+--- /dev/null
++++ b/.changeset/fix-windows-node-npm-shims.md
+@@ -0,0 +1,12 @@
++---
++"@pnpm/store.cafs": patch
++"@pnpm/worker": patch
++"@pnpm/fetching.binary-fetcher": patch
++"pnpm": patch
++---
++
++fix: preserve bundled `node_modules` from Node.js Windows zip so that npm/npx shims are created correctly on Windows.
++
++The Windows Node.js distribution places npm inside a root-level `node_modules/` directory of the zip archive. `addFilesFromDir` was skipping root-level `node_modules` (to avoid treating a package's own npm dependencies as part of its content), which caused the bundled npm to be missing after installation. This prevented `pnpm env use` from creating the npm and npx shims on Windows.
++
++Added an `includeNodeModules` option to `addFilesFromDir` and set it to `true` in the binary fetcher so that the complete Node.js distribution, including its bundled npm, is preserved.
+diff --git a/.changeset/refactor-env-use-global-bin-linker.md b/.changeset/refactor-env-use-global-bin-linker.md
+new file mode 100644
+index 00000000000..9bf1526eadb
+--- /dev/null
++++ b/.changeset/refactor-env-use-global-bin-linker.md
+@@ -0,0 +1,9 @@
++---
++"@pnpm/constants": patch
++"@pnpm/resolver-base": patch
++"@pnpm/lockfile.types": patch
++"@pnpm/node.resolver": patch
++"@pnpm/plugin-commands-env": patch
++---
++
++Added `getNodeBinsForCurrentOS` to `@pnpm/constants` which returns a `Record<string, string>` with paths for `node`, `npm`, and `npx` within the Node.js package. This record is now used as `BinaryResolution.bin` (type widened from `string` to `string | Record<string, string>`) and as `manifest.bin` in the node resolver, so pnpm's bin-linker creates all three shims automatically when installing a Node.js runtime.
+diff --git a/env/node.resolver/src/index.ts b/env/node.resolver/src/index.ts
+index 7616395fe59..bd3f0d51885 100644
+--- a/env/node.resolver/src/index.ts
++++ b/env/node.resolver/src/index.ts
+@@ -1,4 +1,4 @@
+-import { getNodeBinLocationForCurrentOS } from '@pnpm/constants'
++import { getNodeBinsForCurrentOS } from '@pnpm/constants'
+ import { fetchShasumsFile } from '@pnpm/crypto.shasums-file'
+ import { PnpmError } from '@pnpm/error'
+ import { type FetchFromRegistry } from '@pnpm/fetching-types'
+@@ -64,7 +64,7 @@ export async function resolveNodeRuntime (
+     manifest: {
+       name: 'node',
+       version,
+-      bin: getNodeBinLocationForCurrentOS(),
++      bin: getNodeBinsForCurrentOS(),
+     },
+     resolution: {
+       type: 'variations',
+@@ -129,7 +129,7 @@ async function readNodeAssetsFromMirror (
+     const resolution: BinaryResolution = {
+       type: 'binary',
+       archive: address.extname === '.zip' ? 'zip' : 'tarball',
+-      bin: getNodeBinLocationForCurrentOS(platform),
++      bin: getNodeBinsForCurrentOS(platform),
+       integrity,
+       url,
+     }
+diff --git a/env/plugin-commands-env/package.json b/env/plugin-commands-env/package.json
+index 8f2d4f8b5e7..90614029bc5 100644
+--- a/env/plugin-commands-env/package.json
++++ b/env/plugin-commands-env/package.json
+@@ -34,23 +34,11 @@
+   "dependencies": {
+     "@pnpm/cli-utils": "workspace:*",
+     "@pnpm/config": "workspace:*",
+-    "@pnpm/env.system-node-version": "workspace:*",
+     "@pnpm/error": "workspace:*",
++    "@pnpm/exec.pnpm-cli-runner": "workspace:*",
+     "@pnpm/fetch": "workspace:*",
+-    "@pnpm/node.fetcher": "workspace:*",
+     "@pnpm/node.resolver": "workspace:*",
+-    "@pnpm/remove-bins": "workspace:*",
+-    "@pnpm/store-path": "workspace:*",
+-    "@pnpm/types": "workspace:*",
+-    "@zkochan/cmd-shim": "catalog:",
+-    "@zkochan/rimraf": "catalog:",
+-    "graceful-fs": "catalog:",
+-    "is-windows": "catalog:",
+-    "load-json-file": "catalog:",
+-    "render-help": "catalog:",
+-    "semver": "catalog:",
+-    "symlink-dir": "catalog:",
+-    "write-json-file": "catalog:"
++    "render-help": "catalog:"
+   },
+   "peerDependencies": {
+     "@pnpm/logger": "catalog:"
+@@ -58,19 +46,7 @@
+   "devDependencies": {
+     "@jest/globals": "catalog:",
+     "@pnpm/logger": "workspace:*",
+-    "@pnpm/plugin-commands-env": "workspace:*",
+-    "@pnpm/prepare": "workspace:*",
+-    "@types/graceful-fs": "catalog:",
+-    "@types/is-windows": "catalog:",
+-    "@types/semver": "catalog:",
+-    "@types/tar-stream": "catalog:",
+-    "@types/yazl": "catalog:",
+-    "execa": "catalog:",
+-    "nock": "catalog:",
+-    "node-fetch": "catalog:",
+-    "path-name": "catalog:",
+-    "tar-stream": "catalog:",
+-    "yazl": "catalog:"
++    "@pnpm/plugin-commands-env": "workspace:*"
+   },
+   "engines": {
+     "node": ">=22.13"
+diff --git a/env/plugin-commands-env/src/downloadNodeVersion.ts b/env/plugin-commands-env/src/downloadNodeVersion.ts
+deleted file mode 100644
+index 99059c5a921..00000000000
+--- a/env/plugin-commands-env/src/downloadNodeVersion.ts
++++ /dev/null
+@@ -1,41 +0,0 @@
+-import { resolveNodeVersion, parseEnvSpecifier, getNodeMirror } from '@pnpm/node.resolver'
+-import { getNodeDir, type NvmNodeCommandOptions } from './node.js'
+-import { createFetchFromRegistry } from '@pnpm/fetch'
+-import { globalInfo } from '@pnpm/logger'
+-
+-export interface GetNodeVersionResult {
+-  nodeVersion: string | null
+-  nodeMirrorBaseUrl: string
+-  releaseChannel: string
+-  versionSpecifier: string
+-}
+-
+-export async function getNodeVersion (opts: NvmNodeCommandOptions, envSpecifier: string): Promise<GetNodeVersionResult> {
+-  const fetch = createFetchFromRegistry(opts)
+-  const { releaseChannel, versionSpecifier } = parseEnvSpecifier(envSpecifier)
+-  const nodeMirrorBaseUrl = getNodeMirror(opts.rawConfig, releaseChannel)
+-  const nodeVersion = await resolveNodeVersion(fetch, versionSpecifier, nodeMirrorBaseUrl)
+-  return { nodeVersion, nodeMirrorBaseUrl, releaseChannel, versionSpecifier }
+-}
+-
+-export interface DownloadNodeVersionResult {
+-  nodeVersion: string
+-  nodeDir: string
+-  nodeMirrorBaseUrl: string
+-}
+-
+-export async function downloadNodeVersion (opts: NvmNodeCommandOptions, envSpecifier: string): Promise<DownloadNodeVersionResult | null> {
+-  const fetch = createFetchFromRegistry(opts)
+-  const { nodeVersion, nodeMirrorBaseUrl } = await getNodeVersion(opts, envSpecifier)
+-  if (!nodeVersion) {
+-    return null
+-  }
+-  const nodeDir = await getNodeDir(fetch, {
+-    ...opts,
+-    useNodeVersion: nodeVersion,
+-    nodeMirrorBaseUrl,
+-  })
+-  globalInfo(`Node.js ${nodeVersion as string} was installed
+-  ${nodeDir}`)
+-  return { nodeVersion, nodeDir, nodeMirrorBaseUrl }
+-}
+diff --git a/env/plugin-commands-env/src/env.ts b/env/plugin-commands-env/src/env.ts
+index 916b0f02b45..a8199771556 100644
+--- a/env/plugin-commands-env/src/env.ts
++++ b/env/plugin-commands-env/src/env.ts
+@@ -1,11 +1,9 @@
+ import { docsUrl } from '@pnpm/cli-utils'
+ import { PnpmError } from '@pnpm/error'
+ import renderHelp from 'render-help'
+-import { envRemove } from './envRemove.js'
++import { envList } from './envList.js'
+ import { envUse } from './envUse.js'
+ import { type NvmNodeCommandOptions } from './node.js'
+-import { envList } from './envList.js'
+-import { envAdd } from './envAdd.js'
+ 
+ export const skipPackageManagerCheck = true
+ 
+@@ -34,16 +32,7 @@ export function help (): string {
+             name: 'use',
+           },
+           {
+-            description: 'Installs the specified version(s) of Node.js without activating them as the current version.',
+-            name: 'add',
+-          },
+-          {
+-            description: 'Removes the specified version(s) of Node.js.',
+-            name: 'remove',
+-            shortAlias: 'rm',
+-          },
+-          {
+-            description: 'List Node.js versions available locally or remotely',
++            description: 'List remote Node.js versions available to install.',
+             name: 'list',
+             shortAlias: 'ls',
+           },
+@@ -57,39 +46,27 @@ export function help (): string {
+             name: '--global',
+             shortAlias: '-g',
+           },
+-          {
+-            description: 'List the remote versions of Node.js',
+-            name: '--remote',
+-          },
+         ],
+       },
+     ],
+     url: docsUrl('env'),
+     usages: [
+-      'pnpm env [command] [options] <version> [<additional-versions>...]',
+       'pnpm env use --global 18',
+       'pnpm env use --global lts',
+       'pnpm env use --global argon',
+       'pnpm env use --global latest',
+       'pnpm env use --global rc/18',
+-      'pnpm env add --global 18',
+-      'pnpm env add --global 18 19 20.6.0',
+-      'pnpm env remove --global 18 lts',
+-      'pnpm env remove --global argon',
+-      'pnpm env remove --global latest',
+-      'pnpm env remove --global rc/18 18 20.6.0',
+       'pnpm env list',
+-      'pnpm env list --remote',
+-      'pnpm env list --remote 18',
+-      'pnpm env list --remote lts',
+-      'pnpm env list --remote argon',
+-      'pnpm env list --remote latest',
+-      'pnpm env list --remote rc/18',
++      'pnpm env list 18',
++      'pnpm env list lts',
++      'pnpm env list argon',
++      'pnpm env list latest',
++      'pnpm env list rc/18',
+     ],
+   })
+ }
+ 
+-export async function handler (opts: NvmNodeCommandOptions, params: string[]): Promise<string | { exitCode: number }> {
++export async function handler (opts: NvmNodeCommandOptions, params: string[]): Promise<string | { exitCode: number } | void> {
+   if (params.length === 0) {
+     throw new PnpmError('ENV_NO_SUBCOMMAND', 'Please specify the subcommand', {
+       hint: help(),
+@@ -101,17 +78,9 @@ export async function handler (opts: NvmNodeCommandOptions, params: string[]): P
+     })
+   }
+   switch (params[0]) {
+-  case 'add': {
+-    return envAdd(opts, params.slice(1))
+-  }
+   case 'use': {
+-    return envUse(opts, params.slice(1))
+-  }
+-  case 'remove':
+-  case 'rm':
+-  case 'uninstall':
+-  case 'un': {
+-    return envRemove(opts, params.slice(1))
++    await envUse(opts, params.slice(1))
++    return
+   }
+   case 'list':
+   case 'ls': {
+diff --git a/env/plugin-commands-env/src/envAdd.ts b/env/plugin-commands-env/src/envAdd.ts
+deleted file mode 100644
+index 18f28f2cca9..00000000000
+--- a/env/plugin-commands-env/src/envAdd.ts
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/* eslint-disable no-await-in-loop */
+-import { PnpmError } from '@pnpm/error'
+-import { downloadNodeVersion } from './downloadNodeVersion.js'
+-import { type NvmNodeCommandOptions } from './node.js'
+-
+-export async function envAdd (opts: NvmNodeCommandOptions, params: string[]): Promise<string> {
+-  if (!opts.global) {
+-    throw new PnpmError('NOT_IMPLEMENTED_YET', '"pnpm env add <version>" can only be used with the "--global" option currently')
+-  }
+-  const failed: string[] = []
+-  for (const envSpecifier of params) {
+-    const result = await downloadNodeVersion(opts, envSpecifier)
+-    if (!result) {
+-      failed.push(envSpecifier)
+-    }
+-  }
+-  if (failed.length > 0) {
+-    throw new PnpmError('COULD_NOT_RESOLVE_NODEJS', `Couldn't find Node.js version matching ${failed.join(', ')}`)
+-  }
+-  return 'All specified Node.js versions were installed'
+-}
+diff --git a/env/plugin-commands-env/src/envList.ts b/env/plugin-commands-env/src/envList.ts
+index ef7a0b38e6c..8bece0ad3d4 100644
+--- a/env/plugin-commands-env/src/envList.ts
++++ b/env/plugin-commands-env/src/envList.ts
+@@ -1,55 +1,16 @@
+-import { promises as fs, existsSync } from 'fs'
+-import path from 'path'
+ import { createFetchFromRegistry } from '@pnpm/fetch'
+ import { resolveNodeVersions, parseEnvSpecifier, getNodeMirror } from '@pnpm/node.resolver'
+-import { PnpmError } from '@pnpm/error'
+-import semver from 'semver'
+-import { getNodeVersionsBaseDir, type NvmNodeCommandOptions } from './node.js'
+-import { getNodeExecPathAndTargetDir, getNodeExecPathInNodeDir } from './utils.js'
++import { type NvmNodeCommandOptions } from './node.js'
+ 
+ export async function envList (opts: NvmNodeCommandOptions, params: string[]): Promise<string> {
+-  if (opts.remote) {
+-    const nodeVersionList = await listRemoteVersions(opts, params[0])
+-    // Make the newest version located in the end of output
+-    return nodeVersionList.reverse().join('\n')
+-  }
+-  const { currentVersion, versions } = await listLocalVersions(opts)
+-  return versions
+-    .map(nodeVersion => `${nodeVersion === currentVersion ? '*' : ' '} ${nodeVersion}`)
+-    .join('\n')
+-}
+-
+-interface LocalVersions {
+-  currentVersion: string | undefined
+-  versions: string[]
+-}
+-
+-async function listLocalVersions (opts: NvmNodeCommandOptions): Promise<LocalVersions> {
+-  const nodeBaseDir = getNodeVersionsBaseDir(opts.pnpmHomeDir)
+-  if (!existsSync(nodeBaseDir)) {
+-    throw new PnpmError('ENV_NO_NODE_DIRECTORY', `Couldn't find Node.js directory in ${nodeBaseDir}`)
+-  }
+-  const { nodeLink } = await getNodeExecPathAndTargetDir(opts.pnpmHomeDir)
+-  const nodeVersionDirs = await fs.readdir(nodeBaseDir)
+-  let currentVersion: string | undefined
+-  const versions: string[] = []
+-  for (const nodeVersion of nodeVersionDirs) {
+-    const nodeVersionDir = path.join(nodeBaseDir, nodeVersion)
+-    const nodeExec = getNodeExecPathInNodeDir(nodeVersionDir)
+-    if (nodeLink?.startsWith(nodeVersionDir)) {
+-      currentVersion = nodeVersion
+-    }
+-    if (semver.valid(nodeVersion) && existsSync(nodeExec)) {
+-      versions.push(nodeVersion)
+-    }
+-  }
+-  return { currentVersion, versions }
++  const nodeVersionList = await listRemoteVersions(opts, params[0])
++  // Make the newest version located at the end of the output
++  return nodeVersionList.reverse().join('\n')
+ }
+ 
+ async function listRemoteVersions (opts: NvmNodeCommandOptions, versionSpec?: string): Promise<string[]> {
+   const fetch = createFetchFromRegistry(opts)
+   const { releaseChannel, versionSpecifier } = parseEnvSpecifier(versionSpec ?? '')
+   const nodeMirrorBaseUrl = getNodeMirror(opts.rawConfig, releaseChannel)
+-  const nodeVersionList = await resolveNodeVersions(fetch, versionSpecifier, nodeMirrorBaseUrl)
+-  return nodeVersionList
++  return resolveNodeVersions(fetch, versionSpecifier, nodeMirrorBaseUrl)
+ }
+diff --git a/env/plugin-commands-env/src/envRemove.ts b/env/plugin-commands-env/src/envRemove.ts
+deleted file mode 100644
+index af923fc9e11..00000000000
+--- a/env/plugin-commands-env/src/envRemove.ts
++++ /dev/null
+@@ -1,69 +0,0 @@
+-/* eslint-disable no-await-in-loop */
+-import util from 'util'
+-import assert from 'assert'
+-import { PnpmError } from '@pnpm/error'
+-import { globalInfo, logger } from '@pnpm/logger'
+-import { removeBin } from '@pnpm/remove-bins'
+-import rimraf from '@zkochan/rimraf'
+-import { existsSync } from 'fs'
+-import path from 'path'
+-import { getNodeVersion } from './downloadNodeVersion.js'
+-import { getNodeVersionsBaseDir, type NvmNodeCommandOptions } from './node.js'
+-import { getNodeExecPathAndTargetDir } from './utils.js'
+-
+-export async function envRemove (opts: NvmNodeCommandOptions, params: string[]): Promise<{ exitCode: number }> {
+-  if (!opts.global) {
+-    throw new PnpmError('NOT_IMPLEMENTED_YET', '"pnpm env remove <version>" can only be used with the "--global" option currently')
+-  }
+-
+-  let failed = false
+-  for (const version of params) {
+-    const err = await removeNodeVersion(opts, version)
+-    if (err) {
+-      logger.error(err)
+-      failed = true
+-    }
+-  }
+-  return { exitCode: failed ? 1 : 0 }
+-}
+-
+-async function removeNodeVersion (opts: NvmNodeCommandOptions, version: string): Promise<Error | undefined> {
+-  const { nodeVersion } = await getNodeVersion(opts, version)
+-  const nodeDir = getNodeVersionsBaseDir(opts.pnpmHomeDir)
+-
+-  if (!nodeVersion) {
+-    return new PnpmError('COULD_NOT_RESOLVE_NODEJS', `Couldn't find Node.js version matching ${version}`)
+-  }
+-
+-  const versionDir = path.resolve(nodeDir, nodeVersion)
+-
+-  if (!existsSync(versionDir)) {
+-    return new PnpmError('ENV_NO_NODE_DIRECTORY', `Couldn't find Node.js directory in ${versionDir}`)
+-  }
+-
+-  const { nodePath, nodeLink } = await getNodeExecPathAndTargetDir(opts.pnpmHomeDir)
+-
+-  if (nodeLink?.includes(versionDir)) {
+-    globalInfo(`Node.js ${nodeVersion as string} was detected as the default one, removing ...`)
+-
+-    const npmPath = path.resolve(opts.pnpmHomeDir, 'npm')
+-    const npxPath = path.resolve(opts.pnpmHomeDir, 'npx')
+-
+-    try {
+-      await Promise.all([
+-        removeBin(nodePath),
+-        removeBin(npmPath),
+-        removeBin(npxPath),
+-      ])
+-    } catch (err: unknown) {
+-      assert(util.types.isNativeError(err))
+-      if (!('code' in err && err.code === 'ENOENT')) return err
+-    }
+-  }
+-
+-  await rimraf(versionDir)
+-
+-  globalInfo(`Node.js ${nodeVersion as string} was removed
+-${versionDir}`)
+-  return undefined
+-}
+diff --git a/env/plugin-commands-env/src/envUse.ts b/env/plugin-commands-env/src/envUse.ts
+index 4386f1a2c87..39df5c72980 100644
+--- a/env/plugin-commands-env/src/envUse.ts
++++ b/env/plugin-commands-env/src/envUse.ts
+@@ -1,60 +1,20 @@
+-import { promises as fs } from 'fs'
+-import util from 'util'
+-import gfs from 'graceful-fs'
+-import path from 'path'
+ import { PnpmError } from '@pnpm/error'
+-import cmdShim from '@zkochan/cmd-shim'
+-import isWindows from 'is-windows'
+-import symlinkDir from 'symlink-dir'
++import { runPnpmCli } from '@pnpm/exec.pnpm-cli-runner'
+ import { type NvmNodeCommandOptions } from './node.js'
+-import { CURRENT_NODE_DIRNAME, getNodeExecPathInBinDir, getNodeExecPathInNodeDir } from './utils.js'
+-import { downloadNodeVersion } from './downloadNodeVersion.js'
+ 
+-export async function envUse (opts: NvmNodeCommandOptions, params: string[]): Promise<string> {
++export async function envUse (opts: NvmNodeCommandOptions, params: string[]): Promise<void> {
+   if (!opts.global) {
+     throw new PnpmError('NOT_IMPLEMENTED_YET', '"pnpm env use <version>" can only be used with the "--global" option currently')
+   }
+-  const nodeInfo = await downloadNodeVersion(opts, params[0])
+-  if (!nodeInfo) {
+-    throw new PnpmError('COULD_NOT_RESOLVE_NODEJS', `Couldn't find Node.js version matching ${params[0]}`)
+-  }
+-  const { nodeDir, nodeVersion } = nodeInfo
+-  const src = getNodeExecPathInNodeDir(nodeDir)
+-  const dest = getNodeExecPathInBinDir(opts.bin)
+-  await symlinkDir(nodeDir, path.join(opts.pnpmHomeDir, CURRENT_NODE_DIRNAME))
+-  try {
+-    gfs.unlinkSync(dest)
+-  } catch (err: unknown) {
+-    if (!(util.types.isNativeError(err) && 'code' in err && err.code === 'ENOENT')) throw err
+-  }
+-  await symlinkOrHardLink(src, dest)
+-  try {
+-    let npmDir = nodeDir
+-    if (process.platform !== 'win32') {
+-      npmDir = path.join(npmDir, 'lib')
+-    }
+-    npmDir = path.join(npmDir, 'node_modules/npm')
+-    if (opts.configDir) {
+-      // We want the global npm settings to persist when Node.js or/and npm is changed to a different version,
+-      // so we tell npm to read the global config from centralized place that is outside of npm's directory.
+-      await fs.writeFile(path.join(npmDir, 'npmrc'), `globalconfig=${path.join(opts.configDir, 'npmrc')}`, 'utf-8')
+-    }
+-    const npmBinDir = path.join(npmDir, 'bin')
+-    const cmdShimOpts = { createPwshFile: false }
+-    await cmdShim(path.join(npmBinDir, 'npm-cli.js'), path.join(opts.bin, 'npm'), cmdShimOpts)
+-    await cmdShim(path.join(npmBinDir, 'npx-cli.js'), path.join(opts.bin, 'npx'), cmdShimOpts)
+-  } catch {
+-    // ignore
+-  }
+-  return `Node.js ${nodeVersion as string} was activated
+-${dest} -> ${src}`
+-}
+ 
+-// On Windows, symlinks only work with developer mode enabled
+-// or with admin permissions. So it is better to use hard links on Windows.
+-async function symlinkOrHardLink (existingPath: string, newPath: string): Promise<void> {
+-  if (isWindows()) {
+-    return fs.link(existingPath, newPath)
++  const version = params[0]?.trim()
++  if (!version) {
++    throw new PnpmError('MISSING_NODE_VERSION', '"pnpm env use --global <version>" requires a Node.js version to be specified')
+   }
+-  return fs.symlink(existingPath, newPath, 'file')
++
++  const args = ['add', '--global', `node@runtime:${version}`]
++  if (opts.bin) args.push('--global-bin-dir', opts.bin)
++  if (opts.storeDir) args.push('--store-dir', opts.storeDir)
++  if (opts.cacheDir) args.push('--cache-dir', opts.cacheDir)
++  runPnpmCli(args, { cwd: opts.pnpmHomeDir })
+ }
+diff --git a/env/plugin-commands-env/src/node.ts b/env/plugin-commands-env/src/node.ts
+index 2c776978614..6b7f5d3fb06 100644
+--- a/env/plugin-commands-env/src/node.ts
++++ b/env/plugin-commands-env/src/node.ts
+@@ -1,15 +1,4 @@
+-import fs from 'fs'
+-import path from 'path'
+-import util from 'util'
+ import { type Config } from '@pnpm/config'
+-import { createFetchFromRegistry, type FetchFromRegistry } from '@pnpm/fetch'
+-import { globalInfo, globalWarn } from '@pnpm/logger'
+-import { fetchNode } from '@pnpm/node.fetcher'
+-import { getNodeMirror } from '@pnpm/node.resolver'
+-import { getStorePath } from '@pnpm/store-path'
+-import { loadJsonFile } from 'load-json-file'
+-import { writeJsonFile } from 'write-json-file'
+-import { isValidVersion, parseNodeSpecifier } from './parseNodeSpecifier.js'
+ 
+ export type NvmNodeCommandOptions = Pick<Config,
+ | 'bin'
+@@ -31,80 +20,23 @@ export type NvmNodeCommandOptions = Pick<Config,
+ | 'strictSsl'
+ | 'storeDir'
+ | 'pnpmHomeDir'
+-> & Partial<Pick<Config, 'configDir' | 'cliOptions' | 'sslConfigs'>> & {
++> & Partial<Pick<Config,
++| 'cacheDir'
++| 'configDir'
++| 'cliOptions'
++| 'sslConfigs'
++// Fields needed to forward opts to add.handler for env use
++| 'registries'
++| 'rawLocalConfig'
++| 'lockfileDir'
++| 'nodeLinker'
++| 'modulesDir'
++| 'symlink'
++| 'frozenLockfile'
++| 'preferFrozenLockfile'
++| 'sideEffectsCache'
++| 'sideEffectsCacheReadonly'
++| 'supportedArchitectures'
++>> & {
+   remote?: boolean
+-  useNodeVersion?: string
+-}
+-
+-export async function getNodeBinDir (opts: NvmNodeCommandOptions): Promise<string> {
+-  const fetch = createFetchFromRegistry(opts)
+-  const nodesDir = getNodeVersionsBaseDir(opts.pnpmHomeDir)
+-  const manifestNodeVersion = (await readNodeVersionsManifest(nodesDir))?.default
+-  let wantedNodeVersion = opts.useNodeVersion ?? manifestNodeVersion
+-  if (opts.useNodeVersion != null) {
+-    // If the user has specified an invalid version via use-node-version, we should not throw an error. Or else, it will break all the commands.
+-    // Instead, we should fallback to the manifest node version
+-    if (!isValidVersion(opts.useNodeVersion)) {
+-      globalWarn(`"${opts.useNodeVersion}" is not a valid Node.js version.`)
+-      wantedNodeVersion = manifestNodeVersion
+-    }
+-  }
+-  if (wantedNodeVersion == null) {
+-    const response = await fetch('https://registry.npmjs.org/node')
+-    wantedNodeVersion = (await response.json() as any)['dist-tags'].lts // eslint-disable-line
+-    if (wantedNodeVersion == null) {
+-      throw new Error('Could not resolve LTS version of Node.js')
+-    }
+-    await writeJsonFile(path.join(nodesDir, 'versions.json'), {
+-      default: wantedNodeVersion,
+-    })
+-  }
+-  const { useNodeVersion, releaseChannel } = parseNodeSpecifier(wantedNodeVersion)
+-  const nodeMirrorBaseUrl = getNodeMirror(opts.rawConfig, releaseChannel)
+-  const nodeDir = await getNodeDir(fetch, {
+-    ...opts,
+-    useNodeVersion,
+-    nodeMirrorBaseUrl,
+-  })
+-  return process.platform === 'win32' ? nodeDir : path.join(nodeDir, 'bin')
+-}
+-
+-export function getNodeVersionsBaseDir (pnpmHomeDir: string): string {
+-  return path.join(pnpmHomeDir, 'nodejs')
+-}
+-
+-export async function getNodeDir (fetch: FetchFromRegistry, opts: NvmNodeCommandOptions & { useNodeVersion: string, nodeMirrorBaseUrl: string }): Promise<string> {
+-  const nodesDir = getNodeVersionsBaseDir(opts.pnpmHomeDir)
+-  await fs.promises.mkdir(nodesDir, { recursive: true })
+-  const versionDir = path.join(nodesDir, opts.useNodeVersion)
+-  if (!fs.existsSync(versionDir)) {
+-    const storeDir = await getStorePath({
+-      pkgRoot: process.cwd(),
+-      storePath: opts.storeDir,
+-      pnpmHomeDir: opts.pnpmHomeDir,
+-    })
+-    globalInfo(`Fetching Node.js ${opts.useNodeVersion} ...`)
+-    await fetchNode(fetch, opts.useNodeVersion, versionDir, {
+-      ...opts,
+-      storeDir,
+-      retry: {
+-        maxTimeout: opts.fetchRetryMaxtimeout,
+-        minTimeout: opts.fetchRetryMintimeout,
+-        retries: opts.fetchRetries,
+-        factor: opts.fetchRetryFactor,
+-      },
+-    })
+-  }
+-  return versionDir
+-}
+-
+-async function readNodeVersionsManifest (nodesDir: string): Promise<{ default?: string }> {
+-  try {
+-    return await loadJsonFile<{ default?: string }>(path.join(nodesDir, 'versions.json'))
+-  } catch (err: unknown) {
+-    if (util.types.isNativeError(err) && 'code' in err && err.code === 'ENOENT') {
+-      return {}
+-    }
+-    throw err
+-  }
+ }
+diff --git a/env/plugin-commands-env/src/utils.ts b/env/plugin-commands-env/src/utils.ts
+index bc257b7c9b3..5963654077d 100644
+--- a/env/plugin-commands-env/src/utils.ts
++++ b/env/plugin-commands-env/src/utils.ts
+@@ -1,23 +1,5 @@
+-import { promises as fs } from 'fs'
+ import path from 'path'
+ 
+-export const CURRENT_NODE_DIRNAME = 'nodejs_current'
+-
+-export async function getNodeExecPathAndTargetDir (pnpmHomeDir: string): Promise<{ nodePath: string, nodeLink?: string }> {
+-  const nodePath = getNodeExecPathInBinDir(pnpmHomeDir)
+-  const nodeCurrentDirLink = path.join(pnpmHomeDir, CURRENT_NODE_DIRNAME)
+-  let nodeCurrentDir: string | undefined
+-  try {
+-    nodeCurrentDir = await fs.readlink(nodeCurrentDirLink)
+-    if (!path.isAbsolute(nodeCurrentDir)) {
+-      nodeCurrentDir = path.resolve(path.dirname(nodeCurrentDirLink), nodeCurrentDir)
+-    }
+-  } catch {
+-    nodeCurrentDir = undefined
+-  }
+-  return { nodePath, nodeLink: nodeCurrentDir ? getNodeExecPathInNodeDir(nodeCurrentDir) : undefined }
+-}
+-
+ export function getNodeExecPathInBinDir (pnpmHomeDir: string): string {
+   return path.resolve(pnpmHomeDir, process.platform === 'win32' ? 'node.exe' : 'node')
+ }
+diff --git a/env/plugin-commands-env/test/env.test.ts b/env/plugin-commands-env/test/env.test.ts
+index 6b404dc4427..27bfe1a3eb4 100644
+--- a/env/plugin-commands-env/test/env.test.ts
++++ b/env/plugin-commands-env/test/env.test.ts
+@@ -1,360 +1,86 @@
++import { jest } from '@jest/globals'
+ import { PnpmError } from '@pnpm/error'
+-import { env } from '@pnpm/plugin-commands-env'
+-import { tempDir } from '@pnpm/prepare'
+-import * as execa from 'execa'
+-import fs from 'fs'
+-import nock from 'nock'
+-import path from 'path'
+-import PATH from 'path-name'
+-import semver from 'semver'
+ 
+-test('install Node (and npm, npx) by exact version of Node.js', async () => {
+-  tempDir()
+-  const configDir = path.resolve('config')
++const mockRunPnpmCli = jest.fn()
++jest.unstable_mockModule('@pnpm/exec.pnpm-cli-runner', () => ({
++  runPnpmCli: mockRunPnpmCli,
++}))
+ 
++const { env } = await import('@pnpm/plugin-commands-env')
++
++beforeEach(() => {
++  mockRunPnpmCli.mockClear()
++})
++
++test('env use calls pnpm add with the correct arguments', async () => {
+   await env.handler({
+-    bin: process.cwd(),
+-    configDir,
++    bin: '/usr/local/bin',
++    cacheDir: '/tmp/cache',
+     global: true,
+-    pnpmHomeDir: process.cwd(),
++    pnpmHomeDir: '/tmp/pnpm-home',
+     rawConfig: {},
+-  }, ['use', '16.4.0'])
+-
+-  const opts = {
+-    env: {
+-      [PATH]: `${process.cwd()}${path.delimiter}${process.env[PATH] as string}`,
+-    },
+-    extendEnv: false,
+-  }
+-
+-  {
+-    const { stdout } = execa.sync('node', ['-v'], opts)
+-    expect(stdout.toString()).toBe('v16.4.0')
+-  }
+-
+-  {
+-    const { stdout } = execa.sync('npm', ['-v'], opts)
+-    expect(stdout.toString()).toBe('7.18.1')
+-  }
++    storeDir: '/tmp/store',
++  }, ['use', '18'])
+ 
+-  {
+-    const { stdout } = execa.sync('npx', ['-v'], opts)
+-    expect(stdout.toString()).toBe('7.18.1')
+-  }
+-
+-  const dirs = fs.readdirSync(path.resolve('nodejs'))
+-  expect(dirs).toEqual(['16.4.0'])
+-
+-  {
+-    const { stdout } = execa.sync('npm', ['config', 'get', 'globalconfig'], opts)
+-    expect(stdout.toString()).toBe(path.join(configDir, 'npmrc'))
+-  }
++  expect(mockRunPnpmCli).toHaveBeenCalledWith(
++    ['add', '--global', 'node@runtime:18', '--global-bin-dir', '/usr/local/bin', '--store-dir', '/tmp/store', '--cache-dir', '/tmp/cache'],
++    { cwd: '/tmp/pnpm-home' }
++  )
+ })
+ 
+-test('resolveNodeVersion uses node-mirror:release option', async () => {
+-  tempDir()
+-  const configDir = path.resolve('config')
+-
+-  const nockScope = nock('https://pnpm-node-mirror-test.localhost')
+-    .get('/download/release/index.json')
+-    .reply(200, [])
+-
+-  await expect(
+-    env.handler({
+-      bin: process.cwd(),
+-      configDir,
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {
+-        'node-mirror:release': 'https://pnpm-node-mirror-test.localhost/download/release',
+-      },
+-    }, ['use', '16.4.0'])
+-  ).rejects.toEqual(new PnpmError('COULD_NOT_RESOLVE_NODEJS', 'Couldn\'t find Node.js version matching 16.4.0'))
++test('env use passes lts specifier through unchanged', async () => {
++  await env.handler({
++    bin: '/usr/local/bin',
++    global: true,
++    pnpmHomeDir: '/tmp/pnpm-home',
++    rawConfig: {},
++    storeDir: '/tmp/store',
++  }, ['use', 'lts'])
+ 
+-  expect(nockScope.isDone()).toBeTruthy()
++  expect(mockRunPnpmCli).toHaveBeenCalledWith(
++    ['add', '--global', 'node@runtime:lts', '--global-bin-dir', '/usr/local/bin', '--store-dir', '/tmp/store'],
++    { cwd: '/tmp/pnpm-home' }
++  )
+ })
+ 
+-test('fail if a non-existed Node.js version is tried to be installed', async () => {
+-  tempDir()
++test('env use passes codename specifier through unchanged', async () => {
++  await env.handler({
++    bin: '/usr/local/bin',
++    global: true,
++    pnpmHomeDir: '/tmp/pnpm-home',
++    rawConfig: {},
++    storeDir: '/tmp/store',
++  }, ['use', 'argon'])
+ 
+-  await expect(
+-    env.handler({
+-      bin: process.cwd(),
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['use', '6.999'])
+-  ).rejects.toEqual(new PnpmError('COULD_NOT_RESOLVE_NODEJS', 'Couldn\'t find Node.js version matching 6.999'))
++  expect(mockRunPnpmCli).toHaveBeenCalledWith(
++    ['add', '--global', 'node@runtime:argon', '--global-bin-dir', '/usr/local/bin', '--store-dir', '/tmp/store'],
++    { cwd: '/tmp/pnpm-home' }
++  )
+ })
+ 
+-test('fail if a non-existed Node.js LTS is tried to be installed', async () => {
+-  tempDir()
+-
++test('fail if not run with --global', async () => {
+   await expect(
+     env.handler({
+-      bin: process.cwd(),
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['use', 'boo'])
+-  ).rejects.toEqual(new PnpmError('COULD_NOT_RESOLVE_NODEJS', 'Couldn\'t find Node.js version matching boo'))
+-})
+-
+-// Regression test for https://github.com/pnpm/pnpm/issues/4104
+-test('it re-attempts failed downloads', async () => {
+-  tempDir()
+-
+-  // This fixture was retrieved from http://nodejs.org/download/release/index.json on 2021-12-12.
+-  const testReleaseInfoPath = path.join(import.meta.dirname, './fixtures/node-16.4.0-release-info.json')
+-
+-  const nockScope = nock('https://nodejs.org')
+-    // Using nock's persist option since the default fetcher retries requests.
+-    .persist()
+-    .get('/download/release/index.json')
+-    .replyWithFile(200, testReleaseInfoPath)
+-    .persist()
+-    .get(uri => uri.startsWith('/download/release/v16.4.0/'))
+-    .replyWithError('Intentionally failing response for test')
+-
+-  try {
+-    const attempts = 2
+-    for (let i = 0; i < attempts; i++) {
+-      // eslint-disable-next-line no-await-in-loop
+-      await expect(
+-        env.handler({
+-          bin: process.cwd(),
+-          global: true,
+-          pnpmHomeDir: process.cwd(),
+-          rawConfig: {},
+-        }, ['use', '16.4.0'])
+-      ).rejects.toThrow('Intentionally failing response for test')
+-    }
+-
+-    expect(nockScope.isDone()).toBeTruthy()
+-  } finally {
+-    nock.cleanAll()
+-  }
+-})
+-
+-describe('env add/remove', () => {
+-  test('fail if --global is missing', async () => {
+-    tempDir()
+-
+-    await expect(
+-      env.handler({
+-        bin: process.cwd(),
+-        global: false,
+-        pnpmHomeDir: process.cwd(),
+-        rawConfig: {},
+-      }, ['remove', 'lts'])
+-    ).rejects.toEqual(new PnpmError('NOT_IMPLEMENTED_YET', '"pnpm env remove <version>" can only be used with the "--global" option currently'))
+-  })
+-
+-  test('fail if can not resolve Node.js version', async () => {
+-    tempDir()
+-
+-    await expect(
+-      env.handler({
+-        bin: process.cwd(),
+-        global: true,
+-        pnpmHomeDir: process.cwd(),
+-        rawConfig: {},
+-      }, ['rm', 'non-existing-version'])
+-    ).resolves.toEqual({ exitCode: 1 })
+-  })
+-
+-  test('fail if trying to remove version that is not installed', async () => {
+-    tempDir()
+-
+-    await expect(
+-      env.handler({
+-        bin: process.cwd(),
+-        global: true,
+-        pnpmHomeDir: process.cwd(),
+-        rawConfig: {},
+-      }, ['remove', '16.4.0'])
+-    ).resolves.toEqual({ exitCode: 1 })
+-  })
+-
+-  test('install and remove Node.js by exact version', async () => {
+-    tempDir()
+-
+-    const configDir = path.resolve('config')
+-
+-    await env.handler({
+-      bin: process.cwd(),
+-      configDir,
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['use', '16.4.0'])
+-
+-    const opts = {
+-      env: {
+-        [PATH]: process.cwd(),
+-      },
+-      extendEnv: false,
+-    }
+-
+-    {
+-      const { stdout } = execa.sync('node', ['-v'], opts)
+-      expect(stdout.toString()).toBe('v16.4.0')
+-    }
+-
+-    await env.handler({
+-      bin: process.cwd(),
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['rm', '16.4.0'])
+-
+-    expect(() => execa.sync('node', ['-v'], opts)).toThrow()
+-  })
+-
+-  test('install and remove multiple Node.js versions in one command', async () => {
+-    tempDir()
+-
+-    const configDir = path.resolve('config')
+-
+-    await env.handler({
+-      bin: process.cwd(),
+-      configDir,
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['add', '16.4.0', '18.18.0'])
+-
+-    {
+-      const version = await env.handler({
+-        bin: process.cwd(),
+-        configDir,
+-        pnpmHomeDir: process.cwd(),
+-        rawConfig: {},
+-      }, ['list'])
+-
+-      expect((version as string).trim().replaceAll(/\s/g, '')).toMatch(/16\.4\.0.*18\.18\.0/)
+-    }
+-    await env.handler({
+-      bin: process.cwd(),
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['rm', '16.4.0', '18.18.0'])
+-
+-    {
+-      const version = await env.handler({
+-        bin: process.cwd(),
+-        configDir,
+-        pnpmHomeDir: process.cwd(),
+-        rawConfig: {},
+-      }, ['list'])
+-
+-      expect(version).toMatch('')
+-    }
+-  })
+-})
+-
+-describe('env list', () => {
+-  test('list local Node.js versions', async () => {
+-    tempDir()
+-    const configDir = path.resolve('config')
+-
+-    await env.handler({
+-      bin: process.cwd(),
+-      configDir,
+-      global: true,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-    }, ['use', '16.4.0'])
+-
+-    const version = await env.handler({
+-      bin: process.cwd(),
+-      configDir,
+-      pnpmHomeDir: process.cwd(),
++      bin: '/usr/local/bin',
++      global: false,
++      pnpmHomeDir: '/tmp/pnpm-home',
+       rawConfig: {},
+-    }, ['list'])
+-
+-    expect(version).toMatch('16.4.0')
+-  })
+-  test('list local versions fails if Node.js directory not found', async () => {
+-    tempDir()
+-    const configDir = path.resolve('config')
+-    const pnpmHomeDir = path.resolve('specified-dir')
+-
+-    await expect(
+-      env.handler({
+-        bin: process.cwd(),
+-        configDir,
+-        pnpmHomeDir,
+-        rawConfig: {},
+-      }, ['list'])
+-    ).rejects.toEqual(new PnpmError('ENV_NO_NODE_DIRECTORY', `Couldn't find Node.js directory in ${path.join(pnpmHomeDir, 'nodejs')}`))
+-  })
+-  test('list remote Node.js versions', async () => {
+-    tempDir()
+-    const configDir = path.resolve('config')
++    }, ['use', '18'])
++  ).rejects.toEqual(new PnpmError('NOT_IMPLEMENTED_YET', '"pnpm env use <version>" can only be used with the "--global" option currently'))
+ 
+-    const versionStr = await env.handler({
+-      bin: process.cwd(),
+-      configDir,
+-      pnpmHomeDir: process.cwd(),
+-      rawConfig: {},
+-      remote: true,
+-    }, ['list', '16'])
+-
+-    const versions = (versionStr as string).split('\n')
+-    expect(versions.every(version => semver.satisfies(version, '16'))).toBeTruthy()
+-  })
++  expect(mockRunPnpmCli).not.toHaveBeenCalled()
+ })
+ 
+ test('fail if there is no global bin directory', async () => {
+-  tempDir()
+-
+   await expect(
+     env.handler({
+       // @ts-expect-error
+       bin: undefined,
+       global: true,
+-      pnpmHomeDir: process.cwd(),
++      pnpmHomeDir: '/tmp/pnpm-home',
+       rawConfig: {},
+     }, ['use', 'lts'])
+   ).rejects.toEqual(new PnpmError('CANNOT_MANAGE_NODE', 'Unable to manage Node.js because pnpm was not installed using the standalone installation script'))
+-})
+-
+-test('use overrides the previous Node.js version', async () => {
+-  tempDir()
+-  const configDir = path.resolve('config')
+-
+-  await env.handler({
+-    bin: process.cwd(),
+-    configDir,
+-    global: true,
+-    pnpmHomeDir: process.cwd(),
+-    rawConfig: {},
+-  }, ['use', '16.4.0'])
+-
+-  const opts = {
+-    env: {
+-      [PATH]: `${process.cwd()}${path.delimiter}${process.env[PATH] as string}`,
+-    },
+-    extendEnv: false,
+-  }
+-
+-  {
+-    const { stdout } = execa.sync('node', ['-v'], opts)
+-    expect(stdout.toString()).toBe('v16.4.0')
+-  }
+-
+-  await env.handler({
+-    bin: process.cwd(),
+-    configDir,
+-    global: true,
+-    pnpmHomeDir: process.cwd(),
+-    rawConfig: {},
+-  }, ['use', '16.5.0'])
+ 
+-  {
+-    const { stdout } = execa.sync('node', ['-v'], opts)
+-    expect(stdout.toString()).toBe('v16.5.0')
+-  }
++  expect(mockRunPnpmCli).not.toHaveBeenCalled()
+ })
+diff --git a/env/plugin-commands-env/test/node.test.ts b/env/plugin-commands-env/test/node.test.ts
+deleted file mode 100644
+index 658a829390d..00000000000
+--- a/env/plugin-commands-env/test/node.test.ts
++++ /dev/null
+@@ -1,159 +0,0 @@
+-import { Response } from 'node-fetch'
+-import path from 'path'
+-import fs from 'fs'
+-import { Readable } from 'stream'
+-import tar from 'tar-stream'
+-import { jest } from '@jest/globals'
+-import { ZipFile } from 'yazl'
+-import { tempDir } from '@pnpm/prepare'
+-import type { NvmNodeCommandOptions } from '../lib/node.js'
+-
+-async function createEmptyTarballBuffer (): Promise<Buffer> {
+-  const pack = tar.pack()
+-  const chunks: Buffer[] = []
+-  pack.on('data', (chunk: Buffer) => chunks.push(chunk))
+-  return new Promise((resolve) => {
+-    pack.on('end', () => resolve(Buffer.concat(chunks)))
+-    pack.finalize()
+-  })
+-}
+-
+-const fetchMock = jest.fn(async (url: string) => {
+-  if (url.endsWith('SHASUMS256.txt')) {
+-    return new Response(`
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v16.4.0-darwin-arm64.tar.gz
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v16.4.0-linux-arm64.tar.gz
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v16.4.0-linux-x64.tar.gz
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v16.4.0-linux-x64-musl.tar.gz
+-a08f3386090e6511772b949d41970b75a6b71d28abb551dff9854ceb1929dae1  node-v16.4.0-win-x64.zip
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v18.0.0-rc.3-darwin-arm64.tar.gz
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v18.0.0-rc.3-linux-arm64.tar.gz
+-5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef  node-v18.0.0-rc.3-linux-x64.tar.gz
+-07e6121cba611b57f310a489f76c413b6246e79cffe1e9538b2478ffee11c99e  node-v18.0.0-rc.3-win-x64.zip
+-`)
+-  }
+-  if (url.endsWith('.tar.gz')) {
+-    // Collect tarball data before creating Response.
+-    // With tar-stream@3.x, passing pack stream directly to Response
+-    // doesn't properly pipe all data through async iteration.
+-    const buffer = await createEmptyTarballBuffer()
+-    return new Response(buffer)
+-  } else if (url.endsWith('.zip')) {
+-    // The Windows code path for pnpm's node bootstrapping expects a subdir
+-    // within the .zip file.
+-    const pkgName = path.basename(url, '.zip')
+-    const zipfile = new ZipFile()
+-
+-    zipfile.addBuffer(Buffer.from('test'), `${pkgName}/dummy-file`, {
+-      mtime: new Date(0), // fixed timestamp for determinism
+-      mode: 0o100644, // fixed file permissions
+-    })
+-
+-    zipfile.end()
+-    return new Response(Readable.from(zipfile.outputStream))
+-  }
+-
+-  return new Response(Readable.from(Buffer.alloc(0)))
+-})
+-
+-jest.unstable_mockModule('@pnpm/fetch', () => ({
+-  createFetchFromRegistry: () => fetchMock,
+-}))
+-
+-const originalModule = await import('@pnpm/logger')
+-jest.unstable_mockModule('@pnpm/logger', () => {
+-  return {
+-    ...originalModule,
+-    globalWarn: jest.fn(),
+-  }
+-})
+-
+-const { globalWarn } = await import('@pnpm/logger')
+-const {
+-  getNodeDir,
+-  getNodeBinDir,
+-  getNodeVersionsBaseDir,
+-} = await import('../lib/node.js')
+-
+-beforeEach(() => {
+-  fetchMock.mockClear()
+-  jest.mocked(globalWarn).mockClear()
+-})
+-
+-test('check API (placeholder test)', async () => {
+-  expect(typeof getNodeDir).toBe('function')
+-})
+-
+-test('install Node uses node-mirror:release option', async () => {
+-  tempDir()
+-  const configDir = path.resolve('config')
+-
+-  const nodeMirrorRelease = 'https://pnpm-node-mirror-test.localhost/download/release'
+-  const opts: NvmNodeCommandOptions = {
+-    bin: process.cwd(),
+-    configDir,
+-    global: true,
+-    pnpmHomeDir: process.cwd(),
+-    rawConfig: {
+-      'node-mirror:release': nodeMirrorRelease,
+-    },
+-    useNodeVersion: '16.4.0',
+-  }
+-
+-  await getNodeBinDir(opts)
+-
+-  for (const call of fetchMock.mock.calls) {
+-    expect(call[0]).toMatch(nodeMirrorRelease)
+-  }
+-})
+-
+-test('install an rc version of Node.js', async () => {
+-  tempDir()
+-  const configDir = path.resolve('config')
+-
+-  const opts: NvmNodeCommandOptions = {
+-    bin: process.cwd(),
+-    configDir,
+-    global: true,
+-    pnpmHomeDir: process.cwd(),
+-    rawConfig: {},
+-    useNodeVersion: 'rc/18.0.0-rc.3',
+-  }
+-
+-  await getNodeBinDir(opts)
+-
+-  const platform = process.platform === 'win32' ? 'win' : process.platform
+-  const arch = process.arch
+-  const extension = process.platform === 'win32' ? 'zip' : 'tar.gz'
+-  expect(fetchMock.mock.calls[1][0]).toBe(
+-    `https://nodejs.org/download/rc/v18.0.0-rc.3/node-v18.0.0-rc.3-${platform}-${arch}.${extension}`
+-  )
+-})
+-
+-test('get node version base dir', async () => {
+-  expect(typeof getNodeVersionsBaseDir).toBe('function')
+-  const versionDir = getNodeVersionsBaseDir(process.cwd())
+-  expect(versionDir).toBe(path.resolve(process.cwd(), 'nodejs'))
+-})
+-
+-test('specified an invalid Node.js via use-node-version should not cause pnpm itself to break', async () => {
+-  tempDir()
+-  const configDir = path.resolve('config')
+-
+-  const opts: NvmNodeCommandOptions = {
+-    bin: process.cwd(),
+-    configDir,
+-    global: true,
+-    pnpmHomeDir: process.cwd(),
+-    rawConfig: {},
+-    useNodeVersion: '22.14',
+-  }
+-
+-  fs.mkdirSync('nodejs', { recursive: true })
+-  fs.writeFileSync('nodejs/versions.json', '{"default":"16.4.0"}', 'utf8')
+-
+-  expect(await getNodeBinDir(opts)).toBeTruthy()
+-
+-  const calls = jest.mocked(globalWarn).mock.calls
+-  expect(calls[calls.length - 1][0]).toContain('"22.14" is not a valid Node.js version.')
+-})
+diff --git a/env/plugin-commands-env/tsconfig.json b/env/plugin-commands-env/tsconfig.json
+index 4768c08cf2f..35181473f75 100644
+--- a/env/plugin-commands-env/tsconfig.json
++++ b/env/plugin-commands-env/tsconfig.json
+@@ -9,15 +9,15 @@
+     "../../__typings__/**/*.d.ts"
+   ],
+   "references": [
+-    {
+-      "path": "../../__utils__/prepare"
+-    },
+     {
+       "path": "../../cli/cli-utils"
+     },
+     {
+       "path": "../../config/config"
+     },
++    {
++      "path": "../../exec/pnpm-cli-runner"
++    },
+     {
+       "path": "../../network/fetch"
+     },
+@@ -27,23 +27,8 @@
+     {
+       "path": "../../packages/logger"
+     },
+-    {
+-      "path": "../../packages/types"
+-    },
+-    {
+-      "path": "../../pkg-manager/remove-bins"
+-    },
+-    {
+-      "path": "../../store/store-path"
+-    },
+-    {
+-      "path": "../node.fetcher"
+-    },
+     {
+       "path": "../node.resolver"
+-    },
+-    {
+-      "path": "../system-node-version"
+     }
+   ]
+ }
+diff --git a/fetching/binary-fetcher/src/index.ts b/fetching/binary-fetcher/src/index.ts
+index 4c0d5b87d64..8ba15e455b0 100644
+--- a/fetching/binary-fetcher/src/index.ts
++++ b/fetching/binary-fetcher/src/index.ts
+@@ -52,6 +52,7 @@ export function createBinaryFetcher (ctx: {
+         filesIndexFile: opts.filesIndexFile,
+         readManifest: false,
+         appendManifest: manifest,
++        includeNodeModules: true,
+       })
+       break
+     }
+diff --git a/lockfile/types/src/index.ts b/lockfile/types/src/index.ts
+index b0042c55b93..3826e83f0cf 100644
+--- a/lockfile/types/src/index.ts
++++ b/lockfile/types/src/index.ts
+@@ -114,7 +114,7 @@ export interface BinaryResolution {
+   type: 'binary'
+   url: string
+   integrity: string
+-  bin: string
++  bin: string | Record<string, string>
+   archive: 'zip' | 'tarball'
+ }
+ 
+diff --git a/packages/constants/src/index.ts b/packages/constants/src/index.ts
+index 08a222b4533..4d1afd37048 100644
+--- a/packages/constants/src/index.ts
++++ b/packages/constants/src/index.ts
+@@ -22,6 +22,21 @@ export function getNodeBinLocationForCurrentOS (platform: string = process.platf
+   return platform === 'win32' ? 'node.exe' : 'bin/node'
+ }
+ 
++export function getNodeBinsForCurrentOS (platform: string = process.platform): Record<string, string> {
++  if (platform === 'win32') {
++    return {
++      node: 'node.exe',
++      npm: 'node_modules/npm/bin/npm-cli.js',
++      npx: 'node_modules/npm/bin/npx-cli.js',
++    }
++  }
++  return {
++    node: 'bin/node',
++    npm: 'lib/node_modules/npm/bin/npm-cli.js',
++    npx: 'lib/node_modules/npm/bin/npx-cli.js',
++  }
++}
++
+ export function getDenoBinLocationForCurrentOS (platform: string = process.platform): string {
+   return platform === 'win32' ? 'deno.exe' : 'deno'
+ }
+diff --git a/pkg-manager/core/test/install/nodeRuntime.ts b/pkg-manager/core/test/install/nodeRuntime.ts
+index 97ed599692d..6bf24cac293 100644
+--- a/pkg-manager/core/test/install/nodeRuntime.ts
++++ b/pkg-manager/core/test/install/nodeRuntime.ts
+@@ -23,7 +23,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-aix-ppc64.tar.gz',
+       integrity: 'sha256-13Q/3fXoZxJPVVqR9scpEE/Vx12TgvEChsP7s/0S7wc=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -38,7 +42,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-darwin-arm64.tar.gz',
+       integrity: 'sha256-6pbTSc+qZ6qHzuqj5bUskWf3rDAv2NH/Fi0HhencB4U=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -53,7 +61,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-darwin-x64.tar.gz',
+       integrity: 'sha256-Qio4h/9UGPCkVS2Jz5k0arirUbtdOEZguqiLhETSwRE=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -68,7 +80,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-linux-arm64.tar.gz',
+       integrity: 'sha256-HTVHImvn5ZrO7lx9Aan4/BjeZ+AVxaFdjPOFtuAtBis=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -83,7 +99,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-linux-armv7l.tar.gz',
+       integrity: 'sha256-0h239Xxc4YKuwrmoPjKVq8N+FzGrtzmV09Vz4EQJl3w=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -98,7 +118,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-linux-ppc64le.tar.gz',
+       integrity: 'sha256-OwmNzPVtRGu7gIRdNbvsvbdGEoYNFpDzohY4fJnJ1iA=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -113,7 +137,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-linux-s390x.tar.gz',
+       integrity: 'sha256-fsX9rQyBnuoXkA60PB3pSNYgp4OxrJQGLKpDh3ipKzA=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -128,7 +156,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'tarball',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-linux-x64.tar.gz',
+       integrity: 'sha256-dLsPOoAwfFKUIcPthFF7j1Q4Z3CfQeU81z35nmRCr00=',
+-      bin: 'bin/node',
++      bin: {
++        node: 'bin/node',
++        npm: 'lib/node_modules/npm/bin/npm-cli.js',
++        npx: 'lib/node_modules/npm/bin/npx-cli.js',
++      },
+     },
+   },
+   {
+@@ -143,7 +175,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'zip',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-win-arm64.zip',
+       integrity: 'sha256-N2Ehz0a9PAJcXmetrhkK/14l0zoLWPvA2GUtczULOPA=',
+-      bin: 'node.exe',
++      bin: {
++        node: 'node.exe',
++        npm: 'node_modules/npm/bin/npm-cli.js',
++        npx: 'node_modules/npm/bin/npx-cli.js',
++      },
+       prefix: 'node-v22.0.0-win-arm64',
+     },
+   },
+@@ -159,7 +195,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'zip',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-win-x64.zip',
+       integrity: 'sha256-MtY5tH1MCmUf+PjX1BpFQWij1ARb43mF+agQz4zvYXQ=',
+-      bin: 'node.exe',
++      bin: {
++        node: 'node.exe',
++        npm: 'node_modules/npm/bin/npm-cli.js',
++        npx: 'node_modules/npm/bin/npx-cli.js',
++      },
+       prefix: 'node-v22.0.0-win-x64',
+     },
+   },
+@@ -175,7 +215,11 @@ const GLIBC_RESOLUTIONS = [
+       archive: 'zip',
+       url: 'https://nodejs.org/download/release/v22.0.0/node-v22.0.0-win-x86.zip',
+       integrity: 'sha256-4BNPUBcVSjN2csf7zRVOKyx3S0MQkRhWAZINY9DEt9A=',
+-      bin: 'node.exe',
++      bin: {
++        node: 'node.exe',
++        npm: 'node_modules/npm/bin/npm-cli.js',
++        npx: 'node_modules/npm/bin/npx-cli.js',
++      },
+       prefix: 'node-v22.0.0-win-x86',
+     },
+   },
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 1f839cbcd8b..344abd673ed 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -216,9 +216,6 @@ catalogs:
+     '@types/yarnpkg__lockfile':
+       specifier: ^1.1.9
+       version: 1.1.9
+-    '@types/yazl':
+-      specifier: ^3.3.0
+-      version: 3.3.0
+     '@types/zkochan__table':
+       specifier: npm:@types/table@6.0.0
+       version: 6.0.0
+@@ -753,9 +750,6 @@ catalogs:
+     yaml-tag:
+       specifier: 1.1.0
+       version: 1.1.0
+-    yazl:
+-      specifier: ^3.3.1
+-      version: 3.3.1
+ 
+ overrides:
+   '@cypress/request@3.0.9>qs': ^6.14.1
+@@ -2371,57 +2365,21 @@ importers:
+       '@pnpm/config':
+         specifier: workspace:*
+         version: link:../../config/config
+-      '@pnpm/env.system-node-version':
+-        specifier: workspace:*
+-        version: link:../system-node-version
+       '@pnpm/error':
+         specifier: workspace:*
+         version: link:../../packages/error
++      '@pnpm/exec.pnpm-cli-runner':
++        specifier: workspace:*
++        version: link:../../exec/pnpm-cli-runner
+       '@pnpm/fetch':
+         specifier: workspace:*
+         version: link:../../network/fetch
+-      '@pnpm/node.fetcher':
+-        specifier: workspace:*
+-        version: link:../node.fetcher
+       '@pnpm/node.resolver':
+         specifier: workspace:*
+         version: link:../node.resolver
+-      '@pnpm/remove-bins':
+-        specifier: workspace:*
+-        version: link:../../pkg-manager/remove-bins
+-      '@pnpm/store-path':
+-        specifier: workspace:*
+-        version: link:../../store/store-path
+-      '@pnpm/types':
+-        specifier: workspace:*
+-        version: link:../../packages/types
+-      '@zkochan/cmd-shim':
+-        specifier: 'catalog:'
+-        version: 7.0.0
+-      '@zkochan/rimraf':
+-        specifier: 'catalog:'
+-        version: 3.0.2
+-      graceful-fs:
+-        specifier: 'catalog:'
+-        version: 4.2.11(patch_hash=68ebc232025360cb3dcd3081f4067f4e9fc022ab6b6f71a3230e86c7a5b337d1)
+-      is-windows:
+-        specifier: 'catalog:'
+-        version: 1.0.2
+-      load-json-file:
+-        specifier: 'catalog:'
+-        version: 7.0.1
+       render-help:
+         specifier: 'catalog:'
+         version: 1.0.3
+-      semver:
+-        specifier: 'catalog:'
+-        version: 7.7.4
+-      symlink-dir:
+-        specifier: 'catalog:'
+-        version: 7.1.0
+-      write-json-file:
+-        specifier: 'catalog:'
+-        version: 7.0.0
+     devDependencies:
+       '@jest/globals':
+         specifier: 'catalog:'
+@@ -2432,42 +2390,6 @@ importers:
+       '@pnpm/plugin-commands-env':
+         specifier: workspace:*
+         version: 'link:'
+-      '@pnpm/prepare':
+-        specifier: workspace:*
+-        version: link:../../__utils__/prepare
+-      '@types/graceful-fs':
+-        specifier: 'catalog:'
+-        version: 4.1.9
+-      '@types/is-windows':
+-        specifier: 'catalog:'
+-        version: 1.0.2
+-      '@types/semver':
+-        specifier: 'catalog:'
+-        version: 7.7.1
+-      '@types/tar-stream':
+-        specifier: 'catalog:'
+-        version: 2.2.3
+-      '@types/yazl':
+-        specifier: 'catalog:'
+-        version: 3.3.0
+-      execa:
+-        specifier: 'catalog:'
+-        version: safe-execa@0.2.0
+-      nock:
+-        specifier: 'catalog:'
+-        version: 13.3.4
+-      node-fetch:
+-        specifier: 'catalog:'
+-        version: 3.3.2
+-      path-name:
+-        specifier: 'catalog:'
+-        version: 1.0.0
+-      tar-stream:
+-        specifier: 'catalog:'
+-        version: 3.1.7
+-      yazl:
+-        specifier: 'catalog:'
+-        version: 3.3.1
+ 
+   env/system-node-version:
+     dependencies:
+@@ -11102,9 +11024,6 @@ packages:
+   '@types/yarnpkg__lockfile@1.1.9':
+     resolution: {integrity: sha512-GD4Fk15UoP5NLCNor51YdfL9MSdldKCqOC9EssrRw3HVfar9wUZ5y8Lfnp+qVD6hIinLr8ygklDYnmlnlQo12Q==}
+ 
+-  '@types/yazl@3.3.0':
+-    resolution: {integrity: sha512-mFL6lGkk2N5u5nIxpNV/K5LW3qVSbxhJrMxYGOOxZndWxMgCamr/iCsq/1t9kd8pEwhuNP91LC5qZm/qS9pOEw==}
+-
+   '@typescript-eslint/eslint-plugin@8.56.0':
+     resolution: {integrity: sha512-lRyPDLzNCuae71A3t9NEINBiTn7swyOhvUj3MyUOxb8x6g6vPEFoOU+ZRmGMusNC3X3YMhqMIX7i8ShqhT74Pw==}
+     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+@@ -11812,10 +11731,6 @@ packages:
+   bser@2.1.1:
+     resolution: {integrity: sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==}
+ 
+-  buffer-crc32@1.0.0:
+-    resolution: {integrity: sha512-Db1SbgBS/fg/392AblrMJk97KggmvYhr4pB5ZIMTWtaivCPMWLkmb7m21cJvpvgK+J3nsU2CmmixNBZx4vFj/w==}
+-    engines: {node: '>=8.0.0'}
+-
+   buffer-equal-constant-time@1.0.1:
+     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
+ 
+@@ -16524,9 +16439,6 @@ packages:
+     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
+     engines: {node: '>=12'}
+ 
+-  yazl@3.3.1:
+-    resolution: {integrity: sha512-BbETDVWG+VcMUle37k5Fqp//7SDOK2/1+T7X8TD96M3D9G8jK5VLUdQVdVjGi8im7FGkazX7kk5hkU8X4L5Bng==}
+-
+   yocto-queue@0.1.0:
+     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
+     engines: {node: '>=10'}
+@@ -19578,10 +19490,6 @@ snapshots:
+ 
+   '@types/yarnpkg__lockfile@1.1.9': {}
+ 
+-  '@types/yazl@3.3.0':
+-    dependencies:
+-      '@types/node': 25.2.3
+-
+   '@typescript-eslint/eslint-plugin@8.56.0(@typescript-eslint/parser@8.56.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.2))(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.2)':
+     dependencies:
+       '@eslint-community/regexpp': 4.12.2
+@@ -20492,8 +20400,6 @@ snapshots:
+     dependencies:
+       node-int64: 0.4.0
+ 
+-  buffer-crc32@1.0.0: {}
+-
+   buffer-equal-constant-time@1.0.1: {}
+ 
+   buffer-equal@1.0.1: {}
+@@ -25963,10 +25869,6 @@ snapshots:
+       y18n: 5.0.8
+       yargs-parser: 21.1.1
+ 
+-  yazl@3.3.1:
+-    dependencies:
+-      buffer-crc32: 1.0.0
+-
+   yocto-queue@0.1.0: {}
+ 
+   yocto-queue@1.2.2: {}
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index 22012264de2..93e449496c0 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -133,7 +133,6 @@ catalog:
+   '@types/which': ^2.0.2
+   '@types/write-file-atomic': ^4.0.3
+   '@types/yarnpkg__lockfile': ^1.1.9
+-  '@types/yazl': ^3.3.0
+   '@types/zkochan__table': npm:@types/table@6.0.0
+   '@typescript-eslint/utils': ^8.53.0
+   '@typescript/native-preview': 7.0.0-dev.20260216.1
+@@ -312,7 +311,6 @@ catalog:
+   write-yaml-file: ^5.0.0
+   yaml: ^2.8.1
+   yaml-tag: 1.1.0
+-  yazl: ^3.3.1
+ 
+ catalogMode: strict
+ 
+diff --git a/resolving/resolver-base/src/index.ts b/resolving/resolver-base/src/index.ts
+index 148a500ce86..5952c84cb65 100644
+--- a/resolving/resolver-base/src/index.ts
++++ b/resolving/resolver-base/src/index.ts
+@@ -24,7 +24,7 @@ export interface BinaryResolution {
+   archive: 'tarball' | 'zip'
+   url: string
+   integrity: string
+-  bin: string
++  bin: string | Record<string, string>
+   prefix?: string
+ }
+ 
+diff --git a/store/cafs/src/addFilesFromDir.ts b/store/cafs/src/addFilesFromDir.ts
+index 58436aaaf41..af36d92174e 100644
+--- a/store/cafs/src/addFilesFromDir.ts
++++ b/store/cafs/src/addFilesFromDir.ts
+@@ -16,6 +16,7 @@ export function addFilesFromDir (
+   dirname: string,
+   opts: {
+     files?: string[]
++    includeNodeModules?: boolean
+     readManifest?: boolean
+   } = {}
+ ): AddToStoreResult {
+@@ -39,7 +40,7 @@ export function addFilesFromDir (
+       })
+     }
+   } else {
+-    files = findFilesInDir(dirname, resolvedRoot)
++    files = findFilesInDir(dirname, resolvedRoot, opts)
+   }
+   for (const { absolutePath, relativePath, stat } of files) {
+     const buffer = gfs.readFileSync(absolutePath)
+@@ -112,10 +113,11 @@ function getSymlinkStatIfContained (
+   return { stat: fs.statSync(realPath), realPath }
+ }
+ 
+-function findFilesInDir (dir: string, rootDir: string): File[] {
++function findFilesInDir (dir: string, rootDir: string, opts: { includeNodeModules?: boolean }): File[] {
+   const files: File[] = []
+   const ctx: FindFilesContext = {
+     filesList: files,
++    includeNodeModules: opts.includeNodeModules ?? false,
+     rootDir,
+     visited: new Set([rootDir]),
+   }
+@@ -125,6 +127,7 @@ function findFilesInDir (dir: string, rootDir: string): File[] {
+ 
+ interface FindFilesContext {
+   filesList: File[]
++  includeNodeModules: boolean
+   rootDir: string
+   visited: Set<string>
+ }
+@@ -162,7 +165,7 @@ function findFiles (
+ 
+     if (nextRealDir) {
+       if (ctx.visited.has(nextRealDir)) continue
+-      if (relativeDir !== '' || file.name !== 'node_modules') {
++      if (relativeDir !== '' || file.name !== 'node_modules' || ctx.includeNodeModules) {
+         ctx.visited.add(nextRealDir)
+         findFiles(ctx, absolutePath, relativeSubdir, nextRealDir)
+         ctx.visited.delete(nextRealDir)
+diff --git a/store/cafs/src/index.ts b/store/cafs/src/index.ts
+index 835190681ae..2f12c201828 100644
+--- a/store/cafs/src/index.ts
++++ b/store/cafs/src/index.ts
+@@ -57,7 +57,7 @@ export interface CreateCafsOpts {
+ }
+ 
+ export interface CafsFunctions {
+-  addFilesFromDir: (dirname: string, opts?: { files?: string[], readManifest?: boolean }) => AddToStoreResult
++  addFilesFromDir: (dirname: string, opts?: { files?: string[], readManifest?: boolean, includeNodeModules?: boolean }) => AddToStoreResult
+   addFilesFromTarball: (tarballBuffer: Buffer, readManifest?: boolean) => AddToStoreResult
+   addFile: (buffer: Buffer, mode: number) => FileWriteResult
+   getIndexFilePathInCafs: (integrity: string, pkgId: string) => string
+diff --git a/worker/src/index.ts b/worker/src/index.ts
+index 6c8c4956b69..0456e993d65 100644
+--- a/worker/src/index.ts
++++ b/worker/src/index.ts
+@@ -74,7 +74,7 @@ interface AddFilesResult {
+   integrity?: string
+ }
+ 
+-type AddFilesFromDirOptions = Pick<AddDirToStoreMessage, 'storeDir' | 'dir' | 'filesIndexFile' | 'sideEffectsCacheKey' | 'readManifest' | 'pkg' | 'files' | 'appendManifest'>
++type AddFilesFromDirOptions = Pick<AddDirToStoreMessage, 'storeDir' | 'dir' | 'filesIndexFile' | 'sideEffectsCacheKey' | 'readManifest' | 'pkg' | 'files' | 'appendManifest' | 'includeNodeModules'>
+ 
+ export async function addFilesFromDir (opts: AddFilesFromDirOptions): Promise<AddFilesResult> {
+   if (!workerPool) {
+@@ -100,6 +100,7 @@ export async function addFilesFromDir (opts: AddFilesFromDirOptions): Promise<Ad
+       pkg: opts.pkg,
+       appendManifest: opts.appendManifest,
+       files: opts.files,
++      includeNodeModules: opts.includeNodeModules,
+     })
+   })
+ }
+diff --git a/worker/src/start.ts b/worker/src/start.ts
+index 6991472710d..efe5b129b52 100644
+--- a/worker/src/start.ts
++++ b/worker/src/start.ts
+@@ -252,6 +252,7 @@ function addFilesFromDir (
+     dir,
+     files,
+     filesIndexFile,
++    includeNodeModules,
+     sideEffectsCacheKey,
+     storeDir,
+   }: AddDirToStoreMessage
+@@ -262,6 +263,7 @@ function addFilesFromDir (
+   const cafs = cafsCache.get(storeDir)!
+   let { filesIndex, manifest } = cafs.addFilesFromDir(dir, {
+     files,
++    includeNodeModules,
+     readManifest: true,
+   })
+   if (appendManifest && manifest == null) {
+diff --git a/worker/src/types.ts b/worker/src/types.ts
+index 3747ac7a21f..a9668c703ec 100644
+--- a/worker/src/types.ts
++++ b/worker/src/types.ts
+@@ -54,6 +54,7 @@ export interface AddDirToStoreMessage {
+   pkg?: PkgNameVersion
+   appendManifest?: DependencyManifest
+   files?: string[]
++  includeNodeModules?: boolean
+ }
+ 
+ export interface ReadPkgFromCafsMessage {

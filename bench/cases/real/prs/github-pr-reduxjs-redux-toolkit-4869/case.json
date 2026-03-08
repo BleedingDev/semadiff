@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-4869",
+  "language": "ts",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#4869: Fix assorted infinite query types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 4869,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/4869",
+    "baseSha": "18ddd7eb4515122c5922c67c93f515afe5eeb5eb",
+    "headSha": "5f2178e19af15d033e733967b29de9c4a041558c",
+    "selectedFiles": [
+      "packages/toolkit/src/query/endpointDefinitions.ts"
+    ],
+    "collectedAt": "2026-03-08T02:17:11.832Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/query/endpointDefinitions.ts",
+      "oldPath": "packages/toolkit/src/query/endpointDefinitions.ts",
+      "newPath": "packages/toolkit/src/query/endpointDefinitions.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/query/endpointDefinitions.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 598,
+          "endLine": 598
+        },
+        "newRange": {
+          "startLine": 598,
+          "endLine": 598
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

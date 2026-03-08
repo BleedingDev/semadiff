@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-mui-material-ui-45060",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#45060: [docs] Rename \"Base UI\" to \"MUI Base\" in all text",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 45060,
+    "prUrl": "https://github.com/mui/material-ui/pull/45060",
+    "baseSha": "33ce030f2bfeddce914a96899c542c34f567b00b",
+    "headSha": "44cd84340ee8c6165b2a1ba0c416a08ca5e82183",
+    "selectedFiles": [
+      "docs/src/components/productBaseUI/MuiBaseDeprecation.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:41:20.217Z"
+  },
+  "files": [
+    {
+      "id": "docs/src/components/productBaseUI/MuiBaseDeprecation.tsx",
+      "oldPath": "docs/src/components/productBaseUI/MuiBaseDeprecation.tsx",
+      "newPath": "docs/src/components/productBaseUI/MuiBaseDeprecation.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/src/components/productBaseUI/MuiBaseDeprecation.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 1
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

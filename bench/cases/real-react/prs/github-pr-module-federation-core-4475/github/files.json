@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "c3f2c2e1e404daa5f5aa0576d5a187d7aa4d14a5",
+    "filename": "packages/dts-plugin/project.json",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 1,
+    "changes": 5,
+    "blob_url": "https://github.com/module-federation/core/blob/7c55349d62b822b2f39650d2c926a5b064e2d2a1/packages%2Fdts-plugin%2Fproject.json",
+    "raw_url": "https://github.com/module-federation/core/raw/7c55349d62b822b2f39650d2c926a5b064e2d2a1/packages%2Fdts-plugin%2Fproject.json",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fproject.json?ref=7c55349d62b822b2f39650d2c926a5b064e2d2a1",
+    "patch": "@@ -25,7 +25,10 @@\n       \"options\": {\n         \"parallel\": false,\n         \"cwd\": \"packages/dts-plugin\",\n-        \"commands\": [\"rimraf dist-test\", \"nx run dts-plugin:test-impl\"]\n+        \"commands\": [\n+          \"node -e \\\"require('fs').rmSync('dist-test',{recursive:true,force:true,maxRetries:20,retryDelay:50})\\\"\",\n+          \"nx run dts-plugin:test-impl\"\n+        ]\n       }\n     },\n     \"test-impl\": {"
+  },
+  {
+    "sha": "d103436ff6097bcc538e08b6607a502fa5ef393e",
+    "filename": "packages/dts-plugin/src/plugins/GenerateTypesPlugin.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 4,
+    "changes": 6,
+    "blob_url": "https://github.com/module-federation/core/blob/7c55349d62b822b2f39650d2c926a5b064e2d2a1/packages%2Fdts-plugin%2Fsrc%2Fplugins%2FGenerateTypesPlugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/7c55349d62b822b2f39650d2c926a5b064e2d2a1/packages%2Fdts-plugin%2Fsrc%2Fplugins%2FGenerateTypesPlugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fsrc%2Fplugins%2FGenerateTypesPlugin.ts?ref=7c55349d62b822b2f39650d2c926a5b064e2d2a1",
+    "patch": "@@ -172,8 +172,7 @@ export class GenerateTypesPlugin implements WebpackPluginInstance {\n             compilation.emitAsset(\n               zipName,\n               new compiler.webpack.sources.RawSource(\n-                fs.readFileSync(zipTypesPath),\n-                false,\n+                fs.readFileSync(zipTypesPath) as unknown as string,\n               ),\n             );\n           }\n@@ -186,8 +185,7 @@ export class GenerateTypesPlugin implements WebpackPluginInstance {\n             compilation.emitAsset(\n               apiFileName,\n               new compiler.webpack.sources.RawSource(\n-                fs.readFileSync(apiTypesPath),\n-                false,\n+                fs.readFileSync(apiTypesPath) as unknown as string,\n               ),\n             );\n           }"
+  }
+]

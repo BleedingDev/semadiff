@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-7406",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#7406: Update avatar-name.tsx",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 7406,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/7406",
+    "baseSha": "0e0d371a9118df28858f3fdff11bf5ed89441b7e",
+    "headSha": "0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5",
+    "selectedFiles": [
+      "packages/components/avatar/src/avatar-name.tsx"
+    ],
+    "collectedAt": "2026-03-08T04:01:38.690Z"
+  },
+  "files": [
+    {
+      "id": "packages/components/avatar/src/avatar-name.tsx",
+      "oldPath": "packages/components/avatar/src/avatar-name.tsx",
+      "newPath": "packages/components/avatar/src/avatar-name.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/components/avatar/src/avatar-name.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 6,
+          "endLine": 6
+        },
+        "newRange": {
+          "startLine": 6,
+          "endLine": 7
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

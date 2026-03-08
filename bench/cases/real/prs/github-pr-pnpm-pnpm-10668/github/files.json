@@ -1,0 +1,122 @@
+[
+  {
+    "sha": "be382bc6ad806d7bd64bd3745756fb86983fb2ef",
+    "filename": ".changeset/install-from-release-channels.md",
+    "status": "added",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/.changeset%2Finstall-from-release-channels.md",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/.changeset%2Finstall-from-release-channels.md",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/.changeset%2Finstall-from-release-channels.md?ref=6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "patch": "@@ -0,0 +1,6 @@\n+---\n+\"@pnpm/node.resolver\": patch\n+\"@pnpm/plugin-commands-env\": patch\n+---\n+\n+`parseNodeSpecifier` is moved from `@pnpm/plugin-commands-env` to `@pnpm/node.resolver` and enhanced to support all Node.js version specifier formats. Previously `parseEnvSpecifier` (in `@pnpm/node.resolver`) handled the resolver's parsing, while `parseNodeSpecifier` (in `@pnpm/plugin-commands-env`) was a stricter but now-unused validator. They are now unified into a single `parseNodeSpecifier` in `@pnpm/node.resolver` that supports: exact versions (`22.0.0`), prerelease versions (`22.0.0-rc.4`), semver ranges (`18`, `^18`), LTS codenames (`argon`, `iron`), well-known aliases (`lts`, `latest`), standalone release channels (`nightly`, `rc`, `test`, `v8-canary`, `release`), and channel/version combos (`rc/18`, `nightly/latest`)."
+  },
+  {
+    "sha": "71c065a557f022af0543beba03b76e64164b9110",
+    "filename": "cspell.json",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/cspell.json",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/cspell.json",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/cspell.json?ref=6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "patch": "@@ -31,6 +31,7 @@\n     \"clonedeep\",\n     \"cmds\",\n     \"codeload\",\n+    \"codenames\",\n     \"codesign\",\n     \"colorterm\",\n     \"comver\","
+  },
+  {
+    "sha": "878700595436b1d205e1438392275d17c9025310",
+    "filename": "env/node.resolver/src/index.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fnode.resolver%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fnode.resolver%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fnode.resolver%2Fsrc%2Findex.ts?ref=6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "patch": "@@ -14,11 +14,11 @@ import {\n import semver from 'semver'\n import versionSelectorType from 'version-selector-type'\n import { type PkgResolutionId } from '@pnpm/types'\n-import { parseEnvSpecifier } from './parseEnvSpecifier.js'\n+import { parseNodeSpecifier } from './parseNodeSpecifier.js'\n import { getNodeMirror } from './getNodeMirror.js'\n import { getNodeArtifactAddress } from './getNodeArtifactAddress.js'\n \n-export { getNodeMirror, parseEnvSpecifier, getNodeArtifactAddress }\n+export { getNodeMirror, parseNodeSpecifier, getNodeArtifactAddress }\n \n export const DEFAULT_NODE_MIRROR_BASE_URL = 'https://nodejs.org/download/release/'\n export const UNOFFICIAL_NODE_MIRROR_BASE_URL = 'https://unofficial-builds.nodejs.org/download/release/'\n@@ -49,7 +49,7 @@ export async function resolveNodeRuntime (\n \n   if (ctx.offline) throw new PnpmError('NO_OFFLINE_NODEJS_RESOLUTION', 'Offline Node.js resolution is not supported')\n   const versionSpec = wantedDependency.bareSpecifier.substring('runtime:'.length)\n-  const { releaseChannel, versionSpecifier } = parseEnvSpecifier(versionSpec)\n+  const { releaseChannel, versionSpecifier } = parseNodeSpecifier(versionSpec)\n   const nodeMirrorBaseUrl = getNodeMirror(ctx.rawConfig, releaseChannel)\n   const version = await resolveNodeVersion(ctx.fetchFromRegistry, versionSpecifier, nodeMirrorBaseUrl)\n   if (!version) {"
+  },
+  {
+    "sha": "77cce6a97d536af0790b134fbac85517a7b8498a",
+    "filename": "env/node.resolver/src/parseEnvSpecifier.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 19,
+    "changes": 19,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fnode.resolver%2Fsrc%2FparseEnvSpecifier.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fnode.resolver%2Fsrc%2FparseEnvSpecifier.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fnode.resolver%2Fsrc%2FparseEnvSpecifier.ts?ref=895af7032037a7da1711830d7c0673ca2c9b6241",
+    "patch": "@@ -1,19 +0,0 @@\n-export interface EnvSpecifier {\n-  releaseChannel: string\n-  versionSpecifier: string\n-}\n-\n-export function parseEnvSpecifier (specifier: string): EnvSpecifier {\n-  if (specifier.includes('/')) {\n-    const [releaseChannel, versionSpecifier] = specifier.split('/')\n-    return { releaseChannel, versionSpecifier }\n-  }\n-  const prereleaseMatch = specifier.match(/-(nightly|rc|test|v8-canary)/)\n-  if (prereleaseMatch != null) {\n-    return { releaseChannel: prereleaseMatch[1], versionSpecifier: specifier }\n-  }\n-  if (['nightly', 'rc', 'test', 'release', 'v8-canary'].includes(specifier)) {\n-    return { releaseChannel: specifier, versionSpecifier: 'latest' }\n-  }\n-  return { releaseChannel: 'release', versionSpecifier: specifier }\n-}"
+  },
+  {
+    "sha": "2588175cfab5cf8cdb0b71118ec6d6a45cf02a72",
+    "filename": "env/node.resolver/src/parseNodeSpecifier.ts",
+    "status": "added",
+    "additions": 51,
+    "deletions": 0,
+    "changes": 51,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fnode.resolver%2Fsrc%2FparseNodeSpecifier.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fnode.resolver%2Fsrc%2FparseNodeSpecifier.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fnode.resolver%2Fsrc%2FparseNodeSpecifier.ts?ref=6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "patch": "@@ -0,0 +1,51 @@\n+import { PnpmError } from '@pnpm/error'\n+\n+export interface NodeSpecifier {\n+  releaseChannel: string\n+  versionSpecifier: string\n+}\n+\n+const RELEASE_CHANNELS = ['nightly', 'rc', 'test', 'v8-canary', 'release']\n+\n+const isStableVersion = (version: string): boolean => /^\\d+\\.\\d+\\.\\d+$/.test(version)\n+\n+export function parseNodeSpecifier (specifier: string): NodeSpecifier {\n+  // Handle \"channel/version\" format: \"rc/18\", \"rc/18.0.0-rc.4\", \"release/22.0.0\", \"nightly/latest\"\n+  if (specifier.includes('/')) {\n+    const [releaseChannel, versionSpecifier] = specifier.split('/', 2)\n+    if (!RELEASE_CHANNELS.includes(releaseChannel)) {\n+      throw new PnpmError('INVALID_NODE_RELEASE_CHANNEL', `\"${releaseChannel}\" is not a valid Node.js release channel`, {\n+        hint: `Valid release channels are: ${RELEASE_CHANNELS.join(', ')}`,\n+      })\n+    }\n+    return { releaseChannel, versionSpecifier }\n+  }\n+\n+  // Exact prerelease version with a recognized release channel suffix.\n+  // e.g. \"22.0.0-rc.4\", \"22.0.0-nightly20250315d765e70802\", \"22.0.0-v8-canary2025...\"\n+  const prereleaseChannelMatch = specifier.match(/^\\d+\\.\\d+\\.\\d+-(nightly|rc|test|v8-canary)/)\n+  if (prereleaseChannelMatch != null) {\n+    return { releaseChannel: prereleaseChannelMatch[1], versionSpecifier: specifier }\n+  }\n+\n+  // Exact stable version: \"22.0.0\"\n+  if (isStableVersion(specifier)) {\n+    return { releaseChannel: 'release', versionSpecifier: specifier }\n+  }\n+\n+  // Standalone release channel name means \"latest from that channel\".\n+  // e.g. \"nightly\" → latest nightly, \"rc\" → latest rc, \"release\" → latest release\n+  if (RELEASE_CHANNELS.includes(specifier)) {\n+    return { releaseChannel: specifier, versionSpecifier: 'latest' }\n+  }\n+\n+  // Well-known version aliases on the stable release channel\n+  if (specifier === 'lts' || specifier === 'latest') {\n+    return { releaseChannel: 'release', versionSpecifier: specifier }\n+  }\n+\n+  // Semver ranges (\"18\", \"^18\", \">=18\", \"18.x\") and LTS codenames (\"argon\", \"iron\", \"hydrogen\")\n+  // are all passed through as versionSpecifier on the release channel.\n+  // Any truly invalid input will fail at resolution time with NODEJS_VERSION_NOT_FOUND.\n+  return { releaseChannel: 'release', versionSpecifier: specifier }\n+}"
+  },
+  {
+    "sha": "53c37d2aff206e727288804be54adc495d0d1772",
+    "filename": "env/node.resolver/test/parseEnvSpecifier.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 15,
+    "changes": 15,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fnode.resolver%2Ftest%2FparseEnvSpecifier.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fnode.resolver%2Ftest%2FparseEnvSpecifier.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fnode.resolver%2Ftest%2FparseEnvSpecifier.ts?ref=895af7032037a7da1711830d7c0673ca2c9b6241",
+    "patch": "@@ -1,15 +0,0 @@\n-import { parseEnvSpecifier } from '../lib/parseEnvSpecifier.js'\n-\n-test.each([\n-  ['6', '6', 'release'],\n-  ['16.0.0-rc.0', '16.0.0-rc.0', 'rc'],\n-  ['rc/10', '10', 'rc'],\n-  ['nightly', 'latest', 'nightly'],\n-  ['lts', 'lts', 'release'],\n-  ['argon', 'argon', 'release'],\n-  ['latest', 'latest', 'release'],\n-])('Node.js version selector is parsed', (editionSpecifier, versionSpecifier, releaseChannel) => {\n-  const node = parseEnvSpecifier(editionSpecifier)\n-  expect(node.versionSpecifier).toMatch(versionSpecifier)\n-  expect(node.releaseChannel).toBe(releaseChannel)\n-})"
+  },
+  {
+    "sha": "6bb9d7ab551ed5eb1c59a3856b0574ec0413872c",
+    "filename": "env/node.resolver/test/parseNodeSpecifier.test.ts",
+    "status": "added",
+    "additions": 46,
+    "deletions": 0,
+    "changes": 46,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fnode.resolver%2Ftest%2FparseNodeSpecifier.test.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fnode.resolver%2Ftest%2FparseNodeSpecifier.test.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fnode.resolver%2Ftest%2FparseNodeSpecifier.test.ts?ref=6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "patch": "@@ -0,0 +1,46 @@\n+import { parseNodeSpecifier } from '../lib/parseNodeSpecifier.js'\n+\n+test.each([\n+  // Semver ranges → release channel\n+  ['6', '6', 'release'],\n+  ['16.0', '16.0', 'release'],\n+  // Exact prerelease with rc channel\n+  ['16.0.0-rc.0', '16.0.0-rc.0', 'rc'],\n+  // Channel/range combo (major only)\n+  ['rc/10', '10', 'rc'],\n+  // Standalone channel name → latest from that channel\n+  ['nightly', 'latest', 'nightly'],\n+  ['rc', 'latest', 'rc'],\n+  ['test', 'latest', 'test'],\n+  ['v8-canary', 'latest', 'v8-canary'],\n+  ['release', 'latest', 'release'],\n+  // Well-known aliases\n+  ['lts', 'lts', 'release'],\n+  ['latest', 'latest', 'release'],\n+  // LTS codenames\n+  ['argon', 'argon', 'release'],\n+  ['iron', 'iron', 'release'],\n+  // Exact stable version\n+  ['22.0.0', '22.0.0', 'release'],\n+  // Stable release with explicit channel prefix, aliases, and semver ranges\n+  ['release/22.0.0', '22.0.0', 'release'],\n+  ['release/latest', 'latest', 'release'],\n+  ['release/lts', 'lts', 'release'],\n+  ['release/18', '18', 'release'],\n+  // Channel/version combos\n+  ['rc/18', '18', 'rc'],\n+  ['rc/18.0.0-rc.4', '18.0.0-rc.4', 'rc'],\n+  ['nightly/latest', 'latest', 'nightly'],\n+  // Exact nightly version\n+  ['24.0.0-nightly20250315d765e70802', '24.0.0-nightly20250315d765e70802', 'nightly'],\n+  // Exact v8-canary version\n+  ['22.0.0-v8-canary20250101abc', '22.0.0-v8-canary20250101abc', 'v8-canary'],\n+])('Node.js version specifier is parsed: %s', (specifier, expectedVersionSpecifier, expectedReleaseChannel) => {\n+  const result = parseNodeSpecifier(specifier)\n+  expect(result.versionSpecifier).toBe(expectedVersionSpecifier)\n+  expect(result.releaseChannel).toBe(expectedReleaseChannel)\n+})\n+\n+test('throws for unknown release channel', () => {\n+  expect(() => parseNodeSpecifier('foo/18')).toThrow('\"foo\" is not a valid Node.js release channel')\n+})"
+  },
+  {
+    "sha": "71c028f6c315a73b75ee228b220918fddf6a3617",
+    "filename": "env/plugin-commands-env/src/envList.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fplugin-commands-env%2Fsrc%2FenvList.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/6075ecb340fe66aeb77cafa2bbaca6937950ddd0/env%2Fplugin-commands-env%2Fsrc%2FenvList.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fplugin-commands-env%2Fsrc%2FenvList.ts?ref=6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "patch": "@@ -1,5 +1,5 @@\n import { createFetchFromRegistry } from '@pnpm/fetch'\n-import { resolveNodeVersions, parseEnvSpecifier, getNodeMirror } from '@pnpm/node.resolver'\n+import { resolveNodeVersions, parseNodeSpecifier, getNodeMirror } from '@pnpm/node.resolver'\n import { type NvmNodeCommandOptions } from './node.js'\n \n export async function envList (opts: NvmNodeCommandOptions, params: string[]): Promise<string> {\n@@ -10,7 +10,7 @@ export async function envList (opts: NvmNodeCommandOptions, params: string[]): P\n \n async function listRemoteVersions (opts: NvmNodeCommandOptions, versionSpec?: string): Promise<string[]> {\n   const fetch = createFetchFromRegistry(opts)\n-  const { releaseChannel, versionSpecifier } = parseEnvSpecifier(versionSpec ?? '')\n+  const { releaseChannel, versionSpecifier } = versionSpec ? parseNodeSpecifier(versionSpec) : { releaseChannel: 'release', versionSpecifier: '' }\n   const nodeMirrorBaseUrl = getNodeMirror(opts.rawConfig, releaseChannel)\n   return resolveNodeVersions(fetch, versionSpecifier, nodeMirrorBaseUrl)\n }"
+  },
+  {
+    "sha": "7b2d7a0470cd05c18175d7e3cc3506dc4f519cde",
+    "filename": "env/plugin-commands-env/src/parseNodeSpecifier.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 60,
+    "changes": 60,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fplugin-commands-env%2Fsrc%2FparseNodeSpecifier.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fplugin-commands-env%2Fsrc%2FparseNodeSpecifier.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fplugin-commands-env%2Fsrc%2FparseNodeSpecifier.ts?ref=895af7032037a7da1711830d7c0673ca2c9b6241",
+    "patch": "@@ -1,60 +0,0 @@\n-import { PnpmError } from '@pnpm/error'\n-\n-export interface NodeSpecifier {\n-  releaseChannel: string\n-  useNodeVersion: string\n-}\n-\n-const isStableVersion = (version: string): boolean => /^\\d+\\.\\d+\\.\\d+$/.test(version)\n-const matchPrereleaseVersion = (version: string): RegExpMatchArray | null => version.match(/^\\d+\\.\\d+\\.\\d+-((rc)(\\..+)|(test|v8-canary|nightly)(.+))$/)\n-\n-const STABLE_RELEASE_ERROR_HINT = 'The correct syntax for stable release is strictly X.Y.Z or release/X.Y.Z'\n-\n-export function isValidVersion (specifier: string): boolean {\n-  if (specifier.includes('/')) {\n-    const [releaseChannel, useNodeVersion] = specifier.split('/')\n-\n-    if (releaseChannel === 'release') {\n-      return isStableVersion(useNodeVersion)\n-    }\n-\n-    return useNodeVersion.includes(releaseChannel)\n-  }\n-\n-  return isStableVersion(specifier) || matchPrereleaseVersion(specifier) != null\n-}\n-\n-export function parseNodeSpecifier (specifier: string): NodeSpecifier {\n-  if (specifier.includes('/')) {\n-    const [releaseChannel, useNodeVersion] = specifier.split('/')\n-\n-    if (releaseChannel === 'release') {\n-      if (!isStableVersion(useNodeVersion)) {\n-        throw new PnpmError('INVALID_NODE_VERSION', `\"${specifier}\" is not a valid Node.js version`, {\n-          hint: STABLE_RELEASE_ERROR_HINT,\n-        })\n-      }\n-    } else if (!useNodeVersion.includes(releaseChannel)) {\n-      throw new PnpmError('MISMATCHED_RELEASE_CHANNEL', `Node.js version (${useNodeVersion}) must contain the release channel (${releaseChannel})`)\n-    }\n-\n-    return { releaseChannel, useNodeVersion }\n-  }\n-\n-  const prereleaseMatch = matchPrereleaseVersion(specifier)\n-  if (prereleaseMatch != null) {\n-    return { releaseChannel: prereleaseMatch[2], useNodeVersion: specifier }\n-  }\n-\n-  if (isStableVersion(specifier)) {\n-    return { releaseChannel: 'release', useNodeVersion: specifier }\n-  }\n-\n-  let hint: string | undefined\n-  if (['nightly', 'rc', 'test', 'v8-canary'].includes(specifier)) {\n-    hint = `The correct syntax for ${specifier} release is strictly X.Y.Z-${specifier}.W`\n-  } else if (/^\\d+\\.\\d+$/.test(specifier) || /^\\d+$/.test(specifier) || ['release', 'stable', 'latest'].includes(specifier)) {\n-    hint = STABLE_RELEASE_ERROR_HINT\n-  }\n-  throw new PnpmError('INVALID_NODE_VERSION', `\"${specifier}\" is not a valid Node.js version`, { hint })\n-}"
+  },
+  {
+    "sha": "e0ca210afd98d1ec88c130d8455a82766d7c6e19",
+    "filename": "env/plugin-commands-env/test/parseNodeSpecifier.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 70,
+    "changes": 70,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fplugin-commands-env%2Ftest%2FparseNodeSpecifier.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/895af7032037a7da1711830d7c0673ca2c9b6241/env%2Fplugin-commands-env%2Ftest%2FparseNodeSpecifier.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fplugin-commands-env%2Ftest%2FparseNodeSpecifier.ts?ref=895af7032037a7da1711830d7c0673ca2c9b6241",
+    "patch": "@@ -1,70 +0,0 @@\n-import { isValidVersion, parseNodeSpecifier } from '../lib/parseNodeSpecifier.js'\n-\n-test.each([\n-  ['rc/16.0.0-rc.0', '16.0.0-rc.0', 'rc'],\n-  ['16.0.0-rc.0', '16.0.0-rc.0', 'rc'],\n-  ['release/16.0.0', '16.0.0', 'release'],\n-  ['16.0.0', '16.0.0', 'release'],\n-])('Node.js version selector is parsed', (editionSpecifier, useNodeVersion, releaseChannel) => {\n-  const node = parseNodeSpecifier(editionSpecifier)\n-  expect(node.useNodeVersion).toBe(useNodeVersion)\n-  expect(node.releaseChannel).toBe(releaseChannel)\n-})\n-\n-test.each([\n-  ['rc/10', '10', 'rc'],\n-  ['rc/10.0', '10.0', 'rc'],\n-  ['rc/10.0.0', '10.0.0', 'rc'],\n-  ['rc/10.0.0.test.0', '10.0.0.test.0', 'rc'],\n-])('invalid Node.js specifier', (editionSpecifier, useNodeVersion, releaseChannel) => {\n-  expect(() => parseNodeSpecifier(editionSpecifier)).toThrow(`Node.js version (${useNodeVersion}) must contain the release channel (${releaseChannel})`)\n-})\n-\n-test.each([\n-  ['nightly'],\n-  ['rc'],\n-  ['test'],\n-  ['v8-canary'],\n-])('invalid Node.js specifier', async (specifier) => {\n-  const promise = Promise.resolve().then(() => parseNodeSpecifier(specifier))\n-  await expect(promise).rejects.toThrow(`\"${specifier}\" is not a valid Node.js version`)\n-  await expect(promise).rejects.toHaveProperty('hint', `The correct syntax for ${specifier} release is strictly X.Y.Z-${specifier}.W`)\n-})\n-\n-test.each([\n-  ['release'],\n-  ['stable'],\n-  ['latest'],\n-  ['release/16.0.0.release.0'],\n-  ['16'],\n-  ['16.0'],\n-])('invalid Node.js specifier', async (specifier) => {\n-  const promise = Promise.resolve().then(() => parseNodeSpecifier(specifier))\n-  await expect(promise).rejects.toThrow(`\"${specifier}\" is not a valid Node.js version`)\n-  await expect(promise).rejects.toHaveProperty('hint', 'The correct syntax for stable release is strictly X.Y.Z or release/X.Y.Z')\n-})\n-\n-test.each([\n-  ['rc/16.0.0-rc.0', '16.0.0-rc.0', 'rc'],\n-  ['16.0.0-rc.0', '16.0.0-rc.0', 'rc'],\n-  ['release/16.0.0', '16.0.0', 'release'],\n-  ['16.0.0', '16.0.0', 'release'],\n-  ['24.0.0-nightly20250315d765e70802', '24.0.0-nightly20250315d765e70802', 'nightly'],\n-])('valid Node.js specifier', async (specifier) => {\n-  expect(isValidVersion(specifier)).toBe(true)\n-})\n-\n-test.each([\n-  ['nightly'],\n-  ['rc'],\n-  ['test'],\n-  ['v8-canary'],\n-  ['release'],\n-  ['stable'],\n-  ['latest'],\n-  ['release/16.0.0.release.0'],\n-  ['16'],\n-  ['16.0'],\n-])('invalid Node.js specifier', async (specifier) => {\n-  expect(isValidVersion(specifier)).toBe(false)\n-})"
+  }
+]

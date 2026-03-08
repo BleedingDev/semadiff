@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10277",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10277: fix(pagination): export pagination types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10277,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10277",
+    "baseSha": "2dd0617b2f8b7e416e6deaef3edafc6acac957b0",
+    "headSha": "af686a8627b63804477e184c6a24bf222d287a42",
+    "selectedFiles": [
+      "packages/react/src/components/pagination/index.ts"
+    ],
+    "collectedAt": "2026-03-08T03:58:16.688Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/components/pagination/index.ts",
+      "oldPath": "packages/react/src/components/pagination/index.ts",
+      "newPath": "packages/react/src/components/pagination/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/components/pagination/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 22,
+          "endLine": 23
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

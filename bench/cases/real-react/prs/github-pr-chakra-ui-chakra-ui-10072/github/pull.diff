@@ -1,0 +1,118 @@
+diff --git a/.changeset/gorgeous-fans-argue.md b/.changeset/gorgeous-fans-argue.md
+new file mode 100644
+index 00000000000..0dbe7b3b455
+--- /dev/null
++++ b/.changeset/gorgeous-fans-argue.md
+@@ -0,0 +1,5 @@
++---
++"@chakra-ui/react": patch
++---
++
++Allow undefined for optional properties in CSS and recipe types
+diff --git a/packages/react/src/styled-system/css.types.ts b/packages/react/src/styled-system/css.types.ts
+index a9d310c427e..52409327a01 100644
+--- a/packages/react/src/styled-system/css.types.ts
++++ b/packages/react/src/styled-system/css.types.ts
+@@ -45,7 +45,7 @@ export interface CssProperties
+   extends PropertiesFallback<String | Number>,
+     ModernCssProperties,
+     CssVarProperties {
+-  initialLetterAlign?: String
++  initialLetterAlign?: String | undefined
+ }
+ 
+ export interface CssKeyframes {
+@@ -114,7 +114,7 @@ export type CompositionStyleObject<Property extends string> = Nested<
+  * -----------------------------------------------------------------------------*/
+ 
+ interface WithCss {
+-  css?: SystemStyleObject
++  css?: SystemStyleObject | undefined
+ }
+ 
+ type StyleProps = SystemProperties & MinimalNested<SystemStyleObject>
+diff --git a/packages/react/src/styled-system/recipe.types.ts b/packages/react/src/styled-system/recipe.types.ts
+index a2e283ed5c8..8674b099d68 100644
+--- a/packages/react/src/styled-system/recipe.types.ts
++++ b/packages/react/src/styled-system/recipe.types.ts
+@@ -65,23 +65,27 @@ export interface RecipeDefinition<
+   /**
+    * The class name of the recipe.
+    */
+-  className?: string
++  className?: string | undefined
+   /**
+    * The base styles of the recipe.
+    */
+-  base?: SystemStyleObject
++  base?: SystemStyleObject | undefined
+   /**
+    * The multi-variant styles of the recipe.
+    */
+-  variants?: T
++  variants?: T | undefined
+   /**
+    * The default variants of the recipe.
+    */
+-  defaultVariants?: RecipeSelection<T> & { colorPalette?: ColorPalette }
++  defaultVariants?:
++    | (RecipeSelection<T> & { colorPalette?: ColorPalette | undefined })
++    | undefined
+   /**
+    * The styles to apply when a combination of variants is selected.
+    */
+-  compoundVariants?: Pretty<RecipeCompoundVariant<RecipeCompoundSelection<T>>>[]
++  compoundVariants?:
++    | Pretty<RecipeCompoundVariant<RecipeCompoundSelection<T>>>[]
++    | undefined
+ }
+ 
+ export type RecipeCreatorFn = <T extends RecipeVariantRecord>(
+@@ -134,7 +138,7 @@ export interface SlotRecipeDefinition<
+    * Say the recipe has slots like `root`, `control` and the class name is 'checkbox'
+    * Each slot will have a class name like `checkbox__root`, `checkbox__control`
+    */
+-  className?: string
++  className?: string | undefined
+   /**
+    * The parts/slots of the recipe.
+    */
+@@ -142,21 +146,23 @@ export interface SlotRecipeDefinition<
+   /**
+    * The base styles of the recipe.
+    */
+-  base?: SlotRecord<S, SystemStyleObject>
++  base?: SlotRecord<S, SystemStyleObject> | undefined
+   /**
+    * The multi-variant styles of the recipe.
+    */
+-  variants?: T
++  variants?: T | undefined
+   /**
+    * The default variants of the recipe.
+    */
+-  defaultVariants?: RecipeSelection<T> & { colorPalette?: ColorPalette }
++  defaultVariants?:
++    | (RecipeSelection<T> & { colorPalette?: ColorPalette | undefined })
++    | undefined
+   /**
+    * The styles to apply when a combination of variants is selected.
+    */
+-  compoundVariants?: Pretty<
+-    SlotRecipeCompoundVariant<S, RecipeCompoundSelection<T>>
+-  >[]
++  compoundVariants?:
++    | Pretty<SlotRecipeCompoundVariant<S, RecipeCompoundSelection<T>>>[]
++    | undefined
+ }
+ 
+ export type SlotRecipeCreatorFn = <
+@@ -199,7 +205,7 @@ export interface SystemSlotRecipeFn<S extends string, VP, VM> {
+   classNameMap: Record<S, string>
+   variantMap: VM
+   variantKeys: Array<keyof VP>
+-  splitVariantProps<P extends VP & { recipe?: any }>(
++  splitVariantProps<P extends VP & { recipe?: any | undefined }>(
+     props: P,
+   ): [VP, Pretty<DistributiveOmit<P, keyof VP | "recipe">>]
+ }

@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "e71c5ec1ca59cc2d4b614f0c41c0fdf35830abbc",
+    "filename": ".changeset/lucky-buckets-add.md",
+    "status": "added",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/module-federation/core/blob/b6195d1a0789b42d98f6ad989773a4952be6bd7e/.changeset%2Flucky-buckets-add.md",
+    "raw_url": "https://github.com/module-federation/core/raw/b6195d1a0789b42d98f6ad989773a4952be6bd7e/.changeset%2Flucky-buckets-add.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/.changeset%2Flucky-buckets-add.md?ref=b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+    "patch": "@@ -0,0 +1,6 @@\n+---\n+'@module-federation/runtime': minor\n+'@module-federation/sdk': minor\n+---\n+\n+pass all loaderHooks to loadEntry and fetch functions instead of just createScript"
+  },
+  {
+    "sha": "487b5fa5eec482926bad2c5dc3b99233b22cf0c6",
+    "filename": "packages/runtime/src/remote/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fruntime%2Fsrc%2Fremote%2Findex.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fruntime%2Fsrc%2Fremote%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Fremote%2Findex.ts?ref=b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+    "patch": "@@ -145,7 +145,7 @@ export class RemoteHandler {\n     loadEntry: new AsyncHook<\n       [\n         {\n-          createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];\n+          loaderHook: FederationHost['loaderHook'];\n           remoteInfo: RemoteInfo;\n           remoteEntryExports?: RemoteEntryExports;\n         },"
+  },
+  {
+    "sha": "39dcef9617e2a8952c71c74d631bd26e615078ae",
+    "filename": "packages/runtime/src/utils/load.ts",
+    "status": "modified",
+    "additions": 22,
+    "deletions": 18,
+    "changes": 40,
+    "blob_url": "https://github.com/module-federation/core/blob/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fruntime%2Fsrc%2Futils%2Fload.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fruntime%2Fsrc%2Futils%2Fload.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fruntime%2Fsrc%2Futils%2Fload.ts?ref=b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+    "patch": "@@ -68,12 +68,12 @@ async function loadEntryScript({\n   name,\n   globalName,\n   entry,\n-  createScriptHook,\n+  loaderHook,\n }: {\n   name: string;\n   globalName: string;\n   entry: string;\n-  createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];\n+  loaderHook: FederationHost['loaderHook'];\n }): Promise<RemoteEntryExports> {\n   const { entryExports: remoteEntryExports } = getRemoteEntryExports(\n     name,\n@@ -87,7 +87,7 @@ async function loadEntryScript({\n   return loadScript(entry, {\n     attrs: {},\n     createScriptHook: (url, attrs) => {\n-      const res = createScriptHook.emit({ url, attrs });\n+      const res = loaderHook.lifecycle.createScript.emit({ url, attrs });\n \n       if (!res) return;\n \n@@ -127,11 +127,11 @@ async function loadEntryScript({\n async function loadEntryDom({\n   remoteInfo,\n   remoteEntryExports,\n-  createScriptHook,\n+  loaderHook,\n }: {\n   remoteInfo: RemoteInfo;\n   remoteEntryExports?: RemoteEntryExports;\n-  createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];\n+  loaderHook: FederationHost['loaderHook'];\n }) {\n   const { entry, entryGlobalName: globalName, name, type } = remoteInfo;\n   switch (type) {\n@@ -141,16 +141,16 @@ async function loadEntryDom({\n     case 'system':\n       return loadSystemJsEntry({ entry, remoteEntryExports });\n     default:\n-      return loadEntryScript({ entry, globalName, name, createScriptHook });\n+      return loadEntryScript({ entry, globalName, name, loaderHook });\n   }\n }\n \n async function loadEntryNode({\n   remoteInfo,\n-  createScriptHook,\n+  loaderHook,\n }: {\n   remoteInfo: RemoteInfo;\n-  createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];\n+  loaderHook: FederationHost['loaderHook'];\n }) {\n   const { entry, entryGlobalName: globalName, name, type } = remoteInfo;\n   const { entryExports: remoteEntryExports } = getRemoteEntryExports(\n@@ -164,16 +164,18 @@ async function loadEntryNode({\n \n   return loadScriptNode(entry, {\n     attrs: { name, globalName, type },\n-    createScriptHook: (url, attrs) => {\n-      const res = createScriptHook.emit({ url, attrs });\n+    loaderHook: {\n+      createScriptHook: (url: string, attrs: Record<string, any> = {}) => {\n+        const res = loaderHook.lifecycle.createScript.emit({ url, attrs });\n \n-      if (!res) return;\n+        if (!res) return;\n \n-      if ('url' in res) {\n-        return res;\n-      }\n+        if ('url' in res) {\n+          return res;\n+        }\n \n-      return;\n+        return;\n+      },\n     },\n   })\n     .then(() => {\n@@ -220,9 +222,11 @@ export async function getRemoteEntry({\n   if (!globalLoading[uniqueKey]) {\n     const loadEntryHook = origin.remoteHandler.hooks.lifecycle.loadEntry;\n     const createScriptHook = origin.loaderHook.lifecycle.createScript;\n+    const loaderHook = origin.loaderHook;\n+\n     globalLoading[uniqueKey] = loadEntryHook\n       .emit({\n-        createScriptHook,\n+        loaderHook,\n         remoteInfo,\n         remoteEntryExports,\n       })\n@@ -231,8 +235,8 @@ export async function getRemoteEntry({\n           return res;\n         }\n         return isBrowserEnv()\n-          ? loadEntryDom({ remoteInfo, remoteEntryExports, createScriptHook })\n-          : loadEntryNode({ remoteInfo, createScriptHook });\n+          ? loadEntryDom({ remoteInfo, remoteEntryExports, loaderHook })\n+          : loadEntryNode({ remoteInfo, loaderHook });\n       });\n   }\n "
+  },
+  {
+    "sha": "c774a6d257298a1754f6b65abfb0c809aa8d35f2",
+    "filename": "packages/sdk/src/node.ts",
+    "status": "modified",
+    "additions": 16,
+    "deletions": 24,
+    "changes": 40,
+    "blob_url": "https://github.com/module-federation/core/blob/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fsdk%2Fsrc%2Fnode.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fsdk%2Fsrc%2Fnode.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fsdk%2Fsrc%2Fnode.ts?ref=b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+    "patch": "@@ -1,4 +1,4 @@\n-import { CreateScriptHookNode } from './types';\n+import { CreateScriptHookNode, FetchHook } from './types';\n \n function importNodeModule<T>(name: string): Promise<T> {\n   if (!name) {\n@@ -22,12 +22,10 @@ const loadNodeFetch = async (): Promise<typeof fetch> => {\n const lazyLoaderHookFetch = async (\n   input: RequestInfo | URL,\n   init?: RequestInit,\n+  loaderHook?: any,\n ): Promise<Response> => {\n-  // @ts-ignore\n-  const loaderHooks = __webpack_require__.federation.instance.loaderHook;\n-\n   const hook = (url: RequestInfo | URL, init: RequestInit) => {\n-    return loaderHooks.lifecycle.fetch.emit(url, init);\n+    return loaderHook.lifecycle.fetch.emit(url, init);\n   };\n \n   const res = await hook(input, init || {});\n@@ -44,10 +42,13 @@ export function createScriptNode(\n   url: string,\n   cb: (error?: Error, scriptContext?: any) => void,\n   attrs?: Record<string, any>,\n-  createScriptHook?: CreateScriptHookNode,\n+  loaderHook?: {\n+    createScriptHook?: CreateScriptHookNode;\n+    fetch?: FetchHook;\n+  },\n ) {\n-  if (createScriptHook) {\n-    const hookResult = createScriptHook(url);\n+  if (loaderHook?.createScriptHook) {\n+    const hookResult = loaderHook.createScriptHook(url);\n     if (hookResult && typeof hookResult === 'object' && 'url' in hookResult) {\n       url = hookResult.url;\n     }\n@@ -63,20 +64,9 @@ export function createScriptNode(\n   }\n \n   const getFetch = async (): Promise<typeof fetch> => {\n-    //@ts-ignore\n-    if (typeof __webpack_require__ !== 'undefined') {\n-      try {\n-        //@ts-ignore\n-        const loaderHooks = __webpack_require__.federation.instance.loaderHook;\n-        if (loaderHooks.lifecycle.fetch) {\n-          return lazyLoaderHookFetch;\n-        }\n-      } catch (e) {\n-        console.warn(\n-          'federation.instance.loaderHook.lifecycle.fetch failed:',\n-          e,\n-        );\n-      }\n+    if (loaderHook?.fetch) {\n+      return (input: RequestInfo | URL, init?: RequestInit) =>\n+        lazyLoaderHookFetch(input, init, loaderHook);\n     }\n \n     return typeof fetch === 'undefined' ? loadNodeFetch() : fetch;\n@@ -162,7 +152,9 @@ export function loadScriptNode(\n   url: string,\n   info: {\n     attrs?: Record<string, any>;\n-    createScriptHook?: CreateScriptHookNode;\n+    loaderHook?: {\n+      createScriptHook?: CreateScriptHookNode;\n+    };\n   },\n ) {\n   return new Promise<void>((resolve, reject) => {\n@@ -181,7 +173,7 @@ export function loadScriptNode(\n         }\n       },\n       info.attrs,\n-      info.createScriptHook,\n+      info.loaderHook,\n     );\n   });\n }"
+  },
+  {
+    "sha": "75d4326b8209e30f855b3f02667112fb55f285e9",
+    "filename": "packages/sdk/src/types/hooks.ts",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 0,
+    "changes": 4,
+    "blob_url": "https://github.com/module-federation/core/blob/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fsdk%2Fsrc%2Ftypes%2Fhooks.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/b6195d1a0789b42d98f6ad989773a4952be6bd7e/packages%2Fsdk%2Fsrc%2Ftypes%2Fhooks.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fsdk%2Fsrc%2Ftypes%2Fhooks.ts?ref=b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+    "patch": "@@ -23,3 +23,7 @@ export type CreateScriptHook = (\n   url: string,\n   attrs?: Record<string, any> | undefined,\n ) => CreateScriptHookReturn;\n+\n+export type FetchHook = (\n+  args: [string, RequestInit],\n+) => Promise<Response> | void | false;"
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-47702",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#47702: [code-infra] eslint rule rename",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 47702,
+    "prUrl": "https://github.com/mui/material-ui/pull/47702",
+    "baseSha": "dbd4d56935c578c8c714a1e95b8e3153327e633a",
+    "headSha": "4c2874e6dcb4c594cf204a5c5f15b9c1fa40fe7c",
+    "selectedFiles": [
+      "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:41:11.537Z"
+  },
+  "files": [
+    {
+      "id": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+      "oldPath": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+      "newPath": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/mui-docs/src/MarkdownElement/MarkdownElement.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 308,
+          "endLine": 308
+        },
+        "newRange": {
+          "startLine": 308,
+          "endLine": 308
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

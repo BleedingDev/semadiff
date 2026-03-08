@@ -1,0 +1,87 @@
+[
+  {
+    "tracking_name": "packages/zod/src/v3/tests/object.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv3%2Ftests%2Fobject.test.ts&old_oid=d8772d4f9843870dd5e7aa6ed62ab2971a995d7f&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv3%2Ftests%2Fobject.test.ts&new_oid=1427dc27802201cf7e550222a0ff1f5e33c6cc14&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/zod/src/v3/tests/object.test.ts",
+      "oid": "d8772d4f9843870dd5e7aa6ed62ab2971a995d7f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v3/tests/object.test.ts",
+      "oid": "1427dc27802201cf7e550222a0ff1f5e33c6cc14",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ac613a1ccae81f384dbdba10826ff1e362e6fd2beb25cb7dd11d48a1e8cc7a8e"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/array.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Farray.test.ts&old_oid=57cf9e340659851f5871450c48d535f783eaa872&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Farray.test.ts&new_oid=483e25fedd7cec842d48347b3017da9624bc8104&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/zod/src/v4/classic/tests/array.test.ts",
+      "oid": "57cf9e340659851f5871450c48d535f783eaa872",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/array.test.ts",
+      "oid": "483e25fedd7cec842d48347b3017da9624bc8104",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7c4ba973986ef2f144fcf383f7188f76683a5ac27dbc82963596679be25e7116"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/object.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fobject.test.ts&old_oid=608b145e4f34f587724a1f615381f79c3425633b&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fobject.test.ts&new_oid=3bd5088650fad4d8e1c30db284d4efa505e2873a&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/zod/src/v4/classic/tests/object.test.ts",
+      "oid": "608b145e4f34f587724a1f615381f79c3425633b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/object.test.ts",
+      "oid": "3bd5088650fad4d8e1c30db284d4efa505e2873a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "34b9f1d62135b2114ce0bfdedd1bcdaa90dbd140f215416c1915b069870300e0"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/refine.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frefine.test.ts&old_oid=a528b2a72a7a3c92aa44ffe9bea11ce2d85a5697&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frefine.test.ts&new_oid=fe312d86db6c82dd95fed60f9c4f4d62ef0138e9&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/zod/src/v4/classic/tests/refine.test.ts",
+      "oid": "a528b2a72a7a3c92aa44ffe9bea11ce2d85a5697",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/refine.test.ts",
+      "oid": "fe312d86db6c82dd95fed60f9c4f4d62ef0138e9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6eb589f42d12c6a894aa964924dffc481e005103bb105f0608a0b20c672acc16"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/set.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fset.test.ts&old_oid=3c1c3ec7cf34cfdcc8bd8af20726b35c7f1295d7&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fset.test.ts&new_oid=3338219ed4652cb1bf80aba609caf0da8e3296f9&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/zod/src/v4/classic/tests/set.test.ts",
+      "oid": "3c1c3ec7cf34cfdcc8bd8af20726b35c7f1295d7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/set.test.ts",
+      "oid": "3338219ed4652cb1bf80aba609caf0da8e3296f9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c46b6d5829142eabf052de73b6e7dae028f7b65f41cc8052de7f6a12a42e15a2"
+  }
+]

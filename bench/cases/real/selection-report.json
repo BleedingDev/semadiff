@@ -1,0 +1,2544 @@
+{
+  "version": "0.1.0",
+  "caseRoot": "/Users/satan/side/experiments/semantic-diff-rewrite/bench/cases/real/prs",
+  "generatedAt": "2026-03-08T02:35:24.385Z",
+  "tools": [
+    {
+      "tool": "semadiff",
+      "toolVersion": "0.1.0",
+      "review": {
+        "cases": 50,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 50,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 50,
+        "totalRuntimeMs": 552.43,
+        "medianRuntimeMs": 3.963,
+        "p95RuntimeMs": 54.391
+      }
+    },
+    {
+      "tool": "git-diff",
+      "toolVersion": "git version 2.53.0",
+      "review": {
+        "cases": 50,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 50,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 50,
+        "totalRuntimeMs": 431.962,
+        "medianRuntimeMs": 8.504,
+        "p95RuntimeMs": 9.861
+      }
+    },
+    {
+      "tool": "git-diff-color-moved",
+      "toolVersion": "git version 2.53.0 (+color-moved)",
+      "review": {
+        "cases": 50,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 50,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 50,
+        "totalRuntimeMs": 404.661,
+        "medianRuntimeMs": 8.022,
+        "p95RuntimeMs": 9.552
+      }
+    },
+    {
+      "tool": "difftastic",
+      "toolVersion": "Difftastic 0.67.0\n\nToolchain: 1.91.1\nSystem:    macos aarch64",
+      "review": {
+        "cases": 50,
+        "averagePrecision": 0.087,
+        "averageRecall": 0.117,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 50,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 50,
+        "totalRuntimeMs": 1944.96,
+        "medianRuntimeMs": 30.072,
+        "p95RuntimeMs": 115.088
+      }
+    },
+    {
+      "tool": "semanticdiff",
+      "toolVersion": "cached-web",
+      "review": {
+        "cases": 50,
+        "averagePrecision": 1,
+        "averageRecall": 1,
+        "averageMoveRecall": null,
+        "averageRenameRecall": null
+      },
+      "entity": {
+        "supportedCases": 0,
+        "unsupportedCases": 50,
+        "averagePrecision": null,
+        "averageRecall": null,
+        "averageF1": null,
+        "averageChangePrecision": null,
+        "averageChangeRecall": null,
+        "averageChangeF1": null
+      },
+      "performance": {
+        "cases": 50,
+        "totalRuntimeMs": 135.864,
+        "medianRuntimeMs": 1.317,
+        "p95RuntimeMs": 15.058
+      }
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "github-pr-colinhacks-zod-4536",
+      "description": "colinhacks/zod#4536: test: clarify test description for recursive types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 4536,
+        "prUrl": "https://github.com/colinhacks/zod/pull/4536",
+        "baseSha": "4a259687c30a0dd774dc755cdedfc3f521919dd0",
+        "headSha": "593c1dd22ab43162dff79cc28f7af87f24350080",
+        "selectedFiles": [
+          "packages/zod/src/v4/classic/tests/recursive-types.test.ts"
+        ],
+        "collectedAt": "2026-03-08T02:13:41.816Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-4588",
+      "description": "colinhacks/zod#4588: refactor: remove unused import & imported multiple times",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 4588,
+        "prUrl": "https://github.com/colinhacks/zod/pull/4588",
+        "baseSha": "52808166ec4ee89ed04d0da6b86c42134f6b07e4",
+        "headSha": "dce4660ce29c004d026be1eeead9578ceeaefd68",
+        "selectedFiles": [
+          "packages/bench/object.ts"
+        ],
+        "collectedAt": "2026-03-08T02:15:23.262Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-4672",
+      "description": "colinhacks/zod#4672: refactor: remove unnecessary assertion",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 4672,
+        "prUrl": "https://github.com/colinhacks/zod/pull/4672",
+        "baseSha": "82b43fa9ff832b80e249b944fefb8177827136e6",
+        "headSha": "f03f722fce2d02c98f3b341a453f700256c7474b",
+        "selectedFiles": [
+          "packages/zod/src/v3/helpers/util.ts"
+        ],
+        "collectedAt": "2026-03-08T02:14:55.674Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-4920",
+      "description": "colinhacks/zod#4920: feat: Icelandic translation",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 4920,
+        "prUrl": "https://github.com/colinhacks/zod/pull/4920",
+        "baseSha": "2c333e268c316deef829c736b8c46ec95ee03e39",
+        "headSha": "5c6b15d2bc4ef760005a3db3ee39defb61d78155",
+        "selectedFiles": [
+          "packages/zod/src/v4/locales/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:14:23.794Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5028",
+      "description": "colinhacks/zod#5028: chore: upgrade vitest to v4",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5028,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5028",
+        "baseSha": "62bf4e439e287e55c843245b49f8d34b1ad024ee",
+        "headSha": "1f5677e1ae23a7b4da93d3626cc8f7df71ff2831",
+        "selectedFiles": [
+          "vitest.config.ts"
+        ],
+        "collectedAt": "2026-03-08T02:12:22.420Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5104",
+      "description": "colinhacks/zod#5104: refactor: remove unnecessary await in test",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5104,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5104",
+        "baseSha": "0313553db1bca4a023ff4767503befc025689188",
+        "headSha": "6c9e285ebcf17b8d820d315b02b7231b5468f789",
+        "selectedFiles": [
+          "packages/zod/src/v4/classic/tests/set.test.ts"
+        ],
+        "collectedAt": "2026-03-08T02:14:31.838Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5338",
+      "description": "colinhacks/zod#5338: fix(url): reflect the specified regex correctly in error",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5338,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5338",
+        "baseSha": "5c2602ceb8be8941c64bbe5ac7d92cc174ae6f7e",
+        "headSha": "b55f06f0bd12b9059b5e1469b7bd3713e995291b",
+        "selectedFiles": [
+          "packages/zod/src/v4/core/schemas.ts"
+        ],
+        "collectedAt": "2026-03-08T02:11:46.015Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5476",
+      "description": "colinhacks/zod#5476: fix(implementasync): Inferred type should always be a promise",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5476,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5476",
+        "baseSha": "4063e802d539d04182fc3e66a543ae6d1ba5658e",
+        "headSha": "f8781da4397a8be1ece410c802acfd0ff20d8f4f",
+        "selectedFiles": [
+          "packages/zod/src/v4/core/schemas.ts"
+        ],
+        "collectedAt": "2026-03-08T02:11:30.180Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5511",
+      "description": "colinhacks/zod#5511: fix(mini): export ZodMiniJSONSchema types to prevent TS4023",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5511,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5511",
+        "baseSha": "6e968a3b49cbcb3bffc30c68634e80168e8f2a2e",
+        "headSha": "87dae2616304a3e80fe23fb52f68317f2fed361d",
+        "selectedFiles": [
+          "packages/zod/src/v4/mini/schemas.ts"
+        ],
+        "collectedAt": "2026-03-08T02:13:16.725Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5584",
+      "description": "colinhacks/zod#5584: Improve locale translation approach",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5584,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5584",
+        "baseSha": "aedcc06eb953c47efb1e7e089cafffd756eb9ba4",
+        "headSha": "fb0861293cc0d2940ff9dcb516a09ff9b9aa2fcc",
+        "selectedFiles": [
+          "packages/zod/src/v4/core/schemas.ts"
+        ],
+        "collectedAt": "2026-03-08T02:14:10.351Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5610",
+      "description": "colinhacks/zod#5610: Add hr (croatian) translation",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5610,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5610",
+        "baseSha": "0cdc0b8597999fd9ca99767b912c1e82c1ff2d6c",
+        "headSha": "34f0958fe91b19d964b11ec6c2fe2287b2374751",
+        "selectedFiles": [
+          "packages/zod/src/v4/locales/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:13:48.101Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-colinhacks-zod-5628",
+      "description": "colinhacks/zod#5628: fix: typo in codec.test.ts file",
+      "source": {
+        "kind": "github-pr",
+        "repository": "colinhacks/zod",
+        "prNumber": 5628,
+        "prUrl": "https://github.com/colinhacks/zod/pull/5628",
+        "baseSha": "9977fb0868432461de265a773319e80a90ba3e37",
+        "headSha": "bee037f43a14737ea9e3f1cc77b7f0624b3696ac",
+        "selectedFiles": [
+          "packages/zod/src/v4/classic/tests/codec.test.ts"
+        ],
+        "collectedAt": "2026-03-08T02:12:57.580Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10603",
+      "description": "pnpm/pnpm#10603: refactor(test): some small polishments",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10603,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10603",
+        "baseSha": "cc7c0d22dfaf8b99b59a76965be058ec2ac29e1d",
+        "headSha": "a799ab11e015c37fd765346762252c518d6b952e",
+        "selectedFiles": [
+          "releasing/plugin-commands-publishing/test/oidcIdToken.test.ts"
+        ],
+        "collectedAt": "2026-03-08T02:27:11.349Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10666",
+      "description": "pnpm/pnpm#10666: refactor(env): `pnpm env` use now delegates to `pnpm add --global`",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10666,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10666",
+        "baseSha": "9065f491f0159bf3081dc14f72587d0d51a49b8e",
+        "headSha": "9127351488dd4c3df066f411c453955a7cc82ab0",
+        "selectedFiles": [
+          "fetching/binary-fetcher/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:26:56.210Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10668",
+      "description": "pnpm/pnpm#10668: refactor(env): unify node version specifier parsing into parseNodeSpecifier in node.resolver",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10668,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10668",
+        "baseSha": "895af7032037a7da1711830d7c0673ca2c9b6241",
+        "headSha": "6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+        "selectedFiles": [
+          "env/plugin-commands-env/src/envList.ts"
+        ],
+        "collectedAt": "2026-03-08T02:26:49.210Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10674",
+      "description": "pnpm/pnpm#10674: refactor: remove last mentions of use-node-version",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10674,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10674",
+        "baseSha": "db80d174016a662426366e70194ac74f082e1f45",
+        "headSha": "3ab22ac4d18f1fc4017439832c49002e457f9aef",
+        "selectedFiles": [
+          "config/config/src/configFileKey.ts"
+        ],
+        "collectedAt": "2026-03-08T02:26:41.616Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10846",
+      "description": "pnpm/pnpm#10846: fix(gvs): engine-agnostic hashes and build failure recovery",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10846,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10846",
+        "baseSha": "d5fcecac82d37b2f77324f2cddbfd96ce1c5e61c",
+        "headSha": "e9d06f0eeced5cb82e9f19995925ef2ea2966b1b",
+        "selectedFiles": [
+          "pkg-manager/modules-yaml/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:25:18.058Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10897",
+      "description": "pnpm/pnpm#10897: fix: improve global install output to show clean summary",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10897,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10897",
+        "baseSha": "5d999f2ceb0916ead451cda6a5c3e8dbc2d9f482",
+        "headSha": "2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+        "selectedFiles": [
+          "cli/default-reporter/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:25:08.252Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10899",
+      "description": "pnpm/pnpm#10899: fix: show linked path instead of ??? in global install output",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10899,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10899",
+        "baseSha": "77165a6fca84fa5d10de2647e8e741010bb8e548",
+        "headSha": "49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750",
+        "selectedFiles": [
+          "cli/default-reporter/src/reporterForClient/reportSummary.ts"
+        ],
+        "collectedAt": "2026-03-08T02:24:55.241Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-10900",
+      "description": "pnpm/pnpm#10900: fix: fix mount-modules test when fuse-native is not installed",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 10900,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/10900",
+        "baseSha": "77165a6fca84fa5d10de2647e8e741010bb8e548",
+        "headSha": "9f7217d94bfb17ffeb8e83530da78ffdc82f8907",
+        "selectedFiles": [
+          ".meta-updater/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:25:01.366Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-6244",
+      "description": "pnpm/pnpm#6244: fix: typo standalone",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 6244,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/6244",
+        "baseSha": "81ca8b1aa546414be380d2599cdc344ce5ce7e96",
+        "headSha": "78ce8607f9e09594b37fde3e12df3337f991c317",
+        "selectedFiles": [
+          "env/plugin-commands-env/src/env.ts"
+        ],
+        "collectedAt": "2026-03-08T02:25:59.289Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-6668",
+      "description": "pnpm/pnpm#6668: fix: parameter typo",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 6668,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/6668",
+        "baseSha": "43151bbd6ea08e59a3256daaecd1336bd864b810",
+        "headSha": "0e8df8fded87acdf85596b62236a73974ca3afaa",
+        "selectedFiles": [
+          "resolving/npm-resolver/src/pickPackageFromMeta.ts"
+        ],
+        "collectedAt": "2026-03-08T02:25:53.104Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-8668",
+      "description": "pnpm/pnpm#8668: fix(license): fix typo of `CC0` license other name",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 8668,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/8668",
+        "baseSha": "54bd7b081d29d2f678d249d44c0359bd73730033",
+        "headSha": "73840e7a35ffe2827336fa79a43883ee9cc41262",
+        "selectedFiles": [
+          "reviewing/license-scanner/src/getPkgInfo.ts"
+        ],
+        "collectedAt": "2026-03-08T02:25:47.601Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-pnpm-pnpm-8866",
+      "description": "pnpm/pnpm#8866: refactor: lockfile types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "pnpm/pnpm",
+        "prNumber": 8866,
+        "prUrl": "https://github.com/pnpm/pnpm/pull/8866",
+        "baseSha": "a162703126ef0be886f76f7b598acb0f38b99394",
+        "headSha": "b90ec11b50b52a5c6cd741aad1642258380f2e8e",
+        "selectedFiles": [
+          "lockfile/fs/test/write.test.ts"
+        ],
+        "collectedAt": "2026-03-08T02:26:28.371Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-273",
+      "description": "reduxjs/redux-toolkit#273: * refactor actionCreator typings from `type` to `interface`",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 273,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/273",
+        "baseSha": "0f4b0e0c670091e05448593c9af2d5b10f6a540e",
+        "headSha": "bc2f68ec26cd7996f5a8d6622341b4432991d887",
+        "selectedFiles": [
+          "src/createSlice.ts"
+        ],
+        "collectedAt": "2026-03-08T02:17:43.270Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-4686",
+      "description": "reduxjs/redux-toolkit#4686: Update @testing-library/react from 13.3.0 to 16.0.1; Fixes #4685",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 4686,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/4686",
+        "baseSha": "3a6ec28968555f260a733a1d5c7b002d6cb6e1c9",
+        "headSha": "23a1c3f406f97ed53d54693ec7e33a51286e6853",
+        "selectedFiles": [
+          "packages/toolkit/src/query/tests/cleanup.test.tsx"
+        ],
+        "collectedAt": "2026-03-08T02:15:50.512Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-4818",
+      "description": "reduxjs/redux-toolkit#4818: Fix infinite query lifecycle callback data types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 4818,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/4818",
+        "baseSha": "2ef6966a4eb2f642767fc1f0ed55f7dc5ea65242",
+        "headSha": "3d8b771d0604ee019787747eaceecbbdb37b79ed",
+        "selectedFiles": [
+          "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts"
+        ],
+        "collectedAt": "2026-03-08T02:17:22.220Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-4869",
+      "description": "reduxjs/redux-toolkit#4869: Fix assorted infinite query types",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 4869,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/4869",
+        "baseSha": "18ddd7eb4515122c5922c67c93f515afe5eeb5eb",
+        "headSha": "5f2178e19af15d033e733967b29de9c4a041558c",
+        "selectedFiles": [
+          "packages/toolkit/src/query/endpointDefinitions.ts"
+        ],
+        "collectedAt": "2026-03-08T02:17:11.832Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-5015",
+      "description": "reduxjs/redux-toolkit#5015: fix(types): re-exporting WritableDraft from immer",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 5015,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5015",
+        "baseSha": "af3e75bb9e6a51e13603d2a5684ef3ba1da07e3b",
+        "headSha": "d83b6d819ccb78c3f9088c771121b77586058609",
+        "selectedFiles": [
+          "packages/toolkit/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:16:59.664Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-5164",
+      "description": "reduxjs/redux-toolkit#5164: chore: update type tests to use `toMatchObjectType` and `toExtend`",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 5164,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5164",
+        "baseSha": "f6cc1a3a3e25c1e1919db2d24a4fef98568c3137",
+        "headSha": "b0ce647d90ae945dda384e85cbda2aea55209bc9",
+        "selectedFiles": [
+          "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx"
+        ],
+        "collectedAt": "2026-03-08T02:16:28.828Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-5218",
+      "description": "reduxjs/redux-toolkit#5218: Export hook options types for RTK Query hooks",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 5218,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5218",
+        "baseSha": "b871d8bc302790ca00d7183b6c0a6a13fdc404a2",
+        "headSha": "20387a1a6902bbf597dbaec103e33dafc2ae53fe",
+        "selectedFiles": [
+          "packages/toolkit/src/query/react/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:16:45.937Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-reduxjs-redux-toolkit-5232",
+      "description": "reduxjs/redux-toolkit#5232: chore(toolkit): update test imports to use public entry points",
+      "source": {
+        "kind": "github-pr",
+        "repository": "reduxjs/redux-toolkit",
+        "prNumber": 5232,
+        "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/5232",
+        "baseSha": "8ed4a900c31d9780df31c68182974812b036dff0",
+        "headSha": "af1ba6aad2980b706707ce9802338f5ed3f10864",
+        "selectedFiles": [
+          "packages/toolkit/src/tests/createReducer.test.ts"
+        ],
+        "collectedAt": "2026-03-08T02:16:01.259Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-typestrong-ts-node-1016",
+      "description": "typeStrong/ts-node#1016: Fix failing tests caused by recent changes to @types/node",
+      "source": {
+        "kind": "github-pr",
+        "repository": "typeStrong/ts-node",
+        "prNumber": 1016,
+        "prUrl": "https://github.com/TypeStrong/ts-node/pull/1016",
+        "baseSha": "2a0f1f3b8f979dbc61726017f5de45a8b03f3c95",
+        "headSha": "b6bc3013f921c3107f1af4a5429718f3a262e1ab",
+        "selectedFiles": [
+          "src/index.spec.ts"
+        ],
+        "collectedAt": "2026-03-08T02:22:18.807Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-typestrong-ts-node-1266",
+      "description": "typeStrong/ts-node#1266: Refactor codebase into separate files, and enable `importsNotUsedAsValues: error`",
+      "source": {
+        "kind": "github-pr",
+        "repository": "typeStrong/ts-node",
+        "prNumber": 1266,
+        "prUrl": "https://github.com/TypeStrong/ts-node/pull/1266",
+        "baseSha": "5c6efa424831aa75d118ad26e8f2917f82f290eb",
+        "headSha": "cb1eb1abe5deca95406c1ce2f4737f11fc555da3",
+        "selectedFiles": [
+          "src/index.spec.ts"
+        ],
+        "collectedAt": "2026-03-08T02:22:31.854Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-typestrong-ts-node-2091",
+      "description": "typeStrong/ts-node#2091: fix: tsconfig not found with TS >= 5.3",
+      "source": {
+        "kind": "github-pr",
+        "repository": "typeStrong/ts-node",
+        "prNumber": 2091,
+        "prUrl": "https://github.com/TypeStrong/ts-node/pull/2091",
+        "baseSha": "c06cbe7d83b5585bb24f9963c42ce13eadd2202f",
+        "headSha": "9be593851d72e44cc8056963d00730ff3e15f748",
+        "selectedFiles": [
+          "src/ts-compiler-types.ts"
+        ],
+        "collectedAt": "2026-03-08T02:21:27.930Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-13285",
+      "description": "vitejs/vite#13285: docs: link to ko translation",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 13285,
+        "prUrl": "https://github.com/vitejs/vite/pull/13285",
+        "baseSha": "e3db7712657232fbb9ea2499a2c6f277d2bb96a3",
+        "headSha": "a36c88f971583d06941e45d31316bbfece1c876d",
+        "selectedFiles": [
+          "docs/.vitepress/config.ts"
+        ],
+        "collectedAt": "2026-03-08T02:20:14.916Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21040",
+      "description": "vitejs/vite#21040: fix(types): add undefined to optional properties for exactOptionalProperties type compatibility",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21040,
+        "prUrl": "https://github.com/vitejs/vite/pull/21040",
+        "baseSha": "b1fd6161886caeb31ac646d6544116d37efe46d0",
+        "headSha": "d8eeab9b2823bc8b29c96850e8a1aa17314b78b1",
+        "selectedFiles": [
+          "packages/vite/src/node/plugin.ts"
+        ],
+        "collectedAt": "2026-03-08T02:20:00.567Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21435",
+      "description": "vitejs/vite#21435: chore: fix typo in plugin.ts comment",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21435,
+        "prUrl": "https://github.com/vitejs/vite/pull/21435",
+        "baseSha": "80840d37d88f3f4344d6317a087dde3469273917",
+        "headSha": "6d9f2b69256a7f3863d8e52b89ac4649db3d6734",
+        "selectedFiles": [
+          "packages/vite/src/node/plugin.ts"
+        ],
+        "collectedAt": "2026-03-08T02:19:27.423Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0.05,
+          "changedLineRecall": 0.5,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21489",
+      "description": "vitejs/vite#21489: chore: fix tiny typos in the changelog and a test case description",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21489,
+        "prUrl": "https://github.com/vitejs/vite/pull/21489",
+        "baseSha": "e575503fd1f22111830c7a6d1715b2a0aa7d2246",
+        "headSha": "7cfef8801c53f4c9ff9079d985f38b2e1fd437fd",
+        "selectedFiles": [
+          "playground/assets/__tests__/assets.spec.ts"
+        ],
+        "collectedAt": "2026-03-08T02:19:18.613Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21507",
+      "description": "vitejs/vite#21507: docs: bulk of typo fixes",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21507,
+        "prUrl": "https://github.com/vitejs/vite/pull/21507",
+        "baseSha": "b243180c0a193c8ab17b88953e9cc7d03f632697",
+        "headSha": "ee0f73d382831cf40564436adbbfa5595b5bacc1",
+        "selectedFiles": [
+          "playground/assets/__tests__/assets.spec.ts"
+        ],
+        "collectedAt": "2026-03-08T02:19:09.550Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21674",
+      "description": "vitejs/vite#21674: refactor(create-vite): remove extra brackets in React Compiler babel plugins",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21674,
+        "prUrl": "https://github.com/vitejs/vite/pull/21674",
+        "baseSha": "5f425a9126ad1a483f482970bef8c29a0e721a3c",
+        "headSha": "bc89ce7efd2dff00ebd2332db814a7a11b9ab423",
+        "selectedFiles": [
+          "packages/create-vite/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:20:51.806Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0.143,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21710",
+      "description": "vitejs/vite#21710: fix(types): remove extends ImportMeta from ModuleRunnerImportMeta",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21710,
+        "prUrl": "https://github.com/vitejs/vite/pull/21710",
+        "baseSha": "f7e1d0720e6b9f2ce5d358b6a23ebdb72c51be70",
+        "headSha": "7733df4ad652d5de77f72b3bd268f7a9b510add8",
+        "selectedFiles": [
+          "packages/vite/src/module-runner/createImportMeta.ts"
+        ],
+        "collectedAt": "2026-03-08T02:18:04.247Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21719",
+      "description": "vitejs/vite#21719: refactor: use `ESTree` types from `rolldown/utils`",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21719,
+        "prUrl": "https://github.com/vitejs/vite/pull/21719",
+        "baseSha": "37a65f8c31b5baeb4dadecfd4da98f81bae4202e",
+        "headSha": "c175294c2b6de2b547ef8d3308cc9b12a9926dec",
+        "selectedFiles": [
+          "packages/vite/src/node/server/pluginContainer.ts"
+        ],
+        "collectedAt": "2026-03-08T02:19:44.246Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21744",
+      "description": "vitejs/vite#21744: refactor: enable some native plugins even with enable native plugin false",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21744,
+        "prUrl": "https://github.com/vitejs/vite/pull/21744",
+        "baseSha": "1958eeb34f9eab93f106b785c1c2ddf97b5c3b3a",
+        "headSha": "d3c2e8be04c65bd7f4b7fcb8e5a86b79455706dd",
+        "selectedFiles": [
+          "packages/vite/src/node/build.ts"
+        ],
+        "collectedAt": "2026-03-08T02:20:35.888Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-21745",
+      "description": "vitejs/vite#21745: fix(dev): disable extglobs for consistency",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 21745,
+        "prUrl": "https://github.com/vitejs/vite/pull/21745",
+        "baseSha": "8546520927de03dc4f868db5a1cec39a1826f3d0",
+        "headSha": "f249ed9a59bc613c4eecc964c0642b47bcaf7b91",
+        "selectedFiles": [
+          "packages/vite/src/node/plugins/importMetaGlob.ts"
+        ],
+        "collectedAt": "2026-03-08T02:18:26.224Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitejs-vite-8751",
+      "description": "vitejs/vite#8751: docs: link to es translation",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitejs/vite",
+        "prNumber": 8751,
+        "prUrl": "https://github.com/vitejs/vite/pull/8751",
+        "baseSha": "19fc7e5fc480b061c154b06a5a83a552b3fbd883",
+        "headSha": "46a8cc75ce329c9256a43301b5b4ddda59c492bc",
+        "selectedFiles": [
+          "docs/.vitepress/config.ts"
+        ],
+        "collectedAt": "2026-03-08T02:20:23.273Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitest-dev-vitest-9632",
+      "description": "vitest-dev/vitest#9632: refactor: copy attachmentsDir in html reporter output",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitest-dev/vitest",
+        "prNumber": 9632,
+        "prUrl": "https://github.com/vitest-dev/vitest/pull/9632",
+        "baseSha": "5cf83019e305fcc041f89378fca8383bf4597e69",
+        "headSha": "5d042c09f86314c700e46cd6554c49bf0dcb0de0",
+        "selectedFiles": [
+          "test/ui/playwright.config.ts"
+        ],
+        "collectedAt": "2026-03-08T02:24:20.874Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitest-dev-vitest-9695",
+      "description": "vitest-dev/vitest#9695: fix(types): `bench.reporters` no longer gives type errors when passing file name string paths",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitest-dev/vitest",
+        "prNumber": 9695,
+        "prUrl": "https://github.com/vitest-dev/vitest/pull/9695",
+        "baseSha": "4d7938a567d4afb16ed793fe1ac34b7b9880f06e",
+        "headSha": "b5c28d7b24acd738be77502f944322fb85361fff",
+        "selectedFiles": [
+          "packages/vitest/src/node/types/benchmark.ts"
+        ],
+        "collectedAt": "2026-03-08T02:23:52.640Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0.143,
+          "changedLineRecall": 0.333,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitest-dev-vitest-9716",
+      "description": "vitest-dev/vitest#9716: fix(browser): types of `getCDPSession` and `cdp()`",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitest-dev/vitest",
+        "prNumber": 9716,
+        "prUrl": "https://github.com/vitest-dev/vitest/pull/9716",
+        "baseSha": "94eb73b519cb5ecd06c9aa178a3f0e161c96236f",
+        "headSha": "3c13cdbfae1dd3362e63fde394e26c526379eec4",
+        "selectedFiles": [
+          "packages/browser-playwright/src/index.ts"
+        ],
+        "collectedAt": "2026-03-08T02:23:22.725Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    },
+    {
+      "caseId": "github-pr-vitest-dev-vitest-9803",
+      "description": "vitest-dev/vitest#9803: fix(browser): skip esbuild.legalComments when using rolldown-vite",
+      "source": {
+        "kind": "github-pr",
+        "repository": "vitest-dev/vitest",
+        "prNumber": 9803,
+        "prUrl": "https://github.com/vitest-dev/vitest/pull/9803",
+        "baseSha": "dfb2159d3b758fa14c08c8d0cf9874fa3312954f",
+        "headSha": "36b91033b5d28d2e466f288e2ab48027c1389481",
+        "selectedFiles": [
+          "packages/browser/src/node/plugin.ts"
+        ],
+        "collectedAt": "2026-03-08T02:23:15.712Z"
+      },
+      "review": {
+        "semadiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "git-diff-color-moved": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "difftastic": {
+          "changedLinePrecision": 0,
+          "changedLineRecall": 0,
+          "moveRecall": null,
+          "renameRecall": null
+        },
+        "semanticdiff": {
+          "changedLinePrecision": 1,
+          "changedLineRecall": 1,
+          "moveRecall": null,
+          "renameRecall": null
+        }
+      }
+    }
+  ]
+}

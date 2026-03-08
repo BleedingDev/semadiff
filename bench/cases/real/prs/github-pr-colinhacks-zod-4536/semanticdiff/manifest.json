@@ -1,0 +1,36 @@
+[
+  {
+    "tracking_name": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frecursive-types.test.ts&old_oid=ad4256fc80663578d92d78bf53d866dca29ec6ee&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Frecursive-types.test.ts&new_oid=5b85c1d8b54969725c85761f2ee66006f4ac1fd0&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+      "oid": "ad4256fc80663578d92d78bf53d866dca29ec6ee",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/classic/tests/recursive-types.test.ts",
+      "oid": "5b85c1d8b54969725c85761f2ee66006f4ac1fd0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8d4af9108bc86915c5f702f5fd5c308322e76aeae75d982e0ebf4f27710c1ff5"
+  },
+  {
+    "tracking_name": "packages/zod/src/v4/mini/tests/recursive-types.test.ts",
+    "diff": "/gh/colinhacks/zod/diff?old_filename=packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Ftests%2Frecursive-types.test.ts&old_oid=d57b4b312e112522a47e293aa7b430a0314fb0b1&old_mode=33188&new_filename=packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Ftests%2Frecursive-types.test.ts&new_oid=7ef490fce66ce23cb9160667d053cc3bcdc68840&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/zod/src/v4/mini/tests/recursive-types.test.ts",
+      "oid": "d57b4b312e112522a47e293aa7b430a0314fb0b1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/zod/src/v4/mini/tests/recursive-types.test.ts",
+      "oid": "7ef490fce66ce23cb9160667d053cc3bcdc68840",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ae18cbd7c947df00037bb99beae22cabef3a1c528c7148fd6e0346bd495cfaf5"
+  }
+]

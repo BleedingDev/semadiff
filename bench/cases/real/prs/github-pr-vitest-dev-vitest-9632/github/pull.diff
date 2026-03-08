@@ -1,0 +1,311 @@
+diff --git a/packages/ui/client/composables/attachments.ts b/packages/ui/client/composables/attachments.ts
+index 6352c1c4867e..93fbb4419745 100644
+--- a/packages/ui/client/composables/attachments.ts
++++ b/packages/ui/client/composables/attachments.ts
+@@ -1,14 +1,15 @@
+ import type { TestAttachment } from '@vitest/runner'
+ import mime from 'mime/lite'
++import { basename } from 'pathe'
+ import { isReport } from '~/constants'
+ 
+ export function getAttachmentUrl(attachment: TestAttachment): string {
+-  // html reporter always saves files into /data/ folder
+-  if (isReport) {
+-    return `/data/${attachment.path}`
+-  }
+   const contentType = attachment.contentType ?? 'application/octet-stream'
+   if (attachment.path) {
++    if (isReport) {
++      // html reporter copies attachments to /data/ folder
++      return `/data/${basename(attachment.path)}`
++    }
+     return `/__vitest_attachment__?path=${encodeURIComponent(attachment.path)}&contentType=${contentType}&token=${(window as any).VITEST_API_TOKEN}`
+   }
+   // attachment.body is always a string outside of the test frame
+diff --git a/packages/ui/node/reporter.ts b/packages/ui/node/reporter.ts
+index b15857c18924..6da18ca5894a 100644
+--- a/packages/ui/node/reporter.ts
++++ b/packages/ui/node/reporter.ts
+@@ -1,15 +1,11 @@
+-import type { Task, TestAttachment } from '@vitest/runner'
+ import type { ModuleGraphData, RunnerTestFile, SerializedConfig } from 'vitest'
+ import type { HTMLOptions, Reporter, Vitest } from 'vitest/node'
+-import crypto from 'node:crypto'
+-import { promises as fs } from 'node:fs'
+-import { readFile, writeFile } from 'node:fs/promises'
++import { existsSync, promises as fs } from 'node:fs'
+ import { fileURLToPath } from 'node:url'
+ import { promisify } from 'node:util'
+ import { gzip, constants as zlibConstants } from 'node:zlib'
+ import { stringify } from 'flatted'
+-import mime from 'mime/lite'
+-import { dirname, extname, relative, resolve } from 'pathe'
++import { dirname, relative, resolve } from 'pathe'
+ import { globSync } from 'tinyglobby'
+ import c from 'tinyrainbow'
+ import { getModuleGraph } from '../../vitest/src/utils/graph'
+@@ -66,7 +62,6 @@ export default class HTMLReporter implements Reporter {
+     this.reporterDir = dirname(htmlFilePath)
+     this.htmlFilePath = htmlFilePath
+ 
+-    await fs.mkdir(resolve(this.reporterDir, 'data'), { recursive: true })
+     await fs.mkdir(resolve(this.reporterDir, 'assets'), { recursive: true })
+   }
+ 
+@@ -82,30 +77,7 @@ export default class HTMLReporter implements Reporter {
+     }
+     const promises: Promise<void>[] = []
+ 
+-    const processAttachments = (task: Task) => {
+-      if (task.type === 'test') {
+-        task.annotations.forEach((annotation) => {
+-          const attachment = annotation.attachment
+-          if (attachment) {
+-            promises.push(this.processAttachment(attachment))
+-          }
+-        })
+-        task.artifacts.forEach((artifact) => {
+-          const attachments = artifact.attachments
+-          if (attachments) {
+-            attachments.forEach((attachment) => {
+-              promises.push(this.processAttachment(attachment))
+-            })
+-          }
+-        })
+-      }
+-      else {
+-        task.tasks.forEach(processAttachments)
+-      }
+-    }
+-
+     promises.push(...result.files.map(async (file) => {
+-      processAttachments(file)
+       const projectName = file.projectName || ''
+       const resolvedConfig = this.ctx.getProjectByName(projectName).config
+       const browser = resolvedConfig.browser.enabled
+@@ -132,42 +104,6 @@ export default class HTMLReporter implements Reporter {
+     await this.writeReport(stringify(result))
+   }
+ 
+-  async processAttachment(attachment: TestAttachment): Promise<void> {
+-    if (attachment.path) {
+-      // keep external resource as is, but remove body if it's set somehow
+-      if (
+-        attachment.path.startsWith('http://')
+-        || attachment.path.startsWith('https://')
+-      ) {
+-        attachment.body = undefined
+-        return
+-      }
+-
+-      const buffer = await readFile(attachment.path)
+-      const hash = crypto.createHash('sha1').update(buffer).digest('hex')
+-      const filename = hash + extname(attachment.path)
+-      // move the file into an html directory to make access/publishing UI easier
+-      await writeFile(resolve(this.reporterDir, 'data', filename), buffer)
+-      attachment.path = filename
+-      attachment.body = undefined
+-      return
+-    }
+-
+-    if (attachment.body) {
+-      const buffer = typeof attachment.body === 'string'
+-        ? Buffer.from(attachment.body, 'base64')
+-        : Buffer.from(attachment.body)
+-
+-      const hash = crypto.createHash('sha1').update(buffer).digest('hex')
+-      const extension = mime.getExtension(attachment.contentType || 'application/octet-stream') || 'dat'
+-      const filename = `${hash}.${extension}`
+-      // store the file in html directory instead of passing down as a body
+-      await writeFile(resolve(this.reporterDir, 'data', filename), buffer)
+-      attachment.path = filename
+-      attachment.body = undefined
+-    }
+-  }
+-
+   async writeReport(report: string): Promise<void> {
+     const metaFile = resolve(this.reporterDir, 'html.meta.json.gz')
+ 
+@@ -198,6 +134,15 @@ export default class HTMLReporter implements Reporter {
+       }),
+     )
+ 
++    // copy attachments
++    // TODO: unify attachmentsDir and html outputFile, so both live together without extra copy
++    if (existsSync(this.ctx.config.attachmentsDir)) {
++      const destAttachmentsDir = resolve(this.reporterDir, 'data')
++      await fs.rm(destAttachmentsDir, { recursive: true, force: true })
++      await fs.mkdir(destAttachmentsDir, { recursive: true })
++      await fs.cp(this.ctx.config.attachmentsDir, destAttachmentsDir, { recursive: true })
++    }
++
+     this.ctx.logger.log(
+       `${c.bold(c.inverse(c.magenta(' HTML ')))} ${c.magenta(
+         'Report is generated',
+diff --git a/test/ui/fixtures/annotated.test.ts b/test/ui/fixtures/annotated.test.ts
+index f7bde4bc510d..7825855898d0 100644
+--- a/test/ui/fixtures/annotated.test.ts
++++ b/test/ui/fixtures/annotated.test.ts
+@@ -20,3 +20,12 @@ test('annotated image test', async ({ annotate }) => {
+     path: './fixtures/cute-puppy.jpg'
+   })
+ })
++
++test('annotated with body', async ({ annotate }) => {
++  await annotate('body annotation', {
++    contentType: 'text/markdown',
++    // requires pre-encoded base64 for raw string
++    // https://github.com/vitest-dev/vitest/issues/9633
++    body: btoa('Hello **markdown**'),
++  })
++})
+diff --git a/test/ui/playwright.config.ts b/test/ui/playwright.config.ts
+index b3360f419e1d..6e08054a2a59 100644
+--- a/test/ui/playwright.config.ts
++++ b/test/ui/playwright.config.ts
+@@ -5,7 +5,8 @@ export default defineConfig({
+   projects: [
+     {
+       name: 'chromium',
+-      use: devices['Desktop Chrome'],
++      // increase viewport height so virtual scroller renders all explorer items
++      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } },
+     },
+   ],
+   use: {
+diff --git a/test/ui/test/html-report.spec.ts b/test/ui/test/html-report.spec.ts
+index 13980852fcfc..7de4225b4101 100644
+--- a/test/ui/test/html-report.spec.ts
++++ b/test/ui/test/html-report.spec.ts
+@@ -1,4 +1,5 @@
+ import type { PreviewServer } from 'vite'
++import { readFileSync } from 'node:fs'
+ import { Writable } from 'node:stream'
+ import { expect, test } from '@playwright/test'
+ import { preview } from 'vite'
+@@ -66,7 +67,7 @@ test.describe('html report', () => {
+     await page.goto(pageUrl)
+ 
+     // dashboard
+-    await expect(page.locator('[aria-labelledby=tests]')).toContainText('15 Pass 2 Fail 17 Total')
++    await expect(page.locator('[aria-labelledby=tests]')).toContainText('16 Pass 2 Fail 18 Total')
+ 
+     // unhandled errors
+     await expect(page.getByTestId('unhandled-errors')).toContainText(
+@@ -169,6 +170,27 @@ test.describe('html report', () => {
+       await expect(annotation.getByRole('link')).toHaveAttribute('href', /data\/\w+/)
+       await expect(annotation.getByRole('img')).toHaveAttribute('src', /data\/\w+/)
+     })
++
++    await test.step('annotated with body', async () => {
++      const item = page.getByLabel('annotated with body')
++      await item.click({ force: true })
++      await page.getByTestId('btn-report').click({ force: true })
++
++      const annotation = page.getByRole('note')
++      await expect(annotation).toHaveCount(1)
++
++      await expect(annotation).toContainText('body annotation')
++      await expect(annotation).toContainText('notice')
++      await expect(annotation).toContainText('fixtures/annotated.test.ts:25:9')
++
++      const downloadPromise = page.waitForEvent('download')
++      await annotation.getByRole('link').click()
++      const download = await downloadPromise
++      expect(download.suggestedFilename()).toBe('body-annotation.md')
++      const downloadPath = await download.path()
++      const content = readFileSync(downloadPath, 'utf-8')
++      expect(content).toBe('Hello **markdown**')
++    })
+   })
+ 
+   test('annotations', async ({ page }) => {
+@@ -179,16 +201,18 @@ test.describe('html report', () => {
+     await page.getByTestId('btn-code').click({ force: true })
+ 
+     const annotations = page.getByRole('note')
+-    await expect(annotations).toHaveCount(5)
++    await expect(annotations).toHaveCount(6)
+ 
+     await expect(annotations.first()).toHaveText('notice: hello world')
+     await expect(annotations.nth(1)).toHaveText('notice: second annotation')
+     await expect(annotations.nth(2)).toHaveText('warning: beware!')
+     await expect(annotations.nth(3)).toHaveText(/notice: file annotation/)
+     await expect(annotations.nth(4)).toHaveText('notice: image annotation')
++    await expect(annotations.nth(5)).toHaveText(/notice: body annotation/)
+ 
+-    await expect(annotations.last().getByRole('link')).toHaveAttribute('href', /data\/\w+/)
+     await expect(annotations.nth(3).getByRole('link')).toHaveAttribute('href', /data\/\w+/)
++    await expect(annotations.nth(4).getByRole('link')).toHaveAttribute('href', /data\/\w+/)
++    await expect(annotations.nth(5).getByRole('link')).toHaveAttribute('href', /^data:text\/markdown;base64,/)
+   })
+ 
+   test('tags filter', async ({ page }) => {
+diff --git a/test/ui/test/ui.spec.ts b/test/ui/test/ui.spec.ts
+index cd0be8248d13..47ba40e13e78 100644
+--- a/test/ui/test/ui.spec.ts
++++ b/test/ui/test/ui.spec.ts
+@@ -1,4 +1,5 @@
+ import type { Vitest } from 'vitest/node'
++import { readFileSync } from 'node:fs'
+ import { Writable } from 'node:stream'
+ import { expect, test } from '@playwright/test'
+ import { startVitest } from 'vitest/node'
+@@ -70,7 +71,7 @@ test.describe('ui', () => {
+     await page.goto(pageUrl)
+ 
+     // dashboard
+-    await expect(page.locator('[aria-labelledby=tests]')).toContainText('15 Pass 2 Fail 17 Total')
++    await expect(page.locator('[aria-labelledby=tests]')).toContainText('16 Pass 2 Fail 18 Total')
+ 
+     // unhandled errors
+     await expect(page.getByTestId('unhandled-errors')).toContainText(
+@@ -177,6 +178,27 @@ test.describe('ui', () => {
+       await expect(annotation.getByRole('link')).toHaveAttribute('href', /__vitest_attachment__\?path=/)
+       await expect(annotation.getByRole('img')).toHaveAttribute('src', /__vitest_attachment__\?path=/)
+     })
++
++    await test.step('annotated with body', async () => {
++      const item = page.getByLabel('annotated with body')
++      await item.click({ force: true })
++      await page.getByTestId('btn-report').click({ force: true })
++
++      const annotation = page.getByRole('note')
++      await expect(annotation).toHaveCount(1)
++
++      await expect(annotation).toContainText('body annotation')
++      await expect(annotation).toContainText('notice')
++      await expect(annotation).toContainText('fixtures/annotated.test.ts:25:9')
++
++      const downloadPromise = page.waitForEvent('download')
++      await annotation.getByRole('link').click()
++      const download = await downloadPromise
++      expect(download.suggestedFilename()).toBe('body-annotation.md')
++      const downloadPath = await download.path()
++      const content = readFileSync(downloadPath, 'utf-8')
++      expect(content).toBe('Hello **markdown**')
++    })
+   })
+ 
+   test('annotations in the editor tab', async ({ page }) => {
+@@ -187,16 +209,18 @@ test.describe('ui', () => {
+     await page.getByTestId('btn-code').click({ force: true })
+ 
+     const annotations = page.getByRole('note')
+-    await expect(annotations).toHaveCount(5)
++    await expect(annotations).toHaveCount(6)
+ 
+     await expect(annotations.first()).toHaveText('notice: hello world')
+     await expect(annotations.nth(1)).toHaveText('notice: second annotation')
+     await expect(annotations.nth(2)).toHaveText('warning: beware!')
+     await expect(annotations.nth(3)).toHaveText(/notice: file annotation/)
+     await expect(annotations.nth(4)).toHaveText('notice: image annotation')
++    await expect(annotations.nth(5)).toHaveText(/notice: body annotation/)
+ 
+-    await expect(annotations.last().getByRole('link')).toHaveAttribute('href', /__vitest_attachment__\?path=/)
+     await expect(annotations.nth(3).getByRole('link')).toHaveAttribute('href', /__vitest_attachment__\?path=/)
++    await expect(annotations.nth(4).getByRole('link')).toHaveAttribute('href', /__vitest_attachment__\?path=/)
++    await expect(annotations.nth(5).getByRole('link')).toHaveAttribute('href', /^data:text\/markdown;base64,/)
+   })
+ 
+   test('error', async ({ page }) => {

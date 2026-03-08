@@ -1,0 +1,53 @@
+[
+  {
+    "tracking_name": "packages/vite/src/node/plugins/importMetaGlob.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts&old_oid=7f24a0a6ff36e180836c86edf37936092e42a90d&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts&new_oid=ccb2dd5b547fbadeb340bce326c09b25cc0a2b3b&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "oid": "7f24a0a6ff36e180836c86edf37936092e42a90d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "oid": "ccb2dd5b547fbadeb340bce326c09b25cc0a2b3b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f3ba8f5897b74676bdfc693707a0b46fa45b272d4dfbc2266a9145e184184df8"
+  },
+  {
+    "tracking_name": "playground/glob-import/__tests__/glob-import.spec.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=playground%2Fglob-import%2F__tests__%2Fglob-import.spec.ts&old_oid=81125143c69479763602fcfb1e1376e2a44a85d1&old_mode=33188&new_filename=playground%2Fglob-import%2F__tests__%2Fglob-import.spec.ts&new_oid=c2d4cf00ee9adc0534f0d800cdcfc78104985b83&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "playground/glob-import/__tests__/glob-import.spec.ts",
+      "oid": "81125143c69479763602fcfb1e1376e2a44a85d1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "playground/glob-import/__tests__/glob-import.spec.ts",
+      "oid": "c2d4cf00ee9adc0534f0d800cdcfc78104985b83",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ad8334fa5b4a976d28153830061a1524c0a1ad50dfeb2379bd076a62ff1fe20b"
+  },
+  {
+    "tracking_name": "playground/glob-import/dir/index.js",
+    "diff": "/gh/vitejs/vite/diff?old_filename=playground%2Fglob-import%2Fdir%2Findex.js&old_oid=94ca66f1017093c7f8c3f5f5420d56fea1081242&old_mode=33188&new_filename=playground%2Fglob-import%2Fdir%2Findex.js&new_oid=88f7a86cf059020c413721db00bad5159eee92d4&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "playground/glob-import/dir/index.js",
+      "oid": "94ca66f1017093c7f8c3f5f5420d56fea1081242",
+      "mode": 33188
+    },
+    "new": {
+      "name": "playground/glob-import/dir/index.js",
+      "oid": "88f7a86cf059020c413721db00bad5159eee92d4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2bc48f66563e85e765e9b472b9036066870b887da05c673b32c04f05bb481d69"
+  }
+]

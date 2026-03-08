@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "0dbe7b3b45513de93c97a8285f897a9f251942a8",
+    "filename": ".changeset/gorgeous-fans-argue.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/12df6ca1eda60d6c3846ba4c44b56975884c1bc6/.changeset%2Fgorgeous-fans-argue.md",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/12df6ca1eda60d6c3846ba4c44b56975884c1bc6/.changeset%2Fgorgeous-fans-argue.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/.changeset%2Fgorgeous-fans-argue.md?ref=12df6ca1eda60d6c3846ba4c44b56975884c1bc6",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@chakra-ui/react\": patch\n+---\n+\n+Allow undefined for optional properties in CSS and recipe types"
+  },
+  {
+    "sha": "52409327a010d4ffca7f5cea93e5dfd20bf7b090",
+    "filename": "packages/react/src/styled-system/css.types.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/12df6ca1eda60d6c3846ba4c44b56975884c1bc6/packages%2Freact%2Fsrc%2Fstyled-system%2Fcss.types.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/12df6ca1eda60d6c3846ba4c44b56975884c1bc6/packages%2Freact%2Fsrc%2Fstyled-system%2Fcss.types.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fstyled-system%2Fcss.types.ts?ref=12df6ca1eda60d6c3846ba4c44b56975884c1bc6",
+    "patch": "@@ -45,7 +45,7 @@ export interface CssProperties\n   extends PropertiesFallback<String | Number>,\n     ModernCssProperties,\n     CssVarProperties {\n-  initialLetterAlign?: String\n+  initialLetterAlign?: String | undefined\n }\n \n export interface CssKeyframes {\n@@ -114,7 +114,7 @@ export type CompositionStyleObject<Property extends string> = Nested<\n  * -----------------------------------------------------------------------------*/\n \n interface WithCss {\n-  css?: SystemStyleObject\n+  css?: SystemStyleObject | undefined\n }\n \n type StyleProps = SystemProperties & MinimalNested<SystemStyleObject>"
+  },
+  {
+    "sha": "8674b099d68b4bf447c6b6c61a2bab1681b3be53",
+    "filename": "packages/react/src/styled-system/recipe.types.ts",
+    "status": "modified",
+    "additions": 19,
+    "deletions": 13,
+    "changes": 32,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/12df6ca1eda60d6c3846ba4c44b56975884c1bc6/packages%2Freact%2Fsrc%2Fstyled-system%2Frecipe.types.ts",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/12df6ca1eda60d6c3846ba4c44b56975884c1bc6/packages%2Freact%2Fsrc%2Fstyled-system%2Frecipe.types.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fstyled-system%2Frecipe.types.ts?ref=12df6ca1eda60d6c3846ba4c44b56975884c1bc6",
+    "patch": "@@ -65,23 +65,27 @@ export interface RecipeDefinition<\n   /**\n    * The class name of the recipe.\n    */\n-  className?: string\n+  className?: string | undefined\n   /**\n    * The base styles of the recipe.\n    */\n-  base?: SystemStyleObject\n+  base?: SystemStyleObject | undefined\n   /**\n    * The multi-variant styles of the recipe.\n    */\n-  variants?: T\n+  variants?: T | undefined\n   /**\n    * The default variants of the recipe.\n    */\n-  defaultVariants?: RecipeSelection<T> & { colorPalette?: ColorPalette }\n+  defaultVariants?:\n+    | (RecipeSelection<T> & { colorPalette?: ColorPalette | undefined })\n+    | undefined\n   /**\n    * The styles to apply when a combination of variants is selected.\n    */\n-  compoundVariants?: Pretty<RecipeCompoundVariant<RecipeCompoundSelection<T>>>[]\n+  compoundVariants?:\n+    | Pretty<RecipeCompoundVariant<RecipeCompoundSelection<T>>>[]\n+    | undefined\n }\n \n export type RecipeCreatorFn = <T extends RecipeVariantRecord>(\n@@ -134,29 +138,31 @@ export interface SlotRecipeDefinition<\n    * Say the recipe has slots like `root`, `control` and the class name is 'checkbox'\n    * Each slot will have a class name like `checkbox__root`, `checkbox__control`\n    */\n-  className?: string\n+  className?: string | undefined\n   /**\n    * The parts/slots of the recipe.\n    */\n   slots: S[] | Readonly<S[]>\n   /**\n    * The base styles of the recipe.\n    */\n-  base?: SlotRecord<S, SystemStyleObject>\n+  base?: SlotRecord<S, SystemStyleObject> | undefined\n   /**\n    * The multi-variant styles of the recipe.\n    */\n-  variants?: T\n+  variants?: T | undefined\n   /**\n    * The default variants of the recipe.\n    */\n-  defaultVariants?: RecipeSelection<T> & { colorPalette?: ColorPalette }\n+  defaultVariants?:\n+    | (RecipeSelection<T> & { colorPalette?: ColorPalette | undefined })\n+    | undefined\n   /**\n    * The styles to apply when a combination of variants is selected.\n    */\n-  compoundVariants?: Pretty<\n-    SlotRecipeCompoundVariant<S, RecipeCompoundSelection<T>>\n-  >[]\n+  compoundVariants?:\n+    | Pretty<SlotRecipeCompoundVariant<S, RecipeCompoundSelection<T>>>[]\n+    | undefined\n }\n \n export type SlotRecipeCreatorFn = <\n@@ -199,7 +205,7 @@ export interface SystemSlotRecipeFn<S extends string, VP, VM> {\n   classNameMap: Record<S, string>\n   variantMap: VM\n   variantKeys: Array<keyof VP>\n-  splitVariantProps<P extends VP & { recipe?: any }>(\n+  splitVariantProps<P extends VP & { recipe?: any | undefined }>(\n     props: P,\n   ): [VP, Pretty<DistributiveOmit<P, keyof VP | \"recipe\">>]\n }"
+  }
+]

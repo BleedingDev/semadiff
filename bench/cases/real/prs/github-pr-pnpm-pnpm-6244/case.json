@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-pnpm-pnpm-6244",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#6244: fix: typo standalone",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 6244,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/6244",
+    "baseSha": "81ca8b1aa546414be380d2599cdc344ce5ce7e96",
+    "headSha": "78ce8607f9e09594b37fde3e12df3337f991c317",
+    "selectedFiles": [
+      "env/plugin-commands-env/src/env.ts"
+    ],
+    "collectedAt": "2026-03-08T02:25:59.289Z"
+  },
+  "files": [
+    {
+      "id": "env/plugin-commands-env/src/env.ts",
+      "oldPath": "env/plugin-commands-env/src/env.ts",
+      "newPath": "env/plugin-commands-env/src/env.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "env/plugin-commands-env/src/env.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 91,
+          "endLine": 91
+        },
+        "newRange": {
+          "startLine": 91,
+          "endLine": 91
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

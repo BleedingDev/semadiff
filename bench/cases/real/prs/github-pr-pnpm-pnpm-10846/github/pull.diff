@@ -1,0 +1,975 @@
+diff --git a/.changeset/engine-agnostic-gvs-hashes.md b/.changeset/engine-agnostic-gvs-hashes.md
+new file mode 100644
+index 00000000000..cd33af705f0
+--- /dev/null
++++ b/.changeset/engine-agnostic-gvs-hashes.md
+@@ -0,0 +1,10 @@
++---
++"@pnpm/calc-dep-state": minor
++"@pnpm/deps.graph-builder": minor
++"@pnpm/resolve-dependencies": minor
++"pnpm": minor
++---
++
++Use `allowBuilds` config to compute engine-agnostic GVS hashes for pure-JS packages [#10837](https://github.com/pnpm/pnpm/issues/10837).
++
++When the global virtual store is enabled, packages that are not allowed to build (and don't transitively depend on packages that are) now get hashes that don't include the engine name (platform, architecture, Node.js major version). This means ~95% of packages in the GVS survive Node.js upgrades and architecture changes without re-import.
+diff --git a/deps/graph-builder/src/iteratePkgsForVirtualStore.ts b/deps/graph-builder/src/iteratePkgsForVirtualStore.ts
+index b02f97cc170..dc3e9a6c38a 100644
+--- a/deps/graph-builder/src/iteratePkgsForVirtualStore.ts
++++ b/deps/graph-builder/src/iteratePkgsForVirtualStore.ts
+@@ -13,7 +13,7 @@ import { type LockfileObject, type PackageSnapshot } from '@pnpm/lockfile.fs'
+ import {
+   nameVerFromPkgSnapshot,
+ } from '@pnpm/lockfile.utils'
+-import { type DepPath, type PkgIdWithPatchHash } from '@pnpm/types'
++import { type AllowBuild, type DepPath, type PkgIdWithPatchHash } from '@pnpm/types'
+ import * as dp from '@pnpm/dependency-path'
+ 
+ interface PkgSnapshotWithLocation {
+@@ -22,13 +22,14 @@ interface PkgSnapshotWithLocation {
+ }
+ 
+ export function * iteratePkgsForVirtualStore (lockfile: LockfileObject, opts: {
++  allowBuild?: AllowBuild
+   enableGlobalVirtualStore?: boolean
+   virtualStoreDirMaxLength: number
+   virtualStoreDir: string
+   globalVirtualStoreDir: string
+ }): IterableIterator<PkgSnapshotWithLocation> {
+   if (opts.enableGlobalVirtualStore) {
+-    for (const { hash, pkgMeta } of hashDependencyPaths(lockfile)) {
++    for (const { hash, pkgMeta } of hashDependencyPaths(lockfile, opts.allowBuild)) {
+       yield {
+         dirInVirtualStore: path.join(opts.globalVirtualStoreDir, hash),
+         pkgMeta,
+@@ -73,9 +74,9 @@ interface PkgMetaAndSnapshot extends PkgMeta {
+   pkgIdWithPatchHash: PkgIdWithPatchHash
+ }
+ 
+-function hashDependencyPaths (lockfile: LockfileObject): IterableIterator<HashedDepPath<PkgMetaAndSnapshot>> {
++function hashDependencyPaths (lockfile: LockfileObject, allowBuild?: AllowBuild): IterableIterator<HashedDepPath<PkgMetaAndSnapshot>> {
+   const graph = lockfileToDepGraph(lockfile)
+-  return iterateHashedGraphNodes(graph, iteratePkgMeta(lockfile, graph))
++  return iterateHashedGraphNodes(graph, iteratePkgMeta(lockfile, graph), allowBuild)
+ }
+ 
+ function * iteratePkgMeta (lockfile: LockfileObject, graph: DepsGraph<DepPath>): PkgMetaIterator<PkgMetaAndSnapshot> {
+diff --git a/deps/graph-builder/src/lockfileToDepGraph.ts b/deps/graph-builder/src/lockfileToDepGraph.ts
+index 769bbf160ac..bf24cf61f26 100644
+--- a/deps/graph-builder/src/lockfileToDepGraph.ts
++++ b/deps/graph-builder/src/lockfileToDepGraph.ts
+@@ -1,3 +1,4 @@
++import fs from 'fs'
+ import path from 'path'
+ import { WANTED_LOCKFILE } from '@pnpm/constants'
+ import {
+@@ -234,6 +235,12 @@ async function buildGraphFromPackages (
+         injectionTargetsByDepPath.set(depPath, [dir])
+       }
+ 
++      // In GVS mode, packages that are allowed to build may have a .pnpm-needs-build
++      // marker indicating a previous build failed or was interrupted. When the
++      // marker is present, skip the fast path to force a re-fetch/re-import/re-build.
++      const mightNeedBuild = opts.enableGlobalVirtualStore &&
++        opts.allowBuild?.(pkgName, pkgVersion) === true
++
+       let dirExists: boolean | undefined
+       if (
+         depIsPresent &&
+@@ -243,14 +250,19 @@ async function buildGraphFromPackages (
+         !opts.includeUnchangedDeps
+       ) {
+         dirExists = await pathExists(dir)
+-        if (dirExists) return
+-        brokenModulesLogger.debug({ missing: dir })
++        if (dirExists) {
++          if (!(mightNeedBuild && fs.existsSync(path.join(dir, '.pnpm-needs-build')))) return
++        } else {
++          brokenModulesLogger.debug({ missing: dir })
++        }
+       }
+ 
+       let fetchResponse!: Partial<FetchResponse>
+       if (depIsPresent && depIntegrityIsUnchanged && equals(currentPackages[depPath].optionalDependencies, pkgSnapshot.optionalDependencies)) {
+         if (dirExists ?? await pathExists(dir)) {
+-          fetchResponse = {}
++          if (!(mightNeedBuild && fs.existsSync(path.join(dir, '.pnpm-needs-build')))) {
++            fetchResponse = {}
++          }
+         } else {
+           brokenModulesLogger.debug({ missing: dir })
+         }
+@@ -259,7 +271,9 @@ async function buildGraphFromPackages (
+       if (!fetchResponse && opts.enableGlobalVirtualStore && !isDirectoryDep
+         && !opts.force) {
+         if (dirExists ?? await pathExists(dir)) {
+-          fetchResponse = {}
++          if (!(mightNeedBuild && fs.existsSync(path.join(dir, '.pnpm-needs-build')))) {
++            fetchResponse = {}
++          }
+         }
+       }
+ 
+diff --git a/exec/build-modules/src/index.ts b/exec/build-modules/src/index.ts
+index 11e06ba3987..68adc361bf8 100644
+--- a/exec/build-modules/src/index.ts
++++ b/exec/build-modules/src/index.ts
+@@ -1,4 +1,5 @@
+ import assert from 'assert'
++import fs from 'fs/promises'
+ import path from 'path'
+ import util from 'util'
+ import { calcDepState, type DepsStateCache } from '@pnpm/calc-dep-state'
+@@ -8,7 +9,7 @@ import { runPostinstallHooks } from '@pnpm/lifecycle'
+ import { linkBins, linkBinsOfPackages } from '@pnpm/link-bins'
+ import { logger } from '@pnpm/logger'
+ import { hardLinkDir } from '@pnpm/worker'
+-import { readPackageJsonFromDir, safeReadPackageJsonFromDir } from '@pnpm/read-package-json'
++import { safeReadPackageJsonFromDir } from '@pnpm/read-package-json'
+ import { type StoreController } from '@pnpm/store-controller-types'
+ import { applyPatchToDir } from '@pnpm/patching.apply-patch'
+ import {
+@@ -49,6 +50,7 @@ export async function buildModules<T extends string> (
+     storeController: StoreController
+     rootModulesDir: string
+     hoistedLocations?: Record<string, string[]>
++    enableGlobalVirtualStore?: boolean
+   }
+ ): Promise<{ ignoredBuilds?: IgnoredBuilds }> {
+   if (!rootDepPaths.length) return {}
+@@ -146,6 +148,7 @@ async function buildDependency<T extends string> (
+     unsafePerm: boolean
+     hoistedLocations?: Record<string, string[]>
+     builtHoistedDeps?: Record<string, DeferredPromise<void>>
++    enableGlobalVirtualStore?: boolean
+     warn: (message: string) => void
+   }
+ ): Promise<void> {
+@@ -158,6 +161,7 @@ async function buildDependency<T extends string> (
+     }
+     opts.builtHoistedDeps[depNode.depPath] = pDefer()
+   }
++  let buildSucceeded = false
+   try {
+     await linkBinsOfDependencies(depNode, depGraph, opts)
+     let isPatched = false
+@@ -179,6 +183,11 @@ async function buildDependency<T extends string> (
+       shellEmulator: opts.shellEmulator,
+       unsafePerm: opts.unsafePerm || false,
+     })
++    // Remove the .pnpm-needs-build marker before uploading side effects,
++    // so it doesn't get cached as part of the package's side effects diff.
++    if (opts.enableGlobalVirtualStore) {
++      await fs.unlink(path.join(depNode.dir, '.pnpm-needs-build')).catch(() => {})
++    }
+     if ((isPatched || hasSideEffects) && opts.sideEffectsCacheWrite) {
+       try {
+         const sideEffectsCacheKey = calcDepState(depGraph, opts.depsStateCache, depPath, {
+@@ -198,17 +207,23 @@ async function buildDependency<T extends string> (
+         })
+       }
+     }
++    buildSucceeded = true
+   } catch (err: unknown) {
+     assert(util.types.isNativeError(err))
++    // In GVS mode, remove the entire hash directory so the next install
++    // sees the directory is absent, re-fetches, and re-builds.
++    if (opts.enableGlobalVirtualStore) {
++      const hashDir = path.resolve(depNode.dir, '../..')
++      await fs.rm(hashDir, { recursive: true, force: true })
++    }
+     if (depNode.optional) {
+       // TODO: add parents field to the log
+-      const pkg = await readPackageJsonFromDir(path.join(depNode.dir)) as DependencyManifest
+       skippedOptionalDependencyLogger.debug({
+         details: err.toString(),
+         package: {
+           id: depNode.dir,
+-          name: pkg.name,
+-          version: pkg.version,
++          name: depNode.name,
++          version: depNode.version,
+         },
+         prefix: opts.lockfileDir,
+         reason: 'build_failure',
+@@ -217,13 +232,15 @@ async function buildDependency<T extends string> (
+     }
+     throw err
+   } finally {
+-    const hoistedLocationsOfDep = opts.hoistedLocations?.[depNode.depPath]
+-    if (hoistedLocationsOfDep) {
+-      // There is no need to build the same package in every location.
+-      // We just copy the built package to every location where it is present.
+-      const currentHoistedLocation = path.relative(opts.lockfileDir, depNode.dir)
+-      const nonBuiltHoistedDeps = hoistedLocationsOfDep?.filter((hoistedLocation) => hoistedLocation !== currentHoistedLocation)
+-      await hardLinkDir(depNode.dir, nonBuiltHoistedDeps)
++    if (buildSucceeded) {
++      const hoistedLocationsOfDep = opts.hoistedLocations?.[depNode.depPath]
++      if (hoistedLocationsOfDep) {
++        // There is no need to build the same package in every location.
++        // We just copy the built package to every location where it is present.
++        const currentHoistedLocation = path.relative(opts.lockfileDir, depNode.dir)
++        const nonBuiltHoistedDeps = hoistedLocationsOfDep?.filter((hoistedLocation) => hoistedLocation !== currentHoistedLocation)
++        await hardLinkDir(depNode.dir, nonBuiltHoistedDeps)
++      }
+     }
+     if (opts.builtHoistedDeps) {
+       opts.builtHoistedDeps[depNode.depPath].resolve()
+diff --git a/packages/calc-dep-state/src/index.ts b/packages/calc-dep-state/src/index.ts
+index 55df0be1339..b42b5052ece 100644
+--- a/packages/calc-dep-state/src/index.ts
++++ b/packages/calc-dep-state/src/index.ts
+@@ -1,6 +1,6 @@
+ import { ENGINE_NAME } from '@pnpm/constants'
+ import { getPkgIdWithPatchHash, refToRelative } from '@pnpm/dependency-path'
+-import { type DepPath, type PkgIdWithPatchHash } from '@pnpm/types'
++import { type AllowBuild, type DepPath, type PkgIdWithPatchHash } from '@pnpm/types'
+ import { hashObjectWithoutSorting, hashObject } from '@pnpm/crypto.object-hasher'
+ import { type LockfileResolution, type LockfileObject } from '@pnpm/lockfile.types'
+ 
+@@ -90,10 +90,25 @@ export interface HashedDepPath<T extends PkgMeta> {
+ 
+ export function * iterateHashedGraphNodes<T extends PkgMeta> (
+   graph: DepsGraph<DepPath>,
+-  pkgMetaIterator: PkgMetaIterator<T>
++  pkgMetaIterator: PkgMetaIterator<T>,
++  allowBuild?: AllowBuild
+ ): IterableIterator<HashedDepPath<T>> {
+-  const _calcGraphNodeHash = calcGraphNodeHash.bind(null, { graph, cache: {} })
+-  for (const pkgMeta of pkgMetaIterator) {
++  let builtDepPaths: Set<DepPath> | undefined
++  let entries: Iterable<T>
++  if (allowBuild != null) {
++    const pkgMetaList = Array.from(pkgMetaIterator)
++    builtDepPaths = computeBuiltDepPaths(pkgMetaList, allowBuild)
++    entries = pkgMetaList
++  } else {
++    entries = pkgMetaIterator
++  }
++  const _calcGraphNodeHash = calcGraphNodeHash.bind(null, {
++    graph,
++    cache: {},
++    builtDepPaths,
++    buildRequiredCache: builtDepPaths !== undefined ? {} : undefined,
++  })
++  for (const pkgMeta of entries) {
+     yield {
+       hash: _calcGraphNodeHash(pkgMeta),
+       pkgMeta,
+@@ -102,22 +117,24 @@ export function * iterateHashedGraphNodes<T extends PkgMeta> (
+ }
+ 
+ export function calcGraphNodeHash<T extends PkgMeta> (
+-  { graph, cache }: {
++  { graph, cache, builtDepPaths, buildRequiredCache }: {
+     graph: DepsGraph<DepPath>
+     cache: DepsStateCache
++    builtDepPaths?: Set<DepPath>
++    buildRequiredCache?: Record<string, boolean>
+   },
+   pkgMeta: T
+ ): string {
+   const { name, version, depPath } = pkgMeta
++  // When builtDepPaths is provided (derived from the allowBuilds config),
++  // we only include the engine name for packages that are allowed to build
++  // or transitively depend on a package that is allowed to build.
++  // This makes GVS hashes engine-agnostic for pure-JS packages,
++  // so they survive Node.js upgrades and architecture changes.
++  const includeEngine = builtDepPaths === undefined ||
++    transitivelyRequiresBuild(graph, builtDepPaths, buildRequiredCache ??= {}, depPath, new Set())
+   const state = {
+-    // Unfortunately, we need to include the engine name in the hash,
+-    // even though it's only required for packages that are built,
+-    // or have dependencies that are built.
+-    // We can't know for sure whether a package needs to be built
+-    // before it's fetched from the registry.
+-    // However, we fetch and write packages to node_modules in random order for performance,
+-    // so we can't determine at this stage which dependencies will be built.
+-    engine: ENGINE_NAME,
++    engine: includeEngine ? ENGINE_NAME : null,
+     deps: calcDepGraphHash(graph, cache, new Set(), depPath),
+   }
+   const hexDigest = hashObjectWithoutSorting(state, { encoding: 'hex' })
+@@ -145,6 +162,50 @@ export function lockfileToDepGraph (lockfile: LockfileObject): DepsGraph<DepPath
+   return graph
+ }
+ 
++function computeBuiltDepPaths (
++  entries: Iterable<{ depPath: DepPath; name: string; version: string }>,
++  allowBuild: AllowBuild
++): Set<DepPath> {
++  const builtDepPaths = new Set<DepPath>()
++  for (const { depPath, name, version } of entries) {
++    if (allowBuild(name, version) === true) {
++      builtDepPaths.add(depPath)
++    }
++  }
++  return builtDepPaths
++}
++
++function transitivelyRequiresBuild<T extends string> (
++  graph: DepsGraph<T>,
++  builtDepPaths: Set<T>,
++  cache: Record<string, boolean>,
++  depPath: T,
++  parents: Set<T>
++): boolean {
++  if (depPath in cache) return cache[depPath]
++  if (builtDepPaths.has(depPath)) {
++    cache[depPath] = true
++    return true
++  }
++  const node = graph[depPath]
++  if (!node) {
++    cache[depPath] = false
++    return false
++  }
++  if (parents.has(depPath)) {
++    return false
++  }
++  const nextParents = new Set([...parents, depPath])
++  for (const childDepPath of Object.values(node.children) as T[]) {
++    if (transitivelyRequiresBuild(graph, builtDepPaths, cache, childDepPath, nextParents)) {
++      cache[depPath] = true
++      return true
++    }
++  }
++  cache[depPath] = false
++  return false
++}
++
+ function lockfileDepsToGraphChildren (deps: Record<string, string>): Record<string, DepPath> {
+   const children: Record<string, DepPath> = {}
+   for (const [alias, reference] of Object.entries(deps)) {
+diff --git a/packages/calc-dep-state/test/index.ts b/packages/calc-dep-state/test/index.ts
+index a9e18545f10..38c15dd32ee 100644
+--- a/packages/calc-dep-state/test/index.ts
++++ b/packages/calc-dep-state/test/index.ts
+@@ -1,7 +1,7 @@
+-import { calcDepState } from '@pnpm/calc-dep-state'
++import { calcDepState, calcGraphNodeHash } from '@pnpm/calc-dep-state'
+ import { ENGINE_NAME } from '@pnpm/constants'
+-import { hashObject } from '@pnpm/crypto.object-hasher'
+-import { type PkgIdWithPatchHash } from '@pnpm/types'
++import { hashObject, hashObjectWithoutSorting } from '@pnpm/crypto.object-hasher'
++import { type DepPath, type PkgIdWithPatchHash } from '@pnpm/types'
+ 
+ const depsGraph = {
+   'foo@1.0.0': {
+@@ -48,3 +48,119 @@ test('calcDepState() when scripts are ignored', () => {
+     includeDepGraphHash: false,
+   })).toBe(ENGINE_NAME)
+ })
++
++describe('calcGraphNodeHash', () => {
++  const graphNodeGraph = {
++    'foo@1.0.0': {
++      children: { bar: 'bar@1.0.0' as DepPath },
++      pkgIdWithPatchHash: 'foo@1.0.0' as PkgIdWithPatchHash,
++      resolution: { integrity: '000' },
++    },
++    'bar@1.0.0': {
++      children: {},
++      pkgIdWithPatchHash: 'bar@1.0.0' as PkgIdWithPatchHash,
++      resolution: { integrity: '001' },
++    },
++    'native@1.0.0': {
++      children: {},
++      pkgIdWithPatchHash: 'native@1.0.0' as PkgIdWithPatchHash,
++      resolution: { integrity: '002' },
++    },
++    'depends-on-native@1.0.0': {
++      children: { native: 'native@1.0.0' as DepPath },
++      pkgIdWithPatchHash: 'depends-on-native@1.0.0' as PkgIdWithPatchHash,
++      resolution: { integrity: '003' },
++    },
++  } as Record<DepPath, { children: Record<string, DepPath>, pkgIdWithPatchHash: PkgIdWithPatchHash, resolution: { integrity: string } }>
++
++  test('includes ENGINE_NAME when builtDepPaths is not provided', () => {
++    const hash = calcGraphNodeHash(
++      { graph: graphNodeGraph, cache: {} },
++      { depPath: 'foo@1.0.0' as DepPath, name: 'foo', version: '1.0.0' }
++    )
++    expect(hash).toContain('foo/1.0.0/')
++    // Hash should include ENGINE_NAME (default behavior)
++    const depsHash = hashObject({
++      id: 'foo@1.0.0:000',
++      deps: {
++        bar: hashObject({ id: 'bar@1.0.0:001', deps: {} }),
++      },
++    })
++    const expectedDigest = hashObjectWithoutSorting(
++      { engine: ENGINE_NAME, deps: depsHash },
++      { encoding: 'hex' }
++    )
++    expect(hash).toBe(`@/foo/1.0.0/${expectedDigest}`)
++  })
++
++  test('omits ENGINE_NAME for pure-JS packages when builtDepPaths is provided', () => {
++    const builtDepPaths = new Set<DepPath>(['native@1.0.0' as DepPath])
++    const hash = calcGraphNodeHash(
++      { graph: graphNodeGraph, cache: {}, builtDepPaths, buildRequiredCache: {} },
++      { depPath: 'foo@1.0.0' as DepPath, name: 'foo', version: '1.0.0' }
++    )
++    const depsHash = hashObject({
++      id: 'foo@1.0.0:000',
++      deps: {
++        bar: hashObject({ id: 'bar@1.0.0:001', deps: {} }),
++      },
++    })
++    const expectedDigest = hashObjectWithoutSorting(
++      { engine: null, deps: depsHash },
++      { encoding: 'hex' }
++    )
++    expect(hash).toBe(`@/foo/1.0.0/${expectedDigest}`)
++  })
++
++  test('includes ENGINE_NAME for packages that require a build', () => {
++    const builtDepPaths = new Set<DepPath>(['native@1.0.0' as DepPath])
++    const hash = calcGraphNodeHash(
++      { graph: graphNodeGraph, cache: {}, builtDepPaths, buildRequiredCache: {} },
++      { depPath: 'native@1.0.0' as DepPath, name: 'native', version: '1.0.0' }
++    )
++    const depsHash = hashObject({ id: 'native@1.0.0:002', deps: {} })
++    const expectedDigest = hashObjectWithoutSorting(
++      { engine: ENGINE_NAME, deps: depsHash },
++      { encoding: 'hex' }
++    )
++    expect(hash).toBe(`@/native/1.0.0/${expectedDigest}`)
++  })
++
++  test('includes ENGINE_NAME for packages that transitively depend on a built package', () => {
++    const builtDepPaths = new Set<DepPath>(['native@1.0.0' as DepPath])
++    const hash = calcGraphNodeHash(
++      { graph: graphNodeGraph, cache: {}, builtDepPaths, buildRequiredCache: {} },
++      { depPath: 'depends-on-native@1.0.0' as DepPath, name: 'depends-on-native', version: '1.0.0' }
++    )
++    const depsHash = hashObject({
++      id: 'depends-on-native@1.0.0:003',
++      deps: {
++        native: hashObject({ id: 'native@1.0.0:002', deps: {} }),
++      },
++    })
++    const expectedDigest = hashObjectWithoutSorting(
++      { engine: ENGINE_NAME, deps: depsHash },
++      { encoding: 'hex' }
++    )
++    expect(hash).toBe(`@/depends-on-native/1.0.0/${expectedDigest}`)
++  })
++
++  test('omits ENGINE_NAME when builtDepPaths is empty', () => {
++    const builtDepPaths = new Set<DepPath>()
++    const hash = calcGraphNodeHash(
++      { graph: graphNodeGraph, cache: {}, builtDepPaths, buildRequiredCache: {} },
++      { depPath: 'foo@1.0.0' as DepPath, name: 'foo', version: '1.0.0' }
++    )
++    const depsHash = hashObject({
++      id: 'foo@1.0.0:000',
++      deps: {
++        bar: hashObject({ id: 'bar@1.0.0:001', deps: {} }),
++      },
++    })
++    const expectedDigest = hashObjectWithoutSorting(
++      { engine: null, deps: depsHash },
++      { encoding: 'hex' }
++    )
++    expect(hash).toBe(`@/foo/1.0.0/${expectedDigest}`)
++  })
++})
+diff --git a/pkg-manager/core/src/install/index.ts b/pkg-manager/core/src/install/index.ts
+index 39ae0d59eb3..8bdd6d60442 100644
+--- a/pkg-manager/core/src/install/index.ts
++++ b/pkg-manager/core/src/install/index.ts
+@@ -1392,6 +1392,7 @@ const _installInContext: InstallFunction = async (projects, ctx, opts) => {
+           storeController: opts.storeController,
+           unsafePerm: opts.unsafePerm,
+           userAgent: opts.userAgent,
++          enableGlobalVirtualStore: opts.enableGlobalVirtualStore,
+         })).ignoredBuilds
+         if (ctx.modulesFile?.ignoredBuilds?.size) {
+           ignoredBuilds ??= new Set()
+@@ -1511,6 +1512,7 @@ const _installInContext: InstallFunction = async (projects, ctx, opts) => {
+           storeDir: ctx.storeDir,
+           virtualStoreDir: ctx.virtualStoreDir,
+           virtualStoreDirMaxLength: ctx.virtualStoreDirMaxLength,
++          allowBuilds: opts.allowBuilds,
+         })
+       })(),
+     ])
+diff --git a/pkg-manager/core/test/install/globalVirtualStore.ts b/pkg-manager/core/test/install/globalVirtualStore.ts
+index defde66a468..6a32aef0228 100644
+--- a/pkg-manager/core/test/install/globalVirtualStore.ts
++++ b/pkg-manager/core/test/install/globalVirtualStore.ts
+@@ -1,8 +1,11 @@
+ import fs from 'fs'
+ import path from 'path'
+ import { assertProject } from '@pnpm/assert-project'
++import { readMsgpackFileSync } from '@pnpm/fs.msgpack-file'
+ import { prepareEmpty, preparePackages } from '@pnpm/prepare'
+ import { install, type MutatedProject, mutateModules, type ProjectOptions } from '@pnpm/core'
++import { getIndexFilePathInCafs, type PackageFilesIndex } from '@pnpm/store.cafs'
++import { getIntegrity } from '@pnpm/registry-mock'
+ import { type ProjectRootDir } from '@pnpm/types'
+ import { sync as rimraf } from '@zkochan/rimraf'
+ import { testDefaults } from '../utils/index.js'
+@@ -118,6 +121,289 @@ test('modules are correctly updated when using a global virtual store', async ()
+   }
+ })
+ 
++test('GVS hashes are engine-agnostic for packages not in allowBuilds', async () => {
++  prepareEmpty()
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/pkg-with-1-dep': '100.0.0',
++    },
++  }
++
++  // Scenario 1: No packages allowed to build — all hashes should be engine-agnostic
++  const gvsDir1 = path.resolve('links1')
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: gvsDir1,
++    allowBuilds: {},
++  }))
++  rimraf('node_modules')
++
++  // Scenario 2: Dependency allowed to build — parent hash becomes engine-specific
++  // because it transitively depends on a package that is allowed to build
++  const gvsDir2 = path.resolve('links2')
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: gvsDir2,
++    frozenLockfile: true,
++    allowBuilds: { '@pnpm.e2e/dep-of-pkg-with-1-dep': true },
++  }))
++
++  // Read hash directories for the parent package from both scenarios
++  const hashNoBuilds = fs.readdirSync(path.join(gvsDir1, '@pnpm.e2e/pkg-with-1-dep/100.0.0'))[0]
++  const hashWithBuilds = fs.readdirSync(path.join(gvsDir2, '@pnpm.e2e/pkg-with-1-dep/100.0.0'))[0]
++
++  // Hashes must differ: scenario 1 omits ENGINE_NAME, scenario 2 includes it
++  // (because dep-of-pkg-with-1-dep is allowed to build)
++  expect(hashNoBuilds).not.toBe(hashWithBuilds)
++
++  // Both scenarios should still produce valid GVS layouts
++  expect(fs.existsSync(path.join(gvsDir1, '@pnpm.e2e/pkg-with-1-dep/100.0.0', hashNoBuilds, 'node_modules/@pnpm.e2e/pkg-with-1-dep/package.json'))).toBeTruthy()
++  expect(fs.existsSync(path.join(gvsDir2, '@pnpm.e2e/pkg-with-1-dep/100.0.0', hashWithBuilds, 'node_modules/@pnpm.e2e/pkg-with-1-dep/package.json'))).toBeTruthy()
++})
++
++test('GVS hashes are stable when allowBuilds targets an unrelated package', async () => {
++  prepareEmpty()
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/pkg-with-1-dep': '100.0.0',
++    },
++  }
++
++  // Scenario 1: No packages allowed to build
++  const gvsDir1 = path.resolve('links1')
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: gvsDir1,
++    allowBuilds: {},
++  }))
++  rimraf('node_modules')
++
++  // Scenario 2: An unrelated package allowed to build
++  // This should NOT affect hashes of @pnpm.e2e/pkg-with-1-dep or its deps
++  const gvsDir2 = path.resolve('links2')
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: gvsDir2,
++    frozenLockfile: true,
++    allowBuilds: { 'some-unrelated-package': true },
++  }))
++
++  // Hashes should be identical since the allowBuilds target is not in the dep tree
++  const hash1 = fs.readdirSync(path.join(gvsDir1, '@pnpm.e2e/pkg-with-1-dep/100.0.0'))[0]
++  const hash2 = fs.readdirSync(path.join(gvsDir2, '@pnpm.e2e/pkg-with-1-dep/100.0.0'))[0]
++  expect(hash1).toBe(hash2)
++})
++
++test('GVS re-links when allowBuilds changes', async () => {
++  prepareEmpty()
++  const globalVirtualStoreDir = path.resolve('links')
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/pkg-with-1-dep': '100.0.0',
++    },
++  }
++
++  // Step 1: Install with no packages allowed to build (engine-agnostic hashes)
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    allowBuilds: {},
++  }))
++
++  const hashBefore = fs.readdirSync(path.join(globalVirtualStoreDir, '@pnpm.e2e/pkg-with-1-dep/100.0.0'))[0]
++
++  // Verify allowBuilds is stored in modules.yaml
++  const rootModules = assertProject(process.cwd())
++  const modulesState = rootModules.readModulesManifest()
++  expect(modulesState?.allowBuilds).toEqual({})
++
++  // Step 2: Reinstall with dep allowed to build — hashes should change
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    allowBuilds: { '@pnpm.e2e/dep-of-pkg-with-1-dep': true },
++  }))
++
++  const hashAfter = fs.readdirSync(path.join(globalVirtualStoreDir, '@pnpm.e2e/pkg-with-1-dep/100.0.0'))
++    .find((h) => h !== hashBefore)
++
++  // A new hash directory should have been created
++  expect(hashAfter).toBeDefined()
++  expect(hashAfter).not.toBe(hashBefore)
++
++  // Verify the new GVS layout is valid
++  expect(fs.existsSync(path.join(globalVirtualStoreDir, '@pnpm.e2e/pkg-with-1-dep/100.0.0', hashAfter!, 'node_modules/@pnpm.e2e/pkg-with-1-dep/package.json'))).toBeTruthy()
++
++  // Verify modules.yaml is updated with new allowBuilds
++  const updatedState = rootModules.readModulesManifest()
++  expect(updatedState?.allowBuilds).toEqual({ '@pnpm.e2e/dep-of-pkg-with-1-dep': true })
++})
++
++test('GVS successful build creates package directory with build artifacts', async () => {
++  prepareEmpty()
++  const globalVirtualStoreDir = path.resolve('links')
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/pre-and-postinstall-scripts-example': '1.0.0',
++    },
++  }
++  const opts = testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    fastUnpack: false,
++    allowBuilds: { '@pnpm.e2e/pre-and-postinstall-scripts-example': true },
++  })
++  await install(manifest, opts)
++
++  // The GVS directory should exist with build artifacts
++  const pkgDir = path.join(globalVirtualStoreDir, '@pnpm.e2e/pre-and-postinstall-scripts-example/1.0.0')
++  const hashes = fs.readdirSync(pkgDir)
++  expect(hashes).toHaveLength(1)
++  const pkgInGvs = path.join(pkgDir, hashes[0], 'node_modules/@pnpm.e2e/pre-and-postinstall-scripts-example')
++  expect(fs.existsSync(path.join(pkgInGvs, 'package.json'))).toBeTruthy()
++  // Build artifacts created by postinstall script should be present
++  expect(fs.existsSync(path.join(pkgInGvs, 'generated-by-postinstall.js'))).toBeTruthy()
++  expect(fs.existsSync(path.join(pkgInGvs, 'generated-by-preinstall.js'))).toBeTruthy()
++  // The .pnpm-needs-build marker should have been removed after successful build
++  expect(fs.existsSync(path.join(pkgInGvs, '.pnpm-needs-build'))).toBeFalsy()
++
++  // The .pnpm-needs-build marker must not be uploaded to the side effects cache
++  const filesIndexFile = getIndexFilePathInCafs(
++    opts.storeDir,
++    getIntegrity('@pnpm.e2e/pre-and-postinstall-scripts-example', '1.0.0'),
++    '@pnpm.e2e/pre-and-postinstall-scripts-example@1.0.0'
++  )
++  const filesIndex = readMsgpackFileSync<PackageFilesIndex>(filesIndexFile)
++  if (filesIndex.sideEffects) {
++    for (const [, diff] of filesIndex.sideEffects) {
++      expect(diff.added?.has('.pnpm-needs-build')).toBeFalsy()
++    }
++  }
++})
++
++test('GVS build failure cleans up broken package directory', async () => {
++  prepareEmpty()
++  const globalVirtualStoreDir = path.resolve('links')
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/failing-postinstall': '1.0.0',
++    },
++  }
++  await expect(
++    install(manifest, testDefaults({
++      enableGlobalVirtualStore: true,
++      virtualStoreDir: globalVirtualStoreDir,
++      fastUnpack: false,
++      allowBuilds: { '@pnpm.e2e/failing-postinstall': true },
++    }))
++  ).rejects.toThrow()
++
++  // The GVS hash directory for the failed package should have been removed
++  // on build failure so the next install can re-fetch and re-build.
++  const pkgVersionDir = path.join(globalVirtualStoreDir, '@pnpm.e2e/failing-postinstall/1.0.0')
++  if (fs.existsSync(pkgVersionDir)) {
++    const hashes = fs.readdirSync(pkgVersionDir)
++    for (const hash of hashes) {
++      const pkgInGvs = path.join(pkgVersionDir, hash, 'node_modules/@pnpm.e2e/failing-postinstall')
++      expect(fs.existsSync(pkgInGvs)).toBeFalsy()
++    }
++  }
++})
++
++test('GVS rebuilds successfully after simulated build failure cleanup', async () => {
++  prepareEmpty()
++  const globalVirtualStoreDir = path.resolve('links')
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/pre-and-postinstall-scripts-example': '1.0.0',
++    },
++  }
++
++  // Step 1: Successful install with build
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    fastUnpack: false,
++    allowBuilds: { '@pnpm.e2e/pre-and-postinstall-scripts-example': true },
++  }))
++
++  const pkgDir = path.join(globalVirtualStoreDir, '@pnpm.e2e/pre-and-postinstall-scripts-example/1.0.0')
++  const hashes = fs.readdirSync(pkgDir)
++  expect(hashes).toHaveLength(1)
++  const hashDir = path.join(pkgDir, hashes[0])
++  expect(fs.existsSync(path.join(hashDir, 'node_modules/@pnpm.e2e/pre-and-postinstall-scripts-example/generated-by-postinstall.js'))).toBeTruthy()
++
++  // Step 2: Simulate a previous build failure by removing the GVS hash directory
++  rimraf(hashDir)
++  expect(fs.existsSync(hashDir)).toBeFalsy()
++
++  // Step 3: Remove node_modules and reinstall with frozenLockfile
++  // The GVS fast path should NOT kick in because the hash dir is gone
++  rimraf('node_modules')
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    frozenLockfile: true,
++    fastUnpack: false,
++    allowBuilds: { '@pnpm.e2e/pre-and-postinstall-scripts-example': true },
++  }))
++
++  // The GVS directory should be recreated with build artifacts
++  const hashesAfter = fs.readdirSync(pkgDir)
++  expect(hashesAfter).toHaveLength(1)
++  expect(fs.existsSync(path.join(pkgDir, hashesAfter[0], 'node_modules/@pnpm.e2e/pre-and-postinstall-scripts-example/generated-by-postinstall.js'))).toBeTruthy()
++})
++
++test('GVS .pnpm-needs-build marker triggers re-import on next install', async () => {
++  prepareEmpty()
++  const globalVirtualStoreDir = path.resolve('links')
++  const manifest = {
++    dependencies: {
++      '@pnpm.e2e/pre-and-postinstall-scripts-example': '1.0.0',
++    },
++  }
++
++  // Step 1: Install with build
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    fastUnpack: false,
++    allowBuilds: { '@pnpm.e2e/pre-and-postinstall-scripts-example': true },
++  }))
++
++  const pkgDir = path.join(globalVirtualStoreDir, '@pnpm.e2e/pre-and-postinstall-scripts-example/1.0.0')
++  const hashes = fs.readdirSync(pkgDir)
++  expect(hashes).toHaveLength(1)
++  const hashDir = path.join(pkgDir, hashes[0])
++  const pkgInGvs = path.join(hashDir, 'node_modules/@pnpm.e2e/pre-and-postinstall-scripts-example')
++  expect(fs.existsSync(path.join(pkgInGvs, 'generated-by-postinstall.js'))).toBeTruthy()
++  // Marker should not be present after successful build
++  expect(fs.existsSync(path.join(pkgInGvs, '.pnpm-needs-build'))).toBeFalsy()
++
++  // Step 2: Simulate a crash between import and build — write a .pnpm-needs-build
++  // marker and remove build artifacts (as if the build never completed)
++  fs.writeFileSync(path.join(pkgInGvs, '.pnpm-needs-build'), '')
++  fs.unlinkSync(path.join(pkgInGvs, 'generated-by-postinstall.js'))
++  expect(fs.existsSync(path.join(pkgInGvs, '.pnpm-needs-build'))).toBeTruthy()
++
++  // Remove node_modules to force a re-install
++  rimraf('node_modules')
++
++  // Step 3: Reinstall — the GVS fast path should detect the .pnpm-needs-build
++  // marker and force a re-fetch, re-import, and re-build.
++  await install(manifest, testDefaults({
++    enableGlobalVirtualStore: true,
++    virtualStoreDir: globalVirtualStoreDir,
++    frozenLockfile: true,
++    fastUnpack: false,
++    allowBuilds: { '@pnpm.e2e/pre-and-postinstall-scripts-example': true },
++  }))
++
++  // The marker should be gone and the package rebuilt with artifacts
++  expect(fs.existsSync(path.join(pkgInGvs, '.pnpm-needs-build'))).toBeFalsy()
++  expect(fs.existsSync(path.join(pkgInGvs, 'generated-by-postinstall.js'))).toBeTruthy()
++})
++
+ test('injected local packages work with global virtual store', async () => {
+   const project1Manifest = {
+     name: 'project-1',
+diff --git a/pkg-manager/headless/src/index.ts b/pkg-manager/headless/src/index.ts
+index 01bce59a6f0..a8c3f9e1439 100644
+--- a/pkg-manager/headless/src/index.ts
++++ b/pkg-manager/headless/src/index.ts
+@@ -335,7 +335,8 @@ export async function headlessInstall (opts: HeadlessOptions): Promise<Installat
+     pnpmVersion: opts.currentEngine.pnpmVersion,
+     supportedArchitectures: opts.supportedArchitectures,
+     includeUnchangedDeps: (!equals(opts.currentHoistPattern ?? [], opts.hoistPattern ?? [])) ||
+-      (!equals(opts.currentPublicHoistPattern ?? [], opts.publicHoistPattern ?? [])),
++      (!equals(opts.currentPublicHoistPattern ?? [], opts.publicHoistPattern ?? [])) ||
++      (opts.enableGlobalVirtualStore === true && !equals(opts.modulesFile?.allowBuilds ?? {}, opts.allowBuilds ?? {})),
+   } as LockfileToDepGraphOptions
+   const {
+     directDependenciesByImporterId,
+@@ -426,9 +427,11 @@ export async function headlessInstall (opts: HeadlessOptions): Promise<Installat
+         disableRelinkLocalDirDeps: opts.disableRelinkLocalDirDeps,
+         depGraph: graph,
+         depsStateCache,
++        enableGlobalVirtualStore: opts.enableGlobalVirtualStore,
+         ignoreScripts: opts.ignoreScripts,
+         lockfileDir: opts.lockfileDir,
+         sideEffectsCacheRead: opts.sideEffectsCacheRead,
++        storeDir: opts.storeDir,
+       }),
+     ])
+ 
+@@ -559,6 +562,7 @@ export async function headlessInstall (opts: HeadlessOptions): Promise<Installat
+       storeController: opts.storeController,
+       unsafePerm: opts.unsafePerm,
+       userAgent: opts.userAgent,
++      enableGlobalVirtualStore: opts.enableGlobalVirtualStore,
+     })).ignoredBuilds
+     if (opts.modulesFile?.ignoredBuilds?.size) {
+       ignoredBuilds ??= new Set()
+@@ -639,6 +643,7 @@ export async function headlessInstall (opts: HeadlessOptions): Promise<Installat
+       storeDir: opts.storeDir,
+       virtualStoreDir,
+       virtualStoreDirMaxLength: opts.virtualStoreDirMaxLength,
++      allowBuilds: opts.allowBuilds,
+     })
+     const currentLockfileDir = path.join(rootModulesDir, '.pnpm')
+     if (opts.useLockfile) {
+@@ -854,12 +859,22 @@ async function linkAllPkgs (
+     depGraph: DependenciesGraph
+     depsStateCache: DepsStateCache
+     disableRelinkLocalDirDeps?: boolean
++    enableGlobalVirtualStore?: boolean
+     force: boolean
+     ignoreScripts: boolean
+     lockfileDir: string
+     sideEffectsCacheRead: boolean
++    storeDir: string
+   }
+ ): Promise<void> {
++  // Create a marker source file that will be added to filesMap for GVS packages
++  // that need building. The importer treats it as just another file, so it's
++  // atomically included in the staged directory and renamed with the package.
++  let needsBuildMarkerSrc: string | undefined
++  if (opts.enableGlobalVirtualStore) {
++    needsBuildMarkerSrc = path.join(opts.storeDir, '.pnpm-needs-build-marker')
++    await fs.writeFile(needsBuildMarkerSrc, '')
++  }
+   await Promise.all(
+     depNodes.map(async (depNode) => {
+       if (!depNode.fetching) return
+@@ -881,8 +896,28 @@ async function linkAllPkgs (
+           })
+         }
+       }
++      // For GVS packages that need building, add a .pnpm-needs-build marker to the
++      // filesMap. The import pipeline treats it as a normal file, so it gets
++      // written into the staging directory and atomically renamed with the rest
++      // of the package. On the next install, GVS fast paths detect the marker
++      // and force a re-fetch/re-import/re-build.
++      // Skip the marker when cached side effects will be applied (the package
++      // is already built and no build will run).
++      const hasCachedSideEffects = sideEffectsCacheKey != null &&
++        filesResponse.sideEffectsMaps?.has(sideEffectsCacheKey) === true
++      const needsBuildMarker = needsBuildMarkerSrc != null &&
++        !hasCachedSideEffects &&
++        (depNode.requiresBuild || depNode.patch != null)
++      let effectiveFilesResponse = filesResponse
++      if (needsBuildMarker) {
++        effectiveFilesResponse = {
++          ...filesResponse,
++          filesMap: new Map([...filesResponse.filesMap, ['.pnpm-needs-build', needsBuildMarkerSrc!]]),
++        }
++      }
++
+       const { importMethod, isBuilt } = await storeController.importPackage(depNode.dir, {
+-        filesResponse,
++        filesResponse: effectiveFilesResponse,
+         force: depNode.forceImportPackage ?? opts.force,
+         disableRelinkLocalDirDeps: opts.disableRelinkLocalDirDeps,
+         requiresBuild: depNode.patch != null || depNode.requiresBuild,
+diff --git a/pkg-manager/modules-yaml/src/index.ts b/pkg-manager/modules-yaml/src/index.ts
+index ca972546bc0..c392e6a9ef8 100644
+--- a/pkg-manager/modules-yaml/src/index.ts
++++ b/pkg-manager/modules-yaml/src/index.ts
+@@ -39,6 +39,7 @@ interface ModulesRaw {
+   virtualStoreDirMaxLength: number
+   injectedDeps?: Record<string, string[]>
+   hoistedLocations?: Record<string, string[]>
++  allowBuilds?: Record<string, boolean | string>
+ }
+ 
+ export type Modules = Omit<ModulesRaw, 'ignoredBuilds'> & {
+diff --git a/pkg-manager/resolve-dependencies/src/index.ts b/pkg-manager/resolve-dependencies/src/index.ts
+index ee0343da122..63d43280b5d 100644
+--- a/pkg-manager/resolve-dependencies/src/index.ts
++++ b/pkg-manager/resolve-dependencies/src/index.ts
+@@ -16,6 +16,7 @@ import {
+ import { verifyPatches } from '@pnpm/patching.config'
+ import { safeReadPackageJsonFromDir } from '@pnpm/read-package-json'
+ import {
++  type AllowBuild,
+   type DependenciesField,
+   DEPENDENCIES_FIELDS,
+   type DependencyManifest,
+@@ -25,6 +26,7 @@ import {
+   type ProjectId,
+   type ProjectRootDir,
+   type DepPath,
++  type PkgIdWithPatchHash,
+ } from '@pnpm/types'
+ import { difference, zipWith } from 'ramda'
+ import isSubdir from 'is-subdir'
+@@ -463,27 +465,28 @@ async function getTopParents (pkgAliases: string[], modulesDir: string): Promise
+     .filter(Boolean) as DependencyManifest[]
+ }
+ 
++function * iterateGraphPkgMetaEntries (graph: DependenciesGraph, runtimeOnly?: boolean): IterableIterator<{ depPath: DepPath; name: string; version: string; pkgIdWithPatchHash: PkgIdWithPatchHash }> {
++  for (const depPath in graph) {
++    if (Object.hasOwn(graph, depPath)) {
++      if (runtimeOnly && !isRuntimeDepPath(depPath as DepPath)) continue
++      const { name, version, pkgIdWithPatchHash } = graph[depPath as DepPath]
++      yield { depPath: depPath as DepPath, name, version, pkgIdWithPatchHash }
++    }
++  }
++}
++
+ function extendGraph (
+   graph: DependenciesGraph,
+   opts: {
++    allowBuild?: AllowBuild
+     globalVirtualStoreDir: string
+     enableGlobalVirtualStore?: boolean
+   }
+ ): DependenciesGraph {
+-  const pkgMetaIter = (function * () {
+-    for (const depPath in graph) {
+-      if ((opts.enableGlobalVirtualStore === true || isRuntimeDepPath(depPath as DepPath)) && Object.hasOwn(graph, depPath)) {
+-        const { name, version, pkgIdWithPatchHash } = graph[depPath as DepPath]
+-        yield {
+-          name,
+-          version,
+-          depPath: depPath as DepPath,
+-          pkgIdWithPatchHash,
+-        }
+-      }
+-    }
+-  })()
+-  for (const { pkgMeta: { depPath }, hash } of iterateHashedGraphNodes(graph, pkgMetaIter)) {
++  const pkgMetaIter = iterateGraphPkgMetaEntries(graph, !opts.enableGlobalVirtualStore)
++  // Only use allowBuild for engine-agnostic hash optimization when GVS is on
++  const allowBuild = opts.enableGlobalVirtualStore ? opts.allowBuild : undefined
++  for (const { pkgMeta: { depPath }, hash } of iterateHashedGraphNodes(graph, pkgMetaIter, allowBuild)) {
+     const modules = path.join(opts.globalVirtualStoreDir, hash, 'node_modules')
+     const node = graph[depPath]
+     Object.assign(node, {

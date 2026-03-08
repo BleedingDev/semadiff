@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "5510233ae8335b7df135baf5b0396a15290d1bd5",
+    "filename": ".changeset/fair-lies-move.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/module-federation/core/blob/7e47cf1148d27f2ade06b8f1f0fb365e67c122ba/.changeset%2Ffair-lies-move.md",
+    "raw_url": "https://github.com/module-federation/core/raw/7e47cf1148d27f2ade06b8f1f0fb365e67c122ba/.changeset%2Ffair-lies-move.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/.changeset%2Ffair-lies-move.md?ref=7e47cf1148d27f2ade06b8f1f0fb365e67c122ba",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+'@module-federation/sdk': patch\n+---\n+\n+fix(sdk): createLink hook error dom attr rel"
+  },
+  {
+    "sha": "5c478b1306893ccf9c05b9b3b50527751e29dfe9",
+    "filename": "packages/sdk/src/dom.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/module-federation/core/blob/7e47cf1148d27f2ade06b8f1f0fb365e67c122ba/packages%2Fsdk%2Fsrc%2Fdom.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/7e47cf1148d27f2ade06b8f1f0fb365e67c122ba/packages%2Fsdk%2Fsrc%2Fdom.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fsdk%2Fsrc%2Fdom.ts?ref=7e47cf1148d27f2ade06b8f1f0fb365e67c122ba",
+    "patch": "@@ -1,4 +1,4 @@\n-import { CreateScriptHookDom, CreateScriptHookReturnDom } from './types';\n+import type { CreateScriptHookDom, CreateScriptHookReturnDom } from './types';\n import { warn } from './utils';\n // eslint-disable-next-line @typescript-eslint/no-explicit-any\n export async function safeWrapper<T extends (...args: Array<any>) => any>(\n@@ -155,11 +155,11 @@ export function createLink(info: {\n   for (let i = 0; i < links.length; i++) {\n     const l = links[i];\n     const linkHref = l.getAttribute('href');\n-    const linkRef = l.getAttribute('ref');\n+    const linkRel = l.getAttribute('rel');\n     if (\n       linkHref &&\n       isStaticResourcesEqual(linkHref, info.url) &&\n-      linkRef === info.attrs['ref']\n+      linkRel === info.attrs['rel']\n     ) {\n       link = l;\n       needAttach = false;"
+  }
+]

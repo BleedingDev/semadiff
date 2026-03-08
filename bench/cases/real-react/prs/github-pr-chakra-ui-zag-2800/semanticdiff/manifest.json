@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/machines/image-cropper/src/index.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=packages%2Fmachines%2Fimage-cropper%2Fsrc%2Findex.ts&old_oid=ac5ac44e612053e0ad2df071761e07b35a63dac5&old_mode=33188&new_filename=packages%2Fmachines%2Fimage-cropper%2Fsrc%2Findex.ts&new_oid=7efc1c7296abc7cae84c0fde4a48db1290416129&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/machines/image-cropper/src/index.ts",
+      "oid": "ac5ac44e612053e0ad2df071761e07b35a63dac5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/machines/image-cropper/src/index.ts",
+      "oid": "7efc1c7296abc7cae84c0fde4a48db1290416129",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0a78f548ef3ef06963831cd91ee1f10b6c8116de483289e785499e53a19b9d03"
+  }
+]

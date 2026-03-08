@@ -1,0 +1,382 @@
+diff --git a/.changeset/giant-ties-notice.md b/.changeset/giant-ties-notice.md
+new file mode 100644
+index 0000000000..85231f69b4
+--- /dev/null
++++ b/.changeset/giant-ties-notice.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/tabs": patch
++---
++
++Tabs: Rename `tablist` part to `list` to match naming convention
+diff --git a/examples/next-ts/pages/tabs.tsx b/examples/next-ts/pages/tabs.tsx
+index cc2f815c6f..aabd158a59 100644
+--- a/examples/next-ts/pages/tabs.tsx
++++ b/examples/next-ts/pages/tabs.tsx
+@@ -26,7 +26,7 @@ export default function Page() {
+       <main className="tabs">
+         <div {...api.rootProps}>
+           <div {...api.indicatorProps} />
+-          <div {...api.tablistProps}>
++          <div {...api.listProps}>
+             {tabsData.map((data) => (
+               <button {...api.getTriggerProps({ value: data.id })} key={data.id} data-testid={`${data.id}-tab`}>
+                 {data.label}
+diff --git a/examples/nuxt-ts/pages/tabs.vue b/examples/nuxt-ts/pages/tabs.vue
+index 84ef722c28..328c576479 100644
+--- a/examples/nuxt-ts/pages/tabs.vue
++++ b/examples/nuxt-ts/pages/tabs.vue
+@@ -16,7 +16,7 @@ const api = computed(() => tabs.connect(state.value, send, normalizeProps))
+   <main class="tabs">
+     <div v-bind="api.rootProps">
+       <div v-bind="api.indicatorProps" />
+-      <div v-bind="api.tablistProps">
++      <div v-bind="api.listProps">
+         <button
+           v-for="data in tabsData"
+           v-bind="api.getTriggerProps({ value: data.id })"
+diff --git a/examples/solid-ts/src/pages/tabs.tsx b/examples/solid-ts/src/pages/tabs.tsx
+index 559aae6a85..dddf0ee3b2 100644
+--- a/examples/solid-ts/src/pages/tabs.tsx
++++ b/examples/solid-ts/src/pages/tabs.tsx
+@@ -21,7 +21,7 @@ export default function Page() {
+         <div {...api().rootProps}>
+           <div {...api().indicatorProps} />
+ 
+-          <div {...api().tablistProps}>
++          <div {...api().listProps}>
+             <For each={tabsData}>
+               {(item) => (
+                 <button data-testid={`${item.id}-tab`} {...api().getTriggerProps({ value: item.id })}>
+diff --git a/examples/vue-ts/src/pages/tabs.tsx b/examples/vue-ts/src/pages/tabs.tsx
+index fac40c42f4..2e0d56fbc2 100644
+--- a/examples/vue-ts/src/pages/tabs.tsx
++++ b/examples/vue-ts/src/pages/tabs.tsx
+@@ -25,7 +25,7 @@ export default defineComponent({
+           <main class="tabs">
+             <div {...api.rootProps}>
+               <div {...api.indicatorProps} />
+-              <div {...api.tablistProps}>
++              <div {...api.listProps}>
+                 {tabsData.map((data) => (
+                   <button {...api.getTriggerProps({ value: data.id })} key={data.id} data-testid={`${data.id}-tab`}>
+                     {data.label}
+diff --git a/packages/docs/data/api.json b/packages/docs/data/api.json
+index 2b4d5f7e05..06bdcf0ab1 100644
+--- a/packages/docs/data/api.json
++++ b/packages/docs/data/api.json
+@@ -2860,7 +2860,7 @@
+     },
+     "context": {
+       "ids": {
+-        "type": "Partial<{ root: string; trigger: string; tablist: string; content: string; indicator: string; }>",
++        "type": "Partial<{ root: string; trigger: string; list: string; content: string; indicator: string; }>",
+         "description": "The ids of the elements in the tabs. Useful for composition."
+       },
+       "translations": {
+@@ -3484,4 +3484,4 @@
+       }
+     }
+   }
+-}
++}
+\ No newline at end of file
+diff --git a/packages/machines/tabs/src/tabs.connect.ts b/packages/machines/tabs/src/tabs.connect.ts
+index 05153f7b5d..bfa69bba43 100644
+--- a/packages/machines/tabs/src/tabs.connect.ts
++++ b/packages/machines/tabs/src/tabs.connect.ts
+@@ -40,15 +40,15 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+       dir: state.context.dir,
+     }),
+ 
+-    tablistProps: normalize.element({
++    listProps: normalize.element({
+       ...parts.list.attrs,
+-      id: dom.getTablistId(state.context),
++      id: dom.getListId(state.context),
+       role: "tablist",
+       dir: state.context.dir,
+       "data-focus": dataAttr(isFocused),
+       "aria-orientation": state.context.orientation,
+       "data-orientation": state.context.orientation,
+-      "aria-label": translations.tablistLabel,
++      "aria-label": translations.listLabel,
+       onKeyDown(event) {
+         if (!isSelfEvent(event)) return
+ 
+@@ -104,7 +104,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         "data-selected": dataAttr(triggerState.isSelected),
+         "data-focus": dataAttr(triggerState.isFocused),
+         "aria-controls": dom.getContentId(state.context, value),
+-        "data-ownedby": dom.getTablistId(state.context),
++        "data-ownedby": dom.getListId(state.context),
+         id: dom.getTriggerId(state.context, value),
+         tabIndex: triggerState.isSelected ? 0 : -1,
+         onFocus() {
+@@ -136,7 +136,7 @@ export function connect<T extends PropTypes>(state: State, send: Send, normalize
+         tabIndex: 0,
+         "aria-labelledby": dom.getTriggerId(state.context, value),
+         role: "tabpanel",
+-        "data-ownedby": dom.getTablistId(state.context),
++        "data-ownedby": dom.getListId(state.context),
+         "data-selected": dataAttr(selected),
+         "data-orientation": state.context.orientation,
+         hidden: !selected,
+diff --git a/packages/machines/tabs/src/tabs.dom.ts b/packages/machines/tabs/src/tabs.dom.ts
+index c298db3caf..22b2bbeb33 100644
+--- a/packages/machines/tabs/src/tabs.dom.ts
++++ b/packages/machines/tabs/src/tabs.dom.ts
+@@ -4,20 +4,20 @@ import type { MachineContext as Ctx } from "./tabs.types"
+ 
+ export const dom = createScope({
+   getRootId: (ctx: Ctx) => ctx.ids?.root ?? `tabs:${ctx.id}`,
+-  getTablistId: (ctx: Ctx) => ctx.ids?.tablist ?? `tabs:${ctx.id}:list`,
++  getListId: (ctx: Ctx) => ctx.ids?.list ?? `tabs:${ctx.id}:list`,
+   getContentId: (ctx: Ctx, id: string) => ctx.ids?.content ?? `tabs:${ctx.id}:content-${id}`,
+   getTriggerId: (ctx: Ctx, id: string) => ctx.ids?.trigger ?? `tabs:${ctx.id}:trigger-${id}`,
+   getIndicatorId: (ctx: Ctx) => ctx.ids?.indicator ?? `tabs:${ctx.id}:indicator`,
+ 
+-  getTablistEl: (ctx: Ctx) => dom.getById(ctx, dom.getTablistId(ctx)),
++  getListEl: (ctx: Ctx) => dom.getById(ctx, dom.getListId(ctx)),
+   getContentEl: (ctx: Ctx, id: string) => dom.getById(ctx, dom.getContentId(ctx, id)),
+   getTriggerEl: (ctx: Ctx, id: string) => dom.getById(ctx, dom.getTriggerId(ctx, id)),
+   getIndicatorEl: (ctx: Ctx) => dom.getById(ctx, dom.getIndicatorId(ctx)),
+ 
+   getElements: (ctx: Ctx) => {
+-    const ownerId = CSS.escape(dom.getTablistId(ctx))
++    const ownerId = CSS.escape(dom.getListId(ctx))
+     const selector = `[role=tab][data-ownedby='${ownerId}']:not([disabled])`
+-    return queryAll(dom.getTablistEl(ctx), selector)
++    return queryAll(dom.getListEl(ctx), selector)
+   },
+ 
+   getFirstEl: (ctx: Ctx) => first(dom.getElements(ctx)),
+diff --git a/packages/machines/tabs/src/tabs.types.ts b/packages/machines/tabs/src/tabs.types.ts
+index c099bc2ddc..b2bd151c14 100644
+--- a/packages/machines/tabs/src/tabs.types.ts
++++ b/packages/machines/tabs/src/tabs.types.ts
+@@ -18,13 +18,13 @@ export interface FocusChangeDetails {
+  * -----------------------------------------------------------------------------*/
+ 
+ export interface IntlTranslations {
+-  tablistLabel?: string
++  listLabel?: string
+ }
+ 
+ export type ElementIds = Partial<{
+   root: string
+   trigger: string
+-  tablist: string
++  list: string
+   content: string
+   indicator: string
+ }>
+@@ -170,7 +170,7 @@ export interface MachineApi<T extends PropTypes = PropTypes> {
+   getTriggerState(props: TriggerProps): TriggerState
+ 
+   rootProps: T["element"]
+-  tablistProps: T["element"]
++  listProps: T["element"]
+   getTriggerProps(props: TriggerProps): T["button"]
+   getContentProps(props: ContentProps): T["element"]
+   indicatorProps: T["element"]
+diff --git a/shared/src/style.css b/shared/src/style.css
+index 8232a492de..bacdad8644 100644
+--- a/shared/src/style.css
++++ b/shared/src/style.css
+@@ -1108,7 +1108,7 @@ main [data-testid="scrubber"] {
+   display: flex;
+ }
+ 
+-[data-scope="tabs"][data-part="tablist"] {
++[data-scope="tabs"][data-part="list"] {
+   margin: 0 0 -0.1em;
+   overflow: visible;
+ }
+diff --git a/website/components/machines/tabs.tsx b/website/components/machines/tabs.tsx
+index ca949ee240..ac85570848 100644
+--- a/website/components/machines/tabs.tsx
++++ b/website/components/machines/tabs.tsx
+@@ -20,7 +20,7 @@ export function Tabs(props: any) {
+ 
+   return (
+     <div>
+-      <div {...api.tablistProps}>
++      <div {...api.listProps}>
+         {data.map((item) => (
+           <button
+             {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/components/mdx-components.tsx b/website/components/mdx-components.tsx
+index ca4c2fefc7..8286e8fe48 100644
+--- a/website/components/mdx-components.tsx
++++ b/website/components/mdx-components.tsx
+@@ -160,7 +160,7 @@ const components: Record<string, FC<any>> = {
+         rounded="6px"
+         {...api.rootProps}
+       >
+-        <Box {...api.tablistProps}>
++        <Box {...api.listProps}>
+           {FRAMEWORKS.map((framework) => (
+             <chakra.button
+               py="2"
+diff --git a/website/components/mutli-framework.tsx b/website/components/mutli-framework.tsx
+index 3e9aeedb29..5f727645f4 100644
+--- a/website/components/mutli-framework.tsx
++++ b/website/components/mutli-framework.tsx
+@@ -32,7 +32,7 @@ export function MultiframeworkTabs() {
+   const api = tabs.connect(state, send, normalizeProps)
+   return (
+     <Box {...api.rootProps}>
+-      <HStack {...api.tablistProps}>
++      <HStack {...api.listProps}>
+         <FrameworkButton {...api.getTriggerProps({ value: "react" })}>
+           <VStack>
+             <ReactIcon />
+diff --git a/website/data/components/tabs.mdx b/website/data/components/tabs.mdx
+index 269bc3ce05..f8122ced05 100644
+--- a/website/data/components/tabs.mdx
++++ b/website/data/components/tabs.mdx
+@@ -204,7 +204,7 @@ style it.
+ }
+ ```
+ 
+-When any tab is focused, the tablist is given a `data-focus` attribute.
++When any tab is focused, the list is given a `data-focus` attribute.
+ 
+ ```css
+ [data-part="list"][data-focus] {
+@@ -231,7 +231,7 @@ use this to set the style for the horizontal or vertical tabs.
+ }
+ 
+ [data-part="list"][data-orientation="(horizontal|vertical)"] {
+-  /* Styles for horizontal/vertical tablist */
++  /* Styles for horizontal/vertical list */
+ }
+ ```
+ 
+diff --git a/website/data/snippets/react/tabs/usage.mdx b/website/data/snippets/react/tabs/usage.mdx
+index 45c16aa5a1..12b21849ff 100644
+--- a/website/data/snippets/react/tabs/usage.mdx
++++ b/website/data/snippets/react/tabs/usage.mdx
+@@ -15,7 +15,7 @@ export function Tabs() {
+ 
+   return (
+     <div {...api.rootProps}>
+-      <div {...api.tablistProps}>
++      <div {...api.listProps}>
+         {data.map((item) => (
+           <button
+             {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/react/tabs/with-indicator.mdx b/website/data/snippets/react/tabs/with-indicator.mdx
+index 8676d0b0de..906523152f 100644
+--- a/website/data/snippets/react/tabs/with-indicator.mdx
++++ b/website/data/snippets/react/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ return (
+   <div {...api.rootProps}>
+-    <div {...api.tablistProps}>
++    <div {...api.listProps}>
+       {data.map((item) => (
+         <button
+           {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/solid/tabs/usage.mdx b/website/data/snippets/solid/tabs/usage.mdx
+index 2eb5facc09..6552ae3c22 100644
+--- a/website/data/snippets/solid/tabs/usage.mdx
++++ b/website/data/snippets/solid/tabs/usage.mdx
+@@ -10,13 +10,15 @@ const data = [
+ ]
+ 
+ export function Tabs() {
+-  const [state, send] = useMachine(tabs.machine({ id: createUniqueId(), value: "item-1" }))
++  const [state, send] = useMachine(
++    tabs.machine({ id: createUniqueId(), value: "item-1" }),
++  )
+ 
+   const api = createMemo(() => tabs.connect(state, send, normalizeProps))
+ 
+   return (
+     <div {...api().rootProps}>
+-      <div {...api().tablistProps}>
++      <div {...api().listProps}>
+         <For each={data}>
+           {(item) => (
+             <button {...api().getTriggerProps({ value: item.value })}>
+diff --git a/website/data/snippets/solid/tabs/with-indicator.mdx b/website/data/snippets/solid/tabs/with-indicator.mdx
+index 69c9be4e9e..28e3a6d6f9 100644
+--- a/website/data/snippets/solid/tabs/with-indicator.mdx
++++ b/website/data/snippets/solid/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ return (
+   <div {...api().rootProps}>
+-    <div {...api().tablistProps}>
++    <div {...api().listProps}>
+       {data.map((item) => (
+         <button
+           {...api().getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/vue-jsx/tabs/usage.mdx b/website/data/snippets/vue-jsx/tabs/usage.mdx
+index a6b804ac98..bdb5c46e6e 100644
+--- a/website/data/snippets/vue-jsx/tabs/usage.mdx
++++ b/website/data/snippets/vue-jsx/tabs/usage.mdx
+@@ -12,8 +12,10 @@ const data = [
+ export default defineComponent({
+   name: "Tabs",
+   setup() {
+-    const [state, send] = useMachine(tabs.machine({ id: "tabs", value: "item-1" }))
+-    
++    const [state, send] = useMachine(
++      tabs.machine({ id: "tabs", value: "item-1" }),
++    )
++
+     const apiRef = computed(() =>
+       tabs.connect(state.value, send, normalizeProps),
+     )
+@@ -22,7 +24,7 @@ export default defineComponent({
+       const api = apiRef.value
+       return (
+         <div {...api.rootProps}>
+-          <div {...api.tablistProps}>
++          <div {...api.listProps}>
+             {data.map((item) => (
+               <button
+                 {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/vue-jsx/tabs/with-indicator.mdx b/website/data/snippets/vue-jsx/tabs/with-indicator.mdx
+index 8676d0b0de..906523152f 100644
+--- a/website/data/snippets/vue-jsx/tabs/with-indicator.mdx
++++ b/website/data/snippets/vue-jsx/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ return (
+   <div {...api.rootProps}>
+-    <div {...api.tablistProps}>
++    <div {...api.listProps}>
+       {data.map((item) => (
+         <button
+           {...api.getTriggerProps({ value: item.value })}
+diff --git a/website/data/snippets/vue-sfc/tabs/usage.mdx b/website/data/snippets/vue-sfc/tabs/usage.mdx
+index ddba98c42a..a27633170d 100644
+--- a/website/data/snippets/vue-sfc/tabs/usage.mdx
++++ b/website/data/snippets/vue-sfc/tabs/usage.mdx
+@@ -16,7 +16,7 @@ const api = computed(() => tabs.connect(state.value, send, normalizeProps));
+ 
+ <template>
+   <div ref="ref" v-bind="api.rootProps">
+-    <div v-bind="api.tablistProps">
++    <div v-bind="api.listProps">
+       <button
+         v-for="item in data"
+         v-bind="api.getTriggerProps({ value: item.value })"
+diff --git a/website/data/snippets/vue-sfc/tabs/with-indicator.mdx b/website/data/snippets/vue-sfc/tabs/with-indicator.mdx
+index 4183817c93..62fa1db9d1 100644
+--- a/website/data/snippets/vue-sfc/tabs/with-indicator.mdx
++++ b/website/data/snippets/vue-sfc/tabs/with-indicator.mdx
+@@ -2,7 +2,7 @@
+ // ...
+ 
+ <div ref="ref" v-bind="api.rootProps">
+-  <div v-bind="api.tablistProps">
++  <div v-bind="api.listProps">
+     <button
+       v-for="item in data"
+       v-bind="api.getTriggerProps({ value: item.value })"

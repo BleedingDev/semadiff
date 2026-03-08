@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4446",
+  "language": "tsx",
+  "kind": "real",
+  "description": "module-federation/core#4446: refactor(metro): align metro plugin configuration with MF SDK",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4446,
+    "prUrl": "https://github.com/module-federation/core/pull/4446",
+    "baseSha": "a0faa70404fde69a029142f2211d44b011937dfe",
+    "headSha": "b029e5d8aaeb79e2122df07b918bfca8163069f0",
+    "selectedFiles": [
+      "packages/metro-core/src/modules/asyncStartup.tsx"
+    ],
+    "collectedAt": "2026-03-08T04:10:57.056Z"
+  },
+  "files": [
+    {
+      "id": "packages/metro-core/src/modules/asyncStartup.tsx",
+      "oldPath": "packages/metro-core/src/modules/asyncStartup.tsx",
+      "newPath": "packages/metro-core/src/modules/asyncStartup.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/metro-core/src/modules/asyncStartup.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 5,
+          "endLine": 5
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

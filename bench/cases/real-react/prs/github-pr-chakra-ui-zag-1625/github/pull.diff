@@ -1,0 +1,1219 @@
+diff --git a/.changeset/lemon-lies-attack.md b/.changeset/lemon-lies-attack.md
+new file mode 100644
+index 0000000000..18b0d7b159
+--- /dev/null
++++ b/.changeset/lemon-lies-attack.md
+@@ -0,0 +1,7 @@
++---
++"@zag-js/collection": patch
++"@zag-js/combobox": patch
++"@zag-js/select": patch
++---
++
++Improve reliability of select and combobox by redesigning the collection interface
+diff --git a/packages/machines/combobox/src/combobox.connect.ts b/packages/machines/combobox/src/combobox.connect.ts
+index 06ae57a63a..47bd0fcc45 100644
+--- a/packages/machines/combobox/src/combobox.connect.ts
++++ b/packages/machines/combobox/src/combobox.connect.ts
+@@ -31,8 +31,8 @@ export function connect<T extends PropTypes, V extends CollectionItem>(
+ 
+   function getItemState(props: ItemProps): ItemState {
+     const { item } = props
+-    const disabled = collection.isItemDisabled(item)
+-    const value = collection.itemToValue(item)
++    const disabled = collection.getItemDisabled(item)
++    const value = collection.getItemValue(item)!
+     return {
+       value,
+       disabled: Boolean(disabled || disabled),
+diff --git a/packages/machines/combobox/src/combobox.machine.ts b/packages/machines/combobox/src/combobox.machine.ts
+index d560cfdf77..bb01c84e9a 100644
+--- a/packages/machines/combobox/src/combobox.machine.ts
++++ b/packages/machines/combobox/src/combobox.machine.ts
+@@ -567,8 +567,8 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+         isInputValueEmpty: (ctx) => ctx.isInputValueEmpty,
+         autoComplete: (ctx) => ctx.autoComplete && !ctx.multiple,
+         autoHighlight: (ctx) => ctx.autoHighlight,
+-        isFirstItemHighlighted: (ctx) => ctx.collection.first() === ctx.highlightedValue,
+-        isLastItemHighlighted: (ctx) => ctx.collection.last() === ctx.highlightedValue,
++        isFirstItemHighlighted: (ctx) => ctx.collection.firstValue === ctx.highlightedValue,
++        isLastItemHighlighted: (ctx) => ctx.collection.lastValue === ctx.highlightedValue,
+         isCustomValue: (ctx) => ctx.inputValue !== ctx.valueAsString,
+         allowCustomValue: (ctx) => !!ctx.allowCustomValue,
+         hasHighlightedItem: (ctx) => ctx.highlightedValue != null,
+@@ -747,10 +747,10 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+           set.inputValue(ctx, inputValue)
+         },
+         syncInitialValues(ctx) {
+-          const selectedItems = ctx.collection.items(ctx.value)
+-          const valueAsString = ctx.collection.itemsToString(selectedItems)
++          const selectedItems = ctx.collection.findMany(ctx.value)
++          const valueAsString = ctx.collection.stringifyMany(ctx.value)
+ 
+-          ctx.highlightedItem = ctx.collection.item(ctx.highlightedValue)
++          ctx.highlightedItem = ctx.collection.find(ctx.highlightedValue)
+           ctx.selectedItems = selectedItems
+           ctx.valueAsString = valueAsString
+ 
+@@ -791,40 +791,40 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+         },
+         highlightFirstItem(ctx) {
+           raf(() => {
+-            const value = ctx.collection.first()
++            const value = ctx.collection.firstValue
+             set.highlightedValue(ctx, value)
+           })
+         },
+         highlightFirstItemIfNeeded(ctx) {
+           if (!ctx.autoHighlight) return
+           raf(() => {
+-            const value = ctx.collection.first()
++            const value = ctx.collection.firstValue
+             set.highlightedValue(ctx, value)
+           })
+         },
+         highlightLastItem(ctx) {
+           raf(() => {
+-            const value = ctx.collection.last()
++            const value = ctx.collection.lastValue
+             set.highlightedValue(ctx, value)
+           })
+         },
+         highlightNextItem(ctx) {
+           let value: string | null = null
+           if (ctx.highlightedValue) {
+-            value = ctx.collection.next(ctx.highlightedValue)
+-            if (!value && ctx.loopFocus) value = ctx.collection.first()
++            value = ctx.collection.getNextValue(ctx.highlightedValue)
++            if (!value && ctx.loopFocus) value = ctx.collection.firstValue
+           } else {
+-            value = ctx.collection.first()
++            value = ctx.collection.firstValue
+           }
+           set.highlightedValue(ctx, value)
+         },
+         highlightPrevItem(ctx) {
+           let value: string | null = null
+           if (ctx.highlightedValue) {
+-            value = ctx.collection.prev(ctx.highlightedValue)
+-            if (!value && ctx.loopFocus) value = ctx.collection.last()
++            value = ctx.collection.getPreviousValue(ctx.highlightedValue)
++            if (!value && ctx.loopFocus) value = ctx.collection.lastValue
+           } else {
+-            value = ctx.collection.last()
++            value = ctx.collection.lastValue
+           }
+           set.highlightedValue(ctx, value)
+         },
+@@ -840,7 +840,7 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+             if (ctx.hasSelectedItems) {
+               value = ctx.collection.sort(ctx.value)[0]
+             } else {
+-              value = ctx.collection.first()
++              value = ctx.collection.firstValue
+             }
+             set.highlightedValue(ctx, value)
+           })
+@@ -851,7 +851,7 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+             if (ctx.hasSelectedItems) {
+               value = ctx.collection.sort(ctx.value)[0]
+             } else {
+-              value = ctx.collection.last()
++              value = ctx.collection.lastValue
+             }
+             set.highlightedValue(ctx, value)
+           })
+@@ -859,7 +859,7 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+         autofillInputValue(ctx, evt) {
+           const inputEl = dom.getInputEl(ctx)
+           if (!ctx.autoComplete || !inputEl || !evt.keypress) return
+-          const valueText = ctx.collection.valueToString(ctx.highlightedValue)
++          const valueText = ctx.collection.stringify(ctx.highlightedValue)
+           raf(() => {
+             inputEl.value = valueText || ctx.inputValue
+           })
+@@ -885,14 +885,14 @@ const sync = {
+   valueChange: (ctx: MachineContext) => {
+     // side effect
+     const prevSelectedItems = ctx.selectedItems
++
+     ctx.selectedItems = ctx.value.map((v) => {
+-      const foundItem = prevSelectedItems.find((item) => ctx.collection.itemToValue(item) === v)
++      const foundItem = prevSelectedItems.find((item) => ctx.collection.hasItem(item))
+       if (foundItem) return foundItem
+-      return ctx.collection.item(v)
++      return ctx.collection.find(v)
+     })
+ 
+-    // set valueAsString
+-    const valueAsString = ctx.collection.itemsToString(ctx.selectedItems)
++    const valueAsString = ctx.collection.stringifyItems(ctx.selectedItems)
+     ctx.valueAsString = valueAsString
+ 
+     // set inputValue
+@@ -917,7 +917,7 @@ const sync = {
+     set.inputValue(ctx, inputValue)
+   },
+   highlightChange: (ctx: MachineContext) => {
+-    ctx.highlightedItem = ctx.collection.item(ctx.highlightedValue)
++    ctx.highlightedItem = ctx.collection.find(ctx.highlightedValue)
+   },
+ }
+ 
+diff --git a/packages/machines/select/src/select.connect.ts b/packages/machines/select/src/select.connect.ts
+index ab5d77bbb1..098aadc236 100644
+--- a/packages/machines/select/src/select.connect.ts
++++ b/packages/machines/select/src/select.connect.ts
+@@ -37,8 +37,8 @@ export function connect<T extends PropTypes, V extends CollectionItem = Collecti
+   const ariaActiveDescendant = highlightedValue ? dom.getItemId(state.context, highlightedValue) : undefined
+ 
+   function getItemState(props: ItemProps): ItemState {
+-    const _disabled = collection.isItemDisabled(props.item)
+-    const value = collection.itemToValue(props.item)
++    const _disabled = collection.getItemDisabled(props.item)
++    const value = collection.getItemValue(props.item)!
+     return {
+       value,
+       disabled: Boolean(disabled || _disabled),
+@@ -83,7 +83,7 @@ export function connect<T extends PropTypes, V extends CollectionItem = Collecti
+       send({ type: "VALUE.SET", value })
+     },
+     selectAll() {
+-      send({ type: "VALUE.SET", value: collection.values() })
++      send({ type: "VALUE.SET", value: collection.getValues() })
+     },
+     highlightValue(value) {
+       send({ type: "HIGHLIGHTED_VALUE.SET", value })
+diff --git a/packages/machines/select/src/select.machine.ts b/packages/machines/select/src/select.machine.ts
+index 86b5604db0..a3c66444f8 100644
+--- a/packages/machines/select/src/select.machine.ts
++++ b/packages/machines/select/src/select.machine.ts
+@@ -363,8 +363,8 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+         multiple: (ctx) => !!ctx.multiple,
+         hasSelectedItems: (ctx) => !!ctx.hasSelectedItems,
+         hasHighlightedItem: (ctx) => ctx.highlightedValue != null,
+-        isFirstItemHighlighted: (ctx) => ctx.highlightedValue === ctx.collection.first(),
+-        isLastItemHighlighted: (ctx) => ctx.highlightedValue === ctx.collection.last(),
++        isFirstItemHighlighted: (ctx) => ctx.highlightedValue === ctx.collection.firstValue,
++        isLastItemHighlighted: (ctx) => ctx.highlightedValue === ctx.collection.lastValue,
+         closeOnSelect: (ctx, evt) => {
+           if (ctx.multiple) return false
+           return !!(evt.closeOnSelect ?? ctx.closeOnSelect)
+@@ -418,6 +418,7 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+         },
+         scrollToHighlightedItem(ctx, _evt, { getState }) {
+           const exec = (immediate: boolean) => {
++            if (ctx.highlightedValue == null) return
+             const state = getState()
+ 
+             // don't scroll into view if we're using the pointer
+@@ -465,20 +466,20 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+         },
+         highlightPreviousItem(ctx) {
+           if (ctx.highlightedValue == null) return
+-          const value = ctx.collection.prev(ctx.highlightedValue)
++          const value = ctx.collection.getPreviousValue(ctx.highlightedValue)
+           set.highlightedItem(ctx, value)
+         },
+         highlightNextItem(ctx) {
+           if (ctx.highlightedValue == null) return
+-          const value = ctx.collection.next(ctx.highlightedValue)
++          const value = ctx.collection.getNextValue(ctx.highlightedValue)
+           set.highlightedItem(ctx, value)
+         },
+         highlightFirstItem(ctx) {
+-          const value = ctx.collection.first()
++          const value = ctx.collection.firstValue
+           set.highlightedItem(ctx, value)
+         },
+         highlightLastItem(ctx) {
+-          const value = ctx.collection.last()
++          const value = ctx.collection.lastValue
+           set.highlightedItem(ctx, value)
+         },
+         setInitialFocus(ctx) {
+@@ -500,11 +501,11 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+           set.selectedItem(ctx, value)
+         },
+         highlightComputedFirstItem(ctx) {
+-          const value = ctx.hasSelectedItems ? ctx.collection.sort(ctx.value)[0] : ctx.collection.first()
++          const value = ctx.hasSelectedItems ? ctx.collection.sort(ctx.value)[0] : ctx.collection.firstValue
+           set.highlightedItem(ctx, value)
+         },
+         highlightComputedLastItem(ctx) {
+-          const value = ctx.hasSelectedItems ? ctx.collection.sort(ctx.value)[0] : ctx.collection.last()
++          const value = ctx.hasSelectedItems ? ctx.collection.sort(ctx.value)[0] : ctx.collection.lastValue
+           set.highlightedItem(ctx, value)
+         },
+         highlightFirstSelectedItem(ctx) {
+@@ -544,19 +545,19 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+           set.selectedItems(ctx, [])
+         },
+         selectPreviousItem(ctx) {
+-          const value = ctx.collection.prev(ctx.value[0])
++          const value = ctx.collection.getPreviousValue(ctx.value[0])
+           set.selectedItem(ctx, value)
+         },
+         selectNextItem(ctx) {
+-          const value = ctx.collection.next(ctx.value[0])
++          const value = ctx.collection.getNextValue(ctx.value[0])
+           set.selectedItem(ctx, value)
+         },
+         selectFirstItem(ctx) {
+-          const value = ctx.collection.first()
++          const value = ctx.collection.firstValue
+           set.selectedItem(ctx, value)
+         },
+         selectLastItem(ctx) {
+-          const value = ctx.collection.last()
++          const value = ctx.collection.lastValue
+           set.selectedItem(ctx, value)
+         },
+         selectMatchingItem(ctx, evt) {
+@@ -597,10 +598,10 @@ export function machine<T extends CollectionItem>(userContext: UserDefinedContex
+           ctx.collection = evt.value
+         },
+         syncCollection(ctx) {
+-          const selectedItems = ctx.collection.items(ctx.value)
+-          const valueAsString = ctx.collection.itemsToString(selectedItems)
++          const selectedItems = ctx.collection.findMany(ctx.value)
++          const valueAsString = ctx.collection.stringifyItems(selectedItems)
+ 
+-          ctx.highlightedItem = ctx.collection.item(ctx.highlightedValue)
++          ctx.highlightedItem = ctx.collection.find(ctx.highlightedValue)
+           ctx.selectedItems = selectedItems
+           ctx.valueAsString = valueAsString
+         },
+@@ -628,15 +629,16 @@ function dispatchChangeEvent(ctx: MachineContext) {
+ const sync = {
+   valueChange: (ctx: MachineContext) => {
+     const prevSelectedItems = ctx.selectedItems
+-    ctx.selectedItems = ctx.value.map((v) => {
+-      const foundItem = prevSelectedItems.find((item) => ctx.collection.itemToValue(item) === v)
++    ctx.selectedItems = ctx.value.map((value) => {
++      const foundItem = prevSelectedItems.find((item) => ctx.collection.getItemValue(item) === value)
+       if (foundItem) return foundItem
+-      return ctx.collection.item(v)
++      return ctx.collection.find(value)
+     })
+-    ctx.valueAsString = ctx.collection.itemsToString(ctx.selectedItems)
++    ctx.valueAsString = ctx.collection.stringifyItems(ctx.selectedItems)
+   },
++
+   highlightChange: (ctx: MachineContext) => {
+-    ctx.highlightedItem = ctx.collection.item(ctx.highlightedValue)
++    ctx.highlightedItem = ctx.collection.find(ctx.highlightedValue)
+   },
+ }
+ 
+diff --git a/packages/utilities/collection/src/collection.ts b/packages/utilities/collection/src/collection.ts
+index 686ba5b8fd..992402bd7b 100644
+--- a/packages/utilities/collection/src/collection.ts
++++ b/packages/utilities/collection/src/collection.ts
+@@ -1,318 +1,223 @@
+-import { isEqual, isObject, hasProp } from "@zag-js/utils"
+-import type { CollectionItem, CollectionNode, CollectionOptions, CollectionSearchOptions } from "./types"
++import { hasProp, isEqual, isObject } from "@zag-js/utils"
++import type { CollectionItem, CollectionMethods, CollectionOptions, CollectionSearchOptions } from "./types"
+ 
+-const fallback = {
+-  itemToValue(item: any) {
++const fallback: CollectionMethods<any> = {
++  itemToValue(item) {
+     if (typeof item === "string") return item
+     if (isObject(item) && hasProp(item, "value")) return item.value
+     return ""
+   },
+-  itemToString(item: any) {
++  itemToString(item) {
+     if (typeof item === "string") return item
+     if (isObject(item) && hasProp(item, "label")) return item.label
+     return fallback.itemToValue(item)
+   },
+-  itemToDisabled(item: any) {
++  isItemDisabled(item) {
+     if (isObject(item) && hasProp(item, "disabled")) return !!item.disabled
+     return false
+   },
+ }
+ 
+ export class Collection<T extends CollectionItem = CollectionItem> {
+-  /**
+-   * The collection nodes
+-   */
+-  private nodes = new Map<string, CollectionNode<T>>()
+-
+-  /**
+-   * The set of disabled values
+-   */
+-  private disabledValues = new Set<string>()
+-
+-  /**
+-   * The first value in the collection (without accounting for disabled items)
+-   */
+-  private _firstValue: string | null = null
+-
+   /**
+    * The items in the collection
+    */
+-  _items: T[] | readonly T[]
+-
+-  /**
+-   * The last value in the collection (without accounting for disabled items)
+-   */
+-  private _lastValue: string | null = null
++  items: T[]
+ 
+   constructor(private options: CollectionOptions<T>) {
+-    this._items = options.items
+-    this.iterate()
++    this.items = [...options.items] as T[]
+   }
+ 
+-  isEqual = (other: Collection<T>) => {
+-    return isEqual(this._items, other._items)
+-  }
+-
+-  /**
+-   * Iterate over the collection items and create a map of nodes
+-   */
+-  public iterate = (): Collection<T> => {
+-    const items = this._items
+-
+-    for (let i = 0; i < items.length; i++) {
+-      const item = items[i]
+-
+-      const value = this.itemToValue(item)
+-      const label = this.itemToString(item)
+-      const disabled = this.itemToDisabled(item)
+-
+-      const node: CollectionNode<T> = {
+-        // freeze item to prevent mutation by frameworks like Solid.js
+-        item: Object.freeze(item),
+-        index: i,
+-        label,
+-        value: value,
+-        previousValue: this.itemToValue(items[i - 1]) ?? null,
+-        nextValue: this.itemToValue(items[i + 1]) ?? null,
+-      }
+-
+-      this.nodes.set(value, node)
+-
+-      if (disabled) {
+-        this.disabledValues.add(value)
+-      }
+-
+-      if (i === 0) {
+-        this._firstValue = value
+-      }
+-
+-      if (i === items.length - 1) {
+-        this._lastValue = value
+-      }
+-    }
+-
+-    return this
++  isEqual(other: Collection<T>) {
++    return isEqual(this.items, other.items)
+   }
+ 
+   /**
+    * Function to update the collection items
+    */
+-  setItems = (items: T[] | readonly T[]) => {
+-    this._items = items
+-    return this.iterate()
++  setItems(items: T[] | readonly T[]) {
++    this.items = Array.from(items) as T[]
+   }
+ 
+   /**
+    * Returns all the values in the collection
+    */
+-  values = () => {
+-    return Array.from(this.nodes.keys())
++  getValues(items = this.items) {
++    return Array.from(items)
++      .map((item) => this.getItemValue(item))
++      .filter(Boolean) as string[]
+   }
+ 
+   /**
+    * Get the item based on its value
+    */
+-  item = (value: string | null): T | null => {
+-    if (value === null) return null
+-    return this.nodes.get(value)?.item ?? null
++  find(value: string | null | undefined): T | null {
++    if (value == null) return null
++    const index = this.items.findIndex((item) => this.getItemValue(item) === value)
++    return index != null ? this.items[index] : null
+   }
+ 
+   /**
+    * Get the items based on its values
+    */
+-  items = (values: string[]): T[] => {
+-    return values.map((value) => this.item(value)!).filter(Boolean)
++  findMany(values: string[]): T[] {
++    return Array.from(values)
++      .map((value) => this.find(value)!)
++      .filter(Boolean)
+   }
+ 
+   /**
+    * Get the item based on its index
+    */
+-  at = (index: number): T | null => {
+-    for (const node of this.nodes.values()) {
+-      if (node.index === index) {
+-        return node.item
+-      }
+-    }
+-    return null
++  at(index: number): T | null {
++    return this.items[index] ?? null
+   }
+ 
+-  private sortFn = (valueA: string, valueB: string): number => {
+-    const nodeA = this.nodes.get(valueA)
+-    const nodeB = this.nodes.get(valueB)
+-    return (nodeA?.index ?? 0) - (nodeB?.index ?? 0)
++  private sortFn(valueA: string, valueB: string): number {
++    const indexA = this.indexOf(valueA)
++    const indexB = this.indexOf(valueB)
++    return (indexA ?? 0) - (indexB ?? 0)
+   }
+ 
+   /**
+    * Sort the values based on their index
+    */
+-  sort = (values: string[]): string[] => {
+-    return [...values].sort(this.sortFn)
++  sort(values: string[]): string[] {
++    return [...values].sort(this.sortFn.bind(this))
+   }
+ 
+   /**
+    * Convert an item to a value
+    */
+-  itemToValue = (item: T): string => {
+-    if (!item) return ""
++  getItemValue(item: T | null | undefined): string | null {
++    if (item == null) return null
+     return this.options.itemToValue?.(item) ?? fallback.itemToValue(item)
+   }
+ 
+   /**
+-   * Convert an item to a string
++   * Whether an item is disabled
+    */
+-  itemToString = (item: T | null): string => {
+-    if (!item) return ""
+-    return this.options.itemToString?.(item) ?? fallback.itemToString(item)
++  getItemDisabled(item: T | null): boolean {
++    if (item == null) return false
++    return this.options.isItemDisabled?.(item) ?? fallback.isItemDisabled(item)
+   }
+ 
+   /**
+-   * Whether an item is disabled
++   * Convert an item to a string
+    */
+-  itemToDisabled = (item: T | null): boolean => {
+-    if (!item) return false
+-    return this.options.isItemDisabled?.(item) ?? fallback.itemToDisabled(item)
++  stringifyItem(item: T | null): string | null {
++    if (item == null) return null
++    return this.options.itemToString?.(item) ?? fallback.itemToString(item)
+   }
+ 
+   /**
+    * Convert a value to a string
+    */
+-  valueToString = (value: string | null): string => {
+-    if (value == null) return ""
+-    return this.nodes.get(value)?.label ?? ""
++  stringify(value: string | null): string | null {
++    if (value == null) return null
++    return this.stringifyItem(this.find(value))
+   }
+ 
+   /**
+    * Convert an array of items to a string
+    */
+-  itemsToString = (item: T[], separator = ", "): string => {
+-    return item
+-      .map((item) => this.itemToString(item))
++  stringifyItems(items: T[], separator = ", "): string {
++    return Array.from(items)
++      .map((item) => this.stringifyItem(item))
+       .filter(Boolean)
+       .join(separator)
+   }
+ 
+   /**
+-   * Whether the collection has a value
++   * Convert an array of items to a string
+    */
+-  has = (value: string | null): boolean => {
+-    if (value == null) return false
+-    return this.nodes.has(value)
++  stringifyMany(value: string[], separator?: string): string {
++    return this.stringifyItems(this.findMany(value), separator)
+   }
+ 
+   /**
+-   * Returns the number of items in the collection
++   * Whether the collection has a value
+    */
+-  count = (): number => {
+-    return this.nodes.size
++  has(value: string | null): boolean {
++    return this.indexOf(value) !== -1
+   }
+ 
+   /**
+-   * Returns the first value in the collection
++   * Whether the collection has an item
+    */
+-  first = (): string | null => {
+-    let firstValue = this._firstValue
+-    while (firstValue != null) {
+-      let item = this.nodes.get(firstValue)
+-      if (item != null && !this.disabledValues.has(item.value)) {
+-        return firstValue
+-      }
+-      firstValue = item?.nextValue ?? null
+-    }
+-    return null
++  hasItem(item: T | null): boolean {
++    if (item == null) return false
++    return this.has(this.getItemValue(item))
+   }
+ 
+   /**
+-   * Returns the last value in the collection
++   * Returns the number of items in the collection
+    */
+-  last = (): string | null => {
+-    let lastValue = this._lastValue
+-    while (lastValue != null) {
+-      let item = this.nodes.get(lastValue)
+-      if (item != null && !this.disabledValues.has(item.value)) {
+-        return lastValue
+-      }
+-      lastValue = item?.previousValue ?? null
+-    }
+-    return null
++  get size(): number {
++    return this.items.length
+   }
+ 
+   /**
+-   * Returns the next value in the collection
++   * Returns the first value in the collection
+    */
+-  next = (value: string | null): string | null => {
+-    if (value == null) return null
+-
+-    const item = this.nodes.get(value)
+-    let nextValue = item?.nextValue ?? null
+-
+-    while (nextValue != null) {
+-      let item = this.nodes.get(nextValue)
+-      if (item != null && !this.disabledValues.has(item.value)) {
+-        return nextValue
+-      }
+-      nextValue = item?.nextValue ?? null
+-    }
+-    return null
++  get firstValue(): string | null {
++    let index = 0
++    while (this.getItemDisabled(this.at(index))) index++
++    return this.getItemValue(this.at(index))
+   }
+ 
+   /**
+-   * Returns the previous value in the collection
++   * Returns the last value in the collection
+    */
+-  prev = (value: string | null): string | null => {
+-    if (value == null) return null
+-
+-    const item = this.nodes.get(value)
+-    let previousValue = item?.previousValue ?? null
+-
+-    while (previousValue != null) {
+-      let item = this.nodes.get(previousValue)
+-      if (item != null && !this.disabledValues.has(item.value)) {
+-        return previousValue
+-      }
+-      previousValue = item?.previousValue ?? null
+-    }
+-    return null
++  get lastValue(): string | null {
++    let index = this.size - 1
++    while (this.getItemDisabled(this.at(index))) index--
++    return this.getItemValue(this.at(index))
+   }
+ 
+   /**
+-   * Whether an item is disabled
++   * Returns the next value in the collection
+    */
+-  isItemDisabled = (item: T): boolean => {
+-    return this.disabledValues.has(this.itemToValue(item))
++  getNextValue(value: string): string | null {
++    let index = this.indexOf(value)
++    if (index === -1) return null
++    index++
++    while (index <= this.size && this.getItemDisabled(this.at(index))) index++
++    return this.getItemValue(this.at(index))
+   }
+ 
+   /**
+-   * Returns the array of collection nodes
++   * Returns the previous value in the collection
+    */
+-  toArray = (): CollectionNode<T>[] => {
+-    return Array.from(this.nodes.values())
++  getPreviousValue(value: string): string | null {
++    let index = this.indexOf(value)
++    if (index === -1) return null
++    index--
++    while (index >= 0 && this.getItemDisabled(this.at(index))) index--
++    return this.getItemValue(this.at(index))
+   }
+ 
+   /**
+    * Get the index of an item based on its key
+    */
+-  indexOf = (value: string | null): number => {
++  indexOf(value: string | null): number {
+     if (value == null) return -1
+-    return this.nodes.get(value)?.index ?? -1
++    return this.items.findIndex((item) => this.getItemValue(item) === value)
+   }
+ 
+-  private getByText = (text: string, currentValue: string | null): CollectionNode<T> | undefined => {
+-    const index = this.indexOf(currentValue)
+-    let nodes = currentValue != null ? wrap(this.toArray(), index) : this.toArray()
++  private getByText(text: string, current: string | null): T | undefined {
++    let items = current != null ? wrap(this.items, this.indexOf(current)) : this.items
+ 
+     const isSingleKey = text.length === 1
++    if (isSingleKey) items = items.filter((item) => this.getItemValue(item) !== current)
+ 
+-    if (isSingleKey) {
+-      nodes = nodes.filter((node) => node.value !== currentValue)
+-    }
+-
+-    return nodes.find((node) => match(node.label, text))
++    return items.find((item) => match(this.stringifyItem(item), text))
+   }
+ 
+   /**
+    * Search for a value based on a query
+    */
+-  search = (queryString: string, options: CollectionSearchOptions): string | null => {
++  search(queryString: string, options: CollectionSearchOptions): string | null {
+     const { state, currentValue, timeout = 350 } = options
+ 
+     const search = state.keysSoFar + queryString
+@@ -320,7 +225,8 @@ export class Collection<T extends CollectionItem = CollectionItem> {
+ 
+     const query = isRepeated ? search[0] : search
+ 
+-    const value = this.getByText(query, currentValue)?.value ?? null
++    const item = this.getByText(query, currentValue)
++    const value = this.getItemValue(item)
+ 
+     function cleanup() {
+       clearTimeout(state.timer)
+@@ -342,25 +248,46 @@ export class Collection<T extends CollectionItem = CollectionItem> {
+     update(search)
+ 
+     return value
+-  };
++  }
+ 
+   *[Symbol.iterator]() {
+-    yield* this._items
++    yield* this.items
++  }
++
++  insertBefore(value: string, item: T) {
++    const index = this.indexOf(value)
++    if (index === -1) return
++    this.items.splice(index, 0, item)
++  }
++
++  insertAfter(value: string, item: T) {
++    const index = this.indexOf(value)
++    if (index === -1) return
++    this.items.splice(index + 1, 0, item)
++  }
++
++  reorder(fromIndex: number, toIndex: number) {
++    if (fromIndex === -1 || toIndex === -1) return
++    if (fromIndex === toIndex) return
++
++    const [removed] = this.items.splice(fromIndex, 1)
++
++    this.items.splice(toIndex, 0, removed)
+   }
+ 
+-  toJSON = () => {
++  toJSON() {
+     return {
+-      size: this.count(),
+-      first: this.first(),
+-      last: this.last(),
++      size: this.size,
++      first: this.firstValue,
++      last: this.lastValue,
+     }
+   }
+ }
+ 
+-const match = (label: string, query: string) => {
+-  return label.toLowerCase().startsWith(query.toLowerCase())
++const match = (label: string | null, query: string) => {
++  return !!label?.toLowerCase().startsWith(query.toLowerCase())
+ }
+ 
+-const wrap = <T>(v: T[], idx: number) => {
++const wrap = <T>(v: T[] | readonly T[], idx: number) => {
+   return v.map((_, index) => v[(Math.max(idx, 0) + index) % v.length])
+ }
+diff --git a/packages/utilities/collection/src/index.ts b/packages/utilities/collection/src/index.ts
+index 6940c040dd..9cf5e0a2d5 100644
+--- a/packages/utilities/collection/src/index.ts
++++ b/packages/utilities/collection/src/index.ts
+@@ -1,7 +1,7 @@
+ export { Collection } from "./collection"
+ export type {
+   CollectionItem,
+-  CollectionNode,
++  CollectionMethods,
+   CollectionOptions,
+   CollectionSearchOptions,
+   CollectionSearchState,
+diff --git a/packages/utilities/collection/src/types.ts b/packages/utilities/collection/src/types.ts
+index cc2fb60d54..ea6e646c2b 100644
+--- a/packages/utilities/collection/src/types.ts
++++ b/packages/utilities/collection/src/types.ts
+@@ -11,30 +11,24 @@ export interface CollectionSearchOptions {
+ 
+ export type CollectionItem = any
+ 
+-export interface CollectionNode<T extends CollectionItem = CollectionItem> {
+-  item: T
+-  index: number
+-  label: string
+-  value: string
+-  previousValue: string | null
+-  nextValue: string | null
+-}
+-
+-export interface CollectionOptions<T extends CollectionItem = CollectionItem> {
+-  /**
+-   * The options of the select
+-   */
+-  items: T[] | readonly T[]
++export interface CollectionMethods<T extends CollectionItem = CollectionItem> {
+   /**
+    * The value of the item
+    */
+-  itemToValue?: (item: T) => string
++  itemToValue: (item: T) => string
+   /**
+    * The label of the item
+    */
+-  itemToString?: (item: T) => string
++  itemToString: (item: T) => string
+   /**
+    * Whether the item is disabled
+    */
+-  isItemDisabled?: (item: T) => boolean
++  isItemDisabled: (item: T) => boolean
++}
++
++export interface CollectionOptions<T extends CollectionItem = CollectionItem> extends Partial<CollectionMethods<T>> {
++  /**
++   * The options of the select
++   */
++  items: T[] | readonly T[]
+ }
+diff --git a/packages/utilities/collection/tests/collection.test.ts b/packages/utilities/collection/tests/collection.test.ts
+new file mode 100644
+index 0000000000..91526e41ad
+--- /dev/null
++++ b/packages/utilities/collection/tests/collection.test.ts
+@@ -0,0 +1,191 @@
++import { Collection } from "../src"
++
++interface Item {
++  label: string
++  value: string
++  disabled?: boolean
++}
++
++const items: Item[] = [
++  { label: "React", value: "react" },
++  { label: "Vue", value: "vue" },
++  { label: "Solid", value: "solid", disabled: true },
++  { label: "Angular", value: "angular" },
++]
++
++let collection: Collection
++
++beforeEach(() => {
++  collection = new Collection({
++    items: items,
++    itemToString: (item) => item.label,
++    itemToValue: (item) => item.value,
++    isItemDisabled: (item) => !!item.disabled,
++  })
++})
++
++describe("collection", () => {
++  test("get values", () => {
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "react",
++        "vue",
++        "solid",
++        "angular",
++      ]
++    `)
++  })
++
++  test("count", () => {
++    expect(collection.size).toMatchInlineSnapshot(`4`)
++  })
++
++  test("next item", () => {
++    expect(collection.getNextValue("react")).toMatchInlineSnapshot(`"vue"`)
++    expect(collection.getNextValue("angular")).toMatchInlineSnapshot(`null`)
++  })
++
++  test("prev item", () => {
++    expect(collection.getPreviousValue("solid")).toMatchInlineSnapshot(`"vue"`)
++    expect(collection.getPreviousValue("react")).toMatchInlineSnapshot(`null`)
++  })
++
++  test("set items", () => {
++    collection.setItems([
++      { label: "Svelte", value: "svelte" },
++      { label: "Node.js", value: "node" },
++    ])
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "svelte",
++        "node",
++      ]
++    `)
++  })
++
++  test("get value at index", () => {
++    expect(collection.at(1)).toMatchInlineSnapshot(`
++      {
++        "label": "Vue",
++        "value": "vue",
++      }
++    `)
++    expect(collection.at(5)).toMatchInlineSnapshot(`null`)
++  })
++
++  test("sort", () => {
++    expect(collection.sort(["solid", "vue"])).toMatchInlineSnapshot(`
++      [
++        "vue",
++        "solid",
++      ]
++    `)
++  })
++
++  test("item to value", () => {
++    expect(collection.getItemValue(items[0])).toMatchInlineSnapshot(`"react"`)
++    expect(collection.getItemValue(items[2])).toMatchInlineSnapshot(`"solid"`)
++  })
++
++  test("item to string", () => {
++    expect(collection.stringifyItem(items[0])).toMatchInlineSnapshot(`"React"`)
++  })
++
++  test("items to string", () => {
++    expect(collection.stringifyItems([items[0], items[3]])).toMatchInlineSnapshot(`"React, Angular"`)
++  })
++
++  test("item to disabled", () => {
++    expect(collection.getItemDisabled(items[0])).toMatchInlineSnapshot(`false`)
++    expect(collection.getItemDisabled(items[2])).toMatchInlineSnapshot(`true`)
++  })
++
++  test("first and last value", () => {
++    expect(collection.firstValue).toMatchInlineSnapshot(`"react"`)
++    expect(collection.lastValue).toMatchInlineSnapshot(`"angular"`)
++  })
++
++  test("has value", () => {
++    expect(collection.has("react")).toMatchInlineSnapshot(`true`)
++    expect(collection.has("<random>")).toMatchInlineSnapshot(`false`)
++  })
++
++  test("search finds a value based on a query", () => {
++    const options = { state: { keysSoFar: "", timer: -1 }, currentValue: null, timeout: 350 }
++    expect(collection.search("r", options)).toMatchInlineSnapshot(`"react"`)
++  })
++
++  test("insert before / valid", () => {
++    collection.insertBefore("react", { label: "Svelte", value: "svelte" })
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "svelte",
++        "react",
++        "vue",
++        "solid",
++        "angular",
++      ]
++    `)
++  })
++
++  test("insert before / invalid", () => {
++    collection.insertBefore("<random>", { label: "Svelte", value: "svelte" })
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "react",
++        "vue",
++        "solid",
++        "angular",
++      ]
++    `)
++  })
++
++  test("insert after / valid", () => {
++    collection.insertAfter("solid", { label: "Svelte", value: "svelte" })
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "react",
++        "vue",
++        "solid",
++        "svelte",
++        "angular",
++      ]
++    `)
++  })
++
++  test("insert after / invalid", () => {
++    collection.insertAfter("<random>", { label: "Svelte", value: "svelte" })
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "react",
++        "vue",
++        "solid",
++        "angular",
++      ]
++    `)
++  })
++
++  test("reorder / valid", () => {
++    collection.reorder(2, 1)
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "react",
++        "solid",
++        "vue",
++        "angular",
++      ]
++    `)
++  })
++
++  test("reorder / invalid", () => {
++    collection.reorder(2, 5)
++    expect(collection.getValues()).toMatchInlineSnapshot(`
++      [
++        "react",
++        "vue",
++        "angular",
++        "solid",
++      ]
++    `)
++  })
++})
+diff --git a/website/data/components/combobox.mdx b/website/data/components/combobox.mdx
+index 06bdbf93b2..f8425288f4 100644
+--- a/website/data/components/combobox.mdx
++++ b/website/data/components/combobox.mdx
+@@ -54,8 +54,8 @@ The combobox package exports these functions:
+ - `machine` — The state machine logic for the combobox widget.
+ - `connect` — The function that translates the machine's state to JSX attributes
+   and event handlers.
+-- `collection` - The function that creates a collection interface from an array
+-  of items.
++- `collection` - The function that creates a
++  [collection interface](/overview/collection) from an array of items.
+ 
+ Next, import the required hooks and functions for your framework and use the
+ combobox machine in your project 🔥
+diff --git a/website/data/components/select.mdx b/website/data/components/select.mdx
+index 7e95093d8e..51df649149 100644
+--- a/website/data/components/select.mdx
++++ b/website/data/components/select.mdx
+@@ -55,8 +55,8 @@ The select package exports these functions:
+ - `machine` — The state machine logic for the select.
+ - `connect` — The function that translates the machine's state to JSX attributes
+   and event handlers.
+-- `collection` - The function that creates a collection interface from an array
+-  of items.
++- `collection` - The function that creates a
++  [collection interface](/overview/collection) from an array of items.
+ 
+ > You'll need to provide a unique `id` to the `useMachine` hook. This is used to
+ > ensure that every part has a unique identifier.
+diff --git a/website/data/overview/collection.mdx b/website/data/overview/collection.mdx
+new file mode 100644
+index 0000000000..6de3aa32a9
+--- /dev/null
++++ b/website/data/overview/collection.mdx
+@@ -0,0 +1,126 @@
++---
++title: Collection
++description: Working with collections in Zag
++---
++
++# Collection
++
++The Collection class is designed to manage a collection of items, providing
++functionalities such as sorting, searching, getting next or previous items,
++converting items to values or strings, checking if an item is disabled, and
++more.
++
++> **Good to know**: This is used in the select and combobox components
++
++## List Collection
++
++A list collection is a collection that is based on an array of items. It is
++created by passing an array of items to the constructor.
++
++```ts
++import { Collection } from "@zag-js/collection"
++
++const collection = new Collection({
++  items: [
++    { label: "Apple", value: "apple" },
++    { label: "Banana", value: "banana" },
++  ],
++})
++```
++
++### Converting value to item
++
++You can convert a value to an item by passing the value to the `find` or
++`findMany` method.
++
++```ts
++const item = collection.find("banana")
++
++console.log(item) // { label: "Banana", value: "banana" }
++
++const items = collection.findMany(["apple", "banana"])
++
++console.log(items) // [{ label: "Apple", value: "apple" }, { label: "Banana", value: "banana" }]
++```
++
++### Value Traversal
++
++You can get the next or previous item based on a value by passing the value to
++the `getNextValue` or `getPreviousValue` method.
++
++```ts
++const nextValue = collection.getNextValue("apple")
++
++console.log(nextValue) // banana
++
++const previousItem = collection.getPreviousValue("banana")
++
++console.log(previousItem) // apple
++```
++
++Likewise, you can also get the first or last item by calling the `firstValue` or
++`lastValue` computed properties.
++
++```ts
++console.log(collection.firstValue) // apple
++
++console.log(collection.lastValue) // banana
++```
++
++### Check for value existence
++
++You can check if a value exists in the collection by calling the `has` method.
++
++```ts
++const hasValue = collection.has("apple")
++
++console.log(hasValue) // true
++```
++
++### Working with custom objects
++
++If you are working with custom objects, you can pass a function to the
++`itemToString` and `getItemValue` options to specify how to convert an item to a
++string and a value, respectively.
++
++```ts
++import { Collection } from "@zag-js/collection"
++
++const collection = new Collection({
++  items: [
++    { id: 1, name: "apple" },
++    { id: 2, name: "banana" },
++    { id: 3, name: "cherry" },
++  ],
++  itemToString: (item) => item.name,
++  itemToValue: (item) => item.id,
++})
++```
++
++To disable an item, you can pass a function to the `isItemDisabled` option.
++
++```ts
++import { Collection } from "@zag-js/collection"
++
++const collection = new Collection({
++  items: [
++    { id: 1, name: "apple" },
++    { id: 2, name: "banana" },
++    { id: 3, name: "cherry" },
++  ],
++  isItemDisabled: (item) => item.id === 2,
++})
++```
++
++### Reorder items
++
++You can reorder items by calling the `reorder` method and passing the starting
++index and the ending index of the item to be moved.
++
++```ts
++const fromIndex = 1 // Banana
++const toIndex = 0 // Apple
++collection.reorder(fromIndex, toIndex)
++
++console.log(collection.items) // [{ label: "Banana", value: "banana" }, { label: "Apple", value: "apple" }]
++```
+diff --git a/website/sidebar.config.ts b/website/sidebar.config.ts
+index ca11834c63..e116c45b98 100644
+--- a/website/sidebar.config.ts
++++ b/website/sidebar.config.ts
+@@ -43,6 +43,7 @@ const sidebar: Record<"docs", SidebarItem[]> = {
+         { type: "doc", label: "State machine", id: "whats-a-machine" },
+         { type: "doc", label: "Styling", id: "styling" },
+         { type: "doc", label: "Composition", id: "composition" },
++        { type: "doc", label: "Collection", id: "collection", new: true },
+         {
+           type: "doc",
+           label: "Programmatic Control",

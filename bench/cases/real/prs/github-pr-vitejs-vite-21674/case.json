@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-vitejs-vite-21674",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitejs/vite#21674: refactor(create-vite): remove extra brackets in React Compiler babel plugins",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitejs/vite",
+    "prNumber": 21674,
+    "prUrl": "https://github.com/vitejs/vite/pull/21674",
+    "baseSha": "5f425a9126ad1a483f482970bef8c29a0e721a3c",
+    "headSha": "bc89ce7efd2dff00ebd2332db814a7a11b9ab423",
+    "selectedFiles": [
+      "packages/create-vite/src/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:20:51.806Z"
+  },
+  "files": [
+    {
+      "id": "packages/create-vite/src/index.ts",
+      "oldPath": "packages/create-vite/src/index.ts",
+      "newPath": "packages/create-vite/src/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/create-vite/src/index.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 795,
+          "endLine": 795
+        },
+        "newRange": {
+          "startLine": 795,
+          "endLine": 795
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

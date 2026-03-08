@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "docs/src/components/pricing/PricingTable.tsx",
+    "diff": "/gh/mui/material-ui/diff?old_filename=docs%2Fsrc%2Fcomponents%2Fpricing%2FPricingTable.tsx&old_oid=4063303dd933d553dd47c2fde6f24cd73caa3ed0&old_mode=33188&new_filename=docs%2Fsrc%2Fcomponents%2Fpricing%2FPricingTable.tsx&new_oid=ee3528373ca17dfac7c1a129a3867acf5b4ba9ae&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/src/components/pricing/PricingTable.tsx",
+      "oid": "4063303dd933d553dd47c2fde6f24cd73caa3ed0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/src/components/pricing/PricingTable.tsx",
+      "oid": "ee3528373ca17dfac7c1a129a3867acf5b4ba9ae",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ee6a1a4ebced8453e8acd50f3255c31dc7956ff22237750eee45197b2a170489"
+  }
+]

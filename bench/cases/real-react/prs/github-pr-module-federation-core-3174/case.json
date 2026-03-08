@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-module-federation-core-3174",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3174: feat(runtime): pass all loader hooks to the fetch and script functions",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3174,
+    "prUrl": "https://github.com/module-federation/core/pull/3174",
+    "baseSha": "54bfd1cf730a842fd323d88d1b7c8ff72678f0ce",
+    "headSha": "b6195d1a0789b42d98f6ad989773a4952be6bd7e",
+    "selectedFiles": [
+      "packages/runtime/src/remote/index.ts"
+    ],
+    "collectedAt": "2026-03-08T04:15:21.615Z"
+  },
+  "files": [
+    {
+      "id": "packages/runtime/src/remote/index.ts",
+      "oldPath": "packages/runtime/src/remote/index.ts",
+      "newPath": "packages/runtime/src/remote/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/runtime/src/remote/index.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 148,
+          "endLine": 148
+        },
+        "newRange": {
+          "startLine": 148,
+          "endLine": 148
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

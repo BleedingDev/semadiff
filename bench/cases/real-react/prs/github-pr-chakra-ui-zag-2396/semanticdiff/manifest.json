@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/frameworks/preact/src/machine.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=packages%2Fframeworks%2Fpreact%2Fsrc%2Fmachine.ts&old_oid=ea0e9627027cacd9a2cf3587bf456be436b79899&old_mode=33188&new_filename=packages%2Fframeworks%2Fpreact%2Fsrc%2Fmachine.ts&new_oid=900c490faedf67e567540a41aaea0884eae770a4&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/frameworks/preact/src/machine.ts",
+      "oid": "ea0e9627027cacd9a2cf3587bf456be436b79899",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/frameworks/preact/src/machine.ts",
+      "oid": "900c490faedf67e567540a41aaea0884eae770a4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "538fb3dfe2af77158c5dd0c2ef2461acabec61f6d0ef6fd7ed53c46f42d85c8e"
+  }
+]

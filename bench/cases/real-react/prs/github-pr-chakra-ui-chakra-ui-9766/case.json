@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-9766",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#9766: docs: refactor radio snippets",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 9766,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9766",
+    "baseSha": "15b758b2d3c69fac24d1fe232197386110f74968",
+    "headSha": "739606b31743d606b10c27af2e43ecfc8c615c0f",
+    "selectedFiles": [
+      "packages/react/__stories__/radio-card.stories.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:57:02.538Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/__stories__/radio-card.stories.tsx",
+      "oldPath": "packages/react/__stories__/radio-card.stories.tsx",
+      "newPath": "packages/react/__stories__/radio-card.stories.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/__stories__/radio-card.stories.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 26,
+          "endLine": 26
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "tracking_name": ".changeset/shy-pumas-provide.md",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=.changeset%2Fshy-pumas-provide.md&new_oid=e0dcffd02d60d1c45798cd9fa6f424a061b6bb34&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/shy-pumas-provide.md",
+      "oid": "e0dcffd02d60d1c45798cd9fa6f424a061b6bb34",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "eb1bf5e17be53b0f70589eadb1481f0017a04b1b1bf01cc255d3a270a97b4068"
+  },
+  {
+    "tracking_name": "packages/components/avatar/src/avatar-name.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Favatar%2Fsrc%2Favatar-name.tsx&old_oid=09696ef877bea300eb542641c37e47add6aa8485&old_mode=33188&new_filename=packages%2Fcomponents%2Favatar%2Fsrc%2Favatar-name.tsx&new_oid=d605dcdf31c8ef33fba9ef18a14263fa5e2765ba&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/components/avatar/src/avatar-name.tsx",
+      "oid": "09696ef877bea300eb542641c37e47add6aa8485",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/avatar/src/avatar-name.tsx",
+      "oid": "d605dcdf31c8ef33fba9ef18a14263fa5e2765ba",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "26d64b3c021e5259f8008f5d9aa73b6faa35238bfe6e8a0c389ac9ebf33093e2"
+  }
+]

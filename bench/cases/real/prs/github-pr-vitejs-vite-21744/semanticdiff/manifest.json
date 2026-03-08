@@ -1,0 +1,206 @@
+[
+  {
+    "tracking_name": ".github/workflows/ci.yml",
+    "diff": "/gh/vitejs/vite/diff?old_filename=.github%2Fworkflows%2Fci.yml&old_oid=e337a1dd7869226439fd13db6a64de84a262475d&old_mode=33188&new_filename=.github%2Fworkflows%2Fci.yml&new_oid=410a413a823061612a293572d319c71d3b70844f&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": ".github/workflows/ci.yml",
+      "oid": "e337a1dd7869226439fd13db6a64de84a262475d",
+      "mode": 33188
+    },
+    "new": {
+      "name": ".github/workflows/ci.yml",
+      "oid": "410a413a823061612a293572d319c71d3b70844f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b803fcb7f17ed9235f1e5cb1fcd2f5d3b2838429d4368ae4c57ce4436577f03f"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/__tests__/plugins/define.spec.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2F__tests__%2Fplugins%2Fdefine.spec.ts&old_oid=fd0c883cf55e5ab0775240bab199b93a553dd31c&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2F__tests__%2Fplugins%2Fdefine.spec.ts&new_oid=bffb92cd807ddf6c709f9ecb79c914c04e0d2565&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/vite/src/node/__tests__/plugins/define.spec.ts",
+      "oid": "fd0c883cf55e5ab0775240bab199b93a553dd31c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/__tests__/plugins/define.spec.ts",
+      "oid": "bffb92cd807ddf6c709f9ecb79c914c04e0d2565",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "549eafb0508edbd712731e6b064bf7f4ac695383189a619d607bc3167a51611e"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/build.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fbuild.ts&old_oid=f31d083b0446ecaf9d216fffdbfbbf33eb08d4aa&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fbuild.ts&new_oid=b2b5ecef6f7441c0b54c8d592b532b25f3bffc1e&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/vite/src/node/build.ts",
+      "oid": "f31d083b0446ecaf9d216fffdbfbbf33eb08d4aa",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/build.ts",
+      "oid": "b2b5ecef6f7441c0b54c8d592b532b25f3bffc1e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "aa53520bfd53e6c24220c44494457cc66370fd2bee513c15f9be7eb537a363e7"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/config.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fconfig.ts&old_oid=d45c6372f7d77b5650393968308672b5bd366730&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fconfig.ts&new_oid=5a7ff1d619c149af958997c9bafecc28ecaf6b9f&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/vite/src/node/config.ts",
+      "oid": "d45c6372f7d77b5650393968308672b5bd366730",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/config.ts",
+      "oid": "5a7ff1d619c149af958997c9bafecc28ecaf6b9f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "11e17761d4ecfee8f8fde15c6d79b7bc0260176396a30dfd8e6f6bbaf5af4745"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/define.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Fdefine.ts&old_oid=098887f1d1859eae5a7d9ee150ccd5bc3f80e605&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Fdefine.ts&new_oid=493697ff681c9efa895630251475e2619e4b45f1&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/define.ts",
+      "oid": "098887f1d1859eae5a7d9ee150ccd5bc3f80e605",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/define.ts",
+      "oid": "493697ff681c9efa895630251475e2619e4b45f1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d90a7c21c9fb9222e557704bd906ea5671d5fe384c8fb105459eea8c36fdb4f0"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/dynamicImportVars.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FdynamicImportVars.ts&old_oid=b164eab0ee46bf3b4dddc736d04cbbc8a7c87b52&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FdynamicImportVars.ts&new_oid=32138e26de9e5005e6434a95429f4140f27451b5&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/dynamicImportVars.ts",
+      "oid": "b164eab0ee46bf3b4dddc736d04cbbc8a7c87b52",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/dynamicImportVars.ts",
+      "oid": "32138e26de9e5005e6434a95429f4140f27451b5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "309e5af7d3263d408c73cf68d3c7a2d526438f01ad6e1b56bf08c62d9cafa06d"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/importMetaGlob.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts&old_oid=ccb2dd5b547fbadeb340bce326c09b25cc0a2b3b&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2FimportMetaGlob.ts&new_oid=816115501c0aa099cbce75a46e8cdfb0ad01a838&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "oid": "ccb2dd5b547fbadeb340bce326c09b25cc0a2b3b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/importMetaGlob.ts",
+      "oid": "816115501c0aa099cbce75a46e8cdfb0ad01a838",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f3ba8f5897b74676bdfc693707a0b46fa45b272d4dfbc2266a9145e184184df8"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/index.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Findex.ts&old_oid=5cc3e31931504eb346008ec88b330e1d2fe2cfe5&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Findex.ts&new_oid=2ec7032fae7600a5dd3be651718f4db9a5209401&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/index.ts",
+      "oid": "5cc3e31931504eb346008ec88b330e1d2fe2cfe5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/index.ts",
+      "oid": "2ec7032fae7600a5dd3be651718f4db9a5209401",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5d977ec5bf5e8f4a2e6feefaa99f53724925500426005ec1368b177a02f6c210"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/manifest.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Fmanifest.ts&old_oid=709c58fe6f0b2beaf5b46ca2a094f13d1fce657f&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Fmanifest.ts&new_oid=70ec394874663a069f327046651be1fca2a17993&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/manifest.ts",
+      "oid": "709c58fe6f0b2beaf5b46ca2a094f13d1fce657f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/manifest.ts",
+      "oid": "70ec394874663a069f327046651be1fca2a17993",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f2bad1f1ef27e0d2a0113e5906b371f773bbd8753e21d4069b43fb3dd1367172"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/oxc.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Foxc.ts&old_oid=9ad774823bb4a2abf7589318fe9aee8afaa4afc9&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Foxc.ts&new_oid=e0e30e8224d7b9deb4a0a1c8f16f839d98f600a0&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/oxc.ts",
+      "oid": "9ad774823bb4a2abf7589318fe9aee8afaa4afc9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/oxc.ts",
+      "oid": "e0e30e8224d7b9deb4a0a1c8f16f839d98f600a0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "94ce912961d9b5a6aba27dea2396e11a19548bb6011749a117e0bd8da7bd58fe"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/reporter.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Freporter.ts&old_oid=540def1b5ddeb1e70e79d1ca15409c83a103c79b&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Freporter.ts&new_oid=186d467a87861eaebd10285e81aedf25183cbefc&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/reporter.ts",
+      "oid": "540def1b5ddeb1e70e79d1ca15409c83a103c79b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/reporter.ts",
+      "oid": "186d467a87861eaebd10285e81aedf25183cbefc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "804926239ab7ce5dd12d3ba02244733917a7a54582b67c8212e130679aa00508"
+  },
+  {
+    "tracking_name": "packages/vite/src/node/plugins/worker.ts",
+    "diff": "/gh/vitejs/vite/diff?old_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Fworker.ts&old_oid=3a042353379ad725bc101c93050b1ca22e6ee529&old_mode=33188&new_filename=packages%2Fvite%2Fsrc%2Fnode%2Fplugins%2Fworker.ts&new_oid=579cc1ad4f96d19b5dce7bff0652fc3524f70dfa&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "old": {
+      "name": "packages/vite/src/node/plugins/worker.ts",
+      "oid": "3a042353379ad725bc101c93050b1ca22e6ee529",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/vite/src/node/plugins/worker.ts",
+      "oid": "579cc1ad4f96d19b5dce7bff0652fc3524f70dfa",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3b7bb11b5633d82f82c069037789e105005d657667b1da1e96c18fcf3eb622ad"
+  }
+]

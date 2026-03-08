@@ -38,6 +38,40 @@ describe("diff cosmetic helpers", () => {
     expect(shouldPairDeleteInsert("foo", "bar", "ts")).toBe(true);
   });
 
+  test("does not pair unrelated multiline TypeScript blocks", () => {
+    const oldText = [
+      "const left = 1;",
+      "const right = 2;",
+      "const total = left + right;",
+      "console.log(total);",
+      "return left + right;",
+    ].join("\n");
+    const newText = [
+      "function renderItems() {",
+      "  return items.map(renderItem);",
+      "}",
+      "const panel = createPanel(theme);",
+      "return panel;",
+    ].join("\n");
+
+    expect(shouldPairDeleteInsert(oldText, newText, "ts")).toBe(false);
+  });
+
+  test("keeps pairing related multiline TypeScript blocks", () => {
+    const oldText = [
+      "function renderItems() {",
+      "  return items.map(renderItem);",
+      "}",
+    ].join("\n");
+    const newText = [
+      "function renderItems() {",
+      "  return items.map(renderOption);",
+      "}",
+    ].join("\n");
+
+    expect(shouldPairDeleteInsert(oldText, newText, "ts")).toBe(true);
+  });
+
   test("detects side-effect import lines", () => {
     expect(isSideEffectImportLine('import "./setup";')).toBe(true);
     expect(isSideEffectImportLine('import { x } from "./x";')).toBe(false);

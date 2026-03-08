@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "7c2c3fcb14abe9012d442d6b9ad1b52964ef4a4b",
+    "filename": ".changeset/large-actors-fly.md",
+    "status": "added",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/module-federation/core/blob/d332ad6e6507720b7762a9da7e78e0e33f9cf764/.changeset%2Flarge-actors-fly.md",
+    "raw_url": "https://github.com/module-federation/core/raw/d332ad6e6507720b7762a9da7e78e0e33f9cf764/.changeset%2Flarge-actors-fly.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/.changeset%2Flarge-actors-fly.md?ref=d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+    "patch": "@@ -0,0 +1,6 @@\n+---\n+'@module-federation/dts-plugin': minor\n+'@module-federation/sdk': minor\n+---\n+\n+added flag to fetch types from remote when building in production."
+  },
+  {
+    "sha": "d2ddc196ec993ad6556bbb041a515bc7224b5482",
+    "filename": "packages/dts-plugin/src/core/configurations/hostPlugin.test.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 0,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.test.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.test.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.test.ts?ref=d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+    "patch": "@@ -43,6 +43,7 @@ describe('hostPlugin', () => {\n           runtimePkgs: [],\n           remoteTypeUrls: {},\n           timeout: 60000,\n+          typesOnBuild: false,\n         });\n \n         expect(mapRemotesToDownload).toStrictEqual({\n@@ -70,6 +71,7 @@ describe('hostPlugin', () => {\n           runtimePkgs: [],\n           remoteTypeUrls: {},\n           timeout: 60000,\n+          typesOnBuild: false,\n         };\n \n         const { hostOptions, mapRemotesToDownload } ="
+  },
+  {
+    "sha": "b868bb0bcb02005b33a741defef6d24a60edefd6",
+    "filename": "packages/dts-plugin/src/core/configurations/hostPlugin.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/module-federation/core/blob/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fsrc%2Fcore%2Fconfigurations%2FhostPlugin.ts?ref=d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+    "patch": "@@ -19,6 +19,7 @@ const defaultOptions = {\n   runtimePkgs: [],\n   remoteTypeUrls: {},\n   timeout: 60000,\n+  typesOnBuild: false,\n } satisfies Partial<HostOptions>;\n \n const buildZipUrl = (hostOptions: Required<HostOptions>, url: string) => {"
+  },
+  {
+    "sha": "ae1097794528d131f3742fe6ec8097aa17178a10",
+    "filename": "packages/dts-plugin/src/plugins/ConsumeTypesPlugin.ts",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 5,
+    "changes": 11,
+    "blob_url": "https://github.com/module-federation/core/blob/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fdts-plugin%2Fsrc%2Fplugins%2FConsumeTypesPlugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fdts-plugin%2Fsrc%2Fplugins%2FConsumeTypesPlugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fdts-plugin%2Fsrc%2Fplugins%2FConsumeTypesPlugin.ts?ref=d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+    "patch": "@@ -15,6 +15,7 @@ import type { Compiler, WebpackPluginInstance } from 'webpack';\n export const DEFAULT_CONSUME_TYPES = {\n   abortOnError: false,\n   consumeAPITypes: true,\n+  typesOnBuild: false,\n };\n \n export const normalizeConsumeTypesOptions = ({\n@@ -99,11 +100,6 @@ export class ConsumeTypesPlugin implements WebpackPluginInstance {\n   apply(compiler: Compiler) {\n     const { dtsOptions, pluginOptions, fetchRemoteTypeUrlsResolve } = this;\n \n-    if (isPrd()) {\n-      fetchRemoteTypeUrlsResolve(undefined);\n-      return;\n-    }\n-\n     const dtsManagerOptions = normalizeConsumeTypesOptions({\n       context: compiler.context,\n       dtsOptions,\n@@ -115,6 +111,11 @@ export class ConsumeTypesPlugin implements WebpackPluginInstance {\n       return;\n     }\n \n+    if (isPrd() && !dtsManagerOptions.host.typesOnBuild) {\n+      fetchRemoteTypeUrlsResolve(undefined);\n+      return;\n+    }\n+\n     logger.debug('start fetching remote types...');\n     const promise = consumeTypesAPI(\n       dtsManagerOptions,"
+  },
+  {
+    "sha": "8671cc4f9546ca42917249afb34d0183c680e137",
+    "filename": "packages/sdk/src/types/plugins/ModuleFederationPlugin.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/module-federation/core/blob/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fsdk%2Fsrc%2Ftypes%2Fplugins%2FModuleFederationPlugin.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/d332ad6e6507720b7762a9da7e78e0e33f9cf764/packages%2Fsdk%2Fsrc%2Ftypes%2Fplugins%2FModuleFederationPlugin.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fsdk%2Fsrc%2Ftypes%2Fplugins%2FModuleFederationPlugin.ts?ref=d332ad6e6507720b7762a9da7e78e0e33f9cf764",
+    "patch": "@@ -156,6 +156,7 @@ export interface DtsHostOptions {\n   runtimePkgs?: string[];\n   remoteTypeUrls?: (() => Promise<RemoteTypeUrls>) | RemoteTypeUrls;\n   timeout?: number;\n+  typesOnBuild?: boolean;\n }\n \n export interface DtsRemoteOptions {"
+  }
+]

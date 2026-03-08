@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-15399",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#15399: [Portal] Migrate to React hooks",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 15399,
+    "prUrl": "https://github.com/mui/material-ui/pull/15399",
+    "baseSha": "7869aac11e9d4b2dc9bdd450cb890f58119409cf",
+    "headSha": "85602822d521a639432af2c893030cc372afbcb9",
+    "selectedFiles": [
+      "docs/src/pages/demos/progress/CircularIntegration.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:42:57.698Z"
+  },
+  "files": [
+    {
+      "id": "docs/src/pages/demos/progress/CircularIntegration.tsx",
+      "oldPath": "docs/src/pages/demos/progress/CircularIntegration.tsx",
+      "newPath": "docs/src/pages/demos/progress/CircularIntegration.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/src/pages/demos/progress/CircularIntegration.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 47,
+          "endLine": 47
+        },
+        "newRange": {
+          "startLine": 47,
+          "endLine": 47
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

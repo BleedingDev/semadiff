@@ -1,0 +1,13 @@
+diff --git a/packages/toolkit/src/index.ts b/packages/toolkit/src/index.ts
+index 65291ab83b..7c23fd7255 100644
+--- a/packages/toolkit/src/index.ts
++++ b/packages/toolkit/src/index.ts
+@@ -10,7 +10,7 @@ export {
+   original,
+   isDraft,
+ } from 'immer'
+-export type { Draft } from 'immer'
++export type { Draft, WritableDraft } from 'immer'
+ export {
+   createSelector,
+   createSelectorCreator,

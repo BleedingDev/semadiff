@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4476",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4476: refactor: remove remote ip strategy feature",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4476,
+    "prUrl": "https://github.com/module-federation/core/pull/4476",
+    "baseSha": "befc21c138e8cd1f06ef35af311e5bfc8633864a",
+    "headSha": "25d05dc3c6a8ef67245f47fb5e4fbb42da20cae4",
+    "selectedFiles": [
+      "packages/modernjs-v3/src/cli/index.ts"
+    ],
+    "collectedAt": "2026-03-08T04:10:39.649Z"
+  },
+  "files": [
+    {
+      "id": "packages/modernjs-v3/src/cli/index.ts",
+      "oldPath": "packages/modernjs-v3/src/cli/index.ts",
+      "newPath": "packages/modernjs-v3/src/cli/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/modernjs-v3/src/cli/index.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 23,
+          "endLine": 23
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

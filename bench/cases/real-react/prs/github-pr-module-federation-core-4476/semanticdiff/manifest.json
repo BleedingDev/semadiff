@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/modernjs-v3/src/cli/index.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fmodernjs-v3%2Fsrc%2Fcli%2Findex.ts&old_oid=04a76f078c7dde2e67fc77e05bc323a3ff5b5cdc&old_mode=33188&new_filename=packages%2Fmodernjs-v3%2Fsrc%2Fcli%2Findex.ts&new_oid=d3e370e12d485f4da0e06db974f73c85b8f2e90d&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/modernjs-v3/src/cli/index.ts",
+      "oid": "04a76f078c7dde2e67fc77e05bc323a3ff5b5cdc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/modernjs-v3/src/cli/index.ts",
+      "oid": "d3e370e12d485f4da0e06db974f73c85b8f2e90d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "291b76dc51308bdee3e37276b1319848351b611c6e03e93b7cfdcd4076a672ac"
+  }
+]

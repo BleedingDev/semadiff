@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "test/regressions/charts/XAxisTickLabelOverflow.tsx",
+    "diff": "/gh/mui/mui-x/diff?old_filename=docs%2Fdata%2Fvisual-regression-tests%2FXAxisTickLabelOverflow.tsx&old_oid=1aebcd00dec42abc0d458bee32e6d490f594dea0&old_mode=33188&new_filename=test%2Fregressions%2Fcharts%2FXAxisTickLabelOverflow.tsx&new_oid=273a5cb6c73d2acc0ef6cf194c530bc1d4b3bd94&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/data/visual-regression-tests/XAxisTickLabelOverflow.tsx",
+      "oid": "1aebcd00dec42abc0d458bee32e6d490f594dea0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "test/regressions/charts/XAxisTickLabelOverflow.tsx",
+      "oid": "273a5cb6c73d2acc0ef6cf194c530bc1d4b3bd94",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2e677b3aa74c5ccea9de0517fcd1728b144407cefb160c7425abad67dc188ac1"
+  }
+]

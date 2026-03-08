@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-9759",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#9759: docs: refactor checkbox snippets",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 9759,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9759",
+    "baseSha": "96e1730c508762e12cb5c294f927786be6eb0b28",
+    "headSha": "0bc356933636351773ced2ab74360cbf5aa2abba",
+    "selectedFiles": [
+      "packages/react/__stories__/checkbox.stories.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:57:24.202Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/__stories__/checkbox.stories.tsx",
+      "oldPath": "packages/react/__stories__/checkbox.stories.tsx",
+      "newPath": "packages/react/__stories__/checkbox.stories.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/__stories__/checkbox.stories.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 30,
+          "endLine": 30
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "67635e15bc9994c16ea2c317ecded35d278a7048",
+    "filename": "packages/vite/src/node/plugin.ts",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 4,
+    "changes": 8,
+    "blob_url": "https://github.com/vitejs/vite/blob/d8eeab9b2823bc8b29c96850e8a1aa17314b78b1/packages%2Fvite%2Fsrc%2Fnode%2Fplugin.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/d8eeab9b2823bc8b29c96850e8a1aa17314b78b1/packages%2Fvite%2Fsrc%2Fnode%2Fplugin.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fnode%2Fplugin.ts?ref=d8eeab9b2823bc8b29c96850e8a1aa17314b78b1",
+    "patch": "@@ -128,11 +128,11 @@ export interface Plugin<A = any> extends RollupPlugin<A> {\n       options: {\n         attributes: Record<string, string>\n         custom?: CustomPluginOptions\n-        ssr?: boolean\n+        ssr?: boolean | undefined\n         /**\n          * @internal\n          */\n-        scan?: boolean\n+        scan?: boolean | undefined\n         isEntry: boolean\n       },\n     ) => Promise<ResolveIdResult> | ResolveIdResult,\n@@ -143,7 +143,7 @@ export interface Plugin<A = any> extends RollupPlugin<A> {\n       this: PluginContext,\n       id: string,\n       options?: {\n-        ssr?: boolean\n+        ssr?: boolean | undefined\n       },\n     ) => Promise<LoadResult> | LoadResult,\n     { filter?: { id?: StringFilter } }\n@@ -154,7 +154,7 @@ export interface Plugin<A = any> extends RollupPlugin<A> {\n       code: string,\n       id: string,\n       options?: {\n-        ssr?: boolean\n+        ssr?: boolean | undefined\n       },\n     ) => Promise<TransformResult> | TransformResult,\n     { filter?: { id?: StringFilter; code?: StringFilter } }"
+  }
+]

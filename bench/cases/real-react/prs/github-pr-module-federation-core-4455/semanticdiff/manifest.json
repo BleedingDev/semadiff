@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "apps/3000-home/cypress/support/e2e.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=apps%2F3000-home%2Fcypress%2Fsupport%2Fe2e.ts&old_oid=1c1a9e772baea367e08b1c7b15e65b3fede3d17f&old_mode=33188&new_filename=apps%2F3000-home%2Fcypress%2Fsupport%2Fe2e.ts&new_oid=80524cea256a23bf3eba08ab782c4f48b8fd746b&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "apps/3000-home/cypress/support/e2e.ts",
+      "oid": "1c1a9e772baea367e08b1c7b15e65b3fede3d17f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/3000-home/cypress/support/e2e.ts",
+      "oid": "80524cea256a23bf3eba08ab782c4f48b8fd746b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b765aecc4c22c1455af1635e0393f50809efb25c54e223a8b45c2d6ade635fc6"
+  }
+]

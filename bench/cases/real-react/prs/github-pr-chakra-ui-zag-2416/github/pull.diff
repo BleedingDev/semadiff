@@ -1,0 +1,150 @@
+diff --git a/examples/vanilla-ts/src/accordion.ts b/examples/vanilla-ts/src/accordion.ts
+index cc49a94738..bf58c31c9e 100644
+--- a/examples/vanilla-ts/src/accordion.ts
++++ b/examples/vanilla-ts/src/accordion.ts
+@@ -1,8 +1,6 @@
+ import * as accordion from "@zag-js/accordion"
+-import { normalizeProps } from "./normalize-props"
+-import { spreadProps } from "./spread-props"
++import { normalizeProps, spreadProps, VanillaMachine } from "./lib"
+ import { Component } from "./component"
+-import { VanillaMachine } from "./lib/machine"
+ 
+ export class Accordion extends Component<accordion.Props, accordion.Api> {
+   initMachine(props: accordion.Props) {
+diff --git a/examples/vanilla-ts/src/avatar.ts b/examples/vanilla-ts/src/avatar.ts
+index c3ba3976e7..41598f0ea0 100644
+--- a/examples/vanilla-ts/src/avatar.ts
++++ b/examples/vanilla-ts/src/avatar.ts
+@@ -1,8 +1,6 @@
+ import * as avatar from "@zag-js/avatar"
+-import { normalizeProps } from "./normalize-props"
+-import { spreadProps } from "./spread-props"
++import { normalizeProps, spreadProps, VanillaMachine } from "./lib"
+ import { Component } from "./component"
+-import { VanillaMachine } from "./lib/machine"
+ 
+ export class Avatar extends Component<avatar.Props, avatar.Api> {
+   initMachine(props: avatar.Props) {
+diff --git a/examples/vanilla-ts/src/checkbox.ts b/examples/vanilla-ts/src/checkbox.ts
+index 09d54c9b69..86929349c5 100644
+--- a/examples/vanilla-ts/src/checkbox.ts
++++ b/examples/vanilla-ts/src/checkbox.ts
+@@ -1,8 +1,6 @@
+ import * as checkbox from "@zag-js/checkbox"
+-import { normalizeProps } from "./normalize-props"
+-import { spreadProps } from "./spread-props"
++import { normalizeProps, spreadProps, VanillaMachine } from "./lib"
+ import { Component } from "./component"
+-import { VanillaMachine } from "./lib/machine"
+ 
+ export class Checkbox extends Component<checkbox.Props, checkbox.Api> {
+   initMachine(props: checkbox.Props) {
+diff --git a/examples/vanilla-ts/src/component.ts b/examples/vanilla-ts/src/component.ts
+index b7492a469d..dd484d7a53 100644
+--- a/examples/vanilla-ts/src/component.ts
++++ b/examples/vanilla-ts/src/component.ts
+@@ -1,4 +1,4 @@
+-import { VanillaMachine } from "./lib/machine"
++import { VanillaMachine } from "./lib"
+ 
+ interface ComponentInterface<Api> {
+   rootEl: HTMLElement
+diff --git a/examples/vanilla-ts/src/lib/bindable.ts b/examples/vanilla-ts/src/lib/bindable.ts
+index 1cff962a92..34347acefc 100644
+--- a/examples/vanilla-ts/src/lib/bindable.ts
++++ b/examples/vanilla-ts/src/lib/bindable.ts
+@@ -42,3 +42,17 @@ export function bindable<T>(props: () => BindableParams<T>): Bindable<T> {
+     },
+   }
+ }
++
++bindable.cleanup = (_fn: VoidFunction) => {
++  // No-op in vanilla implementation
++}
++
++bindable.ref = <T>(defaultValue: T) => {
++  let value = defaultValue
++  return {
++    get: () => value,
++    set: (next: T) => {
++      value = next
++    },
++  }
++}
+diff --git a/examples/vanilla-ts/src/lib/index.ts b/examples/vanilla-ts/src/lib/index.ts
+new file mode 100644
+index 0000000000..b7de5edfff
+--- /dev/null
++++ b/examples/vanilla-ts/src/lib/index.ts
+@@ -0,0 +1,3 @@
++export { normalizeProps } from "./normalize-props"
++export { spreadProps } from "./spread-props"
++export { VanillaMachine } from "./machine"
+diff --git a/examples/vanilla-ts/src/lib/machine.ts b/examples/vanilla-ts/src/lib/machine.ts
+index 5e72b0a68a..007e3bfdbc 100644
+--- a/examples/vanilla-ts/src/lib/machine.ts
++++ b/examples/vanilla-ts/src/lib/machine.ts
+@@ -18,6 +18,7 @@ import { createScope, INIT_STATE, MachineStatus } from "@zag-js/core"
+ import { subscribe } from "@zag-js/store"
+ import { compact, identity, isEqual, isFunction, isString, toArray, warn } from "@zag-js/utils"
+ import { bindable } from "./bindable"
++import { createRefs } from "./refs"
+ 
+ export class VanillaMachine<T extends MachineSchema> {
+   scope: Scope
+@@ -338,15 +339,3 @@ export class VanillaMachine<T extends MachineSchema> {
+     choose: this.choose,
+   })
+ }
+-
+-function createRefs<T>(refs: T) {
+-  const ref = { current: refs }
+-  return {
+-    get<K extends keyof T>(key: K): T[K] {
+-      return ref.current[key]
+-    },
+-    set<K extends keyof T>(key: K, value: T[K]) {
+-      ref.current[key] = value
+-    },
+-  }
+-}
+diff --git a/examples/vanilla-ts/src/normalize-props.ts b/examples/vanilla-ts/src/lib/normalize-props.ts
+similarity index 100%
+rename from examples/vanilla-ts/src/normalize-props.ts
+rename to examples/vanilla-ts/src/lib/normalize-props.ts
+diff --git a/examples/vanilla-ts/src/lib/refs.ts b/examples/vanilla-ts/src/lib/refs.ts
+new file mode 100644
+index 0000000000..81057207f3
+--- /dev/null
++++ b/examples/vanilla-ts/src/lib/refs.ts
+@@ -0,0 +1,11 @@
++export function createRefs<T>(refs: T) {
++  const ref = { current: refs }
++  return {
++    get<K extends keyof T>(key: K): T[K] {
++      return ref.current[key]
++    },
++    set<K extends keyof T>(key: K, value: T[K]) {
++      ref.current[key] = value
++    },
++  }
++}
+diff --git a/examples/vanilla-ts/src/spread-props.ts b/examples/vanilla-ts/src/lib/spread-props.ts
+similarity index 100%
+rename from examples/vanilla-ts/src/spread-props.ts
+rename to examples/vanilla-ts/src/lib/spread-props.ts
+diff --git a/examples/vanilla-ts/src/popover.ts b/examples/vanilla-ts/src/popover.ts
+index 0ec5fc311a..89a0973f64 100644
+--- a/examples/vanilla-ts/src/popover.ts
++++ b/examples/vanilla-ts/src/popover.ts
+@@ -1,8 +1,6 @@
+ import * as popover from "@zag-js/popover"
+-import { normalizeProps } from "./normalize-props"
+-import { spreadProps } from "./spread-props"
++import { normalizeProps, spreadProps, VanillaMachine } from "./lib"
+ import { Component } from "./component"
+-import { VanillaMachine } from "./lib/machine"
+ 
+ export class Popover extends Component<popover.Props, popover.Api> {
+   initMachine(props: popover.Props) {

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+    "diff": "/gh/mui/material-ui/diff?old_filename=packages%2Fmui-base%2Fsrc%2FInputUnstyled%2FInputUnstyled.tsx&old_oid=25e38709294400b1127ba34af1237b28e3cf5ad3&old_mode=33188&new_filename=packages%2Fmui-base%2Fsrc%2FInputUnstyled%2FInputUnstyled.tsx&new_oid=4b0e9c50439b2cb56478a0b882c6c1a00f3ea5a0&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+      "oid": "25e38709294400b1127ba34af1237b28e3cf5ad3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/mui-base/src/InputUnstyled/InputUnstyled.tsx",
+      "oid": "4b0e9c50439b2cb56478a0b882c6c1a00f3ea5a0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "10d7381b361debbb8d42e478f939f845ab690e8ba37c2a0e0a4b16cd9122bf79"
+  }
+]

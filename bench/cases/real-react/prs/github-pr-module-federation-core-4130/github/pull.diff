@@ -1,0 +1,1953 @@
+diff --git a/.changeset/mean-bulldogs-glow.md b/.changeset/mean-bulldogs-glow.md
+new file mode 100644
+index 00000000000..da1985aa878
+--- /dev/null
++++ b/.changeset/mean-bulldogs-glow.md
+@@ -0,0 +1,10 @@
++---
++'@module-federation/rsbuild-plugin': patch
++'@module-federation/enhanced': patch
++'@module-federation/manifest': patch
++'@module-federation/modern-js': patch
++'@module-federation/rspack': patch
++'@module-federation/sdk': patch
++---
++
++refactor(manifest): collect assets from build hook
+diff --git a/apps/website-new/docs/en/configure/manifest.mdx b/apps/website-new/docs/en/configure/manifest.mdx
+index 6d99b0f3a96..a6b27d21fe3 100644
+--- a/apps/website-new/docs/en/configure/manifest.mdx
++++ b/apps/website-new/docs/en/configure/manifest.mdx
+@@ -3,7 +3,10 @@
+ - Type: `boolean | PluginManifestOptions`
+ - Default value: `undefined`
+ 
+-Used to control whether to generate a manifest and the corresponding generation configuration.
++Controls whether the plugin generates manifest artifacts and how they are produced. When enabled, the plugin emits `mf-manifest.json` and `mf-stats.json` (names can be customized via `fileName`) on every build so that other tools can consume them directly through `processAssets` or from the final build output.
++
++- `mf-stats.json`: captures the full build statistics, including the assets for exposes/shared/remotes, `metaData` (plugin version, build info, `remoteEntry`, etc.), and any additional asset analysis. Ideal for debugging or merging stats across environments.
++- `mf-manifest.json`: a runtime-oriented manifest distilled from the stats. It keeps the stable structure that Module Federation consumers read when loading remote modules. The exposes/shared/remotes entries describe what is actually available to consumers.
+ 
+ The `PluginManifestOptions` types are as follows:
+ 
+@@ -29,6 +32,8 @@ manifest filePath
+ 
+ manifest fileName
+ 
++If `fileName` is provided, the companion stats file automatically receives a `-stats` suffix (for example, `fileName: 'mf.json'` produces both `mf.json` and `mf-stats.json`). Generated files are written under `filePath` when that option is set.
++
+ ## disableAssetsAnalyze
+ 
+ :::warning
+diff --git a/apps/website-new/docs/en/guide/troubleshooting/other.mdx b/apps/website-new/docs/en/guide/troubleshooting/other.mdx
+index 3d60b59055c..dc84389af25 100644
+--- a/apps/website-new/docs/en/guide/troubleshooting/other.mdx
++++ b/apps/website-new/docs/en/guide/troubleshooting/other.mdx
+@@ -120,3 +120,14 @@ export default function MFLinkPlugin(): ModuleFederationRuntimePlugin {
+   };
+ }
+ ```
++
++
++## Multiple assets emit different content to the same filename mf-manifest.json
++
++### Reason
++
++In Rspack `1.6.0-beta.0`, we ported the manifest implementation to Rust. Upgrading Rspack without upgrading the MF-related packages will cause this error.
++
++### Solution
++
++Upgrade the `@module-federation` scoped npm package to version 0.21.0 or later.
+diff --git a/apps/website-new/docs/zh/configure/manifest.mdx b/apps/website-new/docs/zh/configure/manifest.mdx
+index ae141cdb289..057ab994f06 100644
+--- a/apps/website-new/docs/zh/configure/manifest.mdx
++++ b/apps/website-new/docs/zh/configure/manifest.mdx
+@@ -3,7 +3,10 @@
+ - 类型：`boolean | PluginManifestOptions`
+ - 默认值：`undefined`
+ 
+-用于控制是否生成 manifest ，以及对应的生成配置。
++用于控制是否生成 manifest ，以及对应的生成配置。启用后插件会在每次构建中同时产出 `mf-manifest.json` 与 `mf-stats.json`（名称可通过 `fileName` 自定义），并写入到构建产物中，供其他工具在 `processAssets` 钩子或构建结果中直接读取。
++
++- `mf-stats.json`：包含完整的构建统计信息，如 exposes/shared/remotes 的资源列表、`metaData`（插件版本、构建信息、`remoteEntry` 等）以及额外的资产分析结果，适合用于后续合并或诊断。
++- `mf-manifest.json`：在 stats 基础上提炼出的运行时清单，结构稳定，供 Module Federation 消费端在加载远程模块时读取。文件中的 exposes/shared/remotes 对应线上对外暴露的能力。
+ 
+ `PluginManifestOptions` 类型如下：
+ 
+@@ -29,6 +32,8 @@ manifest 存放路径
+ 
+ manifest 文件名称
+ 
++如果设置了 `fileName`，对应的 stats 文件名会自动附加 `-stats` 后缀（例如 `fileName: 'mf.json'` 时会同时生成 `mf.json` 与 `mf-stats.json`）。所有文件都会写入 `filePath`（若配置）指定的子目录。
++
+ ## disableAssetsAnalyze
+ 
+ :::warning
+diff --git a/apps/website-new/docs/zh/guide/troubleshooting/other.mdx b/apps/website-new/docs/zh/guide/troubleshooting/other.mdx
+index bdac2e03328..6a9e51f1bcc 100644
+--- a/apps/website-new/docs/zh/guide/troubleshooting/other.mdx
++++ b/apps/website-new/docs/zh/guide/troubleshooting/other.mdx
+@@ -94,3 +94,13 @@ export default function MFLinkPlugin(): ModuleFederationRuntimePlugin {
+   };
+ }
+ ```
++
++## Multiple assets emit different content to the same filename mf-manifest.json
++
++### 原因
++
++在 Rspack `1.6.0-beta.0` 中，我们将 manifest 实现移植到了 Rust 侧，如果升级了 Rspack  而没有升级 MF 相关的 package 则会造成此错误。
++
++### 解决方案
++
++升级 `@module-federation` scope 下的 npm 包至 `0.21.0` 及以上版本。
+diff --git a/packages/enhanced/src/lib/container/ModuleFederationPlugin.ts b/packages/enhanced/src/lib/container/ModuleFederationPlugin.ts
+index cb0b23e39b5..dd3a686ab96 100644
+--- a/packages/enhanced/src/lib/container/ModuleFederationPlugin.ts
++++ b/packages/enhanced/src/lib/container/ModuleFederationPlugin.ts
+@@ -234,10 +234,6 @@ class ModuleFederationPlugin implements WebpackPluginInstance {
+       this._statsPlugin.apply(compiler);
+     }
+   }
+-
+-  get statsResourceInfo() {
+-    return this._statsPlugin?.resourceInfo;
+-  }
+ }
+ 
+ export default ModuleFederationPlugin;
+diff --git a/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts b/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts
+index 6db01b861f9..857ecc309ba 100644
+--- a/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts
++++ b/packages/enhanced/src/wrapper/ModuleFederationPlugin.ts
+@@ -111,8 +111,4 @@ export default class ModuleFederationPlugin implements WebpackPluginInstance {
+       }).apply(compiler);
+     }
+   }
+-
+-  get statsResourceInfo(): Partial<ResourceInfo> | undefined {
+-    return this._mfPlugin?.statsResourceInfo;
+-  }
+ }
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/index.js b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/index.js
+new file mode 100644
+index 00000000000..58b6873d8a8
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/index.js
+@@ -0,0 +1,42 @@
++const fs = __non_webpack_require__('fs');
++const path = __non_webpack_require__('path');
++
++const statsPath = path.join(__dirname, 'mf-stats.json');
++const manifestPath = path.join(__dirname, 'mf-manifest.json');
++
++const stats = JSON.parse(fs.readFileSync(statsPath, 'utf-8'));
++const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
++
++it('should still emit the remote entry', () => {
++  const remoteEntryFile = stats.metaData.remoteEntry.name;
++  const remoteEntryPath = path.join(__dirname, remoteEntryFile);
++  expect(fs.existsSync(remoteEntryPath)).toBe(true);
++});
++
++it('should omit asset details from stats when disableAssetsAnalyze is true', () => {
++  expect(stats.shared).toHaveLength(1);
++  expect(stats.shared[0].assets.js.sync).toEqual([]);
++  expect(stats.shared[0].assets.js.async).toEqual([]);
++  expect(stats.exposes).toHaveLength(1);
++  expect(stats.exposes[0].assets.js.sync).toEqual([]);
++  expect(stats.exposes[0].assets.js.async).toEqual([]);
++});
++
++it('should omit asset details from manifest when disableAssetsAnalyze is true', () => {
++  expect(manifest.shared).toHaveLength(1);
++  expect(manifest.shared[0].assets.js.sync).toEqual([]);
++  expect(manifest.shared[0].assets.js.async).toEqual([]);
++  expect(manifest.exposes).toHaveLength(1);
++  expect(manifest.exposes[0].assets.js.sync).toEqual([]);
++  expect(manifest.exposes[0].assets.js.async).toEqual([]);
++});
++
++it('should mark remote usage locations as UNKNOWN', () => {
++  expect(stats.remotes).toEqual(
++    expect.arrayContaining([
++      expect.objectContaining({
++        usedIn: ['UNKNOWN'],
++      }),
++    ]),
++  );
++});
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/lazy-module.js b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/lazy-module.js
+new file mode 100644
+index 00000000000..78cd2d7296e
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/lazy-module.js
+@@ -0,0 +1 @@
++export const lazy = true;
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/module.js b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/module.js
+new file mode 100644
+index 00000000000..83ef2f5ec25
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/module.js
+@@ -0,0 +1,11 @@
++import react from 'react';
++import remote from 'remote';
++
++global.react = react;
++global.remote = remote;
++
++import('./lazy-module').then((r) => {
++  console.log('lazy module: ', r);
++});
++
++export const ok = true;
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/node_modules/package.json b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/node_modules/package.json
+new file mode 100644
+index 00000000000..a1069cc8a84
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/node_modules/package.json
+@@ -0,0 +1,4 @@
++{
++  "name": "react",
++  "version": "1.0.0"
++}
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/node_modules/react.js b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/node_modules/react.js
+new file mode 100644
+index 00000000000..ff64eb39526
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/node_modules/react.js
+@@ -0,0 +1 @@
++export default "React";
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/package.json b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/package.json
+new file mode 100644
+index 00000000000..7a8cb9b6720
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/package.json
+@@ -0,0 +1,5 @@
++{
++  "dependencies": {
++    "react": "1.0.0"
++  }
++}
+diff --git a/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/webpack.config.js b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/webpack.config.js
+new file mode 100644
+index 00000000000..a5f96b3c20a
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-disable-assets-analyze/webpack.config.js
+@@ -0,0 +1,32 @@
++const { ModuleFederationPlugin } = require('../../../../dist/src');
++
++module.exports = {
++  optimization: {
++    chunkIds: 'named',
++    moduleIds: 'named',
++  },
++  output: {
++    publicPath: '/',
++    chunkFilename: '[id].js',
++  },
++  plugins: [
++    new ModuleFederationPlugin({
++      name: 'container',
++      filename: 'container.[chunkhash:8].js',
++      library: { type: 'commonjs-module' },
++      exposes: {
++        'expose-a': './module.js',
++      },
++      remoteType: 'script',
++      remotes: {
++        remote: 'remote@http://localhost:8000/remoteEntry.js',
++      },
++      shared: {
++        react: {},
++      },
++      manifest: {
++        disableAssetsAnalyze: true,
++      },
++    }),
++  ],
++};
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/index.js b/packages/enhanced/test/configCases/container/manifest-file-name/index.js
+new file mode 100644
+index 00000000000..5f207bbc37d
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/index.js
+@@ -0,0 +1,35 @@
++const fs = __non_webpack_require__('fs');
++const path = __non_webpack_require__('path');
++
++const customPath = 'custom-path';
++const customManifestPath = path.join(
++  __dirname,
++  customPath,
++  'custom-manifest.json',
++);
++const customStatsPath = path.join(
++  __dirname,
++  customPath,
++  'custom-manifest-stats.json',
++);
++const defaultManifestPath = path.join(__dirname, 'mf-manifest.json');
++const defaultStatsPath = path.join(__dirname, 'mf-stats.json');
++
++const stats = JSON.parse(fs.readFileSync(customStatsPath, 'utf-8'));
++const manifest = JSON.parse(fs.readFileSync(customManifestPath, 'utf-8'));
++
++it('should emit manifest with the configured fileName', () => {
++  expect(fs.existsSync(customManifestPath)).toBe(true);
++  expect(fs.existsSync(customStatsPath)).toBe(true);
++});
++
++it('should not emit default manifest file names when fileName is set', () => {
++  expect(fs.existsSync(defaultManifestPath)).toBe(false);
++  expect(fs.existsSync(defaultStatsPath)).toBe(false);
++});
++
++it('should still point to the emitted remote entry', () => {
++  const remoteEntryFile = stats.metaData.remoteEntry.name;
++  const remoteEntryPath = path.join(__dirname, remoteEntryFile);
++  expect(fs.existsSync(remoteEntryPath)).toBe(true);
++});
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/lazy-module.js b/packages/enhanced/test/configCases/container/manifest-file-name/lazy-module.js
+new file mode 100644
+index 00000000000..78cd2d7296e
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/lazy-module.js
+@@ -0,0 +1 @@
++export const lazy = true;
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/module.js b/packages/enhanced/test/configCases/container/manifest-file-name/module.js
+new file mode 100644
+index 00000000000..83ef2f5ec25
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/module.js
+@@ -0,0 +1,11 @@
++import react from 'react';
++import remote from 'remote';
++
++global.react = react;
++global.remote = remote;
++
++import('./lazy-module').then((r) => {
++  console.log('lazy module: ', r);
++});
++
++export const ok = true;
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/node_modules/package.json b/packages/enhanced/test/configCases/container/manifest-file-name/node_modules/package.json
+new file mode 100644
+index 00000000000..a1069cc8a84
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/node_modules/package.json
+@@ -0,0 +1,4 @@
++{
++  "name": "react",
++  "version": "1.0.0"
++}
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/node_modules/react.js b/packages/enhanced/test/configCases/container/manifest-file-name/node_modules/react.js
+new file mode 100644
+index 00000000000..ff64eb39526
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/node_modules/react.js
+@@ -0,0 +1 @@
++export default "React";
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/package.json b/packages/enhanced/test/configCases/container/manifest-file-name/package.json
+new file mode 100644
+index 00000000000..7a8cb9b6720
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/package.json
+@@ -0,0 +1,5 @@
++{
++  "dependencies": {
++    "react": "1.0.0"
++  }
++}
+diff --git a/packages/enhanced/test/configCases/container/manifest-file-name/webpack.config.js b/packages/enhanced/test/configCases/container/manifest-file-name/webpack.config.js
+new file mode 100644
+index 00000000000..50a2446e48a
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest-file-name/webpack.config.js
+@@ -0,0 +1,33 @@
++const { ModuleFederationPlugin } = require('../../../../dist/src');
++
++module.exports = {
++  optimization: {
++    chunkIds: 'named',
++    moduleIds: 'named',
++  },
++  output: {
++    publicPath: '/',
++    chunkFilename: '[id].js',
++  },
++  plugins: [
++    new ModuleFederationPlugin({
++      name: 'container',
++      filename: 'container.[chunkhash:8].js',
++      library: { type: 'commonjs-module' },
++      exposes: {
++        'expose-a': './module.js',
++      },
++      remoteType: 'script',
++      remotes: {
++        remote: 'remote@http://localhost:8000/remoteEntry.js',
++      },
++      shared: {
++        react: {},
++      },
++      manifest: {
++        fileName: 'custom-manifest.json',
++        filePath: 'custom-path',
++      },
++    }),
++  ],
++};
+diff --git a/packages/enhanced/test/configCases/container/manifest/index.js b/packages/enhanced/test/configCases/container/manifest/index.js
+new file mode 100644
+index 00000000000..95310daee80
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/index.js
+@@ -0,0 +1,93 @@
++const fs = __non_webpack_require__('fs');
++const path = __non_webpack_require__('path');
++
++const statsPath = path.join(__dirname, 'mf-stats.json');
++const manifestPath = path.join(__dirname, 'mf-manifest.json');
++const stats = JSON.parse(fs.readFileSync(statsPath, 'utf-8'));
++const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
++
++it('should emit remote entry with hash', () => {
++  const remoteEntryFile = stats.metaData.remoteEntry.name;
++  const remoteEntryPath = path.join(__dirname, remoteEntryFile);
++  expect(fs.existsSync(remoteEntryPath)).toBe(true);
++});
++
++// shared
++it('should report shared assets in sync only', () => {
++  expect(stats.shared).toHaveLength(1);
++  expect(stats.shared[0].assets.js.sync.sort()).toEqual([
++    'node_modules_react_js.js',
++  ]);
++  expect(stats.shared[0].assets.js.async).toEqual([]);
++});
++
++it('should materialize in manifest', () => {
++  expect(manifest.shared).toEqual(
++    expect.arrayContaining([
++      expect.objectContaining({
++        name: 'react',
++        assets: expect.objectContaining({
++          js: expect.objectContaining({
++            sync: expect.arrayContaining(['node_modules_react_js.js']),
++            async: [],
++          }),
++        }),
++      }),
++    ]),
++  );
++});
++
++//exposes
++it('should expose sync assets only', () => {
++  expect(stats.exposes).toHaveLength(1);
++  expect(stats.exposes[0].assets.js.sync).toEqual([
++    '__federation_expose_expose_a.js',
++  ]);
++  expect(stats.exposes[0].assets.js.async).toEqual(['lazy-module_js.js']);
++});
++
++it('should reflect expose assets in manifest', () => {
++  expect(manifest.exposes).toEqual(
++    expect.arrayContaining([
++      expect.objectContaining({
++        name: 'expose-a',
++        path: './expose-a',
++        assets: expect.objectContaining({
++          js: expect.objectContaining({
++            sync: ['__federation_expose_expose_a.js'],
++            async: ['lazy-module_js.js'],
++          }),
++        }),
++      }),
++    ]),
++  );
++});
++
++// remotes
++
++it('should record remote usage', () => {
++  expect(stats.remotes).toEqual(
++    expect.arrayContaining([
++      expect.objectContaining({
++        alias: '@remote/alias',
++        consumingFederationContainerName: 'container',
++        federationContainerName: 'remote',
++        moduleName: '.',
++        usedIn: expect.arrayContaining(['module.js']),
++        entry: 'http://localhost:8000/remoteEntry.js',
++      }),
++    ]),
++  );
++});
++
++it('should persist remote metadata in manifest', () => {
++  expect(manifest.remotes).toEqual(
++    expect.arrayContaining([
++      expect.objectContaining({
++        alias: '@remote/alias',
++        federationContainerName: 'remote',
++        moduleName: '.',
++      }),
++    ]),
++  );
++});
+diff --git a/packages/enhanced/test/configCases/container/manifest/lazy-module.js b/packages/enhanced/test/configCases/container/manifest/lazy-module.js
+new file mode 100644
+index 00000000000..78cd2d7296e
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/lazy-module.js
+@@ -0,0 +1 @@
++export const lazy = true;
+diff --git a/packages/enhanced/test/configCases/container/manifest/module.js b/packages/enhanced/test/configCases/container/manifest/module.js
+new file mode 100644
+index 00000000000..d6829917c6f
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/module.js
+@@ -0,0 +1,11 @@
++import react from 'react';
++import remote from '@remote/alias';
++
++global.react = react;
++global.remote = remote;
++
++import('./lazy-module').then((r) => {
++  console.log('lazy module: ', r);
++});
++
++export const ok = true;
+diff --git a/packages/enhanced/test/configCases/container/manifest/node_modules/package.json b/packages/enhanced/test/configCases/container/manifest/node_modules/package.json
+new file mode 100644
+index 00000000000..a1069cc8a84
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/node_modules/package.json
+@@ -0,0 +1,4 @@
++{
++  "name": "react",
++  "version": "1.0.0"
++}
+diff --git a/packages/enhanced/test/configCases/container/manifest/node_modules/react.js b/packages/enhanced/test/configCases/container/manifest/node_modules/react.js
+new file mode 100644
+index 00000000000..ff64eb39526
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/node_modules/react.js
+@@ -0,0 +1 @@
++export default "React";
+diff --git a/packages/enhanced/test/configCases/container/manifest/package.json b/packages/enhanced/test/configCases/container/manifest/package.json
+new file mode 100644
+index 00000000000..7a8cb9b6720
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/package.json
+@@ -0,0 +1,5 @@
++{
++  "dependencies": {
++    "react": "1.0.0"
++  }
++}
+diff --git a/packages/enhanced/test/configCases/container/manifest/webpack.config.js b/packages/enhanced/test/configCases/container/manifest/webpack.config.js
+new file mode 100644
+index 00000000000..f560ddaeecd
+--- /dev/null
++++ b/packages/enhanced/test/configCases/container/manifest/webpack.config.js
+@@ -0,0 +1,29 @@
++const { ModuleFederationPlugin } = require('../../../../dist/src');
++
++module.exports = {
++  optimization: {
++    chunkIds: 'named',
++    moduleIds: 'named',
++  },
++  output: {
++    publicPath: '/',
++    chunkFilename: '[id].js',
++  },
++  plugins: [
++    new ModuleFederationPlugin({
++      name: 'container',
++      filename: 'container.[chunkhash:8].js',
++      library: { type: 'commonjs-module' },
++      exposes: {
++        './expose-a': './module.js',
++      },
++      remoteType: 'script',
++      remotes: {
++        '@remote/alias': 'remote@http://localhost:8000/remoteEntry.js',
++      },
++      shared: {
++        react: {},
++      },
++    }),
++  ],
++};
+diff --git a/packages/managers/__tests__/__snapshots__/RemoteManager.spec.ts.snap b/packages/managers/__tests__/__snapshots__/RemoteManager.spec.ts.snap
+index e059363fb3f..b0e7db308f6 100644
+--- a/packages/managers/__tests__/__snapshots__/RemoteManager.spec.ts.snap
++++ b/packages/managers/__tests__/__snapshots__/RemoteManager.spec.ts.snap
+@@ -16,14 +16,18 @@ exports[`RemoteManager statsRemoteWithEmptyUsedIn 1`] = `
+     "entry": "http://localhost:3000/remoteEntry.js",
+     "federationContainerName": "remote1",
+     "moduleName": "UNKNOWN",
+-    "usedIn": [],
++    "usedIn": [
++      "UNKNOWN",
++    ],
+   },
+   {
+     "alias": "remote-version",
+     "consumingFederationContainerName": "@module-federation/remote-managers-test",
+     "federationContainerName": "remote2",
+     "moduleName": "UNKNOWN",
+-    "usedIn": [],
++    "usedIn": [
++      "UNKNOWN",
++    ],
+     "version": "1.2.3",
+   },
+   {
+@@ -31,7 +35,9 @@ exports[`RemoteManager statsRemoteWithEmptyUsedIn 1`] = `
+     "consumingFederationContainerName": "@module-federation/remote-managers-test",
+     "federationContainerName": "remote3",
+     "moduleName": "UNKNOWN",
+-    "usedIn": [],
++    "usedIn": [
++      "UNKNOWN",
++    ],
+     "version": "*",
+   },
+ ]
+diff --git a/packages/managers/__tests__/__snapshots__/SharedManager.spec.ts.snap b/packages/managers/__tests__/__snapshots__/SharedManager.spec.ts.snap
+index 51661a8aef5..25e0f8ac59e 100644
+--- a/packages/managers/__tests__/__snapshots__/SharedManager.spec.ts.snap
++++ b/packages/managers/__tests__/__snapshots__/SharedManager.spec.ts.snap
+@@ -7,6 +7,6 @@ exports[`SharedManager normalizedOptions 1`] = `
+   "requiredVersion": "^18.0.0",
+   "shareScope": "default",
+   "singleton": false,
+-  "version": "18.3.1",
++  "version": undefined,
+ }
+ `;
+diff --git a/packages/managers/src/RemoteManager.ts b/packages/managers/src/RemoteManager.ts
+index 8c27521f085..9b5b87ddba4 100644
+--- a/packages/managers/src/RemoteManager.ts
++++ b/packages/managers/src/RemoteManager.ts
+@@ -54,7 +54,7 @@ class RemoteManager extends BasicPluginOptionsManager<moduleFederationPlugin.Mod
+           moduleName: UNKNOWN_MODULE_NAME,
+           federationContainerName: normalizedOption.name,
+           consumingFederationContainerName: name!,
+-          usedIn: [],
++          usedIn: [UNKNOWN_MODULE_NAME],
+         };
+       } else {
+         curObj = {
+@@ -63,7 +63,7 @@ class RemoteManager extends BasicPluginOptionsManager<moduleFederationPlugin.Mod
+           version: normalizedOption.version,
+           federationContainerName: normalizedOption.name,
+           consumingFederationContainerName: name!,
+-          usedIn: [],
++          usedIn: [UNKNOWN_MODULE_NAME],
+         };
+       }
+       sum.push(curObj);
+diff --git a/packages/managers/src/index.ts b/packages/managers/src/index.ts
+index 74d63a89a58..58e339a8642 100644
+--- a/packages/managers/src/index.ts
++++ b/packages/managers/src/index.ts
+@@ -3,5 +3,8 @@ export { ContainerManager } from './ContainerManager';
+ export { PKGJsonManager } from './PKGJsonManager';
+ export { RemoteManager } from './RemoteManager';
+ export { SharedManager } from './SharedManager';
++
++export { UNKNOWN_MODULE_NAME } from './constant';
++
+ export * as utils from './utils';
+ export * as types from './types';
+diff --git a/packages/manifest/src/ManifestManager.ts b/packages/manifest/src/ManifestManager.ts
+index f86c4734cc5..8f0b3e724f5 100644
+--- a/packages/manifest/src/ManifestManager.ts
++++ b/packages/manifest/src/ManifestManager.ts
+@@ -6,11 +6,11 @@ import {
+   ManifestShared,
+   ManifestRemote,
+   moduleFederationPlugin,
++  getManifestFileName,
+ } from '@module-federation/sdk';
+-import { getFileName, isDev } from './utils';
++import { isDev } from './utils';
+ import logger from './logger';
+ import type { Compilation, Compiler } from 'webpack';
+-import { ManifestInfo } from './types';
+ 
+ interface GenerateManifestOptions {
+   compilation: Compilation;
+@@ -23,34 +23,23 @@ interface GenerateManifestOptions {
+ 
+ class ManifestManager {
+   private _options: moduleFederationPlugin.ModuleFederationPluginOptions = {};
+-  private _manifest?: Manifest;
+-
+-  get manifest(): Manifest | undefined {
+-    return this._manifest;
+-  }
+ 
+   init(options: moduleFederationPlugin.ModuleFederationPluginOptions): void {
+     this._options = options;
+   }
+ 
+   get fileName(): string {
+-    return getFileName(this._options.manifest).manifestFileName;
++    return getManifestFileName(this._options.manifest).manifestFileName;
+   }
+ 
+-  async generateManifest(
+-    options: GenerateManifestOptions,
+-    extraOptions: { disableEmit?: boolean } = {},
+-  ): Promise<ManifestInfo> {
+-    const {
+-      compilation,
+-      publicPath,
+-      stats,
+-      compiler,
+-      bundler,
+-      additionalData,
+-    } = options;
+-    const { disableEmit } = extraOptions;
++  updateManifest(options: GenerateManifestOptions): Manifest {
++    const manifest = this.generateManifest(options);
++
++    return manifest;
++  }
+ 
++  generateManifest(options: GenerateManifestOptions): Manifest {
++    const { publicPath, stats, compiler } = options;
+     // Initialize manifest with required properties from stats
+     const { id, name, metaData } = stats;
+     const manifest: Manifest = {
+@@ -106,31 +95,6 @@ class ManifestManager {
+       return sum;
+     }, [] as ManifestRemote[]);
+ 
+-    this._manifest = manifest;
+-
+-    const manifestFileName = this.fileName;
+-
+-    if (additionalData) {
+-      const ret = await additionalData({
+-        manifest: this._manifest,
+-        stats,
+-        pluginOptions: this._options,
+-        compiler,
+-        compilation,
+-        bundler,
+-      });
+-      this._manifest = ret || this._manifest;
+-    }
+-
+-    if (!disableEmit) {
+-      compilation.emitAsset(
+-        manifestFileName,
+-        new compiler.webpack.sources.RawSource(
+-          JSON.stringify(this._manifest, null, 2),
+-        ),
+-      );
+-    }
+-
+     if (
+       isDev() &&
+       (process.env['MF_SSR_PRJ']
+@@ -139,17 +103,12 @@ class ManifestManager {
+     ) {
+       logger.info(
+         `Manifest Link: ${chalk.cyan(
+-          `${
+-            publicPath === 'auto' ? '{auto}/' : publicPath
+-          }${manifestFileName}`,
++          `${publicPath === 'auto' ? '{auto}/' : publicPath}${this.fileName}`,
+         )} `,
+       );
+     }
+ 
+-    return {
+-      manifest: this._manifest,
+-      filename: manifestFileName,
+-    };
++    return manifest;
+   }
+ }
+ 
+diff --git a/packages/manifest/src/ModuleHandler.ts b/packages/manifest/src/ModuleHandler.ts
+index 1c2be85110c..1de9f2ea052 100644
+--- a/packages/manifest/src/ModuleHandler.ts
++++ b/packages/manifest/src/ModuleHandler.ts
+@@ -13,6 +13,7 @@ import {
+   RemoteManager,
+   SharedManager,
+ } from '@module-federation/managers';
++import type managerTypes from '@module-federation/managers';
+ import { getFileNameWithOutExt } from './utils';
+ 
+ type ShareMap = { [sharedKey: string]: StatsShared };
+@@ -168,6 +169,39 @@ export function getExposeItem({
+   };
+ }
+ 
++export const getShareItem = ({
++  pkgName,
++  normalizedShareOptions,
++  pkgVersion,
++  hostName,
++}: {
++  pkgName: string;
++  hostName?: string;
++  normalizedShareOptions: managerTypes.types.NormalizedSharedOptions[string];
++  pkgVersion: string;
++}): StatsShared => {
++  return {
++    ...normalizedShareOptions,
++    id: `${hostName}:${pkgName}`,
++    requiredVersion:
++      normalizedShareOptions?.requiredVersion || `^${pkgVersion}`,
++    name: pkgName,
++    version: pkgVersion,
++    assets: {
++      js: {
++        async: [],
++        sync: [],
++      },
++      css: {
++        async: [],
++        sync: [],
++      },
++    },
++    // @ts-ignore to deduplicate
++    usedIn: new Set(),
++  };
++};
++
+ class ModuleHandler {
+   private _options: moduleFederationPlugin.ModuleFederationPluginOptions;
+   private _bundler: 'webpack' | 'rspack' = 'webpack';
+@@ -214,27 +248,12 @@ class ModuleHandler {
+       if (sharedMap[pkgName]) {
+         return;
+       }
+-      sharedMap[pkgName] = {
+-        ...sharedManagerNormalizedOptions[pkgName],
+-        id: `${this._options.name}:${pkgName}`,
+-        requiredVersion:
+-          sharedManagerNormalizedOptions[pkgName]?.requiredVersion ||
+-          `^${pkgVersion}`,
+-        name: pkgName,
+-        version: pkgVersion,
+-        assets: {
+-          js: {
+-            async: [],
+-            sync: [],
+-          },
+-          css: {
+-            async: [],
+-            sync: [],
+-          },
+-        },
+-        // @ts-ignore to deduplicate
+-        usedIn: new Set(),
+-      };
++      sharedMap[pkgName] = getShareItem({
++        pkgName,
++        pkgVersion,
++        normalizedShareOptions: sharedManagerNormalizedOptions[pkgName],
++        hostName: this._options.name,
++      });
+     };
+ 
+     const collectRelationshipMap = (mod: StatsModule, pkgName: string) => {
+diff --git a/packages/manifest/src/StatsManager.ts b/packages/manifest/src/StatsManager.ts
+index 2547aaf8ed2..69863538e7f 100644
+--- a/packages/manifest/src/StatsManager.ts
++++ b/packages/manifest/src/StatsManager.ts
+@@ -15,6 +15,10 @@ import {
+   encodeName,
+   MFPrefetchCommon,
+   composeKeyWithSeparator,
++  getManifestFileName,
++  StatsMetaDataWithGetPublicPath,
++  StatsMetaDataWithPublicPath,
++  StatsShared,
+ } from '@module-federation/sdk';
+ import { Compilation, Compiler, StatsCompilation, StatsModule } from 'webpack';
+ import {
+@@ -25,7 +29,6 @@ import {
+   getSharedModules,
+   assert,
+   getFileNameWithOutExt,
+-  getFileName,
+   getTypesMetaInfo,
+ } from './utils';
+ import logger from './logger';
+@@ -35,9 +38,15 @@ import {
+   SharedManager,
+   PKGJsonManager,
+   utils,
++  UNKNOWN_MODULE_NAME,
+ } from '@module-federation/managers';
+ import { HOT_UPDATE_SUFFIX } from './constants';
+-import { ModuleHandler, getExposeItem, getExposeName } from './ModuleHandler';
++import {
++  ModuleHandler,
++  getExposeItem,
++  getExposeName,
++  getShareItem,
++} from './ModuleHandler';
+ import { StatsInfo } from './types';
+ 
+ class StatsManager {
+@@ -61,8 +70,29 @@ class StatsManager {
+   }
+ 
+   get fileName(): string {
+-    return getFileName(this._options.manifest).statsFileName;
++    return getManifestFileName(this._options.manifest).statsFileName;
++  }
++
++  setMetaDataPublicPath(
++    metaData: BasicStatsMetaData,
++    compiler: Compiler,
++  ): StatsMetaData {
++    if (this._options.getPublicPath) {
++      if ('publicPath' in metaData) {
++        // @ts-ignore
++        delete metaData.publicPath;
++      }
++
++      (
++        metaData as StatsMetaData<StatsMetaDataWithGetPublicPath>
++      ).getPublicPath = this._options.getPublicPath;
++    } else {
++      (metaData as StatsMetaData<StatsMetaDataWithPublicPath>).publicPath =
++        this.getPublicPath(compiler);
++    }
++    return metaData as StatsMetaData;
+   }
++
+   private _getMetaData(
+     compiler: Compiler,
+     compilation: Compilation,
+@@ -148,20 +178,7 @@ class StatsManager {
+       }
+     }
+     metaData.prefetchInterface = prefetchInterface;
+-
+-    if (this._options.getPublicPath) {
+-      if ('publicPath' in metaData) {
+-        delete metaData.publicPath;
+-      }
+-      return {
+-        ...metaData,
+-        getPublicPath: this._options.getPublicPath,
+-      };
+-    }
+-    return {
+-      ...metaData,
+-      publicPath: this.getPublicPath(compiler),
+-    };
++    return this.setMetaDataPublicPath(metaData, compiler);
+   }
+ 
+   private _getFilteredModules(stats: StatsCompilation): StatsModule[] {
+@@ -319,6 +336,20 @@ class StatsManager {
+             },
+           });
+         });
++        stats.shared = Object.entries(
++          this._sharedManager.normalizedOptions,
++        ).reduce<StatsShared[]>((sum, cur) => {
++          const [pkgName, normalizedShareOptions] = cur;
++          sum.push(
++            getShareItem({
++              pkgName,
++              normalizedShareOptions,
++              pkgVersion: UNKNOWN_MODULE_NAME,
++              hostName: name,
++            }),
++          );
++          return sum;
++        }, []);
+         return stats;
+       }
+ 
+@@ -519,50 +550,28 @@ class StatsManager {
+     this._sharedManager.init(options);
+   }
+ 
++  updateStats(stats: Stats, compiler: Compiler): Stats {
++    const { metaData } = stats;
++    if (!metaData.types) {
++      metaData.types = getTypesMetaInfo(this._options, compiler.context);
++    }
++    if (!metaData.pluginVersion) {
++      metaData.pluginVersion = this._pluginVersion;
++    }
++    this.setMetaDataPublicPath(metaData, compiler);
++    // rspack not support legacy prefetch, and this field should be removed in the future
++    metaData.prefetchInterface = false;
++
++    return stats;
++  }
++
+   async generateStats(
+     compiler: Compiler,
+     compilation: Compilation,
+-    extraOptions: { disableEmit?: boolean } = {},
+-  ): Promise<StatsInfo> {
++  ): Promise<Stats> {
+     try {
+-      const { disableEmit } = extraOptions;
+-      const existedStats = compilation.getAsset(this.fileName);
+-      if (existedStats && !isDev()) {
+-        return {
+-          stats: JSON.parse(existedStats.source.source().toString()),
+-          filename: this.fileName,
+-        };
+-      }
+-      const { manifest: manifestOptions = {} } = this._options;
+-      let stats = await this._generateStats(compiler, compilation);
+-
+-      if (
+-        typeof manifestOptions === 'object' &&
+-        manifestOptions.additionalData
+-      ) {
+-        const ret = await manifestOptions.additionalData({
+-          stats,
+-          pluginOptions: this._options,
+-          compiler,
+-          compilation,
+-          bundler: this._bundler,
+-        });
+-        stats = ret || stats;
+-      }
+-
+-      if (!disableEmit) {
+-        compilation.emitAsset(
+-          this.fileName,
+-          new compiler.webpack.sources.RawSource(
+-            JSON.stringify(stats, null, 2),
+-          ),
+-        );
+-      }
+-
+-      return {
+-        stats,
+-        filename: this.fileName,
+-      };
++      const stats = await this._generateStats(compiler, compilation);
++      return stats;
+     } catch (err) {
+       throw err;
+     }
+diff --git a/packages/manifest/src/StatsPlugin.ts b/packages/manifest/src/StatsPlugin.ts
+index befb284e97e..fe104630332 100644
+--- a/packages/manifest/src/StatsPlugin.ts
++++ b/packages/manifest/src/StatsPlugin.ts
+@@ -7,7 +7,6 @@ import { ManifestManager } from './ManifestManager';
+ import { StatsManager } from './StatsManager';
+ import { PLUGIN_IDENTIFIER } from './constants';
+ import logger from './logger';
+-import { StatsInfo, ManifestInfo, ResourceInfo } from './types';
+ 
+ export class StatsPlugin implements WebpackPluginInstance {
+   readonly name = 'StatsPlugin';
+@@ -16,9 +15,6 @@ export class StatsPlugin implements WebpackPluginInstance {
+   private _manifestManager: ManifestManager = new ManifestManager();
+   private _enable: boolean = true;
+   private _bundler: 'webpack' | 'rspack' = 'webpack';
+-  statsInfo?: StatsInfo;
+-  manifestInfo?: ManifestInfo;
+-  disableEmit?: boolean;
+ 
+   constructor(
+     options: moduleFederationPlugin.ModuleFederationPluginOptions,
+@@ -30,7 +26,6 @@ export class StatsPlugin implements WebpackPluginInstance {
+     try {
+       this._options = options;
+       this._bundler = bundler;
+-      this.disableEmit = Boolean(process.env['MF_DISABLE_EMIT_STATS']);
+       this._statsManager.init(this._options, { pluginVersion, bundler });
+       this._manifestManager.init(this._options);
+     } catch (err) {
+@@ -61,39 +56,91 @@ export class StatsPlugin implements WebpackPluginInstance {
+         },
+         async () => {
+           if (this._options.manifest !== false) {
+-            this.statsInfo = await this._statsManager.generateStats(
+-              compiler,
+-              compilation,
+-              {
+-                disableEmit: this.disableEmit,
+-              },
++            const existedStats = compilation.getAsset(
++              this._statsManager.fileName,
+             );
+-            this.manifestInfo = await this._manifestManager.generateManifest(
+-              {
++            // new rspack should hit
++            if (existedStats) {
++              let updatedStats = this._statsManager.updateStats(
++                JSON.parse(existedStats.source.source().toString()),
++                compiler,
++              );
++              if (
++                typeof this._options.manifest === 'object' &&
++                this._options.manifest.additionalData
++              ) {
++                updatedStats =
++                  (await this._options.manifest.additionalData({
++                    stats: updatedStats,
++                    compiler,
++                    compilation,
++                    bundler: this._bundler,
++                  })) || updatedStats;
++              }
++
++              compilation.updateAsset(
++                this._statsManager.fileName,
++                new compiler.webpack.sources.RawSource(
++                  JSON.stringify(updatedStats, null, 2),
++                ),
++              );
++              const updatedManifest = this._manifestManager.updateManifest({
+                 compilation,
+-                stats: this.statsInfo.stats,
++                stats: updatedStats,
+                 publicPath: this._statsManager.getPublicPath(compiler),
+                 compiler,
+                 bundler: this._bundler,
+-                additionalData:
+-                  typeof this._options.manifest === 'object'
+-                    ? this._options.manifest.additionalData
+-                    : undefined,
+-              },
+-              {
+-                disableEmit: this.disableEmit,
+-              },
++              });
++              const source = new compiler.webpack.sources.RawSource(
++                JSON.stringify(updatedManifest, null, 2),
++              );
++              compilation.updateAsset(this._manifestManager.fileName, source);
++
++              return;
++            }
++
++            // webpack + legacy rspack
++            let stats = await this._statsManager.generateStats(
++              compiler,
++              compilation,
++            );
++
++            if (
++              typeof this._options.manifest === 'object' &&
++              this._options.manifest.additionalData
++            ) {
++              stats =
++                (await this._options.manifest.additionalData({
++                  stats,
++                  compiler,
++                  compilation,
++                  bundler: this._bundler,
++                })) || stats;
++            }
++
++            const manifest = await this._manifestManager.generateManifest({
++              compilation,
++              stats: stats,
++              publicPath: this._statsManager.getPublicPath(compiler),
++              compiler,
++              bundler: this._bundler,
++            });
++
++            compilation.emitAsset(
++              this._statsManager.fileName,
++              new compiler.webpack.sources.RawSource(
++                JSON.stringify(stats, null, 2),
++              ),
++            );
++            compilation.emitAsset(
++              this._manifestManager.fileName,
++              new compiler.webpack.sources.RawSource(
++                JSON.stringify(manifest, null, 2),
++              ),
+             );
+           }
+         },
+       );
+     });
+   }
+-
+-  get resourceInfo(): Partial<ResourceInfo> {
+-    return {
+-      stats: this.statsInfo,
+-      manifest: this.manifestInfo,
+-    };
+-  }
+ }
+diff --git a/packages/manifest/src/utils.ts b/packages/manifest/src/utils.ts
+index 27e0b4c15bd..fca0717d340 100644
+--- a/packages/manifest/src/utils.ts
++++ b/packages/manifest/src/utils.ts
+@@ -220,45 +220,6 @@ export function getFileNameWithOutExt(str: string): string {
+   return str.replace(path.extname(str), '');
+ }
+ 
+-export function getFileName(
+-  manifestOptions?: moduleFederationPlugin.ModuleFederationPluginOptions['manifest'],
+-): {
+-  statsFileName: string;
+-  manifestFileName: string;
+-} {
+-  if (!manifestOptions) {
+-    return {
+-      statsFileName: StatsFileName,
+-      manifestFileName: ManifestFileName,
+-    };
+-  }
+-
+-  let filePath =
+-    typeof manifestOptions === 'boolean' ? '' : manifestOptions.filePath || '';
+-  let fileName =
+-    typeof manifestOptions === 'boolean' ? '' : manifestOptions.fileName || '';
+-
+-  const JSON_EXT = '.json';
+-  const addExt = (name: string): string => {
+-    if (name.endsWith(JSON_EXT)) {
+-      return name;
+-    }
+-    return `${name}${JSON_EXT}`;
+-  };
+-  const insertSuffix = (name: string, suffix: string): string => {
+-    return name.replace(JSON_EXT, `${suffix}${JSON_EXT}`);
+-  };
+-  const manifestFileName = fileName ? addExt(fileName) : ManifestFileName;
+-  const statsFileName = fileName
+-    ? insertSuffix(manifestFileName, '-stats')
+-    : StatsFileName;
+-
+-  return {
+-    statsFileName: simpleJoinRemoteEntry(filePath, statsFileName),
+-    manifestFileName: simpleJoinRemoteEntry(filePath, manifestFileName),
+-  };
+-}
+-
+ export function getTypesMetaInfo(
+   pluginOptions: moduleFederationPlugin.ModuleFederationPluginOptions,
+   context: string,
+diff --git a/packages/modernjs/src/cli/configPlugin.ts b/packages/modernjs/src/cli/configPlugin.ts
+index 8b792b48e5b..2986fa105fe 100644
+--- a/packages/modernjs/src/cli/configPlugin.ts
++++ b/packages/modernjs/src/cli/configPlugin.ts
+@@ -37,7 +37,6 @@ type RuntimePluginEntry = NonNullable<
+ 
+ export function setEnv(enableSSR: boolean) {
+   if (enableSSR) {
+-    process.env['MF_DISABLE_EMIT_STATS'] = 'true';
+     process.env['MF_SSR_PRJ'] = 'true';
+   }
+ }
+diff --git a/packages/modernjs/src/cli/index.ts b/packages/modernjs/src/cli/index.ts
+index 06fad84b5f4..f6ca5c9cfee 100644
+--- a/packages/modernjs/src/cli/index.ts
++++ b/packages/modernjs/src/cli/index.ts
+@@ -18,10 +18,12 @@ export const moduleFederationPlugin = (
+     ssrConfig: undefined,
+     browserPlugin: undefined,
+     nodePlugin: undefined,
++    assetResources: {},
+     distOutputDir: '',
+     originPluginOptions: userConfig,
+     remoteIpStrategy: userConfig?.remoteIpStrategy,
+     userConfig: userConfig || {},
++    assetFileNames: {},
+     fetchServerQuery: userConfig.fetchServerQuery ?? undefined,
+   };
+   return {
+diff --git a/packages/modernjs/src/cli/ssrPlugin.ts b/packages/modernjs/src/cli/ssrPlugin.ts
+index 5224a419f95..64119d7d217 100644
+--- a/packages/modernjs/src/cli/ssrPlugin.ts
++++ b/packages/modernjs/src/cli/ssrPlugin.ts
+@@ -5,7 +5,16 @@ import { ModuleFederationPlugin as RspackModuleFederationPlugin } from '@module-
+ import UniverseEntryChunkTrackerPlugin from '@module-federation/node/universe-entry-chunk-tracker-plugin';
+ import logger from '../logger';
+ import { isDev } from './utils';
+-import { updateStatsAndManifest } from '@module-federation/rsbuild-plugin/utils';
++import {
++  updateStatsAndManifest,
++  type StatsAssetResource,
++} from '@module-federation/rsbuild-plugin/utils';
++import {
++  ManifestFileName,
++  StatsFileName,
++  simpleJoinRemoteEntry,
++} from '@module-federation/sdk';
++import type { moduleFederationPlugin } from '@module-federation/sdk';
+ import { isWebTarget, skipByTarget } from './utils';
+ 
+ import type {
+@@ -14,15 +23,50 @@ import type {
+   ModifyRspackConfigFn,
+ } from '@rsbuild/core';
+ import type { CliPluginFuture, AppTools } from '@modern-js/app-tools';
+-import type { InternalModernPluginOptions, PluginOptions } from '../types';
++import type {
++  AssetFileNames,
++  InternalModernPluginOptions,
++  PluginOptions,
++} from '../types';
+ 
+ export function setEnv() {
+-  process.env['MF_DISABLE_EMIT_STATS'] = 'true';
+   process.env['MF_SSR_PRJ'] = 'true';
+ }
+ 
+ export const CHAIN_MF_PLUGIN_ID = 'plugin-module-federation-server';
+ 
++function getManifestAssetFileNames(
++  manifestOption?: moduleFederationPlugin.ModuleFederationPluginOptions['manifest'],
++): AssetFileNames {
++  if (!manifestOption) {
++    return {
++      statsFileName: StatsFileName,
++      manifestFileName: ManifestFileName,
++    };
++  }
++
++  const JSON_EXT = '.json';
++  const filePath =
++    typeof manifestOption === 'boolean' ? '' : manifestOption.filePath || '';
++  const baseFileName =
++    typeof manifestOption === 'boolean' ? '' : manifestOption.fileName || '';
++  const ensureExt = (name: string) =>
++    name.endsWith(JSON_EXT) ? name : `${name}${JSON_EXT}`;
++  const withSuffix = (name: string, suffix: string) =>
++    name.replace(JSON_EXT, `${suffix}${JSON_EXT}`);
++  const manifestFileName = baseFileName
++    ? ensureExt(baseFileName)
++    : ManifestFileName;
++  const statsFileName = baseFileName
++    ? withSuffix(manifestFileName, '-stats')
++    : StatsFileName;
++
++  return {
++    statsFileName: simpleJoinRemoteEntry(filePath, statsFileName),
++    manifestFileName: simpleJoinRemoteEntry(filePath, manifestFileName),
++  };
++}
++
+ type ModifyBundlerConfiguration =
+   | Parameters<ModifyWebpackConfigFn>[0]
+   | Parameters<ModifyRspackConfigFn>[0];
+@@ -43,6 +87,53 @@ const mfSSRRsbuildPlugin = (
+       let csrOutputPath = '';
+       let ssrOutputPath = '';
+       let ssrEnv = '';
++      let csrEnv = '';
++
++      const browserAssetFileNames =
++        pluginOptions.assetFileNames.browser ||
++        getManifestAssetFileNames(pluginOptions.csrConfig?.manifest);
++      const nodeAssetFileNames =
++        pluginOptions.assetFileNames?.node ||
++        getManifestAssetFileNames(pluginOptions.ssrConfig?.manifest);
++
++      const collectAssets = (
++        assets: Record<string, { source: () => string | Buffer }>,
++        fileNames: { statsFileName: string; manifestFileName: string },
++        tag: 'browser' | 'node',
++      ): StatsAssetResource | undefined => {
++        const statsAsset = assets[fileNames.statsFileName];
++        const manifestAsset = assets[fileNames.manifestFileName];
++
++        if (!statsAsset || !manifestAsset) {
++          return undefined;
++        }
++
++        try {
++          const statsRaw = statsAsset.source();
++          const manifestRaw = manifestAsset.source();
++          const statsContent =
++            typeof statsRaw === 'string' ? statsRaw : statsRaw.toString();
++          const manifestContent =
++            typeof manifestRaw === 'string'
++              ? manifestRaw
++              : manifestRaw.toString();
++
++          return {
++            stats: {
++              data: JSON.parse(statsContent),
++              filename: fileNames.statsFileName,
++            },
++            manifest: {
++              data: JSON.parse(manifestContent),
++              filename: fileNames.manifestFileName,
++            },
++          };
++        } catch (err) {
++          const message = err instanceof Error ? err.message : String(err);
++          logger.error(`Failed to parse ${tag} manifest assets: ${message}`);
++          return undefined;
++        }
++      };
+ 
+       api.modifyEnvironmentConfig((config, { name }) => {
+         const target = config.output.target;
+@@ -51,6 +142,7 @@ const mfSSRRsbuildPlugin = (
+         }
+         if (isWebTarget(target)) {
+           csrOutputPath = config.output.distPath.root;
++          csrEnv = name;
+         } else {
+           ssrOutputPath = config.output.distPath.root;
+           ssrEnv = name;
+@@ -84,6 +176,43 @@ const mfSSRRsbuildPlugin = (
+         modifySSRPublicPath(config, utils);
+         return config;
+       });
++
++      api.processAssets(
++        { stage: 'report' },
++        ({ assets, environment: envContext }) => {
++          const envName = envContext.name;
++
++          if (
++            pluginOptions.csrConfig?.manifest !== false &&
++            csrEnv &&
++            envName === csrEnv
++          ) {
++            const browserAssets = collectAssets(
++              assets,
++              browserAssetFileNames,
++              'browser',
++            );
++            if (browserAssets) {
++              pluginOptions.assetResources.browser = browserAssets;
++            }
++          }
++
++          if (
++            pluginOptions.ssrConfig?.manifest !== false &&
++            ssrEnv &&
++            envName === ssrEnv
++          ) {
++            const nodeAssets = collectAssets(
++              assets,
++              nodeAssetFileNames,
++              'node',
++            );
++            if (nodeAssets) {
++              pluginOptions.assetResources.node = nodeAssets;
++            }
++          }
++        },
++      );
+     },
+   };
+ };
+@@ -228,14 +357,27 @@ export const moduleFederationSSRPlugin = (
+         },
+       };
+     });
++    const writeMergedManifest = () => {
++      const { distOutputDir, assetResources } = pluginOptions;
++      const browserAssets = assetResources.browser;
++      const nodeAssets = assetResources.node;
++
++      if (!distOutputDir || !browserAssets || !nodeAssets) {
++        return;
++      }
++      try {
++        updateStatsAndManifest(nodeAssets, browserAssets, distOutputDir);
++      } catch (err) {
++        logger.error(err);
++      }
++    };
++
+     api.onAfterBuild(() => {
+-      const { nodePlugin, browserPlugin, distOutputDir } = pluginOptions;
+-      updateStatsAndManifest(nodePlugin, browserPlugin, distOutputDir);
++      writeMergedManifest();
+     });
+     api.onDevCompileDone(() => {
+       // 热更后修改 manifest
+-      const { nodePlugin, browserPlugin, distOutputDir } = pluginOptions;
+-      updateStatsAndManifest(nodePlugin, browserPlugin, distOutputDir);
++      writeMergedManifest();
+     });
+   },
+ });
+diff --git a/packages/modernjs/src/types/index.ts b/packages/modernjs/src/types/index.ts
+index 13df1d45919..09082c159a6 100644
+--- a/packages/modernjs/src/types/index.ts
++++ b/packages/modernjs/src/types/index.ts
+@@ -1,6 +1,7 @@
+ import { moduleFederationPlugin } from '@module-federation/sdk';
+ import type { ModuleFederationPlugin as WebpackModuleFederationPlugin } from '@module-federation/enhanced';
+ import type { ModuleFederationPlugin as RspackModuleFederationPlugin } from '@module-federation/enhanced/rspack';
++import type { StatsAssetResource } from '@module-federation/rsbuild-plugin/utils';
+ 
+ export interface PluginOptions {
+   config?: moduleFederationPlugin.ModuleFederationPluginOptions;
+@@ -14,6 +15,10 @@ export interface PluginOptions {
+   fetchServerQuery?: Record<string, unknown>;
+ }
+ 
++export type AssetFileNames = {
++  statsFileName: string;
++  manifestFileName: string;
++};
+ export interface InternalModernPluginOptions {
+   csrConfig?: moduleFederationPlugin.ModuleFederationPluginOptions;
+   ssrConfig?: moduleFederationPlugin.ModuleFederationPluginOptions;
+@@ -21,6 +26,14 @@ export interface InternalModernPluginOptions {
+   originPluginOptions: PluginOptions;
+   browserPlugin?: BundlerPlugin;
+   nodePlugin?: BundlerPlugin;
++  assetFileNames: {
++    node?: AssetFileNames;
++    browser?: AssetFileNames;
++  };
++  assetResources: {
++    browser?: StatsAssetResource;
++    node?: StatsAssetResource;
++  };
+   remoteIpStrategy?: 'ipv4' | 'inherit';
+   userConfig?: PluginOptions;
+   fetchServerQuery?: Record<string, unknown>;
+diff --git a/packages/rsbuild-plugin/src/cli/index.ts b/packages/rsbuild-plugin/src/cli/index.ts
+index d143c6638d3..2fcf3f57834 100644
+--- a/packages/rsbuild-plugin/src/cli/index.ts
++++ b/packages/rsbuild-plugin/src/cli/index.ts
+@@ -3,7 +3,7 @@ import {
+   ModuleFederationPlugin,
+   PLUGIN_NAME,
+ } from '@module-federation/enhanced/rspack';
+-import { isRequiredVersion } from '@module-federation/sdk';
++import { isRequiredVersion, getManifestFileName } from '@module-federation/sdk';
+ import pkgJson from '../../package.json';
+ import logger from '../logger';
+ import {
+@@ -16,6 +16,7 @@ import {
+   SSR_ENV_NAME,
+   SSR_DIR,
+   updateStatsAndManifest,
++  StatsAssetResource,
+   patchSSRRspackConfig,
+ } from '../utils';
+ 
+@@ -47,7 +48,10 @@ type ExposedAPIType = {
+     browserPlugin?: ModuleFederationPlugin;
+     rspressSSGPlugin?: ModuleFederationPlugin;
+     distOutputDir?: string;
++    browserEnvironmentName?: string;
++    nodeEnvironmentName?: string;
+   };
++  assetResources: Record<string, StatsAssetResource>;
+   isSSRConfig: typeof isSSRConfig;
+   isRspressSSGConfig: typeof isRspressSSGConfig;
+ };
+@@ -242,8 +246,12 @@ export const pluginModuleFederation = (
+       options: {
+         nodePlugin: undefined,
+         browserPlugin: undefined,
++        rspressSSGPlugin: undefined,
+         distOutputDir: undefined,
++        browserEnvironmentName: undefined,
++        nodeEnvironmentName: undefined,
+       },
++      assetResources: {},
+       isSSRConfig,
+       isRspressSSGConfig,
+     };
+@@ -251,6 +259,71 @@ export const pluginModuleFederation = (
+       RSBUILD_PLUGIN_MODULE_FEDERATION_NAME,
+       generateMergedStatsAndManifestOptions,
+     );
++
++    const defaultBrowserEnvironmentName = environment;
++    const assetFileNames = getManifestFileName(
++      moduleFederationOptions.manifest,
++    );
++
++    if (moduleFederationOptions.manifest !== false) {
++      api.processAssets(
++        {
++          stage: 'report',
++        },
++        ({ assets, environment: envContext }) => {
++          const expectedBrowserEnv =
++            generateMergedStatsAndManifestOptions.options
++              .browserEnvironmentName ?? defaultBrowserEnvironmentName;
++          const expectedNodeEnv =
++            generateMergedStatsAndManifestOptions.options.nodeEnvironmentName ??
++            SSR_ENV_NAME;
++          const envName = envContext.name;
++
++          if (envName !== expectedBrowserEnv && envName !== expectedNodeEnv) {
++            return;
++          }
++
++          const assetResources =
++            generateMergedStatsAndManifestOptions.assetResources;
++          const targetResources =
++            assetResources[envName] || (assetResources[envName] = {});
++
++          const statsAsset = assets[assetFileNames.statsFileName];
++          if (statsAsset) {
++            try {
++              const raw = statsAsset.source();
++              const content = typeof raw === 'string' ? raw : raw.toString();
++              targetResources.stats = {
++                data: JSON.parse(content),
++                filename: assetFileNames.statsFileName,
++              };
++            } catch (err) {
++              const message = err instanceof Error ? err.message : String(err);
++              logger.error(
++                `Failed to parse stats asset "${assetFileNames.statsFileName}" for environment "${envName}": ${message}`,
++              );
++            }
++          }
++
++          const manifestAsset = assets[assetFileNames.manifestFileName];
++          if (manifestAsset) {
++            try {
++              const raw = manifestAsset.source();
++              const content = typeof raw === 'string' ? raw : raw.toString();
++              targetResources.manifest = {
++                data: JSON.parse(content),
++                filename: assetFileNames.manifestFileName,
++              };
++            } catch (err) {
++              const message = err instanceof Error ? err.message : String(err);
++              logger.error(
++                `Failed to parse manifest asset "${assetFileNames.manifestFileName}" for environment "${envName}": ${message}`,
++              );
++            }
++          }
++        },
++      );
++    }
+     api.onBeforeCreateCompiler(({ bundlerConfigs }) => {
+       if (!bundlerConfigs) {
+         throw new Error('Can not get bundlerConfigs!');
+@@ -343,6 +416,8 @@ export const pluginModuleFederation = (
+                 new ModuleFederationPlugin(
+                   createSSRMFConfig(moduleFederationOptions),
+                 );
++              generateMergedStatsAndManifestOptions.options.nodeEnvironmentName =
++                bundlerConfig.name || SSR_ENV_NAME;
+               bundlerConfig.plugins!.push(
+                 generateMergedStatsAndManifestOptions.options.nodePlugin,
+               );
+@@ -379,6 +454,8 @@ export const pluginModuleFederation = (
+               new ModuleFederationPlugin(moduleFederationOptions);
+             generateMergedStatsAndManifestOptions.options.distOutputDir =
+               bundlerConfig.output?.path || '';
++            generateMergedStatsAndManifestOptions.options.browserEnvironmentName =
++              bundlerConfig.name || defaultBrowserEnvironmentName;
+             bundlerConfig.plugins!.push(
+               generateMergedStatsAndManifestOptions.options.browserPlugin,
+             );
+@@ -388,12 +465,27 @@ export const pluginModuleFederation = (
+     });
+ 
+     const generateMergedStatsAndManifest = () => {
+-      const { nodePlugin, browserPlugin, distOutputDir } =
++      const { distOutputDir, browserEnvironmentName, nodeEnvironmentName } =
+         generateMergedStatsAndManifestOptions.options;
+-      if (!nodePlugin || !browserPlugin || !distOutputDir) {
++
++      if (!distOutputDir || !browserEnvironmentName || !nodeEnvironmentName) {
+         return;
+       }
+-      updateStatsAndManifest(nodePlugin, browserPlugin, distOutputDir);
++
++      const assetResources =
++        generateMergedStatsAndManifestOptions.assetResources;
++      const browserAssets = assetResources[browserEnvironmentName];
++      const nodeAssets = assetResources[nodeEnvironmentName];
++
++      if (!browserAssets || !nodeAssets) {
++        return;
++      }
++
++      try {
++        updateStatsAndManifest(nodeAssets, browserAssets, distOutputDir);
++      } catch (err) {
++        logger.error(err);
++      }
+     };
+ 
+     api.onDevCompileDone(() => {
+diff --git a/packages/rsbuild-plugin/src/utils/index.ts b/packages/rsbuild-plugin/src/utils/index.ts
+index 93ae8f4d8e5..dfb5739d8d5 100644
+--- a/packages/rsbuild-plugin/src/utils/index.ts
++++ b/packages/rsbuild-plugin/src/utils/index.ts
+@@ -9,6 +9,7 @@ export { autoDeleteSplitChunkCacheGroups } from './autoDeleteSplitChunkCacheGrou
+ export { addDataFetchExposes } from './addDataFetchExposes';
+ 
+ export { updateStatsAndManifest } from './manifest';
++export type { StatsAssetResource } from './manifest';
+ 
+ export {
+   patchSSRRspackConfig,
+diff --git a/packages/rsbuild-plugin/src/utils/manifest.ts b/packages/rsbuild-plugin/src/utils/manifest.ts
+index d4836e16a2a..867364ca842 100644
+--- a/packages/rsbuild-plugin/src/utils/manifest.ts
++++ b/packages/rsbuild-plugin/src/utils/manifest.ts
+@@ -1,12 +1,15 @@
+ import path from 'path';
+ import { Stats, Manifest } from '@module-federation/sdk';
+ import fs from 'fs-extra';
+-import type { ModuleFederationPlugin as WebpackModuleFederationPlugin } from '@module-federation/enhanced';
+-import type { ModuleFederationPlugin as RspackModuleFederationPlugin } from '@module-federation/enhanced/rspack';
++type AssetResource<T> = {
++  data: T;
++  filename: string;
++};
+ 
+-type BundlerPlugin =
+-  | WebpackModuleFederationPlugin
+-  | RspackModuleFederationPlugin;
++export type StatsAssetResource = {
++  stats?: AssetResource<Stats>;
++  manifest?: AssetResource<Manifest>;
++};
+ 
+ function mergeStats(browserStats: Stats, nodeStats: Stats): Stats {
+   const ssrRemoteEntry = nodeStats.metaData.remoteEntry;
+@@ -32,46 +35,34 @@ function mergeManifest(
+ }
+ 
+ function mergeStatsAndManifest(
+-  nodePlugin: BundlerPlugin,
+-  browserPlugin: BundlerPlugin,
++  nodeAssets: StatsAssetResource,
++  browserAssets: StatsAssetResource,
+ ): {
+   mergedStats: Stats;
+   mergedStatsFilePath: string;
+   mergedManifest: Manifest;
+   mergedManifestFilePath: string;
+ } {
+-  const nodeResourceInfo = nodePlugin.statsResourceInfo;
+-  const browserResourceInfo = browserPlugin.statsResourceInfo;
+-  if (
+-    !browserResourceInfo ||
+-    !nodeResourceInfo ||
+-    !browserResourceInfo.stats ||
+-    !nodeResourceInfo.stats ||
+-    !browserResourceInfo.manifest ||
+-    !nodeResourceInfo.manifest
+-  ) {
+-    throw new Error('can not get browserResourceInfo or nodeResourceInfo');
++  const { stats: browserStats, manifest: browserManifest } = browserAssets;
++  const { stats: nodeStats, manifest: nodeManifest } = nodeAssets;
++
++  if (!browserStats || !nodeStats || !browserManifest || !nodeManifest) {
++    throw new Error('Failed to read stats or manifest assets for merge');
+   }
+-  const mergedStats = mergeStats(
+-    browserResourceInfo.stats.stats,
+-    nodeResourceInfo.stats.stats,
+-  );
+-  const mergedManifest = mergeManifest(
+-    browserResourceInfo.manifest.manifest,
+-    nodeResourceInfo.manifest.manifest,
+-  );
++  const mergedStats = mergeStats(browserStats.data, nodeStats.data);
++  const mergedManifest = mergeManifest(browserManifest.data, nodeManifest.data);
+ 
+   return {
+     mergedStats: mergedStats,
+-    mergedStatsFilePath: browserResourceInfo.stats.filename,
++    mergedStatsFilePath: browserStats.filename,
+     mergedManifest: mergedManifest,
+-    mergedManifestFilePath: browserResourceInfo.manifest.filename,
++    mergedManifestFilePath: browserManifest.filename,
+   };
+ }
+ 
+ export function updateStatsAndManifest(
+-  nodePlugin: BundlerPlugin,
+-  browserPlugin: BundlerPlugin,
++  nodeAssets: StatsAssetResource,
++  browserAssets: StatsAssetResource,
+   outputDir: string,
+ ) {
+   const {
+@@ -79,7 +70,7 @@ export function updateStatsAndManifest(
+     mergedStatsFilePath,
+     mergedManifest,
+     mergedManifestFilePath,
+-  } = mergeStatsAndManifest(nodePlugin, browserPlugin);
++  } = mergeStatsAndManifest(nodeAssets, browserAssets);
+ 
+   fs.writeFileSync(
+     path.resolve(outputDir, mergedStatsFilePath),
+diff --git a/packages/rsbuild-plugin/src/utils/ssr.ts b/packages/rsbuild-plugin/src/utils/ssr.ts
+index b7d50ef6cf5..8d12faabd3b 100644
+--- a/packages/rsbuild-plugin/src/utils/ssr.ts
++++ b/packages/rsbuild-plugin/src/utils/ssr.ts
+@@ -13,7 +13,6 @@ export const SSR_DIR = 'ssr';
+ export const SSR_ENV_NAME = 'mf-ssr';
+ 
+ export function setSSREnv() {
+-  process.env['MF_DISABLE_EMIT_STATS'] = 'true';
+   process.env['MF_SSR_PRJ'] = 'true';
+ }
+ 
+diff --git a/packages/rspack/src/ModuleFederationPlugin.ts b/packages/rspack/src/ModuleFederationPlugin.ts
+index 2072e887560..c7c6a119af4 100644
+--- a/packages/rspack/src/ModuleFederationPlugin.ts
++++ b/packages/rspack/src/ModuleFederationPlugin.ts
+@@ -336,10 +336,6 @@ export class ModuleFederationPlugin implements RspackPluginInstance {
+       patchChunkSplit(cacheGroups[cacheGroupKey]);
+     });
+   }
+-
+-  get statsResourceInfo() {
+-    return this._statsPlugin?.resourceInfo;
+-  }
+ }
+ 
+ export const GetPublicPathPlugin = RemoteEntryPlugin;
+diff --git a/packages/sdk/src/generateSnapshotFromManifest.ts b/packages/sdk/src/generateSnapshotFromManifest.ts
+index 9817ea14925..f55e57d482f 100644
+--- a/packages/sdk/src/generateSnapshotFromManifest.ts
++++ b/packages/sdk/src/generateSnapshotFromManifest.ts
+@@ -5,8 +5,9 @@ import {
+   BasicProviderModuleInfo,
+   ConsumerModuleInfo,
+   ManifestProvider,
++  moduleFederationPlugin,
+ } from './types';
+-import { MANIFEST_EXT } from './constant';
++import { MANIFEST_EXT, ManifestFileName, StatsFileName } from './constant';
+ 
+ interface IOptions {
+   remotes?: Record<string, string>;
+@@ -123,7 +124,7 @@ export function generateSnapshotFromManifest(
+       name: remoteEntryName,
+       type: remoteEntryType,
+     },
+-    types: remoteTypes,
++    types: remoteTypes = { path: '', name: '', zip: '', api: '' },
+     buildInfo: { buildVersion },
+     globalName,
+     ssrRemoteEntry,
+@@ -209,3 +210,42 @@ export function isManifestProvider(
+     return false;
+   }
+ }
++
++export function getManifestFileName(
++  manifestOptions?: moduleFederationPlugin.ModuleFederationPluginOptions['manifest'],
++): {
++  statsFileName: string;
++  manifestFileName: string;
++} {
++  if (!manifestOptions) {
++    return {
++      statsFileName: StatsFileName,
++      manifestFileName: ManifestFileName,
++    };
++  }
++
++  let filePath =
++    typeof manifestOptions === 'boolean' ? '' : manifestOptions.filePath || '';
++  let fileName =
++    typeof manifestOptions === 'boolean' ? '' : manifestOptions.fileName || '';
++
++  const JSON_EXT = '.json';
++  const addExt = (name: string): string => {
++    if (name.endsWith(JSON_EXT)) {
++      return name;
++    }
++    return `${name}${JSON_EXT}`;
++  };
++  const insertSuffix = (name: string, suffix: string): string => {
++    return name.replace(JSON_EXT, `${suffix}${JSON_EXT}`);
++  };
++  const manifestFileName = fileName ? addExt(fileName) : ManifestFileName;
++  const statsFileName = fileName
++    ? insertSuffix(manifestFileName, '-stats')
++    : StatsFileName;
++
++  return {
++    statsFileName: simpleJoinRemoteEntry(filePath, statsFileName),
++    manifestFileName: simpleJoinRemoteEntry(filePath, manifestFileName),
++  };
++}
+diff --git a/packages/sdk/src/index.ts b/packages/sdk/src/index.ts
+index d840e767eae..91408c4a527 100644
+--- a/packages/sdk/src/index.ts
++++ b/packages/sdk/src/index.ts
+@@ -6,6 +6,7 @@ export {
+   isManifestProvider,
+   simpleJoinRemoteEntry,
+   inferAutoPublicPath,
++  getManifestFileName,
+ } from './generateSnapshotFromManifest';
+ export {
+   logger,
+diff --git a/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts b/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts
+index e754de48a57..b398ca797fd 100644
+--- a/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts
++++ b/packages/sdk/src/types/plugins/ModuleFederationPlugin.ts
+@@ -115,8 +115,6 @@ export type DataPrefetch = boolean;
+ 
+ export interface AdditionalDataOptions {
+   stats: Stats;
+-  manifest?: Manifest;
+-  pluginOptions: ModuleFederationPluginOptions;
+   compiler: webpack.Compiler;
+   compilation: webpack.Compilation;
+   bundler: 'webpack' | 'rspack';
+@@ -127,7 +125,7 @@ export interface PluginManifestOptions {
+   fileName?: string;
+   additionalData?: (
+     options: AdditionalDataOptions,
+-  ) => Promise<Stats | void> | Stats | void;
++  ) => Promise<void | Stats> | Stats | void;
+ }
+ 
+ export interface PluginDevOptions {
+diff --git a/packages/sdk/src/types/stats.ts b/packages/sdk/src/types/stats.ts
+index 470c52f32d0..b32366c4b7b 100644
+--- a/packages/sdk/src/types/stats.ts
++++ b/packages/sdk/src/types/stats.ts
+@@ -47,16 +47,16 @@ export interface BasicStatsMetaData {
+   ssrRemoteEntry?: ResourceInfo;
+   prefetchInterface?: boolean;
+   prefetchEntry?: ResourceInfo;
+-  types: MetaDataTypes;
++  types?: MetaDataTypes;
+   type: string;
+-  pluginVersion: string;
++  pluginVersion?: string;
+ }
+ 
+-type StatsMetaDataWithGetPublicPath<T = BasicStatsMetaData> = T & {
++export type StatsMetaDataWithGetPublicPath<T = BasicStatsMetaData> = T & {
+   getPublicPath: string;
+ };
+ 
+-type StatsMetaDataWithPublicPath<T = BasicStatsMetaData> = T & {
++export type StatsMetaDataWithPublicPath<T = BasicStatsMetaData> = T & {
+   publicPath: string;
+   ssrPublicPath?: string;
+ };

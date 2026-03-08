@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+    "diff": "/gh/mui/material-ui/diff?old_filename=docs%2Fdata%2Fjoy%2Fcustomization%2Ftheme-colors%2FPaletteThemeViewer.tsx&old_oid=8e89311bce9efebb4714956961ae78443f421b5f&old_mode=33188&new_filename=docs%2Fdata%2Fjoy%2Fcustomization%2Ftheme-colors%2FPaletteThemeViewer.tsx&new_oid=6a499db926f7ee7b382799d958fe822f834532a4&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+      "oid": "8e89311bce9efebb4714956961ae78443f421b5f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx",
+      "oid": "6a499db926f7ee7b382799d958fe822f834532a4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "dc3cfe55024599313e2dad7cae9601a756debea98bc2602981c6681710aef90b"
+  }
+]

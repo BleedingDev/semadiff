@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-mui-material-ui-15125",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#15125: [docs] SimplePortal example using Hooks",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 15125,
+    "prUrl": "https://github.com/mui/material-ui/pull/15125",
+    "baseSha": "cc429dec23f73ed8dde0468890b3238f533c9f17",
+    "headSha": "18c94ce1b6161795aa3b519346cf14604ba2dffc",
+    "selectedFiles": [
+      "docs/src/pages/utils/portal/SimplePortal.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:43:04.819Z"
+  },
+  "files": [
+    {
+      "id": "docs/src/pages/utils/portal/SimplePortal.tsx",
+      "oldPath": null,
+      "newPath": "docs/src/pages/utils/portal/SimplePortal.tsx",
+      "status": "added",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/src/pages/utils/portal/SimplePortal.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 1,
+          "endLine": 43
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

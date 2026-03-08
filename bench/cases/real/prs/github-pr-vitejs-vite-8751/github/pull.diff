@@ -1,0 +1,14 @@
+diff --git a/docs/.vitepress/config.ts b/docs/.vitepress/config.ts
+index 7baf0d9e6714bc..3f7762f2cdd2c4 100644
+--- a/docs/.vitepress/config.ts
++++ b/docs/.vitepress/config.ts
+@@ -57,7 +57,8 @@ export default defineConfig({
+       text: 'English',
+       items: [
+         { text: '简体中文', link: 'https://cn.vitejs.dev' },
+-        { text: '日本語', link: 'https://ja.vitejs.dev' }
++        { text: '日本語', link: 'https://ja.vitejs.dev' },
++        { text: 'Español', link: 'https://es.vitejs.dev' }
+       ]
+     },
+ 

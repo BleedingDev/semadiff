@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "5c5d00b08f320338d9bfc0bcc54b48e66438e857",
+    "filename": ".changeset/short-seals-arrive.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/087caad7716a49fe4a9f52dc1fbc7379c71d12ca/.changeset%2Fshort-seals-arrive.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/087caad7716a49fe4a9f52dc1fbc7379c71d12ca/.changeset%2Fshort-seals-arrive.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Fshort-seals-arrive.md?ref=087caad7716a49fe4a9f52dc1fbc7379c71d12ca",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@zag-js/image-cropper\": patch\n+---\n+\n+Export missing types"
+  },
+  {
+    "sha": "7efc1c7296abc7cae84c0fde4a48db1290416129",
+    "filename": "packages/machines/image-cropper/src/index.ts",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/087caad7716a49fe4a9f52dc1fbc7379c71d12ca/packages%2Fmachines%2Fimage-cropper%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/087caad7716a49fe4a9f52dc1fbc7379c71d12ca/packages%2Fmachines%2Fimage-cropper%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Fimage-cropper%2Fsrc%2Findex.ts?ref=087caad7716a49fe4a9f52dc1fbc7379c71d12ca",
+    "patch": "@@ -15,4 +15,9 @@ export type {\n   FlipState,\n   RotationChangeDetails,\n   ZoomChangeDetails,\n+  GetCroppedImageOptions,\n+  IntlTranslations,\n+  PreviewDescriptionDetails,\n+  SelectionLabelDetails,\n+  SelectionValueTextDetails,\n } from \"./image-cropper.types\""
+  }
+]

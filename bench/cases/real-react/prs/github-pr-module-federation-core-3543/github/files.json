@@ -1,0 +1,98 @@
+[
+  {
+    "sha": "66b1ac121311ab807648decdba27455f4ef948f5",
+    "filename": ".changeset/dry-keys-taste.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/.changeset%2Fdry-keys-taste.md",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/.changeset%2Fdry-keys-taste.md",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/.changeset%2Fdry-keys-taste.md?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+'@module-federation/bridge-react': minor\n+---\n+\n+fix(bridge-react): prevent destroy/render the remote component every time after the states changed\n\\ No newline at end of file"
+  },
+  {
+    "sha": "e31d64c2bf5c620d3d6089055d0be0e9ae62deb2",
+    "filename": "apps/router-demo/router-host-2000/src/pages/Home.tsx",
+    "status": "modified",
+    "additions": 15,
+    "deletions": 0,
+    "changes": 15,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-host-2000%2Fsrc%2Fpages%2FHome.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-host-2000%2Fsrc%2Fpages%2FHome.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/apps%2Frouter-demo%2Frouter-host-2000%2Fsrc%2Fpages%2FHome.tsx?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -1,6 +1,9 @@\n+import { useState } from 'react';\n import { Space, Table, Tag } from 'antd';\n import type { TableProps } from 'antd';\n import type React from 'react';\n+import { init, loadRemote } from '@module-federation/enhanced/runtime';\n+import { createRemoteComponent } from '@module-federation/bridge-react';\n \n interface DataType {\n   key: string;\n@@ -83,11 +86,23 @@ const data: DataType[] = [\n   },\n ];\n \n+const Remote1Button = createRemoteComponent<any, any>({\n+  loader: () => loadRemote('remote1/export-button'),\n+  // @ts-ignore\n+  fallback: null,\n+  loading: null,\n+});\n+\n const Home: React.FC = () => {\n+  const [count, setCount] = useState(0);\n   return (\n     <>\n       <h2>Router host Home page</h2>\n       <Table columns={columns} dataSource={data} />\n+      <Remote1Button\n+        text={`Hit me! ${count}`}\n+        onClick={() => setCount((prevState: number) => prevState + 1)}\n+      />\n     </>\n   );\n };"
+  },
+  {
+    "sha": "5060e48b3317bdbbe7803ec2961295b88db6064b",
+    "filename": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 0,
+    "changes": 1,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-remote1-2001%2Frsbuild.config.ts",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-remote1-2001%2Frsbuild.config.ts",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/apps%2Frouter-demo%2Frouter-remote1-2001%2Frsbuild.config.ts?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -39,6 +39,7 @@ export default defineConfig({\n       exposes: {\n         './button': './src/button.tsx',\n         './export-app': './src/export-App.tsx',\n+        './export-button': './src/export-Button.tsx',\n         './app': './src/App.tsx',\n       },\n       shared: {"
+  },
+  {
+    "sha": "c0616c94170189306799b0fff6714409b7b6ed3d",
+    "filename": "apps/router-demo/router-remote1-2001/src/button.tsx",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-remote1-2001%2Fsrc%2Fbutton.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-remote1-2001%2Fsrc%2Fbutton.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/apps%2Frouter-demo%2Frouter-remote1-2001%2Fsrc%2Fbutton.tsx?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -1,3 +1,3 @@\n-export default function Button() {\n-  return <button>Provider button</button>;\n+export default function Button(props: { text: string; onClick: () => void }) {\n+  return <button onClick={props.onClick}>{props.text}</button>;\n }"
+  },
+  {
+    "sha": "f8f7aee933a1dfae7ea2e90b1b8883396714ad24",
+    "filename": "apps/router-demo/router-remote1-2001/src/export-Button.tsx",
+    "status": "added",
+    "additions": 9,
+    "deletions": 0,
+    "changes": 9,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-remote1-2001%2Fsrc%2Fexport-Button.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/apps%2Frouter-demo%2Frouter-remote1-2001%2Fsrc%2Fexport-Button.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/apps%2Frouter-demo%2Frouter-remote1-2001%2Fsrc%2Fexport-Button.tsx?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -0,0 +1,9 @@\n+import React from 'react';\n+import Button from './button';\n+import { createBridgeComponent } from '@module-federation/bridge-react';\n+\n+const provider = createBridgeComponent({\n+  rootComponent: Button,\n+});\n+\n+export default provider;"
+  },
+  {
+    "sha": "64e4592e774469aebf1ed26cf5a2c7a16d3b4903",
+    "filename": "packages/bridge/bridge-react/src/provider/create.tsx",
+    "status": "modified",
+    "additions": 7,
+    "deletions": 3,
+    "changes": 10,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fprovider%2Fcreate.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fprovider%2Fcreate.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fprovider%2Fcreate.tsx?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -86,9 +86,13 @@ export function createBridgeComponent<T>(bridgeInfo: ProviderFnParams<T>) {\n             bridgeInfo?.render(rootComponentWithErrorBoundary, dom),\n           ).then((root: RootType) => rootMap.set(info.dom, root));\n         } else {\n-          const root = createRoot(info.dom);\n+          let root = rootMap.get(info.dom);\n+          // do not call createRoot multiple times\n+          if (!root) {\n+            root = createRoot(info.dom);\n+            rootMap.set(info.dom, root);\n+          }\n           root.render(rootComponentWithErrorBoundary);\n-          rootMap.set(info.dom, root);\n         }\n \n         instance?.bridgeHook?.lifecycle?.afterBridgeRender?.emit(info) || {};\n@@ -105,7 +109,7 @@ export function createBridgeComponent<T>(bridgeInfo: ProviderFnParams<T>) {\n           }\n           rootMap.delete(info.dom);\n         }\n-        instance?.bridgeHook?.lifecycle?.destroyBridge?.emit(info);\n+        instance?.bridgeHook?.lifecycle?.afterBridgeDestroy?.emit(info);\n       },\n     };\n   };"
+  },
+  {
+    "sha": "2a5ce1810acb82d1090de525e2b5604f97ff9aaf",
+    "filename": "packages/bridge/bridge-react/src/remote/component.tsx",
+    "status": "modified",
+    "additions": 81,
+    "deletions": 96,
+    "changes": 177,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcomponent.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcomponent.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcomponent.tsx?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -40,112 +40,97 @@ const RemoteAppWrapper = forwardRef(function (\n   props: RemoteAppParams & RenderFnParams,\n   ref,\n ) {\n-  const RemoteApp = () => {\n-    LoggerInstance.debug(`RemoteAppWrapper RemoteApp props >>>`, { props });\n-    const {\n-      moduleName,\n-      memoryRoute,\n-      basename,\n-      providerInfo,\n-      className,\n-      style,\n-      fallback,\n-      ...resProps\n-    } = props;\n-\n-    const instance = federationRuntime.instance;\n-    const rootRef: React.MutableRefObject<HTMLDivElement | null> =\n-      ref && 'current' in ref\n-        ? (ref as React.MutableRefObject<HTMLDivElement | null>)\n-        : useRef(null);\n-\n-    const renderDom: React.MutableRefObject<HTMLElement | null> = useRef(null);\n-    const providerInfoRef = useRef<any>(null);\n+  const {\n+    moduleName,\n+    memoryRoute,\n+    basename,\n+    providerInfo,\n+    className,\n+    style,\n+    fallback,\n+    ...resProps\n+  } = props;\n+\n+  const instance = federationRuntime.instance;\n+  const rootRef: React.MutableRefObject<HTMLDivElement | null> =\n+    ref && 'current' in ref\n+      ? (ref as React.MutableRefObject<HTMLDivElement | null>)\n+      : useRef(null);\n+\n+  const renderDom: React.MutableRefObject<HTMLElement | null> = useRef(null);\n+  const providerInfoRef = useRef<any>(null);\n+  const [initialized, setInitialized] = useState(false);\n+\n+  LoggerInstance.debug(`RemoteAppWrapper instance from props >>>`, instance);\n+\n+  // 初始化远程组件\n+  useEffect(() => {\n+    if (initialized) return;\n+    const providerReturn = providerInfo();\n+    providerInfoRef.current = providerReturn;\n+    setInitialized(true);\n+\n+    return () => {\n+      if (providerInfoRef.current?.destroy) {\n+        LoggerInstance.debug(\n+          `createRemoteComponent LazyComponent destroy >>>`,\n+          { moduleName, basename, dom: renderDom.current },\n+        );\n \n-    LoggerInstance.debug(`RemoteAppWrapper instance from props >>>`, instance);\n+        instance?.bridgeHook?.lifecycle?.beforeBridgeDestroy?.emit({\n+          moduleName,\n+          dom: renderDom.current,\n+          basename,\n+          memoryRoute,\n+          fallback,\n+          ...resProps,\n+        });\n \n-    useEffect(() => {\n-      const renderTimeout = setTimeout(() => {\n-        const providerReturn = providerInfo();\n-        providerInfoRef.current = providerReturn;\n+        providerInfoRef.current?.destroy({\n+          moduleName,\n+          dom: renderDom.current,\n+        });\n \n-        let renderProps = {\n+        instance?.bridgeHook?.lifecycle?.afterBridgeDestroy?.emit({\n           moduleName,\n-          dom: rootRef.current,\n+          dom: renderDom.current,\n           basename,\n           memoryRoute,\n           fallback,\n           ...resProps,\n-        };\n-        renderDom.current = rootRef.current;\n-        LoggerInstance.debug(\n-          `createRemoteComponent LazyComponent render >>>`,\n-          renderProps,\n-        );\n-\n-        LoggerInstance.debug(\n-          `createRemoteComponent LazyComponent hostInstance >>>`,\n-          instance,\n-        );\n-        const beforeBridgeRenderRes =\n-          instance?.bridgeHook?.lifecycle?.beforeBridgeRender?.emit(\n-            renderProps,\n-          ) || {};\n-        // @ts-ignore\n-        renderProps = { ...renderProps, ...beforeBridgeRenderRes.extraProps };\n-        providerReturn.render(renderProps);\n-        instance?.bridgeHook?.lifecycle?.afterBridgeRender?.emit(renderProps);\n-      });\n-\n-      return () => {\n-        clearTimeout(renderTimeout);\n-        setTimeout(() => {\n-          if (providerInfoRef.current?.destroy) {\n-            LoggerInstance.debug(\n-              `createRemoteComponent LazyComponent destroy >>>`,\n-              { moduleName, basename, dom: renderDom.current },\n-            );\n-\n-            instance?.bridgeHook?.lifecycle?.beforeBridgeDestroy?.emit({\n-              moduleName,\n-              dom: renderDom.current,\n-              basename,\n-              memoryRoute,\n-              fallback,\n-              ...resProps,\n-            });\n-\n-            providerInfoRef.current?.destroy({\n-              moduleName,\n-              dom: renderDom.current,\n-            });\n-\n-            instance?.bridgeHook?.lifecycle?.afterBridgeDestroy?.emit({\n-              moduleName,\n-              dom: renderDom.current,\n-              basename,\n-              memoryRoute,\n-              fallback,\n-              ...resProps,\n-            });\n-          }\n         });\n-      };\n-    }, []);\n-\n-    // bridge-remote-root\n-    const rootComponentClassName = `${getRootDomDefaultClassName(moduleName)} ${props?.className}`;\n-    return (\n-      <div\n-        className={rootComponentClassName}\n-        style={props?.style}\n-        ref={rootRef}\n-      ></div>\n-    );\n-  };\n+      }\n+    };\n+  }, [moduleName]);\n \n-  (RemoteApp as any)['__APP_VERSION__'] = __APP_VERSION__;\n-  return <RemoteApp />;\n+  // trigger render after props updated\n+  useEffect(() => {\n+    if (!initialized || !providerInfoRef.current) return;\n+\n+    let renderProps = {\n+      moduleName,\n+      dom: rootRef.current,\n+      basename,\n+      memoryRoute,\n+      fallback,\n+      ...resProps,\n+    };\n+    renderDom.current = rootRef.current;\n+\n+    const beforeBridgeRenderRes =\n+      instance?.bridgeHook?.lifecycle?.beforeBridgeRender?.emit(renderProps) ||\n+      {};\n+    // @ts-ignore\n+    renderProps = { ...renderProps, ...beforeBridgeRenderRes.extraProps };\n+    providerInfoRef.current.render(renderProps);\n+    instance?.bridgeHook?.lifecycle?.afterBridgeRender?.emit(renderProps);\n+  }, [initialized, ...Object.values(props)]);\n+\n+  // bridge-remote-root\n+  const rootComponentClassName = `${getRootDomDefaultClassName(moduleName)} ${className || ''}`;\n+  return (\n+    <div className={rootComponentClassName} style={style} ref={rootRef}></div>\n+  );\n });\n \n interface ExtraDataProps {"
+  },
+  {
+    "sha": "fe138b55ca36a94b35d97fb17304c4f608d71771",
+    "filename": "packages/bridge/bridge-react/src/remote/create.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/module-federation/core/blob/8b897e9816479347b9ce119b8e61db0b0e80fd2e/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcreate.tsx",
+    "raw_url": "https://github.com/module-federation/core/raw/8b897e9816479347b9ce119b8e61db0b0e80fd2e/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcreate.tsx",
+    "contents_url": "https://api.github.com/repos/module-federation/core/contents/packages%2Fbridge%2Fbridge-react%2Fsrc%2Fremote%2Fcreate.tsx?ref=8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "patch": "@@ -100,9 +100,9 @@ export function createRemoteComponent<T, E extends keyof T>(\n       : {}\n     : {};\n \n+  const LazyComponent = createLazyRemoteComponent(info);\n   return forwardRef<HTMLDivElement, ProviderParams & RawComponentType>(\n     (props, ref) => {\n-      const LazyComponent = createLazyRemoteComponent(info);\n       return (\n         <ErrorBoundary FallbackComponent={info.fallback}>\n           <React.Suspense fallback={info.loading}>"
+  }
+]

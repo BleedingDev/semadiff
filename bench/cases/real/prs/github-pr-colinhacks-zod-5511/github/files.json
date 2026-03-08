@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "35a77cf8f608f741e81728ad841de2a50d65673c",
+    "filename": "packages/zod/src/v4/classic/tests/fix-json-issue.test.ts",
+    "status": "added",
+    "additions": 26,
+    "deletions": 0,
+    "changes": 26,
+    "blob_url": "https://github.com/colinhacks/zod/blob/87dae2616304a3e80fe23fb52f68317f2fed361d/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffix-json-issue.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/87dae2616304a3e80fe23fb52f68317f2fed361d/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffix-json-issue.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Ffix-json-issue.test.ts?ref=87dae2616304a3e80fe23fb52f68317f2fed361d",
+    "patch": "@@ -0,0 +1,26 @@\n+import { expect, test } from \"vitest\";\n+import { type infer as _infer, json, nullable, object, pipe, transform } from \"../../mini/index.js\";\n+// biome-ignore lint/correctness/noUnusedImports: This import verifies the type is exported\n+import type { _ZodMiniJSONSchema } from \"../../mini/schemas.js\";\n+\n+const DataType = object({\n+  data: json(),\n+});\n+type DataType = _infer<typeof DataType>;\n+\n+// biome-ignore lint/suspicious/noExportsInTest: This export is required to reproduce TS4023\n+export const Container = object({\n+  contained: pipe(\n+    nullable(DataType),\n+    transform<DataType | null>(\n+      (v) =>\n+        v ?? {\n+          data: \"\",\n+        }\n+    )\n+  ),\n+});\n+\n+test(\"issue reproduction should compile without type errors\", () => {\n+  expect(Container).toBeDefined();\n+});"
+  },
+  {
+    "sha": "19455cee61fa41b0a79fdb3ca83d4258e57bde70",
+    "filename": "packages/zod/src/v4/mini/schemas.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/colinhacks/zod/blob/87dae2616304a3e80fe23fb52f68317f2fed361d/packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Fschemas.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/87dae2616304a3e80fe23fb52f68317f2fed361d/packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Fschemas.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fmini%2Fschemas.ts?ref=87dae2616304a3e80fe23fb52f68317f2fed361d",
+    "patch": "@@ -1649,7 +1649,7 @@ export const stringbool: (_params?: string | core.$ZodStringBoolParams) => ZodMi\n // json\n \n // json\n-type _ZodMiniJSONSchema = ZodMiniUnion<\n+export type _ZodMiniJSONSchema = ZodMiniUnion<\n   [\n     ZodMiniString,\n     ZodMiniNumber,\n@@ -1659,7 +1659,7 @@ type _ZodMiniJSONSchema = ZodMiniUnion<\n     ZodMiniRecord<ZodMiniString<string>, ZodMiniJSONSchema>,\n   ]\n >;\n-type _ZodMiniJSONSchemaInternals = _ZodMiniJSONSchema[\"_zod\"];\n+export type _ZodMiniJSONSchemaInternals = _ZodMiniJSONSchema[\"_zod\"];\n \n export interface ZodMiniJSONSchemaInternals extends _ZodMiniJSONSchemaInternals {\n   output: util.JSONType;"
+  }
+]

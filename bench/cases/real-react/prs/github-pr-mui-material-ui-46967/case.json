@@ -1,0 +1,116 @@
+{
+  "id": "github-pr-mui-material-ui-46967",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/material-ui#46967: [internal] Refactor `useForkRef` TS types: tighten `cleanupRef` and simplify ref typing",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 46967,
+    "prUrl": "https://github.com/mui/material-ui/pull/46967",
+    "baseSha": "02f0caa49747867d7c5c384a1c72088e54f1aaf9",
+    "headSha": "b3e0cb3f49e1e6acae45ca7ef9539d6d9ae95862",
+    "selectedFiles": [
+      "packages/mui-utils/src/useForkRef/useForkRef.ts"
+    ],
+    "collectedAt": "2026-03-08T03:39:17.819Z"
+  },
+  "files": [
+    {
+      "id": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+      "oldPath": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+      "newPath": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 22,
+          "endLine": 22
+        },
+        "newRange": {
+          "startLine": 22,
+          "endLine": 22
+        }
+      },
+      {
+        "fileId": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 24,
+          "endLine": 24
+        },
+        "newRange": {
+          "startLine": 24,
+          "endLine": 24
+        }
+      },
+      {
+        "fileId": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 40,
+          "endLine": 40
+        },
+        "newRange": {
+          "startLine": 40,
+          "endLine": 40
+        }
+      },
+      {
+        "fileId": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 42,
+          "endLine": 42
+        },
+        "newRange": {
+          "startLine": 42,
+          "endLine": 42
+        }
+      },
+      {
+        "fileId": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 60,
+          "endLine": 60
+        },
+        "newRange": {
+          "startLine": 60,
+          "endLine": 60
+        }
+      },
+      {
+        "fileId": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 64,
+          "endLine": 64
+        },
+        "newRange": {
+          "startLine": 64,
+          "endLine": 64
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-colinhacks-zod-4588",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#4588: refactor: remove unused import & imported multiple times",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 4588,
+    "prUrl": "https://github.com/colinhacks/zod/pull/4588",
+    "baseSha": "52808166ec4ee89ed04d0da6b86c42134f6b07e4",
+    "headSha": "dce4660ce29c004d026be1eeead9578ceeaefd68",
+    "selectedFiles": [
+      "packages/bench/object.ts"
+    ],
+    "collectedAt": "2026-03-08T02:15:23.262Z"
+  },
+  "files": [
+    {
+      "id": "packages/bench/object.ts",
+      "oldPath": "packages/bench/object.ts",
+      "newPath": "packages/bench/object.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/bench/object.ts",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 5,
+          "endLine": 5
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

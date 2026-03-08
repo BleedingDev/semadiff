@@ -49,6 +49,11 @@ interface MoveMetaInput {
   renameGroupId?: string;
 }
 
+interface MoveBlockSpan {
+  startIndex: number;
+  length: number;
+}
+
 function buildMoveMeta(input: MoveMetaInput): MoveMeta | undefined {
   const meta: MoveMeta = {};
   if (input.confidence !== undefined) {
@@ -61,6 +66,33 @@ function buildMoveMeta(input: MoveMetaInput): MoveMeta | undefined {
     meta.renameGroupId = input.renameGroupId;
   }
   return Object.keys(meta).length > 0 ? meta : undefined;
+}
+
+function resolveMoveBlockSpan(block: UnitBlock): MoveBlockSpan | null {
+  let first = 0;
+  while (
+    first < block.units.length &&
+    getComparableText(block.units[first] as DiffToken).trim().length === 0
+  ) {
+    first += 1;
+  }
+
+  let last = block.units.length - 1;
+  while (
+    last >= first &&
+    getComparableText(block.units[last] as DiffToken).trim().length === 0
+  ) {
+    last -= 1;
+  }
+
+  if (last < first) {
+    return null;
+  }
+
+  return {
+    startIndex: block.start + first,
+    length: last - first + 1,
+  };
 }
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: move detection requires branching on match confidence.
@@ -124,6 +156,12 @@ export function detectMoves(
       continue;
     }
 
+    const deleteSpan = resolveMoveBlockSpan(delEntry.block);
+    const insertSpan = resolveMoveBlockSpan(insertMatch.block);
+    if (!(deleteSpan && insertSpan)) {
+      continue;
+    }
+
     const tokenCount = Math.min(deleteUnits.length, bestUnits.length);
     const minContentLength = Math.min(
       moveUnitTextLength(deleteUnits),
@@ -151,13 +189,13 @@ export function detectMoves(
       id: moveId,
       oldRange: rangeForTokens(
         oldTokens,
-        delEntry.block.start,
-        delEntry.block.units.length
+        deleteSpan.startIndex,
+        deleteSpan.length
       ),
       newRange: rangeForTokens(
         newTokens,
-        insertMatch.block.start,
-        insertMatch.block.units.length
+        insertSpan.startIndex,
+        insertSpan.length
       ),
       confidence,
       operations: operationIds,
@@ -166,14 +204,14 @@ export function detectMoves(
     const oldSlice = textForTokens(
       oldText,
       oldTokens,
-      delEntry.block.start,
-      delEntry.block.units.length
+      deleteSpan.startIndex,
+      deleteSpan.length
     );
     const newSlice = textForTokens(
       newText,
       newTokens,
-      insertMatch.block.start,
-      insertMatch.block.units.length
+      insertSpan.startIndex,
+      insertSpan.length
     );
 
     moveOps.push({

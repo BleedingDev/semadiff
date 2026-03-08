@@ -1,0 +1,4657 @@
+diff --git a/.changeset/beige-news-repeat.md b/.changeset/beige-news-repeat.md
+new file mode 100644
+index 0000000000..befe16cb1f
+--- /dev/null
++++ b/.changeset/beige-news-repeat.md
+@@ -0,0 +1,14 @@
++---
++"@zag-js/collection": minor
++---
++
++- **ListCollection**
++
++  - Fix stale issues in mutation methods by returning a new `ListCollection` instead of mutating the internal `items`
++
++    - Add new methods to the list collection: `update`, `upsert`, `remove`, `append`, `prepend`, `move`
++
++- **GridCollection**
++
++  - Add new methods to the grid collection: `getCell`, `getValueCell`, `getFirstEnabledColumnIndex`,
++    `getLastEnabledColumnIndex`, `getNextRowValue`, `getPreviousRowValue`
+diff --git a/.changeset/sour-chairs-joke.md b/.changeset/sour-chairs-joke.md
+new file mode 100644
+index 0000000000..8dfa3bf28d
+--- /dev/null
++++ b/.changeset/sour-chairs-joke.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/listbox": minor
++---
++
++Initial release of listbox state machine
+diff --git a/examples/next-ts/package.json b/examples/next-ts/package.json
+index 5bf19eea14..ca8712022b 100644
+--- a/examples/next-ts/package.json
++++ b/examples/next-ts/package.json
+@@ -48,6 +48,7 @@
+     "@zag-js/hover-card": "workspace:*",
+     "@zag-js/i18n-utils": "workspace:*",
+     "@zag-js/interact-outside": "workspace:*",
++    "@zag-js/listbox": "workspace:*",
+     "@zag-js/live-region": "workspace:*",
+     "@zag-js/menu": "workspace:*",
+     "@zag-js/navigation-menu": "workspace:*",
+@@ -112,4 +113,4 @@
+     "typescript": "5.8.2"
+   },
+   "license": "MIT"
+-}
+\ No newline at end of file
++}
+diff --git a/examples/next-ts/pages/compositions b/examples/next-ts/pages/compositions
+index 41741defff..591ee07873 160000
+--- a/examples/next-ts/pages/compositions
++++ b/examples/next-ts/pages/compositions
+@@ -1 +1 @@
+-Subproject commit 41741defffcb278cbfae9620531e47d85e975ea8
++Subproject commit 591ee07873877b712625025ae83f36395df1543b
+diff --git a/examples/next-ts/pages/listbox-grid.tsx b/examples/next-ts/pages/listbox-grid.tsx
+new file mode 100644
+index 0000000000..e7f0854e6c
+--- /dev/null
++++ b/examples/next-ts/pages/listbox-grid.tsx
+@@ -0,0 +1,51 @@
++import * as listbox from "@zag-js/listbox"
++import { normalizeProps, useMachine } from "@zag-js/react"
++import { listboxControls, selectData } from "@zag-js/shared"
++import { useId } from "react"
++import { StateVisualizer } from "../components/state-visualizer"
++import { Toolbar } from "../components/toolbar"
++import { useControls } from "../hooks/use-controls"
++
++interface Item {
++  label: string
++  value: string
++}
++
++export default function Page() {
++  const controls = useControls(listboxControls)
++
++  const collection = listbox.gridCollection({
++    items: selectData,
++    columnCount: 3,
++  })
++
++  const service = useMachine(listbox.machine as listbox.Machine<Item>, {
++    collection,
++    id: useId(),
++    ...controls.context,
++  })
++
++  const api = listbox.connect(service, normalizeProps)
++
++  return (
++    <>
++      <main className="listbox">
++        <div {...api.getRootProps()}>
++          <label {...api.getLabelProps()}>Label</label>
++          <ul {...api.getContentProps()}>
++            {collection.items.map((item) => (
++              <li key={item.value} {...api.getItemProps({ item })}>
++                {item.label}
++                <span {...api.getItemIndicatorProps({ item })}>✓</span>
++              </li>
++            ))}
++          </ul>
++        </div>
++      </main>
++
++      <Toolbar controls={controls.ui} viz>
++        <StateVisualizer state={service} omit={["collection"]} context={["highlightedValue"]} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/next-ts/pages/listbox.tsx b/examples/next-ts/pages/listbox.tsx
+new file mode 100644
+index 0000000000..d251d39632
+--- /dev/null
++++ b/examples/next-ts/pages/listbox.tsx
+@@ -0,0 +1,48 @@
++import * as listbox from "@zag-js/listbox"
++import { normalizeProps, useMachine } from "@zag-js/react"
++import { listboxControls, selectData } from "@zag-js/shared"
++import { useId } from "react"
++import { StateVisualizer } from "../components/state-visualizer"
++import { Toolbar } from "../components/toolbar"
++import { useControls } from "../hooks/use-controls"
++
++interface Item {
++  label: string
++  value: string
++}
++
++export default function Page() {
++  const controls = useControls(listboxControls)
++
++  const collection = listbox.collection({ items: selectData })
++
++  const service = useMachine(listbox.machine as listbox.Machine<Item>, {
++    collection,
++    id: useId(),
++    ...controls.context,
++  })
++
++  const api = listbox.connect(service, normalizeProps)
++
++  return (
++    <>
++      <main className="listbox">
++        <div {...api.getRootProps()}>
++          <label {...api.getLabelProps()}>Label</label>
++          <ul {...api.getContentProps()}>
++            {selectData.map((item) => (
++              <li key={item.value} {...api.getItemProps({ item })}>
++                <span {...api.getItemTextProps({ item })}>{item.label}</span>
++                <span {...api.getItemIndicatorProps({ item })}>✓</span>
++              </li>
++            ))}
++          </ul>
++        </div>
++      </main>
++
++      <Toolbar controls={controls.ui}>
++        <StateVisualizer state={service} omit={["collection"]} context={["highlightedValue"]} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/nuxt-ts/components/Controls.vue b/examples/nuxt-ts/components/Controls.vue
+index 506a359292..2daab13b14 100644
+--- a/examples/nuxt-ts/components/Controls.vue
++++ b/examples/nuxt-ts/components/Controls.vue
+@@ -53,7 +53,12 @@ defineProps<{ control: any }>()
+             "
+           >
+             <option>-----</option>
+-            <option v-for="option in value.options" :key="option" :value="option">
++            <option
++              v-for="option in value.options"
++              :key="option"
++              :value="option"
++              :selected="control.getState(key) === option"
++            >
+               {{ option }}
+             </option>
+           </select>
+diff --git a/examples/nuxt-ts/composables/useControls.ts b/examples/nuxt-ts/composables/useControls.ts
+index 54e884bdb4..db314e7ddd 100644
+--- a/examples/nuxt-ts/composables/useControls.ts
++++ b/examples/nuxt-ts/composables/useControls.ts
+@@ -1,5 +1,5 @@
+-import { getControlDefaults, type ControlRecord, type ControlValue, deepSet, deepGet } from "@zag-js/shared"
+-import type { UnwrapRef } from "vue"
++import { deepGet, deepSet, getControlDefaults, type ControlRecord, type ControlValue } from "@zag-js/shared"
++import type { ComputedRef, UnwrapRef } from "vue"
+ 
+ export interface UseControlsReturn<T extends ControlRecord> {
+   config: T
+@@ -7,19 +7,20 @@ export interface UseControlsReturn<T extends ControlRecord> {
+   setState: (key: string, value: any) => void
+   getState: (key: string) => any
+   keys: (keyof T)[]
++  mergeProps: <P>(props: P) => ComputedRef<ControlValue<T> & P>
+ }
+ 
+ export const useControls = <T extends ControlRecord>(config: T): UseControlsReturn<T> => {
+   const state = ref<any>(getControlDefaults(config))
+ 
+   const setState = (key: string, value: any) => {
+-    const newState = unref(state)
++    const newState = toValue(state)
+     deepSet(newState, key, value)
+     state.value = newState
+   }
+ 
+   const getState = (key: string) => {
+-    return computed(() => deepGet(unref(state), key))
++    return deepGet(toValue(state), key)
+   }
+ 
+   return {
+@@ -28,5 +29,11 @@ export const useControls = <T extends ControlRecord>(config: T): UseControlsRetu
+     setState,
+     getState,
+     keys: Object.keys(config) as (keyof ControlValue<T>)[],
++    mergeProps: <P>(props: P): ComputedRef<ControlValue<T> & P> => {
++      return computed(() => ({
++        ...toValue(state),
++        ...props,
++      }))
++    },
+   }
+ }
+diff --git a/examples/nuxt-ts/package.json b/examples/nuxt-ts/package.json
+index 6fd292ef8d..767240939f 100644
+--- a/examples/nuxt-ts/package.json
++++ b/examples/nuxt-ts/package.json
+@@ -45,6 +45,7 @@
+     "@zag-js/i18n-utils": "workspace:*",
+     "@zag-js/interact-outside": "workspace:*",
+     "@zag-js/live-region": "workspace:*",
++    "@zag-js/listbox": "workspace:*",
+     "@zag-js/menu": "workspace:*",
+     "@zag-js/number-input": "workspace:*",
+     "@zag-js/pagination": "workspace:*",
+@@ -94,4 +95,4 @@
+     "@types/node": "22.13.13",
+     "nuxt": "3.16.1"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/examples/nuxt-ts/pages/accordion.vue b/examples/nuxt-ts/pages/accordion.vue
+index 7969a10fd5..c797cdad69 100644
+--- a/examples/nuxt-ts/pages/accordion.vue
++++ b/examples/nuxt-ts/pages/accordion.vue
+@@ -6,7 +6,12 @@ import { ChevronRight } from "lucide-vue-next"
+ 
+ const controls = useControls(accordionControls)
+ 
+-const service = useMachine(accordion.machine, { id: useId() })
++const service = useMachine(
++  accordion.machine,
++  controls.mergeProps<accordion.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => accordion.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/angle-slider.vue b/examples/nuxt-ts/pages/angle-slider.vue
+index 8b0c9413b9..5a6dce9c99 100644
+--- a/examples/nuxt-ts/pages/angle-slider.vue
++++ b/examples/nuxt-ts/pages/angle-slider.vue
+@@ -5,7 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(angleSliderControls)
+ 
+-const service = useMachine(angleSlider.machine, { id: useId() })
++const service = useMachine(
++  angleSlider.machine,
++  controls.mergeProps<angleSlider.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => angleSlider.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/carousel.vue b/examples/nuxt-ts/pages/carousel.vue
+index d9e31bdc23..c22ef9061b 100644
+--- a/examples/nuxt-ts/pages/carousel.vue
++++ b/examples/nuxt-ts/pages/carousel.vue
+@@ -5,13 +5,16 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(carouselControls)
+ 
+-const service = useMachine(carousel.machine, {
+-  id: useId(),
+-  spacing: "20px",
+-  slidesPerPage: 2,
+-  slideCount: carouselData.length,
+-  allowMouseDrag: true,
+-})
++const service = useMachine(
++  carousel.machine,
++  controls.mergeProps<carousel.Props>({
++    id: useId(),
++    spacing: "20px",
++    slidesPerPage: 2,
++    slideCount: carouselData.length,
++    allowMouseDrag: true,
++  }),
++)
+ 
+ const api = computed(() => carousel.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/checkbox.vue b/examples/nuxt-ts/pages/checkbox.vue
+index 171c6bd949..b2b2ec81de 100644
+--- a/examples/nuxt-ts/pages/checkbox.vue
++++ b/examples/nuxt-ts/pages/checkbox.vue
+@@ -6,10 +6,13 @@ import serialize from "form-serialize"
+ 
+ const controls = useControls(checkboxControls)
+ 
+-const service = useMachine(checkbox.machine, {
+-  name: "checkbox",
+-  id: useId(),
+-})
++const service = useMachine(
++  checkbox.machine,
++  controls.mergeProps<checkbox.Props>({
++    name: "checkbox",
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => checkbox.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/clipboard.vue b/examples/nuxt-ts/pages/clipboard.vue
+index 37a7e9dadd..29e8a03518 100644
+--- a/examples/nuxt-ts/pages/clipboard.vue
++++ b/examples/nuxt-ts/pages/clipboard.vue
+@@ -6,10 +6,13 @@ import { ClipboardCheck, ClipboardCopyIcon } from "lucide-vue-next"
+ 
+ const controls = useControls(clipboardControls)
+ 
+-const service = useMachine(clipboard.machine, {
+-  id: useId(),
+-  defaultValue: "https://github.com/chakra-ui/zag",
+-})
++const service = useMachine(
++  clipboard.machine,
++  controls.mergeProps<clipboard.Props>({
++    id: useId(),
++    defaultValue: "https://github.com/chakra-ui/zag",
++  }),
++)
+ 
+ const api = computed(() => clipboard.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/collapsible.vue b/examples/nuxt-ts/pages/collapsible.vue
+index 53e592c6c2..6b8fcbcfe5 100644
+--- a/examples/nuxt-ts/pages/collapsible.vue
++++ b/examples/nuxt-ts/pages/collapsible.vue
+@@ -2,13 +2,16 @@
+ import * as collapsible from "@zag-js/collapsible"
+ import { collapsibleControls } from "@zag-js/shared"
+ import { normalizeProps, useMachine } from "@zag-js/vue"
+-import { ChevronDownIcon } from 'lucide-vue-next'
++import { ChevronDownIcon } from "lucide-vue-next"
+ 
+ const controls = useControls(collapsibleControls)
+ 
+-const service = useMachine(collapsible.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  collapsible.machine,
++  controls.mergeProps<collapsible.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => collapsible.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/color-picker.vue b/examples/nuxt-ts/pages/color-picker.vue
+index 9b7eb7fe18..af169f0e99 100644
+--- a/examples/nuxt-ts/pages/color-picker.vue
++++ b/examples/nuxt-ts/pages/color-picker.vue
+@@ -6,12 +6,15 @@ import serialize from "form-serialize"
+ 
+ const controls = useControls(colorPickerControls)
+ 
+-const service = useMachine(colorPicker.machine, {
+-  id: useId(),
+-  name: "color",
+-  defaultFormat: "hsla",
+-  defaultValue: colorPicker.parse("hsl(0, 100%, 50%)"),
+-})
++const service = useMachine(
++  colorPicker.machine,
++  controls.mergeProps<colorPicker.Props>({
++    id: useId(),
++    name: "color",
++    defaultFormat: "hsla",
++    defaultValue: colorPicker.parse("hsl(0, 100%, 50%)"),
++  }),
++)
+ 
+ const api = computed(() => colorPicker.connect(service, normalizeProps))
+ 
+diff --git a/examples/nuxt-ts/pages/combobox.vue b/examples/nuxt-ts/pages/combobox.vue
+index 818e136ed0..c247e2a2cd 100644
+--- a/examples/nuxt-ts/pages/combobox.vue
++++ b/examples/nuxt-ts/pages/combobox.vue
+@@ -16,19 +16,22 @@ const collectionRef = computed(() =>
+   }),
+ )
+ 
+-const service = useMachine(combobox.machine, {
+-  id: useId(),
+-  get collection() {
+-    return collectionRef.value
+-  },
+-  onOpenChange() {
+-    options.value = comboboxData
+-  },
+-  onInputValueChange({ inputValue }) {
+-    const filtered = matchSorter(comboboxData, inputValue, { keys: ["label"] })
+-    options.value = filtered.length > 0 ? filtered : comboboxData
+-  },
+-})
++const service = useMachine(
++  combobox.machine,
++  controls.mergeProps<combobox.Props>({
++    id: useId(),
++    get collection() {
++      return collectionRef.value
++    },
++    onOpenChange() {
++      options.value = comboboxData
++    },
++    onInputValueChange({ inputValue }) {
++      const filtered = matchSorter(comboboxData, inputValue, { keys: ["label"] })
++      options.value = filtered.length > 0 ? filtered : comboboxData
++    },
++  }),
++)
+ 
+ const api = computed(() => combobox.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/date-picker-multi.vue b/examples/nuxt-ts/pages/date-picker-multi.vue
+index 6076538df8..1e3219ebed 100644
+--- a/examples/nuxt-ts/pages/date-picker-multi.vue
++++ b/examples/nuxt-ts/pages/date-picker-multi.vue
+@@ -5,11 +5,14 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(datePickerControls)
+ 
+-const service = useMachine(datePicker.machine, {
+-  id: useId(),
+-  locale: "en",
+-  selectionMode: "multiple",
+-})
++const service = useMachine(
++  datePicker.machine,
++  controls.mergeProps<datePicker.Props>({
++    id: useId(),
++    locale: "en",
++    selectionMode: "multiple",
++  }),
++)
+ 
+ const api = computed(() => datePicker.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/date-picker-range.vue b/examples/nuxt-ts/pages/date-picker-range.vue
+index eccc9c9566..865cb0828f 100644
+--- a/examples/nuxt-ts/pages/date-picker-range.vue
++++ b/examples/nuxt-ts/pages/date-picker-range.vue
+@@ -6,13 +6,16 @@ import { computed } from "vue"
+ 
+ const controls = useControls(datePickerControls)
+ 
+-const service = useMachine(datePicker.machine, {
+-  id: useId(),
+-  name: "date[]",
+-  locale: "en",
+-  numOfMonths: 2,
+-  selectionMode: "range",
+-})
++const service = useMachine(
++  datePicker.machine,
++  controls.mergeProps<datePicker.Props>({
++    id: useId(),
++    name: "date[]",
++    locale: "en",
++    numOfMonths: 2,
++    selectionMode: "range",
++  }),
++)
+ 
+ const api = computed(() => datePicker.connect(service, normalizeProps))
+ const offset = computed(() => api.value.getOffset({ months: 1 }))
+diff --git a/examples/nuxt-ts/pages/date-picker.vue b/examples/nuxt-ts/pages/date-picker.vue
+index 95ee851af4..0642081a9c 100644
+--- a/examples/nuxt-ts/pages/date-picker.vue
++++ b/examples/nuxt-ts/pages/date-picker.vue
+@@ -6,11 +6,14 @@ import { computed } from "vue"
+ 
+ const controls = useControls(datePickerControls)
+ 
+-const service = useMachine(datePicker.machine, {
+-  id: "1",
+-  locale: "en",
+-  selectionMode: "single",
+-})
++const service = useMachine(
++  datePicker.machine,
++  controls.mergeProps<datePicker.Props>({
++    id: useId(),
++    locale: "en",
++    selectionMode: "single",
++  }),
++)
+ 
+ const api = computed(() => datePicker.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/editable.vue b/examples/nuxt-ts/pages/editable.vue
+index 59b86b5ebe..5e2d89d386 100644
+--- a/examples/nuxt-ts/pages/editable.vue
++++ b/examples/nuxt-ts/pages/editable.vue
+@@ -5,10 +5,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(editableControls)
+ 
+-const service = useMachine(editable.machine, {
+-  id: useId(),
+-  defaultValue: "Hello World",
+-})
++const service = useMachine(
++  editable.machine,
++  controls.mergeProps<editable.Props>({
++    id: useId(),
++    defaultValue: "Hello World",
++  }),
++)
+ 
+ const api = computed(() => editable.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/file-upload.vue b/examples/nuxt-ts/pages/file-upload.vue
+index c69bcf2c99..27e43e3526 100644
+--- a/examples/nuxt-ts/pages/file-upload.vue
++++ b/examples/nuxt-ts/pages/file-upload.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(fileUploadControls)
+ 
+-const service = useMachine(fileUpload.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  fileUpload.machine,
++  controls.mergeProps<fileUpload.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => fileUpload.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/floating-panel.vue b/examples/nuxt-ts/pages/floating-panel.vue
+index e2a342d792..de248a5cf8 100644
+--- a/examples/nuxt-ts/pages/floating-panel.vue
++++ b/examples/nuxt-ts/pages/floating-panel.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(floatingPanelControls)
+ 
+-const service = useMachine(floatingPanel.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  floatingPanel.machine,
++  controls.mergeProps<floatingPanel.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => floatingPanel.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/hover-card.vue b/examples/nuxt-ts/pages/hover-card.vue
+index 0d8cc79467..9d2bd9673b 100644
+--- a/examples/nuxt-ts/pages/hover-card.vue
++++ b/examples/nuxt-ts/pages/hover-card.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(hoverCardControls)
+ 
+-const service = useMachine(hoverCard.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  hoverCard.machine,
++  controls.mergeProps<hoverCard.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => hoverCard.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/listbox-grid.vue b/examples/nuxt-ts/pages/listbox-grid.vue
+new file mode 100644
+index 0000000000..a5c92e9fb7
+--- /dev/null
++++ b/examples/nuxt-ts/pages/listbox-grid.vue
+@@ -0,0 +1,48 @@
++<script setup lang="ts">
++import * as listbox from "@zag-js/listbox"
++import { normalizeProps, useMachine } from "@zag-js/vue"
++import { listboxControls, selectData } from "@zag-js/shared"
++
++interface Item {
++  label: string
++  value: string
++}
++
++const controls = useControls(listboxControls)
++
++const collection = listbox.gridCollection({
++  items: selectData,
++  columnCount: 3,
++})
++
++const service = useMachine(
++  listbox.machine,
++  controls.mergeProps<listbox.Props<Item>>({
++    collection,
++    id: useId(),
++  }),
++)
++
++const api = computed(() => listbox.connect(service, normalizeProps))
++</script>
++
++<template>
++  <main class="listbox">
++    <div v-bind="api.getRootProps()">
++      <label v-bind="api.getLabelProps()">Label</label>
++      <ul v-bind="api.getContentProps()">
++        <li v-for="item in selectData" :key="item.value" v-bind="api.getItemProps({ item })">
++          <span v-bind="api.getItemTextProps({ item })">{{ item.label }}</span>
++          <span v-bind="api.getItemIndicatorProps({ item })">✓</span>
++        </li>
++      </ul>
++    </div>
++  </main>
++
++  <Toolbar>
++    <StateVisualizer :state="service" />
++    <template #controls>
++      <Controls :control="controls" />
++    </template>
++  </Toolbar>
++</template>
+diff --git a/examples/nuxt-ts/pages/listbox.vue b/examples/nuxt-ts/pages/listbox.vue
+new file mode 100644
+index 0000000000..f65ec3d971
+--- /dev/null
++++ b/examples/nuxt-ts/pages/listbox.vue
+@@ -0,0 +1,44 @@
++<script setup lang="ts">
++import * as listbox from "@zag-js/listbox"
++import { normalizeProps, useMachine } from "@zag-js/vue"
++import { listboxControls, selectData } from "@zag-js/shared"
++
++interface Item {
++  label: string
++  value: string
++}
++
++const controls = useControls(listboxControls)
++const collection = listbox.collection({ items: selectData })
++
++const service = useMachine(
++  listbox.machine,
++  controls.mergeProps<listbox.Props<Item>>({
++    collection,
++    id: useId(),
++  }),
++)
++
++const api = computed(() => listbox.connect(service, normalizeProps))
++</script>
++
++<template>
++  <main class="listbox">
++    <div v-bind="api.getRootProps()">
++      <label v-bind="api.getLabelProps()">Label</label>
++      <ul v-bind="api.getContentProps()">
++        <li v-for="item in selectData" :key="item.value" v-bind="api.getItemProps({ item })">
++          <span v-bind="api.getItemTextProps({ item })">{{ item.label }}</span>
++          <span v-bind="api.getItemIndicatorProps({ item })">✓</span>
++        </li>
++      </ul>
++    </div>
++  </main>
++
++  <Toolbar>
++    <StateVisualizer :state="service" />
++    <template #controls>
++      <Controls :control="controls" />
++    </template>
++  </Toolbar>
++</template>
+diff --git a/examples/nuxt-ts/pages/menu-options.vue b/examples/nuxt-ts/pages/menu-options.vue
+index 0c8aa3f029..106f1d4715 100644
+--- a/examples/nuxt-ts/pages/menu-options.vue
++++ b/examples/nuxt-ts/pages/menu-options.vue
+@@ -4,7 +4,12 @@ import { menuControls, menuOptionData } from "@zag-js/shared"
+ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(menuControls)
+-const service = useMachine(menu.machine, { id: useId() })
++const service = useMachine(
++  menu.machine,
++  controls.mergeProps<menu.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => menu.connect(service, normalizeProps))
+ 
+diff --git a/examples/nuxt-ts/pages/menu.vue b/examples/nuxt-ts/pages/menu.vue
+index 32c0180592..c76f04f03f 100644
+--- a/examples/nuxt-ts/pages/menu.vue
++++ b/examples/nuxt-ts/pages/menu.vue
+@@ -5,10 +5,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(menuControls)
+ 
+-const service = useMachine(menu.machine, {
+-  id: useId(),
+-  onSelect: console.log,
+-})
++const service = useMachine(
++  menu.machine,
++  controls.mergeProps<menu.Props>({
++    id: useId(),
++    onSelect: console.log,
++  }),
++)
+ 
+ const api = computed(() => menu.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/number-input.vue b/examples/nuxt-ts/pages/number-input.vue
+index 4bfe3bf537..a4b76bf459 100644
+--- a/examples/nuxt-ts/pages/number-input.vue
++++ b/examples/nuxt-ts/pages/number-input.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(numberInputControls)
+ 
+-const service = useMachine(numberInput.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  numberInput.machine,
++  controls.mergeProps<numberInput.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => numberInput.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/pagination.vue b/examples/nuxt-ts/pages/pagination.vue
+index 2ead4f6dfb..f465c718ac 100644
+--- a/examples/nuxt-ts/pages/pagination.vue
++++ b/examples/nuxt-ts/pages/pagination.vue
+@@ -6,13 +6,16 @@ import * as pagination from "@zag-js/pagination"
+ const controls = useControls(paginationControls)
+ const details = ref({})
+ 
+-const service = useMachine(pagination.machine, {
+-  id: useId(),
+-  count: paginationData.length,
+-  onPageChange(v) {
+-    details.value = v
+-  },
+-})
++const service = useMachine(
++  pagination.machine,
++  controls.mergeProps<pagination.Props>({
++    id: useId(),
++    count: paginationData.length,
++    onPageChange(v) {
++      details.value = v
++    },
++  }),
++)
+ 
+ const api = computed(() => pagination.connect(service, normalizeProps))
+ const data = computed(() => api.value.slice(paginationData))
+diff --git a/examples/nuxt-ts/pages/pin-input.vue b/examples/nuxt-ts/pages/pin-input.vue
+index 5ff198a838..c23cf07d74 100644
+--- a/examples/nuxt-ts/pages/pin-input.vue
++++ b/examples/nuxt-ts/pages/pin-input.vue
+@@ -6,11 +6,14 @@ import serialize from "form-serialize"
+ 
+ const controls = useControls(pinInputControls)
+ 
+-const service = useMachine(pinInput.machine, {
+-  id: useId(),
+-  name: "test",
+-  count: 3,
+-})
++const service = useMachine(
++  pinInput.machine,
++  controls.mergeProps<pinInput.Props>({
++    id: useId(),
++    name: "test",
++    count: 3,
++  }),
++)
+ 
+ const api = computed(() => pinInput.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/popover.vue b/examples/nuxt-ts/pages/popover.vue
+index 010e19e30d..235a90fe94 100644
+--- a/examples/nuxt-ts/pages/popover.vue
++++ b/examples/nuxt-ts/pages/popover.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(popoverControls)
+ 
+-const service = useMachine(popover.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  popover.machine,
++  controls.mergeProps<popover.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => popover.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/progress.vue b/examples/nuxt-ts/pages/progress.vue
+index 3e78cc8512..93f316d794 100644
+--- a/examples/nuxt-ts/pages/progress.vue
++++ b/examples/nuxt-ts/pages/progress.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(progressControls)
+ 
+-const service = useMachine(progress.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  progress.machine,
++  controls.mergeProps<progress.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => progress.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/qr-code.vue b/examples/nuxt-ts/pages/qr-code.vue
+index 1f8d17fcda..4d2bc5319b 100644
+--- a/examples/nuxt-ts/pages/qr-code.vue
++++ b/examples/nuxt-ts/pages/qr-code.vue
+@@ -5,10 +5,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(qrCodeControls)
+ 
+-const service = useMachine(qrCode.machine, {
+-  id: useId(),
+-  encoding: { ecc: "H" },
+-})
++const service = useMachine(
++  qrCode.machine,
++  controls.mergeProps<qrCode.Props>({
++    id: useId(),
++    encoding: { ecc: "H" },
++  }),
++)
+ 
+ const api = computed(() => qrCode.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/radio-group.vue b/examples/nuxt-ts/pages/radio-group.vue
+index 5a8fd8904e..8a65a51ee0 100644
+--- a/examples/nuxt-ts/pages/radio-group.vue
++++ b/examples/nuxt-ts/pages/radio-group.vue
+@@ -6,10 +6,13 @@ import serialize from "form-serialize"
+ 
+ const controls = useControls(radioControls)
+ 
+-const service = useMachine(radio.machine, {
+-  id: useId(),
+-  name: "fruit",
+-})
++const service = useMachine(
++  radio.machine,
++  controls.mergeProps<radio.Props>({
++    id: useId(),
++    name: "fruit",
++  }),
++)
+ 
+ const api = computed(() => radio.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/range-slider.vue b/examples/nuxt-ts/pages/range-slider.vue
+index da7f738c59..b270b82ca0 100644
+--- a/examples/nuxt-ts/pages/range-slider.vue
++++ b/examples/nuxt-ts/pages/range-slider.vue
+@@ -6,11 +6,14 @@ import serialize from "form-serialize"
+ 
+ const controls = useControls(sliderControls)
+ 
+-const service = useMachine(slider.machine, {
+-  id: useId(),
+-  name: "quantity",
+-  defaultValue: [10, 60],
+-})
++const service = useMachine(
++  slider.machine,
++  controls.mergeProps<slider.Props>({
++    id: useId(),
++    name: "quantity",
++    defaultValue: [10, 60],
++  }),
++)
+ 
+ const api = computed(() => slider.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/rating-group.vue b/examples/nuxt-ts/pages/rating-group.vue
+index 5dc69ef2d6..fdf0ee4eb2 100644
+--- a/examples/nuxt-ts/pages/rating-group.vue
++++ b/examples/nuxt-ts/pages/rating-group.vue
+@@ -5,10 +5,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(ratingControls)
+ 
+-const service = useMachine(rating.machine, {
+-  id: useId(),
+-  defaultValue: 2.5,
+-})
++const service = useMachine(
++  rating.machine,
++  controls.mergeProps<rating.Props>({
++    id: useId(),
++    defaultValue: 2.5,
++  }),
++)
+ 
+ const api = computed(() => rating.connect(service, normalizeProps))
+ 
+diff --git a/examples/nuxt-ts/pages/segment-control.vue b/examples/nuxt-ts/pages/segment-control.vue
+index 624264cdac..d40e33bc9a 100644
+--- a/examples/nuxt-ts/pages/segment-control.vue
++++ b/examples/nuxt-ts/pages/segment-control.vue
+@@ -5,11 +5,14 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(radioControls)
+ 
+-const service = useMachine(radio.machine, {
+-  id: useId(),
+-  name: "fruit",
+-  orientation: "horizontal",
+-})
++const service = useMachine(
++  radio.machine,
++  controls.mergeProps<radio.Props>({
++    id: useId(),
++    name: "fruit",
++    orientation: "horizontal",
++  }),
++)
+ 
+ const api = computed(() => radio.connect(service, normalizeProps))
+ </script>
+@@ -36,7 +39,7 @@ const api = computed(() => radio.connect(service, normalizeProps))
+   </main>
+ 
+   <Toolbar>
+-      <StateVisualizer :state="service" />
++    <StateVisualizer :state="service" />
+     <template #controls>
+       <Controls :control="controls" />
+     </template>
+diff --git a/examples/nuxt-ts/pages/select.vue b/examples/nuxt-ts/pages/select.vue
+index a2cc2399b4..33b5f46348 100644
+--- a/examples/nuxt-ts/pages/select.vue
++++ b/examples/nuxt-ts/pages/select.vue
+@@ -6,10 +6,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(selectControls)
+ 
+-const service = useMachine(select.machine, {
+-  collection: select.collection({ items: selectData }),
+-  id: useId(),
+-})
++const service = useMachine(
++  select.machine,
++  controls.mergeProps<select.Props>({
++    collection: select.collection({ items: selectData }),
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => select.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/signature-pad.vue b/examples/nuxt-ts/pages/signature-pad.vue
+index 89e987f95b..638b1e83da 100644
+--- a/examples/nuxt-ts/pages/signature-pad.vue
++++ b/examples/nuxt-ts/pages/signature-pad.vue
+@@ -9,17 +9,20 @@ const setUrl = (v: string) => (url.value = v)
+ 
+ const controls = useControls(signaturePadControls)
+ 
+-const service = useMachine(signaturePad.machine, {
+-  id: useId(),
+-  onDrawEnd(details) {
+-    details.getDataUrl("image/png").then(setUrl)
+-  },
+-  drawing: {
+-    fill: "red",
+-    size: 4,
+-    simulatePressure: true,
+-  },
+-})
++const service = useMachine(
++  signaturePad.machine,
++  controls.mergeProps<signaturePad.Props>({
++    id: useId(),
++    onDrawEnd(details) {
++      details.getDataUrl("image/png").then(setUrl)
++    },
++    drawing: {
++      fill: "red",
++      size: 4,
++      simulatePressure: true,
++    },
++  }),
++)
+ 
+ const api = computed(() => signaturePad.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/slider.vue b/examples/nuxt-ts/pages/slider.vue
+index 2f1f97f1a7..2ef86b64d5 100644
+--- a/examples/nuxt-ts/pages/slider.vue
++++ b/examples/nuxt-ts/pages/slider.vue
+@@ -6,11 +6,14 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(sliderControls)
+ 
+-const service = useMachine(slider.machine, {
+-  id: useId(),
+-  name: "quantity",
+-  defaultValue: [0],
+-})
++const service = useMachine(
++  slider.machine,
++  controls.mergeProps<slider.Props>({
++    id: useId(),
++    name: "quantity",
++    defaultValue: [0],
++  }),
++)
+ 
+ const api = computed(() => slider.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/splitter.vue b/examples/nuxt-ts/pages/splitter.vue
+index fe2efcaa70..010d54a1dd 100644
+--- a/examples/nuxt-ts/pages/splitter.vue
++++ b/examples/nuxt-ts/pages/splitter.vue
+@@ -5,10 +5,13 @@ import * as splitter from "@zag-js/splitter"
+ 
+ const controls = useControls(splitterControls)
+ 
+-const service = useMachine(splitter.machine, {
+-  id: useId(),
+-  panels: [{ id: "a" }, { id: "b" }],
+-})
++const service = useMachine(
++  splitter.machine,
++  controls.mergeProps<splitter.Props>({
++    id: useId(),
++    panels: [{ id: "a" }, { id: "b" }],
++  }),
++)
+ 
+ const api = computed(() => splitter.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/steps.vue b/examples/nuxt-ts/pages/steps.vue
+index e8af4ef176..3882dc47dc 100644
+--- a/examples/nuxt-ts/pages/steps.vue
++++ b/examples/nuxt-ts/pages/steps.vue
+@@ -3,10 +3,15 @@ import * as steps from "@zag-js/steps"
+ import { stepsControls, stepsData } from "@zag-js/shared"
+ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+-const service = useMachine(steps.machine, {
+-  id: useId(),
+-  count: stepsData.length,
+-})
++const controls = useControls(stepsControls)
++
++const service = useMachine(
++  steps.machine,
++  controls.mergeProps<steps.Props>({
++    id: useId(),
++    count: stepsData.length,
++  }),
++)
+ 
+ const api = computed(() => steps.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/switch.vue b/examples/nuxt-ts/pages/switch.vue
+index 6faccaa36e..3c6aa9b953 100644
+--- a/examples/nuxt-ts/pages/switch.vue
++++ b/examples/nuxt-ts/pages/switch.vue
+@@ -5,10 +5,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(switchControls)
+ 
+-const service = useMachine(zagSwitch.machine, {
+-  name: "switch",
+-  id: useId(),
+-})
++const service = useMachine(
++  zagSwitch.machine,
++  controls.mergeProps<zagSwitch.Props>({
++    name: "switch",
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => zagSwitch.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/tabs.vue b/examples/nuxt-ts/pages/tabs.vue
+index f9fa19b6ca..09054b6b85 100644
+--- a/examples/nuxt-ts/pages/tabs.vue
++++ b/examples/nuxt-ts/pages/tabs.vue
+@@ -5,10 +5,13 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(tabsControls)
+ 
+-const service = useMachine(tabs.machine, {
+-  id: useId(),
+-  defaultValue: "nils",
+-})
++const service = useMachine(
++  tabs.machine,
++  controls.mergeProps<tabs.Props>({
++    id: useId(),
++    defaultValue: "nils",
++  }),
++)
+ 
+ const api = computed(() => tabs.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/tags-input.vue b/examples/nuxt-ts/pages/tags-input.vue
+index 2486612943..96f98f588a 100644
+--- a/examples/nuxt-ts/pages/tags-input.vue
++++ b/examples/nuxt-ts/pages/tags-input.vue
+@@ -9,10 +9,13 @@ function toDashCase(str: string) {
+   return str.replace(/\s+/g, "-").toLowerCase()
+ }
+ 
+-const service = useMachine(tagsInput.machine, {
+-  id: useId(),
+-  defaultValue: ["React", "Vue"],
+-})
++const service = useMachine(
++  tagsInput.machine,
++  controls.mergeProps<tagsInput.Props>({
++    id: useId(),
++    defaultValue: ["React", "Vue"],
++  }),
++)
+ 
+ const api = computed(() => tagsInput.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/time-picker.vue b/examples/nuxt-ts/pages/time-picker.vue
+index 2aae8659f8..783d8fb6e2 100644
+--- a/examples/nuxt-ts/pages/time-picker.vue
++++ b/examples/nuxt-ts/pages/time-picker.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(timePickerControls)
+ 
+-const service = useMachine(timePicker.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  timePicker.machine,
++  controls.mergeProps<timePicker.Props>({
++    id: useId(),
++  }),
++)
+ 
+ const api = computed(() => timePicker.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/nuxt-ts/pages/toggle-group-set-value.vue b/examples/nuxt-ts/pages/toggle-group-set-value.vue
+deleted file mode 100644
+index 1747b9d083..0000000000
+--- a/examples/nuxt-ts/pages/toggle-group-set-value.vue
++++ /dev/null
+@@ -1,25 +0,0 @@
+-<script setup lang="ts">
+-import * as toggle from "@zag-js/toggle-group"
+-import { toggleGroupData } from "@zag-js/shared"
+-import { normalizeProps, useMachine } from "@zag-js/vue"
+-
+-const service = useMachine(toggle.machine, {
+-  id: useId(),
+-})
+-const api = computed(() => toggle.connect(service, normalizeProps))
+-</script>
+-
+-<template>
+-  <main class="toggle-group">
+-    <button @click="api.setValue(['bold'])">Set Value</button>
+-    <div v-bind="api.getRootProps()">
+-      <button v-for="item in toggleGroupData" :key="item.value" v-bind="api.getItemProps({ value: item.value })">
+-        {{ item.label }}
+-      </button>
+-    </div>
+-  </main>
+-
+-  <Toolbar>
+-    <StateVisualizer :state="service" />
+-  </Toolbar>
+-</template>
+diff --git a/examples/nuxt-ts/pages/toggle-group.vue b/examples/nuxt-ts/pages/toggle-group.vue
+index 130a496e29..127011d113 100644
+--- a/examples/nuxt-ts/pages/toggle-group.vue
++++ b/examples/nuxt-ts/pages/toggle-group.vue
+@@ -5,9 +5,12 @@ import { normalizeProps, useMachine } from "@zag-js/vue"
+ 
+ const controls = useControls(toggleGroupControls)
+ 
+-const service = useMachine(toggle.machine, {
+-  id: useId(),
+-})
++const service = useMachine(
++  toggle.machine,
++  controls.mergeProps<toggle.Props>({
++    id: useId(),
++  }),
++)
+ const api = computed(() => toggle.connect(service, normalizeProps))
+ </script>
+ 
+@@ -23,5 +26,8 @@ const api = computed(() => toggle.connect(service, normalizeProps))
+ 
+   <Toolbar>
+     <StateVisualizer :state="service" />
++    <template #controls>
++      <Controls :control="controls" />
++    </template>
+   </Toolbar>
+ </template>
+diff --git a/examples/nuxt-ts/pages/tooltip.vue b/examples/nuxt-ts/pages/tooltip.vue
+index 047d5ab055..e7a1fbfcfb 100644
+--- a/examples/nuxt-ts/pages/tooltip.vue
++++ b/examples/nuxt-ts/pages/tooltip.vue
+@@ -1,7 +1,7 @@
+ <script setup>
+ import * as tooltip from "@zag-js/tooltip"
+ import { normalizeProps, useMachine } from "@zag-js/vue"
+-import { computed, Teleport } from "vue"
++import { computed } from "vue"
+ 
+ const service = useMachine(tooltip.machine, {
+   id: useId(),
+diff --git a/examples/nuxt-ts/pages/tour.vue b/examples/nuxt-ts/pages/tour.vue
+index 28d1984a8d..662b60335a 100644
+--- a/examples/nuxt-ts/pages/tour.vue
++++ b/examples/nuxt-ts/pages/tour.vue
+@@ -7,10 +7,13 @@ import { useId } from "vue"
+ 
+ const controls = useControls(tourControls)
+ 
+-const service = useMachine(tour.machine, {
+-  id: useId(),
+-  steps: tourData,
+-})
++const service = useMachine(
++  tour.machine,
++  controls.mergeProps<tour.Props>({
++    id: useId(),
++    steps: tourData,
++  }),
++)
+ 
+ const api = computed(() => tour.connect(service, normalizeProps))
+ const open = computed(() => api.value.open && api.value.step)
+diff --git a/examples/nuxt-ts/pages/tree-view.vue b/examples/nuxt-ts/pages/tree-view.vue
+index ebbbcfc937..2338c8752d 100644
+--- a/examples/nuxt-ts/pages/tree-view.vue
++++ b/examples/nuxt-ts/pages/tree-view.vue
+@@ -50,10 +50,13 @@ const collection = tree.collection<Node>({
+   },
+ })
+ 
+-const service = useMachine(tree.machine, {
+-  id: useId(),
+-  collection,
+-})
++const service = useMachine(
++  tree.machine,
++  controls.mergeProps<tree.Props>({
++    id: useId(),
++    collection,
++  }),
++)
+ 
+ const api = computed(() => tree.connect(service, normalizeProps))
+ </script>
+diff --git a/examples/solid-ts/package.json b/examples/solid-ts/package.json
+index 6c66841296..4f75e44c83 100644
+--- a/examples/solid-ts/package.json
++++ b/examples/solid-ts/package.json
+@@ -47,6 +47,7 @@
+     "@zag-js/hover-card": "workspace:*",
+     "@zag-js/i18n-utils": "workspace:*",
+     "@zag-js/interact-outside": "workspace:*",
++    "@zag-js/listbox": "workspace:*",
+     "@zag-js/live-region": "workspace:*",
+     "@zag-js/menu": "workspace:*",
+     "@zag-js/navigation-menu": "workspace:*",
+@@ -94,4 +95,4 @@
+   "engines": {
+     "node": ">=18"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/examples/solid-ts/src/routes/listbox-grid.tsx b/examples/solid-ts/src/routes/listbox-grid.tsx
+new file mode 100644
+index 0000000000..19db1d0598
+--- /dev/null
++++ b/examples/solid-ts/src/routes/listbox-grid.tsx
+@@ -0,0 +1,55 @@
++import * as listbox from "@zag-js/listbox"
++import { normalizeProps, useMachine } from "@zag-js/solid"
++import { listboxControls, selectData } from "@zag-js/shared"
++import { createMemo, createUniqueId, For } from "solid-js"
++import { StateVisualizer } from "../components/state-visualizer"
++import { Toolbar } from "../components/toolbar"
++import { useControls } from "../hooks/use-controls"
++
++interface Item {
++  label: string
++  value: string
++}
++
++export default function Page() {
++  const controls = useControls(listboxControls)
++
++  const collection = listbox.gridCollection({
++    items: selectData,
++    columnCount: 3,
++  })
++
++  const service = useMachine(
++    listbox.machine as listbox.Machine<Item>,
++    controls.mergeProps({
++      collection,
++      id: createUniqueId(),
++    }),
++  )
++
++  const api = createMemo(() => listbox.connect(service, normalizeProps))
++
++  return (
++    <>
++      <main class="listbox">
++        <div {...api().getRootProps()}>
++          <label {...api().getLabelProps()}>Label</label>
++          <ul {...api().getContentProps()}>
++            <For each={collection.items}>
++              {(item) => (
++                <li {...api().getItemProps({ item })}>
++                  {item.label}
++                  <span {...api().getItemIndicatorProps({ item })}>✓</span>
++                </li>
++              )}
++            </For>
++          </ul>
++        </div>
++      </main>
++
++      <Toolbar controls={controls}>
++        <StateVisualizer state={service} omit={["collection"]} context={["highlightedValue"]} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/solid-ts/src/routes/listbox.tsx b/examples/solid-ts/src/routes/listbox.tsx
+new file mode 100644
+index 0000000000..9b3eeeb9ea
+--- /dev/null
++++ b/examples/solid-ts/src/routes/listbox.tsx
+@@ -0,0 +1,51 @@
++import * as listbox from "@zag-js/listbox"
++import { listboxControls, selectData } from "@zag-js/shared"
++import { normalizeProps, useMachine } from "@zag-js/solid"
++import { StateVisualizer } from "../components/state-visualizer"
++import { Toolbar } from "../components/toolbar"
++import { useControls } from "../hooks/use-controls"
++import { createMemo, createUniqueId, For } from "solid-js"
++
++interface Item {
++  label: string
++  value: string
++}
++
++export default function Page() {
++  const controls = useControls(listboxControls)
++  const collection = listbox.collection({ items: selectData })
++
++  const service = useMachine(
++    listbox.machine as listbox.Machine<Item>,
++    controls.mergeProps({
++      collection,
++      id: createUniqueId(),
++    }),
++  )
++
++  const api = createMemo(() => listbox.connect(service, normalizeProps))
++
++  return (
++    <>
++      <main class="listbox">
++        <div {...api().getRootProps()}>
++          <label {...api().getLabelProps()}>Label {api().highlightedValue}</label>
++          <ul {...api().getContentProps()}>
++            <For each={selectData}>
++              {(item) => (
++                <li {...api().getItemProps({ item })}>
++                  <span {...api().getItemTextProps({ item })}>{item.label}</span>
++                  <span {...api().getItemIndicatorProps({ item })}>✓</span>
++                </li>
++              )}
++            </For>
++          </ul>
++        </div>
++      </main>
++
++      <Toolbar controls={controls}>
++        <StateVisualizer state={service} omit={["collection"]} context={["highlightedValue", "focused"]} />
++      </Toolbar>
++    </>
++  )
++}
+diff --git a/examples/svelte-ts/package.json b/examples/svelte-ts/package.json
+index 012bcfd9e8..7c846d07f4 100644
+--- a/examples/svelte-ts/package.json
++++ b/examples/svelte-ts/package.json
+@@ -46,6 +46,7 @@
+     "@zag-js/i18n-utils": "workspace:*",
+     "@zag-js/interact-outside": "workspace:*",
+     "@zag-js/live-region": "workspace:*",
++    "@zag-js/listbox": "workspace:*",
+     "@zag-js/menu": "workspace:*",
+     "@zag-js/navigation-menu": "workspace:*",
+     "@zag-js/number-input": "workspace:*",
+@@ -99,4 +100,4 @@
+     "vite": "6.2.3",
+     "vite-tsconfig-paths": "5.1.4"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/examples/svelte-ts/src/App.svelte b/examples/svelte-ts/src/App.svelte
+index 9b68ed8f23..65718f3093 100644
+--- a/examples/svelte-ts/src/App.svelte
++++ b/examples/svelte-ts/src/App.svelte
+@@ -53,6 +53,8 @@
+   import Tooltip from "./routes/tooltip.svelte"
+   import Tour from "./routes/tour.svelte"
+   import TreeView from "./routes/tree-view.svelte"
++  import Listbox from "./routes/listbox.svelte"
++  import ListboxGrid from "./routes/listbox-grid.svelte"
+ 
+   const sortedRoutes = routesData.sort((a, b) => a.label.localeCompare(b.label))
+ 
+@@ -108,6 +110,8 @@
+     { path: "/presence", component: Presence },
+     { path: "/popper", component: Popper },
+     { path: "/steps", component: Steps },
++    { path: "/listbox", component: Listbox },
++    { path: "/listbox-grid", component: ListboxGrid },
+   ]
+ </script>
+ 
+diff --git a/examples/svelte-ts/src/routes/listbox-grid.svelte b/examples/svelte-ts/src/routes/listbox-grid.svelte
+new file mode 100644
+index 0000000000..66eb2ce068
+--- /dev/null
++++ b/examples/svelte-ts/src/routes/listbox-grid.svelte
+@@ -0,0 +1,46 @@
++<script lang="ts">
++  import * as listbox from "@zag-js/listbox"
++  import { normalizeProps, useMachine } from "@zag-js/svelte"
++  import { listboxControls, selectData } from "@zag-js/shared"
++  import { useControls } from "$lib/use-controls.svelte"
++  import StateVisualizer from "$lib/components/state-visualizer.svelte"
++  import Toolbar from "$lib/components/toolbar.svelte"
++
++  interface Item {
++    label: string
++    value: string
++  }
++
++  const controls = useControls(listboxControls)
++
++  const collection = listbox.gridCollection({
++    items: selectData,
++    columnCount: 3,
++  })
++
++  const id = $props.id()
++  const service = useMachine(listbox.machine, {
++    collection,
++    id,
++  })
++
++  const api = $derived(listbox.connect(service, normalizeProps))
++</script>
++
++<main class="listbox">
++  <div {...api.getRootProps()}>
++    <label {...api.getLabelProps()}>Label</label>
++    <ul {...api.getContentProps()}>
++      {#each selectData as item}
++        <li {...api.getItemProps({ item })}>
++          <span {...api.getItemTextProps({ item })}>{item.label}</span>
++          <span {...api.getItemIndicatorProps({ item })}>✓</span>
++        </li>
++      {/each}
++    </ul>
++  </div>
++</main>
++
++<Toolbar {controls}>
++  <StateVisualizer state={service} />
++</Toolbar>
+diff --git a/examples/svelte-ts/src/routes/listbox.svelte b/examples/svelte-ts/src/routes/listbox.svelte
+new file mode 100644
+index 0000000000..a91a25eda3
+--- /dev/null
++++ b/examples/svelte-ts/src/routes/listbox.svelte
+@@ -0,0 +1,42 @@
++<script lang="ts">
++  import * as listbox from "@zag-js/listbox"
++  import { normalizeProps, useMachine } from "@zag-js/svelte"
++  import { listboxControls, selectData } from "@zag-js/shared"
++  import { useControls } from "$lib/use-controls.svelte"
++  import StateVisualizer from "$lib/components/state-visualizer.svelte"
++  import Toolbar from "$lib/components/toolbar.svelte"
++
++  interface Item {
++    label: string
++    value: string
++  }
++
++  const controls = useControls(listboxControls)
++  const collection = listbox.collection({ items: selectData })
++
++  const id = $props.id()
++  const service = useMachine(listbox.machine, {
++    collection,
++    id,
++  })
++
++  const api = $derived(listbox.connect(service, normalizeProps))
++</script>
++
++<main class="listbox">
++  <div {...api.getRootProps()}>
++    <label {...api.getLabelProps()}>Label</label>
++    <ul {...api.getContentProps()}>
++      {#each selectData as item}
++        <li {...api.getItemProps({ item })}>
++          <span {...api.getItemTextProps({ item })}>{item.label}</span>
++          <span {...api.getItemIndicatorProps({ item })}>✓</span>
++        </li>
++      {/each}
++    </ul>
++  </div>
++</main>
++
++<Toolbar {controls}>
++  <StateVisualizer state={service} />
++</Toolbar>
+diff --git a/packages/frameworks/preact/src/machine.ts b/packages/frameworks/preact/src/machine.ts
+index ea0e962702..900c490fae 100644
+--- a/packages/frameworks/preact/src/machine.ts
++++ b/packages/frameworks/preact/src/machine.ts
+@@ -159,7 +159,7 @@ export function useMachine<T extends MachineSchema>(
+   }
+ 
+   const computed: ComputedFn<T> = (key) => {
+-    ensure(machine.computed, `[zag-js] No computed object found on machine`)
++    ensure(machine.computed, () => `[zag-js] No computed object found on machine`)
+     const fn = machine.computed[key]
+     return fn({
+       context: ctx as any,
+diff --git a/packages/frameworks/react/src/machine.ts b/packages/frameworks/react/src/machine.ts
+index 365c2ba968..2f039b80c6 100644
+--- a/packages/frameworks/react/src/machine.ts
++++ b/packages/frameworks/react/src/machine.ts
+@@ -158,7 +158,7 @@ export function useMachine<T extends MachineSchema>(
+   }
+ 
+   const computed: ComputedFn<T> = (key) => {
+-    ensure(machine.computed, `[zag-js] No computed object found on machine`)
++    ensure(machine.computed, () => `[zag-js] No computed object found on machine`)
+     const fn = machine.computed[key]
+     return fn({
+       context: ctx as any,
+diff --git a/packages/frameworks/solid/src/machine.ts b/packages/frameworks/solid/src/machine.ts
+index 9b3ccfa0c1..d2f38ac327 100644
+--- a/packages/frameworks/solid/src/machine.ts
++++ b/packages/frameworks/solid/src/machine.ts
+@@ -166,7 +166,7 @@ export function useMachine<T extends MachineSchema>(
+   }
+ 
+   const computed: ComputedFn<T> = (key) => {
+-    ensure(machine.computed, `[zag-js] No computed object found on machine`)
++    ensure(machine.computed, () => `[zag-js] No computed object found on machine`)
+     const fn = machine.computed[key]
+     return fn({
+       context: ctx,
+diff --git a/packages/frameworks/svelte/src/machine.svelte.ts b/packages/frameworks/svelte/src/machine.svelte.ts
+index 6eeb2b2662..36652a18f6 100644
+--- a/packages/frameworks/svelte/src/machine.svelte.ts
++++ b/packages/frameworks/svelte/src/machine.svelte.ts
+@@ -162,7 +162,7 @@ export function useMachine<T extends MachineSchema>(
+   }
+ 
+   const computed: ComputedFn<T> = (key) => {
+-    ensure(machine.computed, `[zag-js] No computed object found on machine`)
++    ensure(machine.computed, () => `[zag-js] No computed object found on machine`)
+     const fn = machine.computed[key]
+     return fn({
+       context: ctx,
+diff --git a/packages/frameworks/vue/src/machine.ts b/packages/frameworks/vue/src/machine.ts
+index 96a56ac767..94dcff2ea4 100644
+--- a/packages/frameworks/vue/src/machine.ts
++++ b/packages/frameworks/vue/src/machine.ts
+@@ -168,7 +168,7 @@ export function useMachine<T extends MachineSchema>(
+   }
+ 
+   const computed: ComputedFn<T> = (key) => {
+-    ensure(machine.computed, `[zag-js] No computed object found on machine`)
++    ensure(machine.computed, () => `[zag-js] No computed object found on machine`)
+     const fn = machine.computed[key]
+     return fn({
+       context: ctx as any,
+diff --git a/packages/machines/combobox/src/combobox.connect.ts b/packages/machines/combobox/src/combobox.connect.ts
+index e0c042a465..899c1468c9 100644
+--- a/packages/machines/combobox/src/combobox.connect.ts
++++ b/packages/machines/combobox/src/combobox.connect.ts
+@@ -43,7 +43,7 @@ export function connect<T extends PropTypes, V extends CollectionItem>(
+   function getItemState(props: ItemProps): ItemState {
+     const disabled = collection.getItemDisabled(props.item)
+     const value = collection.getItemValue(props.item)
+-    ensure(value, `[zag-js] No value found for item ${JSON.stringify(props.item)}`)
++    ensure(value, () => `[zag-js] No value found for item ${JSON.stringify(props.item)}`)
+     return {
+       value,
+       disabled: Boolean(disabled || disabled),
+@@ -430,6 +430,7 @@ export function connect<T extends PropTypes, V extends CollectionItem>(
+         dir: prop("dir"),
+         id: dom.getItemGroupId(scope, id),
+         "aria-labelledby": dom.getItemGroupLabelId(scope, id),
++        role: "group",
+       })
+     },
+ 
+@@ -439,7 +440,7 @@ export function connect<T extends PropTypes, V extends CollectionItem>(
+         ...parts.itemGroupLabel.attrs,
+         dir: prop("dir"),
+         id: dom.getItemGroupLabelId(scope, htmlFor),
+-        role: "group",
++        role: "presentation",
+       })
+     },
+   }
+diff --git a/packages/machines/listbox/CHANGELOG.md b/packages/machines/listbox/CHANGELOG.md
+new file mode 100644
+index 0000000000..d4fe8d14ef
+--- /dev/null
++++ b/packages/machines/listbox/CHANGELOG.md
+@@ -0,0 +1 @@
++# @zag-js/listbox
+diff --git a/packages/machines/listbox/README.md b/packages/machines/listbox/README.md
+new file mode 100644
+index 0000000000..e77030aa97
+--- /dev/null
++++ b/packages/machines/listbox/README.md
+@@ -0,0 +1,19 @@
++# @zag-js/listbox
++
++Core logic for the listbox widget implemented as a state machine
++
++## Installation
++
++```sh
++yarn add @zag-js/listbox
++# or
++npm i @zag-js/listbox
++```
++
++## Contribution
++
++Yes please! See the [contributing guidelines](https://github.com/chakra-ui/zag/blob/main/CONTRIBUTING.md) for details.
++
++## Licence
++
++This project is licensed under the terms of the [MIT license](https://github.com/chakra-ui/zag/blob/main/LICENSE).
+diff --git a/packages/machines/listbox/package.json b/packages/machines/listbox/package.json
+new file mode 100644
+index 0000000000..24945b908a
+--- /dev/null
++++ b/packages/machines/listbox/package.json
+@@ -0,0 +1,49 @@
++{
++  "name": "@zag-js/listbox",
++  "version": "1.7.0",
++  "description": "Core logic for the listbox widget implemented as a state machine",
++  "keywords": [
++    "js",
++    "machine",
++    "xstate",
++    "statechart",
++    "component",
++    "chakra-ui",
++    "listbox"
++  ],
++  "author": "Segun Adebayo <sage@adebayosegun.com>",
++  "homepage": "https://github.com/chakra-ui/zag#readme",
++  "license": "MIT",
++  "repository": "https://github.com/chakra-ui/zag/tree/main/packages/listbox",
++  "sideEffects": false,
++  "files": [
++    "dist"
++  ],
++  "scripts": {
++    "build": "tsup",
++    "lint": "eslint src",
++    "typecheck": "tsc --noEmit",
++    "prepack": "clean-package",
++    "postpack": "clean-package restore"
++  },
++  "publishConfig": {
++    "access": "public"
++  },
++  "bugs": {
++    "url": "https://github.com/chakra-ui/zag/issues"
++  },
++  "dependencies": {
++    "@zag-js/anatomy": "workspace:*",
++    "@zag-js/core": "workspace:*",
++    "@zag-js/dom-query": "workspace:*",
++    "@zag-js/collection": "workspace:*",
++    "@zag-js/utils": "workspace:*",
++    "@zag-js/types": "workspace:*",
++    "@zag-js/focus-visible": "workspace:*"
++  },
++  "devDependencies": {
++    "clean-package": "2.2.0"
++  },
++  "clean-package": "../../../clean-package.config.json",
++  "main": "src/index.ts"
++}
+diff --git a/packages/machines/listbox/src/index.ts b/packages/machines/listbox/src/index.ts
+new file mode 100644
+index 0000000000..c1b0459fc4
+--- /dev/null
++++ b/packages/machines/listbox/src/index.ts
+@@ -0,0 +1,28 @@
++export { anatomy } from "./listbox.anatomy"
++export { collection, gridCollection } from "./listbox.collection"
++export { connect } from "./listbox.connect"
++export { machine } from "./listbox.machine"
++export * from "./listbox.props"
++export type {
++  ListboxApi as Api,
++  ElementIds,
++  HighlightChangeDetails,
++  ItemGroupLabelProps,
++  ItemGroupProps,
++  ItemProps,
++  ItemState,
++  ListboxMachine as Machine,
++  ListboxProps as Props,
++  ScrollToIndexDetails,
++  ListboxService as Service,
++  ValueChangeDetails,
++  SelectionDetails,
++} from "./listbox.types"
++
++export type {
++  CollectionItem,
++  CollectionOptions,
++  GridCollection,
++  GridCollectionOptions,
++  ListCollection,
++} from "@zag-js/collection"
+diff --git a/packages/machines/listbox/src/listbox.anatomy.ts b/packages/machines/listbox/src/listbox.anatomy.ts
+new file mode 100644
+index 0000000000..f0e8e7b480
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.anatomy.ts
+@@ -0,0 +1,15 @@
++import { createAnatomy } from "@zag-js/anatomy"
++
++export const anatomy = createAnatomy("listbox").parts(
++  "label",
++  "input",
++  "item",
++  "itemText",
++  "itemIndicator",
++  "itemGroup",
++  "itemGroupLabel",
++  "content",
++  "root",
++  "valueText",
++)
++export const parts = anatomy.build()
+diff --git a/packages/machines/listbox/src/listbox.collection.ts b/packages/machines/listbox/src/listbox.collection.ts
+new file mode 100644
+index 0000000000..53a09badb6
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.collection.ts
+@@ -0,0 +1,23 @@
++import {
++  GridCollection,
++  ListCollection,
++  type CollectionItem,
++  type CollectionOptions,
++  type GridCollectionOptions,
++} from "@zag-js/collection"
++
++export const collection = <T extends CollectionItem>(options: CollectionOptions<T>): ListCollection<T> => {
++  return new ListCollection<T>(options)
++}
++
++collection.empty = (): ListCollection<CollectionItem> => {
++  return new ListCollection<CollectionItem>({ items: [] })
++}
++
++export const gridCollection = <T extends CollectionItem>(options: GridCollectionOptions<T>): GridCollection<T> => {
++  return new GridCollection<T>(options)
++}
++
++gridCollection.empty = (): GridCollection<CollectionItem> => {
++  return new GridCollection<CollectionItem>({ items: [], columnCount: 0 })
++}
+diff --git a/packages/machines/listbox/src/listbox.connect.ts b/packages/machines/listbox/src/listbox.connect.ts
+new file mode 100644
+index 0000000000..e6e676ef95
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.connect.ts
+@@ -0,0 +1,381 @@
++import { isGridCollection, type CollectionItem } from "@zag-js/collection"
++import type { Service } from "@zag-js/core"
++import {
++  ariaAttr,
++  dataAttr,
++  getByTypeahead,
++  getEventKey,
++  getEventTarget,
++  getNativeEvent,
++  isComposingEvent,
++  isCtrlOrMetaKey,
++  isEditableElement,
++  isSelfTarget,
++} from "@zag-js/dom-query"
++import type { EventKeyMap, NormalizeProps, PropTypes } from "@zag-js/types"
++import { ensure } from "@zag-js/utils"
++import { parts } from "./listbox.anatomy"
++import * as dom from "./listbox.dom"
++import type { ItemProps, ItemState, ListboxApi, ListboxSchema } from "./listbox.types"
++
++export function connect<T extends PropTypes, V extends CollectionItem = CollectionItem>(
++  service: Service<ListboxSchema<V>>,
++  normalize: NormalizeProps<T>,
++): ListboxApi<T, V> {
++  const { context, prop, scope, computed, send } = service
++
++  const disabled = prop("disabled")
++  const collection = prop("collection")
++  const layout = isGridCollection(collection) ? "grid" : "list"
++
++  const value = context.get("value")
++  const highlightedValue = context.get("highlightedValue")
++  const highlightedItem = context.get("highlightedItem")
++  const selectedItems = context.get("selectedItems")
++
++  const isTypingAhead = computed("isTypingAhead")
++  const interactive = computed("isInteractive")
++
++  const ariaActiveDescendant = highlightedValue ? dom.getItemId(scope, highlightedValue) : undefined
++
++  function getItemState(props: ItemProps): ItemState {
++    const itemDisabled = collection.getItemDisabled(props.item)
++    const value = collection.getItemValue(props.item)
++    ensure(value, () => `[zag-js] No value found for item ${JSON.stringify(props.item)}`)
++    return {
++      value,
++      disabled: Boolean(disabled || itemDisabled),
++      highlighted: highlightedValue === value && context.get("focused"),
++      selected: context.get("value").includes(value),
++    }
++  }
++
++  return {
++    empty: value.length === 0,
++    highlightedItem,
++    highlightedValue,
++    selectedItems,
++    hasSelectedItems: computed("hasSelectedItems"),
++    value,
++    valueAsString: context.get("valueAsString"),
++    collection,
++    disabled: !!disabled,
++    selectValue(value) {
++      send({ type: "ITEM.SELECT", value })
++    },
++    setValue(value) {
++      send({ type: "VALUE.SET", value })
++    },
++    selectAll() {
++      if (!computed("multiple")) {
++        throw new Error("[zag-js] Cannot select all items in a single-select listbox")
++      }
++      send({ type: "VALUE.SET", value: collection.getValues() })
++    },
++    highlightValue(value) {
++      send({ type: "HIGHLIGHTED_VALUE.SET", value })
++    },
++    clearValue(value) {
++      if (value) {
++        send({ type: "ITEM.CLEAR", value })
++      } else {
++        send({ type: "VALUE.CLEAR" })
++      }
++    },
++
++    getItemState,
++
++    getRootProps() {
++      return normalize.element({
++        ...parts.root.attrs,
++        dir: prop("dir"),
++        id: dom.getRootId(scope),
++        "data-orientation": prop("orientation"),
++        "data-disabled": dataAttr(disabled),
++      })
++    },
++
++    getInputProps(props = {}) {
++      return normalize.input({
++        ...parts.input.attrs,
++        dir: prop("dir"),
++        disabled,
++        "data-disabled": dataAttr(disabled),
++        autoComplete: "off",
++        autoCorrect: "off",
++        "aria-haspopup": "listbox",
++        "aria-controls": dom.getContentId(scope),
++        "aria-autocomplete": "list",
++        "aria-activedescendant": ariaActiveDescendant,
++        spellCheck: false,
++        enterKeyHint: "go",
++        onBlur(event) {
++          if (event.defaultPrevented) return
++          send({ type: "HIGHLIGHTED_VALUE.SET", value: null })
++        },
++        onInput(event) {
++          if (!props.autoHighlight) return
++          const node = event.currentTarget
++          queueMicrotask(() => {
++            if (!node.isConnected) return
++            send({
++              type: "HIGHLIGHTED_VALUE.SET",
++              value: node.value ? prop("collection").firstValue : null,
++            })
++          })
++        },
++        onKeyDown(event) {
++          if (event.defaultPrevented) return
++          if (isComposingEvent(event)) return
++          const nativeEvent = getNativeEvent(event)
++          switch (nativeEvent.key) {
++            case "ArrowDown":
++            case "ArrowUp":
++            case "Home":
++            case "End":
++              event.preventDefault()
++              const win = scope.getWin()
++              const keyboardEvent = new win.KeyboardEvent(nativeEvent.type, nativeEvent)
++              dom.getContentEl(scope)?.dispatchEvent(keyboardEvent)
++              break
++            case "Enter":
++              event.preventDefault()
++              send({ type: "ITEM.CLICK", value: highlightedValue })
++              break
++            default:
++              break
++          }
++        },
++      })
++    },
++
++    getLabelProps() {
++      return normalize.element({
++        dir: prop("dir"),
++        id: dom.getLabelId(scope),
++        ...parts.label.attrs,
++        "data-disabled": dataAttr(disabled),
++      })
++    },
++
++    getValueTextProps() {
++      return normalize.element({
++        ...parts.valueText.attrs,
++        dir: prop("dir"),
++        "data-disabled": dataAttr(disabled),
++      })
++    },
++
++    getItemProps(props) {
++      const itemState = getItemState(props)
++
++      return normalize.element({
++        id: dom.getItemId(scope, itemState.value),
++        role: "option",
++        ...parts.item.attrs,
++        dir: prop("dir"),
++        "data-value": itemState.value,
++        "aria-selected": itemState.selected,
++        "data-layout": layout,
++        "data-state": itemState.selected ? "checked" : "unchecked",
++        "data-orientation": prop("orientation"),
++        "data-highlighted": dataAttr(itemState.highlighted),
++        "data-disabled": dataAttr(itemState.disabled),
++        "aria-disabled": ariaAttr(itemState.disabled),
++        onPointerMove(event) {
++          if (!props.highlightOnHover) return
++          if (itemState.disabled || event.pointerType !== "mouse") return
++          if (itemState.highlighted) return
++          send({ type: "ITEM.POINTER_MOVE", value: itemState.value })
++        },
++        onMouseDown(event) {
++          event.preventDefault()
++          dom.getContentEl(scope)?.focus()
++        },
++        onClick(event) {
++          if (event.defaultPrevented) return
++          if (itemState.disabled) return
++          send({
++            type: "ITEM.CLICK",
++            value: itemState.value,
++            shiftKey: event.shiftKey,
++            anchorValue: highlightedValue,
++            metaKey: isCtrlOrMetaKey(event),
++          })
++        },
++      })
++    },
++
++    getItemTextProps(props) {
++      const itemState = getItemState(props)
++      return normalize.element({
++        ...parts.itemText.attrs,
++        "data-state": itemState.selected ? "checked" : "unchecked",
++        "data-disabled": dataAttr(itemState.disabled),
++        "data-highlighted": dataAttr(itemState.highlighted),
++      })
++    },
++
++    getItemIndicatorProps(props) {
++      const itemState = getItemState(props)
++      return normalize.element({
++        ...parts.itemIndicator.attrs,
++        "aria-hidden": true,
++        "data-state": itemState.selected ? "checked" : "unchecked",
++        hidden: !itemState.selected,
++      })
++    },
++
++    getItemGroupLabelProps(props) {
++      const { htmlFor } = props
++      return normalize.element({
++        ...parts.itemGroupLabel.attrs,
++        id: dom.getItemGroupLabelId(scope, htmlFor),
++        dir: prop("dir"),
++        role: "presentation",
++      })
++    },
++
++    getItemGroupProps(props) {
++      const { id } = props
++      return normalize.element({
++        ...parts.itemGroup.attrs,
++        "data-disabled": dataAttr(disabled),
++        "data-orientation": prop("orientation"),
++        id: dom.getItemGroupId(scope, id),
++        "aria-labelledby": dom.getItemGroupLabelId(scope, id),
++        role: "group",
++        dir: prop("dir"),
++      })
++    },
++
++    getContentProps() {
++      return normalize.element({
++        dir: prop("dir"),
++        id: dom.getContentId(scope),
++        role: "listbox",
++        ...parts.content.attrs,
++        "data-activedescendant": ariaActiveDescendant,
++        "aria-activedescendant": ariaActiveDescendant,
++        "data-orientation": prop("orientation"),
++        "aria-multiselectable": computed("multiple") ? true : undefined,
++        "aria-labelledby": dom.getLabelId(scope),
++        tabIndex: 0,
++        "data-layout": layout,
++        style: {
++          "--column-count": isGridCollection(collection) ? collection.columnCount : 1,
++        },
++        onFocus() {
++          send({ type: "CONTENT.FOCUS" })
++        },
++        onBlur() {
++          send({ type: "CONTENT.BLUR" })
++        },
++        onKeyDown(event) {
++          if (!interactive) return
++          if (!isSelfTarget(event)) return
++          const shiftKey = event.shiftKey
++
++          const keyMap: EventKeyMap = {
++            ArrowUp(event) {
++              let nextValue: string | null = null
++              if (isGridCollection(collection) && highlightedValue) {
++                nextValue = collection.getPreviousRowValue(highlightedValue)
++              } else if (highlightedValue) {
++                nextValue = collection.getPreviousValue(highlightedValue)
++              }
++
++              nextValue ||= collection.lastValue
++              if (!nextValue) return
++
++              event.preventDefault()
++              send({ type: "NAVIGATE", value: nextValue, shiftKey, anchorValue: highlightedValue })
++            },
++
++            ArrowDown(event) {
++              let nextValue: string | null = null
++              if (isGridCollection(collection) && highlightedValue) {
++                nextValue = collection.getNextRowValue(highlightedValue)
++              } else if (highlightedValue) {
++                nextValue = collection.getNextValue(highlightedValue)
++              }
++
++              nextValue ||= collection.firstValue
++              if (!nextValue) return
++
++              event.preventDefault()
++              send({ type: "NAVIGATE", value: nextValue, shiftKey, anchorValue: highlightedValue })
++            },
++
++            ArrowLeft() {
++              if (!isGridCollection(collection) && prop("orientation") === "vertical") return
++              let nextValue = highlightedValue ? collection.getPreviousValue(highlightedValue) : null
++              if (!nextValue && prop("loopFocus")) {
++                nextValue = collection.lastValue
++              }
++              if (!nextValue) return
++              event.preventDefault()
++              send({ type: "NAVIGATE", value: nextValue, shiftKey, anchorValue: highlightedValue })
++            },
++
++            ArrowRight() {
++              if (!isGridCollection(collection) && prop("orientation") === "vertical") return
++              let nextValue = highlightedValue ? collection.getNextValue(highlightedValue) : null
++              if (!nextValue && prop("loopFocus")) {
++                nextValue = collection.firstValue
++              }
++              if (!nextValue) return
++              event.preventDefault()
++              send({ type: "NAVIGATE", value: nextValue, shiftKey, anchorValue: highlightedValue })
++            },
++
++            Home(event) {
++              event.preventDefault()
++              let nextValue = collection.firstValue
++              send({ type: "NAVIGATE", value: nextValue, shiftKey, anchorValue: highlightedValue })
++            },
++            End(event) {
++              event.preventDefault()
++              let nextValue = collection.lastValue
++              send({ type: "NAVIGATE", value: nextValue, shiftKey, anchorValue: highlightedValue })
++            },
++            Enter() {
++              send({ type: "ITEM.CLICK", value: highlightedValue })
++            },
++            a(event) {
++              if (isCtrlOrMetaKey(event) && computed("multiple") && !prop("disallowSelectAll")) {
++                event.preventDefault()
++                send({ type: "VALUE.SET", value: collection.getValues() })
++              }
++            },
++            Space(event) {
++              if (isTypingAhead && prop("typeahead")) {
++                send({ type: "CONTENT.TYPEAHEAD", key: event.key })
++              } else {
++                keyMap.Enter?.(event)
++              }
++            },
++          }
++
++          const exec = keyMap[getEventKey(event)]
++
++          if (exec) {
++            exec(event)
++            return
++          }
++
++          const target = getEventTarget<Element>(event)
++
++          if (isEditableElement(target)) {
++            return
++          }
++
++          if (getByTypeahead.isValidEvent(event) && prop("typeahead")) {
++            send({ type: "CONTENT.TYPEAHEAD", key: event.key })
++            event.preventDefault()
++          }
++        },
++      })
++    },
++  }
++}
+diff --git a/packages/machines/listbox/src/listbox.dom.ts b/packages/machines/listbox/src/listbox.dom.ts
+new file mode 100644
+index 0000000000..c3d5fa20b1
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.dom.ts
+@@ -0,0 +1,13 @@
++import type { Scope } from "@zag-js/core"
++
++export const getRootId = (ctx: Scope) => ctx.ids?.root ?? `select:${ctx.id}`
++export const getContentId = (ctx: Scope) => ctx.ids?.content ?? `select:${ctx.id}:content`
++export const getLabelId = (ctx: Scope) => ctx.ids?.label ?? `select:${ctx.id}:label`
++export const getItemId = (ctx: Scope, id: string | number) => ctx.ids?.item?.(id) ?? `select:${ctx.id}:option:${id}`
++export const getItemGroupId = (ctx: Scope, id: string | number) =>
++  ctx.ids?.itemGroup?.(id) ?? `select:${ctx.id}:optgroup:${id}`
++export const getItemGroupLabelId = (ctx: Scope, id: string | number) =>
++  ctx.ids?.itemGroupLabel?.(id) ?? `select:${ctx.id}:optgroup-label:${id}`
++
++export const getContentEl = (ctx: Scope) => ctx.getById(getContentId(ctx))
++export const getItemEl = (ctx: Scope, id: string | number) => ctx.getById(getItemId(ctx, id))
+diff --git a/packages/machines/listbox/src/listbox.machine.ts b/packages/machines/listbox/src/listbox.machine.ts
+new file mode 100644
+index 0000000000..32dd00664a
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.machine.ts
+@@ -0,0 +1,390 @@
++import type { CollectionItem, ListCollection } from "@zag-js/collection"
++import { Selection } from "@zag-js/collection"
++import { createMachine } from "@zag-js/core"
++import { getByTypeahead, observeAttributes, raf, scrollIntoView } from "@zag-js/dom-query"
++import { getInteractionModality, trackFocusVisible as trackFocusVisibleFn } from "@zag-js/focus-visible"
++import { isEqual } from "@zag-js/utils"
++import { collection } from "./listbox.collection"
++import * as dom from "./listbox.dom"
++import type { ListboxSchema, SelectionDetails } from "./listbox.types"
++
++export const machine = createMachine<ListboxSchema>({
++  props({ props }) {
++    return {
++      loopFocus: false,
++      composite: true,
++      defaultValue: [],
++      multiple: false,
++      typeahead: true,
++      collection: collection.empty(),
++      orientation: "vertical",
++      selectionMode: "single",
++      ...props,
++    }
++  },
++
++  context({ prop, bindable }) {
++    return {
++      value: bindable(() => ({
++        defaultValue: prop("defaultValue"),
++        value: prop("value"),
++        isEqual,
++        onChange(value) {
++          const items = prop("collection").findMany(value)
++          return prop("onValueChange")?.({ value, items })
++        },
++      })),
++
++      highlightedValue: bindable<string | null>(() => ({
++        defaultValue: prop("defaultHighlightedValue") || null,
++        value: prop("highlightedValue"),
++        sync: true,
++        onChange(value) {
++          prop("onHighlightChange")?.({
++            highlightedValue: value,
++            highlightedItem: prop("collection").find(value),
++            highlightedIndex: prop("collection").indexOf(value),
++          })
++        },
++      })),
++
++      highlightedItem: bindable<CollectionItem | null>(() => ({
++        defaultValue: null,
++      })),
++
++      selectedItems: bindable<CollectionItem[]>(() => {
++        const value = prop("value") ?? prop("defaultValue") ?? []
++        const items = prop("collection").findMany(value)
++        return { defaultValue: items }
++      }),
++
++      valueAsString: bindable(() => {
++        const value = prop("value") ?? prop("defaultValue") ?? []
++        return { defaultValue: prop("collection").stringifyMany(value) }
++      }),
++
++      focused: bindable(() => ({
++        defaultValue: false,
++      })),
++    }
++  },
++
++  refs({ prop }) {
++    return {
++      typeahead: { ...getByTypeahead.defaultOptions },
++      prevCollection: prop("collection"),
++    }
++  },
++
++  computed: {
++    hasSelectedItems: ({ context }) => context.get("value").length > 0,
++    isTypingAhead: ({ refs }) => refs.get("typeahead").keysSoFar !== "",
++    isInteractive: ({ prop }) => !prop("disabled"),
++    selection: ({ context, prop }) => {
++      const selection = new Selection(context.get("value"))
++      selection.selectionMode = prop("selectionMode")
++      selection.deselectable = !!prop("deselectable")
++      return selection
++    },
++    multiple: ({ prop }) => prop("selectionMode") === "multiple" || prop("selectionMode") === "extended",
++  },
++
++  initialState() {
++    return "idle"
++  },
++
++  watch({ context, prop, track, action }) {
++    track([() => context.get("value").toString()], () => {
++      action(["syncSelectedItems"])
++    })
++    track([() => context.get("highlightedValue")], () => {
++      action(["syncHighlightedItem"])
++    })
++    track([() => prop("collection").toString()], () => {
++      action(["syncCollection"])
++    })
++  },
++
++  effects: ["trackFocusVisible"],
++
++  on: {
++    "HIGHLIGHTED_VALUE.SET": {
++      actions: ["setHighlightedItem"],
++    },
++    "ITEM.SELECT": {
++      actions: ["selectItem"],
++    },
++    "ITEM.CLEAR": {
++      actions: ["clearItem"],
++    },
++    "VALUE.SET": {
++      actions: ["setSelectedItems"],
++    },
++    "VALUE.CLEAR": {
++      actions: ["clearSelectedItems"],
++    },
++    "CLEAR.CLICK": {
++      actions: ["clearSelectedItems"],
++    },
++  },
++
++  states: {
++    idle: {
++      effects: ["scrollToHighlightedItem"],
++      on: {
++        "CONTENT.FOCUS": {
++          actions: ["setFocused"],
++        },
++        "CONTENT.BLUR": {
++          actions: ["clearFocused"],
++        },
++        "ITEM.CLICK": {
++          actions: ["setHighlightedItem", "selectHighlightedItem"],
++        },
++        "CONTENT.TYPEAHEAD": {
++          actions: ["highlightMatchingItem"],
++        },
++        "ITEM.POINTER_MOVE": {
++          actions: ["highlightItem"],
++        },
++        "ITEM.POINTER_LEAVE": {
++          actions: ["clearHighlightedItem"],
++        },
++        NAVIGATE: {
++          actions: ["setHighlightedItem", "selectWithKeyboard"],
++        },
++      },
++    },
++  },
++
++  implementations: {
++    effects: {
++      trackFocusVisible: ({ scope }) => {
++        return trackFocusVisibleFn({ root: scope.getRootNode?.() })
++      },
++
++      scrollToHighlightedItem({ context, prop, scope }) {
++        const exec = (immediate: boolean) => {
++          const highlightedValue = context.get("highlightedValue")
++          if (highlightedValue == null) return
++
++          const modality = getInteractionModality()
++
++          // don't scroll into view if we're using the pointer
++          if (modality !== "keyboard") return
++
++          const itemEl = dom.getItemEl(scope, highlightedValue)
++          const contentEl = dom.getContentEl(scope)
++
++          const scrollToIndexFn = prop("scrollToIndexFn")
++          if (scrollToIndexFn) {
++            const highlightedIndex = prop("collection").indexOf(highlightedValue)
++            scrollToIndexFn?.({ index: highlightedIndex, immediate })
++            return
++          }
++
++          scrollIntoView(itemEl, { rootEl: contentEl, block: "nearest" })
++        }
++
++        raf(() => exec(true))
++
++        const contentEl = () => dom.getContentEl(scope)
++        return observeAttributes(contentEl, {
++          defer: true,
++          attributes: ["data-activedescendant"],
++          callback() {
++            exec(false)
++          },
++        })
++      },
++    },
++
++    actions: {
++      selectHighlightedItem({ context, prop, event, computed }) {
++        const value = event.value ?? context.get("highlightedValue")
++        if (value == null) return
++
++        const selection = computed("selection")
++        const collection = prop("collection")
++
++        if (event.shiftKey && computed("multiple") && event.anchorValue) {
++          const next = selection.extendSelection(collection, event.anchorValue, value)
++          invokeOnSelect(selection, next, prop("onSelect"))
++          context.set("value", Array.from(next))
++        } else {
++          const next = selection.select(collection, value, event.metaKey)
++          invokeOnSelect(selection, next, prop("onSelect"))
++          context.set("value", Array.from(next))
++        }
++      },
++
++      selectWithKeyboard({ context, prop, event, computed }) {
++        const selection = computed("selection")
++        const collection = prop("collection")
++
++        if (event.shiftKey && computed("multiple") && event.anchorValue) {
++          const next = selection.extendSelection(collection, event.anchorValue, event.value)
++          invokeOnSelect(selection, next, prop("onSelect"))
++          context.set("value", Array.from(next))
++          return
++        }
++
++        if (prop("selectOnHighlight")) {
++          const next = selection.replaceSelection(collection, event.value)
++          invokeOnSelect(selection, next, prop("onSelect"))
++          context.set("value", Array.from(next))
++        }
++      },
++
++      highlightItem({ context, event }) {
++        context.set("highlightedValue", event.value)
++      },
++
++      highlightMatchingItem({ context, prop, event, refs }) {
++        const value = prop("collection").search(event.key, {
++          state: refs.get("typeahead"),
++          currentValue: context.get("highlightedValue"),
++        })
++
++        if (value == null) return
++        context.set("highlightedValue", value)
++      },
++
++      setHighlightedItem({ context, event }) {
++        context.set("highlightedValue", event.value)
++      },
++
++      clearHighlightedItem({ context }) {
++        context.set("highlightedValue", null)
++      },
++
++      selectItem({ context, prop, event, computed }) {
++        const collection = prop("collection")
++        const selection = computed("selection")
++
++        const next = selection.select(collection, event.value)
++        invokeOnSelect(selection, next, prop("onSelect"))
++
++        context.set("value", Array.from(next))
++      },
++
++      clearItem({ context, event, computed }) {
++        const selection = computed("selection")
++        const value = selection.deselect(event.value)
++        context.set("value", Array.from(value))
++      },
++
++      setSelectedItems({ context, event }) {
++        context.set("value", event.value)
++      },
++
++      clearSelectedItems({ context }) {
++        context.set("value", [])
++      },
++
++      syncCollection({ context, prop, refs }) {
++        const collection = prop("collection")
++
++        const highlightedItem = collection.find(context.get("highlightedValue"))
++        if (highlightedItem) context.set("highlightedItem", highlightedItem)
++
++        const selectedItems = collection.findMany(context.get("value"))
++        context.set("selectedItems", selectedItems)
++
++        const valueAsString = collection.stringifyItems(selectedItems)
++        context.set("valueAsString", valueAsString)
++
++        const highlightedValue = syncHighlightedValue(
++          collection,
++          refs.get("prevCollection"),
++          context.get("highlightedValue"),
++        )
++
++        queueMicrotask(() => {
++          context.set("highlightedValue", highlightedValue)
++          refs.set("prevCollection", collection)
++        })
++      },
++
++      syncSelectedItems({ context, prop }) {
++        const collection = prop("collection")
++        const prevSelectedItems = context.get("selectedItems")
++
++        const value = context.get("value")
++        const selectedItems = value.map((value) => {
++          const item = prevSelectedItems.find((item) => collection.getItemValue(item) === value)
++          return item || collection.find(value)
++        })
++
++        context.set("selectedItems", selectedItems)
++        context.set("valueAsString", collection.stringifyItems(selectedItems))
++      },
++
++      syncHighlightedItem({ context, prop }) {
++        const collection = prop("collection")
++        const highlightedValue = context.get("highlightedValue")
++        const highlightedItem = highlightedValue ? collection.find(highlightedValue) : null
++        context.set("highlightedItem", highlightedItem)
++      },
++
++      setFocused({ context }) {
++        context.set("focused", true)
++      },
++
++      clearFocused({ context }) {
++        context.set("focused", false)
++      },
++    },
++  },
++})
++
++function invokeOnSelect(current: Set<string>, next: Set<string>, onSelect?: (details: SelectionDetails) => void) {
++  const added = next.difference(current)
++  for (const item of added) {
++    onSelect?.({ value: item })
++  }
++}
++
++function syncHighlightedValue<T>(
++  collection: ListCollection<T>,
++  prevCollection: ListCollection<T> | null,
++  highlightedValue: string | null,
++) {
++  if (highlightedValue != null && !collection.find(highlightedValue) && prevCollection) {
++    const startIndex = prevCollection.indexOf(highlightedValue)
++
++    const prevItems = [...prevCollection.items]
++    const items = [...collection.items]
++
++    const diff: number = (prevItems?.length ?? 0) - (items?.length ?? 0)
++    let index = Math.min(
++      diff > 1 ? Math.max((startIndex ?? 0) - diff + 1, 0) : (startIndex ?? 0),
++      (items?.length ?? 0) - 1,
++    )
++
++    let newValue: string | null = null
++    let isReverseSearching = false
++
++    while (index >= 0) {
++      if (!collection.getItemDisabled(items[index])) {
++        newValue = collection.getItemValue(items[index])
++        break
++      }
++      // Find next, not disabled item.
++      if (index < items.length - 1 && !isReverseSearching) {
++        index++
++        // Otherwise, find previous, not disabled item.
++      } else {
++        isReverseSearching = true
++        if (index > (startIndex ?? 0)) {
++          index = startIndex ?? 0
++        }
++        index--
++      }
++    }
++
++    return newValue
++  }
++
++  return null
++}
+diff --git a/packages/machines/listbox/src/listbox.props.ts b/packages/machines/listbox/src/listbox.props.ts
+new file mode 100644
+index 0000000000..0332056b83
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.props.ts
+@@ -0,0 +1,37 @@
++import { createProps } from "@zag-js/types"
++import { createSplitProps } from "@zag-js/utils"
++import type { ItemGroupLabelProps, ItemGroupProps, ItemProps, ListboxProps } from "./listbox.types"
++
++export const props = createProps<ListboxProps>()([
++  "collection",
++  "defaultHighlightedValue",
++  "defaultValue",
++  "dir",
++  "disabled",
++  "deselectable",
++  "disallowSelectAll",
++  "getRootNode",
++  "highlightedValue",
++  "id",
++  "ids",
++  "loopFocus",
++  "onHighlightChange",
++  "onSelect",
++  "onValueChange",
++  "orientation",
++  "scrollToIndexFn",
++  "selectionMode",
++  "selectOnHighlight",
++  "typeahead",
++  "value",
++])
++export const splitProps = createSplitProps<Partial<ListboxProps>>(props)
++
++export const itemProps = createProps<ItemProps>()(["item", "highlightOnHover"])
++export const splitItemProps = createSplitProps<ItemProps>(itemProps)
++
++export const itemGroupProps = createProps<ItemGroupProps>()(["id"])
++export const splitItemGroupProps = createSplitProps<ItemGroupProps>(itemGroupProps)
++
++export const itemGroupLabelProps = createProps<ItemGroupLabelProps>()(["htmlFor"])
++export const splitItemGroupLabelProps = createSplitProps<ItemGroupLabelProps>(itemGroupLabelProps)
+diff --git a/packages/machines/listbox/src/listbox.types.ts b/packages/machines/listbox/src/listbox.types.ts
+new file mode 100644
+index 0000000000..5d343fcbd2
+--- /dev/null
++++ b/packages/machines/listbox/src/listbox.types.ts
+@@ -0,0 +1,288 @@
++import type { CollectionItem, GridCollection, ListCollection, Selection, SelectionMode } from "@zag-js/collection"
++import type { EventObject, Machine, Service } from "@zag-js/core"
++import type { TypeaheadState } from "@zag-js/dom-query"
++import type { CommonProperties, DirectionProperty, OrientationProperty, PropTypes, RequiredBy } from "@zag-js/types"
++
++/* -----------------------------------------------------------------------------
++ * Callback details
++ * -----------------------------------------------------------------------------*/
++
++export interface ValueChangeDetails<T extends CollectionItem = CollectionItem> {
++  value: string[]
++  items: T[]
++}
++
++export interface HighlightChangeDetails<T extends CollectionItem = CollectionItem> {
++  highlightedValue: string | null
++  highlightedItem: T | null
++  highlightedIndex: number
++}
++
++export interface ScrollToIndexDetails {
++  index: number
++  immediate?: boolean | undefined
++}
++
++export interface SelectionDetails {
++  value: string
++}
++
++/* -----------------------------------------------------------------------------
++ * Machine context
++ * -----------------------------------------------------------------------------*/
++
++export type ElementIds = Partial<{
++  root: string
++  content: string
++  label: string
++  item(id: string | number): string
++  itemGroup(id: string | number): string
++  itemGroupLabel(id: string | number): string
++}>
++
++export interface ListboxProps<T extends CollectionItem = CollectionItem>
++  extends DirectionProperty,
++    CommonProperties,
++    OrientationProperty {
++  /**
++   * The item collection
++   */
++  collection: ListCollection<T> | GridCollection<T>
++  /**
++   * The ids of the elements in the listbox. Useful for composition.
++   */
++  ids?: ElementIds | undefined
++  /**
++   * Whether the listbox is disabled
++   */
++  disabled?: boolean | undefined
++  /**
++   * Whether to disallow selecting all items when `meta+a` is pressed
++   */
++  disallowSelectAll?: boolean | undefined
++  /**
++   * The callback fired when the highlighted item changes.
++   */
++  onHighlightChange?: ((details: HighlightChangeDetails<T>) => void) | undefined
++  /**
++   * The callback fired when the selected item changes.
++   */
++  onValueChange?: ((details: ValueChangeDetails<T>) => void) | undefined
++  /**
++   * The controlled keys of the selected items
++   */
++  value?: string[] | undefined
++  /**
++   * The initial default value of the listbox when rendered.
++   * Use when you don't need to control the value of the listbox.
++   *
++   * @default []
++   */
++  defaultValue?: string[] | undefined
++  /**
++   * The controlled key of the highlighted item
++   */
++  highlightedValue?: string | null
++  /**
++   * The initial value of the highlighted item when opened.
++   * Use when you don't need to control the highlighted value of the listbox.
++   */
++  defaultHighlightedValue?: string | null | undefined
++  /**
++   * Whether to loop the keyboard navigation through the options
++   * @default false
++   */
++  loopFocus?: boolean | undefined
++  /**
++   * How multiple selection should behave in the listbox.
++   *
++   * - `single`: The user can select a single item.
++   * - `multiple`: The user can select multiple items without using modifier keys.
++   * - `extended`: The user can select multiple items by using modifier keys.
++   *
++   * @default "single"
++   */
++  selectionMode?: SelectionMode | undefined
++  /**
++   * Function to scroll to a specific index
++   */
++  scrollToIndexFn?: ((details: ScrollToIndexDetails) => void) | undefined
++  /**
++   * Whether to select the item when it is highlighted
++   */
++  selectOnHighlight?: boolean | undefined
++  /**
++   * Whether to disallow empty selection
++   */
++  deselectable?: boolean | undefined
++  /**
++   * Whether to enable typeahead on the listbox
++   */
++  typeahead?: boolean | undefined
++  /**
++   * Function called when an item is selected
++   */
++  onSelect?: ((details: SelectionDetails) => void) | undefined
++}
++
++type PropsWithDefault = "collection" | "selectionMode"
++
++export interface ListboxSchema<T extends CollectionItem = CollectionItem> {
++  state: "idle"
++  props: RequiredBy<ListboxProps<T>, PropsWithDefault>
++  context: {
++    value: string[]
++    highlightedValue: string | null
++    highlightedItem: T | null
++    selectedItems: T[]
++    valueAsString: string
++    focused: boolean
++  }
++  computed: {
++    hasSelectedItems: boolean
++    isTypingAhead: boolean
++    isInteractive: boolean
++    selection: Selection
++    multiple: boolean
++  }
++  refs: {
++    typeahead: TypeaheadState
++    prevCollection: ListCollection<T> | null
++  }
++  action: string
++  guard: string
++  effect: string
++  event: EventObject
++}
++
++export type ListboxService<T extends CollectionItem = CollectionItem> = Service<ListboxSchema<T>>
++
++export type ListboxMachine<T extends CollectionItem = CollectionItem> = Machine<ListboxSchema<T>>
++
++/* -----------------------------------------------------------------------------
++ * Component API
++ * -----------------------------------------------------------------------------*/
++
++export interface ItemProps<T extends CollectionItem = CollectionItem> {
++  /**
++   * The item to render
++   */
++  item: T
++  /**
++   * Whether to highlight the item on hover
++   */
++  highlightOnHover?: boolean | undefined
++}
++
++export interface ItemState {
++  /**
++   * The underlying value of the item
++   */
++  value: string
++  /**
++   * Whether the item is disabled
++   */
++  disabled: boolean
++  /**
++   * Whether the item is selected
++   */
++  selected: boolean
++  /**
++   * Whether the item is highlighted
++   */
++  highlighted: boolean
++}
++
++export interface ItemGroupProps {
++  id: string
++}
++
++export interface ItemGroupLabelProps {
++  htmlFor: string
++}
++
++export interface InputProps {
++  /**
++   * Whether to automatically highlight the item when typing
++   * @default false
++   */
++  autoHighlight?: boolean | undefined
++}
++
++export interface ListboxApi<T extends PropTypes = PropTypes, V extends CollectionItem = CollectionItem> {
++  /**
++   * Whether the select value is empty
++   */
++  empty: boolean
++  /**
++   * The value of the highlighted item
++   */
++  highlightedValue: string | null
++  /**
++   * The highlighted item
++   */
++  highlightedItem: V | null
++  /**
++   * Function to highlight a value
++   */
++  highlightValue(value: string): void
++  /**
++   * The selected items
++   */
++  selectedItems: V[]
++  /**
++   * Whether there's a selected option
++   */
++  hasSelectedItems: boolean
++  /**
++   * The selected item keys
++   */
++  value: string[]
++  /**
++   * The string representation of the selected items
++   */
++  valueAsString: string
++  /**
++   * Function to select a value
++   */
++  selectValue(value: string): void
++  /**
++   * Function to select all values.
++   *
++   * **Note**: This should only be called when the selectionMode is `multiple` or `extended`.
++   * Otherwise, an exception will be thrown.
++   */
++  selectAll(): void
++  /**
++   * Function to set the value of the select
++   */
++  setValue(value: string[]): void
++  /**
++   * Function to clear the value of the select.
++   * If a value is provided, it will only clear that value, otherwise, it will clear all values.
++   */
++  clearValue(value?: string): void
++  /**
++   * Returns the state of a select item
++   */
++  getItemState(props: ItemProps): ItemState
++  /**
++   * Function to toggle the select
++   */
++  collection: ListCollection<V>
++  /**
++   * Whether the select is disabled
++   */
++  disabled: boolean
++
++  getInputProps(props?: InputProps): T["input"]
++  getRootProps(): T["element"]
++  getLabelProps(): T["label"]
++  getValueTextProps(): T["element"]
++  getContentProps(): T["element"]
++  getItemProps(props: ItemProps): T["element"]
++  getItemTextProps(props: ItemProps): T["element"]
++  getItemIndicatorProps(props: ItemProps): T["element"]
++  getItemGroupProps(props: ItemGroupProps): T["element"]
++  getItemGroupLabelProps(props: ItemGroupLabelProps): T["element"]
++}
+diff --git a/packages/machines/listbox/tsconfig.json b/packages/machines/listbox/tsconfig.json
+new file mode 100644
+index 0000000000..8e781cd154
+--- /dev/null
++++ b/packages/machines/listbox/tsconfig.json
+@@ -0,0 +1,7 @@
++{
++  "extends": "../../../tsconfig.json",
++  "include": ["src"],
++  "compilerOptions": {
++    "tsBuildInfoFile": "node_modules/.cache/.tsbuildinfo"
++  }
++}
+diff --git a/packages/machines/menu/src/menu.connect.ts b/packages/machines/menu/src/menu.connect.ts
+index a76aab86fa..ac39853da6 100644
+--- a/packages/machines/menu/src/menu.connect.ts
++++ b/packages/machines/menu/src/menu.connect.ts
+@@ -450,9 +450,9 @@ export function connect<T extends PropTypes>(service: Service<MenuSchema>, norma
+ 
+     getItemGroupLabelProps(props) {
+       return normalize.element({
++        ...parts.itemGroupLabel.attrs,
+         id: dom.getGroupLabelId(scope, props.htmlFor),
+         dir: prop("dir"),
+-        ...parts.itemGroupLabel.attrs,
+       })
+     },
+ 
+diff --git a/packages/machines/select/src/select.connect.ts b/packages/machines/select/src/select.connect.ts
+index c6f97a6a90..e1d18d5af4 100644
+--- a/packages/machines/select/src/select.connect.ts
++++ b/packages/machines/select/src/select.connect.ts
+@@ -45,7 +45,7 @@ export function connect<T extends PropTypes, V extends CollectionItem = Collecti
+   function getItemState(props: ItemProps): ItemState {
+     const _disabled = collection.getItemDisabled(props.item)
+     const value = collection.getItemValue(props.item)
+-    ensure(value, `[zag-js] No value found for item ${JSON.stringify(props.item)}`)
++    ensure(value, () => `[zag-js] No value found for item ${JSON.stringify(props.item)}`)
+     return {
+       value,
+       disabled: Boolean(disabled || _disabled),
+@@ -315,8 +315,8 @@ export function connect<T extends PropTypes, V extends CollectionItem = Collecti
+       return normalize.element({
+         ...parts.itemGroupLabel.attrs,
+         id: dom.getItemGroupLabelId(scope, htmlFor),
+-        role: "group",
+         dir: prop("dir"),
++        role: "presentation",
+       })
+     },
+ 
+@@ -327,6 +327,7 @@ export function connect<T extends PropTypes, V extends CollectionItem = Collecti
+         "data-disabled": dataAttr(disabled),
+         id: dom.getItemGroupId(scope, id),
+         "aria-labelledby": dom.getItemGroupLabelId(scope, id),
++        role: "group",
+         dir: prop("dir"),
+       })
+     },
+diff --git a/packages/machines/splitter/src/splitter.connect.ts b/packages/machines/splitter/src/splitter.connect.ts
+index 966e4d0964..9aa3d6be72 100644
+--- a/packages/machines/splitter/src/splitter.connect.ts
++++ b/packages/machines/splitter/src/splitter.connect.ts
+@@ -63,7 +63,7 @@ export function connect<T extends PropTypes>(service: SplitterService, normalize
+       const panelData = getPanelById(panels, id)
+ 
+       const { panelSize } = panelDataHelper(panels, panelData, size)
+-      ensure(panelSize, `Panel size not found for panel "${panelData.id}"`)
++      ensure(panelSize, () => `Panel size not found for panel "${panelData.id}"`)
+ 
+       return panelSize
+     },
+@@ -73,7 +73,7 @@ export function connect<T extends PropTypes>(service: SplitterService, normalize
+       const panelData = getPanelById(panels, id)
+ 
+       const { collapsedSize = 0, collapsible, panelSize } = panelDataHelper(panels, panelData, size)
+-      ensure(panelSize, `Panel size not found for panel "${panelData.id}"`)
++      ensure(panelSize, () => `Panel size not found for panel "${panelData.id}"`)
+       return collapsible === true && fuzzyNumbersEqual(panelSize, collapsedSize)
+     },
+     isPanelExpanded(id) {
+@@ -82,7 +82,7 @@ export function connect<T extends PropTypes>(service: SplitterService, normalize
+       const panelData = getPanelById(panels, id)
+ 
+       const { collapsedSize = 0, collapsible, panelSize } = panelDataHelper(panels, panelData, size)
+-      ensure(panelSize, `Panel size not found for panel "${panelData.id}"`)
++      ensure(panelSize, () => `Panel size not found for panel "${panelData.id}"`)
+ 
+       return !collapsible || fuzzyCompareNumbers(panelSize, collapsedSize) > 0
+     },
+diff --git a/packages/machines/splitter/src/splitter.machine.ts b/packages/machines/splitter/src/splitter.machine.ts
+index 9e18aceb25..9bef5a9b6d 100644
+--- a/packages/machines/splitter/src/splitter.machine.ts
++++ b/packages/machines/splitter/src/splitter.machine.ts
+@@ -260,7 +260,7 @@ export const machine = createMachine<SplitterSchema>({
+         if (!panelGroupEl) return
+ 
+         const handleElement = dom.getResizeTriggerEl(scope, resizeTriggerId)
+-        ensure(handleElement, `Drag handle element not found for id "${resizeTriggerId}"`)
++        ensure(handleElement, () => `Drag handle element not found for id "${resizeTriggerId}"`)
+ 
+         const initialCursorPosition = orientation === "horizontal" ? event.point.x : event.point.y
+ 
+@@ -293,12 +293,12 @@ export const machine = createMachine<SplitterSchema>({
+         const panels = prop("panels")
+ 
+         const panel = panels.find((panel) => panel.id === event.id)
+-        ensure(panel, `Panel data not found for id "${event.id}"`)
++        ensure(panel, () => `Panel data not found for id "${event.id}"`)
+ 
+         if (panel.collapsible) {
+           const { collapsedSize = 0, panelSize, pivotIndices } = panelDataHelper(panels, panel, prevSize)
+ 
+-          ensure(panelSize, `Panel size not found for panel "${panel.id}"`)
++          ensure(panelSize, () => `Panel size not found for panel "${panel.id}"`)
+ 
+           if (!fuzzyNumbersEqual(panelSize, collapsedSize)) {
+             refs.get("panelSizeBeforeCollapse").set(panel.id, panelSize)
+@@ -329,7 +329,7 @@ export const machine = createMachine<SplitterSchema>({
+         const prevSize = context.get("size")
+ 
+         const panel = panels.find((panel) => panel.id === event.id)
+-        ensure(panel, `Panel data not found for id "${event.id}"`)
++        ensure(panel, () => `Panel data not found for id "${event.id}"`)
+ 
+         if (panel.collapsible) {
+           const {
+@@ -376,7 +376,7 @@ export const machine = createMachine<SplitterSchema>({
+         const unsafePanelSize = event.size
+ 
+         const { panelSize, pivotIndices } = panelDataHelper(panels, panel, prevSize)
+-        ensure(panelSize, `Panel size not found for panel "${panel.id}"`)
++        ensure(panelSize, () => `Panel size not found for panel "${panel.id}"`)
+ 
+         const isLastPanel = findPanelDataIndex(panels, panel) === panels.length - 1
+         const delta = isLastPanel ? panelSize - unsafePanelSize : unsafePanelSize - panelSize
+@@ -405,7 +405,7 @@ export const machine = createMachine<SplitterSchema>({
+         const panels = prop("panels")
+ 
+         const panelGroupElement = dom.getRootEl(scope)
+-        ensure(panelGroupElement, `Panel group element not found`)
++        ensure(panelGroupElement, () => `Panel group element not found`)
+ 
+         const pivotIndices = resizeTriggerId.split(":").map((id) => panels.findIndex((panel) => panel.id === id))
+ 
+@@ -491,7 +491,7 @@ export const machine = createMachine<SplitterSchema>({
+         if (index === -1) return
+ 
+         const panelData = panelDataArray[index]
+-        ensure(panelData, `No panel data found for index ${index}`)
++        ensure(panelData, () => `No panel data found for index ${index}`)
+ 
+         const size = sizes[index]
+ 
+@@ -566,7 +566,7 @@ function setSize(params: Params<SplitterSchema>, sizes: number[]) {
+ 
+   sizes.forEach((size, index) => {
+     const panelData = panelsArray[index]
+-    ensure(panelData, `Panel data not found for index ${index}`)
++    ensure(panelData, () => `Panel data not found for index ${index}`)
+ 
+     const { collapsedSize = 0, collapsible, id: panelId } = panelData
+ 
+diff --git a/packages/machines/splitter/src/utils/aria.ts b/packages/machines/splitter/src/utils/aria.ts
+index f616d28c75..771503b89b 100644
+--- a/packages/machines/splitter/src/utils/aria.ts
++++ b/packages/machines/splitter/src/utils/aria.ts
+@@ -21,7 +21,7 @@ export function calculateAriaValues({
+   let totalMaxSize = 0
+ 
+   const firstIndex = pivotIndices[0]
+-  ensure(firstIndex, "No pivot index found")
++  ensure(firstIndex, () => "No pivot index found")
+ 
+   panels.forEach((panel, index) => {
+     const { maxSize = 100, minSize = 0 } = panel
+diff --git a/packages/machines/splitter/src/utils/panel.ts b/packages/machines/splitter/src/utils/panel.ts
+index 237c4ef614..9f04e564e2 100644
+--- a/packages/machines/splitter/src/utils/panel.ts
++++ b/packages/machines/splitter/src/utils/panel.ts
+@@ -9,7 +9,7 @@ import type { DragState, PanelData } from "../splitter.types"
+ 
+ export function getPanelById(panels: PanelData[], id: string) {
+   const panel = panels.find((panel) => panel.id === id)
+-  ensure(panel, `Panel data not found for id "${id}"`)
++  ensure(panel, () => `Panel data not found for id "${id}"`)
+   return panel
+ }
+ 
+@@ -114,7 +114,7 @@ export function getUnsafeDefaultSize({ panels, size: sizes }: { panels: PanelDat
+   // Distribute default sizes first
+   for (let index = 0; index < panels.length; index++) {
+     const panel = panels[index]
+-    ensure(panel, `Panel data not found for index ${index}`)
++    ensure(panel, () => `Panel data not found for index ${index}`)
+     const defaultSize = sizes[index]
+ 
+     if (defaultSize != null) {
+@@ -127,7 +127,7 @@ export function getUnsafeDefaultSize({ panels, size: sizes }: { panels: PanelDat
+   // Remaining size should be distributed evenly between panels without default sizes
+   for (let index = 0; index < panels.length; index++) {
+     const panel = panels[index]
+-    ensure(panel, `Panel data not found for index ${index}`)
++    ensure(panel, () => `Panel data not found for index ${index}`)
+     const defaultSize = sizes[index]
+ 
+     if (defaultSize != null) {
+diff --git a/packages/machines/splitter/src/utils/resize-by-delta.ts b/packages/machines/splitter/src/utils/resize-by-delta.ts
+index 5293c25f67..693be1e906 100644
+--- a/packages/machines/splitter/src/utils/resize-by-delta.ts
++++ b/packages/machines/splitter/src/utils/resize-by-delta.ts
+@@ -28,8 +28,8 @@ export function resizeByDelta(props: Layout): number[] {
+ 
+   const [firstPivotIndex, secondPivotIndex] = pivotIndices
+ 
+-  ensure(firstPivotIndex, "Invalid first pivot index")
+-  ensure(secondPivotIndex, "Invalid second pivot index")
++  ensure(firstPivotIndex, () => "Invalid first pivot index")
++  ensure(secondPivotIndex, () => "Invalid second pivot index")
+ 
+   let deltaApplied = 0
+ 
+@@ -49,13 +49,13 @@ export function resizeByDelta(props: Layout): number[] {
+         // Check if we should expand a collapsed panel
+         const index = delta < 0 ? secondPivotIndex : firstPivotIndex
+         const panel = panels[index]
+-        ensure(panel, `Panel data not found for index ${index}`)
++        ensure(panel, () => `Panel data not found for index ${index}`)
+ 
+         const { collapsedSize = 0, collapsible, minSize = 0 } = panel
+ 
+         if (collapsible) {
+           const prevSize = initialSize[index]
+-          ensure(prevSize, `Previous size not found for panel index ${index}`)
++          ensure(prevSize, () => `Previous size not found for panel index ${index}`)
+ 
+           if (fuzzyNumbersEqual(prevSize, collapsedSize)) {
+             const localDelta = minSize - prevSize
+@@ -70,13 +70,13 @@ export function resizeByDelta(props: Layout): number[] {
+         // Check if we should collapse a panel at its minimum size
+         const index = delta < 0 ? firstPivotIndex : secondPivotIndex
+         const panel = panels[index]
+-        ensure(panel, `No panel data found for index ${index}`)
++        ensure(panel, () => `No panel data found for index ${index}`)
+ 
+         const { collapsedSize = 0, collapsible, minSize = 0 } = panel
+ 
+         if (collapsible) {
+           const prevSize = initialSize[index]
+-          ensure(prevSize, `Previous size not found for panel index ${index}`)
++          ensure(prevSize, () => `Previous size not found for panel index ${index}`)
+ 
+           if (fuzzyNumbersEqual(prevSize, minSize)) {
+             const localDelta = prevSize - collapsedSize
+@@ -103,7 +103,7 @@ export function resizeByDelta(props: Layout): number[] {
+ 
+     while (true) {
+       const prevSize = initialSize[index]
+-      ensure(prevSize, `Previous size not found for panel index ${index}`)
++      ensure(prevSize, () => `Previous size not found for panel index ${index}`)
+ 
+       const maxSafeSize = resizePanel({
+         panels,
+@@ -133,7 +133,7 @@ export function resizeByDelta(props: Layout): number[] {
+       const deltaRemaining = Math.abs(delta) - Math.abs(deltaApplied)
+ 
+       const prevSize = initialSize[index]
+-      ensure(prevSize, `Previous size not found for panel index ${index}`)
++      ensure(prevSize, () => `Previous size not found for panel index ${index}`)
+ 
+       const unsafeSize = prevSize - deltaRemaining
+       const safeSize = resizePanel({ panels, index, size: unsafeSize })
+@@ -171,7 +171,7 @@ export function resizeByDelta(props: Layout): number[] {
+     const pivotIndex = delta < 0 ? secondPivotIndex : firstPivotIndex
+ 
+     const prevSize = initialSize[pivotIndex]
+-    ensure(prevSize, `Previous size not found for panel index ${pivotIndex}`)
++    ensure(prevSize, () => `Previous size not found for panel index ${pivotIndex}`)
+ 
+     const unsafeSize = prevSize + deltaApplied
+     const safeSize = resizePanel({ panels, index: pivotIndex, size: unsafeSize })
+@@ -187,7 +187,7 @@ export function resizeByDelta(props: Layout): number[] {
+       let index = pivotIndex
+       while (index >= 0 && index < panels.length) {
+         const prevSize = nextSize[index]
+-        ensure(prevSize, `Previous size not found for panel index ${index}`)
++        ensure(prevSize, () => `Previous size not found for panel index ${index}`)
+ 
+         const unsafeSize = prevSize + deltaRemaining
+         const safeSize = resizePanel({ panels, index, size: unsafeSize })
+diff --git a/packages/machines/splitter/src/utils/resize-panel.ts b/packages/machines/splitter/src/utils/resize-panel.ts
+index 06b0fc5feb..5e164f1cf0 100644
+--- a/packages/machines/splitter/src/utils/resize-panel.ts
++++ b/packages/machines/splitter/src/utils/resize-panel.ts
+@@ -9,7 +9,7 @@ import { fuzzyCompareNumbers, PRECISION } from "./fuzzy"
+ 
+ export function resizePanel({ panels, index, size }: { panels: PanelData[]; index: number; size: number }) {
+   const panel = panels[index]
+-  ensure(panel, `Panel data not found for index ${index}`)
++  ensure(panel, () => `Panel data not found for index ${index}`)
+ 
+   let { collapsedSize = 0, collapsible, maxSize = 100, minSize = 0 } = panel
+ 
+diff --git a/packages/machines/splitter/src/utils/validate-sizes.ts b/packages/machines/splitter/src/utils/validate-sizes.ts
+index b007a06996..a1335767cd 100644
+--- a/packages/machines/splitter/src/utils/validate-sizes.ts
++++ b/packages/machines/splitter/src/utils/validate-sizes.ts
+@@ -18,7 +18,7 @@ export function validateSizes({ size: prevSize, panels }: { size: number[]; pane
+   } else if (!fuzzyNumbersEqual(nextSizeTotalSize, 100) && nextSize.length > 0) {
+     for (let index = 0; index < panels.length; index++) {
+       const unsafeSize = nextSize[index]
+-      ensure(unsafeSize, `No size data found for index ${index}`)
++      ensure(unsafeSize, () => `No size data found for index ${index}`)
+       const safeSize = (100 / nextSizeTotalSize) * unsafeSize
+       nextSize[index] = safeSize
+     }
+@@ -29,7 +29,7 @@ export function validateSizes({ size: prevSize, panels }: { size: number[]; pane
+   // First pass: Validate the proposed size given each panel's constraints
+   for (let index = 0; index < panels.length; index++) {
+     const unsafeSize = nextSize[index]
+-    ensure(unsafeSize, `No size data found for index ${index}`)
++    ensure(unsafeSize, () => `No size data found for index ${index}`)
+     const safeSize = resizePanel({ panels, index, size: unsafeSize })
+     if (unsafeSize != safeSize) {
+       remainingSize += unsafeSize - safeSize
+@@ -42,7 +42,7 @@ export function validateSizes({ size: prevSize, panels }: { size: number[]; pane
+   if (!fuzzyNumbersEqual(remainingSize, 0)) {
+     for (let index = 0; index < panels.length; index++) {
+       const prevSize = nextSize[index]
+-      ensure(prevSize, `No size data found for index ${index}`)
++      ensure(prevSize, () => `No size data found for index ${index}`)
+       const unsafeSize = prevSize + remainingSize
+       const safeSize = resizePanel({ panels, index, size: unsafeSize })
+ 
+diff --git a/packages/utilities/collection/src/grid-collection.ts b/packages/utilities/collection/src/grid-collection.ts
+index 93e3c93c1f..f753db0330 100644
+--- a/packages/utilities/collection/src/grid-collection.ts
++++ b/packages/utilities/collection/src/grid-collection.ts
+@@ -1,4 +1,4 @@
+-import { chunk } from "@zag-js/utils"
++import { chunk, nextIndex, prevIndex } from "@zag-js/utils"
+ import { ListCollection } from "./list-collection"
+ import type { CollectionItem, CollectionOptions } from "./types"
+ 
+@@ -43,17 +43,120 @@ export class GridCollection<T extends CollectionItem = CollectionItem> extends L
+     return this.at(this.getCellIndex(row, column))
+   }
+ 
++  /**
++   * Returns the row and column index for a given value
++   */
++  getValueCell = (value: string): { row: number; column: number } | null => {
++    const index = this.indexOf(value)
++    if (index === -1) return null
++    const row = Math.floor(index / this.columnCount)
++    const column = index % this.columnCount
++    return { row, column }
++  }
++
++  /**
++   * Returns the value of the last enabled column in a row
++   */
++  getLastEnabledColumnIndex = (row: number): number | null => {
++    for (let col = this.columnCount - 1; col >= 0; col--) {
++      const cell = this.getCell(row, col)
++      if (cell && !this.getItemDisabled(cell)) {
++        return col
++      }
++    }
++    return null
++  }
++
++  /**
++   * Returns the index of the first enabled column in a row
++   */
++  getFirstEnabledColumnIndex = (row: number): number | null => {
++    for (let col = 0; col < this.columnCount; col++) {
++      const cell = this.getCell(row, col)
++      if (cell && !this.getItemDisabled(cell)) {
++        return col
++      }
++    }
++    return null
++  }
++
+   /**
+    * Returns the value of the previous row in the grid, based on the current value
+    */
+-  getPreviousRowValue = (value: string, clamp = false): string | null => {
+-    return this.getPreviousValue(value, this.columnCount, clamp)
++  getPreviousRowValue = (value: string, loop = false): string | null => {
++    const currentCell = this.getValueCell(value)
++    if (currentCell === null) return null
++
++    const rows = this.getRows()
++    const rowCount = this.getRowCount()
++
++    let prevRowIndex = currentCell.row
++    let prevColumnIndex = currentCell.column
++
++    for (let i = 1; i <= rowCount; i++) {
++      prevRowIndex = prevIndex(rows, prevRowIndex, { loop })
++
++      const prevRow = rows[prevRowIndex]
++      if (!prevRow) continue
++
++      // the previous row has less columns than the current row
++      const prevCell = prevRow[prevColumnIndex]
++      if (!prevCell) {
++        const lastColumnIndex = this.getLastEnabledColumnIndex(prevRowIndex)
++        if (lastColumnIndex != null) {
++          prevColumnIndex = lastColumnIndex
++        }
++      }
++
++      // if the previous cell is enabled, return the value
++      const cell = this.getCell(prevRowIndex, prevColumnIndex)
++      if (!this.getItemDisabled(cell)) {
++        return this.getItemValue(cell)
++      }
++    }
++
++    return this.firstValue
+   }
+ 
+   /**
+    * Returns the value of the next row in the grid, based on the current value
+    */
+-  getNextRowValue = (value: string, clamp = false): string | null => {
+-    return this.getNextValue(value, this.columnCount, clamp)
++  getNextRowValue = (value: string, loop = false): string | null => {
++    const currentCell = this.getValueCell(value)
++    if (currentCell === null) return null
++
++    const rows = this.getRows()
++    const rowCount = this.getRowCount()
++
++    let nextRowIndex = currentCell.row
++    let nextColumnIndex = currentCell.column
++
++    for (let i = 1; i <= rowCount; i++) {
++      nextRowIndex = nextIndex(rows, nextRowIndex, { loop })
++
++      const nextRow = rows[nextRowIndex]
++      if (!nextRow) continue
++
++      // if the next cell is has less columns than the current row,
++      const nextCell = nextRow[nextColumnIndex]
++      if (!nextCell) {
++        const lastColumnIndex = this.getLastEnabledColumnIndex(nextRowIndex)
++        if (lastColumnIndex != null) {
++          nextColumnIndex = lastColumnIndex
++        }
++      }
++
++      // if the next cell is enabled, return the value
++      const cell = this.getCell(nextRowIndex, nextColumnIndex)
++      if (!this.getItemDisabled(cell)) {
++        return this.getItemValue(cell)
++      }
++    }
++
++    return this.lastValue
+   }
+ }
++
++export function isGridCollection(v: unknown): v is GridCollection<any> {
++  return v instanceof GridCollection
++}
+diff --git a/packages/utilities/collection/src/index.ts b/packages/utilities/collection/src/index.ts
+index ad34c8291e..7adda28aa0 100644
+--- a/packages/utilities/collection/src/index.ts
++++ b/packages/utilities/collection/src/index.ts
+@@ -1,6 +1,6 @@
+-export { GridCollection, type GridCollectionOptions } from "./grid-collection"
++export { GridCollection, type GridCollectionOptions, isGridCollection } from "./grid-collection"
+ export { TreeCollection, filePathToTree, flattenedToTree } from "./tree-collection"
+-export { ListCollection } from "./list-collection"
++export { ListCollection, isListCollection } from "./list-collection"
+ export type {
+   CollectionItem,
+   CollectionMethods,
+@@ -14,3 +14,4 @@ export type {
+   FilePathTreeNode,
+   TreeSkipFn,
+ } from "./types"
++export { Selection, type SelectionMode } from "./selection"
+diff --git a/packages/utilities/collection/src/list-collection.ts b/packages/utilities/collection/src/list-collection.ts
+index 77c8749d89..580654186c 100644
+--- a/packages/utilities/collection/src/list-collection.ts
++++ b/packages/utilities/collection/src/list-collection.ts
+@@ -28,6 +28,10 @@ export class ListCollection<T extends CollectionItem = CollectionItem> {
+     this.items = [...options.items] as T[]
+   }
+ 
++  copy = (items?: T[]) => {
++    return new ListCollection({ ...this.options, items: items ?? [...this.items] })
++  }
++
+   isEqual = (other: ListCollection<T>) => {
+     return isEqual(this.items, other.items)
+   }
+@@ -35,8 +39,8 @@ export class ListCollection<T extends CollectionItem = CollectionItem> {
+   /**
+    * Function to update the collection items
+    */
+-  setItems = (items: T[] | readonly T[]) => {
+-    this.items = Array.from(items) as T[]
++  setItems = (items: T[]) => {
++    return this.copy(items)
+   }
+ 
+   /**
+@@ -254,23 +258,93 @@ export class ListCollection<T extends CollectionItem = CollectionItem> {
+     yield* this.items
+   }
+ 
+-  insertBefore = (value: string, item: T) => {
+-    const index = this.indexOf(value)
+-    if (index === -1) return
+-    this.items.splice(index, 0, item)
++  update = (value: string, item: T) => {
++    let index = this.items.findIndex((item) => this.getItemValue(item) === value)
++    if (index === -1) return this
++    return this.copy([...this.items.slice(0, index), item, ...this.items.slice(index + 1)])
++  }
++
++  insert = (index: number, ...items: T[]) => {
++    return this.copy(insert(this.items, index, ...items))
++  }
++
++  insertBefore = (value: string, ...items: T[]) => {
++    let toIndex = this.indexOf(value)
++    if (toIndex === -1) {
++      if (this.items.length === 0) toIndex = 0
++      else return this
++    }
++    return this.copy(insert(this.items, toIndex, ...items))
++  }
++
++  insertAfter = (value: string, ...items: T[]) => {
++    let toIndex = this.indexOf(value)
++    if (toIndex === -1) {
++      if (this.items.length === 0) toIndex = 0
++      else return this
++    }
++    return this.copy(insert(this.items, toIndex + 1, ...items))
++  }
++
++  prepend = (...items: T[]) => {
++    return this.copy(insert(this.items, 0, ...items))
++  }
++
++  append = (...items: T[]) => {
++    return this.copy(insert(this.items, this.items.length, ...items))
++  }
++
++  remove = (...itemsOrValues: Array<T | string>) => {
++    const values = itemsOrValues.map((itemOrValue) =>
++      typeof itemOrValue === "string" ? itemOrValue : this.getItemValue(itemOrValue),
++    )
++    return this.copy(
++      this.items.filter((item) => {
++        const value = this.getItemValue(item)
++        if (value == null) return false
++        return !values.includes(value)
++      }),
++    )
+   }
+ 
+-  insertAfter = (value: string, item: T) => {
+-    const index = this.indexOf(value)
+-    if (index === -1) return
+-    this.items.splice(index + 1, 0, item)
++  move = (value: string, toIndex: number) => {
++    const fromIndex = this.indexOf(value)
++    if (fromIndex === -1) return this
++    return this.copy(move(this.items, [fromIndex], toIndex))
+   }
+ 
+   reorder = (fromIndex: number, toIndex: number) => {
+-    if (fromIndex === -1 || toIndex === -1) return
+-    if (fromIndex === toIndex) return
+-    const [removed] = this.items.splice(fromIndex, 1)
+-    this.items.splice(toIndex, 0, removed)
++    return this.copy(move(this.items, [fromIndex], toIndex))
++  }
++
++  compareValue = (a: string, b: string) => {
++    const indexA = this.indexOf(a)
++    const indexB = this.indexOf(b)
++    if (indexA < indexB) return -1
++    if (indexA > indexB) return 1
++    return 0
++  }
++
++  private range = (from: string | null, to: string | null) => {
++    let keys: string[] = []
++    let key: string | null = from
++    while (key != null) {
++      let item = this.find(key)
++      if (item) keys.push(key)
++      if (key === to) return keys
++      key = this.getNextValue(key)
++    }
++    return []
++  }
++
++  getValueRange = (from: string | null, to: string | null) => {
++    if (from && to) {
++      if (this.compareValue(from, to) <= 0) {
++        return this.range(from, to)
++      }
++      return this.range(to, from)
++    }
++    return []
+   }
+ 
+   toString = () => {
+@@ -301,3 +375,21 @@ const match = (label: string | null, query: string) => {
+ const wrap = <T>(v: T[] | readonly T[], idx: number) => {
+   return v.map((_, index) => v[(Math.max(idx, 0) + index) % v.length])
+ }
++
++export function isListCollection(v: unknown): v is ListCollection<any> {
++  return v instanceof ListCollection
++}
++
++function insert<T>(items: T[], index: number, ...values: T[]): T[] {
++  return [...items.slice(0, index), ...values, ...items.slice(index)]
++}
++
++function move<T>(items: T[], indices: number[], toIndex: number): T[] {
++  indices = [...indices].sort((a, b) => a - b)
++  const itemsToMove = indices.map((i) => items[i])
++  for (let i = indices.length - 1; i >= 0; i--) {
++    items = [...items.slice(0, indices[i]), ...items.slice(indices[i] + 1)]
++  }
++  toIndex = Math.max(0, toIndex - indices.filter((i) => i < toIndex).length)
++  return [...items.slice(0, toIndex), ...itemsToMove, ...items.slice(toIndex)]
++}
+diff --git a/packages/utilities/collection/src/selection.ts b/packages/utilities/collection/src/selection.ts
+new file mode 100644
+index 0000000000..5c44409a5c
+--- /dev/null
++++ b/packages/utilities/collection/src/selection.ts
+@@ -0,0 +1,189 @@
++import { isEqual } from "@zag-js/utils"
++import type { ListCollection } from "./list-collection"
++
++/**
++ * The mode of the selection.
++ *
++ * - `none`: A user can't select items.
++ * - `single`: A user can select a single item.
++ * - `multiple`: The user can select multiple items without using modifier keys.
++ * - `extended`: The user can select multiple items by using modifier keys.
++ */
++export type SelectionMode = "single" | "multiple" | "none" | "extended"
++
++export class Selection extends Set<string> {
++  selectionMode: SelectionMode = "single"
++  deselectable = true
++
++  constructor(values: Iterable<string> = []) {
++    super(values)
++  }
++
++  copy = (): Selection => {
++    const clone = new Selection([...this])
++    return this.sync(clone)
++  }
++
++  private sync = (other: Selection): Selection => {
++    other.selectionMode = this.selectionMode
++    other.deselectable = this.deselectable
++    return other
++  }
++
++  isEmpty = (): boolean => {
++    return this.size === 0
++  }
++
++  isSelected = (value: string | null): boolean => {
++    if (this.selectionMode === "none" || value == null) {
++      return false
++    }
++    return this.has(value)
++  }
++
++  canSelect = (collection: ListCollection, value: string): boolean => {
++    return this.selectionMode !== "none" || !collection.getItemDisabled(collection.find(value))
++  }
++
++  firstSelectedValue = (collection: ListCollection): string | null => {
++    let firstValue: string | null = null
++    for (let value of this) {
++      if (!firstValue || collection.compareValue(value, firstValue) < 0) {
++        firstValue = value
++      }
++    }
++    return firstValue
++  }
++
++  lastSelectedValue = (collection: ListCollection): string | null => {
++    let lastValue: string | null = null
++    for (let value of this) {
++      if (!lastValue || collection.compareValue(value, lastValue) > 0) {
++        lastValue = value
++      }
++    }
++    return lastValue
++  }
++
++  extendSelection = (collection: ListCollection, anchorValue: string, targetValue: string): Selection => {
++    if (this.selectionMode === "none") {
++      return this
++    }
++
++    if (this.selectionMode === "single") {
++      return this.replaceSelection(collection, targetValue)
++    }
++
++    const selection = this.copy()
++    const range = collection.getValueRange(anchorValue, targetValue)
++    const forwards = collection.compareValue(targetValue, anchorValue) >= 0
++
++    range.forEach((value) => {
++      if (!this.canSelect(collection, value)) return
++
++      if (forwards) {
++        // When extending forward, keep anchor and add everything up to target
++        selection.add(value)
++      } else {
++        // When extending backward, keep only values up to and including target
++        if (collection.compareValue(value, targetValue) <= 0) {
++          selection.add(value)
++        } else {
++          selection.delete(value)
++        }
++      }
++    })
++
++    return selection
++  }
++
++  toggleSelection = (collection: ListCollection, value: string): Selection => {
++    if (this.selectionMode === "none") {
++      return this
++    }
++
++    if (this.selectionMode === "single" && !this.isSelected(value)) {
++      return this.replaceSelection(collection, value)
++    }
++
++    const selection = this.copy()
++    if (selection.has(value)) {
++      selection.delete(value)
++    } else if (selection.canSelect(collection, value)) {
++      selection.add(value)
++    }
++
++    return selection
++  }
++
++  replaceSelection = (collection: ListCollection, value: string | null): Selection => {
++    if (this.selectionMode === "none") {
++      return this
++    }
++
++    if (value == null) {
++      return this
++    }
++
++    if (!this.canSelect(collection, value)) {
++      return this
++    }
++
++    const selection = new Selection([value])
++    return this.sync(selection)
++  }
++
++  setSelection = (values: Iterable<string>): Selection => {
++    if (this.selectionMode === "none") {
++      return this
++    }
++
++    let selection = new Selection()
++    for (let value of values) {
++      if (value != null) {
++        selection.add(value)
++        if (this.selectionMode === "single") {
++          break
++        }
++      }
++    }
++
++    return this.sync(selection)
++  }
++
++  clearSelection = (): Selection => {
++    const selection = this.copy()
++    if (selection.deselectable && selection.size > 0) {
++      selection.clear()
++    }
++    return selection
++  }
++
++  select = (collection: ListCollection, value: string, forceToggle?: boolean): Selection => {
++    if (this.selectionMode === "none") {
++      return this
++    }
++
++    if (this.selectionMode === "single") {
++      if (this.isSelected(value) && this.deselectable) {
++        return this.toggleSelection(collection, value)
++      } else {
++        return this.replaceSelection(collection, value)
++      }
++    } else if (this.selectionMode === "multiple" || forceToggle) {
++      return this.toggleSelection(collection, value)
++    } else {
++      return this.replaceSelection(collection, value)
++    }
++  }
++
++  deselect = (value: string): Selection => {
++    const selection = this.copy()
++    selection.delete(value)
++    return selection
++  }
++
++  isEqual = (other: Selection): boolean => {
++    return isEqual(Array.from(this), Array.from(other))
++  }
++}
+diff --git a/packages/utilities/collection/tests/grid-collection.test.ts b/packages/utilities/collection/tests/grid-collection.test.ts
+index 1c9a73db82..8888aed7eb 100644
+--- a/packages/utilities/collection/tests/grid-collection.test.ts
++++ b/packages/utilities/collection/tests/grid-collection.test.ts
+@@ -43,15 +43,16 @@ beforeEach(() => {
+ describe("grid collection", () => {
+   test("get next row", () => {
+     expect(grid.getNextRowValue("ts")).toMatchInlineSnapshot(`"go"`)
+-    expect(grid.getNextRowValue("js")).toMatchInlineSnapshot(`null`)
++    expect(grid.getNextRowValue("js")).toMatchInlineSnapshot(`"go"`)
+     expect(grid.getNextRowValue("deno")).toMatchInlineSnapshot(`"rust"`)
++    expect(grid.getNextRowValue("vue")).toMatchInlineSnapshot(`"ts"`)
+   })
+ 
+   test("get prev row", () => {
+-    expect(grid.getPreviousRowValue("ts")).toMatchInlineSnapshot(`"angular"`)
++    expect(grid.getPreviousRowValue("ts")).toMatchInlineSnapshot(`"vue"`)
+     expect(grid.getPreviousRowValue("js")).toMatchInlineSnapshot(`"node"`)
+     expect(grid.getPreviousRowValue("deno")).toMatchInlineSnapshot(`"angular"`)
+-    expect(grid.getPreviousRowValue("vue")).toMatchInlineSnapshot(`null`)
++    expect(grid.getPreviousRowValue("vue")).toMatchInlineSnapshot(`"vue"`)
+   })
+ 
+   test("get rows", () => {
+diff --git a/packages/utilities/collection/tests/list-collection.test.ts b/packages/utilities/collection/tests/list-collection.test.ts
+index 59e7dc4828..1b1b355251 100644
+--- a/packages/utilities/collection/tests/list-collection.test.ts
++++ b/packages/utilities/collection/tests/list-collection.test.ts
+@@ -51,11 +51,11 @@ describe("list collection", () => {
+   })
+ 
+   test("set items", () => {
+-    list.setItems([
++    const next = list.setItems([
+       { label: "Svelte", value: "svelte" },
+       { label: "Node.js", value: "node" },
+     ])
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "svelte",
+         "node",
+@@ -116,8 +116,8 @@ describe("list collection", () => {
+   })
+ 
+   test("insert before / valid", () => {
+-    list.insertBefore("react", { label: "Svelte", value: "svelte" })
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    const next = list.insertBefore("react", { label: "Svelte", value: "svelte" })
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "svelte",
+         "react",
+@@ -129,8 +129,8 @@ describe("list collection", () => {
+   })
+ 
+   test("insert before / invalid", () => {
+-    list.insertBefore("<random>", { label: "Svelte", value: "svelte" })
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    const next = list.insertBefore("<random>", { label: "Svelte", value: "svelte" })
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "react",
+         "vue",
+@@ -141,8 +141,8 @@ describe("list collection", () => {
+   })
+ 
+   test("insert after / valid", () => {
+-    list.insertAfter("solid", { label: "Svelte", value: "svelte" })
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    const next = list.insertAfter("solid", { label: "Svelte", value: "svelte" })
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "react",
+         "vue",
+@@ -154,8 +154,8 @@ describe("list collection", () => {
+   })
+ 
+   test("insert after / invalid", () => {
+-    list.insertAfter("<random>", { label: "Svelte", value: "svelte" })
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    const next = list.insertAfter("<random>", { label: "Svelte", value: "svelte" })
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "react",
+         "vue",
+@@ -166,8 +166,8 @@ describe("list collection", () => {
+   })
+ 
+   test("reorder / valid", () => {
+-    list.reorder(2, 1)
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    const next = list.reorder(2, 1)
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "react",
+         "solid",
+@@ -178,8 +178,8 @@ describe("list collection", () => {
+   })
+ 
+   test("reorder / invalid", () => {
+-    list.reorder(2, 5)
+-    expect(list.getValues()).toMatchInlineSnapshot(`
++    const next = list.reorder(2, 5)
++    expect(next.getValues()).toMatchInlineSnapshot(`
+       [
+         "react",
+         "vue",
+diff --git a/packages/utilities/collection/tests/selection.test.ts b/packages/utilities/collection/tests/selection.test.ts
+new file mode 100644
+index 0000000000..260f1024d7
+--- /dev/null
++++ b/packages/utilities/collection/tests/selection.test.ts
+@@ -0,0 +1,85 @@
++import { ListCollection, Selection } from "../src"
++
++const collection = new ListCollection({
++  items: [
++    { id: "1", value: "1" },
++    { id: "2", value: "2" },
++    { id: "3", value: "3" },
++    { id: "4", value: "4" },
++    { id: "5", value: "5" },
++    { id: "6", value: "6" },
++  ],
++})
++
++describe("Selection", () => {
++  it("extend / include", () => {
++    let sel = new Selection(["1"])
++    sel.selectionMode = "multiple"
++    expect(sel.extendSelection(collection, "1", "2")).toMatchInlineSnapshot(`
++      Set {
++        "1",
++        "2",
++      }
++    `)
++  })
++
++  it("extend / toggle", () => {
++    let sel = new Selection(["1", "2", "3"])
++    sel.selectionMode = "multiple"
++    expect(sel.extendSelection(collection, "3", "2")).toMatchInlineSnapshot(`
++      Set {
++        "1",
++        "2",
++      }
++    `)
++  })
++
++  it("select", () => {
++    let sel = new Selection()
++    sel.selectionMode = "multiple"
++    expect(sel.select(collection, "1").select(collection, "2")).toMatchInlineSnapshot(`
++      Set {
++        "1",
++        "2",
++      }
++    `)
++  })
++
++  it("clearSelection", () => {
++    let sel = new Selection(["1", "2", "3"])
++    sel.selectionMode = "multiple"
++    expect(sel.clearSelection()).toMatchInlineSnapshot(`Set {}`)
++  })
++
++  it("isSelected", () => {
++    let sel = new Selection(["1", "2", "3"])
++    sel.selectionMode = "multiple"
++    expect(sel.isSelected("1")).toBe(true)
++    expect(sel.isSelected("4")).toBe(false)
++  })
++
++  it("extend / first", () => {
++    let sel = new Selection(["1"])
++    sel.selectionMode = "multiple"
++    expect(sel.extendSelection(collection, "1", "1")).toMatchInlineSnapshot(`
++      Set {
++        "1",
++      }
++    `)
++  })
++
++  it("extend / last", () => {
++    let sel = new Selection(["1"])
++    sel.selectionMode = "multiple"
++    expect(sel.extendSelection(collection, "1", "6")).toMatchInlineSnapshot(`
++      Set {
++        "1",
++        "2",
++        "3",
++        "4",
++        "5",
++        "6",
++      }
++    `)
++  })
++})
+diff --git a/packages/utilities/core/src/warning.ts b/packages/utilities/core/src/warning.ts
+index 54d28b6038..1676e72718 100644
+--- a/packages/utilities/core/src/warning.ts
++++ b/packages/utilities/core/src/warning.ts
+@@ -18,8 +18,8 @@ export function invariant(...a: any[]): void {
+   }
+ }
+ 
+-export function ensure<T>(c: T | null | undefined, m: string): asserts c is T {
+-  if (c == null) throw new Error(m)
++export function ensure<T>(c: T | null | undefined, m: () => string): asserts c is T {
++  if (c == null) throw new Error(m())
+ }
+ 
+ type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+diff --git a/packages/utilities/dom-query/src/event.ts b/packages/utilities/dom-query/src/event.ts
+index 15fc3a916d..a010ec99f9 100644
+--- a/packages/utilities/dom-query/src/event.ts
++++ b/packages/utilities/dom-query/src/event.ts
+@@ -52,13 +52,18 @@ export function isDownloadingEvent(event: Pick<MouseEvent, "altKey" | "currentTa
+ }
+ 
+ export function isComposingEvent(event: any) {
+-  return getNativeEvent(event).isComposing
++  return getNativeEvent(event).isComposing || event.keyCode === 229
+ }
+ 
+ export function isKeyboardClick(e: Pick<MouseEvent, "detail" | "clientX" | "clientY">) {
+   return e.detail === 0 || (e.clientX === 0 && e.clientY === 0)
+ }
+ 
++export function isCtrlOrMetaKey(e: Pick<KeyboardEvent, "ctrlKey" | "metaKey">) {
++  if (isMac()) return e.metaKey
++  return e.ctrlKey
++}
++
+ export function isPrintableKey(e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey">): boolean {
+   return e.key.length === 1 && !e.ctrlKey && !e.metaKey
+ }
+diff --git a/packages/utilities/focus-visible/src/index.ts b/packages/utilities/focus-visible/src/index.ts
+index 8d784c2ecb..a5e0bed0fa 100644
+--- a/packages/utilities/focus-visible/src/index.ts
++++ b/packages/utilities/focus-visible/src/index.ts
+@@ -2,12 +2,7 @@
+  * Credit: Huge props to the team at Adobe for inspiring this implementation.
+  * https://github.com/adobe/react-spectrum/blob/main/packages/%40react-aria/interactions/src/useFocusVisible.ts
+  */
+-import { getDocument, getEventTarget, getWindow, isMac } from "@zag-js/dom-query"
+-
+-function isVirtualClick(event: MouseEvent | PointerEvent): boolean {
+-  if ((event as any).mozInputSource === 0 && event.isTrusted) return true
+-  return event.detail === 0 && !(event as PointerEvent).pointerType
+-}
++import { getDocument, getEventTarget, getWindow, isMac, isVirtualClick } from "@zag-js/dom-query"
+ 
+ function isValidKey(e: KeyboardEvent) {
+   return !(
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index bc77433252..25efa08409 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -242,6 +242,9 @@ importers:
+       '@zag-js/interact-outside':
+         specifier: workspace:*
+         version: link:../../packages/utilities/interact-outside
++      '@zag-js/listbox':
++        specifier: workspace:*
++        version: link:../../packages/machines/listbox
+       '@zag-js/live-region':
+         specifier: workspace:*
+         version: link:../../packages/utilities/live-region
+@@ -531,6 +534,9 @@ importers:
+       '@zag-js/interact-outside':
+         specifier: workspace:*
+         version: link:../../packages/utilities/interact-outside
++      '@zag-js/listbox':
++        specifier: workspace:*
++        version: link:../../packages/machines/listbox
+       '@zag-js/live-region':
+         specifier: workspace:*
+         version: link:../../packages/utilities/live-region
+@@ -1040,6 +1046,9 @@ importers:
+       '@zag-js/interact-outside':
+         specifier: workspace:*
+         version: link:../../packages/utilities/interact-outside
++      '@zag-js/listbox':
++        specifier: workspace:*
++        version: link:../../packages/machines/listbox
+       '@zag-js/live-region':
+         specifier: workspace:*
+         version: link:../../packages/utilities/live-region
+@@ -1277,6 +1286,9 @@ importers:
+       '@zag-js/interact-outside':
+         specifier: workspace:*
+         version: link:../../packages/utilities/interact-outside
++      '@zag-js/listbox':
++        specifier: workspace:*
++        version: link:../../packages/machines/listbox
+       '@zag-js/live-region':
+         specifier: workspace:*
+         version: link:../../packages/utilities/live-region
+@@ -2289,6 +2301,34 @@ importers:
+         specifier: 2.2.0
+         version: 2.2.0
+ 
++  packages/machines/listbox:
++    dependencies:
++      '@zag-js/anatomy':
++        specifier: workspace:*
++        version: link:../../anatomy
++      '@zag-js/collection':
++        specifier: workspace:*
++        version: link:../../utilities/collection
++      '@zag-js/core':
++        specifier: workspace:*
++        version: link:../../core
++      '@zag-js/dom-query':
++        specifier: workspace:*
++        version: link:../../utilities/dom-query
++      '@zag-js/focus-visible':
++        specifier: workspace:*
++        version: link:../../utilities/focus-visible
++      '@zag-js/types':
++        specifier: workspace:*
++        version: link:../../types
++      '@zag-js/utils':
++        specifier: workspace:*
++        version: link:../../utilities/core
++    devDependencies:
++      clean-package:
++        specifier: 2.2.0
++        version: 2.2.0
++
+   packages/machines/menu:
+     dependencies:
+       '@zag-js/anatomy':
+diff --git a/shared/src/controls.ts b/shared/src/controls.ts
+index 25cea32989..46fee46054 100644
+--- a/shared/src/controls.ts
++++ b/shared/src/controls.ts
+@@ -173,6 +173,17 @@ export const selectControls = defineControls({
+   dir: { type: "select", options: ["ltr", "rtl"] as const, defaultValue: "ltr" },
+ })
+ 
++export const listboxControls = defineControls({
++  selectionMode: {
++    type: "select",
++    options: ["none", "single", "multiple", "extended"] as const,
++    defaultValue: "single",
++  },
++  deselectable: { type: "boolean", defaultValue: true },
++  disabled: { type: "boolean", defaultValue: false },
++  loopFocus: { type: "boolean", defaultValue: false },
++})
++
+ export const datePickerControls = defineControls({
+   readOnly: { type: "boolean", defaultValue: false },
+   disabled: { type: "boolean", defaultValue: false },
+diff --git a/shared/src/css/layout.css b/shared/src/css/layout.css
+index b3b98e6f4a..df9e5dee71 100644
+--- a/shared/src/css/layout.css
++++ b/shared/src/css/layout.css
+@@ -8,8 +8,9 @@ body {
+ 
+ * {
+   box-sizing: border-box;
+-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+-    "Helvetica Neue", sans-serif;
++  font-family:
++    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
++    sans-serif;
+ }
+ 
+ input::-webkit-outer-spin-button,
+@@ -50,6 +51,7 @@ ul {
+   line-height: 1em;
+   flex: 1;
+   padding: 40px;
++  overflow-y: auto;
+ }
+ 
+ .index-nav ul {
+diff --git a/shared/src/css/listbox.css b/shared/src/css/listbox.css
+new file mode 100644
+index 0000000000..76236ef391
+--- /dev/null
++++ b/shared/src/css/listbox.css
+@@ -0,0 +1,75 @@
++[data-scope="listbox"][data-part="label"] {
++  font-size: 14px;
++}
++
++[data-scope="listbox"][data-part="label"][data-disabled] {
++  cursor: default;
++  color: gray;
++}
++
++[data-scope="listbox"][data-part="label"][data-invalid] {
++  color: red;
++}
++
++[data-scope="listbox"][data-part="content"] {
++  padding: 0px;
++  list-style: none;
++  width: 400px;
++  margin: 0;
++  margin-top: 4px;
++  padding: 4px;
++  background: #efefef;
++  max-height: 400px;
++  overflow-y: auto;
++  position: relative;
++  overscroll-behavior: contain;
++  scroll-padding: 4px;
++
++  &[data-layout="grid"] {
++    display: grid;
++    grid-template-columns: repeat(var(--column-count), 1fr);
++    gap: 4px;
++  }
++}
++
++[data-scope="listbox"][data-part="item"] {
++  padding: 4px 8px;
++  cursor: default;
++  display: flex;
++  align-items: center;
++  border-radius: 4px;
++
++  &[data-layout="grid"] {
++    display: flex;
++    flex-direction: column;
++    padding: 8px;
++    border-radius: 8px;
++    align-items: center;
++    justify-content: center;
++    min-height: 40px;
++    border: 1px solid #ccc;
++    padding: 8px;
++
++    > * {
++      flex: 0 0 auto;
++      display: inline;
++    }
++  }
++}
++
++[data-scope="listbox"][data-part="item"][data-disabled] {
++  color: #777;
++}
++
++[data-scope="listbox"][data-part="item-text"] {
++  flex: 1;
++  width: 100%;
++}
++
++[data-scope="listbox"][data-part="item"][data-state="checked"] {
++  background: rgb(197, 197, 255);
++}
++
++[data-scope="listbox"][data-part="item"][data-highlighted] {
++  outline: 2px solid rgb(172, 172, 243);
++}
+diff --git a/shared/src/routes.ts b/shared/src/routes.ts
+index 946bbe27a2..804f950f29 100644
+--- a/shared/src/routes.ts
++++ b/shared/src/routes.ts
+@@ -4,6 +4,8 @@ type RouteData = {
+ }
+ 
+ export const routesData: RouteData[] = [
++  { label: "Listbox", path: "/listbox" },
++  { label: "Listbox (Grid)", path: "/listbox-grid" },
+   { label: "Navigation Menu", path: "/navigation-menu" },
+   { label: "Navigation Menu (Viewport)", path: "/navigation-menu-viewport" },
+   { label: "Navigation Menu (Nested)", path: "/navigation-menu-nested" },
+diff --git a/shared/src/style.css b/shared/src/style.css
+index 893bb106b1..1c837c0f51 100644
+--- a/shared/src/style.css
++++ b/shared/src/style.css
+@@ -20,6 +20,7 @@
+ 
+ @import url("./css/hover-card.css");
+ 
++@import url("./css/listbox.css");
+ @import url("./css/layout.css");
+ 
+ @import url("./css/menu.css");
+diff --git a/website/data/components/listbox.mdx b/website/data/components/listbox.mdx
+new file mode 100644
+index 0000000000..1c6e2909aa
+--- /dev/null
++++ b/website/data/components/listbox.mdx
+@@ -0,0 +1,224 @@
++---
++title: Listbox
++description:
++  Used to display a list of selectable options, supporting both single and
++  multiple selection modes.
++package: "@zag-js/listbox"
++---
++
++# Listbox
++
++A listbox component that displays a list of selectable options, supporting both
++single and multiple selection modes.
++
++<Resources pkg="@zag-js/listbox" />
++
++<Showcase id="Listbox" />
++
++**Features**
++
++- Supports single, multiple, or no selection
++- Can be controlled or uncontrolled
++- Fully managed keyboard navigation (arrow keys, home, end, etc.)
++- Vertical and horizontal orientation
++- Typeahead to allow focusing the matching item
++- Supports items, labels, groups of items
++- Supports grid and list layouts
++
++## Installation
++
++To use the listbox machine in your project, run the following command in your
++command line:
++
++<CodeSnippet id="listbox/installation.mdx" />
++
++This command will install the framework agnostic listbox logic and the reactive
++utilities for your framework of choice.
++
++## Anatomy
++
++To set up the listbox correctly, you'll need to understand its anatomy and how
++we name its parts.
++
++> Each part includes a `data-part` attribute to help identify them in the DOM.
++
++<Anatomy id="listbox" />
++
++## Usage
++
++First, import the listbox package into your project
++
++```jsx
++import * as listbox from "@zag-js/listbox"
++```
++
++The listbox package exports two key functions:
++
++- `machine` — The state machine logic for the listbox widget.
++- `connect` — The function that translates the machine's state to JSX attributes
++  and event handlers.
++
++> You'll also need to provide a unique `id` to the `useMachine` hook. This is
++> used to ensure that every part has a unique identifier.
++
++Next, import the required hooks and functions for your framework and use the
++listbox machine in your project 🔥
++
++<CodeSnippet id="listbox/usage.mdx" />
++
++## Setting the initial selection
++
++To set the initial selection, you can use the `defaultValue` property.
++
++```tsx
++const service = useMachine(listbox.machine, {
++  defaultValue: ["item-1", "item-2"],
++})
++```
++
++## Controlling the selection
++
++To control the selection programmatically, you can use the `value` and
++`onValueChange` properties.
++
++```tsx
++const service = useMachine(listbox.machine, {
++  value: ["item-1", "item-2"],
++  onValueChange: (value) => {
++    console.log(value)
++  },
++})
++```
++
++## Filtering
++
++The listbox component supports filtering of items via `api.getInputProps`.
++Here's an example of how to support searching through a list of items.
++
++## Selecting multiple items
++
++To enable multiple selection, set the `selectionMode` property to `multiple` or
++`extended`.
++
++## Selection Modes
++
++By default, a user can select a single item in a listbox. You can set the
++`selectionMode` property to a SelectionMode enumeration value to enable
++multi-selection. Here are the selection mode values.
++
++- **single**: A user can select a single item using the space bar, mouse click,
++  or touch tap.
++- **multiple**: A user can select multiple items using the space bar, mouse
++  click, or touch tap to toggle selection on the focused item. Using the arrow
++  keys, a user can move focus independently of selection.
++- **extended**: With no modifier keys like `Ctrl`, `Cmd` or `Shift`: the
++  behavior is the same as single selection.
++
++```tsx
++const service = useMachine(listbox.machine, {
++  selectionMode: "multiple",
++})
++```
++
++## Disabling items
++
++To disable an item, you can use the `disabled` property.
++
++```tsx
++api.getItemProps({
++  // ...
++  disabled: true,
++})
++```
++
++To disable the entire listbox, you can use the `disabled` property.
++
++```tsx
++const service = useMachine(listbox.machine, {
++  disabled: true,
++})
++```
++
++### Grid layout
++
++To enable a grid layout, provide a grid collection to the `collection` property.
++
++```tsx
++const service = useMachine(listbox.machine, {
++  collection: listbox.gridCollection({
++    items: [],
++    columnCount: 3,
++  }),
++})
++```
++
++## Styling guide
++
++Earlier, we mentioned that each listbox part has a `data-part` attribute added
++to them to select and style them in the DOM.
++
++```css
++[data-scope="listbox"][data-part="root"] {
++  /* styles for the root part */
++}
++
++[data-scope="listbox"][data-part="label"] {
++  /* styles for the label part */
++}
++
++[data-scope="listbox"][data-part="content"] {
++  /* styles for the content part */
++}
++
++[data-scope="listbox"][data-part="item"] {
++  /* styles for the item part */
++}
++
++[data-scope="listbox"][data-part="itemGroup"] {
++  /* styles for the item group part */
++}
++```
++
++### Focused state
++
++The focused state is applied to the item that is currently focused.
++
++```css
++[data-scope="listbox"][data-part="item"][data-focused] {
++  /* styles for the focused item part */
++}
++```
++
++### Selected state
++
++The selected state is applied to the item that is currently selected.
++
++```css
++[data-scope="listbox"][data-part="item"][data-selected] {
++  /* styles for the selected item part */
++}
++```
++
++### Disabled state
++
++The disabled state is applied to the item that is currently disabled.
++
++```css
++[data-scope="listbox"][data-part="item"][data-disabled] {
++  /* styles for the disabled item part */
++}
++```
++
++## Methods and Properties
++
++### Machine Context
++
++The listbox machine exposes the following context properties:
++
++<ContextTable name="listbox" />
++
++### Machine API
++
++The listbox `api` exposes the following methods:
++
++<ApiTable name="listbox" />
+diff --git a/website/data/snippets/react/listbox/installation.mdx b/website/data/snippets/react/listbox/installation.mdx
+new file mode 100644
+index 0000000000..7853ae22ea
+--- /dev/null
++++ b/website/data/snippets/react/listbox/installation.mdx
+@@ -0,0 +1,5 @@
++```bash
++npm install @zag-js/listbox @zag-js/react
++# or
++yarn add @zag-js/listbox @zag-js/react
++```
+diff --git a/website/data/snippets/react/listbox/usage.mdx b/website/data/snippets/react/listbox/usage.mdx
+new file mode 100644
+index 0000000000..31dcf6d8b7
+--- /dev/null
++++ b/website/data/snippets/react/listbox/usage.mdx
+@@ -0,0 +1,17 @@
++```jsx
++import * as listbox from "@zag-js/listbox"
++import { useMachine, normalizeProps } from "@zag-js/react"
++import { useId } from "react"
++
++function Listbox() {
++  const service = useMachine(listbox.machine, { id: useId() })
++
++  const api = listbox.connect(service, normalizeProps)
++
++  return (
++    <div {...api.getRootProps()}>
++      <div {...api.getContentProps()}>...</div>
++    </div>
++  )
++}
++```
+diff --git a/website/data/snippets/solid/listbox/installation.mdx b/website/data/snippets/solid/listbox/installation.mdx
+new file mode 100644
+index 0000000000..3f98a49556
+--- /dev/null
++++ b/website/data/snippets/solid/listbox/installation.mdx
+@@ -0,0 +1,5 @@
++```bash
++npm install @zag-js/listbox @zag-js/solid
++# or
++yarn add @zag-js/listbox @zag-js/solid
++```
+diff --git a/website/data/snippets/solid/listbox/usage.mdx b/website/data/snippets/solid/listbox/usage.mdx
+new file mode 100644
+index 0000000000..f1524eebe2
+--- /dev/null
++++ b/website/data/snippets/solid/listbox/usage.mdx
+@@ -0,0 +1,17 @@
++```jsx
++import * as listbox from "@zag-js/listbox"
++import { useMachine, normalizeProps } from "@zag-js/solid"
++import { createMemo, createUniqueId } from "solid-js"
++
++function Listbox() {
++  const service = useMachine(listbox.machine, { id: createUniqueId() })
++
++  const api = createMemo(() => listbox.connect(service, normalizeProps))
++
++  return (
++    <div {...api().getRootProps()}>
++      <div {...api().getContentProps()}>...</div>
++    </div>
++  )
++}
++```
+diff --git a/website/data/snippets/vue/listbox/installation.mdx b/website/data/snippets/vue/listbox/installation.mdx
+new file mode 100644
+index 0000000000..e79a64bcac
+--- /dev/null
++++ b/website/data/snippets/vue/listbox/installation.mdx
+@@ -0,0 +1,5 @@
++```bash
++npm install @zag-js/listbox @zag-js/vue
++# or
++yarn add @zag-js/listbox @zag-js/vue
++```
+diff --git a/website/data/snippets/vue/listbox/usage.mdx b/website/data/snippets/vue/listbox/usage.mdx
+new file mode 100644
+index 0000000000..27235d3778
+--- /dev/null
++++ b/website/data/snippets/vue/listbox/usage.mdx
+@@ -0,0 +1,17 @@
++```html
++<script setup>
++  import * as listbox from "@zag-js/listbox"
++  import { useMachine, normalizeProps } from "@zag-js/vue"
++  import { computed, useId } from "vue"
++
++  const service = useMachine(listbox.machine, { id: useId() })
++
++  const api = computed(() => listbox.connect(service, normalizeProps))
++</script>
++
++<template>
++  <div ref="ref" v-bind="api.getRootProps()">
++    <div v-bind="api.getContentProps()">...</div>
++  </div>
++</template>
++```

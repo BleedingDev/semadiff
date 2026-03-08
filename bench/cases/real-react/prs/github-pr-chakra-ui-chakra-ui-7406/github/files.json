@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "e0dcffd02d60d1c45798cd9fa6f424a061b6bb34",
+    "filename": ".changeset/shy-pumas-provide.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5/.changeset%2Fshy-pumas-provide.md",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5/.changeset%2Fshy-pumas-provide.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/.changeset%2Fshy-pumas-provide.md?ref=0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@chakra-ui/avatar\": patch\n+---\n+\n+Fix issue where initials was not correctly computed when name includes a middle name like \"Sage Naruto Manich\""
+  },
+  {
+    "sha": "d605dcdf31c8ef33fba9ef18a14263fa5e2765ba",
+    "filename": "packages/components/avatar/src/avatar-name.tsx",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 1,
+    "changes": 3,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5/packages%2Fcomponents%2Favatar%2Fsrc%2Favatar-name.tsx",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5/packages%2Fcomponents%2Favatar%2Fsrc%2Favatar-name.tsx",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Fcomponents%2Favatar%2Fsrc%2Favatar-name.tsx?ref=0358275f990fe3c3ecbfe4c4cce6fc11d888f3d5",
+    "patch": "@@ -3,7 +3,8 @@ import { useAvatarStyles } from \"./avatar-context\"\n import { AvatarOptions } from \"./avatar-types\"\n \n export function initials(name: string) {\n-  const [firstName, lastName] = name.split(\" \")\n+  const [firstName, ...otherNames] = name.split(\" \");\n+  const [lastName] = otherNames.reverse();\n   return firstName && lastName\n     ? `${firstName.charAt(0)}${lastName.charAt(0)}`\n     : firstName.charAt(0)"
+  }
+]

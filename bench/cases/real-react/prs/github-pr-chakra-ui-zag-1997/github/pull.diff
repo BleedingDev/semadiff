@@ -1,0 +1,123 @@
+diff --git a/examples/lit-ts/src/accordion-element.ts b/examples/lit-ts/src/accordion-element.ts
+index d316ae231f..b7fa2baefc 100644
+--- a/examples/lit-ts/src/accordion-element.ts
++++ b/examples/lit-ts/src/accordion-element.ts
+@@ -1,6 +1,5 @@
+ import { spread } from "@open-wc/lit-helpers"
+ import * as accordion from "@zag-js/accordion"
+-import { Machine } from "@zag-js/core"
+ import { accordionData } from "@zag-js/shared"
+ import { PropTypes } from "@zag-js/types"
+ import { html, unsafeCSS } from "lit"
+@@ -11,7 +10,7 @@ import { normalizeProps } from "./normalize-props"
+ 
+ @customElement("accordion-element")
+ export class AccordionElement extends Component<accordion.Context, accordion.Api, accordion.Service> {
+-  initService(context: accordion.Context): Machine<any, any, any> {
++  initService(context: accordion.Context): accordion.Service {
+     return accordion.machine({ ...context, id: "1" })
+   }
+ 
+diff --git a/examples/lit-ts/src/avatar-element.ts b/examples/lit-ts/src/avatar-element.ts
+index cfcb5d95a4..f3790c1aea 100644
+--- a/examples/lit-ts/src/avatar-element.ts
++++ b/examples/lit-ts/src/avatar-element.ts
+@@ -1,6 +1,5 @@
+ import { spread } from "@open-wc/lit-helpers"
+ import * as avatar from "@zag-js/avatar"
+-import { Machine } from "@zag-js/core"
+ import { PropTypes } from "@zag-js/types"
+ import { html, unsafeCSS } from "lit"
+ import { customElement } from "lit/decorators.js"
+@@ -10,7 +9,7 @@ import { normalizeProps } from "./normalize-props"
+ 
+ @customElement("avatar-element")
+ export class AvatarElement extends Component<avatar.Context, avatar.Api, avatar.Service> {
+-  initService(context: avatar.Context): Machine<any, any, any> {
++  initService(context: avatar.Context): avatar.Service {
+     return avatar.machine({ ...context, id: "1" })
+   }
+ 
+diff --git a/examples/lit-ts/src/carousel-element.ts b/examples/lit-ts/src/carousel-element.ts
+index 33441cd732..15d493f19f 100644
+--- a/examples/lit-ts/src/carousel-element.ts
++++ b/examples/lit-ts/src/carousel-element.ts
+@@ -1,6 +1,5 @@
+ import { spread } from "@open-wc/lit-helpers"
+ import * as carousel from "@zag-js/carousel"
+-import { Machine } from "@zag-js/core"
+ import { carouselData } from "@zag-js/shared"
+ import { PropTypes } from "@zag-js/types"
+ import { html, unsafeCSS } from "lit"
+@@ -11,7 +10,7 @@ import { normalizeProps } from "./normalize-props"
+ 
+ @customElement("carousel-element")
+ export class CarouselElement extends Component<carousel.Context, carousel.Api, carousel.Service> {
+-  initService(context: carousel.Context): Machine<any, any, any> {
++  initService(context: carousel.Context): carousel.Service {
+     return carousel.machine({ ...context, id: "1", index: 0, spacing: "20px", slidesPerView: 2 })
+   }
+ 
+diff --git a/examples/lit-ts/src/component.ts b/examples/lit-ts/src/component.ts
+index 8b1bc19e24..1da365a173 100644
+--- a/examples/lit-ts/src/component.ts
++++ b/examples/lit-ts/src/component.ts
+@@ -1,21 +1,28 @@
+-import { Machine, StateFrom } from "@zag-js/core"
++import { Dict, Machine, StateFrom, StateMachine } from "@zag-js/core"
+ import { LitElement } from "lit"
+ import { state } from "lit/decorators.js"
+ 
+ interface ComponentInterface<Api, Service> {
+   api: Api
+-  service: ReturnType<any>
++  service: Service
+   state: StateFrom<Service>
+ }
+ 
+-export abstract class Component<Context, Api, Service> extends LitElement implements ComponentInterface<Api, Service> {
++export abstract class Component<
++    Context extends Dict,
++    Api,
++    Service extends Machine<any, any, StateMachine.AnyEventObject>,
++  >
++  extends LitElement
++  implements ComponentInterface<Api, Service>
++{
+   api: Api
+-  service: ReturnType<any>
++  service: Service
+ 
+   @state()
+   state: StateFrom<Service>
+ 
+-  abstract initService(context: Context): Machine<any, any, any>
++  abstract initService(context: Context): Service
+   abstract initApi(): Api
+ 
+   constructor(context: Context) {
+@@ -23,11 +30,11 @@ export abstract class Component<Context, Api, Service> extends LitElement implem
+     this.service = this.initService(context)
+     this.service._created()
+ 
+-    this.state = this.service.getState()
++    this.state = this.service.getState() as StateFrom<Service>
+     this.api = this.initApi()
+ 
+-    this.service.subscribe((state: StateFrom<Service>) => {
+-      this.state = state
++    this.service.subscribe((state) => {
++      this.state = state as StateFrom<Service>
+       this.api = this.initApi()
+     })
+   }
+diff --git a/packages/core/src/index.ts b/packages/core/src/index.ts
+index 352870079a..ae65731f22 100644
+--- a/packages/core/src/index.ts
++++ b/packages/core/src/index.ts
+@@ -4,4 +4,4 @@ export { choose, guards } from "./guard-utils"
+ export * from "./machine"
+ export { mergeProps } from "./merge-props"
+ export type { ContextFrom, EventFrom, StateFrom } from "./type-utils"
+-export type { StateMachine } from "./types"
++export type { Dict, StateMachine } from "./types"

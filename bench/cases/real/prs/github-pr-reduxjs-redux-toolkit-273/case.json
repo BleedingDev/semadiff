@@ -1,0 +1,80 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-273",
+  "language": "ts",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#273: * refactor actionCreator typings from `type` to `interface`",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 273,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/273",
+    "baseSha": "0f4b0e0c670091e05448593c9af2d5b10f6a540e",
+    "headSha": "bc2f68ec26cd7996f5a8d6622341b4432991d887",
+    "selectedFiles": [
+      "src/createSlice.ts"
+    ],
+    "collectedAt": "2026-03-08T02:17:43.270Z"
+  },
+  "files": [
+    {
+      "id": "src/createSlice.ts",
+      "oldPath": "src/createSlice.ts",
+      "newPath": "src/createSlice.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "src/createSlice.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 8,
+          "endLine": 8
+        },
+        "newRange": {
+          "startLine": 8,
+          "endLine": 8
+        }
+      },
+      {
+        "fileId": "src/createSlice.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 140,
+          "endLine": 140
+        },
+        "newRange": {
+          "startLine": 140,
+          "endLine": 140
+        }
+      },
+      {
+        "fileId": "src/createSlice.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 223,
+          "endLine": 223
+        },
+        "newRange": {
+          "startLine": 223,
+          "endLine": 223
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

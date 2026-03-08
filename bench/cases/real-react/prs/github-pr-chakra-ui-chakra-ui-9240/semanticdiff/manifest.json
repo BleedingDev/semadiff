@@ -1,0 +1,48 @@
+[
+  {
+    "tracking_name": ".changeset/large-queens-cover.md",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=.changeset%2Flarge-queens-cover.md&new_oid=5354a6683f934815b5562ffcaa817c076dd2e2e8&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/large-queens-cover.md",
+      "oid": "5354a6683f934815b5562ffcaa817c076dd2e2e8",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "63adb23ca6745b40ad6d7fcd92193acff8ab315324c824105567d6ff7a24d5fb"
+  },
+  {
+    "tracking_name": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Fcreate-slot-recipe-context.tsx&old_oid=9cbc20c78e09644841effd6ec1e2c2edc5c78758&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Fcreate-slot-recipe-context.tsx&new_oid=cc96e88dbd98b121c0552c5a0b8e9d5c71c81fba&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+      "oid": "9cbc20c78e09644841effd6ec1e2c2edc5c78758",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/styled-system/create-slot-recipe-context.tsx",
+      "oid": "cc96e88dbd98b121c0552c5a0b8e9d5c71c81fba",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "956d0f651c7dedb140df3213eb58c11d163e27f2a181656ac11f64d6aa853c21"
+  },
+  {
+    "tracking_name": "packages/react/src/styled-system/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts&old_oid=cd7b4fa35883d4d86ca487f7de689adae96f6eeb&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Findex.ts&new_oid=8813113423c28f011a1c4d1d0a1d253253ab058c&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/react/src/styled-system/index.ts",
+      "oid": "cd7b4fa35883d4d86ca487f7de689adae96f6eeb",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/styled-system/index.ts",
+      "oid": "8813113423c28f011a1c4d1d0a1d253253ab058c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "84544912fcb9765e0ddc0188e4e839450d972d606afe2cd0a577a7a705410ecd"
+  }
+]

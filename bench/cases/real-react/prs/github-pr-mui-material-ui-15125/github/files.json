@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "debb418727ad1f3fbd541e0f540c585f47c3de43",
+    "filename": "docs/src/pages/utils/portal/SimplePortal.js",
+    "status": "modified",
+    "additions": 24,
+    "deletions": 38,
+    "changes": 62,
+    "blob_url": "https://github.com/mui/material-ui/blob/18c94ce1b6161795aa3b519346cf14604ba2dffc/docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/18c94ce1b6161795aa3b519346cf14604ba2dffc/docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.js?ref=18c94ce1b6161795aa3b519346cf14604ba2dffc",
+    "patch": "@@ -1,55 +1,41 @@\n import React from 'react';\n-import PropTypes from 'prop-types';\n import Portal from '@material-ui/core/Portal';\n import Button from '@material-ui/core/Button';\n import Typography from '@material-ui/core/Typography';\n-import { withStyles } from '@material-ui/core/styles';\n+import { makeStyles } from '@material-ui/core/styles';\n \n-const styles = theme => ({\n+const useStyles = makeStyles(theme => ({\n   alert: {\n     padding: theme.spacing(1),\n     margin: theme.spacing(1, 0),\n     border: '1px solid',\n     borderColor: theme.palette.text.primary,\n   },\n-});\n+}));\n \n-class SimplePortal extends React.Component {\n-  state = {\n-    show: false,\n-  };\n+function SimplePortal() {\n+  const [show, setShow] = React.useState(false);\n+  const container = React.useRef(null);\n+  const classes = useStyles();\n \n-  handleClick = () => {\n-    this.setState(state => ({ show: !state.show }));\n-  };\n+  function handleClick() {\n+    setShow(!show);\n+  }\n \n-  render() {\n-    const { classes } = this.props;\n-    const { show } = this.state;\n-    return (\n-      <div>\n-        <Button onClick={this.handleClick}>{show ? 'Unmount children' : 'Mount children'}</Button>\n-        <div className={classes.alert}>\n-          <Typography>It looks like I will render here.</Typography>\n-          {show ? (\n-            <Portal container={this.container}>\n-              <Typography>But I actually render here!</Typography>\n-            </Portal>\n-          ) : null}\n-        </div>\n-        <div\n-          className={classes.alert}\n-          ref={ref => {\n-            this.container = ref;\n-          }}\n-        />\n+  return (\n+    <div>\n+      <Button onClick={handleClick}>{show ? 'Unmount children' : 'Mount children'}</Button>\n+      <div className={classes.alert}>\n+        <Typography>It looks like I will render here.</Typography>\n+        {show ? (\n+          <Portal container={container.current}>\n+            <Typography>But I actually render here!</Typography>\n+          </Portal>\n+        ) : null}\n       </div>\n-    );\n-  }\n+      <div className={classes.alert} ref={container} />\n+    </div>\n+  );\n }\n \n-SimplePortal.propTypes = {\n-  classes: PropTypes.object.isRequired,\n-};\n-\n-export default withStyles(styles)(SimplePortal);\n+export default SimplePortal;"
+  },
+  {
+    "sha": "81e642dd6f339a693c89ef7b6f554aac532fcded",
+    "filename": "docs/src/pages/utils/portal/SimplePortal.tsx",
+    "status": "added",
+    "additions": 43,
+    "deletions": 0,
+    "changes": 43,
+    "blob_url": "https://github.com/mui/material-ui/blob/18c94ce1b6161795aa3b519346cf14604ba2dffc/docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.tsx",
+    "raw_url": "https://github.com/mui/material-ui/raw/18c94ce1b6161795aa3b519346cf14604ba2dffc/docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.tsx",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.tsx?ref=18c94ce1b6161795aa3b519346cf14604ba2dffc",
+    "patch": "@@ -0,0 +1,43 @@\n+import React from 'react';\n+import Portal from '@material-ui/core/Portal';\n+import Button from '@material-ui/core/Button';\n+import Typography from '@material-ui/core/Typography';\n+import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';\n+\n+const useStyles = makeStyles((theme: Theme) =>\n+  createStyles({\n+    alert: {\n+      padding: theme.spacing(1),\n+      margin: theme.spacing(1, 0),\n+      border: '1px solid',\n+      borderColor: theme.palette.text.primary,\n+    },\n+  }),\n+);\n+\n+function SimplePortal() {\n+  const [show, setShow] = React.useState(false);\n+  const container = React.useRef(null);\n+  const classes = useStyles();\n+\n+  function handleClick() {\n+    setShow(!show);\n+  }\n+\n+  return (\n+    <div>\n+      <Button onClick={handleClick}>{show ? 'Unmount children' : 'Mount children'}</Button>\n+      <div className={classes.alert}>\n+        <Typography>It looks like I will render here.</Typography>\n+        {show ? (\n+          <Portal container={container.current}>\n+            <Typography>But I actually render here!</Typography>\n+          </Portal>\n+        ) : null}\n+      </div>\n+      <div className={classes.alert} ref={container} />\n+    </div>\n+  );\n+}\n+\n+export default SimplePortal;"
+  },
+  {
+    "sha": "eb0c79583728bdb260fc2743fcddcf79c4a359c4",
+    "filename": "pages/utils/portal.js",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 1,
+    "changes": 6,
+    "blob_url": "https://github.com/mui/material-ui/blob/18c94ce1b6161795aa3b519346cf14604ba2dffc/pages%2Futils%2Fportal.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/18c94ce1b6161795aa3b519346cf14604ba2dffc/pages%2Futils%2Fportal.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/pages%2Futils%2Fportal.js?ref=18c94ce1b6161795aa3b519346cf14604ba2dffc",
+    "patch": "@@ -4,7 +4,11 @@ import React from 'react';\n import MarkdownDocs from 'docs/src/modules/components/MarkdownDocs';\n \n const req = require.context('docs/src/pages/utils/portal', false, /\\.md|\\.js$/);\n-const reqSource = require.context('!raw-loader!../../docs/src/pages/utils/portal', false, /\\.js$/);\n+const reqSource = require.context(\n+  '!raw-loader!../../docs/src/pages/utils/portal',\n+  false,\n+  /\\.(js|tsx)$/,\n+);\n const reqPrefix = 'pages/utils/portal';\n \n function Page() {"
+  }
+]

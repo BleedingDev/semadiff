@@ -1,0 +1,50 @@
+{
+  "id": "tailwind-reorder-tsx-001",
+  "language": "tsx",
+  "kind": "micro",
+  "description": "Pure Tailwind class reordering should stay suppressed.",
+  "files": [
+    {
+      "oldPath": "src/button.tsx",
+      "newPath": "src/button.tsx",
+      "status": "modified",
+      "beforePath": "old.tsx",
+      "afterPath": "new.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [],
+    "moves": [],
+    "renames": [],
+    "entities": [
+      {
+        "side": "old",
+        "kind": "function",
+        "name": "Button",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "kind": "function",
+        "name": "Button",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      }
+    ],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": true,
+    "graph": false
+  }
+}

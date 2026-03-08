@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-10118",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#10118: fix: rename interface NativeSelectField to NativeSelectFieldProps",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 10118,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/10118",
+    "baseSha": "d7914ad43a382f30ea221e5fcbb151c658bee440",
+    "headSha": "dae0c83b71710c2a837074fb9ed63abf313563ff",
+    "selectedFiles": [
+      "apps/compositions/src/ui/native-select.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:57:45.391Z"
+  },
+  "files": [
+    {
+      "id": "apps/compositions/src/ui/native-select.tsx",
+      "oldPath": "apps/compositions/src/ui/native-select.tsx",
+      "newPath": "apps/compositions/src/ui/native-select.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/compositions/src/ui/native-select.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 29,
+          "endLine": 29
+        },
+        "newRange": {
+          "startLine": 29,
+          "endLine": 29
+        }
+      },
+      {
+        "fileId": "apps/compositions/src/ui/native-select.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 35,
+          "endLine": 35
+        },
+        "newRange": {
+          "startLine": 35,
+          "endLine": 35
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

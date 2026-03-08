@@ -1,0 +1,429 @@
+diff --git a/.changeset/bright-squids-float.md b/.changeset/bright-squids-float.md
+new file mode 100644
+index 00000000000..6385f7b892f
+--- /dev/null
++++ b/.changeset/bright-squids-float.md
+@@ -0,0 +1,5 @@
++---
++'@module-federation/dts-plugin': patch
++---
++
++Replace the Koa-based dev types server with a native Node HTTP server to reduce dependencies and keep type generation behavior unchanged.
+diff --git a/apps/metro-example-host/android/settings.gradle b/apps/metro-example-host/android/settings.gradle
+index 0d9688ec04e..8d38b5abb6e 100644
+--- a/apps/metro-example-host/android/settings.gradle
++++ b/apps/metro-example-host/android/settings.gradle
+@@ -1,6 +1,6 @@
+-pluginManagement { includeBuild("../../../node_modules/@react-native/gradle-plugin") }
++pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+ plugins { id("com.facebook.react.settings") }
+ extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand(['npx', 'rnef', 'config', '-p', 'android']) }
+ rootProject.name = "MFExampleHost"
+ include ':app'
+-includeBuild('../../../node_modules/@react-native/gradle-plugin')
++includeBuild('../node_modules/@react-native/gradle-plugin')
+diff --git a/apps/metro-example-host/metro.config.js b/apps/metro-example-host/metro.config.js
+index ec49dd20eb5..421bcac5c2b 100644
+--- a/apps/metro-example-host/metro.config.js
++++ b/apps/metro-example-host/metro.config.js
+@@ -47,8 +47,8 @@ module.exports = withModuleFederation(
+       lodash: {
+         singleton: false,
+         eager: false,
+-        requiredVersion: '4.16.6',
+-        version: '4.16.6',
++        requiredVersion: '4.17.23',
++        version: '4.17.23',
+       },
+     },
+     shareStrategy: 'loaded-first',
+diff --git a/apps/metro-example-host/package.json b/apps/metro-example-host/package.json
+index d7184f20ebc..571c33127f9 100644
+--- a/apps/metro-example-host/package.json
++++ b/apps/metro-example-host/package.json
+@@ -34,6 +34,7 @@
+     "@module-federation/runtime": "workspace:*",
+     "@react-native/babel-preset": "0.80.0",
+     "@react-native/eslint-config": "0.80.0",
++    "@react-native/gradle-plugin": "0.80.0",
+     "@react-native/metro-config": "0.80.0",
+     "@react-native/typescript-config": "0.80.0",
+     "@rnef/cli": "^0.7.25",
+diff --git a/apps/metro-example-mini/metro.config.js b/apps/metro-example-mini/metro.config.js
+index bd86ea7af45..94f953a8281 100644
+--- a/apps/metro-example-mini/metro.config.js
++++ b/apps/metro-example-mini/metro.config.js
+@@ -48,7 +48,7 @@ module.exports = withModuleFederation(
+       lodash: {
+         singleton: false,
+         eager: false,
+-        version: '4.17.21',
++        version: '4.17.23',
+       },
+     },
+     shareStrategy: 'version-first',
+diff --git a/apps/metro-example-nested-mini/metro.config.js b/apps/metro-example-nested-mini/metro.config.js
+index d4c55a5ce72..f77a324c024 100644
+--- a/apps/metro-example-nested-mini/metro.config.js
++++ b/apps/metro-example-nested-mini/metro.config.js
+@@ -51,8 +51,8 @@ module.exports = withModuleFederation(
+       lodash: {
+         singleton: false,
+         eager: false,
+-        requiredVersion: '4.17.21',
+-        version: '4.17.21',
++        requiredVersion: '4.17.23',
++        version: '4.17.23',
+       },
+     },
+     shareStrategy: 'version-first',
+diff --git a/packages/dts-plugin/package.json b/packages/dts-plugin/package.json
+index de164ae5522..d6ccec60292 100644
+--- a/packages/dts-plugin/package.json
++++ b/packages/dts-plugin/package.json
+@@ -58,7 +58,6 @@
+     "chalk": "3.0.0",
+     "fs-extra": "9.1.0",
+     "isomorphic-ws": "5.0.0",
+-    "koa": "3.0.3",
+     "lodash.clonedeepwith": "4.5.0",
+     "log4js": "6.9.1",
+     "node-schedule": "2.1.1",
+@@ -67,7 +66,6 @@
+   },
+   "devDependencies": {
+     "@module-federation/runtime": "workspace:*",
+-    "@types/koa": "2.15.0",
+     "@types/node-schedule": "2.1.7",
+     "@types/ws": "8.5.12",
+     "@vue/tsconfig": "^0.7.0",
+diff --git a/packages/dts-plugin/src/core/lib/typeScriptCompiler.test.ts b/packages/dts-plugin/src/core/lib/typeScriptCompiler.test.ts
+index 1ac94505c87..e548c1415f1 100644
+--- a/packages/dts-plugin/src/core/lib/typeScriptCompiler.test.ts
++++ b/packages/dts-plugin/src/core/lib/typeScriptCompiler.test.ts
+@@ -449,7 +449,7 @@ describe('typeScriptCompiler', () => {
+                         name: 'constant.d.ts',
+                       },
+                       {
+-                        name: 'createKoaServer.d.ts',
++                        name: 'createHttpServer.d.ts',
+                       },
+                       {
+                         name: 'createWebsocket.d.ts',
+diff --git a/packages/dts-plugin/src/dev-worker/forkDevWorker.ts b/packages/dts-plugin/src/dev-worker/forkDevWorker.ts
+index ce1a4d55e6c..6587c49b4e6 100644
+--- a/packages/dts-plugin/src/dev-worker/forkDevWorker.ts
++++ b/packages/dts-plugin/src/dev-worker/forkDevWorker.ts
+@@ -14,7 +14,7 @@ import {
+   UpdateCallbackOptions,
+   UpdateKind,
+   ModuleFederationDevServer,
+-  createKoaServer,
++  createHttpServer,
+   fileLog,
+   getIPV4,
+   DEFAULT_TAR_NAME,
+@@ -114,7 +114,7 @@ export async function forkDevWorker(
+       const mfTypesZipPath = retrieveTypesZipPath(mfTypesPath, remoteOptions);
+ 
+       await Promise.all([
+-        createKoaServer({
++        createHttpServer({
+           typeTarPath: mfTypesZipPath,
+         }).then((res) => {
+           serverAddress = res.serverAddress;
+diff --git a/packages/dts-plugin/src/server/createHttpServer.ts b/packages/dts-plugin/src/server/createHttpServer.ts
+new file mode 100644
+index 00000000000..2f733db9f90
+--- /dev/null
++++ b/packages/dts-plugin/src/server/createHttpServer.ts
+@@ -0,0 +1,50 @@
++import http from 'http';
++import fs from 'fs-extra';
++import { getFreePort, getIPV4 } from './utils';
++import { DEFAULT_TAR_NAME } from './constant';
++
++interface CreateHttpServerOptions {
++  typeTarPath: string;
++}
++
++export async function createHttpServer(
++  options: CreateHttpServerOptions,
++): Promise<{
++  server: http.Server;
++  serverAddress: string;
++}> {
++  const { typeTarPath } = options;
++  const freeport = await getFreePort();
++  const server = http.createServer((req, res) => {
++    const requestPath = req.url?.split('?')[0] ?? '/';
++    if (requestPath === `/${DEFAULT_TAR_NAME}`) {
++      res.statusCode = 200;
++      res.setHeader('Content-Type', 'application/x-gzip');
++      if (req.method === 'HEAD') {
++        res.end();
++        return;
++      }
++      const stream = fs.createReadStream(typeTarPath);
++      stream.on('error', () => {
++        if (!res.headersSent) {
++          res.statusCode = 500;
++        }
++        res.end();
++      });
++      res.on('close', () => {
++        stream.destroy();
++      });
++      stream.pipe(res);
++      return;
++    }
++    res.statusCode = 404;
++    res.end();
++  });
++
++  server.listen(freeport);
++
++  return {
++    server,
++    serverAddress: `http://${getIPV4()}:${freeport}`,
++  };
++}
+diff --git a/packages/dts-plugin/src/server/createKoaServer.ts b/packages/dts-plugin/src/server/createKoaServer.ts
+deleted file mode 100644
+index 505879c3cb0..00000000000
+--- a/packages/dts-plugin/src/server/createKoaServer.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-import fs from 'fs-extra';
+-import Koa from 'koa';
+-import { getFreePort, getIPV4 } from './utils';
+-import { DEFAULT_TAR_NAME } from './constant';
+-
+-interface CreateKoaServerOptions {
+-  typeTarPath: string;
+-}
+-
+-export async function createKoaServer(
+-  options: CreateKoaServerOptions,
+-): Promise<{
+-  server: Koa;
+-  serverAddress: string;
+-}> {
+-  const { typeTarPath } = options;
+-  const freeport = await getFreePort();
+-  const app = new Koa();
+-
+-  app.use(async (ctx, next) => {
+-    if (ctx.path === `/${DEFAULT_TAR_NAME}`) {
+-      ctx.status = 200;
+-      ctx.body = fs.createReadStream(typeTarPath);
+-      ctx.response.type = 'application/x-gzip';
+-    } else {
+-      await next();
+-    }
+-  });
+-
+-  app.listen(freeport);
+-
+-  return {
+-    server: app,
+-    serverAddress: `http://${getIPV4()}:${freeport}`,
+-  };
+-}
+diff --git a/packages/dts-plugin/src/server/index.ts b/packages/dts-plugin/src/server/index.ts
+index 94a86a39acb..8599306ad20 100644
+--- a/packages/dts-plugin/src/server/index.ts
++++ b/packages/dts-plugin/src/server/index.ts
+@@ -1,7 +1,7 @@
+ export * from './Publisher';
+ export * from './DevServer';
+ export * from './constant';
+-export * from './createKoaServer';
++export * from './createHttpServer';
+ export * from './message/Action/Update';
+ export * from './utils/getIPV4';
+ export * from './utils/log';
+diff --git a/packages/enhanced/test/ConfigTestCases.rstest.ts b/packages/enhanced/test/ConfigTestCases.rstest.ts
+index 59d7b8e6a91..e71925ffb43 100644
+--- a/packages/enhanced/test/ConfigTestCases.rstest.ts
++++ b/packages/enhanced/test/ConfigTestCases.rstest.ts
+@@ -37,6 +37,7 @@ const casesPath = path.join(__dirname, 'configCases');
+ const ensureTreeShakingFixtures = (testDirectory: string) => {
+   const nodeModulesDir = path.join(testDirectory, 'node_modules');
+   const isReshake = path.basename(testDirectory) === 'reshake-share';
++  fs.mkdirSync(nodeModulesDir, { recursive: true });
+   const ensurePackage = (
+     pkgName: string,
+     entryContents: string,
+diff --git a/packages/enhanced/test/scripts/ensure-reshake-fixtures.js b/packages/enhanced/test/scripts/ensure-reshake-fixtures.js
+index 7b81829ead9..07bfbac528d 100644
+--- a/packages/enhanced/test/scripts/ensure-reshake-fixtures.js
++++ b/packages/enhanced/test/scripts/ensure-reshake-fixtures.js
+@@ -132,6 +132,12 @@ const uiLibSideEffectEntry = [
+ ].join('\n');
+ 
+ for (const baseDir of fixtureRoots) {
++  try {
++    fs.rmSync(baseDir, { recursive: true, force: true });
++  } catch {
++    // ignore cleanup errors and ensure the directory exists
++  }
++  fs.mkdirSync(baseDir, { recursive: true });
+   const isReshake = baseDir.includes(`${path.sep}reshake-share${path.sep}`);
+   if (isReshake) {
+     ensureFixture(baseDir, 'ui-lib-dep', uiLibDepEntry);
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index c7b22cc2aa2..b45a81e826d 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -913,6 +913,9 @@ importers:
+       '@react-native/eslint-config':
+         specifier: 0.80.0
+         version: 0.80.0(eslint@9.26.0(hono@4.11.7)(jiti@2.6.1))(jest@29.7.0(@types/node@20.19.5)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@swc/core@1.15.10(@swc/helpers@0.5.18))(@types/node@20.19.5)(typescript@5.0.4)))(prettier@2.8.8)(typescript@5.0.4)
++      '@react-native/gradle-plugin':
++        specifier: 0.80.0
++        version: 0.80.0
+       '@react-native/metro-config':
+         specifier: 0.80.0
+         version: 0.80.0(@babel/core@7.28.6)
+@@ -3196,9 +3199,6 @@ importers:
+       isomorphic-ws:
+         specifier: 5.0.0
+         version: 5.0.0(ws@8.18.0)
+-      koa:
+-        specifier: 3.0.3
+-        version: 3.0.3
+       lodash.clonedeepwith:
+         specifier: 4.5.0
+         version: 4.5.0
+@@ -3221,9 +3221,6 @@ importers:
+       '@module-federation/runtime':
+         specifier: workspace:*
+         version: link:../runtime
+-      '@types/koa':
+-        specifier: 2.15.0
+-        version: 2.15.0
+       '@types/node-schedule':
+         specifier: 2.1.7
+         version: 2.1.7
+@@ -13225,9 +13222,6 @@ packages:
+   '@tybys/wasm-util@0.9.0':
+     resolution: {integrity: sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw==}
+ 
+-  '@types/accepts@1.3.7':
+-    resolution: {integrity: sha512-Pay9fq2lM2wXPWbteBsRAGiWH2hig4ZE2asK+mm7kUzlxRTfL961rj89I6zV/E3PcIkDqyuBEcMxFT7rccugeQ==}
+-
+   '@types/adm-zip@0.5.5':
+     resolution: {integrity: sha512-YCGstVMjc4LTY5uK9/obvxBya93axZOVOyf2GSUulADzmLhYE45u2nAssCs/fWBs1Ifq5Vat75JTPwd5XZoPJw==}
+ 
+@@ -13279,18 +13273,12 @@ packages:
+   '@types/connect@3.4.38':
+     resolution: {integrity: sha512-K6uROf1LD88uDQqJCktA4yzL1YYAK6NgfsI0v/mTgyPKWsX1CnJ0XPSDhViejru1GcRkLWb8RlzFYJRqGUbaug==}
+ 
+-  '@types/content-disposition@0.5.9':
+-    resolution: {integrity: sha512-8uYXI3Gw35MhiVYhG3s295oihrxRyytcRHjSjqnqZVDDy/xcGBRny7+Xj1Wgfhv5QzRtN2hB2dVRBUX9XW3UcQ==}
+-
+   '@types/conventional-commits-parser@5.0.2':
+     resolution: {integrity: sha512-BgT2szDXnVypgpNxOK8aL5SGjUdaQbC++WZNjF1Qge3Og2+zhHj+RWhmehLhYyvQwqAmvezruVfOf8+3m74W+g==}
+ 
+   '@types/cookie@0.4.1':
+     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
+ 
+-  '@types/cookies@0.9.2':
+-    resolution: {integrity: sha512-1AvkDdZM2dbyFybL4fxpuNCaWyv//0AwsuUk2DWeXyM1/5ZKm6W3z6mQi24RZ4l2ucY+bkSHzbDVpySqPGuV8A==}
+-
+   '@types/cross-spawn@6.0.6':
+     resolution: {integrity: sha512-fXRhhUkG4H3TQk5dBhQ7m/JDdSNHKwR2BBia62lhwEIq9xGiQKLxd6LymNhn47SjXhsUEPmxi+PKw2OkW4LLjA==}
+ 
+@@ -13500,9 +13488,6 @@ packages:
+   '@types/html-to-text@9.0.4':
+     resolution: {integrity: sha512-pUY3cKH/Nm2yYrEmDlPR1mR7yszjGx4DrwPjQ702C4/D5CwHuZTgZdIdwPkRbcuhs7BAh2L5rg3CL5cbRiGTCQ==}
+ 
+-  '@types/http-assert@1.5.6':
+-    resolution: {integrity: sha512-TTEwmtjgVbYAzZYWyeHPrrtWnfVkm8tQkP8P21uQifPgMRgjrow3XDEYqucuC8SKZJT7pUnhU/JymvjggxO9vw==}
+-
+   '@types/http-cache-semantics@4.2.0':
+     resolution: {integrity: sha512-L3LgimLHXtGkWikKnsPg0/VFx9OGZaC+eN1u4r+OB1XRqH3meBIAVC2zr1WdMH+RHmnRkqliQAOHNJ/E0j/e0Q==}
+ 
+@@ -13542,15 +13527,6 @@ packages:
+   '@types/json5@0.0.29':
+     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+ 
+-  '@types/keygrip@1.0.6':
+-    resolution: {integrity: sha512-lZuNAY9xeJt7Bx4t4dx0rYCDqGPW8RXhQZK1td7d4H6E9zYbLoOtjBvfwdTKpsyxQI/2jv+armjX/RW+ZNpXOQ==}
+-
+-  '@types/koa-compose@3.2.9':
+-    resolution: {integrity: sha512-BroAZ9FTvPiCy0Pi8tjD1OfJ7bgU1gQf0eR6e1Vm+JJATy9eKOG3hQMFtMciMawiSOVnLMdmUOC46s7HBhSTsA==}
+-
+-  '@types/koa@2.15.0':
+-    resolution: {integrity: sha512-7QFsywoE5URbuVnG3loe03QXuGajrnotr3gQkXcEBShORai23MePfFYdhz90FEtBBpkyIYQbVD+evKtloCgX3g==}
+-
+   '@types/loadable__component@5.13.10':
+     resolution: {integrity: sha512-2/LjmgG1JcGPj7T3NViq7BB5cvOA0s63gL3Gv+FPULj2L+3ExWfsNQcsFPUIOoGsVUJeZxgNPf320JZDyxjtCQ==}
+ 
+@@ -42132,10 +42108,6 @@ snapshots:
+     dependencies:
+       tslib: 2.8.1
+ 
+-  '@types/accepts@1.3.7':
+-    dependencies:
+-      '@types/node': 20.19.5
+-
+   '@types/adm-zip@0.5.5':
+     dependencies:
+       '@types/node': 20.19.5
+@@ -42208,21 +42180,12 @@ snapshots:
+     dependencies:
+       '@types/node': 20.19.5
+ 
+-  '@types/content-disposition@0.5.9': {}
+-
+   '@types/conventional-commits-parser@5.0.2':
+     dependencies:
+       '@types/node': 20.19.5
+ 
+   '@types/cookie@0.4.1': {}
+ 
+-  '@types/cookies@0.9.2':
+-    dependencies:
+-      '@types/connect': 3.4.38
+-      '@types/express': 4.17.21
+-      '@types/keygrip': 1.0.6
+-      '@types/node': 20.19.5
+-
+   '@types/cross-spawn@6.0.6':
+     dependencies:
+       '@types/node': 20.19.5
+@@ -42471,8 +42434,6 @@ snapshots:
+ 
+   '@types/html-to-text@9.0.4': {}
+ 
+-  '@types/http-assert@1.5.6': {}
+-
+   '@types/http-cache-semantics@4.2.0': {}
+ 
+   '@types/http-errors@2.0.5': {}
+@@ -42515,23 +42476,6 @@ snapshots:
+ 
+   '@types/json5@0.0.29': {}
+ 
+-  '@types/keygrip@1.0.6': {}
+-
+-  '@types/koa-compose@3.2.9':
+-    dependencies:
+-      '@types/koa': 2.15.0
+-
+-  '@types/koa@2.15.0':
+-    dependencies:
+-      '@types/accepts': 1.3.7
+-      '@types/content-disposition': 0.5.9
+-      '@types/cookies': 0.9.2
+-      '@types/http-assert': 1.5.6
+-      '@types/http-errors': 2.0.5
+-      '@types/keygrip': 1.0.6
+-      '@types/koa-compose': 3.2.9
+-      '@types/node': 20.19.5
+-
+   '@types/loadable__component@5.13.10':
+     dependencies:
+       '@types/react': 19.2.10

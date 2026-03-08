@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=apps%2Frouter-demo%2Frouter-remote1-2001%2Frsbuild.config.ts&old_oid=fde8d12cc36a3fea334322891670082a74a411d8&old_mode=33188&new_filename=apps%2Frouter-demo%2Frouter-remote1-2001%2Frsbuild.config.ts&new_oid=5060e48b3317bdbbe7803ec2961295b88db6064b&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+      "oid": "fde8d12cc36a3fea334322891670082a74a411d8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+      "oid": "5060e48b3317bdbbe7803ec2961295b88db6064b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fc10f895c10024fa248a4b2d41dc5749d9ec9131294be88990b425cadc77c4ac"
+  }
+]

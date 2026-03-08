@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-9770",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#9770: docs: refactor snippet usage",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 9770,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9770",
+    "baseSha": "491035070149b17a61625f9f48647ae98513761f",
+    "headSha": "d82173d904bcfeadae9ac078915f19fac114c15a",
+    "selectedFiles": [
+      "packages/react/__stories__/rating.stories.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:57:15.549Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/__stories__/rating.stories.tsx",
+      "oldPath": "packages/react/__stories__/rating.stories.tsx",
+      "newPath": "packages/react/__stories__/rating.stories.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/__stories__/rating.stories.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 26,
+          "endLine": 26
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

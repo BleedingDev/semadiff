@@ -1,0 +1,499 @@
+[
+  {
+    "tracking_name": ".changeset/swift-lamps-guess.md",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=.changeset%2Fswift-lamps-guess.md&new_oid=46279b1ab8f717fd39136c80d1dd8b8eb62ef30b&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/swift-lamps-guess.md",
+      "oid": "46279b1ab8f717fd39136c80d1dd8b8eb62ef30b",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "1be91885cd962773415f8d817c3560da1abb4567a9824391540b1260297f5b2b"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-auto-fill.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-auto-fill.tsx&new_oid=8f0eaa0c07f09c4e5c7f60091364a386b373ee72&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-auto-fill.tsx",
+      "oid": "8f0eaa0c07f09c4e5c7f60091364a386b373ee72",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "db6d6670dcada31090e1c3e77a5ff14fab34d24dd0bec84c786f3312fa4235f0"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-custom-speed.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-custom-speed.tsx&new_oid=7a4f70ab7c16f620b220b2c2cd97a370fd75bd8e&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-custom-speed.tsx",
+      "oid": "7a4f70ab7c16f620b220b2c2cd97a370fd75bd8e",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "9910c58a23e3bdb9b42d0e8b14b18288c6074dc73821bdb1bae5afe7f9207001"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-diagonal.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-diagonal.tsx&new_oid=809dec891b4729d7ed3246505f7de0a7bffcfa85&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-diagonal.tsx",
+      "oid": "809dec891b4729d7ed3246505f7de0a7bffcfa85",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "3f8c19944ad4c92c5921c418bdbe8e94951717a079418a29e93b1a3022c47b1f"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-edge-gradient.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-edge-gradient.tsx&new_oid=ce6acd6c4f836526ad07a805cec2d8be91bd4ec4&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-edge-gradient.tsx",
+      "oid": "ce6acd6c4f836526ad07a805cec2d8be91bd4ec4",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "126bbc94124ea649564b88f99381a60c1a275e2b2b357b912a89b983cafd4a3f"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-finite-loop.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-finite-loop.tsx&new_oid=e90805e97a04c263b7a4dc2599a9af858bf0a888&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-finite-loop.tsx",
+      "oid": "e90805e97a04c263b7a4dc2599a9af858bf0a888",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "b31f4cf083caeb6a8a3454255ce40fda979bb48e74f6e0b6e5f7774f0b2bedc6"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-hover-expand.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-hover-expand.tsx&new_oid=d7965b3684a8c0d5ea4bd267e508e8e473f0ff94&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-hover-expand.tsx",
+      "oid": "d7965b3684a8c0d5ea4bd267e508e8e473f0ff94",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "838c0addacbb9ffe16520b97e31af84d180ca2c2e7152e9338e55269a1df5ae1"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-multiple.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-multiple.tsx&new_oid=8ef4bf48f4da00262843d8ddb20133e006f259c1&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-multiple.tsx",
+      "oid": "8ef4bf48f4da00262843d8ddb20133e006f259c1",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "81d6500f387a07f273a6ba9bdc9e0174c204ba6c64a6dea9e0978bb1963527ec"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-news-ticker.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-news-ticker.tsx&new_oid=f59dbd3ab1fe0f739b29b519c77093fb29495616&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-news-ticker.tsx",
+      "oid": "f59dbd3ab1fe0f739b29b519c77093fb29495616",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "69f7dab0681770e90bc73579fbea3c3012c0972b4ca7604b93a5a8860c09d658"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-parallax.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-parallax.tsx&new_oid=964ebd91c1c684816f687e80608dd7d112e4f7a1&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-parallax.tsx",
+      "oid": "964ebd91c1c684816f687e80608dd7d112e4f7a1",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "52d3792cd7ac8a8311aeafc59f422ada951b5d64beebdf900bdbe42d736928bf"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-pause-interactions.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-pause-interactions.tsx&new_oid=1b3bb3b41f6b60772280e75ded5fd4b385f71d2d&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-pause-interactions.tsx",
+      "oid": "1b3bb3b41f6b60772280e75ded5fd4b385f71d2d",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "bceadd57fddcb2ed6c1b259e2963de195b804bfea5eb8781c87c9d1e74343cf5"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-programmatic-control.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-programmatic-control.tsx&new_oid=0374f333b44f2a5ac0877836e3238e88d497f8cd&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-programmatic-control.tsx",
+      "oid": "0374f333b44f2a5ac0877836e3238e88d497f8cd",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "c6d1f23b1fbf4f521a3e022179eb874a4d2e8c42a76a4aa7fd9402a96ae24502"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-reverse-direction.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-reverse-direction.tsx&new_oid=42439f2a28120fef06a5722f9bf87c08797c9707&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-reverse-direction.tsx",
+      "oid": "42439f2a28120fef06a5722f9bf87c08797c9707",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "1e6442122a041291391e42018d3ff35fc0d72a944510a1444656be193cd9b3f7"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-testimonials.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-testimonials.tsx&new_oid=00b99405a5c4c32ad179afba0b3e26e34a6e111f&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-testimonials.tsx",
+      "oid": "00b99405a5c4c32ad179afba0b3e26e34a6e111f",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "60644143812a12ab42a9e2804c59fd87f048254014b73e0defcfc006599122e6"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-velocity.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-velocity.tsx&new_oid=2fc52c92ba9408c29e3e80259e07540d34b54571&new_mode=33188",
+    "file": "diffs/diff-015.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-velocity.tsx",
+      "oid": "2fc52c92ba9408c29e3e80259e07540d34b54571",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "55eab2033146ea66c0297256f1b39c1dc79ea7e0f319ec4219c10f133c1a1e8b"
+  },
+  {
+    "tracking_name": "apps/compositions/src/examples/marquee-vertical-orientation.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fcompositions%2Fsrc%2Fexamples%2Fmarquee-vertical-orientation.tsx&new_oid=e9bafa335eb1717d5f93af6bc0ae39f001b4e33c&new_mode=33188",
+    "file": "diffs/diff-016.json",
+    "new": {
+      "name": "apps/compositions/src/examples/marquee-vertical-orientation.tsx",
+      "oid": "e9bafa335eb1717d5f93af6bc0ae39f001b4e33c",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "d8abba234b73c30a53b4d98d90713793eaf1125e8fa475339d74823e8cad4b46"
+  },
+  {
+    "tracking_name": "apps/www/content/docs/components/marquee.mdx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fcontent%2Fdocs%2Fcomponents%2Fmarquee.mdx&new_oid=f316e21a5f8be2e1041bd0a048c117517dcc152e&new_mode=33188",
+    "file": "diffs/diff-017.json",
+    "new": {
+      "name": "apps/www/content/docs/components/marquee.mdx",
+      "oid": "f316e21a5f8be2e1041bd0a048c117517dcc152e",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "3f487524e14c9b9ea85ae6ff0b634b9ee29ea46b5c11143253edb5137ee57b8f"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/action-bar.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Faction-bar.json&old_oid=66d5f2ca91eb4d2674a32ae5928c98379d9ac64b&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Faction-bar.json&new_oid=3ccc60d546c44c849452ffc2854e41f2a2d790e5&new_mode=33188",
+    "file": "diffs/diff-018.json",
+    "old": {
+      "name": "apps/www/public/r/types/action-bar.json",
+      "oid": "66d5f2ca91eb4d2674a32ae5928c98379d9ac64b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/action-bar.json",
+      "oid": "3ccc60d546c44c849452ffc2854e41f2a2d790e5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d6d9f529272488be721a1cce1f5ad74c69be5c02e2015cd7a2e80d984e325da4"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/breadcrumb.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fbreadcrumb.json&old_oid=94621505ad12dd7a1f0e48ea0929625b25159a12&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fbreadcrumb.json&new_oid=f662a5f8ddeb9e95c10974dac6171d87569bb5e2&new_mode=33188",
+    "file": "diffs/diff-019.json",
+    "old": {
+      "name": "apps/www/public/r/types/breadcrumb.json",
+      "oid": "94621505ad12dd7a1f0e48ea0929625b25159a12",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/breadcrumb.json",
+      "oid": "f662a5f8ddeb9e95c10974dac6171d87569bb5e2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2ac8c35b684eb7aa487f14101c96416c23bc8c5484cf7021e06cd92fb0c3423b"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/index.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Findex.json&old_oid=b78a950e018176428388c448523f65d0f6e49aa4&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Findex.json&new_oid=f51a137b1b630ceae48faa470fbe7fe032c59ff8&new_mode=33188",
+    "file": "diffs/diff-020.json",
+    "old": {
+      "name": "apps/www/public/r/types/index.json",
+      "oid": "b78a950e018176428388c448523f65d0f6e49aa4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/index.json",
+      "oid": "f51a137b1b630ceae48faa470fbe7fe032c59ff8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "388d23b469058bdc6f45443911ee39bfa73777cff1fe1a823c109da38e684ff8"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/marquee.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fmarquee.json&new_oid=b9828117b86fadd9e3680b8293599bcc9e7fd932&new_mode=33188",
+    "file": "diffs/diff-021.json",
+    "new": {
+      "name": "apps/www/public/r/types/marquee.json",
+      "oid": "b9828117b86fadd9e3680b8293599bcc9e7fd932",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "7d40387286e6f8d412f65e0b6634a7120225332b8556d74c36a224dcf952dc0a"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/native-select.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fnative-select.json&old_oid=8323159973286a477426ab1a0329fb0d8d2112a8&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fnative-select.json&new_oid=5efd7ae49d750e9271b4074e91a380d0845fa48c&new_mode=33188",
+    "file": "diffs/diff-022.json",
+    "old": {
+      "name": "apps/www/public/r/types/native-select.json",
+      "oid": "8323159973286a477426ab1a0329fb0d8d2112a8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/native-select.json",
+      "oid": "5efd7ae49d750e9271b4074e91a380d0845fa48c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0140e278e6c21a0c2d1aa3cc6e5d938371d650fab7236a16eef95a5f93c2fd1f"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/radio-card.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fradio-card.json&old_oid=1ad98af4703046326dbdaaa76bf7b4775cbfbcf5&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fradio-card.json&new_oid=d5bdca8bdd88d6b470eda301f35c3d3c88f6235b&new_mode=33188",
+    "file": "diffs/diff-023.json",
+    "old": {
+      "name": "apps/www/public/r/types/radio-card.json",
+      "oid": "1ad98af4703046326dbdaaa76bf7b4775cbfbcf5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/radio-card.json",
+      "oid": "d5bdca8bdd88d6b470eda301f35c3d3c88f6235b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9fa2ab3f486ff5bac24d131d2d5900a4589587231c0b394a95ecb81fd05542e4"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/select.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fselect.json&old_oid=6e9fc2ab894b769f609e2082684132b9542eebc6&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fselect.json&new_oid=bce70f401feaea96dcd03032c133eda0260050f9&new_mode=33188",
+    "file": "diffs/diff-024.json",
+    "old": {
+      "name": "apps/www/public/r/types/select.json",
+      "oid": "6e9fc2ab894b769f609e2082684132b9542eebc6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/select.json",
+      "oid": "bce70f401feaea96dcd03032c133eda0260050f9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6e7680a0d76dc5477fd6a397ec9de76cea09ad83f4c5e65efc04bd2d3cb07149"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/slider.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fslider.json&old_oid=322eff982a238075791f9139d5700a4a6e0ba69e&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Fslider.json&new_oid=d72f44510b15cb9e1fc2d222a0a0ad67b52b3f31&new_mode=33188",
+    "file": "diffs/diff-025.json",
+    "old": {
+      "name": "apps/www/public/r/types/slider.json",
+      "oid": "322eff982a238075791f9139d5700a4a6e0ba69e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/slider.json",
+      "oid": "d72f44510b15cb9e1fc2d222a0a0ad67b52b3f31",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3e4fae4377f8ef80ede0801c6a72885e763219b97dd334223b2e1322efd2dab1"
+  },
+  {
+    "tracking_name": "apps/www/public/r/types/toast.json",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Ftoast.json&old_oid=06b129cfe71b5c6bc63d897c071a80462098730b&old_mode=33188&new_filename=apps%2Fwww%2Fpublic%2Fr%2Ftypes%2Ftoast.json&new_oid=d44c1755c38070e9dbffd03315a29aff61c2f293&new_mode=33188",
+    "file": "diffs/diff-026.json",
+    "old": {
+      "name": "apps/www/public/r/types/toast.json",
+      "oid": "06b129cfe71b5c6bc63d897c071a80462098730b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "apps/www/public/r/types/toast.json",
+      "oid": "d44c1755c38070e9dbffd03315a29aff61c2f293",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "52abce5e52d7932d2ca21f8061c5860ced0d8c7e49811874722980850c1981e7"
+  },
+  {
+    "tracking_name": "packages/react/__stories__/marquee.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2F__stories__%2Fmarquee.stories.tsx&new_oid=a12de0c36a01af25bea2e14566128d2b37279024&new_mode=33188",
+    "file": "diffs/diff-027.json",
+    "new": {
+      "name": "packages/react/__stories__/marquee.stories.tsx",
+      "oid": "a12de0c36a01af25bea2e14566128d2b37279024",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "93d08bee79caf17ae87d9eb2d41a4a67d02af469f2f8c79b0f420b6512b3abf7"
+  },
+  {
+    "tracking_name": "packages/react/src/anatomy.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fanatomy.ts&old_oid=da320fa2f8aa76df0081ee1069ba52c71f2c81b5&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fanatomy.ts&new_oid=c6f05f1ae004fd0484e5a9d5972349cd2a0e36b5&new_mode=33188",
+    "file": "diffs/diff-028.json",
+    "old": {
+      "name": "packages/react/src/anatomy.ts",
+      "oid": "da320fa2f8aa76df0081ee1069ba52c71f2c81b5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/anatomy.ts",
+      "oid": "c6f05f1ae004fd0484e5a9d5972349cd2a0e36b5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "29860b2860672a8827d1bd05e6c01b7d9c0a2cd04427471984bb9783b1270967"
+  },
+  {
+    "tracking_name": "packages/react/src/components/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fcomponents%2Findex.ts&old_oid=a1a81c6d390bfcb4f6ac356ea8e8326a4e0f3715&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Findex.ts&new_oid=9fb5709a4985d9605db5b962076555d7c7297cfd&new_mode=33188",
+    "file": "diffs/diff-029.json",
+    "old": {
+      "name": "packages/react/src/components/index.ts",
+      "oid": "a1a81c6d390bfcb4f6ac356ea8e8326a4e0f3715",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/components/index.ts",
+      "oid": "9fb5709a4985d9605db5b962076555d7c7297cfd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a8f122bf9257756078da94e8c3a64f5a360b49d5e2eee45ae7579ebc369f9053"
+  },
+  {
+    "tracking_name": "packages/react/src/components/marquee/index.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fmarquee%2Findex.ts&new_oid=f233118c005735f491c1b30482a62a5fd36cff80&new_mode=33188",
+    "file": "diffs/diff-030.json",
+    "new": {
+      "name": "packages/react/src/components/marquee/index.ts",
+      "oid": "f233118c005735f491c1b30482a62a5fd36cff80",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "d0f0b4e35e1ddb25908c20f7238f882991de5fe717dc5c5d590a1eac1bbadbbb"
+  },
+  {
+    "tracking_name": "packages/react/src/components/marquee/marquee.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fmarquee%2Fmarquee.ts&new_oid=371658e70bd8a588dc9ba6509ab0e1915d0f3638&new_mode=33188",
+    "file": "diffs/diff-031.json",
+    "new": {
+      "name": "packages/react/src/components/marquee/marquee.ts",
+      "oid": "371658e70bd8a588dc9ba6509ab0e1915d0f3638",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "fd1f406867b3c247f0f0f42a9ccf3a1ad43cbaa904e4126ff201e178d5d0fc12"
+  },
+  {
+    "tracking_name": "packages/react/src/components/marquee/namespace.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Fcomponents%2Fmarquee%2Fnamespace.ts&new_oid=ef4df5482617b09f476f5f7f6e1f19eb891dc8e4&new_mode=33188",
+    "file": "diffs/diff-032.json",
+    "new": {
+      "name": "packages/react/src/components/marquee/namespace.ts",
+      "oid": "ef4df5482617b09f476f5f7f6e1f19eb891dc8e4",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "18e44977e570d0a286b437cb2389b717f369b14c1b80a89cfd0d5008588ea462"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/recipes/marquee.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=packages%2Freact%2Fsrc%2Ftheme%2Frecipes%2Fmarquee.ts&new_oid=fd9756c3a83f0dcfad78ad941f824a6d2cc15c9b&new_mode=33188",
+    "file": "diffs/diff-033.json",
+    "new": {
+      "name": "packages/react/src/theme/recipes/marquee.ts",
+      "oid": "fd9756c3a83f0dcfad78ad941f824a6d2cc15c9b",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "7ac05aa0ef4d93f2e739acea81cf83a2b6f53b1470e7da71e827cdd4371068ea"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/slot-recipes.export.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.export.ts&old_oid=ec015f85350627a99fc9fa4946a6d63551d01a85&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.export.ts&new_oid=43eac989cf7937c27881d5fd9bb3cc814c01a03e&new_mode=33188",
+    "file": "diffs/diff-034.json",
+    "old": {
+      "name": "packages/react/src/theme/slot-recipes.export.ts",
+      "oid": "ec015f85350627a99fc9fa4946a6d63551d01a85",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/slot-recipes.export.ts",
+      "oid": "43eac989cf7937c27881d5fd9bb3cc814c01a03e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "012ab4a5381aa9ab6a112580e7faed59fa34122ffa14835a30d9626da10cd339"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/slot-recipes.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.ts&old_oid=56f49c036471e078a5fdaf228715a24d6fb8bf09&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Fslot-recipes.ts&new_oid=eb0cf3400ab4a1e60854ea67b2658bbe43e60590&new_mode=33188",
+    "file": "diffs/diff-035.json",
+    "old": {
+      "name": "packages/react/src/theme/slot-recipes.ts",
+      "oid": "56f49c036471e078a5fdaf228715a24d6fb8bf09",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/slot-recipes.ts",
+      "oid": "eb0cf3400ab4a1e60854ea67b2658bbe43e60590",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a43040496f616e5612bf863ca5f4ba75a026ec4e1542cfee2ce7dcba38be62b7"
+  },
+  {
+    "tracking_name": "packages/react/src/theme/tokens/keyframes.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Ftheme%2Ftokens%2Fkeyframes.ts&old_oid=cd1d4389f8b9d097729216706d313ac00649744c&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Ftheme%2Ftokens%2Fkeyframes.ts&new_oid=6466c0b1d2786a10a086a302fa6f4e3ac51a1320&new_mode=33188",
+    "file": "diffs/diff-036.json",
+    "old": {
+      "name": "packages/react/src/theme/tokens/keyframes.ts",
+      "oid": "cd1d4389f8b9d097729216706d313ac00649744c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/theme/tokens/keyframes.ts",
+      "oid": "6466c0b1d2786a10a086a302fa6f4e3ac51a1320",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9f4f76d4bab91be9741c9035f14635bbf12b62c0422b1b6abdb67cbd0e41effd"
+  }
+]

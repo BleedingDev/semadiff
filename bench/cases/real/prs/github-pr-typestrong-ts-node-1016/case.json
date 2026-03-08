@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-typestrong-ts-node-1016",
+  "language": "ts",
+  "kind": "real",
+  "description": "typeStrong/ts-node#1016: Fix failing tests caused by recent changes to @types/node",
+  "source": {
+    "kind": "github-pr",
+    "repository": "typeStrong/ts-node",
+    "prNumber": 1016,
+    "prUrl": "https://github.com/TypeStrong/ts-node/pull/1016",
+    "baseSha": "2a0f1f3b8f979dbc61726017f5de45a8b03f3c95",
+    "headSha": "b6bc3013f921c3107f1af4a5429718f3a262e1ab",
+    "selectedFiles": [
+      "src/index.spec.ts"
+    ],
+    "collectedAt": "2026-03-08T02:22:18.807Z"
+  },
+  "files": [
+    {
+      "id": "src/index.spec.ts",
+      "oldPath": "src/index.spec.ts",
+      "newPath": "src/index.spec.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "src/index.spec.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 599,
+          "endLine": 599
+        },
+        "newRange": {
+          "startLine": 599,
+          "endLine": 599
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

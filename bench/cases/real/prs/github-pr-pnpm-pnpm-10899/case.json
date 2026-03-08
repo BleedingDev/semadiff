@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-pnpm-pnpm-10899",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10899: fix: show linked path instead of ??? in global install output",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10899,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10899",
+    "baseSha": "77165a6fca84fa5d10de2647e8e741010bb8e548",
+    "headSha": "49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750",
+    "selectedFiles": [
+      "cli/default-reporter/src/reporterForClient/reportSummary.ts"
+    ],
+    "collectedAt": "2026-03-08T02:24:55.241Z"
+  },
+  "files": [
+    {
+      "id": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+      "oldPath": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+      "newPath": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 121,
+          "endLine": 121
+        },
+        "newRange": {
+          "startLine": 121,
+          "endLine": 121
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fenhanced%2Ftest%2FConfigTestCases.rstest.ts&old_oid=59d7b8e6a910b742170da32333b564045347e086&old_mode=33188&new_filename=packages%2Fenhanced%2Ftest%2FConfigTestCases.rstest.ts&new_oid=e71925ffb43082e3efea0f4e0255ce044b2ea439&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+      "oid": "59d7b8e6a910b742170da32333b564045347e086",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/enhanced/test/ConfigTestCases.rstest.ts",
+      "oid": "e71925ffb43082e3efea0f4e0255ce044b2ea439",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ab29e96661cfa854dd3094b1cfde4795b5f667cdfbb42d6970b7c0581b0f31f2"
+  }
+]

@@ -1,0 +1,88 @@
+diff --git a/packages/vite/package.json b/packages/vite/package.json
+index 93bf04b014d2ee..0f195bb8c1331c 100644
+--- a/packages/vite/package.json
++++ b/packages/vite/package.json
+@@ -65,7 +65,7 @@
+     "build-types": "pnpm build-types-roll && pnpm build-types-check",
+     "build-types-roll": "rolldown --config rolldown.dts.config.ts",
+     "build-types-check": "tsc --project tsconfig.check.json",
+-    "typecheck": "tsc && tsc -p src/node && tsc -p src/module-runner && tsc -p src/shared && tsc -p src/node/__tests_dts__",
++    "typecheck": "tsc && tsc -p src/node && tsc -p src/module-runner && tsc -p src/shared && tsc -p src/node/__tests_dts__ && tsc -p src/module-runner/__tests_dts__",
+     "lint": "eslint --cache --ext .ts src/**",
+     "format": "prettier --write --cache --parser typescript \"src/**/*.ts\"",
+     "generate-target": "tsx scripts/generateTarget.ts",
+diff --git a/packages/vite/src/module-runner/__tests_dts__/importMeta.ts b/packages/vite/src/module-runner/__tests_dts__/importMeta.ts
+new file mode 100644
+index 00000000000000..d187a8924b5c3f
+--- /dev/null
++++ b/packages/vite/src/module-runner/__tests_dts__/importMeta.ts
+@@ -0,0 +1,20 @@
++/**
++ * Type test to verify ModuleRunnerImportMeta is structurally compatible
++ * with ImportMeta (including @types/node augmentations).
++ *
++ * This replaces `extends ImportMeta` in the interface declaration with a
++ * test-only assignability check that won't cause TS2717 "subsequent property
++ * declarations must have the same type" errors in consumer projects using
++ * skipLibCheck: false with augmented ImportMeta.
++ */
++
++import type { ExpectExtends, ExpectTrue } from '@type-challenges/utils'
++import type { ModuleRunnerImportMeta } from '../types'
++
++export type cases = [
++  // Ensure ModuleRunnerImportMeta is assignable to ImportMeta
++  // (which includes @types/node augmentations: dirname, filename, url, resolve, main)
++  ExpectTrue<ExpectExtends<Omit<ImportMeta, 'main'>, ModuleRunnerImportMeta>>,
++]
++
++export {}
+diff --git a/packages/vite/src/module-runner/__tests_dts__/tsconfig.json b/packages/vite/src/module-runner/__tests_dts__/tsconfig.json
+new file mode 100644
+index 00000000000000..0ba0f7e065d784
+--- /dev/null
++++ b/packages/vite/src/module-runner/__tests_dts__/tsconfig.json
+@@ -0,0 +1,9 @@
++{
++  "extends": "../../../tsconfig.base.json",
++  "compilerOptions": {
++    "isolatedDeclarations": false,
++    "declaration": false
++  },
++  "include": ["../", "../../types"],
++  "exclude": ["../**/__tests__"]
++}
+diff --git a/packages/vite/src/module-runner/createImportMeta.ts b/packages/vite/src/module-runner/createImportMeta.ts
+index f007dadde8e343..a72b9b5d63ed75 100644
+--- a/packages/vite/src/module-runner/createImportMeta.ts
++++ b/packages/vite/src/module-runner/createImportMeta.ts
+@@ -32,8 +32,7 @@ export function createDefaultImportMeta(
+           `file transformation. Make sure to reference it by the full name.`,
+       )
+     },
+-    // @types/node adds `main` to `import.meta`, but we don't add that for the defaultImportMeta
+-  } satisfies Omit<ModuleRunnerImportMeta, 'main'> as any
++  }
+ }
+ 
+ /**
+diff --git a/packages/vite/src/module-runner/types.ts b/packages/vite/src/module-runner/types.ts
+index 8ccf4b5edb0a4c..38586c2900d288 100644
+--- a/packages/vite/src/module-runner/types.ts
++++ b/packages/vite/src/module-runner/types.ts
+@@ -24,10 +24,14 @@ import type { InterceptorOptions } from './sourcemap/interceptor'
+ 
+ export type { DefineImportMetadata, SSRImportMetadata }
+ 
+-export interface ModuleRunnerImportMeta extends ImportMeta {
++export interface ModuleRunnerImportMeta {
+   url: string
+   env: ImportMetaEnv
+   hot?: ViteHotContext
++  dirname: string
++  filename: string
++  glob: (...args: any[]) => any
++  resolve(specifier: string, parent?: string): string
+   [key: string]: any
+ }
+ 

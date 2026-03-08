@@ -1,0 +1,1179 @@
+diff --git a/apps/compositions/src/examples/checkbox-basic.tsx b/apps/compositions/src/examples/checkbox-basic.tsx
+index c24a299a3ff..e96894ce945 100644
+--- a/apps/compositions/src/examples/checkbox-basic.tsx
++++ b/apps/compositions/src/examples/checkbox-basic.tsx
+@@ -1,5 +1,13 @@
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox } from "@chakra-ui/react"
+ 
+ export const CheckboxBasic = () => {
+-  return <Checkbox>Accept terms and conditions</Checkbox>
++  return (
++    <Checkbox.Root>
++      <Checkbox.HiddenInput />
++      <Checkbox.Control>
++        <Checkbox.Indicator />
++      </Checkbox.Control>
++      <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
++    </Checkbox.Root>
++  )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-card-basic.tsx b/apps/compositions/src/examples/checkbox-card-basic.tsx
+index beb629536ce..f0a0cd74cf6 100644
+--- a/apps/compositions/src/examples/checkbox-card-basic.tsx
++++ b/apps/compositions/src/examples/checkbox-card-basic.tsx
+@@ -1,7 +1,15 @@
+-import { CheckboxCard } from "compositions/ui/checkbox-card"
++import { CheckboxCard } from "@chakra-ui/react"
+ 
+ export const CheckboxCardBasic = () => {
+   return (
+-    <CheckboxCard label="Next.js" description="Best for apps" maxW="240px" />
++    <CheckboxCard.Root maxW="240px">
++      <CheckboxCard.HiddenInput />
++      <CheckboxCard.Control>
++        <CheckboxCard.Content>
++          <CheckboxCard.Label>Next.js</CheckboxCard.Label>
++        </CheckboxCard.Content>
++        <CheckboxCard.Indicator />
++      </CheckboxCard.Control>
++    </CheckboxCard.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-card-closed-component.tsx b/apps/compositions/src/examples/checkbox-card-closed-component.tsx
+new file mode 100644
+index 00000000000..063925b786c
+--- /dev/null
++++ b/apps/compositions/src/examples/checkbox-card-closed-component.tsx
+@@ -0,0 +1,58 @@
++import { CheckboxCard as ChakraCheckboxCard } from "@chakra-ui/react"
++import * as React from "react"
++
++export interface CheckboxCardProps extends ChakraCheckboxCard.RootProps {
++  icon?: React.ReactElement
++  label?: React.ReactNode
++  description?: React.ReactNode
++  addon?: React.ReactNode
++  indicator?: React.ReactNode | null
++  indicatorPlacement?: "start" | "end" | "inside"
++  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
++}
++
++export const CheckboxCard = React.forwardRef<
++  HTMLInputElement,
++  CheckboxCardProps
++>(function CheckboxCard(props, ref) {
++  const {
++    inputProps,
++    label,
++    description,
++    icon,
++    addon,
++    indicator = <ChakraCheckboxCard.Indicator />,
++    indicatorPlacement = "end",
++    ...rest
++  } = props
++
++  const hasContent = label || description || icon
++  const ContentWrapper = indicator ? ChakraCheckboxCard.Content : React.Fragment
++
++  return (
++    <ChakraCheckboxCard.Root {...rest}>
++      <ChakraCheckboxCard.HiddenInput ref={ref} {...inputProps} />
++      <ChakraCheckboxCard.Control>
++        {indicatorPlacement === "start" && indicator}
++        {hasContent && (
++          <ContentWrapper>
++            {icon}
++            {label && (
++              <ChakraCheckboxCard.Label>{label}</ChakraCheckboxCard.Label>
++            )}
++            {description && (
++              <ChakraCheckboxCard.Description>
++                {description}
++              </ChakraCheckboxCard.Description>
++            )}
++            {indicatorPlacement === "inside" && indicator}
++          </ContentWrapper>
++        )}
++        {indicatorPlacement === "end" && indicator}
++      </ChakraCheckboxCard.Control>
++      {addon && <ChakraCheckboxCard.Addon>{addon}</ChakraCheckboxCard.Addon>}
++    </ChakraCheckboxCard.Root>
++  )
++})
++
++export const CheckboxCardIndicator = ChakraCheckboxCard.Indicator
+diff --git a/apps/compositions/src/examples/checkbox-card-disabled.tsx b/apps/compositions/src/examples/checkbox-card-disabled.tsx
+index e0741e561f4..b9381a803a9 100644
+--- a/apps/compositions/src/examples/checkbox-card-disabled.tsx
++++ b/apps/compositions/src/examples/checkbox-card-disabled.tsx
+@@ -1,12 +1,18 @@
+-import { CheckboxCard } from "compositions/ui/checkbox-card"
++import { CheckboxCard } from "@chakra-ui/react"
+ 
+ export const CheckboxCardDisabled = () => {
+   return (
+-    <CheckboxCard
+-      disabled
+-      label="Disabled"
+-      description="This is a disabled checkbox"
+-      maxW="320px"
+-    />
++    <CheckboxCard.Root disabled maxW="320px">
++      <CheckboxCard.HiddenInput />
++      <CheckboxCard.Control>
++        <CheckboxCard.Content>
++          <CheckboxCard.Label>Disabled</CheckboxCard.Label>
++          <CheckboxCard.Description>
++            This is a disabled checkbox
++          </CheckboxCard.Description>
++        </CheckboxCard.Content>
++        <CheckboxCard.Indicator />
++      </CheckboxCard.Control>
++    </CheckboxCard.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-card-no-indicator.tsx b/apps/compositions/src/examples/checkbox-card-no-indicator.tsx
+new file mode 100644
+index 00000000000..b5ba0572682
+--- /dev/null
++++ b/apps/compositions/src/examples/checkbox-card-no-indicator.tsx
+@@ -0,0 +1,21 @@
++import { CheckboxCard, HStack } from "@chakra-ui/react"
++
++export const CheckboxCardNoIndicator = () => {
++  return (
++    <HStack>
++      <CheckboxCard.Root>
++        <CheckboxCard.HiddenInput />
++        <CheckboxCard.Control>
++          <CheckboxCard.Label>Chakra UI</CheckboxCard.Label>
++        </CheckboxCard.Control>
++      </CheckboxCard.Root>
++
++      <CheckboxCard.Root>
++        <CheckboxCard.HiddenInput />
++        <CheckboxCard.Control>
++          <CheckboxCard.Label>Next.js</CheckboxCard.Label>
++        </CheckboxCard.Control>
++      </CheckboxCard.Root>
++    </HStack>
++  )
++}
+diff --git a/apps/compositions/src/examples/checkbox-card-with-addon.tsx b/apps/compositions/src/examples/checkbox-card-with-addon.tsx
+index 1bfa5b07282..8e8a8d3f22c 100644
+--- a/apps/compositions/src/examples/checkbox-card-with-addon.tsx
++++ b/apps/compositions/src/examples/checkbox-card-with-addon.tsx
+@@ -1,18 +1,22 @@
+-import { Badge, HStack } from "@chakra-ui/react"
+-import { CheckboxCard } from "compositions/ui/checkbox-card"
++import { Badge, CheckboxCard, HStack } from "@chakra-ui/react"
+ 
+ export const CheckboxCardWithAddon = () => {
+   return (
+-    <CheckboxCard
+-      label="With Addon"
+-      description="Some description"
+-      maxW="300px"
+-      addon={
++    <CheckboxCard.Root maxW="300px">
++      <CheckboxCard.HiddenInput />
++      <CheckboxCard.Control>
++        <CheckboxCard.Content>
++          <CheckboxCard.Label>With Addon</CheckboxCard.Label>
++          <CheckboxCard.Description>Some description</CheckboxCard.Description>
++        </CheckboxCard.Content>
++        <CheckboxCard.Indicator />
++      </CheckboxCard.Control>
++      <CheckboxCard.Addon>
+         <HStack>
+           Some supporting text
+           <Badge variant="solid">New</Badge>
+         </HStack>
+-      }
+-    />
++      </CheckboxCard.Addon>
++    </CheckboxCard.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-card-without-snippet.tsx b/apps/compositions/src/examples/checkbox-card-with-description.tsx
+similarity index 50%
+rename from apps/compositions/src/examples/checkbox-card-without-snippet.tsx
+rename to apps/compositions/src/examples/checkbox-card-with-description.tsx
+index d7fa6365fbf..08dcb2e5ecb 100644
+--- a/apps/compositions/src/examples/checkbox-card-without-snippet.tsx
++++ b/apps/compositions/src/examples/checkbox-card-with-description.tsx
+@@ -1,16 +1,16 @@
+ import { CheckboxCard } from "@chakra-ui/react"
+ 
+-export const CheckboxCardWithoutSnippet = () => {
++export const CheckboxCardWithDescription = () => {
+   return (
+     <CheckboxCard.Root maxW="240px">
+       <CheckboxCard.HiddenInput />
+       <CheckboxCard.Control>
++        <CheckboxCard.Content>
++          <CheckboxCard.Label>Next.js</CheckboxCard.Label>
++          <CheckboxCard.Description>Best for apps</CheckboxCard.Description>
++        </CheckboxCard.Content>
+         <CheckboxCard.Indicator />
+       </CheckboxCard.Control>
+-      <CheckboxCard.Content>
+-        <CheckboxCard.Label>Next.js</CheckboxCard.Label>
+-        <CheckboxCard.Description>Best for apps</CheckboxCard.Description>
+-      </CheckboxCard.Content>
+     </CheckboxCard.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-card-with-group.tsx b/apps/compositions/src/examples/checkbox-card-with-group.tsx
+index 4e36ebc4215..9f4f63605ce 100644
+--- a/apps/compositions/src/examples/checkbox-card-with-group.tsx
++++ b/apps/compositions/src/examples/checkbox-card-with-group.tsx
+@@ -1,5 +1,4 @@
+-import { CheckboxGroup, Flex, Text } from "@chakra-ui/react"
+-import { CheckboxCard } from "compositions/ui/checkbox-card"
++import { CheckboxCard, CheckboxGroup, Flex, Text } from "@chakra-ui/react"
+ 
+ export const CheckboxCardWithGroup = () => {
+   return (
+@@ -9,12 +8,18 @@ export const CheckboxCardWithGroup = () => {
+       </Text>
+       <Flex gap="2">
+         {items.map((item) => (
+-          <CheckboxCard
+-            label={item.title}
+-            description={item.description}
+-            key={item.value}
+-            value={item.value}
+-          />
++          <CheckboxCard.Root key={item.value} value={item.value}>
++            <CheckboxCard.HiddenInput />
++            <CheckboxCard.Control>
++              <CheckboxCard.Content>
++                <CheckboxCard.Label>{item.title}</CheckboxCard.Label>
++                <CheckboxCard.Description>
++                  {item.description}
++                </CheckboxCard.Description>
++              </CheckboxCard.Content>
++              <CheckboxCard.Indicator />
++            </CheckboxCard.Control>
++          </CheckboxCard.Root>
+         ))}
+       </Flex>
+     </CheckboxGroup>
+diff --git a/apps/compositions/src/examples/checkbox-card-with-icon.tsx b/apps/compositions/src/examples/checkbox-card-with-icon.tsx
+index 596ccdedd94..bcbea299d5b 100644
+--- a/apps/compositions/src/examples/checkbox-card-with-icon.tsx
++++ b/apps/compositions/src/examples/checkbox-card-with-icon.tsx
+@@ -1,8 +1,10 @@
+-import { CheckboxGroup, Float, Icon, SimpleGrid } from "@chakra-ui/react"
+ import {
+   CheckboxCard,
+-  CheckboxCardIndicator,
+-} from "compositions/ui/checkbox-card"
++  CheckboxGroup,
++  Float,
++  Icon,
++  SimpleGrid,
++} from "@chakra-ui/react"
+ import { HiGlobeAlt, HiLockClosed, HiShieldCheck, HiUser } from "react-icons/hi"
+ 
+ export const CheckboxCardWithIcon = () => {
+@@ -10,22 +12,23 @@ export const CheckboxCardWithIcon = () => {
+     <CheckboxGroup defaultValue={["Guest"]}>
+       <SimpleGrid minChildWidth="200px" gap="2">
+         {items.map((item) => (
+-          <CheckboxCard
+-            align="center"
+-            key={item.label}
+-            icon={
+-              <Icon fontSize="2xl" mb="2">
+-                {item.icon}
+-              </Icon>
+-            }
+-            label={item.label}
+-            description={item.description}
+-            indicator={
++          <CheckboxCard.Root align="center" key={item.label}>
++            <CheckboxCard.HiddenInput />
++            <CheckboxCard.Control>
++              <CheckboxCard.Content>
++                <Icon fontSize="2xl" mb="2">
++                  {item.icon}
++                </Icon>
++                <CheckboxCard.Label>{item.label}</CheckboxCard.Label>
++                <CheckboxCard.Description>
++                  {item.description}
++                </CheckboxCard.Description>
++              </CheckboxCard.Content>
+               <Float placement="top-end" offset="6">
+-                <CheckboxCardIndicator />
++                <CheckboxCard.Indicator />
+               </Float>
+-            }
+-          />
++            </CheckboxCard.Control>
++          </CheckboxCard.Root>
+         ))}
+       </SimpleGrid>
+     </CheckboxGroup>
+diff --git a/apps/compositions/src/examples/checkbox-card-with-sizes.tsx b/apps/compositions/src/examples/checkbox-card-with-sizes.tsx
+index ba080e58774..e1dbcb41620 100644
+--- a/apps/compositions/src/examples/checkbox-card-with-sizes.tsx
++++ b/apps/compositions/src/examples/checkbox-card-with-sizes.tsx
+@@ -1,11 +1,20 @@
+-import { For, Stack } from "@chakra-ui/react"
+-import { CheckboxCard } from "compositions/ui/checkbox-card"
++import { CheckboxCard, For, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxCardWithSizes = () => {
+   return (
+     <Stack maxW="320px">
+       <For each={["sm", "md", "lg"]}>
+-        {(size) => <CheckboxCard label={`Checkbox (${size})`} size={size} />}
++        {(size) => (
++          <CheckboxCard.Root size={size} key={size}>
++            <CheckboxCard.HiddenInput />
++            <CheckboxCard.Control>
++              <CheckboxCard.Content>
++                <CheckboxCard.Label>Checkbox {size}</CheckboxCard.Label>
++              </CheckboxCard.Content>
++              <CheckboxCard.Indicator />
++            </CheckboxCard.Control>
++          </CheckboxCard.Root>
++        )}
+       </For>
+     </Stack>
+   )
+diff --git a/apps/compositions/src/examples/checkbox-card-with-variants.tsx b/apps/compositions/src/examples/checkbox-card-with-variants.tsx
+index f4c980a6e89..fc4eff15243 100644
+--- a/apps/compositions/src/examples/checkbox-card-with-variants.tsx
++++ b/apps/compositions/src/examples/checkbox-card-with-variants.tsx
+@@ -1,17 +1,24 @@
+-import { For, Stack } from "@chakra-ui/react"
+-import { CheckboxCard } from "compositions/ui/checkbox-card"
++import { CheckboxCard, For, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxCardWithVariants = () => {
+   return (
+     <Stack maxW="320px">
+       <For each={["subtle", "surface", "outline"]}>
+         {(variant) => (
+-          <CheckboxCard
++          <CheckboxCard.Root
+             defaultChecked
+-            label={`Checkbox (${variant})`}
+-            colorPalette="teal"
++            key={variant}
+             variant={variant}
+-          />
++            colorPalette="teal"
++          >
++            <CheckboxCard.HiddenInput />
++            <CheckboxCard.Control>
++              <CheckboxCard.Content>
++                <CheckboxCard.Label>Checkbox {variant}</CheckboxCard.Label>
++              </CheckboxCard.Content>
++              <CheckboxCard.Indicator />
++            </CheckboxCard.Control>
++          </CheckboxCard.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/compositions/src/examples/checkbox-closed-component.tsx b/apps/compositions/src/examples/checkbox-closed-component.tsx
+new file mode 100644
+index 00000000000..2a27c2ffb3e
+--- /dev/null
++++ b/apps/compositions/src/examples/checkbox-closed-component.tsx
+@@ -0,0 +1,25 @@
++import { Checkbox as ChakraCheckbox } from "@chakra-ui/react"
++import * as React from "react"
++
++export interface CheckboxProps extends ChakraCheckbox.RootProps {
++  icon?: React.ReactNode
++  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
++  rootRef?: React.Ref<HTMLLabelElement>
++}
++
++export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
++  function Checkbox(props, ref) {
++    const { icon, children, inputProps, rootRef, ...rest } = props
++    return (
++      <ChakraCheckbox.Root ref={rootRef} {...rest}>
++        <ChakraCheckbox.HiddenInput ref={ref} {...inputProps} />
++        <ChakraCheckbox.Control>
++          {icon || <ChakraCheckbox.Indicator />}
++        </ChakraCheckbox.Control>
++        {children != null && (
++          <ChakraCheckbox.Label>{children}</ChakraCheckbox.Label>
++        )}
++      </ChakraCheckbox.Root>
++    )
++  },
++)
+diff --git a/apps/compositions/src/examples/checkbox-controlled.tsx b/apps/compositions/src/examples/checkbox-controlled.tsx
+index 9d44bf68855..6e8860e87a9 100644
+--- a/apps/compositions/src/examples/checkbox-controlled.tsx
++++ b/apps/compositions/src/examples/checkbox-controlled.tsx
+@@ -1,16 +1,20 @@
+ "use client"
+ 
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox } from "@chakra-ui/react"
+ import { useState } from "react"
+ 
+ export const CheckboxControlled = () => {
+   const [checked, setChecked] = useState(false)
+   return (
+-    <Checkbox
++    <Checkbox.Root
+       checked={checked}
+       onCheckedChange={(e) => setChecked(!!e.checked)}
+     >
+-      Accept terms and conditions
+-    </Checkbox>
++      <Checkbox.HiddenInput />
++      <Checkbox.Control>
++        <Checkbox.Indicator />
++      </Checkbox.Control>
++      <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
++    </Checkbox.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-indeterminate.tsx b/apps/compositions/src/examples/checkbox-indeterminate.tsx
+index 14552f6b6ee..8fe647eea3d 100644
+--- a/apps/compositions/src/examples/checkbox-indeterminate.tsx
++++ b/apps/compositions/src/examples/checkbox-indeterminate.tsx
+@@ -1,7 +1,6 @@
+ "use client"
+ 
+-import { Stack } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, Stack } from "@chakra-ui/react"
+ import { useState } from "react"
+ 
+ const initialValues = [
+@@ -18,7 +17,7 @@ export const CheckboxIndeterminate = () => {
+   const indeterminate = values.some((value) => value.checked) && !allChecked
+ 
+   const items = values.map((item, index) => (
+-    <Checkbox
++    <Checkbox.Root
+       ms="6"
+       key={item.value}
+       checked={item.checked}
+@@ -30,13 +29,17 @@ export const CheckboxIndeterminate = () => {
+         })
+       }}
+     >
+-      {item.label}
+-    </Checkbox>
++      <Checkbox.HiddenInput />
++      <Checkbox.Control>
++        <Checkbox.Indicator />
++      </Checkbox.Control>
++      <Checkbox.Label>{item.label}</Checkbox.Label>
++    </Checkbox.Root>
+   ))
+ 
+   return (
+     <Stack align="flex-start">
+-      <Checkbox
++      <Checkbox.Root
+         checked={indeterminate ? "indeterminate" : allChecked}
+         onCheckedChange={(e) => {
+           setValues((current) =>
+@@ -44,8 +47,12 @@ export const CheckboxIndeterminate = () => {
+           )
+         }}
+       >
+-        Weekdays
+-      </Checkbox>
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Weekdays</Checkbox.Label>
++      </Checkbox.Root>
+       {items}
+     </Stack>
+   )
+diff --git a/apps/compositions/src/examples/checkbox-with-colors.tsx b/apps/compositions/src/examples/checkbox-with-colors.tsx
+index 33f45c953e9..f0b970ad842 100644
+--- a/apps/compositions/src/examples/checkbox-with-colors.tsx
++++ b/apps/compositions/src/examples/checkbox-with-colors.tsx
+@@ -1,6 +1,5 @@
+-import { For, Stack, Text } from "@chakra-ui/react"
++import { Checkbox, For, Stack, Text } from "@chakra-ui/react"
+ import { colorPalettes } from "compositions/lib/color-palettes"
+-import { Checkbox } from "compositions/ui/checkbox"
+ 
+ export const CheckboxWithColors = () => {
+   return (
+@@ -17,16 +16,25 @@ export const CheckboxWithColors = () => {
+           <For each={["outline", "subtle", "solid"]}>
+             {(variant) => (
+               <Stack key={variant} mb="4">
+-                <Checkbox variant={variant} colorPalette={colorPalette}>
+-                  Checkbox
+-                </Checkbox>
+-                <Checkbox
++                <Checkbox.Root variant={variant} colorPalette={colorPalette}>
++                  <Checkbox.HiddenInput />
++                  <Checkbox.Control>
++                    <Checkbox.Indicator />
++                  </Checkbox.Control>
++                  <Checkbox.Label>Checkbox</Checkbox.Label>
++                </Checkbox.Root>
++
++                <Checkbox.Root
+                   defaultChecked
+                   variant={variant}
+                   colorPalette={colorPalette}
+                 >
+-                  Checkbox
+-                </Checkbox>
++                  <Checkbox.HiddenInput />
++                  <Checkbox.Control>
++                    <Checkbox.Indicator />
++                  </Checkbox.Control>
++                  <Checkbox.Label>Checkbox</Checkbox.Label>
++                </Checkbox.Root>
+               </Stack>
+             )}
+           </For>
+diff --git a/apps/compositions/src/examples/checkbox-with-custom-icon.tsx b/apps/compositions/src/examples/checkbox-with-custom-icon.tsx
+index 9fbac95934d..c85a6bc7ce8 100644
+--- a/apps/compositions/src/examples/checkbox-with-custom-icon.tsx
++++ b/apps/compositions/src/examples/checkbox-with-custom-icon.tsx
+@@ -1,10 +1,14 @@
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox } from "@chakra-ui/react"
+ import { HiOutlinePlus } from "react-icons/hi"
+ 
+ export const CheckboxWithCustomIcon = () => {
+   return (
+-    <Checkbox defaultChecked icon={<HiOutlinePlus />}>
+-      With Custom Icon
+-    </Checkbox>
++    <Checkbox.Root defaultChecked>
++      <Checkbox.HiddenInput />
++      <Checkbox.Control>
++        <HiOutlinePlus />
++      </Checkbox.Control>
++      <Checkbox.Label>With Custom Icon</Checkbox.Label>
++    </Checkbox.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-description.tsx b/apps/compositions/src/examples/checkbox-with-description.tsx
+index 450d20ad02c..a043681ae61 100644
+--- a/apps/compositions/src/examples/checkbox-with-description.tsx
++++ b/apps/compositions/src/examples/checkbox-with-description.tsx
+@@ -1,13 +1,18 @@
+-import { Box } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Box, Checkbox, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxWithDescription = () => {
+   return (
+-    <Checkbox gap="4" alignItems="flex-start">
+-      <Box lineHeight="1">I agree to the terms and conditions</Box>
+-      <Box fontWeight="normal" color="fg.muted" mt="1">
+-        By clicking this, you agree to our Terms and Privacy Policy.
+-      </Box>
+-    </Checkbox>
++    <Checkbox.Root gap="4" alignItems="flex-start">
++      <Checkbox.HiddenInput />
++      <Checkbox.Control>
++        <Checkbox.Indicator />
++      </Checkbox.Control>
++      <Stack gap="1">
++        <Checkbox.Label>I agree to the terms and conditions</Checkbox.Label>
++        <Box textStyle="sm" color="fg.muted">
++          By clicking this, you agree to our Terms and Privacy Policy.
++        </Box>
++      </Stack>
++    </Checkbox.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx b/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx
+index 6cb145d6cfe..be70552b14e 100644
+--- a/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx
++++ b/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx
+@@ -1,8 +1,13 @@
+ "use client"
+ 
+-import { Button, CheckboxGroup, Code, Fieldset } from "@chakra-ui/react"
++import {
++  Button,
++  Checkbox,
++  CheckboxGroup,
++  Code,
++  Fieldset,
++} from "@chakra-ui/react"
+ import { zodResolver } from "@hookform/resolvers/zod"
+-import { Checkbox } from "compositions/ui/checkbox"
+ import { useController, useForm } from "react-hook-form"
+ import { z } from "zod"
+ 
+@@ -50,9 +55,13 @@ export const CheckboxWithGroupHookForm = () => {
+         >
+           <Fieldset.Content>
+             {items.map((item) => (
+-              <Checkbox key={item.value} value={item.value}>
+-                {item.label}
+-              </Checkbox>
++              <Checkbox.Root key={item.value} value={item.value}>
++                <Checkbox.HiddenInput />
++                <Checkbox.Control>
++                  <Checkbox.Indicator />
++                </Checkbox.Control>
++                <Checkbox.Label> {item.label}</Checkbox.Label>
++              </Checkbox.Root>
+             ))}
+           </Fieldset.Content>
+         </CheckboxGroup>
+diff --git a/apps/compositions/src/examples/checkbox-with-group.tsx b/apps/compositions/src/examples/checkbox-with-group.tsx
+index 0471ac6baca..36a90780b98 100644
+--- a/apps/compositions/src/examples/checkbox-with-group.tsx
++++ b/apps/compositions/src/examples/checkbox-with-group.tsx
+@@ -1,5 +1,4 @@
+-import { CheckboxGroup, Fieldset } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, CheckboxGroup, Fieldset, For } from "@chakra-ui/react"
+ 
+ export const CheckboxWithGroup = () => {
+   return (
+@@ -9,10 +8,17 @@ export const CheckboxWithGroup = () => {
+           Select framework
+         </Fieldset.Legend>
+         <Fieldset.Content>
+-          <Checkbox value="react">React</Checkbox>
+-          <Checkbox value="svelte">Svelte</Checkbox>
+-          <Checkbox value="vue">Vue</Checkbox>
+-          <Checkbox value="angular">Angular</Checkbox>
++          <For each={["React", "Svelte", "Vue", "Angular"]}>
++            {(value) => (
++              <Checkbox.Root key={value} value={value}>
++                <Checkbox.HiddenInput />
++                <Checkbox.Control>
++                  <Checkbox.Indicator />
++                </Checkbox.Control>
++                <Checkbox.Label>{value}</Checkbox.Label>
++              </Checkbox.Root>
++            )}
++          </For>
+         </Fieldset.Content>
+       </CheckboxGroup>
+     </Fieldset.Root>
+diff --git a/apps/compositions/src/examples/checkbox-with-hook-form.tsx b/apps/compositions/src/examples/checkbox-with-hook-form.tsx
+index ac9d882b319..b862f25a167 100644
+--- a/apps/compositions/src/examples/checkbox-with-hook-form.tsx
++++ b/apps/compositions/src/examples/checkbox-with-hook-form.tsx
+@@ -1,9 +1,8 @@
+ "use client"
+ 
+-import { Button, Code, HStack, Stack } from "@chakra-ui/react"
++import { Button, Checkbox, Code, Field, HStack, Stack } from "@chakra-ui/react"
+ import { zodResolver } from "@hookform/resolvers/zod"
+-import { Checkbox } from "compositions/ui/checkbox"
+-import { Field } from "compositions/ui/field"
++import "compositions/ui/field"
+ import { Controller, useController, useForm } from "react-hook-form"
+ import { z } from "zod"
+ 
+@@ -33,18 +32,21 @@ export const CheckboxWithHookForm = () => {
+           control={form.control}
+           name="enabled"
+           render={({ field }) => (
+-            <Field
+-              disabled={field.disabled}
+-              invalid={invalid}
+-              errorText={form.formState.errors.enabled?.message}
+-            >
+-              <Checkbox
++            <Field.Root invalid={invalid} disabled={field.disabled}>
++              <Checkbox.Root
+                 checked={field.value}
+                 onCheckedChange={({ checked }) => field.onChange(checked)}
+               >
+-                Checkbox
+-              </Checkbox>
+-            </Field>
++                <Checkbox.HiddenInput />
++                <Checkbox.Control>
++                  <Checkbox.Indicator />
++                </Checkbox.Control>
++                <Checkbox.Label>Checkbox</Checkbox.Label>
++              </Checkbox.Root>
++              <Field.ErrorText>
++                {form.formState.errors.enabled?.message}
++              </Field.ErrorText>
++            </Field.Root>
+           )}
+         />
+ 
+diff --git a/apps/compositions/src/examples/checkbox-without-snippet.tsx b/apps/compositions/src/examples/checkbox-with-label-position.tsx
+similarity index 85%
+rename from apps/compositions/src/examples/checkbox-without-snippet.tsx
+rename to apps/compositions/src/examples/checkbox-with-label-position.tsx
+index 42dc23feac7..246da957529 100644
+--- a/apps/compositions/src/examples/checkbox-without-snippet.tsx
++++ b/apps/compositions/src/examples/checkbox-with-label-position.tsx
+@@ -1,13 +1,13 @@
+ import { Checkbox } from "@chakra-ui/react"
+ 
+-export const CheckboxWithoutSnippet = () => {
++export const CheckboxWithLabelPosition = () => {
+   return (
+     <Checkbox.Root>
+       <Checkbox.HiddenInput />
++      <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+       <Checkbox.Control>
+         <Checkbox.Indicator />
+       </Checkbox.Control>
+-      <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+     </Checkbox.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-link.tsx b/apps/compositions/src/examples/checkbox-with-link.tsx
+index 35780791b6f..113694ff7e6 100644
+--- a/apps/compositions/src/examples/checkbox-with-link.tsx
++++ b/apps/compositions/src/examples/checkbox-with-link.tsx
+@@ -1,13 +1,18 @@
+-import { Link } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, Link } from "@chakra-ui/react"
+ 
+ export const CheckboxWithLink = () => {
+   return (
+-    <Checkbox>
+-      I agree to the{" "}
+-      <Link colorPalette="teal" href="https://google.com">
+-        terms and conditions
+-      </Link>
+-    </Checkbox>
++    <Checkbox.Root>
++      <Checkbox.HiddenInput />
++      <Checkbox.Control>
++        <Checkbox.Indicator />
++      </Checkbox.Control>
++      <Checkbox.Label>
++        I agree to the{" "}
++        <Link colorPalette="teal" href="https://google.com">
++          terms and conditions
++        </Link>
++      </Checkbox.Label>
++    </Checkbox.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-sizes.tsx b/apps/compositions/src/examples/checkbox-with-sizes.tsx
+index 42e65ac2cca..734a09ae4c4 100644
+--- a/apps/compositions/src/examples/checkbox-with-sizes.tsx
++++ b/apps/compositions/src/examples/checkbox-with-sizes.tsx
+@@ -1,14 +1,17 @@
+-import { For, Stack } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, For, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxWithSizes = () => {
+   return (
+     <Stack align="flex-start" flex="1" gap="4">
+       <For each={["sm", "md", "lg"]}>
+         {(size) => (
+-          <Checkbox defaultChecked size={size} key={size}>
+-            Checkbox
+-          </Checkbox>
++          <Checkbox.Root defaultChecked size={size} key={size}>
++            <Checkbox.HiddenInput />
++            <Checkbox.Control>
++              <Checkbox.Indicator />
++            </Checkbox.Control>
++            <Checkbox.Label>Checkbox</Checkbox.Label>
++          </Checkbox.Root>
+         )}
+       </For>
+     </Stack>
+diff --git a/apps/compositions/src/examples/checkbox-with-states.tsx b/apps/compositions/src/examples/checkbox-with-states.tsx
+index 766bcb4f77c..a0bbf94b6b0 100644
+--- a/apps/compositions/src/examples/checkbox-with-states.tsx
++++ b/apps/compositions/src/examples/checkbox-with-states.tsx
+@@ -1,15 +1,39 @@
+-import { Stack } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxWithStates = () => {
+   return (
+     <Stack>
+-      <Checkbox disabled>Disabled</Checkbox>
+-      <Checkbox defaultChecked disabled>
+-        Disabled
+-      </Checkbox>
+-      <Checkbox readOnly>Readonly</Checkbox>
+-      <Checkbox invalid>Invalid</Checkbox>
++      <Checkbox.Root disabled>
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Disabled</Checkbox.Label>
++      </Checkbox.Root>
++
++      <Checkbox.Root defaultChecked disabled>
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Disabled</Checkbox.Label>
++      </Checkbox.Root>
++
++      <Checkbox.Root readOnly>
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Readonly</Checkbox.Label>
++      </Checkbox.Root>
++
++      <Checkbox.Root invalid>
++        <Checkbox.HiddenInput />
++        <Checkbox.Control>
++          <Checkbox.Indicator />
++        </Checkbox.Control>
++        <Checkbox.Label>Invalid</Checkbox.Label>
++      </Checkbox.Root>
+     </Stack>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-variants.tsx b/apps/compositions/src/examples/checkbox-with-variants.tsx
+index b5cd1864f01..0ba36d0d70a 100644
+--- a/apps/compositions/src/examples/checkbox-with-variants.tsx
++++ b/apps/compositions/src/examples/checkbox-with-variants.tsx
+@@ -1,5 +1,4 @@
+-import { For, HStack, Stack, Text } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, For, HStack, Stack, Text } from "@chakra-ui/react"
+ 
+ export const CheckboxWithVariants = () => {
+   return (
+@@ -8,9 +7,13 @@ export const CheckboxWithVariants = () => {
+         {(variant) => (
+           <Stack align="flex-start" flex="1" key={variant}>
+             <Text>{variant}</Text>
+-            <Checkbox defaultChecked variant={variant}>
+-              Checkbox
+-            </Checkbox>
++            <Checkbox.Root defaultChecked variant={variant}>
++              <Checkbox.HiddenInput />
++              <Checkbox.Control>
++                <Checkbox.Indicator />
++              </Checkbox.Control>
++              <Checkbox.Label>Checkbox</Checkbox.Label>
++            </Checkbox.Root>
+           </Stack>
+         )}
+       </For>
+diff --git a/apps/www/content/docs/components/checkbox-card.mdx b/apps/www/content/docs/components/checkbox-card.mdx
+index 737e607707b..96962df560a 100644
+--- a/apps/www/content/docs/components/checkbox-card.mdx
++++ b/apps/www/content/docs/components/checkbox-card.mdx
+@@ -10,30 +10,40 @@ links:
+ 
+ <ExampleTabs name="checkbox-card-basic" />
+ 
+-## Setup
++## Usage
+ 
+-If you don't already have the snippet, run the following command to add the
+-`checkbox-card` snippet
++```tsx
++import { CheckboxCard } from "@chakra-ui/react"
++```
+ 
+-```sh
+-npx @chakra-ui/cli snippet add checkbox-card
++```tsx
++<CheckboxCard.Root>
++  <CheckboxCard.HiddenInput />
++  <CheckboxCard.Control>
++    <CheckboxCard.Content>
++      <CheckboxCard.Label />
++      <CheckboxCard.Description />
++    <CheckboxCard.Indicator />
++  </CheckboxCard.Control>
++</CheckboxCard.Root>
+ ```
+ 
+-The snippet includes a closed component composition for the `CheckboxCard`
+-component.
++:::info
+ 
+-## Usage
++If you prefer a closed component composition, check out the
++[snippet below](#closed-component).
+ 
+-```jsx
+-import { CheckboxCard } from "@/components/ui/checkbox-card"
+-```
+-
+-```jsx
+-<CheckboxCard label="Checkbox Card" />
+-```
++:::
+ 
+ ## Examples
+ 
++### Description
++
++Use the `CheckboxCard.Description` component to add a description to the
++checkbox card.
++
++<ExampleTabs name="checkbox-card-with-description" />
++
+ ### Group
+ 
+ Use the `CheckboxCardGroup` component to group multiple checkbox cards.
+@@ -42,40 +52,62 @@ Use the `CheckboxCardGroup` component to group multiple checkbox cards.
+ 
+ ### Sizes
+ 
+-Use the `size` prop to change the size of the checkbox card.
++Pass the `size` prop to the `CheckboxCard.Root` component to change the size of
++the checkbox card.
+ 
+ <ExampleTabs name="checkbox-card-with-sizes" />
+ 
+ ### Variants
+ 
+-Use the `variant` prop to change the variant of the checkbox card.
++Use the `variant` prop to Pass the `variant` prop to the `CheckboxCard.Root`
++component to change the variant of the checkbox card.
+ 
+ <ExampleTabs name="checkbox-card-with-variants" />
+ 
+ ### Disabled
+ 
+-Use the `disabled` prop to make the checkbox card disabled.
++Pass the `disabled` prop to the `CheckboxCard.Root` component to make the
++checkbox card disabled.
+ 
+ <ExampleTabs name="checkbox-card-disabled" />
+ 
+ ### Addon
+ 
+-Use the `CheckboxCardAddon` to add some more context to the checkbox card.
++Render additional content within the `CheckboxCard.Addon` component to add some
++more context to the checkbox card.
+ 
+ <ExampleTabs name="checkbox-card-with-addon" />
+ 
++### No Indicator
++
++Here's an example of how to use the checkbox card without an indicator.
++
++<ExampleTabs name="checkbox-card-no-indicator" />
++
+ ### Icon
+ 
+-Render custom icons within the checkbox card.
++Here's an example of how to render custom icons within the checkbox card.
+ 
+ <ExampleTabs name="checkbox-card-with-icon" />
+ 
+-### Without Snippet
++### Closed Component
+ 
+-If you don't want to use the snippet, you can use the `CheckboxCard` component
+-from the `@chakra-ui/react` package.
++Here's how to setup the Checkbox card for a closed component composition.
+ 
+-<ExampleTabs name="checkbox-card-without-snippet" />
++<ExampleCode name="checkbox-card-closed-component" />
++
++If you want to automatically add the closed component to your project, run the
++command:
++
++```bash
++npx @chakra-ui/cli snippet add checkbox-card
++```
++
++#### Usage
++
++```tsx
++<CheckboxCard label="Checkbox Card" />
++```
+ 
+ ## Props
+ 
+diff --git a/apps/www/content/docs/components/checkbox.mdx b/apps/www/content/docs/components/checkbox.mdx
+index cdc089a77ff..bf80e74c983 100644
+--- a/apps/www/content/docs/components/checkbox.mdx
++++ b/apps/www/content/docs/components/checkbox.mdx
+@@ -11,50 +11,56 @@ links:
+ 
+ <ExampleTabs name="checkbox-basic" />
+ 
+-## Setup
+-
+-If you don't already have the snippet, run the following command to add the
+-`checkbox` snippet
++## Usage
+ 
+-```sh
+-npx @chakra-ui/cli snippet add checkbox
++```tsx
++import { Checkbox } from "@chakra-ui/react"
+ ```
+ 
+-The snippet includes a closed component composition for the `Checkbox`
++```tsx
++<Checkbox.Root>
++  <Checkbox.HiddenInput />
++  <Checkbox.Control>
++    <Checkbox.Indicator />
++  </Checkbox.Control>
++  <Checkbox.Label>Click me</Checkbox.Label>
++</Checkbox.Root>
++```
+ 
+-## Usage
++:::info
+ 
+-```jsx
+-import { Checkbox } from "@/components/ui/checkbox"
+-```
++If you prefer a closed component composition, check out the
++[snippet below](#closed-component).
+ 
+-```jsx
+-<Checkbox>Click me</Checkbox>
+-```
++:::
+ 
+ ## Examples
+ 
+ ### Variants
+ 
+-Use the `variant` prop to change the visual style of the checkbox.
++Pass the `variant` prop to the `Checkbox.Root` component to change the visual
++style of the checkbox.
+ 
+ <ExampleTabs name="checkbox-with-variants" />
+ 
+ ### Colors
+ 
+-Use the `colorPalette` prop to change the color of the checkbox.
++Pass the `colorPalette` prop to the `Checkbox.Root` component to change the
++color of the checkbox.
+ 
+ <ExampleTabs name="checkbox-with-colors" />
+ 
+ ### Sizes
+ 
+-Use the `size` prop to change the size of the checkbox.
++Pass the `size` prop to the `Checkbox.Root` component to change the size of the
++checkbox.
+ 
+ <ExampleTabs name="checkbox-with-sizes" />
+ 
+ ### States
+ 
+-Use the `disabled` or `invalid` prop to change the visual state of the checkbox.
++Pass the `disabled` or `invalid` prop to the `Checkbox.Root` component to change
++the visual state of the checkbox.
+ 
+ <ExampleTabs name="checkbox-with-states" />
+ 
+@@ -65,6 +71,12 @@ checkbox.
+ 
+ <ExampleTabs name="checkbox-controlled" />
+ 
++### Label Position
++
++Here's an example of how to change the label position to the right.
++
++<ExampleTabs name="checkbox-with-label-position" />
++
+ ### Store
+ 
+ An alternative way to control the checkbox is to use the `RootProvider`
+@@ -97,7 +109,8 @@ Here's an example of how to use the `CheckboxGroup` component with the
+ 
+ ### Custom Icon
+ 
+-Use the `icon` prop to change the icon of the checkbox.
++Render a custom icon within `Checkbox.Control` to change the icon of the
++checkbox.
+ 
+ <ExampleTabs name="checkbox-with-custom-icon" />
+ 
+@@ -110,22 +123,34 @@ indeterminate state.
+ 
+ ### Description
+ 
+-Add content to the children of the `Checkbox` component to add a description.
++Here's an example of how to add some further description to the checkbox.
+ 
+ <ExampleTabs name="checkbox-with-description" />
+ 
+ ### Link
+ 
+-Render an anchor tag as the checkbox label.
++Render an anchor tag within the `Checkbox.Label` to add a link to the label.
+ 
+ <ExampleTabs name="checkbox-with-link" />
+ 
+-### Without Snippet
++### Closed Component
++
++Here's how to setup the Checkbox for a closed component composition.
+ 
+-If you don't want to use the snippet, you can use the `Checkbox` component from
+-the `@chakra-ui/react` package.
++<ExampleCode name="checkbox-closed-component" />
+ 
+-<ExampleTabs name="checkbox-without-snippet" />
++If you want to automatically add the closed component to your project, run the
++command:
++
++```bash
++npx @chakra-ui/cli snippet add checkbox
++```
++
++#### Usage
++
++```tsx
++<Checkbox>Accept terms and conditions</Checkbox>
++```
+ 
+ ## Props
+ 
+diff --git a/packages/react/__stories__/checkbox-card.stories.tsx b/packages/react/__stories__/checkbox-card.stories.tsx
+index b156fd40571..95f059d7b7c 100644
+--- a/packages/react/__stories__/checkbox-card.stories.tsx
++++ b/packages/react/__stories__/checkbox-card.stories.tsx
+@@ -13,6 +13,7 @@ export default {
+ } satisfies Meta
+ 
+ export { CheckboxCardBasic as Basic } from "compositions/examples/checkbox-card-basic"
++export { CheckboxCardWithDescription as Description } from "compositions/examples/checkbox-card-with-description"
+ export { CheckboxCardDisabled as Disabled } from "compositions/examples/checkbox-card-disabled"
+ export { CheckboxCardWithStates as States } from "compositions/examples/checkbox-card-with-states"
+ export { CheckboxCardWithAddon as Addon } from "compositions/examples/checkbox-card-with-addon"
+@@ -20,4 +21,4 @@ export { CheckboxCardWithIcon as Icon } from "compositions/examples/checkbox-car
+ export { CheckboxCardVariantTable as Variants } from "compositions/examples/checkbox-card-variant-table"
+ export { CheckboxCardSizeTable as Sizes } from "compositions/examples/checkbox-card-size-table"
+ export { CheckboxCardWithGroup as Group } from "compositions/examples/checkbox-card-with-group"
+-export { CheckboxCardWithoutSnippet as WithoutSnippet } from "compositions/examples/checkbox-card-without-snippet"
++export { CheckboxCardNoIndicator as NoIndicator } from "compositions/examples/checkbox-card-no-indicator"
+diff --git a/packages/react/__stories__/checkbox.stories.tsx b/packages/react/__stories__/checkbox.stories.tsx
+index c8828716b9f..e94e0fa849c 100644
+--- a/packages/react/__stories__/checkbox.stories.tsx
++++ b/packages/react/__stories__/checkbox.stories.tsx
+@@ -27,3 +27,4 @@ export { CheckboxWithIndeterminate as Indeterminate } from "compositions/example
+ export { CheckboxWithLink as Link } from "compositions/examples/checkbox-with-link"
+ export { CheckboxWithStates as States } from "compositions/examples/checkbox-with-states"
+ export { CheckboxWithStore as Store } from "compositions/examples/checkbox-with-store"
++export { CheckboxWithLabelPosition as LabelPosition } from "compositions/examples/checkbox-with-label-position"

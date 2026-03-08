@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "ece5c22ba794c7320ea50327fbca6057079fa7a4",
+    "filename": "packages/docs-v3/README_ZH.md",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/bee037f43a14737ea9e3f1cc77b7f0624b3696ac/packages%2Fdocs-v3%2FREADME_ZH.md",
+    "raw_url": "https://github.com/colinhacks/zod/raw/bee037f43a14737ea9e3f1cc77b7f0624b3696ac/packages%2Fdocs-v3%2FREADME_ZH.md",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fdocs-v3%2FREADME_ZH.md?ref=bee037f43a14737ea9e3f1cc77b7f0624b3696ac",
+    "patch": "@@ -1932,7 +1932,7 @@ Tuples\n Recursive Types\n Function Schemas\n \n-<abbr title=\"For instance, Yup allows custmo error messages with the syntax yup.number().min(5, 'Number must be more than 5!')\">Validation Messages</abbr>\n+<abbr title=\"For instance, Yup allows custom error messages with the syntax yup.number().min(5, 'Number must be more than 5!')\">Validation Messages</abbr>\n Immutable instances\n Type Guards\n Validity Checking"
+  },
+  {
+    "sha": "c779744c037025f81860e13ad353102f1cb9bfb9",
+    "filename": "packages/zod/src/v4/classic/tests/codec.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/colinhacks/zod/blob/bee037f43a14737ea9e3f1cc77b7f0624b3696ac/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fcodec.test.ts",
+    "raw_url": "https://github.com/colinhacks/zod/raw/bee037f43a14737ea9e3f1cc77b7f0624b3696ac/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fcodec.test.ts",
+    "contents_url": "https://api.github.com/repos/colinhacks/zod/contents/packages%2Fzod%2Fsrc%2Fv4%2Fclassic%2Ftests%2Fcodec.test.ts?ref=bee037f43a14737ea9e3f1cc77b7f0624b3696ac",
+    "patch": "@@ -503,7 +503,7 @@ test(\"codec type enforcement - complex types\", () => {\n   );\n });\n \n-test(\"codex with overwrites\", () => {\n+test(\"codec with overwrites\", () => {\n   const stringPlusA = z.string().overwrite((val) => val + \"a\");\n   const A = z\n     .codec(stringPlusA, stringPlusA, {"
+  }
+]

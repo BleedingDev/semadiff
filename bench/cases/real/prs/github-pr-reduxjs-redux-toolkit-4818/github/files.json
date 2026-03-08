@@ -1,0 +1,74 @@
+[
+  {
+    "sha": "307706ded9e8939c543a0308a7582f274cacd1fb",
+    "filename": "packages/toolkit/src/query/core/apiState.ts",
+    "status": "modified",
+    "additions": 17,
+    "deletions": 20,
+    "changes": 37,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FapiState.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FapiState.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FapiState.ts?ref=3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "patch": "@@ -30,34 +30,31 @@ export type RefetchConfigOptions = {\n   refetchOnFocus: boolean\n }\n \n-export type GetNextPageParamFunction<TPageParam, TQueryFnData> = (\n-  lastPage: TQueryFnData,\n-  allPages: Array<TQueryFnData>,\n-  lastPageParam: TPageParam,\n-  allPageParams: Array<TPageParam>,\n-) => TPageParam | undefined | null\n+export type PageParamFunction<DataType, PageParam> = (\n+  firstPage: DataType,\n+  allPages: Array<DataType>,\n+  firstPageParam: PageParam,\n+  allPageParams: Array<PageParam>,\n+) => PageParam | undefined | null\n \n-export type GetPreviousPageParamFunction<TPageParam, TQueryFnData> = (\n-  firstPage: TQueryFnData,\n-  allPages: Array<TQueryFnData>,\n-  firstPageParam: TPageParam,\n-  allPageParams: Array<TPageParam>,\n-) => TPageParam | undefined | null\n-\n-export type InfiniteQueryConfigOptions<TQueryFnData, TPageParam> = {\n-  initialPageParam: TPageParam\n+export type InfiniteQueryConfigOptions<DataType, PageParam> = {\n+  initialPageParam: PageParam\n   maxPages?: number\n   /**\n    * This function can be set to automatically get the previous cursor for infinite queries.\n    * The result will also be used to determine the value of `hasPreviousPage`.\n    */\n-  getPreviousPageParam?: GetPreviousPageParamFunction<TPageParam, TQueryFnData>\n-  getNextPageParam: GetNextPageParamFunction<TPageParam, TQueryFnData>\n+  getPreviousPageParam?: PageParamFunction<DataType, PageParam>\n+  /**\n+   * This function is required to automatically get the next cursor for infinite queries.\n+   * The result will also be used to determine the value of `hasNextPage`.\n+   */\n+  getNextPageParam: PageParamFunction<DataType, PageParam>\n }\n \n-export interface InfiniteData<TData, TPageParam> {\n-  pages: Array<TData>\n-  pageParams: Array<TPageParam>\n+export interface InfiniteData<DataType, PageParam> {\n+  pages: Array<DataType>\n+  pageParams: Array<PageParam>\n }\n \n /**"
+  },
+  {
+    "sha": "6783ab8a4ef0259b96aa22361889a7023bd0d2c6",
+    "filename": "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildMiddleware%2FcacheLifecycle.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildMiddleware%2FcacheLifecycle.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildMiddleware%2FcacheLifecycle.ts?ref=3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "patch": "@@ -355,7 +355,7 @@ export const buildCacheLifecycleHandler: InternalHandlerBuilder = ({\n       cacheEntryRemoved,\n     }\n \n-    const runningHandler = onCacheEntryAdded(originalArgs, lifecycleApi)\n+    const runningHandler = onCacheEntryAdded(originalArgs, lifecycleApi as any)\n     // if a `neverResolvedError` was thrown, but not handled in the running handler, do not let it leak out further\n     Promise.resolve(runningHandler).catch((e) => {\n       if (e === neverResolvedError) return"
+  },
+  {
+    "sha": "e2b91f7c1fdb7256f4a71a60beff3cd66617d243",
+    "filename": "packages/toolkit/src/query/core/buildMiddleware/queryLifecycle.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildMiddleware%2FqueryLifecycle.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildMiddleware%2FqueryLifecycle.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildMiddleware%2FqueryLifecycle.ts?ref=3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "patch": "@@ -483,7 +483,7 @@ export const buildQueryLifecycleHandler: InternalHandlerBuilder = ({\n             : undefined) as any,\n           queryFulfilled,\n         }\n-        onQueryStarted(originalArgs, lifecycleApi)\n+        onQueryStarted(originalArgs, lifecycleApi as any)\n       }\n     } else if (isFullfilledThunk(action)) {\n       const { requestId, baseQueryMeta } = action.meta"
+  },
+  {
+    "sha": "aabeba6c028c99cb3b83815646a7bac641283a63",
+    "filename": "packages/toolkit/src/query/endpointDefinitions.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 2,
+    "changes": 5,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts?ref=3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "patch": "@@ -21,6 +21,7 @@ import type {\n   QueryLifecycleQueryExtraOptions,\n } from './core/buildMiddleware/queryLifecycle'\n import type {\n+  InfiniteData,\n   InfiniteQueryConfigOptions,\n   QuerySubState,\n   RootState,\n@@ -580,13 +581,13 @@ export interface InfiniteQueryExtraOptions<\n   BaseQuery extends BaseQueryFn,\n   ReducerPath extends string = string,\n > extends CacheLifecycleInfiniteQueryExtraOptions<\n-      ResultType,\n+      InfiniteData<ResultType, PageParam>,\n       QueryArg,\n       BaseQuery,\n       ReducerPath\n     >,\n     QueryLifecycleInfiniteQueryExtraOptions<\n-      ResultType,\n+      InfiniteData<ResultType, PageParam>,\n       QueryArg,\n       BaseQuery,\n       ReducerPath"
+  },
+  {
+    "sha": "bfce2ca5db956a2869c163f08c0fd091d6f6d8a8",
+    "filename": "packages/toolkit/src/query/tests/infiniteQueries.test-d.ts",
+    "status": "modified",
+    "additions": 12,
+    "deletions": 0,
+    "changes": 12,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts?ref=3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "patch": "@@ -41,6 +41,18 @@ describe('Infinite queries', () => {\n \n             return `https://example.com/listItems?page=${pageParam}`\n           },\n+          async onCacheEntryAdded(arg, api) {\n+            const data = await api.cacheDataLoaded\n+            expectTypeOf(data.data).toEqualTypeOf<\n+              InfiniteData<Pokemon[], number>\n+            >()\n+          },\n+          async onQueryStarted(arg, api) {\n+            const data = await api.queryFulfilled\n+            expectTypeOf(data.data).toEqualTypeOf<\n+              InfiniteData<Pokemon[], number>\n+            >()\n+          },\n         }),\n       }),\n     })"
+  },
+  {
+    "sha": "41d787b0fce57c81c3e72632016ad79ded2734d3",
+    "filename": "packages/toolkit/src/query/tests/infiniteQueries.test.ts",
+    "status": "modified",
+    "additions": 80,
+    "deletions": 0,
+    "changes": 80,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/3d8b771d0604ee019787747eaceecbbdb37b79ed/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test.ts?ref=3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "patch": "@@ -621,4 +621,84 @@ describe('Infinite queries', () => {\n       pageParams: [3, 4],\n     })\n   })\n+\n+  test('Cache lifecycle methods are called', async () => {\n+    const cacheEntryAddedCallback = vi.fn()\n+    const queryStartedCallback = vi.fn()\n+\n+    const pokemonApi = createApi({\n+      baseQuery: fetchBaseQuery({ baseUrl: 'https://pokeapi.co/api/v2/' }),\n+      endpoints: (builder) => ({\n+        getInfinitePokemonWithLifecycles: builder.infiniteQuery<\n+          Pokemon[],\n+          string,\n+          number\n+        >({\n+          infiniteQueryOptions: {\n+            initialPageParam: 0,\n+            getNextPageParam: (\n+              lastPage,\n+              allPages,\n+              // Page param type should be `number`\n+              lastPageParam,\n+              allPageParams,\n+            ) => lastPageParam + 1,\n+            getPreviousPageParam: (\n+              firstPage,\n+              allPages,\n+              firstPageParam,\n+              allPageParams,\n+            ) => {\n+              return firstPageParam > 0 ? firstPageParam - 1 : undefined\n+            },\n+          },\n+          query(pageParam) {\n+            return `https://example.com/listItems?page=${pageParam}`\n+          },\n+          async onCacheEntryAdded(arg, api) {\n+            const data = await api.cacheDataLoaded\n+            cacheEntryAddedCallback(arg, data)\n+          },\n+          async onQueryStarted(arg, api) {\n+            const data = await api.queryFulfilled\n+            queryStartedCallback(arg, data)\n+          },\n+        }),\n+      }),\n+    })\n+\n+    const storeRef = setupApiStore(\n+      pokemonApi,\n+      { ...actionsReducer },\n+      {\n+        withoutTestLifecycles: true,\n+      },\n+    )\n+\n+    const res1 = storeRef.store.dispatch(\n+      pokemonApi.endpoints.getInfinitePokemonWithLifecycles.initiate(\n+        'fire',\n+        {},\n+      ),\n+    )\n+\n+    const entry1InitialLoad = await res1\n+    checkResultData(entry1InitialLoad, [[{ id: '0', name: 'Pokemon 0' }]])\n+\n+    expect(cacheEntryAddedCallback).toHaveBeenCalledWith('fire', {\n+      data: {\n+        pages: [[{ id: '0', name: 'Pokemon 0' }]],\n+        pageParams: [0],\n+      },\n+      meta: undefined,\n+    })\n+\n+    expect(queryStartedCallback).toHaveBeenCalledWith('fire', {\n+      data: {\n+        pages: [[{ id: '0', name: 'Pokemon 0' }]],\n+        pageParams: [0],\n+      },\n+      meta: undefined,\n+    })\n+  })\n })"
+  }
+]

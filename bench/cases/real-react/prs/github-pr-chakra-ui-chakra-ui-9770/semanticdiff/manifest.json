@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/react/__stories__/rating.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2F__stories__%2Frating.stories.tsx&old_oid=c03e575a299e7b686ee1e70411a891072c41dde9&old_mode=33188&new_filename=packages%2Freact%2F__stories__%2Frating.stories.tsx&new_oid=563c4d4fa5053fb7ebd3af39c4d8aa334e38c15f&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/react/__stories__/rating.stories.tsx",
+      "oid": "c03e575a299e7b686ee1e70411a891072c41dde9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/__stories__/rating.stories.tsx",
+      "oid": "563c4d4fa5053fb7ebd3af39c4d8aa334e38c15f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4b81af5c9ba9f675c145093da8dafa1c326f3702760adf01735af25e597b4122"
+  }
+]

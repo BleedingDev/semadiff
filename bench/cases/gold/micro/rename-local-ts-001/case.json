@@ -1,0 +1,93 @@
+{
+  "id": "rename-local-ts-001",
+  "language": "ts",
+  "kind": "micro",
+  "description": "Local variable rename stays grouped as an update plus rename metadata.",
+  "files": [
+    {
+      "oldPath": "src/compute.ts",
+      "newPath": "src/compute.ts",
+      "status": "modified",
+      "beforePath": "old.ts",
+      "afterPath": "new.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "type": "update",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "newRange": {
+          "startLine": 1,
+          "endLine": 3
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [
+      {
+        "from": "foo",
+        "to": "bar",
+        "occurrences": 3
+      }
+    ],
+    "entities": [
+      {
+        "side": "old",
+        "kind": "function",
+        "name": "compute",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      },
+      {
+        "side": "new",
+        "kind": "function",
+        "name": "compute",
+        "range": {
+          "startLine": 1,
+          "endLine": 3
+        },
+        "exported": true
+      }
+    ],
+    "entityChanges": [
+      {
+        "kind": "function",
+        "before": {
+          "kind": "function",
+          "name": "compute",
+          "range": {
+            "startLine": 1,
+            "endLine": 3
+          },
+          "exported": true
+        },
+        "after": {
+          "kind": "function",
+          "name": "compute",
+          "range": {
+            "startLine": 1,
+            "endLine": 3
+          },
+          "exported": true
+        },
+        "changeKinds": [
+          "modified"
+        ]
+      }
+    ],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": true,
+    "graph": false
+  }
+}

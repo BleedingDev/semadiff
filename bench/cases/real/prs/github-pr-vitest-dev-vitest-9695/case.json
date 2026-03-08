@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-vitest-dev-vitest-9695",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitest-dev/vitest#9695: fix(types): `bench.reporters` no longer gives type errors when passing file name string paths",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitest-dev/vitest",
+    "prNumber": 9695,
+    "prUrl": "https://github.com/vitest-dev/vitest/pull/9695",
+    "baseSha": "4d7938a567d4afb16ed793fe1ac34b7b9880f06e",
+    "headSha": "b5c28d7b24acd738be77502f944322fb85361fff",
+    "selectedFiles": [
+      "packages/vitest/src/node/types/benchmark.ts"
+    ],
+    "collectedAt": "2026-03-08T02:23:52.640Z"
+  },
+  "files": [
+    {
+      "id": "packages/vitest/src/node/types/benchmark.ts",
+      "oldPath": "packages/vitest/src/node/types/benchmark.ts",
+      "newPath": "packages/vitest/src/node/types/benchmark.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/vitest/src/node/types/benchmark.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 28,
+          "endLine": 29
+        },
+        "newRange": {
+          "startLine": 28,
+          "endLine": 29
+        }
+      },
+      {
+        "fileId": "packages/vitest/src/node/types/benchmark.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 33,
+          "endLine": 33
+        },
+        "newRange": {
+          "startLine": 33,
+          "endLine": 33
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

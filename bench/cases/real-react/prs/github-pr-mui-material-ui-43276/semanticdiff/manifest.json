@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "docs/data/material/components/progress/CircularIntegration.tsx",
+    "diff": "/gh/mui/material-ui/diff?old_filename=docs%2Fdata%2Fmaterial%2Fcomponents%2Fprogress%2FCircularIntegration.tsx&old_oid=c32a5957a42fb88843ed5dd3419b3faac0391c22&old_mode=33188&new_filename=docs%2Fdata%2Fmaterial%2Fcomponents%2Fprogress%2FCircularIntegration.tsx&new_oid=c0e3761c48905bf48fc9bb83b110e416ce3387f7&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/data/material/components/progress/CircularIntegration.tsx",
+      "oid": "c32a5957a42fb88843ed5dd3419b3faac0391c22",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/data/material/components/progress/CircularIntegration.tsx",
+      "oid": "c0e3761c48905bf48fc9bb83b110e416ce3387f7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "745f4170632f499967f8ab802f0faa2463358e65809ee67a969a9b5e170c01bd"
+  }
+]

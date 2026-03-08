@@ -1,0 +1,52 @@
+diff --git a/.meta-updater/src/index.ts b/.meta-updater/src/index.ts
+index 67730929f61..893381d6f3a 100644
+--- a/.meta-updater/src/index.ts
++++ b/.meta-updater/src/index.ts
+@@ -372,6 +372,7 @@ async function updateManifest (workspaceDir: string, manifest: ProjectManifest,
+   if (scripts.test) {
+     Object.assign(manifest, {
+       jest: {
++        ...(manifest as any).jest, // eslint-disable-line
+         preset,
+       },
+     })
+diff --git a/modules-mounter/daemon/__mocks__/fuse-native.js b/modules-mounter/daemon/__mocks__/fuse-native.js
+new file mode 100644
+index 00000000000..e0259b2b756
+--- /dev/null
++++ b/modules-mounter/daemon/__mocks__/fuse-native.js
+@@ -0,0 +1 @@
++export default { ENOENT: -2 }
+diff --git a/modules-mounter/daemon/package.json b/modules-mounter/daemon/package.json
+index c882f9c31cf..9727413c0f6 100644
+--- a/modules-mounter/daemon/package.json
++++ b/modules-mounter/daemon/package.json
+@@ -66,6 +66,9 @@
+     "node": ">=22.13"
+   },
+   "jest": {
+-    "preset": "@pnpm/jest-config"
++    "preset": "@pnpm/jest-config",
++    "moduleNameMapper": {
++      "^fuse-native$": "<rootDir>/__mocks__/fuse-native.js"
++    }
+   }
+ }
+diff --git a/modules-mounter/daemon/test/createFuseHandlers.test.ts b/modules-mounter/daemon/test/createFuseHandlers.test.ts
+index e7b2c3a0462..caeafa9dcc2 100644
+--- a/modules-mounter/daemon/test/createFuseHandlers.test.ts
++++ b/modules-mounter/daemon/test/createFuseHandlers.test.ts
+@@ -1,12 +1,12 @@
+ import { STORE_VERSION } from '@pnpm/constants'
+ import { jest } from '@jest/globals'
+ import path from 'path'
+-import type { FuseHandlers } from '../src/createFuseHandlers.js'
+ 
+ jest.unstable_mockModule('fuse-native', () => ({ default: { ENOENT: -2 } }))
+ 
+ const { default: Fuse } = await import('fuse-native')
+ const { createFuseHandlers } = await import('../src/createFuseHandlers.js')
++type FuseHandlers = Awaited<ReturnType<typeof createFuseHandlers>>
+ 
+ describe('FUSE handlers', () => {
+   let handlers: FuseHandlers

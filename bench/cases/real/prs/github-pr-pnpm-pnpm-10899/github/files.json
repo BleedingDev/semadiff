@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "8495ecad06681185a7e8d1292817c45e7f80acf1",
+    "filename": ".changeset/fix-global-link-output.md",
+    "status": "added",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750/.changeset%2Ffix-global-link-output.md",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750/.changeset%2Ffix-global-link-output.md",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/.changeset%2Ffix-global-link-output.md?ref=49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750",
+    "patch": "@@ -0,0 +1,6 @@\n+---\n+\"@pnpm/default-reporter\": patch\n+\"pnpm\": patch\n+---\n+\n+Fixed global install output showing `???` instead of the linked package path when linking from the current directory."
+  },
+  {
+    "sha": "ad63f7a3d176dcd273a337f38ea84b28333d6641",
+    "filename": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts?ref=49aa5782eafaf9d33c1a24c7fe9b0b6b23d25750",
+    "patch": "@@ -118,7 +118,7 @@ function printDiffs (\n       result += ` ${chalk.red('deprecated')}`\n     }\n     if (pkg.from) {\n-      result += ` ${chalk.grey(`<- ${pkg.from && path.relative(opts.prefix, pkg.from) || '???'}`)}`\n+      result += ` ${chalk.grey(`<- ${path.relative(opts.prefix, pkg.from) || pkg.from}`)}`\n     }\n     if (pkg.added && depType === 'dev' && opts.pnpmConfig?.saveDev === false && opts.cmd === 'add') {\n       result += `${chalk.yellow(' already in devDependencies, was not moved to dependencies.')}`"
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-colinhacks-zod-5610",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5610: Add hr (croatian) translation",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5610,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5610",
+    "baseSha": "0cdc0b8597999fd9ca99767b912c1e82c1ff2d6c",
+    "headSha": "34f0958fe91b19d964b11ec6c2fe2287b2374751",
+    "selectedFiles": [
+      "packages/zod/src/v4/locales/index.ts"
+    ],
+    "collectedAt": "2026-03-08T02:13:48.101Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/locales/index.ts",
+      "oldPath": "packages/zod/src/v4/locales/index.ts",
+      "newPath": "packages/zod/src/v4/locales/index.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/locales/index.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 17,
+          "endLine": 17
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

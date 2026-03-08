@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-47708",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#47708: Bump react monorepo",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 47708,
+    "prUrl": "https://github.com/mui/material-ui/pull/47708",
+    "baseSha": "e0a971ab71d0f870354c1eb17ea029e34f355ffa",
+    "headSha": "626b26abd0767e74aadfdb195aad38f42d99006c",
+    "selectedFiles": [
+      "docs/data/joy/getting-started/templates/sign-in-side/App.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:43:50.811Z"
+  },
+  "files": [
+    {
+      "id": "docs/data/joy/getting-started/templates/sign-in-side/App.tsx",
+      "oldPath": "docs/data/joy/getting-started/templates/sign-in-side/App.tsx",
+      "newPath": "docs/data/joy/getting-started/templates/sign-in-side/App.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/data/joy/getting-started/templates/sign-in-side/App.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 160,
+          "endLine": 160
+        },
+        "newRange": {
+          "startLine": 160,
+          "endLine": 160
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

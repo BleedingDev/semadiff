@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "dd6ea7a5e5afeec77fa5bb83829e291bbaf95c40",
+    "filename": "packages/react/src/components/strong/index.tsx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/chakra-ui/blob/2bb5e38bf2234660cc29c805d3fb6d57ddd84815/packages%2Freact%2Fsrc%2Fcomponents%2Fstrong%2Findex.tsx",
+    "raw_url": "https://github.com/chakra-ui/chakra-ui/raw/2bb5e38bf2234660cc29c805d3fb6d57ddd84815/packages%2Freact%2Fsrc%2Fcomponents%2Fstrong%2Findex.tsx",
+    "contents_url": "https://api.github.com/repos/chakra-ui/chakra-ui/contents/packages%2Freact%2Fsrc%2Fcomponents%2Fstrong%2Findex.tsx?ref=2bb5e38bf2234660cc29c805d3fb6d57ddd84815",
+    "patch": "@@ -2,7 +2,7 @@\n \n import { type HTMLChakraProps, chakra } from \"../../styled-system\"\n \n-export interface StrongProps extends HTMLChakraProps<\"em\"> {}\n+export interface StrongProps extends HTMLChakraProps<\"strong\"> {}\n \n export const Strong = chakra(\"strong\", {\n   base: { fontWeight: \"semibold\" },"
+  }
+]

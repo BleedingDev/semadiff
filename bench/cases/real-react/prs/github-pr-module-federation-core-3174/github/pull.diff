@@ -1,0 +1,235 @@
+diff --git a/.changeset/lucky-buckets-add.md b/.changeset/lucky-buckets-add.md
+new file mode 100644
+index 00000000000..e71c5ec1ca5
+--- /dev/null
++++ b/.changeset/lucky-buckets-add.md
+@@ -0,0 +1,6 @@
++---
++'@module-federation/runtime': minor
++'@module-federation/sdk': minor
++---
++
++pass all loaderHooks to loadEntry and fetch functions instead of just createScript
+diff --git a/packages/runtime/src/remote/index.ts b/packages/runtime/src/remote/index.ts
+index 52f65921a6f..487b5fa5eec 100644
+--- a/packages/runtime/src/remote/index.ts
++++ b/packages/runtime/src/remote/index.ts
+@@ -145,7 +145,7 @@ export class RemoteHandler {
+     loadEntry: new AsyncHook<
+       [
+         {
+-          createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];
++          loaderHook: FederationHost['loaderHook'];
+           remoteInfo: RemoteInfo;
+           remoteEntryExports?: RemoteEntryExports;
+         },
+diff --git a/packages/runtime/src/utils/load.ts b/packages/runtime/src/utils/load.ts
+index a5331da8c97..39dcef9617e 100644
+--- a/packages/runtime/src/utils/load.ts
++++ b/packages/runtime/src/utils/load.ts
+@@ -68,12 +68,12 @@ async function loadEntryScript({
+   name,
+   globalName,
+   entry,
+-  createScriptHook,
++  loaderHook,
+ }: {
+   name: string;
+   globalName: string;
+   entry: string;
+-  createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];
++  loaderHook: FederationHost['loaderHook'];
+ }): Promise<RemoteEntryExports> {
+   const { entryExports: remoteEntryExports } = getRemoteEntryExports(
+     name,
+@@ -87,7 +87,7 @@ async function loadEntryScript({
+   return loadScript(entry, {
+     attrs: {},
+     createScriptHook: (url, attrs) => {
+-      const res = createScriptHook.emit({ url, attrs });
++      const res = loaderHook.lifecycle.createScript.emit({ url, attrs });
+ 
+       if (!res) return;
+ 
+@@ -127,11 +127,11 @@ async function loadEntryScript({
+ async function loadEntryDom({
+   remoteInfo,
+   remoteEntryExports,
+-  createScriptHook,
++  loaderHook,
+ }: {
+   remoteInfo: RemoteInfo;
+   remoteEntryExports?: RemoteEntryExports;
+-  createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];
++  loaderHook: FederationHost['loaderHook'];
+ }) {
+   const { entry, entryGlobalName: globalName, name, type } = remoteInfo;
+   switch (type) {
+@@ -141,16 +141,16 @@ async function loadEntryDom({
+     case 'system':
+       return loadSystemJsEntry({ entry, remoteEntryExports });
+     default:
+-      return loadEntryScript({ entry, globalName, name, createScriptHook });
++      return loadEntryScript({ entry, globalName, name, loaderHook });
+   }
+ }
+ 
+ async function loadEntryNode({
+   remoteInfo,
+-  createScriptHook,
++  loaderHook,
+ }: {
+   remoteInfo: RemoteInfo;
+-  createScriptHook: FederationHost['loaderHook']['lifecycle']['createScript'];
++  loaderHook: FederationHost['loaderHook'];
+ }) {
+   const { entry, entryGlobalName: globalName, name, type } = remoteInfo;
+   const { entryExports: remoteEntryExports } = getRemoteEntryExports(
+@@ -164,16 +164,18 @@ async function loadEntryNode({
+ 
+   return loadScriptNode(entry, {
+     attrs: { name, globalName, type },
+-    createScriptHook: (url, attrs) => {
+-      const res = createScriptHook.emit({ url, attrs });
++    loaderHook: {
++      createScriptHook: (url: string, attrs: Record<string, any> = {}) => {
++        const res = loaderHook.lifecycle.createScript.emit({ url, attrs });
+ 
+-      if (!res) return;
++        if (!res) return;
+ 
+-      if ('url' in res) {
+-        return res;
+-      }
++        if ('url' in res) {
++          return res;
++        }
+ 
+-      return;
++        return;
++      },
+     },
+   })
+     .then(() => {
+@@ -220,9 +222,11 @@ export async function getRemoteEntry({
+   if (!globalLoading[uniqueKey]) {
+     const loadEntryHook = origin.remoteHandler.hooks.lifecycle.loadEntry;
+     const createScriptHook = origin.loaderHook.lifecycle.createScript;
++    const loaderHook = origin.loaderHook;
++
+     globalLoading[uniqueKey] = loadEntryHook
+       .emit({
+-        createScriptHook,
++        loaderHook,
+         remoteInfo,
+         remoteEntryExports,
+       })
+@@ -231,8 +235,8 @@ export async function getRemoteEntry({
+           return res;
+         }
+         return isBrowserEnv()
+-          ? loadEntryDom({ remoteInfo, remoteEntryExports, createScriptHook })
+-          : loadEntryNode({ remoteInfo, createScriptHook });
++          ? loadEntryDom({ remoteInfo, remoteEntryExports, loaderHook })
++          : loadEntryNode({ remoteInfo, loaderHook });
+       });
+   }
+ 
+diff --git a/packages/sdk/src/node.ts b/packages/sdk/src/node.ts
+index 0a4ae1433c3..c774a6d2572 100644
+--- a/packages/sdk/src/node.ts
++++ b/packages/sdk/src/node.ts
+@@ -1,4 +1,4 @@
+-import { CreateScriptHookNode } from './types';
++import { CreateScriptHookNode, FetchHook } from './types';
+ 
+ function importNodeModule<T>(name: string): Promise<T> {
+   if (!name) {
+@@ -22,12 +22,10 @@ const loadNodeFetch = async (): Promise<typeof fetch> => {
+ const lazyLoaderHookFetch = async (
+   input: RequestInfo | URL,
+   init?: RequestInit,
++  loaderHook?: any,
+ ): Promise<Response> => {
+-  // @ts-ignore
+-  const loaderHooks = __webpack_require__.federation.instance.loaderHook;
+-
+   const hook = (url: RequestInfo | URL, init: RequestInit) => {
+-    return loaderHooks.lifecycle.fetch.emit(url, init);
++    return loaderHook.lifecycle.fetch.emit(url, init);
+   };
+ 
+   const res = await hook(input, init || {});
+@@ -44,10 +42,13 @@ export function createScriptNode(
+   url: string,
+   cb: (error?: Error, scriptContext?: any) => void,
+   attrs?: Record<string, any>,
+-  createScriptHook?: CreateScriptHookNode,
++  loaderHook?: {
++    createScriptHook?: CreateScriptHookNode;
++    fetch?: FetchHook;
++  },
+ ) {
+-  if (createScriptHook) {
+-    const hookResult = createScriptHook(url);
++  if (loaderHook?.createScriptHook) {
++    const hookResult = loaderHook.createScriptHook(url);
+     if (hookResult && typeof hookResult === 'object' && 'url' in hookResult) {
+       url = hookResult.url;
+     }
+@@ -63,20 +64,9 @@ export function createScriptNode(
+   }
+ 
+   const getFetch = async (): Promise<typeof fetch> => {
+-    //@ts-ignore
+-    if (typeof __webpack_require__ !== 'undefined') {
+-      try {
+-        //@ts-ignore
+-        const loaderHooks = __webpack_require__.federation.instance.loaderHook;
+-        if (loaderHooks.lifecycle.fetch) {
+-          return lazyLoaderHookFetch;
+-        }
+-      } catch (e) {
+-        console.warn(
+-          'federation.instance.loaderHook.lifecycle.fetch failed:',
+-          e,
+-        );
+-      }
++    if (loaderHook?.fetch) {
++      return (input: RequestInfo | URL, init?: RequestInit) =>
++        lazyLoaderHookFetch(input, init, loaderHook);
+     }
+ 
+     return typeof fetch === 'undefined' ? loadNodeFetch() : fetch;
+@@ -162,7 +152,9 @@ export function loadScriptNode(
+   url: string,
+   info: {
+     attrs?: Record<string, any>;
+-    createScriptHook?: CreateScriptHookNode;
++    loaderHook?: {
++      createScriptHook?: CreateScriptHookNode;
++    };
+   },
+ ) {
+   return new Promise<void>((resolve, reject) => {
+@@ -181,7 +173,7 @@ export function loadScriptNode(
+         }
+       },
+       info.attrs,
+-      info.createScriptHook,
++      info.loaderHook,
+     );
+   });
+ }
+diff --git a/packages/sdk/src/types/hooks.ts b/packages/sdk/src/types/hooks.ts
+index 1284d890e00..75d4326b820 100644
+--- a/packages/sdk/src/types/hooks.ts
++++ b/packages/sdk/src/types/hooks.ts
+@@ -23,3 +23,7 @@ export type CreateScriptHook = (
+   url: string,
+   attrs?: Record<string, any> | undefined,
+ ) => CreateScriptHookReturn;
++
++export type FetchHook = (
++  args: [string, RequestInit],
++) => Promise<Response> | void | false;

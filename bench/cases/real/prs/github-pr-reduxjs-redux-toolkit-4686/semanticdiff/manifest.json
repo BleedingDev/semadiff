@@ -1,0 +1,189 @@
+[
+  {
+    "tracking_name": "examples/query/react/basic/package.json",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=examples%2Fquery%2Freact%2Fbasic%2Fpackage.json&old_oid=709c27b6c8a38e189f9cb8d05b743fa1adf2777f&old_mode=33188&new_filename=examples%2Fquery%2Freact%2Fbasic%2Fpackage.json&new_oid=fc44afac89032420d2f4a0e9afe69584bd758925&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "examples/query/react/basic/package.json",
+      "oid": "709c27b6c8a38e189f9cb8d05b743fa1adf2777f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "examples/query/react/basic/package.json",
+      "oid": "fc44afac89032420d2f4a0e9afe69584bd758925",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "38c23d33438f5cf8c071a937aadd3f3b23d7ab239a62966d398d674254ab175a"
+  },
+  {
+    "tracking_name": "examples/query/react/kitchen-sink/package.json",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=examples%2Fquery%2Freact%2Fkitchen-sink%2Fpackage.json&old_oid=2e1675c6fc444d4c66579866006787b4d6396e0a&old_mode=33188&new_filename=examples%2Fquery%2Freact%2Fkitchen-sink%2Fpackage.json&new_oid=c0e57941277e1b72c5980c29ecae03643d8862e6&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "examples/query/react/kitchen-sink/package.json",
+      "oid": "2e1675c6fc444d4c66579866006787b4d6396e0a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "examples/query/react/kitchen-sink/package.json",
+      "oid": "c0e57941277e1b72c5980c29ecae03643d8862e6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "55c2919ef798c57d4c0e739c1f1780cdf7cbae9992a00f8eb3c0acfe423d22c6"
+  },
+  {
+    "tracking_name": "packages/toolkit/package.json",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fpackage.json&old_oid=e3c3c8b6f3ba00d751f786e251cf93ee4dc56fe6&old_mode=33188&new_filename=packages%2Ftoolkit%2Fpackage.json&new_oid=dee00cc37a223c279a1eabf514809b671d0ce181&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/toolkit/package.json",
+      "oid": "e3c3c8b6f3ba00d751f786e251cf93ee4dc56fe6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/package.json",
+      "oid": "dee00cc37a223c279a1eabf514809b671d0ce181",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6e658c563b3b159011adf5baf9a8ac24b29f6ca8c6d62ea26074b9e300a72c20"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/apiProvider.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FapiProvider.test.tsx&old_oid=f6a4cea10addaaef5eef593c26d1b75fec20d0f6&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FapiProvider.test.tsx&new_oid=4fdf9de462d55778ea1836b62b9fa889dd524e7a&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/apiProvider.test.tsx",
+      "oid": "f6a4cea10addaaef5eef593c26d1b75fec20d0f6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/apiProvider.test.tsx",
+      "oid": "4fdf9de462d55778ea1836b62b9fa889dd524e7a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a21a05fbce277f7a8c4a8cf32abfefe2ee3a6b50f6a03f8a9700d1adc8c2dce6"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/buildHooks.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildHooks.test.tsx&old_oid=6810e75dd8bf38eb805f6c37aa0dbd8d32950cdd&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FbuildHooks.test.tsx&new_oid=50ff5611485bf68ef0efa17c35095129ee0d548f&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/buildHooks.test.tsx",
+      "oid": "6810e75dd8bf38eb805f6c37aa0dbd8d32950cdd",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/buildHooks.test.tsx",
+      "oid": "50ff5611485bf68ef0efa17c35095129ee0d548f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "db590c69227289229ac752af81445def0df4934f53b5c3a00d7428161a2f5f99"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Fcleanup.test.tsx&old_oid=fff0d4f7ad869ab60855fc3a795211e74299d17f&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Fcleanup.test.tsx&new_oid=49b634d7f413b52eb9cf88c9c02be9cf45158850&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+      "oid": "fff0d4f7ad869ab60855fc3a795211e74299d17f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/cleanup.test.tsx",
+      "oid": "49b634d7f413b52eb9cf88c9c02be9cf45158850",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "866a28b3e71d48688b3e9e707f0f1f6ddee64f317e4a19086090acbfb84f4b10"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FfetchBaseQuery.test.tsx&old_oid=3b70753318e525fe095143ae6e0f26a92c0a24b4&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FfetchBaseQuery.test.tsx&new_oid=845a1c3592b622353792adbf6cc66484f6d068ee&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "oid": "3b70753318e525fe095143ae6e0f26a92c0a24b4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/fetchBaseQuery.test.tsx",
+      "oid": "845a1c3592b622353792adbf6cc66484f6d068ee",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "156822f88a24f4b4ac050654a74f1f6f5c780ca50bdb8cab6e04e3e8990a4a4b"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/mocks/handlers.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Fmocks%2Fhandlers.ts&old_oid=3fe044fdf0b774f3d79880d4733d448d2811cec8&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2Fmocks%2Fhandlers.ts&new_oid=6f2146e175c2485811ef0d27be00f9a06a7aea6e&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/mocks/handlers.ts",
+      "oid": "3fe044fdf0b774f3d79880d4733d448d2811cec8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/mocks/handlers.ts",
+      "oid": "6f2146e175c2485811ef0d27be00f9a06a7aea6e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7780a061b17d2257702a27f3e07cf880275c851bbc23458c1203affd9894c4d8"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/optimisticUpserts.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FoptimisticUpserts.test.tsx&old_oid=600c433aab0a2bd5fcc4bd8f822ecb2c882b7f38&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FoptimisticUpserts.test.tsx&new_oid=ac6c8ee4737e7159f31c0c1adea5aba38a5a48ca&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/optimisticUpserts.test.tsx",
+      "oid": "600c433aab0a2bd5fcc4bd8f822ecb2c882b7f38",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/optimisticUpserts.test.tsx",
+      "oid": "ac6c8ee4737e7159f31c0c1adea5aba38a5a48ca",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "54bfc03b32a774797168d39e63f0da5be91f9f7f141b8798e38de1c7f5c84eeb"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FrefetchingBehaviors.test.tsx&old_oid=be27d08d9fdc2112772ccfd010b04e9280aeeaaf&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FrefetchingBehaviors.test.tsx&new_oid=96e41b9e10beacdac9f1dabc9e3a6c3569d6d607&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx",
+      "oid": "be27d08d9fdc2112772ccfd010b04e9280aeeaaf",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/refetchingBehaviors.test.tsx",
+      "oid": "96e41b9e10beacdac9f1dabc9e3a6c3569d6d607",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ee2c397d7e95176a4e3cf392f23a8925044197207e5b11419e12df4b1c2a3928"
+  },
+  {
+    "tracking_name": "yarn.lock",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=yarn.lock&old_oid=e88f6db1e1e4aba38772e29f8091090e295f7e3e&old_mode=33188&new_filename=yarn.lock&new_oid=b503e74683678444344340ecc253ed1d44c5131b&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "yarn.lock",
+      "oid": "e88f6db1e1e4aba38772e29f8091090e295f7e3e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "yarn.lock",
+      "oid": "b503e74683678444344340ecc253ed1d44c5131b",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "51e4f558fae534656963876761c95b83b6ef5da5103c4adef6768219ed76c2de"
+  }
+]

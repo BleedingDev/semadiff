@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-pnpm-pnpm-10668",
+  "language": "ts",
+  "kind": "real",
+  "description": "pnpm/pnpm#10668: refactor(env): unify node version specifier parsing into parseNodeSpecifier in node.resolver",
+  "source": {
+    "kind": "github-pr",
+    "repository": "pnpm/pnpm",
+    "prNumber": 10668,
+    "prUrl": "https://github.com/pnpm/pnpm/pull/10668",
+    "baseSha": "895af7032037a7da1711830d7c0673ca2c9b6241",
+    "headSha": "6075ecb340fe66aeb77cafa2bbaca6937950ddd0",
+    "selectedFiles": [
+      "env/plugin-commands-env/src/envList.ts"
+    ],
+    "collectedAt": "2026-03-08T02:26:49.210Z"
+  },
+  "files": [
+    {
+      "id": "env/plugin-commands-env/src/envList.ts",
+      "oldPath": "env/plugin-commands-env/src/envList.ts",
+      "newPath": "env/plugin-commands-env/src/envList.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "env/plugin-commands-env/src/envList.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 2,
+          "endLine": 2
+        },
+        "newRange": {
+          "startLine": 2,
+          "endLine": 2
+        }
+      },
+      {
+        "fileId": "env/plugin-commands-env/src/envList.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 13
+        },
+        "newRange": {
+          "startLine": 13,
+          "endLine": 13
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

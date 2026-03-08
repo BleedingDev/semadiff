@@ -1,0 +1,13 @@
+diff --git a/src/index.spec.ts b/src/index.spec.ts
+index 725bb8b1d..29b90495a 100644
+--- a/src/index.spec.ts
++++ b/src/index.spec.ts
+@@ -596,7 +596,7 @@ describe('ts-node', function () {
+             return _compile.call(this, code, fileName)
+           }
+ 
+-          return old(m, fileName)
++          return old!(m, fileName)
+         }
+       })
+ 

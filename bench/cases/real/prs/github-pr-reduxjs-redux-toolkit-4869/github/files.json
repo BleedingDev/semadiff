@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "c43dd025728fcd1f99d329987bc5e77db08ee4a9",
+    "filename": "docs/rtk-query/usage/infinite-queries.mdx",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/5f2178e19af15d033e733967b29de9c4a041558c/docs%2Frtk-query%2Fusage%2Finfinite-queries.mdx",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/5f2178e19af15d033e733967b29de9c4a041558c/docs%2Frtk-query%2Fusage%2Finfinite-queries.mdx",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/docs%2Frtk-query%2Fusage%2Finfinite-queries.mdx?ref=5f2178e19af15d033e733967b29de9c4a041558c",
+    "patch": "@@ -63,7 +63,7 @@ This structure allows flexibility in how your UI chooses to render the data (sho\n \n Infinite query endpoints are defined by returning an object inside the `endpoints` section of `createApi`, and defining the fields using the `build.infiniteQuery()` method. They are an extension of standard query endpoints - you can specify [the same options as standard queries](./queries.mdx#defining-query-endpoints) (providing either `query` or `queryFn`, customizing with `transformResponse`, lifecycles with `onCacheEntryAdded` and `onQueryStarted`, defining tags, etc). However, they also require an additional `infiniteQueryOptions` field to specify the infinite query behavior.\n \n-With TypeScript, you must supply 3 generic arguments: `build.infiniteQuery<ResultType, QueryArg, PageParam>`, where `ResultType` is the contents of a single page, `QueryArg` is the type passed in as the cache key, and `PageParam` is the value that will be passed to `query/queryFn` to make the rest. If there is no argument, use `void` for the arg type instead.\n+With TypeScript, you must supply 3 generic arguments: `build.infiniteQuery<ResultType, QueryArg, PageParam>`, where `ResultType` is the contents of a single page, `QueryArg` is the type passed in as the cache key, and `PageParam` is the value used to request a specific page. If there is no argument, use `void` for the arg type instead.\n \n ### `infiniteQueryOptions`\n "
+  },
+  {
+    "sha": "81ca5d38a7b90fdb0f12b7ff2a7dee38cb233f37",
+    "filename": "packages/toolkit/src/query/core/buildThunks.ts",
+    "status": "modified",
+    "additions": 28,
+    "deletions": 10,
+    "changes": 38,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildThunks.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildThunks.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildThunks.ts?ref=5f2178e19af15d033e733967b29de9c4a041558c",
+    "patch": "@@ -26,6 +26,7 @@ import type {\n   PageParamFrom,\n   QueryArgFrom,\n   QueryDefinition,\n+  ResultDescription,\n   ResultTypeFrom,\n } from '../endpointDefinitions'\n import {\n@@ -71,14 +72,14 @@ export type BuildThunksApiEndpointQuery<\n \n export type BuildThunksApiEndpointInfiniteQuery<\n   Definition extends InfiniteQueryDefinition<any, any, any, any, any>,\n-> = Matchers<QueryThunk, Definition>\n+> = Matchers<InfiniteQueryThunk<any>, Definition>\n \n export type BuildThunksApiEndpointMutation<\n   Definition extends MutationDefinition<any, any, any, any, any>,\n > = Matchers<MutationThunk, Definition>\n \n type EndpointThunk<\n-  Thunk extends QueryThunk | MutationThunk,\n+  Thunk extends QueryThunk | MutationThunk | InfiniteQueryThunk<any>,\n   Definition extends EndpointDefinition<any, any, any, any>,\n > =\n   Definition extends EndpointDefinition<\n@@ -94,27 +95,41 @@ type EndpointThunk<\n           ATConfig & { rejectValue: BaseQueryError<BaseQueryFn> }\n         >\n       : never\n-    : never\n+    : Definition extends InfiniteQueryDefinition<\n+          infer QueryArg,\n+          infer PageParam,\n+          infer BaseQueryFn,\n+          any,\n+          infer ResultType\n+        >\n+      ? Thunk extends AsyncThunk<unknown, infer ATArg, infer ATConfig>\n+        ? AsyncThunk<\n+            InfiniteData<ResultType, PageParam>,\n+            ATArg & { originalArgs: QueryArg },\n+            ATConfig & { rejectValue: BaseQueryError<BaseQueryFn> }\n+          >\n+        : never\n+      : never\n \n export type PendingAction<\n-  Thunk extends QueryThunk | MutationThunk,\n+  Thunk extends QueryThunk | MutationThunk | InfiniteQueryThunk<any>,\n   Definition extends EndpointDefinition<any, any, any, any>,\n > = ReturnType<EndpointThunk<Thunk, Definition>['pending']>\n \n export type FulfilledAction<\n-  Thunk extends QueryThunk | MutationThunk,\n+  Thunk extends QueryThunk | MutationThunk | InfiniteQueryThunk<any>,\n   Definition extends EndpointDefinition<any, any, any, any>,\n > = ReturnType<EndpointThunk<Thunk, Definition>['fulfilled']>\n \n export type RejectedAction<\n-  Thunk extends QueryThunk | MutationThunk,\n+  Thunk extends QueryThunk | MutationThunk | InfiniteQueryThunk<any>,\n   Definition extends EndpointDefinition<any, any, any, any>,\n > = ReturnType<EndpointThunk<Thunk, Definition>['rejected']>\n \n export type Matcher<M> = (value: any) => value is M\n \n export interface Matchers<\n-  Thunk extends QueryThunk | MutationThunk,\n+  Thunk extends QueryThunk | MutationThunk | InfiniteQueryThunk<any>,\n   Definition extends EndpointDefinition<any, any, any, any>,\n > {\n   matchPending: Matcher<PendingAction<Thunk, Definition>>\n@@ -645,7 +660,6 @@ export function buildThunks<\n           isForcedQueryNeedingRefetch || !cachedData ? blankData : cachedData\n         ) as InfiniteData<unknown, unknown>\n \n-\n         // If the thunk specified a direction and we do have at least one page,\n         // fetch the next or previous page\n         if ('direction' in arg && arg.direction && existingData.pages.length) {\n@@ -960,14 +974,18 @@ export function getPreviousPageParam(\n \n export function calculateProvidedByThunk(\n   action: UnwrapPromise<\n-    ReturnType<ReturnType<QueryThunk>> | ReturnType<ReturnType<MutationThunk>>\n+    | ReturnType<ReturnType<QueryThunk>>\n+    | ReturnType<ReturnType<MutationThunk>>\n+    | ReturnType<ReturnType<InfiniteQueryThunk<any>>>\n   >,\n   type: 'providesTags' | 'invalidatesTags',\n   endpointDefinitions: EndpointDefinitions,\n   assertTagType: AssertTagTypes,\n ) {\n   return calculateProvidedBy(\n-    endpointDefinitions[action.meta.arg.endpointName][type],\n+    endpointDefinitions[action.meta.arg.endpointName][\n+      type\n+    ] as ResultDescription<any, any, any, any, any>,\n     isFulfilled(action) ? action.payload : undefined,\n     isRejectedWithValue(action) ? action.payload : undefined,\n     action.meta.arg.originalArgs,"
+  },
+  {
+    "sha": "d69b976d21933340a4be0d799829b44bb0d7f6cc",
+    "filename": "packages/toolkit/src/query/endpointDefinitions.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts?ref=5f2178e19af15d033e733967b29de9c4a041558c",
+    "patch": "@@ -595,7 +595,7 @@ export interface InfiniteQueryExtraOptions<\n \n   providesTags?: ResultDescription<\n     TagTypes,\n-    ResultType,\n+    InfiniteData<ResultType, PageParam>,\n     QueryArg,\n     BaseQueryError<BaseQuery>,\n     BaseQueryMeta<BaseQuery>"
+  },
+  {
+    "sha": "4c8ca51bef3daa0c6cc9f3dee3d9443f406a85f9",
+    "filename": "packages/toolkit/src/query/react/buildHooks.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 2,
+    "changes": 4,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts?ref=5f2178e19af15d033e733967b29de9c4a041558c",
+    "patch": "@@ -940,7 +940,7 @@ export type UseInfiniteQuery<\n export type UseInfiniteQueryState<\n   D extends InfiniteQueryDefinition<any, any, any, any, any>,\n > = <R extends Record<string, any> = UseInfiniteQueryStateDefaultResult<D>>(\n-  arg: QueryArgFrom<D> | SkipToken,\n+  arg: InfiniteQueryArgFrom<D> | SkipToken,\n   options?: UseInfiniteQueryStateOptions<D, R>,\n ) => UseInfiniteQueryStateResult<D, R>\n \n@@ -977,7 +977,7 @@ export type TypedUseInfiniteQueryState<\n export type UseInfiniteQuerySubscription<\n   D extends InfiniteQueryDefinition<any, any, any, any, any>,\n > = (\n-  arg: QueryArgFrom<D> | SkipToken,\n+  arg: InfiniteQueryArgFrom<D> | SkipToken,\n   options?: UseInfiniteQuerySubscriptionOptions<D>,\n ) => UseInfiniteQuerySubscriptionResult<D>\n "
+  },
+  {
+    "sha": "2ada1aef09cf7316abdb96435d9e0d844c44fe95",
+    "filename": "packages/toolkit/src/query/tests/infiniteQueries.test-d.ts",
+    "status": "modified",
+    "additions": 37,
+    "deletions": 0,
+    "changes": 37,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/5f2178e19af15d033e733967b29de9c4a041558c/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts?ref=5f2178e19af15d033e733967b29de9c4a041558c",
+    "patch": "@@ -5,6 +5,7 @@ import {\n   QueryStatus,\n } from '@reduxjs/toolkit/query/react'\n import { setupApiStore } from '../../tests/utils/helpers'\n+import { createSlice } from '@internal/createSlice'\n \n describe('Infinite queries', () => {\n   test('Basic infinite query behavior', async () => {\n@@ -54,6 +55,12 @@ describe('Infinite queries', () => {\n               InfiniteData<Pokemon[], number>\n             >()\n           },\n+          providesTags: (result) => {\n+            expectTypeOf(result).toEqualTypeOf<\n+              InfiniteData<Pokemon[], number> | undefined\n+            >()\n+            return []\n+          },\n         }),\n       }),\n     })\n@@ -68,6 +75,36 @@ describe('Infinite queries', () => {\n \n     expectTypeOf(pokemonApi.useGetInfinitePokemonInfiniteQuery).toBeFunction()\n \n+    expectTypeOf(pokemonApi.endpoints.getInfinitePokemon.useInfiniteQuery)\n+      .parameter(0)\n+      .toEqualTypeOf<string | typeof skipToken>()\n+\n+    expectTypeOf(pokemonApi.endpoints.getInfinitePokemon.useInfiniteQueryState)\n+      .parameter(0)\n+      .toEqualTypeOf<string | typeof skipToken>()\n+\n+    expectTypeOf(\n+      pokemonApi.endpoints.getInfinitePokemon.useInfiniteQuerySubscription,\n+    )\n+      .parameter(0)\n+      .toEqualTypeOf<string | typeof skipToken>()\n+\n+    const slice = createSlice({\n+      name: 'pokemon',\n+      initialState: {} as { data: Pokemon[] },\n+      reducers: {},\n+      extraReducers: (builder) => {\n+        builder.addMatcher(\n+          pokemonApi.endpoints.getInfinitePokemon.matchFulfilled,\n+          (state, action) => {\n+            expectTypeOf(action.payload).toEqualTypeOf<\n+              InfiniteData<Pokemon[], number>\n+            >()\n+          },\n+        )\n+      },\n+    })\n+\n     const res = storeRef.store.dispatch(\n       pokemonApi.endpoints.getInfinitePokemon.initiate('fire', {}),\n     )"
+  }
+]

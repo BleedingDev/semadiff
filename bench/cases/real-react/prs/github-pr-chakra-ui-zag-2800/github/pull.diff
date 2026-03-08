@@ -1,0 +1,25 @@
+diff --git a/.changeset/short-seals-arrive.md b/.changeset/short-seals-arrive.md
+new file mode 100644
+index 0000000000..5c5d00b08f
+--- /dev/null
++++ b/.changeset/short-seals-arrive.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/image-cropper": patch
++---
++
++Export missing types
+diff --git a/packages/machines/image-cropper/src/index.ts b/packages/machines/image-cropper/src/index.ts
+index ac5ac44e61..7efc1c7296 100644
+--- a/packages/machines/image-cropper/src/index.ts
++++ b/packages/machines/image-cropper/src/index.ts
+@@ -15,4 +15,9 @@ export type {
+   FlipState,
+   RotationChangeDetails,
+   ZoomChangeDetails,
++  GetCroppedImageOptions,
++  IntlTranslations,
++  PreviewDescriptionDetails,
++  SelectionLabelDetails,
++  SelectionValueTextDetails,
+ } from "./image-cropper.types"

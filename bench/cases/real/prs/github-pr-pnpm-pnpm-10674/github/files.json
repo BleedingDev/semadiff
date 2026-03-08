@@ -1,0 +1,50 @@
+[
+  {
+    "sha": "b997960989a4c686fee553624e82815a73933e12",
+    "filename": "config/config/src/configFileKey.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/3ab22ac4d18f1fc4017439832c49002e457f9aef/config%2Fconfig%2Fsrc%2FconfigFileKey.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/3ab22ac4d18f1fc4017439832c49002e457f9aef/config%2Fconfig%2Fsrc%2FconfigFileKey.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/config%2Fconfig%2Fsrc%2FconfigFileKey.ts?ref=3ab22ac4d18f1fc4017439832c49002e457f9aef",
+    "patch": "@@ -132,7 +132,6 @@ export const excludedPnpmKeys = [\n   'trust-policy',\n   'trust-policy-exclude',\n   'trust-policy-ignore-after',\n-  'use-node-version',\n   'use-stderr',\n   'verify-deps-before-run',\n   'verify-store-integrity',"
+  },
+  {
+    "sha": "6f034276750ba9a9e031b00b12959657daa16c8a",
+    "filename": "config/config/src/types.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/3ab22ac4d18f1fc4017439832c49002e457f9aef/config%2Fconfig%2Fsrc%2Ftypes.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/3ab22ac4d18f1fc4017439832c49002e457f9aef/config%2Fconfig%2Fsrc%2Ftypes.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/config%2Fconfig%2Fsrc%2Ftypes.ts?ref=3ab22ac4d18f1fc4017439832c49002e457f9aef",
+    "patch": "@@ -118,7 +118,6 @@ export const pnpmTypes = {\n   'trust-policy-exclude': [String, Array],\n   'trust-policy-ignore-after': Number,\n   'use-beta-cli': Boolean,\n-  'use-node-version': String,\n   'use-stderr': Boolean,\n   'verify-deps-before-run': Boolean,\n   'verify-store-integrity': Boolean,"
+  },
+  {
+    "sha": "bc24703bdf01023465e58c763648a0689763159a",
+    "filename": "exec/plugin-commands-script-runners/src/create.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 7,
+    "changes": 8,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/3ab22ac4d18f1fc4017439832c49002e457f9aef/exec%2Fplugin-commands-script-runners%2Fsrc%2Fcreate.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/3ab22ac4d18f1fc4017439832c49002e457f9aef/exec%2Fplugin-commands-script-runners%2Fsrc%2Fcreate.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/exec%2Fplugin-commands-script-runners%2Fsrc%2Fcreate.ts?ref=3ab22ac4d18f1fc4017439832c49002e457f9aef",
+    "patch": "@@ -1,8 +1,6 @@\n import renderHelp from 'render-help'\n import { docsUrl } from '@pnpm/cli-utils'\n-import { types } from '@pnpm/config'\n import { PnpmError } from '@pnpm/error'\n-import { pick } from 'ramda'\n import * as dlx from './dlx.js'\n \n export const commandNames = ['create']\n@@ -28,11 +26,7 @@ export async function handler (_opts: dlx.DlxCommandOptions, params: string[]):\n }\n \n export function rcOptionsTypes (): Record<string, unknown> {\n-  return {\n-    ...pick([\n-      'use-node-version',\n-    ], types),\n-  }\n+  return {}\n }\n \n export function cliOptionsTypes (): Record<string, unknown> {"
+  },
+  {
+    "sha": "46d0ccbf0ea66674c45ef7e14a715ee203bc3e54",
+    "filename": "pnpm/src/main.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 2,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/3ab22ac4d18f1fc4017439832c49002e457f9aef/pnpm%2Fsrc%2Fmain.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/3ab22ac4d18f1fc4017439832c49002e457f9aef/pnpm%2Fsrc%2Fmain.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/pnpm%2Fsrc%2Fmain.ts?ref=3ab22ac4d18f1fc4017439832c49002e457f9aef",
+    "patch": "@@ -297,8 +297,6 @@ export async function main (inputArgv: string[]): Promise<void> {\n         result = await result\n       }\n     } finally {\n-      // When use-node-version is set and \"pnpm run\" is executed,\n-      // this will be the only place where the tarball worker pool is finished.\n       await finishWorkers()\n     }\n     executionTimeLogger.debug({"
+  }
+]

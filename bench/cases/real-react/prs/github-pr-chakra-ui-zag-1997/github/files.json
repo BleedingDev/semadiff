@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "b7fa2baefcee1c521fc7b2e5164088cc7ed37950",
+    "filename": "examples/lit-ts/src/accordion-element.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 2,
+    "changes": 3,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Faccordion-element.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Faccordion-element.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/examples%2Flit-ts%2Fsrc%2Faccordion-element.ts?ref=80cc918c67371073b90c86e11a8ee9d0932935d6",
+    "patch": "@@ -1,6 +1,5 @@\n import { spread } from \"@open-wc/lit-helpers\"\n import * as accordion from \"@zag-js/accordion\"\n-import { Machine } from \"@zag-js/core\"\n import { accordionData } from \"@zag-js/shared\"\n import { PropTypes } from \"@zag-js/types\"\n import { html, unsafeCSS } from \"lit\"\n@@ -11,7 +10,7 @@ import { normalizeProps } from \"./normalize-props\"\n \n @customElement(\"accordion-element\")\n export class AccordionElement extends Component<accordion.Context, accordion.Api, accordion.Service> {\n-  initService(context: accordion.Context): Machine<any, any, any> {\n+  initService(context: accordion.Context): accordion.Service {\n     return accordion.machine({ ...context, id: \"1\" })\n   }\n "
+  },
+  {
+    "sha": "f3790c1aea9d27fb9bb3145a4e5f2fa834a58beb",
+    "filename": "examples/lit-ts/src/avatar-element.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 2,
+    "changes": 3,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Favatar-element.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Favatar-element.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/examples%2Flit-ts%2Fsrc%2Favatar-element.ts?ref=80cc918c67371073b90c86e11a8ee9d0932935d6",
+    "patch": "@@ -1,6 +1,5 @@\n import { spread } from \"@open-wc/lit-helpers\"\n import * as avatar from \"@zag-js/avatar\"\n-import { Machine } from \"@zag-js/core\"\n import { PropTypes } from \"@zag-js/types\"\n import { html, unsafeCSS } from \"lit\"\n import { customElement } from \"lit/decorators.js\"\n@@ -10,7 +9,7 @@ import { normalizeProps } from \"./normalize-props\"\n \n @customElement(\"avatar-element\")\n export class AvatarElement extends Component<avatar.Context, avatar.Api, avatar.Service> {\n-  initService(context: avatar.Context): Machine<any, any, any> {\n+  initService(context: avatar.Context): avatar.Service {\n     return avatar.machine({ ...context, id: \"1\" })\n   }\n "
+  },
+  {
+    "sha": "15d493f19f31643a973333b0e1e52d93d888a7f8",
+    "filename": "examples/lit-ts/src/carousel-element.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 2,
+    "changes": 3,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Fcarousel-element.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Fcarousel-element.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/examples%2Flit-ts%2Fsrc%2Fcarousel-element.ts?ref=80cc918c67371073b90c86e11a8ee9d0932935d6",
+    "patch": "@@ -1,6 +1,5 @@\n import { spread } from \"@open-wc/lit-helpers\"\n import * as carousel from \"@zag-js/carousel\"\n-import { Machine } from \"@zag-js/core\"\n import { carouselData } from \"@zag-js/shared\"\n import { PropTypes } from \"@zag-js/types\"\n import { html, unsafeCSS } from \"lit\"\n@@ -11,7 +10,7 @@ import { normalizeProps } from \"./normalize-props\"\n \n @customElement(\"carousel-element\")\n export class CarouselElement extends Component<carousel.Context, carousel.Api, carousel.Service> {\n-  initService(context: carousel.Context): Machine<any, any, any> {\n+  initService(context: carousel.Context): carousel.Service {\n     return carousel.machine({ ...context, id: \"1\", index: 0, spacing: \"20px\", slidesPerView: 2 })\n   }\n "
+  },
+  {
+    "sha": "1da365a1736f8ece51501ed4d35bd53526519493",
+    "filename": "examples/lit-ts/src/component.ts",
+    "status": "modified",
+    "additions": 15,
+    "deletions": 8,
+    "changes": 23,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Fcomponent.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/80cc918c67371073b90c86e11a8ee9d0932935d6/examples%2Flit-ts%2Fsrc%2Fcomponent.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/examples%2Flit-ts%2Fsrc%2Fcomponent.ts?ref=80cc918c67371073b90c86e11a8ee9d0932935d6",
+    "patch": "@@ -1,33 +1,40 @@\n-import { Machine, StateFrom } from \"@zag-js/core\"\n+import { Dict, Machine, StateFrom, StateMachine } from \"@zag-js/core\"\n import { LitElement } from \"lit\"\n import { state } from \"lit/decorators.js\"\n \n interface ComponentInterface<Api, Service> {\n   api: Api\n-  service: ReturnType<any>\n+  service: Service\n   state: StateFrom<Service>\n }\n \n-export abstract class Component<Context, Api, Service> extends LitElement implements ComponentInterface<Api, Service> {\n+export abstract class Component<\n+    Context extends Dict,\n+    Api,\n+    Service extends Machine<any, any, StateMachine.AnyEventObject>,\n+  >\n+  extends LitElement\n+  implements ComponentInterface<Api, Service>\n+{\n   api: Api\n-  service: ReturnType<any>\n+  service: Service\n \n   @state()\n   state: StateFrom<Service>\n \n-  abstract initService(context: Context): Machine<any, any, any>\n+  abstract initService(context: Context): Service\n   abstract initApi(): Api\n \n   constructor(context: Context) {\n     super()\n     this.service = this.initService(context)\n     this.service._created()\n \n-    this.state = this.service.getState()\n+    this.state = this.service.getState() as StateFrom<Service>\n     this.api = this.initApi()\n \n-    this.service.subscribe((state: StateFrom<Service>) => {\n-      this.state = state\n+    this.service.subscribe((state) => {\n+      this.state = state as StateFrom<Service>\n       this.api = this.initApi()\n     })\n   }"
+  },
+  {
+    "sha": "ae65731f2259a374eefa508a85fd30c4aa502865",
+    "filename": "packages/core/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/80cc918c67371073b90c86e11a8ee9d0932935d6/packages%2Fcore%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/80cc918c67371073b90c86e11a8ee9d0932935d6/packages%2Fcore%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fcore%2Fsrc%2Findex.ts?ref=80cc918c67371073b90c86e11a8ee9d0932935d6",
+    "patch": "@@ -4,4 +4,4 @@ export { choose, guards } from \"./guard-utils\"\n export * from \"./machine\"\n export { mergeProps } from \"./merge-props\"\n export type { ContextFrom, EventFrom, StateFrom } from \"./type-utils\"\n-export type { StateMachine } from \"./types\"\n+export type { Dict, StateMachine } from \"./types\""
+  }
+]

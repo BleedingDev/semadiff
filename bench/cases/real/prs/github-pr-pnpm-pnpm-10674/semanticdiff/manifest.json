@@ -1,0 +1,70 @@
+[
+  {
+    "tracking_name": "config/config/src/configFileKey.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=config%2Fconfig%2Fsrc%2FconfigFileKey.ts&old_oid=34bdf7c2a8320dc2664262778af6d5607a0cde17&old_mode=33188&new_filename=config%2Fconfig%2Fsrc%2FconfigFileKey.ts&new_oid=b997960989a4c686fee553624e82815a73933e12&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "config/config/src/configFileKey.ts",
+      "oid": "34bdf7c2a8320dc2664262778af6d5607a0cde17",
+      "mode": 33188
+    },
+    "new": {
+      "name": "config/config/src/configFileKey.ts",
+      "oid": "b997960989a4c686fee553624e82815a73933e12",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c83f21c0b65dcdf87d04294a32323865791b60c09b5c85e0dec21bf251c7c130"
+  },
+  {
+    "tracking_name": "config/config/src/types.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=config%2Fconfig%2Fsrc%2Ftypes.ts&old_oid=9c2073e001c1325bc1d162e70d931892bd891504&old_mode=33188&new_filename=config%2Fconfig%2Fsrc%2Ftypes.ts&new_oid=6f034276750ba9a9e031b00b12959657daa16c8a&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "config/config/src/types.ts",
+      "oid": "9c2073e001c1325bc1d162e70d931892bd891504",
+      "mode": 33188
+    },
+    "new": {
+      "name": "config/config/src/types.ts",
+      "oid": "6f034276750ba9a9e031b00b12959657daa16c8a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a41bd79caa4fd2b4ff3cf1c7424111ab7322187e8560791cc8cb9548bcad9329"
+  },
+  {
+    "tracking_name": "exec/plugin-commands-script-runners/src/create.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=exec%2Fplugin-commands-script-runners%2Fsrc%2Fcreate.ts&old_oid=9b4f505b9ff8d7700cbaa3ef480631ac300964d2&old_mode=33188&new_filename=exec%2Fplugin-commands-script-runners%2Fsrc%2Fcreate.ts&new_oid=bc24703bdf01023465e58c763648a0689763159a&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "exec/plugin-commands-script-runners/src/create.ts",
+      "oid": "9b4f505b9ff8d7700cbaa3ef480631ac300964d2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "exec/plugin-commands-script-runners/src/create.ts",
+      "oid": "bc24703bdf01023465e58c763648a0689763159a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "72a6c7a9e54855d57232d4b02c8845c51b4b892475cfd6a0ea2ab6a43fe44a7d"
+  },
+  {
+    "tracking_name": "pnpm/src/main.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Fsrc%2Fmain.ts&old_oid=55e9feedadd27a8f1f373f952824df341488dec7&old_mode=33188&new_filename=pnpm%2Fsrc%2Fmain.ts&new_oid=46d0ccbf0ea66674c45ef7e14a715ee203bc3e54&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "pnpm/src/main.ts",
+      "oid": "55e9feedadd27a8f1f373f952824df341488dec7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/src/main.ts",
+      "oid": "46d0ccbf0ea66674c45ef7e14a715ee203bc3e54",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6e4319c857103e8343412204d22db81a77964d1d4b8fc38cc0245de53e32d438"
+  }
+]

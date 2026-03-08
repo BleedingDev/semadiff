@@ -1,0 +1,570 @@
+{
+  "id": "github-pr-mui-material-ui-47694",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#47694: [chore] rebase master in v7.x (large multi-file slice)",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 47694,
+    "prUrl": "https://github.com/mui/material-ui/pull/47694",
+    "baseSha": "c3347dfcd63f4d4a4aa7294267ddffc0f324576e",
+    "headSha": "820bfc0143a5cb17f9d230565ccd17d8236f6f5f",
+    "selectedFiles": [
+      "docs/data/joy/components/autocomplete/Virtualize.tsx",
+      "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+      "docs/data/material/components/autocomplete/Virtualize.tsx",
+      "docs/data/material/components/dialogs/FormDialog.tsx"
+    ],
+    "collectedAt": "2026-03-08T00:00:00.000Z"
+  },
+  "files": [
+    {
+      "id": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+      "oldPath": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+      "newPath": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    },
+    {
+      "id": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+      "oldPath": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+      "newPath": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-02-before.tsx",
+      "afterPath": "file-02-after.tsx"
+    },
+    {
+      "id": "docs/data/material/components/autocomplete/Virtualize.tsx",
+      "oldPath": "docs/data/material/components/autocomplete/Virtualize.tsx",
+      "newPath": "docs/data/material/components/autocomplete/Virtualize.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-03-before.tsx",
+      "afterPath": "file-03-after.tsx"
+    },
+    {
+      "id": "docs/data/material/components/dialogs/FormDialog.tsx",
+      "oldPath": "docs/data/material/components/dialogs/FormDialog.tsx",
+      "newPath": "docs/data/material/components/dialogs/FormDialog.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-04-before.tsx",
+      "afterPath": "file-04-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 2,
+          "endLine": 2
+        },
+        "newRange": {
+          "startLine": 2,
+          "endLine": 2
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 5,
+          "endLine": 5
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 9,
+          "endLine": 11
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 13
+        },
+        "newRange": {
+          "startLine": 15,
+          "endLine": 15
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 18,
+          "endLine": 18
+        },
+        "newRange": {
+          "startLine": 20,
+          "endLine": 20
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 36,
+          "endLine": 56
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 64,
+          "endLine": 64
+        },
+        "newRange": {
+          "startLine": 45,
+          "endLine": 50
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 66,
+          "endLine": 66
+        },
+        "newRange": {
+          "startLine": 52,
+          "endLine": 52
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 68,
+          "endLine": 73
+        },
+        "newRange": {
+          "startLine": 54,
+          "endLine": 71
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 82,
+          "endLine": 89
+        },
+        "newRange": {
+          "startLine": 80,
+          "endLine": 106
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 91,
+          "endLine": 95
+        },
+        "newRange": {
+          "startLine": 108,
+          "endLine": 110
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 132,
+          "endLine": 154
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 165,
+          "endLine": 169
+        }
+      },
+      {
+        "fileId": "docs/data/joy/components/autocomplete/Virtualize.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 175,
+          "endLine": 175
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 1,
+          "endLine": 1
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 3,
+          "endLine": 3
+        },
+        "newRange": {
+          "startLine": 2,
+          "endLine": 3
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 68,
+          "endLine": 68
+        },
+        "newRange": {
+          "startLine": 68,
+          "endLine": 68
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 72,
+          "endLine": 72
+        },
+        "newRange": {
+          "startLine": 72,
+          "endLine": 72
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 82,
+          "endLine": 82
+        },
+        "newRange": {
+          "startLine": 82,
+          "endLine": 82
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 166,
+          "endLine": 166
+        },
+        "newRange": {
+          "startLine": 166,
+          "endLine": 168
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 171,
+          "endLine": 171
+        },
+        "newRange": {
+          "startLine": 173,
+          "endLine": 173
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 179,
+          "endLine": 180
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 182,
+          "endLine": 183
+        },
+        "newRange": {
+          "startLine": 182,
+          "endLine": 182
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 191,
+          "endLine": 193
+        },
+        "newRange": {
+          "startLine": 190,
+          "endLine": 198
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 204,
+          "endLine": 204
+        },
+        "newRange": {
+          "startLine": 209,
+          "endLine": 209
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/CustomizedHook.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 220,
+          "endLine": 230
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 8,
+          "endLine": 8
+        },
+        "newRange": {
+          "startLine": 8,
+          "endLine": 13
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 13,
+          "endLine": 15
+        },
+        "newRange": {
+          "startLine": 18,
+          "endLine": 34
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 18,
+          "endLine": 18
+        },
+        "newRange": {
+          "startLine": 37,
+          "endLine": 37
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 21,
+          "endLine": 21
+        },
+        "newRange": {
+          "startLine": 40,
+          "endLine": 40
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 38,
+          "endLine": 38
+        },
+        "newRange": {
+          "startLine": 57,
+          "endLine": 74
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 40,
+          "endLine": 43
+        },
+        "newRange": {
+          "startLine": 76,
+          "endLine": 81
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 45,
+          "endLine": 46
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 48,
+          "endLine": 49
+        },
+        "newRange": {
+          "startLine": 84,
+          "endLine": 85
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 51,
+          "endLine": 71
+        },
+        "newRange": {
+          "startLine": 87,
+          "endLine": 87
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 80,
+          "endLine": 80
+        },
+        "newRange": {
+          "startLine": 96,
+          "endLine": 96
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "delete",
+        "oldRange": {
+          "startLine": 84,
+          "endLine": 84
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 95,
+          "endLine": 95
+        },
+        "newRange": {
+          "startLine": 110,
+          "endLine": 111
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 98,
+          "endLine": 113
+        },
+        "newRange": {
+          "startLine": 114,
+          "endLine": 129
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 161,
+          "endLine": 184
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 196,
+          "endLine": 196
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/autocomplete/Virtualize.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 162,
+          "endLine": 162
+        },
+        "newRange": {
+          "startLine": 203,
+          "endLine": 205
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/dialogs/FormDialog.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 21,
+          "endLine": 29
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/dialogs/FormDialog.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 26,
+          "endLine": 42
+        },
+        "newRange": {
+          "startLine": 35,
+          "endLine": 35
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/dialogs/FormDialog.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 49,
+          "endLine": 59
+        },
+        "newRange": {
+          "startLine": 42,
+          "endLine": 54
+        }
+      },
+      {
+        "fileId": "docs/data/material/components/dialogs/FormDialog.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 63,
+          "endLine": 63
+        },
+        "newRange": {
+          "startLine": 58,
+          "endLine": 60
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

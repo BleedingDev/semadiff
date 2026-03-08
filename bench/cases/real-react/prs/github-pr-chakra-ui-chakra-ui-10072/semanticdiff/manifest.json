@@ -1,0 +1,48 @@
+[
+  {
+    "tracking_name": ".changeset/gorgeous-fans-argue.md",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?new_filename=.changeset%2Fgorgeous-fans-argue.md&new_oid=0dbe7b3b45513de93c97a8285f897a9f251942a8&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/gorgeous-fans-argue.md",
+      "oid": "0dbe7b3b45513de93c97a8285f897a9f251942a8",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "c37367d40e1d6b8a35f797b129bf133dd6a64d33cf674e5808636c17dddd7edc"
+  },
+  {
+    "tracking_name": "packages/react/src/styled-system/css.types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Fcss.types.ts&old_oid=a9d310c427e15fea3ac7fcac828fb115b1117979&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Fcss.types.ts&new_oid=52409327a010d4ffca7f5cea93e5dfd20bf7b090&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/react/src/styled-system/css.types.ts",
+      "oid": "a9d310c427e15fea3ac7fcac828fb115b1117979",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/styled-system/css.types.ts",
+      "oid": "52409327a010d4ffca7f5cea93e5dfd20bf7b090",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "89a3d9cd16df53bf454db6d77eb6ae5c80537104b2be7e4cf91a101e7dac2f18"
+  },
+  {
+    "tracking_name": "packages/react/src/styled-system/recipe.types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Frecipe.types.ts&old_oid=a2e283ed5c83e1bf702930e7c30ea820e2d6e0d5&old_mode=33188&new_filename=packages%2Freact%2Fsrc%2Fstyled-system%2Frecipe.types.ts&new_oid=8674b099d68b4bf447c6b6c61a2bab1681b3be53&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/react/src/styled-system/recipe.types.ts",
+      "oid": "a2e283ed5c83e1bf702930e7c30ea820e2d6e0d5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/react/src/styled-system/recipe.types.ts",
+      "oid": "8674b099d68b4bf447c6b6c61a2bab1681b3be53",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9d26d449c503406e4c09906518cbb9671a7ac86fc67a43cd505f1b6d381ac261"
+  }
+]

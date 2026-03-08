@@ -1,0 +1,859 @@
+diff --git a/apps/compositions/src/examples/checkbox-basic.tsx b/apps/compositions/src/examples/checkbox-basic.tsx
+index e96894ce945..61ccf9a40e1 100644
+--- a/apps/compositions/src/examples/checkbox-basic.tsx
++++ b/apps/compositions/src/examples/checkbox-basic.tsx
+@@ -4,9 +4,7 @@ export const CheckboxBasic = () => {
+   return (
+     <Checkbox.Root>
+       <Checkbox.HiddenInput />
+-      <Checkbox.Control>
+-        <Checkbox.Indicator />
+-      </Checkbox.Control>
++      <Checkbox.Control />
+       <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+     </Checkbox.Root>
+   )
+diff --git a/apps/compositions/src/examples/checkbox-controlled.tsx b/apps/compositions/src/examples/checkbox-controlled.tsx
+index 6e8860e87a9..75e01ca4568 100644
+--- a/apps/compositions/src/examples/checkbox-controlled.tsx
++++ b/apps/compositions/src/examples/checkbox-controlled.tsx
+@@ -11,9 +11,7 @@ export const CheckboxControlled = () => {
+       onCheckedChange={(e) => setChecked(!!e.checked)}
+     >
+       <Checkbox.HiddenInput />
+-      <Checkbox.Control>
+-        <Checkbox.Indicator />
+-      </Checkbox.Control>
++      <Checkbox.Control />
+       <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+     </Checkbox.Root>
+   )
+diff --git a/apps/compositions/src/examples/checkbox-indeterminate.tsx b/apps/compositions/src/examples/checkbox-indeterminate.tsx
+index 8fe647eea3d..d76f4a077f4 100644
+--- a/apps/compositions/src/examples/checkbox-indeterminate.tsx
++++ b/apps/compositions/src/examples/checkbox-indeterminate.tsx
+@@ -30,9 +30,7 @@ export const CheckboxIndeterminate = () => {
+       }}
+     >
+       <Checkbox.HiddenInput />
+-      <Checkbox.Control>
+-        <Checkbox.Indicator />
+-      </Checkbox.Control>
++      <Checkbox.Control />
+       <Checkbox.Label>{item.label}</Checkbox.Label>
+     </Checkbox.Root>
+   ))
+diff --git a/apps/compositions/src/examples/checkbox-with-colors.tsx b/apps/compositions/src/examples/checkbox-with-colors.tsx
+index f0b970ad842..42341b4dd21 100644
+--- a/apps/compositions/src/examples/checkbox-with-colors.tsx
++++ b/apps/compositions/src/examples/checkbox-with-colors.tsx
+@@ -18,9 +18,7 @@ export const CheckboxWithColors = () => {
+               <Stack key={variant} mb="4">
+                 <Checkbox.Root variant={variant} colorPalette={colorPalette}>
+                   <Checkbox.HiddenInput />
+-                  <Checkbox.Control>
+-                    <Checkbox.Indicator />
+-                  </Checkbox.Control>
++                  <Checkbox.Control />
+                   <Checkbox.Label>Checkbox</Checkbox.Label>
+                 </Checkbox.Root>
+ 
+@@ -30,9 +28,7 @@ export const CheckboxWithColors = () => {
+                   colorPalette={colorPalette}
+                 >
+                   <Checkbox.HiddenInput />
+-                  <Checkbox.Control>
+-                    <Checkbox.Indicator />
+-                  </Checkbox.Control>
++                  <Checkbox.Control />
+                   <Checkbox.Label>Checkbox</Checkbox.Label>
+                 </Checkbox.Root>
+               </Stack>
+diff --git a/apps/compositions/src/examples/checkbox-with-description.tsx b/apps/compositions/src/examples/checkbox-with-description.tsx
+index a043681ae61..619fa801c1d 100644
+--- a/apps/compositions/src/examples/checkbox-with-description.tsx
++++ b/apps/compositions/src/examples/checkbox-with-description.tsx
+@@ -4,9 +4,7 @@ export const CheckboxWithDescription = () => {
+   return (
+     <Checkbox.Root gap="4" alignItems="flex-start">
+       <Checkbox.HiddenInput />
+-      <Checkbox.Control>
+-        <Checkbox.Indicator />
+-      </Checkbox.Control>
++      <Checkbox.Control />
+       <Stack gap="1">
+         <Checkbox.Label>I agree to the terms and conditions</Checkbox.Label>
+         <Box textStyle="sm" color="fg.muted">
+diff --git a/apps/compositions/src/examples/checkbox-with-form.tsx b/apps/compositions/src/examples/checkbox-with-form.tsx
+index 5b2d8506bd9..ed7d46789f4 100644
+--- a/apps/compositions/src/examples/checkbox-with-form.tsx
++++ b/apps/compositions/src/examples/checkbox-with-form.tsx
+@@ -1,8 +1,6 @@
+ "use client"
+ 
+-import { Button, Input, Stack } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
+-import { Field } from "compositions/ui/field"
++import { Button, Checkbox, Field, Input, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxWithForm = () => {
+   return (
+@@ -13,16 +11,20 @@ export const CheckboxWithForm = () => {
+       }}
+     >
+       <Stack maxW="sm" gap="4" align="flex-start">
+-        <Field label="User name">
+-          <Input name="username" />
+-        </Field>
+-        <Field label="Password">
+-          <Input name="password" />
+-        </Field>
++        <Field.Root>
++          <Field.Label>Username</Field.Label>
++          <Input placeholder="username" />
++        </Field.Root>
++        <Field.Root>
++          <Field.Label>Password</Field.Label>
++          <Input placeholder="password" />
++        </Field.Root>
+ 
+-        <Checkbox mt="2" name="remember" value="one">
+-          Remember me
+-        </Checkbox>
++        <Checkbox.Root mt="2" value="remember me">
++          <Checkbox.HiddenInput />
++          <Checkbox.Control />
++          <Checkbox.Label>Remember me</Checkbox.Label>
++        </Checkbox.Root>
+ 
+         <Button variant="solid" mt="3">
+           Submit
+diff --git a/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx b/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx
+index be70552b14e..5ba43cfe02d 100644
+--- a/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx
++++ b/apps/compositions/src/examples/checkbox-with-group-hook-form.tsx
+@@ -57,10 +57,8 @@ export const CheckboxWithGroupHookForm = () => {
+             {items.map((item) => (
+               <Checkbox.Root key={item.value} value={item.value}>
+                 <Checkbox.HiddenInput />
+-                <Checkbox.Control>
+-                  <Checkbox.Indicator />
+-                </Checkbox.Control>
+-                <Checkbox.Label> {item.label}</Checkbox.Label>
++                <Checkbox.Control />
++                <Checkbox.Label>{item.label}</Checkbox.Label>
+               </Checkbox.Root>
+             ))}
+           </Fieldset.Content>
+diff --git a/apps/compositions/src/examples/checkbox-with-group.tsx b/apps/compositions/src/examples/checkbox-with-group.tsx
+index 36a90780b98..65292cded83 100644
+--- a/apps/compositions/src/examples/checkbox-with-group.tsx
++++ b/apps/compositions/src/examples/checkbox-with-group.tsx
+@@ -12,9 +12,7 @@ export const CheckboxWithGroup = () => {
+             {(value) => (
+               <Checkbox.Root key={value} value={value}>
+                 <Checkbox.HiddenInput />
+-                <Checkbox.Control>
+-                  <Checkbox.Indicator />
+-                </Checkbox.Control>
++                <Checkbox.Control />
+                 <Checkbox.Label>{value}</Checkbox.Label>
+               </Checkbox.Root>
+             )}
+diff --git a/apps/compositions/src/examples/checkbox-with-hook-form.tsx b/apps/compositions/src/examples/checkbox-with-hook-form.tsx
+index b862f25a167..8ff1a84fa20 100644
+--- a/apps/compositions/src/examples/checkbox-with-hook-form.tsx
++++ b/apps/compositions/src/examples/checkbox-with-hook-form.tsx
+@@ -38,9 +38,7 @@ export const CheckboxWithHookForm = () => {
+                 onCheckedChange={({ checked }) => field.onChange(checked)}
+               >
+                 <Checkbox.HiddenInput />
+-                <Checkbox.Control>
+-                  <Checkbox.Indicator />
+-                </Checkbox.Control>
++                <Checkbox.Control />
+                 <Checkbox.Label>Checkbox</Checkbox.Label>
+               </Checkbox.Root>
+               <Field.ErrorText>
+diff --git a/apps/compositions/src/examples/checkbox-with-indeterminate.tsx b/apps/compositions/src/examples/checkbox-with-indeterminate.tsx
+index 3d32de2b6d1..e9216b83c65 100644
+--- a/apps/compositions/src/examples/checkbox-with-indeterminate.tsx
++++ b/apps/compositions/src/examples/checkbox-with-indeterminate.tsx
+@@ -1,15 +1,21 @@
+-import { Stack } from "@chakra-ui/react"
+-import { Checkbox } from "compositions/ui/checkbox"
++import { Checkbox, For, Stack } from "@chakra-ui/react"
+ 
+ export const CheckboxWithIndeterminate = () => {
+   return (
+     <Stack>
+-      <Checkbox defaultChecked="indeterminate" variant="subtle">
+-        Subtle
+-      </Checkbox>
+-      <Checkbox defaultChecked="indeterminate" variant="outline">
+-        Outline
+-      </Checkbox>
++      <For each={["subtle", "outline"]}>
++        {(variant) => (
++          <Checkbox.Root
++            defaultChecked="indeterminate"
++            variant={variant}
++            key={variant}
++          >
++            <Checkbox.HiddenInput />
++            <Checkbox.Control />
++            <Checkbox.Label>{variant}</Checkbox.Label>
++          </Checkbox.Root>
++        )}
++      </For>
+     </Stack>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-label-position.tsx b/apps/compositions/src/examples/checkbox-with-label-position.tsx
+index 246da957529..b82b68a827c 100644
+--- a/apps/compositions/src/examples/checkbox-with-label-position.tsx
++++ b/apps/compositions/src/examples/checkbox-with-label-position.tsx
+@@ -5,9 +5,7 @@ export const CheckboxWithLabelPosition = () => {
+     <Checkbox.Root>
+       <Checkbox.HiddenInput />
+       <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+-      <Checkbox.Control>
+-        <Checkbox.Indicator />
+-      </Checkbox.Control>
++      <Checkbox.Control />
+     </Checkbox.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/checkbox-with-link.tsx b/apps/compositions/src/examples/checkbox-with-link.tsx
+index 113694ff7e6..37f8bf16a94 100644
+--- a/apps/compositions/src/examples/checkbox-with-link.tsx
++++ b/apps/compositions/src/examples/checkbox-with-link.tsx
+@@ -4,9 +4,7 @@ export const CheckboxWithLink = () => {
+   return (
+     <Checkbox.Root>
+       <Checkbox.HiddenInput />
+-      <Checkbox.Control>
+-        <Checkbox.Indicator />
+-      </Checkbox.Control>
++      <Checkbox.Control />
+       <Checkbox.Label>
+         I agree to the{" "}
+         <Link colorPalette="teal" href="https://google.com">
+diff --git a/apps/compositions/src/examples/checkbox-with-sizes.tsx b/apps/compositions/src/examples/checkbox-with-sizes.tsx
+index 734a09ae4c4..776dce019b6 100644
+--- a/apps/compositions/src/examples/checkbox-with-sizes.tsx
++++ b/apps/compositions/src/examples/checkbox-with-sizes.tsx
+@@ -7,9 +7,7 @@ export const CheckboxWithSizes = () => {
+         {(size) => (
+           <Checkbox.Root defaultChecked size={size} key={size}>
+             <Checkbox.HiddenInput />
+-            <Checkbox.Control>
+-              <Checkbox.Indicator />
+-            </Checkbox.Control>
++            <Checkbox.Control />
+             <Checkbox.Label>Checkbox</Checkbox.Label>
+           </Checkbox.Root>
+         )}
+diff --git a/apps/compositions/src/examples/checkbox-with-states.tsx b/apps/compositions/src/examples/checkbox-with-states.tsx
+index a0bbf94b6b0..d6b54bc1e77 100644
+--- a/apps/compositions/src/examples/checkbox-with-states.tsx
++++ b/apps/compositions/src/examples/checkbox-with-states.tsx
+@@ -5,33 +5,25 @@ export const CheckboxWithStates = () => {
+     <Stack>
+       <Checkbox.Root disabled>
+         <Checkbox.HiddenInput />
+-        <Checkbox.Control>
+-          <Checkbox.Indicator />
+-        </Checkbox.Control>
++        <Checkbox.Control />
+         <Checkbox.Label>Disabled</Checkbox.Label>
+       </Checkbox.Root>
+ 
+       <Checkbox.Root defaultChecked disabled>
+         <Checkbox.HiddenInput />
+-        <Checkbox.Control>
+-          <Checkbox.Indicator />
+-        </Checkbox.Control>
++        <Checkbox.Control />
+         <Checkbox.Label>Disabled</Checkbox.Label>
+       </Checkbox.Root>
+ 
+       <Checkbox.Root readOnly>
+         <Checkbox.HiddenInput />
+-        <Checkbox.Control>
+-          <Checkbox.Indicator />
+-        </Checkbox.Control>
++        <Checkbox.Control />
+         <Checkbox.Label>Readonly</Checkbox.Label>
+       </Checkbox.Root>
+ 
+       <Checkbox.Root invalid>
+         <Checkbox.HiddenInput />
+-        <Checkbox.Control>
+-          <Checkbox.Indicator />
+-        </Checkbox.Control>
++        <Checkbox.Control />
+         <Checkbox.Label>Invalid</Checkbox.Label>
+       </Checkbox.Root>
+     </Stack>
+diff --git a/apps/compositions/src/examples/checkbox-with-store.tsx b/apps/compositions/src/examples/checkbox-with-store.tsx
+index b3797c11817..313ca50eb67 100644
+--- a/apps/compositions/src/examples/checkbox-with-store.tsx
++++ b/apps/compositions/src/examples/checkbox-with-store.tsx
+@@ -8,9 +8,7 @@ export const CheckboxWithStore = () => {
+     <Checkbox.RootProvider value={checkbox}>
+       <Checkbox.Root>
+         <Checkbox.HiddenInput />
+-        <Checkbox.Control>
+-          <Checkbox.Indicator />
+-        </Checkbox.Control>
++        <Checkbox.Control />
+         <Checkbox.Label>Accept terms and conditions</Checkbox.Label>
+       </Checkbox.Root>
+     </Checkbox.RootProvider>
+diff --git a/apps/compositions/src/examples/checkbox-with-variants.tsx b/apps/compositions/src/examples/checkbox-with-variants.tsx
+index 0ba36d0d70a..f18e6e4a04d 100644
+--- a/apps/compositions/src/examples/checkbox-with-variants.tsx
++++ b/apps/compositions/src/examples/checkbox-with-variants.tsx
+@@ -9,9 +9,7 @@ export const CheckboxWithVariants = () => {
+             <Text>{variant}</Text>
+             <Checkbox.Root defaultChecked variant={variant}>
+               <Checkbox.HiddenInput />
+-              <Checkbox.Control>
+-                <Checkbox.Indicator />
+-              </Checkbox.Control>
++              <Checkbox.Control />
+               <Checkbox.Label>Checkbox</Checkbox.Label>
+             </Checkbox.Root>
+           </Stack>
+diff --git a/apps/compositions/src/examples/rating-basic.tsx b/apps/compositions/src/examples/rating-basic.tsx
+index 5c190d3a755..727a5736ff8 100644
+--- a/apps/compositions/src/examples/rating-basic.tsx
++++ b/apps/compositions/src/examples/rating-basic.tsx
+@@ -4,13 +4,7 @@ export const RatingBasic = () => {
+   return (
+     <RatingGroup.Root count={5} defaultValue={3} size="sm">
+       <RatingGroup.HiddenInput />
+-      <RatingGroup.Control>
+-        {Array.from({ length: 5 }).map((_, index) => (
+-          <RatingGroup.Item key={index} index={index + 1}>
+-            <RatingGroup.ItemIndicator />
+-          </RatingGroup.Item>
+-        ))}
+-      </RatingGroup.Control>
++      <RatingGroup.Control />
+     </RatingGroup.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/rating-controlled.tsx b/apps/compositions/src/examples/rating-controlled.tsx
+index 9b360641e51..404c0da7986 100644
+--- a/apps/compositions/src/examples/rating-controlled.tsx
++++ b/apps/compositions/src/examples/rating-controlled.tsx
+@@ -12,13 +12,7 @@ export const RatingControlled = () => {
+       onValueChange={(e) => setValue(e.value)}
+     >
+       <RatingGroup.HiddenInput />
+-      <RatingGroup.Control>
+-        {Array.from({ length: 5 }).map((_, index) => (
+-          <RatingGroup.Item key={index} index={index + 1}>
+-            <RatingGroup.ItemIndicator />
+-          </RatingGroup.Item>
+-        ))}
+-      </RatingGroup.Control>
++      <RatingGroup.Control />
+     </RatingGroup.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/rating-in-testimonial.tsx b/apps/compositions/src/examples/rating-in-testimonial.tsx
+index 4dc994d2956..f65ecaac3f3 100644
+--- a/apps/compositions/src/examples/rating-in-testimonial.tsx
++++ b/apps/compositions/src/examples/rating-in-testimonial.tsx
+@@ -11,13 +11,7 @@ export const RatingInTestimonial = () => {
+         size="xs"
+       >
+         <RatingGroup.HiddenInput />
+-        <RatingGroup.Control>
+-          {Array.from({ length: 5 }).map((_, index) => (
+-            <RatingGroup.Item key={index} index={index + 1}>
+-              <RatingGroup.ItemIndicator />
+-            </RatingGroup.Item>
+-          ))}
+-        </RatingGroup.Control>
++        <RatingGroup.Control />
+       </RatingGroup.Root>
+ 
+       <Text>
+diff --git a/apps/compositions/src/examples/rating-with-colors.tsx b/apps/compositions/src/examples/rating-with-colors.tsx
+index 19abe7f6e12..5ac802840e8 100644
+--- a/apps/compositions/src/examples/rating-with-colors.tsx
++++ b/apps/compositions/src/examples/rating-with-colors.tsx
+@@ -21,13 +21,7 @@ export const RatingWithColors = () => {
+             colorPalette={colorPalette}
+           >
+             <RatingGroup.HiddenInput />
+-            <RatingGroup.Control>
+-              {Array.from({ length: 5 }).map((_, index) => (
+-                <RatingGroup.Item key={index} index={index + 1}>
+-                  <RatingGroup.ItemIndicator />
+-                </RatingGroup.Item>
+-              ))}
+-            </RatingGroup.Control>
++            <RatingGroup.Control />
+           </RatingGroup.Root>
+         </Stack>
+       ))}
+diff --git a/apps/compositions/src/examples/rating-with-half.tsx b/apps/compositions/src/examples/rating-with-half.tsx
+index 72eb7e5f533..6b48db915bf 100644
+--- a/apps/compositions/src/examples/rating-with-half.tsx
++++ b/apps/compositions/src/examples/rating-with-half.tsx
+@@ -4,13 +4,7 @@ export const RatingWithHalf = () => {
+   return (
+     <RatingGroup.Root allowHalf count={5} defaultValue={3.5} size="sm">
+       <RatingGroup.HiddenInput />
+-      <RatingGroup.Control>
+-        {Array.from({ length: 5 }).map((_, index) => (
+-          <RatingGroup.Item key={index} index={index + 1}>
+-            <RatingGroup.ItemIndicator />
+-          </RatingGroup.Item>
+-        ))}
+-      </RatingGroup.Control>
++      <RatingGroup.Control />
+     </RatingGroup.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/rating-with-hook-form.tsx b/apps/compositions/src/examples/rating-with-hook-form.tsx
+index 1539e22ae6f..114b8f23b51 100644
+--- a/apps/compositions/src/examples/rating-with-hook-form.tsx
++++ b/apps/compositions/src/examples/rating-with-hook-form.tsx
+@@ -38,13 +38,7 @@ export const RatingWithHookForm = () => {
+                 onValueChange={({ value }) => field.onChange(value)}
+               >
+                 <RatingGroup.HiddenInput />
+-                <RatingGroup.Control>
+-                  {Array.from({ length: 5 }).map((_, index) => (
+-                    <RatingGroup.Item key={index} index={index + 1}>
+-                      <RatingGroup.ItemIndicator />
+-                    </RatingGroup.Item>
+-                  ))}
+-                </RatingGroup.Control>
++                <RatingGroup.Control />
+               </RatingGroup.Root>
+             )}
+           />
+diff --git a/apps/compositions/src/examples/rating-with-label.tsx b/apps/compositions/src/examples/rating-with-label.tsx
+new file mode 100644
+index 00000000000..1d52614cbed
+--- /dev/null
++++ b/apps/compositions/src/examples/rating-with-label.tsx
+@@ -0,0 +1,11 @@
++import { RatingGroup } from "@chakra-ui/react"
++
++export const RatingWithLabel = () => {
++  return (
++    <RatingGroup.Root count={5} defaultValue={3} size="sm" gap="4">
++      <RatingGroup.HiddenInput />
++      <RatingGroup.Label>Rating</RatingGroup.Label>
++      <RatingGroup.Control />
++    </RatingGroup.Root>
++  )
++}
+diff --git a/apps/compositions/src/examples/rating-with-readonly.tsx b/apps/compositions/src/examples/rating-with-readonly.tsx
+index a5c79baf6ac..3529885e3f7 100644
+--- a/apps/compositions/src/examples/rating-with-readonly.tsx
++++ b/apps/compositions/src/examples/rating-with-readonly.tsx
+@@ -4,13 +4,7 @@ export const RatingWithReadonly = () => {
+   return (
+     <RatingGroup.Root readOnly count={5} defaultValue={3} size="sm">
+       <RatingGroup.HiddenInput />
+-      <RatingGroup.Control>
+-        {Array.from({ length: 5 }).map((_, index) => (
+-          <RatingGroup.Item key={index} index={index + 1}>
+-            <RatingGroup.ItemIndicator />
+-          </RatingGroup.Item>
+-        ))}
+-      </RatingGroup.Control>
++      <RatingGroup.Control />
+     </RatingGroup.Root>
+   )
+ }
+diff --git a/apps/compositions/src/examples/rating-with-sizes.tsx b/apps/compositions/src/examples/rating-with-sizes.tsx
+index 03ece62d441..e33a183d160 100644
+--- a/apps/compositions/src/examples/rating-with-sizes.tsx
++++ b/apps/compositions/src/examples/rating-with-sizes.tsx
+@@ -7,13 +7,7 @@ export const RatingWithSizes = () => {
+         {(size) => (
+           <RatingGroup.Root key={size} count={5} defaultValue={3} size={size}>
+             <RatingGroup.HiddenInput />
+-            <RatingGroup.Control>
+-              {Array.from({ length: 5 }).map((_, index) => (
+-                <RatingGroup.Item key={index} index={index + 1}>
+-                  <RatingGroup.ItemIndicator />
+-                </RatingGroup.Item>
+-              ))}
+-            </RatingGroup.Control>
++            <RatingGroup.Control />
+           </RatingGroup.Root>
+         )}
+       </For>
+diff --git a/apps/compositions/src/examples/rating-with-store.tsx b/apps/compositions/src/examples/rating-with-store.tsx
+index 3ba920815cb..9b8a3fb6e9d 100644
+--- a/apps/compositions/src/examples/rating-with-store.tsx
++++ b/apps/compositions/src/examples/rating-with-store.tsx
+@@ -7,13 +7,7 @@ export const RatingWithStore = () => {
+   return (
+     <RatingGroup.RootProvider value={store} size="sm">
+       <RatingGroup.HiddenInput />
+-      <RatingGroup.Control>
+-        {store.items.map((index) => (
+-          <RatingGroup.Item key={index} index={index}>
+-            <RatingGroup.ItemIndicator />
+-          </RatingGroup.Item>
+-        ))}
+-      </RatingGroup.Control>
++      <RatingGroup.Control />
+     </RatingGroup.RootProvider>
+   )
+ }
+diff --git a/apps/compositions/src/examples/switch-basic.tsx b/apps/compositions/src/examples/switch-basic.tsx
+index a1ab217b966..cdf43d25538 100644
+--- a/apps/compositions/src/examples/switch-basic.tsx
++++ b/apps/compositions/src/examples/switch-basic.tsx
+@@ -4,9 +4,7 @@ export const SwitchBasic = () => {
+   return (
+     <Switch.Root>
+       <Switch.HiddenInput />
+-      <Switch.Control>
+-        <Switch.Thumb />
+-      </Switch.Control>
++      <Switch.Control />
+       <Switch.Label>Activate Chakra</Switch.Label>
+     </Switch.Root>
+   )
+diff --git a/apps/compositions/src/examples/switch-with-colors.tsx b/apps/compositions/src/examples/switch-with-colors.tsx
+index 820d95cd70f..52b0efd7a24 100644
+--- a/apps/compositions/src/examples/switch-with-colors.tsx
++++ b/apps/compositions/src/examples/switch-with-colors.tsx
+@@ -16,17 +16,13 @@ export const SwitchWithColors = () => {
+ 
+           <Switch.Root colorPalette={colorPalette}>
+             <Switch.HiddenInput />
+-            <Switch.Control>
+-              <Switch.Thumb />
+-            </Switch.Control>
++            <Switch.Control />
+             <Switch.Label />
+           </Switch.Root>
+ 
+           <Switch.Root colorPalette={colorPalette} defaultChecked>
+             <Switch.HiddenInput />
+-            <Switch.Control>
+-              <Switch.Thumb />
+-            </Switch.Control>
++            <Switch.Control />
+             <Switch.Label />
+           </Switch.Root>
+         </Stack>
+diff --git a/apps/compositions/src/examples/switch-with-disabled.tsx b/apps/compositions/src/examples/switch-with-disabled.tsx
+index 4d01507effe..d2ebd01bd08 100644
+--- a/apps/compositions/src/examples/switch-with-disabled.tsx
++++ b/apps/compositions/src/examples/switch-with-disabled.tsx
+@@ -4,9 +4,7 @@ export const SwitchWithDisabled = () => {
+   return (
+     <Switch.Root disabled>
+       <Switch.HiddenInput />
+-      <Switch.Control>
+-        <Switch.Thumb />
+-      </Switch.Control>
++      <Switch.Control />
+       <Switch.Label>Activate Chakra</Switch.Label>
+     </Switch.Root>
+   )
+diff --git a/apps/compositions/src/examples/switch-with-hook-form.tsx b/apps/compositions/src/examples/switch-with-hook-form.tsx
+index 3f3901d674e..491f8b375cb 100644
+--- a/apps/compositions/src/examples/switch-with-hook-form.tsx
++++ b/apps/compositions/src/examples/switch-with-hook-form.tsx
+@@ -35,9 +35,7 @@ export const SwitchWithHookForm = () => {
+                 onCheckedChange={({ checked }) => field.onChange(checked)}
+               >
+                 <Switch.HiddenInput onBlur={field.onBlur} />
+-                <Switch.Control>
+-                  <Switch.Thumb />
+-                </Switch.Control>
++                <Switch.Control />
+                 <Switch.Label>Activate Chakra</Switch.Label>
+               </Switch.Root>
+               <Field.ErrorText>{errors.active?.message}</Field.ErrorText>
+diff --git a/apps/compositions/src/examples/switch-with-invalid.tsx b/apps/compositions/src/examples/switch-with-invalid.tsx
+index ffa04f83d6b..dedd5579df9 100644
+--- a/apps/compositions/src/examples/switch-with-invalid.tsx
++++ b/apps/compositions/src/examples/switch-with-invalid.tsx
+@@ -4,9 +4,7 @@ export const SwitchWithInvalid = () => {
+   return (
+     <Switch.Root invalid>
+       <Switch.HiddenInput />
+-      <Switch.Control>
+-        <Switch.Thumb />
+-      </Switch.Control>
++      <Switch.Control />
+       <Switch.Label>Activate Chakra</Switch.Label>
+     </Switch.Root>
+   )
+diff --git a/apps/compositions/src/examples/switch-with-sizes.tsx b/apps/compositions/src/examples/switch-with-sizes.tsx
+index 87e7641e252..6e5c669cf10 100644
+--- a/apps/compositions/src/examples/switch-with-sizes.tsx
++++ b/apps/compositions/src/examples/switch-with-sizes.tsx
+@@ -7,9 +7,7 @@ export const SwitchWithSizes = () => {
+         {(size) => (
+           <Switch.Root key={size} size={size}>
+             <Switch.HiddenInput />
+-            <Switch.Control>
+-              <Switch.Thumb />
+-            </Switch.Control>
++            <Switch.Control />
+             <Switch.Label />
+           </Switch.Root>
+         )}
+diff --git a/apps/compositions/src/examples/switch-with-thumb-indicator.tsx b/apps/compositions/src/examples/switch-with-thumb-indicator.tsx
+index 0740a4ffbe2..d35a215556e 100644
+--- a/apps/compositions/src/examples/switch-with-thumb-indicator.tsx
++++ b/apps/compositions/src/examples/switch-with-thumb-indicator.tsx
+@@ -7,7 +7,7 @@ export const SwitchWithThumbIndicator = () => {
+       <Switch.HiddenInput />
+       <Switch.Control>
+         <Switch.Thumb>
+-          <Switch.ThumbIndicator fallback={<HiX />}>
++          <Switch.ThumbIndicator fallback={<HiX color="black" />}>
+             <HiCheck />
+           </Switch.ThumbIndicator>
+         </Switch.Thumb>
+diff --git a/apps/compositions/src/examples/switch-with-tooltip.tsx b/apps/compositions/src/examples/switch-with-tooltip.tsx
+index cb26602f4d2..a2c14769c05 100644
+--- a/apps/compositions/src/examples/switch-with-tooltip.tsx
++++ b/apps/compositions/src/examples/switch-with-tooltip.tsx
+@@ -8,9 +8,7 @@ export const SwitchWithTooltip = () => {
+     <Tooltip ids={{ trigger: id }} content="This is a tooltip">
+       <Switch.Root ids={{ root: id }}>
+         <Switch.HiddenInput />
+-        <Switch.Control>
+-          <Switch.Thumb />
+-        </Switch.Control>
++        <Switch.Control />
+         <Switch.Label>Switch with tooltip</Switch.Label>
+       </Switch.Root>
+     </Tooltip>
+diff --git a/apps/compositions/src/examples/switch-with-variants.tsx b/apps/compositions/src/examples/switch-with-variants.tsx
+index ea275743ea0..2dfe23d0d43 100644
+--- a/apps/compositions/src/examples/switch-with-variants.tsx
++++ b/apps/compositions/src/examples/switch-with-variants.tsx
+@@ -7,9 +7,7 @@ export const SwitchWithVariants = () => {
+         {(variant) => (
+           <Switch.Root key={variant} variant={variant}>
+             <Switch.HiddenInput />
+-            <Switch.Control>
+-              <Switch.Thumb />
+-            </Switch.Control>
++            <Switch.Control />
+             <Switch.Label />
+           </Switch.Root>
+         )}
+diff --git a/apps/www/content/docs/components/checkbox.mdx b/apps/www/content/docs/components/checkbox.mdx
+index f22a0c96c52..456bc4a0918 100644
+--- a/apps/www/content/docs/components/checkbox.mdx
++++ b/apps/www/content/docs/components/checkbox.mdx
+@@ -34,6 +34,34 @@ If you prefer a closed component composition, check out the
+ 
+ :::
+ 
++## Shortcuts
++
++The `Checkbox` component also provides a set of shortcuts for common use cases.
++
++### CheckboxControl
++
++The `Checkbox.Control` renders the `Checkbox.Indicator` within it by default.
++
++This works:
++
++```tsx
++<Checkbox.Root>
++  <Checkbox.HiddenInput />
++  <Checkbox.Control>
++    <Checkbox.Indicator />
++  </Checkbox.Control>
++</Checkbox.Root>
++```
++
++This might be more concise, if you don't need to customize the indicator:
++
++```tsx
++<Checkbox.Root>
++  <Checkbox.HiddenInput />
++  <Checkbox.Control />
++</Checkbox.Root>
++```
++
+ ## Examples
+ 
+ ### Variants
+@@ -87,6 +115,12 @@ checkbox.
+ 
+ <ExampleTabs name="checkbox-with-store" />
+ 
++### Composition
++
++Here's an example of how to compose a checkbox with a field component.
++
++<ExampleTabs name="checkbox-with-form" />
++
+ ### Hook Form
+ 
+ Here's an example of how to use the `Checkbox` component with the
+diff --git a/apps/www/content/docs/components/rating.mdx b/apps/www/content/docs/components/rating.mdx
+index 659c92c5a21..03dbcd3075e 100644
+--- a/apps/www/content/docs/components/rating.mdx
++++ b/apps/www/content/docs/components/rating.mdx
+@@ -17,6 +17,7 @@ import { RatingGroup } from "@chakra-ui/react"
+ 
+ ```tsx
+ <RatingGroup.Root>
++  <RatingGroup.Label />
+   <RatingGroup.HiddenInput />
+   <RatingGroup.Control>
+     <RatingGroup.Item>
+@@ -26,8 +27,52 @@ import { RatingGroup } from "@chakra-ui/react"
+ </RatingGroup.Root>
+ ```
+ 
++:::info
++
++If you prefer a closed component composition, check out the
++[snippet below](#closed-component).
++
++:::
++
++## Shortcuts
++
++The `Rating` component also provides a set of shortcuts for common use cases.
++
++### RatingControl
++
++By default, the `RatingControl` shortcut renders the number of rating items
++specified in the `count` prop.
++
++This works:
++
++```tsx
++<RatingGroup.Root count={5}>
++  <RatingGroup.HiddenInput />
++  <RatingGroup.Control>
++    {Array.from({ length: 5 }).map((_, index) => (
++      <RatingGroup.Item key={index} index={index + 1}>
++        <RatingGroup.ItemIndicator />
++      </RatingGroup.Item>
++    ))}
++  </RatingGroup.Control>
++</RatingGroup.Root>
++```
++
++This might be more concise, if you don't need to customize the rating icons:
++
++```tsx
++<RatingGroup.Root count={5}>
++  <RatingGroup.HiddenInput />
++  <RatingGroup.Control />
++</RatingGroup.Root>
++```
++
+ ## Examples
+ 
++### Basic
++
++<ExampleTabs name="rating-basic" />
++
+ ### Sizes
+ 
+ Use the `size` prop to change the size of the rating component.
+@@ -68,6 +113,13 @@ override the default star icon.
+ 
+ <ExampleTabs name="rating-with-custom-icon" />
+ 
++### Label
++
++Render the `RatingGroup.Label` component to provide a human-readable label for
++the rating component.
++
++<ExampleTabs name="rating-with-label" />
++
+ ### Half Star
+ 
+ Use the `allowHalf` prop to allow half-star ratings.
+diff --git a/apps/www/content/docs/components/switch.mdx b/apps/www/content/docs/components/switch.mdx
+index 34742702de6..87981759047 100644
+--- a/apps/www/content/docs/components/switch.mdx
++++ b/apps/www/content/docs/components/switch.mdx
+@@ -22,7 +22,7 @@ import { Switch } from "@chakra-ui/react"
+   <Switch.Control>
+     <Switch.Thumb />
+   </Switch.Control>
+-  <Switch.Label>Label</Switch.Label>
++  <Switch.Label />
+ </Switch.Root>
+ ```
+ 
+@@ -33,6 +33,34 @@ If you prefer a closed component composition, check out the
+ 
+ :::
+ 
++## Shortcuts
++
++The `Switch` component also provides a set of shortcuts for common use cases.
++
++### SwitchControl
++
++The `Switch.Control` renders the `Switch.Thumb` within it by default.
++
++This works:
++
++```tsx
++<Switch.Root>
++  <Switch.HiddenInput />
++  <Switch.Control>
++    <Switch.Thumb />
++  </Switch.Control>
++</Switch.Root>
++```
++
++This might be more concise, if you don't need to customize the thumb:
++
++```tsx
++<Switch.Root>
++  <Switch.HiddenInput />
++  <Switch.Control />
++</Switch.Root>
++```
++
+ ## Examples
+ 
+ ### Sizes
+diff --git a/packages/react/__stories__/checkbox.stories.tsx b/packages/react/__stories__/checkbox.stories.tsx
+index e94e0fa849c..4e3dbaaf7f6 100644
+--- a/packages/react/__stories__/checkbox.stories.tsx
++++ b/packages/react/__stories__/checkbox.stories.tsx
+@@ -23,7 +23,7 @@ export { CheckboxWithForm as Form } from "compositions/examples/checkbox-with-fo
+ export { CheckboxWithGroup as Group } from "compositions/examples/checkbox-with-group"
+ export { CheckboxWithGroupHookForm as GroupHookForm } from "compositions/examples/checkbox-with-group-hook-form"
+ export { CheckboxWithHookForm as HookForm } from "compositions/examples/checkbox-with-hook-form"
+-export { CheckboxWithIndeterminate as Indeterminate } from "compositions/examples/checkbox-with-indeterminate"
++export { CheckboxIndeterminate as Indeterminate } from "compositions/examples/checkbox-indeterminate"
+ export { CheckboxWithLink as Link } from "compositions/examples/checkbox-with-link"
+ export { CheckboxWithStates as States } from "compositions/examples/checkbox-with-states"
+ export { CheckboxWithStore as Store } from "compositions/examples/checkbox-with-store"
+diff --git a/packages/react/__stories__/rating.stories.tsx b/packages/react/__stories__/rating.stories.tsx
+index c03e575a299..563c4d4fa50 100644
+--- a/packages/react/__stories__/rating.stories.tsx
++++ b/packages/react/__stories__/rating.stories.tsx
+@@ -23,3 +23,4 @@ export { RatingWithHalf as Half } from "compositions/examples/rating-with-half"
+ export { RatingWithHookForm as HookForm } from "compositions/examples/rating-with-hook-form"
+ export { RatingWithReadonly as ReadOnly } from "compositions/examples/rating-with-readonly"
+ export { RatingWithStore as Store } from "compositions/examples/rating-with-store"
++export { RatingWithLabel as Label } from "compositions/examples/rating-with-label"

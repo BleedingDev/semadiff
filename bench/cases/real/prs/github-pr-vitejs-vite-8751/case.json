@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-vitejs-vite-8751",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitejs/vite#8751: docs: link to es translation",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitejs/vite",
+    "prNumber": 8751,
+    "prUrl": "https://github.com/vitejs/vite/pull/8751",
+    "baseSha": "19fc7e5fc480b061c154b06a5a83a552b3fbd883",
+    "headSha": "46a8cc75ce329c9256a43301b5b4ddda59c492bc",
+    "selectedFiles": [
+      "docs/.vitepress/config.ts"
+    ],
+    "collectedAt": "2026-03-08T02:20:23.273Z"
+  },
+  "files": [
+    {
+      "id": "docs/.vitepress/config.ts",
+      "oldPath": "docs/.vitepress/config.ts",
+      "newPath": "docs/.vitepress/config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/.vitepress/config.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 60,
+          "endLine": 60
+        },
+        "newRange": {
+          "startLine": 60,
+          "endLine": 61
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "f26ef91f278517ed9ff13294aadba5a0ac01c7ab",
+    "filename": "env/plugin-commands-env/src/env.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/78ce8607f9e09594b37fde3e12df3337f991c317/env%2Fplugin-commands-env%2Fsrc%2Fenv.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/78ce8607f9e09594b37fde3e12df3337f991c317/env%2Fplugin-commands-env%2Fsrc%2Fenv.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fplugin-commands-env%2Fsrc%2Fenv.ts?ref=78ce8607f9e09594b37fde3e12df3337f991c317",
+    "patch": "@@ -88,7 +88,7 @@ export async function handler (opts: NvmNodeCommandOptions, params: string[]) {\n     })\n   }\n   if (opts.global && !opts.bin) {\n-    throw new PnpmError('CANNOT_MANAGE_NODE', 'Unable to manage Node.js because pnpm was not installed using the standalon installation script', {\n+    throw new PnpmError('CANNOT_MANAGE_NODE', 'Unable to manage Node.js because pnpm was not installed using the standalone installation script', {\n       hint: 'If you want to manage Node.js with pnpm, you need to remove any Node.js that was installed by other tools, then install pnpm using one of the standalone scripts that are provided on the installation page: https://pnpm.io/installation',\n     })\n   }"
+  },
+  {
+    "sha": "b96db869d374dfa574b6675cdcdf3b38c67aa5eb",
+    "filename": "env/plugin-commands-env/test/env.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/78ce8607f9e09594b37fde3e12df3337f991c317/env%2Fplugin-commands-env%2Ftest%2Fenv.test.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/78ce8607f9e09594b37fde3e12df3337f991c317/env%2Fplugin-commands-env%2Ftest%2Fenv.test.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/env%2Fplugin-commands-env%2Ftest%2Fenv.test.ts?ref=78ce8607f9e09594b37fde3e12df3337f991c317",
+    "patch": "@@ -277,5 +277,5 @@ test('fail if there is no global bin directory', async () => {\n       pnpmHomeDir: process.cwd(),\n       rawConfig: {},\n     }, ['use', 'lts'])\n-  ).rejects.toEqual(new PnpmError('CANNOT_MANAGE_NODE', 'Unable to manage Node.js because pnpm was not installed using the standalon installation script'))\n+  ).rejects.toEqual(new PnpmError('CANNOT_MANAGE_NODE', 'Unable to manage Node.js because pnpm was not installed using the standalone installation script'))\n })"
+  }
+]

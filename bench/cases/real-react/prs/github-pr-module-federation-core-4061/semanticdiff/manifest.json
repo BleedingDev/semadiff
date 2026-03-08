@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fenhanced%2Ftest%2Funit%2Fsharing%2FConsumeSharedPlugin%2FConsumeSharedPlugin.apply.test.ts&old_oid=1c6f0065d5fa9a17333e5634fa6e22aec64e5385&old_mode=33188&new_filename=packages%2Fenhanced%2Ftest%2Funit%2Fsharing%2FConsumeSharedPlugin%2FConsumeSharedPlugin.apply.test.ts&new_oid=171c53d0440a6334b66e15037934816383e662c2&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+      "oid": "1c6f0065d5fa9a17333e5634fa6e22aec64e5385",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.apply.test.ts",
+      "oid": "171c53d0440a6334b66e15037934816383e662c2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d28547fa3e81d1cb78b382d1b60dd8fa0bb6866f42a42146738f6e9d7490dabd"
+  }
+]

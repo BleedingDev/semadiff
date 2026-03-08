@@ -1,0 +1,531 @@
+diff --git a/packages/material-ui-lab/src/DatePicker/DatePicker.tsx b/packages/material-ui-lab/src/DatePicker/DatePicker.tsx
+index 03cee2d58c3dba..e53a70f7bf3000 100644
+--- a/packages/material-ui-lab/src/DatePicker/DatePicker.tsx
++++ b/packages/material-ui-lab/src/DatePicker/DatePicker.tsx
+@@ -16,7 +16,7 @@ import {
+   defaultMaxDate,
+ } from '../internal/pickers/constants/prop-types';
+ import {
+-  makePickerWithStateAndWrapper,
++  makePickerWithState,
+   AllPickerProps,
+   SharedPickerProps,
+ } from '../internal/pickers/Picker/makePickerWithState';
+@@ -77,7 +77,7 @@ export type DatePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDate>(
+  * - [DatePicker API](https://material-ui.com/api/date-picker/)
+  */
+ // @typescript-to-proptypes-generate
+-const DatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(ResponsiveWrapper, {
++const DatePicker = makePickerWithState<BaseDatePickerProps<unknown>>(ResponsiveWrapper, {
+   name: 'MuiDatePicker',
+   ...datePickerConfig,
+ }) as DatePickerGenericComponent<typeof MobileWrapper>;
+diff --git a/packages/material-ui-lab/src/DateTimePicker/DateTimePicker.tsx b/packages/material-ui-lab/src/DateTimePicker/DateTimePicker.tsx
+index 00165e74a09899..859b05b12aaeb9 100644
+--- a/packages/material-ui-lab/src/DateTimePicker/DateTimePicker.tsx
++++ b/packages/material-ui-lab/src/DateTimePicker/DateTimePicker.tsx
+@@ -11,7 +11,7 @@ import {
+ } from '../internal/pickers/hooks/date-helpers-hooks';
+ import { ExportedDayPickerProps } from '../DayPicker/DayPicker';
+ import {
+-  makePickerWithStateAndWrapper,
++  makePickerWithState,
+   SharedPickerProps,
+ } from '../internal/pickers/Picker/makePickerWithState';
+ import { SomeWrapper } from '../internal/pickers/wrappers/Wrapper';
+@@ -133,13 +133,10 @@ export type DateTimePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDa
+  * @ignore - do not document.
+  */
+ /* @typescript-to-proptypes-generate */
+-const DateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unknown>>(
+-  ResponsiveWrapper,
+-  {
+-    name: 'MuiDateTimePicker',
+-    ...dateTimePickerConfig,
+-  },
+-) as DateTimePickerGenericComponent<typeof ResponsiveWrapper>;
++const DateTimePicker = makePickerWithState<BaseDateTimePickerProps<unknown>>(ResponsiveWrapper, {
++  name: 'MuiDateTimePicker',
++  ...dateTimePickerConfig,
++}) as DateTimePickerGenericComponent<typeof ResponsiveWrapper>;
+ 
+ if (process.env.NODE_ENV !== 'production') {
+   (DateTimePicker as any).displayName = 'DateTimePicker';
+diff --git a/packages/material-ui-lab/src/DateTimePicker/DateTimePickerToolbar.tsx b/packages/material-ui-lab/src/DateTimePicker/DateTimePickerToolbar.tsx
+index 21b8513ab8378b..6a524c086009e5 100644
+--- a/packages/material-ui-lab/src/DateTimePicker/DateTimePickerToolbar.tsx
++++ b/packages/material-ui-lab/src/DateTimePicker/DateTimePickerToolbar.tsx
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import { MuiStyles, WithStyles, withStyles } from '@material-ui/core/styles';
+ import PickersToolbarText from '../internal/pickers/PickersToolbarText';
+ import PickersToolbar from '../internal/pickers/PickersToolbar';
+-import ToolbarButton from '../internal/pickers/PickersToolbarButton';
++import PickersToolbarButton from '../internal/pickers/PickersToolbarButton';
+ import DateTimePickerTabs from './DateTimePickerTabs';
+ import { useUtils } from '../internal/pickers/hooks/useUtils';
+ import { WrapperVariantContext } from '../internal/pickers/wrappers/WrapperVariantContext';
+@@ -97,7 +97,7 @@ const DateTimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof
+           isLandscape={false}
+         >
+           <div className={classes.dateContainer}>
+-            <ToolbarButton
++            <PickersToolbarButton
+               tabIndex={-1}
+               variant="subtitle1"
+               data-mui-test="datetimepicker-toolbar-year"
+@@ -105,7 +105,7 @@ const DateTimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof
+               selected={openView === 'year'}
+               value={date ? utils.format(date, 'year') : '–'}
+             />
+-            <ToolbarButton
++            <PickersToolbarButton
+               tabIndex={-1}
+               variant="h4"
+               data-mui-test="datetimepicker-toolbar-date"
+@@ -115,7 +115,7 @@ const DateTimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof
+             />
+           </div>
+           <div className={classes.timeContainer}>
+-            <ToolbarButton
++            <PickersToolbarButton
+               variant="h3"
+               data-mui-test="hours"
+               onClick={() => setOpenView('hours')}
+@@ -124,7 +124,7 @@ const DateTimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof
+               typographyClassName={classes.timeTypography}
+             />
+             <PickersToolbarText variant="h3" value=":" className={classes.separator} />
+-            <ToolbarButton
++            <PickersToolbarButton
+               variant="h3"
+               data-mui-test="minutes"
+               onClick={() => setOpenView('minutes')}
+diff --git a/packages/material-ui-lab/src/DesktopDatePicker/DesktopDatePicker.tsx b/packages/material-ui-lab/src/DesktopDatePicker/DesktopDatePicker.tsx
+index 4e1fc5d804b367..1214924de9bc88 100644
+--- a/packages/material-ui-lab/src/DesktopDatePicker/DesktopDatePicker.tsx
++++ b/packages/material-ui-lab/src/DesktopDatePicker/DesktopDatePicker.tsx
+@@ -5,7 +5,7 @@ import {
+   BaseDatePickerProps,
+ } from '../DatePicker/DatePicker';
+ import { DesktopWrapper } from '../internal/pickers/wrappers/Wrapper';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ 
+ /**
+  *
+@@ -14,13 +14,10 @@ import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePi
+  * - [DesktopDatePicker API](https://material-ui.com/api/desktop-date-picker/)
+  */
+ // @typescript-to-proptypes-generate
+-const DesktopDatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(
+-  DesktopWrapper,
+-  {
+-    name: 'MuiDesktopDatePicker',
+-    ...datePickerConfig,
+-  },
+-) as DatePickerGenericComponent<typeof DesktopWrapper>;
++const DesktopDatePicker = makePickerWithState<BaseDatePickerProps<unknown>>(DesktopWrapper, {
++  name: 'MuiDesktopDatePicker',
++  ...datePickerConfig,
++}) as DatePickerGenericComponent<typeof DesktopWrapper>;
+ 
+ if (process.env.NODE_ENV !== 'production') {
+   (DesktopDatePicker as any).displayName = 'DesktopDatePicker';
+diff --git a/packages/material-ui-lab/src/DesktopDateTimePicker/DesktopDateTimePicker.tsx b/packages/material-ui-lab/src/DesktopDateTimePicker/DesktopDateTimePicker.tsx
+index 337464d42f4709..fc35a8aac2cd85 100644
+--- a/packages/material-ui-lab/src/DesktopDateTimePicker/DesktopDateTimePicker.tsx
++++ b/packages/material-ui-lab/src/DesktopDateTimePicker/DesktopDateTimePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseDateTimePickerProps,
+   dateTimePickerConfig,
+@@ -11,7 +11,7 @@ import { DesktopWrapper } from '../internal/pickers/wrappers/Wrapper';
+  * @ignore - do not document.
+  */
+ /* @typescript-to-proptypes-generate */
+-const DesktopDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unknown>>(
++const DesktopDateTimePicker = makePickerWithState<BaseDateTimePickerProps<unknown>>(
+   DesktopWrapper,
+   {
+     name: 'MuiDesktopDateTimePicker',
+diff --git a/packages/material-ui-lab/src/DesktopTimePicker/DesktopTimePicker.tsx b/packages/material-ui-lab/src/DesktopTimePicker/DesktopTimePicker.tsx
+index ac44e652ea8416..838d39c4e698a2 100644
+--- a/packages/material-ui-lab/src/DesktopTimePicker/DesktopTimePicker.tsx
++++ b/packages/material-ui-lab/src/DesktopTimePicker/DesktopTimePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseTimePickerProps,
+   timePickerConfig,
+@@ -14,7 +14,7 @@ import { DesktopWrapper } from '../internal/pickers/wrappers/Wrapper';
+  *
+  * - [DesktopTimePicker API](https://material-ui.com/api/desktop-time-picker/)
+  */
+-const DesktopTimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(DesktopWrapper, {
++const DesktopTimePicker = makePickerWithState<BaseTimePickerProps>(DesktopWrapper, {
+   name: 'MuiDesktopTimePicker',
+   ...timePickerConfig,
+ }) as TimePickerGenericComponent<typeof DesktopWrapper>;
+diff --git a/packages/material-ui-lab/src/MobileDatePicker/MobileDatePicker.tsx b/packages/material-ui-lab/src/MobileDatePicker/MobileDatePicker.tsx
+index 10dad50734a6af..9ac0c618a35333 100644
+--- a/packages/material-ui-lab/src/MobileDatePicker/MobileDatePicker.tsx
++++ b/packages/material-ui-lab/src/MobileDatePicker/MobileDatePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseDatePickerProps,
+   datePickerConfig,
+@@ -14,13 +14,10 @@ import { MobileWrapper } from '../internal/pickers/wrappers/Wrapper';
+  * - [MobileDatePicker API](https://material-ui.com/api/mobile-date-picker/)
+  */
+ // @typescript-to-proptypes-generate
+-const MobileDatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(
+-  MobileWrapper,
+-  {
+-    name: 'MuiMobileDatePicker',
+-    ...datePickerConfig,
+-  },
+-) as DatePickerGenericComponent<typeof MobileWrapper>;
++const MobileDatePicker = makePickerWithState<BaseDatePickerProps<unknown>>(MobileWrapper, {
++  name: 'MuiMobileDatePicker',
++  ...datePickerConfig,
++}) as DatePickerGenericComponent<typeof MobileWrapper>;
+ 
+ if (process.env.NODE_ENV !== 'production') {
+   (MobileDatePicker as any).displayName = 'MobileDatePicker';
+diff --git a/packages/material-ui-lab/src/MobileDateTimePicker/MobileDateTimePicker.tsx b/packages/material-ui-lab/src/MobileDateTimePicker/MobileDateTimePicker.tsx
+index c54e1a51c32db8..06027bdc55fcc6 100644
+--- a/packages/material-ui-lab/src/MobileDateTimePicker/MobileDateTimePicker.tsx
++++ b/packages/material-ui-lab/src/MobileDateTimePicker/MobileDateTimePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseDateTimePickerProps,
+   dateTimePickerConfig,
+@@ -11,13 +11,10 @@ import { MobileWrapper } from '../internal/pickers/wrappers/Wrapper';
+  * @ignore - do not document.
+  */
+ /* @typescript-to-proptypes-generate */
+-const MobileDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unknown>>(
+-  MobileWrapper,
+-  {
+-    name: 'MuiMobileDateTimePicker',
+-    ...dateTimePickerConfig,
+-  },
+-) as DateTimePickerGenericComponent<typeof MobileWrapper>;
++const MobileDateTimePicker = makePickerWithState<BaseDateTimePickerProps<unknown>>(MobileWrapper, {
++  name: 'MuiMobileDateTimePicker',
++  ...dateTimePickerConfig,
++}) as DateTimePickerGenericComponent<typeof MobileWrapper>;
+ 
+ if (process.env.NODE_ENV !== 'production') {
+   (MobileDateTimePicker as any).displayName = 'MobileDateTimePicker';
+diff --git a/packages/material-ui-lab/src/MobileTimePicker/MobileTimePicker.tsx b/packages/material-ui-lab/src/MobileTimePicker/MobileTimePicker.tsx
+index 2f90887e51bf8a..e874cd290f3861 100644
+--- a/packages/material-ui-lab/src/MobileTimePicker/MobileTimePicker.tsx
++++ b/packages/material-ui-lab/src/MobileTimePicker/MobileTimePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseTimePickerProps,
+   timePickerConfig,
+@@ -14,7 +14,7 @@ import { MobileWrapper } from '../internal/pickers/wrappers/Wrapper';
+  *
+  * - [MobileTimePicker API](https://material-ui.com/api/mobile-time-picker/)
+  */
+-const MobileTimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(MobileWrapper, {
++const MobileTimePicker = makePickerWithState<BaseTimePickerProps>(MobileWrapper, {
+   name: 'MuiMobileTimePicker',
+   ...timePickerConfig,
+ }) as TimePickerGenericComponent<typeof MobileWrapper>;
+diff --git a/packages/material-ui-lab/src/StaticDatePicker/StaticDatePicker.tsx b/packages/material-ui-lab/src/StaticDatePicker/StaticDatePicker.tsx
+index 0677f0b53d29c6..228d513bf7ec15 100644
+--- a/packages/material-ui-lab/src/StaticDatePicker/StaticDatePicker.tsx
++++ b/packages/material-ui-lab/src/StaticDatePicker/StaticDatePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseDatePickerProps,
+   datePickerConfig,
+@@ -14,13 +14,10 @@ import { StaticWrapper } from '../internal/pickers/wrappers/Wrapper';
+  * - [StaticDatePicker API](https://material-ui.com/api/static-date-picker/)
+  */
+ // @typescript-to-proptypes-generate
+-const StaticDatePicker = makePickerWithStateAndWrapper<BaseDatePickerProps<unknown>>(
+-  StaticWrapper,
+-  {
+-    name: 'MuiStaticDatePicker',
+-    ...datePickerConfig,
+-  },
+-) as DatePickerGenericComponent<typeof StaticWrapper>;
++const StaticDatePicker = makePickerWithState<BaseDatePickerProps<unknown>>(StaticWrapper, {
++  name: 'MuiStaticDatePicker',
++  ...datePickerConfig,
++}) as DatePickerGenericComponent<typeof StaticWrapper>;
+ 
+ if (process.env.NODE_ENV !== 'production') {
+   (StaticDatePicker as any).displayName = 'StaticDatePicker';
+diff --git a/packages/material-ui-lab/src/StaticDateTimePicker/StaticDateTimePicker.tsx b/packages/material-ui-lab/src/StaticDateTimePicker/StaticDateTimePicker.tsx
+index 3fc5b0ac895bbe..e357b7c1d12302 100644
+--- a/packages/material-ui-lab/src/StaticDateTimePicker/StaticDateTimePicker.tsx
++++ b/packages/material-ui-lab/src/StaticDateTimePicker/StaticDateTimePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseDateTimePickerProps,
+   dateTimePickerConfig,
+@@ -11,13 +11,10 @@ import { StaticWrapper } from '../internal/pickers/wrappers/Wrapper';
+  * @ignore - do not document.
+  */
+ /* @typescript-to-proptypes-generate */
+-const StaticDateTimePicker = makePickerWithStateAndWrapper<BaseDateTimePickerProps<unknown>>(
+-  StaticWrapper,
+-  {
+-    name: 'MuiStaticDateTimePicker',
+-    ...dateTimePickerConfig,
+-  },
+-) as DateTimePickerGenericComponent<typeof StaticWrapper>;
++const StaticDateTimePicker = makePickerWithState<BaseDateTimePickerProps<unknown>>(StaticWrapper, {
++  name: 'MuiStaticDateTimePicker',
++  ...dateTimePickerConfig,
++}) as DateTimePickerGenericComponent<typeof StaticWrapper>;
+ 
+ if (process.env.NODE_ENV !== 'production') {
+   (StaticDateTimePicker as any).displayName = 'StaticDateTimePicker';
+diff --git a/packages/material-ui-lab/src/StaticTimePicker/StaticTimePicker.tsx b/packages/material-ui-lab/src/StaticTimePicker/StaticTimePicker.tsx
+index 61c14ac0d93d21..b2cfdec375e02c 100644
+--- a/packages/material-ui-lab/src/StaticTimePicker/StaticTimePicker.tsx
++++ b/packages/material-ui-lab/src/StaticTimePicker/StaticTimePicker.tsx
+@@ -1,5 +1,5 @@
+ import PropTypes from 'prop-types';
+-import { makePickerWithStateAndWrapper } from '../internal/pickers/Picker/makePickerWithState';
++import { makePickerWithState } from '../internal/pickers/Picker/makePickerWithState';
+ import {
+   BaseTimePickerProps,
+   timePickerConfig,
+@@ -14,7 +14,7 @@ import { StaticWrapper } from '../internal/pickers/wrappers/Wrapper';
+  *
+  * - [StaticTimePicker API](https://material-ui.com/api/static-time-picker/)
+  */
+-const StaticTimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(StaticWrapper, {
++const StaticTimePicker = makePickerWithState<BaseTimePickerProps>(StaticWrapper, {
+   name: 'MuiStaticTimePicker',
+   ...timePickerConfig,
+ }) as TimePickerGenericComponent<typeof StaticWrapper>;
+diff --git a/packages/material-ui-lab/src/TimePicker/TimePicker.tsx b/packages/material-ui-lab/src/TimePicker/TimePicker.tsx
+index a282ba0832c6c5..5ecb71c789eebe 100644
+--- a/packages/material-ui-lab/src/TimePicker/TimePicker.tsx
++++ b/packages/material-ui-lab/src/TimePicker/TimePicker.tsx
+@@ -17,7 +17,7 @@ import {
+ import { SomeWrapper } from '../internal/pickers/wrappers/Wrapper';
+ import {
+   SharedPickerProps,
+-  makePickerWithStateAndWrapper,
++  makePickerWithState,
+ } from '../internal/pickers/Picker/makePickerWithState';
+ 
+ export interface BaseTimePickerProps<TDate = unknown>
+@@ -89,7 +89,7 @@ export type TimePickerGenericComponent<TWrapper extends SomeWrapper> = (<TDate>(
+  * - [TimePicker API](https://material-ui.com/api/time-picker/)
+  */
+ // @typescript-to-proptypes-generate
+-const TimePicker = makePickerWithStateAndWrapper<BaseTimePickerProps>(ResponsiveWrapper, {
++const TimePicker = makePickerWithState<BaseTimePickerProps>(ResponsiveWrapper, {
+   name: 'MuiTimePicker',
+   ...timePickerConfig,
+ }) as TimePickerGenericComponent<typeof ResponsiveWrapper>;
+diff --git a/packages/material-ui-lab/src/TimePicker/TimePickerToolbar.tsx b/packages/material-ui-lab/src/TimePicker/TimePickerToolbar.tsx
+index 715a97da817bad..c49c72f6d329d7 100644
+--- a/packages/material-ui-lab/src/TimePicker/TimePickerToolbar.tsx
++++ b/packages/material-ui-lab/src/TimePicker/TimePickerToolbar.tsx
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import clsx from 'clsx';
+ import { MuiStyles, useTheme, WithStyles, withStyles } from '@material-ui/core/styles';
+ import PickersToolbarText from '../internal/pickers/PickersToolbarText';
+-import ToolbarButton from '../internal/pickers/PickersToolbarButton';
++import PickersToolbarButton from '../internal/pickers/PickersToolbarButton';
+ import PickersToolbar from '../internal/pickers/PickersToolbar';
+ import { arrayIncludes } from '../internal/pickers/utils';
+ import { useUtils } from '../internal/pickers/hooks/useUtils';
+@@ -56,8 +56,6 @@ export const styles: MuiStyles<TimePickerToolbarClassKey> = {
+   },
+ };
+ 
+-const clockTypographyVariant = 'h3';
+-
+ /**
+  * @ignore - internal component.
+  */
+@@ -89,7 +87,7 @@ const TimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof styl
+     <PickersToolbarText
+       tabIndex={-1}
+       value=":"
+-      variant={clockTypographyVariant}
++      variant="h3"
+       selected={false}
+       className={classes.separator}
+     />
+@@ -112,10 +110,10 @@ const TimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof styl
+         })}
+       >
+         {arrayIncludes(views, 'hours') && (
+-          <ToolbarButton
++          <PickersToolbarButton
+             data-mui-test="hours"
+             tabIndex={-1}
+-            variant={clockTypographyVariant}
++            variant="h3"
+             onClick={() => setOpenView('hours')}
+             selected={openView === 'hours'}
+             value={date ? formatHours(date) : '--'}
+@@ -123,10 +121,10 @@ const TimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof styl
+         )}
+         {arrayIncludes(views, ['hours', 'minutes']) && separator}
+         {arrayIncludes(views, 'minutes') && (
+-          <ToolbarButton
++          <PickersToolbarButton
+             data-mui-test="minutes"
+             tabIndex={-1}
+-            variant={clockTypographyVariant}
++            variant="h3"
+             onClick={() => setOpenView('minutes')}
+             selected={openView === 'minutes'}
+             value={date ? utils.format(date, 'minutes') : '--'}
+@@ -134,9 +132,9 @@ const TimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof styl
+         )}
+         {arrayIncludes(views, ['minutes', 'seconds']) && separator}
+         {arrayIncludes(views, 'seconds') && (
+-          <ToolbarButton
++          <PickersToolbarButton
+             data-mui-test="seconds"
+-            variant={clockTypographyVariant}
++            variant="h3"
+             onClick={() => setOpenView('seconds')}
+             selected={openView === 'seconds'}
+             value={date ? utils.format(date, 'seconds') : '--'}
+@@ -149,7 +147,7 @@ const TimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof styl
+             [classes.ampmLandscape]: isLandscape,
+           })}
+         >
+-          <ToolbarButton
++          <PickersToolbarButton
+             disableRipple
+             variant="subtitle2"
+             data-mui-test="toolbar-am-btn"
+@@ -158,7 +156,7 @@ const TimePickerToolbar: React.FC<ToolbarComponentProps & WithStyles<typeof styl
+             value={utils.getMeridiemText('am')}
+             onClick={() => handleMeridiemChange('am')}
+           />
+-          <ToolbarButton
++          <PickersToolbarButton
+             disableRipple
+             variant="subtitle2"
+             data-mui-test="toolbar-pm-btn"
+diff --git a/packages/material-ui-lab/src/internal/pickers/KeyboardDateInput.tsx b/packages/material-ui-lab/src/internal/pickers/KeyboardDateInput.tsx
+index 45c84a8d476b42..5ffc61314b1bff 100644
+--- a/packages/material-ui-lab/src/internal/pickers/KeyboardDateInput.tsx
++++ b/packages/material-ui-lab/src/internal/pickers/KeyboardDateInput.tsx
+@@ -9,20 +9,21 @@ import { useMaskedInput } from './hooks/useMaskedInput';
+ import { DateInputProps, DateInputRefs } from './PureDateInput';
+ import { getTextFieldAriaText } from './text-field-helper';
+ 
+-export const KeyboardDateInput: React.FC<DateInputProps & DateInputRefs> = ({
+-  containerRef,
+-  inputRef = null,
+-  forwardedRef = null,
+-  disableOpenPicker: hideOpenPickerButton,
+-  getOpenDialogAriaText = getTextFieldAriaText,
+-  InputAdornmentProps,
+-  InputProps,
+-  openPicker: onOpen,
+-  OpenPickerButtonProps,
+-  openPickerIcon = <CalendarIcon />,
+-  renderInput,
+-  ...other
+-}) => {
++export function KeyboardDateInput(props: DateInputProps & DateInputRefs) {
++  const {
++    containerRef,
++    disableOpenPicker,
++    forwardedRef = null,
++    getOpenDialogAriaText = getTextFieldAriaText,
++    InputAdornmentProps,
++    InputProps,
++    inputRef = null,
++    openPicker,
++    OpenPickerButtonProps,
++    openPickerIcon = <CalendarIcon />,
++    renderInput,
++    ...other
++  } = props;
+   const utils = useUtils();
+   const inputRefHandle = useForkRef(inputRef, forwardedRef);
+   const textFieldProps = useMaskedInput(other);
+@@ -34,7 +35,7 @@ export const KeyboardDateInput: React.FC<DateInputProps & DateInputRefs> = ({
+     ...textFieldProps,
+     InputProps: {
+       ...InputProps,
+-      [`${adornmentPosition}Adornment`]: hideOpenPickerButton ? undefined : (
++      [`${adornmentPosition}Adornment`]: disableOpenPicker ? undefined : (
+         <InputAdornment position={adornmentPosition} {...InputAdornmentProps}>
+           <IconButton
+             edge={adornmentPosition}
+@@ -42,7 +43,7 @@ export const KeyboardDateInput: React.FC<DateInputProps & DateInputRefs> = ({
+             disabled={other.disabled}
+             aria-label={getOpenDialogAriaText(other.rawValue, utils)}
+             {...OpenPickerButtonProps}
+-            onClick={onOpen}
++            onClick={openPicker}
+           >
+             {openPickerIcon}
+           </IconButton>
+@@ -50,7 +51,7 @@ export const KeyboardDateInput: React.FC<DateInputProps & DateInputRefs> = ({
+       ),
+     },
+   });
+-};
++}
+ 
+ KeyboardDateInput.propTypes = {
+   acceptRegex: PropTypes.instanceOf(RegExp),
+diff --git a/packages/material-ui-lab/src/internal/pickers/Picker/makePickerWithState.tsx b/packages/material-ui-lab/src/internal/pickers/Picker/makePickerWithState.tsx
+index 2ffdbf72941659..9988d86ebd3532 100644
+--- a/packages/material-ui-lab/src/internal/pickers/Picker/makePickerWithState.tsx
++++ b/packages/material-ui-lab/src/internal/pickers/Picker/makePickerWithState.tsx
+@@ -49,7 +49,7 @@ type PickerComponent<
+   TWrapper extends SomeWrapper
+ > = (props: TViewProps & SharedPickerProps<unknown, TWrapper>) => JSX.Element;
+ 
+-export function makePickerWithStateAndWrapper<
++export function makePickerWithState<
+   T extends AllAvailableForOverrideProps,
+   TWrapper extends SomeWrapper = typeof ResponsiveWrapper
+ >(
+diff --git a/packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx b/packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx
+index 0b7d18000f8c87..ab9d2db810d4b2 100644
+--- a/packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx
++++ b/packages/material-ui-lab/src/internal/pickers/hooks/useMaskedInput.tsx
+@@ -108,7 +108,7 @@ export function useMaskedInput({
+     helperText: formatHelperText,
+     inputProps: {
+       ...inputStateArgs,
+-      disabled, // make spreading in custom input easier
++      disabled,
+       placeholder: formatHelperText,
+       readOnly,
+       type: shouldUseMaskedInput ? 'tel' : 'text',

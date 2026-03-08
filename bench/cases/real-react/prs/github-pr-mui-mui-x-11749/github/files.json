@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "1019a75c38100d1eb79e1f2482bd61f4cbab68a1",
+    "filename": "babel.config.js",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 1,
+    "changes": 4,
+    "blob_url": "https://github.com/mui/mui-x/blob/6e146cadba5f6b1886d1a65bba97ac4562cc17fb/babel.config.js",
+    "raw_url": "https://github.com/mui/mui-x/raw/6e146cadba5f6b1886d1a65bba97ac4562cc17fb/babel.config.js",
+    "contents_url": "https://api.github.com/repos/mui/mui-x/contents/babel.config.js?ref=6e146cadba5f6b1886d1a65bba97ac4562cc17fb",
+    "patch": "@@ -18,7 +18,9 @@ const defaultAlias = {\n   '@mui/x-tree-view': resolveAliasPath('./packages/x-tree-view/src'),\n   '@mui/markdown': '@mui/monorepo/packages/markdown',\n   '@mui/material-nextjs': '@mui/monorepo/packages/mui-material-nextjs/src',\n-  '@mui-internal/api-docs-builder': '@mui/monorepo/packages/api-docs-builder',\n+  '@mui-internal/api-docs-builder': resolveAliasPath(\n+    './node_modules/@mui/monorepo/packages/api-docs-builder',\n+  ),\n   '@mui-internal/docs-utilities': '@mui/monorepo/packages/docs-utilities',\n   '@mui-internal/test-utils': resolveAliasPath(\n     './node_modules/@mui/monorepo/packages/test-utils/src',"
+  },
+  {
+    "sha": "83da9f4f02c1f04d6a4a8fe57227ce52182c7b5f",
+    "filename": "docs/scripts/generateProptypes.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/mui-x/blob/6e146cadba5f6b1886d1a65bba97ac4562cc17fb/docs%2Fscripts%2FgenerateProptypes.ts",
+    "raw_url": "https://github.com/mui/mui-x/raw/6e146cadba5f6b1886d1a65bba97ac4562cc17fb/docs%2Fscripts%2FgenerateProptypes.ts",
+    "contents_url": "https://api.github.com/repos/mui/mui-x/contents/docs%2Fscripts%2FgenerateProptypes.ts?ref=6e146cadba5f6b1886d1a65bba97ac4562cc17fb",
+    "patch": "@@ -6,7 +6,7 @@ import {\n   getPropTypesFromFile,\n   injectPropTypesInFile,\n } from '@mui/monorepo/packages/typescript-to-proptypes';\n-import { fixBabelGeneratorIssues, fixLineEndings } from '@mui/monorepo/packages/docs-utilities';\n+import { fixBabelGeneratorIssues, fixLineEndings } from '@mui-internal/docs-utilities';\n import { createXTypeScriptProjects, XTypeScriptProject } from './createXTypeScriptProjects';\n \n async function generateProptypes(project: XTypeScriptProject, sourceFile: string) {"
+  },
+  {
+    "sha": "89e19bc68a580bdd97270941b15b652436218d9e",
+    "filename": "tsconfig.json",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/mui/mui-x/blob/6e146cadba5f6b1886d1a65bba97ac4562cc17fb/tsconfig.json",
+    "raw_url": "https://github.com/mui/mui-x/raw/6e146cadba5f6b1886d1a65bba97ac4562cc17fb/tsconfig.json",
+    "contents_url": "https://api.github.com/repos/mui/mui-x/contents/tsconfig.json?ref=6e146cadba5f6b1886d1a65bba97ac4562cc17fb",
+    "patch": "@@ -28,6 +28,12 @@\n       \"@mui/x-license-pro/*\": [\"./packages/x-license-pro/src/*\"],\n       \"@mui-internal/test-utils\": [\"./node_modules/@mui/monorepo/packages/test-utils/src\"],\n       \"@mui-internal/test-utils/*\": [\"./node_modules/@mui/monorepo/packages/test-utils/src/*\"],\n+      \"@mui-internal/api-docs-builder\": [\"./node_modules/@mui/monorepo/packages/api-docs-builder\"],\n+      \"@mui-internal/api-docs-builder/*\": [\n+        \"./node_modules/@mui/monorepo/packages/api-docs-builder/*\"\n+      ],\n+      \"@mui-internal/docs-utilities\": [\"./node_modules/@mui/monorepo/packages/docs-utilities\"],\n+      \"@mui-internal/docs-utilities/*\": [\"./node_modules/@mui/monorepo/packages/docs-utilities/*\"],\n       \"test/*\": [\"./test/*\"],\n       \"docs/*\": [\"./node_modules/@mui/monorepo/docs\"],\n       \"docsx/*\": [\"./docs/*\"]"
+  }
+]

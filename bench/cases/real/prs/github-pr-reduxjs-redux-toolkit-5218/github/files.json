@@ -1,0 +1,26 @@
+[
+  {
+    "sha": "68461cd9fe28520fa0269451b6759654a39bb970",
+    "filename": "packages/toolkit/src/query/react/buildHooks.ts",
+    "status": "modified",
+    "additions": 37,
+    "deletions": 0,
+    "changes": 37,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/20387a1a6902bbf597dbaec103e33dafc2ae53fe/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/20387a1a6902bbf597dbaec103e33dafc2ae53fe/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts?ref=20387a1a6902bbf597dbaec103e33dafc2ae53fe",
+    "patch": "@@ -202,6 +202,19 @@ export type UseQuerySubscriptionOptions = SubscriptionOptions & {\n   refetchOnMountOrArgChange?: boolean | number\n }\n \n+/**\n+ * Provides a way to reference the options accepted by the `useQuerySubscription`\n+ * hook in userland code.\n+ *\n+ * Unlike other `Typed*` wrappers, this type has no generic parameters since\n+ * {@linkcode UseQuerySubscriptionOptions} does not depend on a specific query\n+ * definition.\n+ *\n+ * @since 2.2.8\n+ * @public\n+ */\n+export type TypedUseQuerySubscriptionOptions = UseQuerySubscriptionOptions\n+\n /**\n  * A React hook that automatically triggers fetches of data from an endpoint, and 'subscribes' the component to the cached data.\n  *\n@@ -1337,6 +1350,30 @@ export type UseMutationStateOptions<\n   fixedCacheKey?: string\n }\n \n+/**\n+ * Provides a way to define a \"pre-typed\" version of\n+ * {@linkcode UseMutationStateOptions} with specific options for a given mutation.\n+ *\n+ * @template ResultType - The type of the result `data` returned by the mutation.\n+ * @template QueryArg - The type of the argument passed into the mutation.\n+ * @template BaseQuery - The type of the base query function being used.\n+ * @template SelectedResult - The type of the selected result returned by the __`selectFromResult`__ function.\n+ *\n+ * @since 2.2.8\n+ * @public\n+ */\n+export type TypedUseMutationStateOptions<\n+  ResultType,\n+  QueryArg,\n+  BaseQuery extends BaseQueryFn,\n+  SelectedResult extends Record<string, any> = MutationResultSelectorResult<\n+    MutationDefinition<QueryArg, BaseQuery, string, ResultType, string>\n+  >,\n+> = UseMutationStateOptions<\n+  MutationDefinition<QueryArg, BaseQuery, string, ResultType, string>,\n+  SelectedResult\n+>\n+\n export type UseMutationStateResult<\n   D extends MutationDefinition<any, any, any, any>,\n   R,"
+  },
+  {
+    "sha": "2351bdc3f6eb5f497c6a5975047354df5c28821c",
+    "filename": "packages/toolkit/src/query/react/index.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 0,
+    "changes": 2,
+    "blob_url": "https://github.com/reduxjs/redux-toolkit/blob/20387a1a6902bbf597dbaec103e33dafc2ae53fe/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2Findex.ts",
+    "raw_url": "https://github.com/reduxjs/redux-toolkit/raw/20387a1a6902bbf597dbaec103e33dafc2ae53fe/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/reduxjs/redux-toolkit/contents/packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2Findex.ts?ref=20387a1a6902bbf597dbaec103e33dafc2ae53fe",
+    "patch": "@@ -38,6 +38,8 @@ export type {\n   TypedUseInfiniteQuerySubscription,\n   TypedUseInfiniteQueryState,\n   TypedLazyInfiniteQueryTrigger,\n+  TypedUseQuerySubscriptionOptions,\n+  TypedUseMutationStateOptions,\n } from './buildHooks'\n export { UNINITIALIZED_VALUE } from './constants'\n export { createApi, reactHooksModule, reactHooksModuleName }"
+  }
+]

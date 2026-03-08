@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-vitest-dev-vitest-9803",
+  "language": "ts",
+  "kind": "real",
+  "description": "vitest-dev/vitest#9803: fix(browser): skip esbuild.legalComments when using rolldown-vite",
+  "source": {
+    "kind": "github-pr",
+    "repository": "vitest-dev/vitest",
+    "prNumber": 9803,
+    "prUrl": "https://github.com/vitest-dev/vitest/pull/9803",
+    "baseSha": "dfb2159d3b758fa14c08c8d0cf9874fa3312954f",
+    "headSha": "36b91033b5d28d2e466f288e2ab48027c1389481",
+    "selectedFiles": [
+      "packages/browser/src/node/plugin.ts"
+    ],
+    "collectedAt": "2026-03-08T02:23:15.712Z"
+  },
+  "files": [
+    {
+      "id": "packages/browser/src/node/plugin.ts",
+      "oldPath": "packages/browser/src/node/plugin.ts",
+      "newPath": "packages/browser/src/node/plugin.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/browser/src/node/plugin.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 358,
+          "endLine": 358
+        },
+        "newRange": {
+          "startLine": 358,
+          "endLine": 360
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
 import type { UnitBlock } from "../src/diff-blocks";
+import { diffUnits } from "../src/diff-blocks";
 import { detectMoves } from "../src/diff-moves";
 import type { DiffToken } from "../src/diff-tokenize";
+import { tokenize } from "../src/diff-tokenize";
 
 function token(
   text: string,
@@ -51,6 +53,61 @@ describe("move detection helpers", () => {
     expect(result.nestedOps).toHaveLength(1);
     expect(result.moveOps[0]?.meta?.renameGroupId).toBe("rename-1");
     expect(result.nestedOps[0]?.type).toBe("update");
+  });
+
+  test("trims surrounding blank lines from move ranges", () => {
+    const oldText = `${[
+      "export function a() {",
+      "  const value = 1;",
+      "  return value;",
+      "}",
+      "",
+      "export function b() {",
+      "  return 2;",
+      "}",
+    ].join("\n")}\n`;
+    const newText = `${[
+      "export function b() {",
+      "  return 2;",
+      "}",
+      "",
+      "export function a() {",
+      "  const value = 1;",
+      "  return value + 0;",
+      "}",
+    ].join("\n")}\n`;
+    const oldTokens = tokenize(oldText, undefined, undefined, "ts");
+    const newTokens = tokenize(newText, undefined, undefined, "ts");
+    const blocks = diffUnits(oldTokens, newTokens);
+
+    const result = detectMoves(blocks, oldTokens, newTokens, oldText, newText);
+
+    expect(result.moveOps).toHaveLength(1);
+    expect(result.nestedOps).toHaveLength(1);
+    expect(result.moveOps[0]?.oldRange).toEqual({
+      start: { line: 1, column: 1 },
+      end: { line: 5, column: 1 },
+    });
+    expect(result.moveOps[0]?.newRange).toEqual({
+      start: { line: 5, column: 1 },
+      end: { line: 9, column: 1 },
+    });
+    expect(result.moveOps[0]?.oldText).toBe(
+      `${[
+        "export function a() {",
+        "  const value = 1;",
+        "  return value;",
+        "}",
+      ].join("\n")}\n`
+    );
+    expect(result.moveOps[0]?.newText).toBe(
+      `${[
+        "export function a() {",
+        "  const value = 1;",
+        "  return value + 0;",
+        "}",
+      ].join("\n")}\n`
+    );
   });
 
   test("detects move without nested update when content is unchanged", () => {

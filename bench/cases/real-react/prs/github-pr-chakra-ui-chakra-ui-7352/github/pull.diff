@@ -1,0 +1,23 @@
+diff --git a/.changeset/few-apes-yawn.md b/.changeset/few-apes-yawn.md
+new file mode 100644
+index 00000000000..6f3481b4562
+--- /dev/null
++++ b/.changeset/few-apes-yawn.md
+@@ -0,0 +1,5 @@
++---
++"@chakra-ui/editable": patch
++---
++
++Export "useEditableContext" hook
+diff --git a/packages/components/editable/src/index.ts b/packages/components/editable/src/index.ts
+index ba22dd0cbac..020f705c75d 100644
+--- a/packages/components/editable/src/index.ts
++++ b/packages/components/editable/src/index.ts
+@@ -1,6 +1,7 @@
+ export { Editable } from "./editable"
+ export type { EditableProps } from "./editable"
+ export { useEditableStyles } from "./editable-context"
++export { useEditableContext } from "./editable-context"
+ export { EditableInput } from "./editable-input"
+ export type { EditableInputProps } from "./editable-input"
+ export { EditablePreview } from "./editable-preview"

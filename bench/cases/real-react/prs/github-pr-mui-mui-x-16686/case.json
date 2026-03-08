@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-mui-x-16686",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/mui-x#16686: [charts] Migrate `ChartsUsageDemo` to TSX and removed NoSnap",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/mui-x",
+    "prNumber": 16686,
+    "prUrl": "https://github.com/mui/mui-x/pull/16686",
+    "baseSha": "3c5c6b89eb661b31ab1e2aa6565d535aee3ea145",
+    "headSha": "c2d327e4652cffb212d3aaffdc41eb5c427625e7",
+    "selectedFiles": [
+      "docs/data/charts/axis/FormatterDemo.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:54:44.539Z"
+  },
+  "files": [
+    {
+      "id": "docs/data/charts/axis/FormatterDemo.tsx",
+      "oldPath": "docs/data/charts/axis/FormatterDemoNoSnap.tsx",
+      "newPath": "docs/data/charts/axis/FormatterDemo.tsx",
+      "status": "renamed",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/data/charts/axis/FormatterDemo.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 105,
+          "endLine": 105
+        },
+        "newRange": {
+          "startLine": 105,
+          "endLine": 105
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

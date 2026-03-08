@@ -1,0 +1,52 @@
+diff --git a/.changeset/major-chicken-bow.md b/.changeset/major-chicken-bow.md
+new file mode 100644
+index 0000000000..51ce7f2cb4
+--- /dev/null
++++ b/.changeset/major-chicken-bow.md
+@@ -0,0 +1,5 @@
++---
++"@zag-js/vanilla": patch
++---
++
++Updated vanilla mergeProps function to make sure the style prop is always a string
+diff --git a/packages/frameworks/vanilla/src/index.ts b/packages/frameworks/vanilla/src/index.ts
+index 67a1f8f1f3..f9766e4c71 100644
+--- a/packages/frameworks/vanilla/src/index.ts
++++ b/packages/frameworks/vanilla/src/index.ts
+@@ -1,4 +1,4 @@
+-export { mergeProps } from "@zag-js/core"
++export { mergeProps } from "./merge-props"
+ export { normalizeProps } from "./normalize-props"
+ export { spreadProps, type Attrs } from "./spread-props"
+ export { VanillaMachine } from "./machine"
+diff --git a/packages/frameworks/vanilla/src/merge-props.ts b/packages/frameworks/vanilla/src/merge-props.ts
+new file mode 100644
+index 0000000000..8e39ef00e6
+--- /dev/null
++++ b/packages/frameworks/vanilla/src/merge-props.ts
+@@ -0,0 +1,12 @@
++import { mergeProps as zagMergeProps } from "@zag-js/core"
++import { toStyleString } from "./normalize-props"
++
++export function mergeProps(...args: Record<string | symbol, any>[]) {
++  const merged = zagMergeProps(...args)
++
++  if ("style" in merged && typeof merged.style === "object") {
++    merged.style = toStyleString(merged.style)
++  }
++
++  return merged
++}
+diff --git a/packages/frameworks/vanilla/src/normalize-props.ts b/packages/frameworks/vanilla/src/normalize-props.ts
+index 6ae1e0d0f5..279b0fb4c0 100644
+--- a/packages/frameworks/vanilla/src/normalize-props.ts
++++ b/packages/frameworks/vanilla/src/normalize-props.ts
+@@ -18,7 +18,7 @@ export const propMap: AttrMap = {
+ // SVG attributes that should preserve their case
+ const caseSensitiveSvgAttrs = new Set<string>(["viewBox", "preserveAspectRatio"])
+ 
+-const toStyleString = (style: any) => {
++export const toStyleString = (style: any) => {
+   let string = ""
+   for (let key in style) {
+     const value = style[key]

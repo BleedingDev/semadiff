@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-5584",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5584: Improve locale translation approach",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5584,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5584",
+    "baseSha": "aedcc06eb953c47efb1e7e089cafffd756eb9ba4",
+    "headSha": "fb0861293cc0d2940ff9dcb516a09ff9b9aa2fcc",
+    "selectedFiles": [
+      "packages/zod/src/v4/core/schemas.ts"
+    ],
+    "collectedAt": "2026-03-08T02:14:10.351Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/core/schemas.ts",
+      "oldPath": "packages/zod/src/v4/core/schemas.ts",
+      "newPath": "packages/zod/src/v4/core/schemas.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/core/schemas.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 4013,
+          "endLine": 4013
+        },
+        "newRange": {
+          "startLine": 4013,
+          "endLine": 4013
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

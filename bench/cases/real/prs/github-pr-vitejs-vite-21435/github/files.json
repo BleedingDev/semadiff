@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "a0be15a581123e597b5e60f8b5bb75d079ff7e8a",
+    "filename": "packages/vite/src/node/plugin.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/vitejs/vite/blob/6d9f2b69256a7f3863d8e52b89ac4649db3d6734/packages%2Fvite%2Fsrc%2Fnode%2Fplugin.ts",
+    "raw_url": "https://github.com/vitejs/vite/raw/6d9f2b69256a7f3863d8e52b89ac4649db3d6734/packages%2Fvite%2Fsrc%2Fnode%2Fplugin.ts",
+    "contents_url": "https://api.github.com/repos/vitejs/vite/contents/packages%2Fvite%2Fsrc%2Fnode%2Fplugin.ts?ref=6d9f2b69256a7f3863d8e52b89ac4649db3d6734",
+    "patch": "@@ -94,7 +94,7 @@ declare module 'rolldown' {\n  * once per each environment allowing users to have completely different plugins\n  * for each of them. The constructor gets the resolved environment after the server\n  * and builder has already been created simplifying config access and cache\n- * management for for environment specific plugins.\n+ * management for environment specific plugins.\n  * Environment Plugins are closer to regular rollup plugins. They can't define\n  * app level hooks (like config, configResolved, configureServer, etc).\n  */"
+  }
+]

@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-9775",
+  "language": "tsx",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#9775: docs: refactor number input snippets",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 9775,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9775",
+    "baseSha": "32b1822482f657827eae4fe89dddcb7cc70bfe03",
+    "headSha": "70a46ebe62b7ea98fce3d93ffa30cf43c2d59934",
+    "selectedFiles": [
+      "packages/react/__stories__/number-input.stories.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:57:09.019Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/__stories__/number-input.stories.tsx",
+      "oldPath": "packages/react/__stories__/number-input.stories.tsx",
+      "newPath": "packages/react/__stories__/number-input.stories.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/__stories__/number-input.stories.tsx",
+        "type": "insert",
+        "newRange": {
+          "startLine": 27,
+          "endLine": 28
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

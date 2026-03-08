@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-4455",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#4455: refactor(build): migrate Nx executors to vanilla CLI targets",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 4455,
+    "prUrl": "https://github.com/module-federation/core/pull/4455",
+    "baseSha": "6edeb57dc7c9ee9334273d3710eb9c24e83fddec",
+    "headSha": "d99aeb392c44660d6a9c6f203dedaa5bca0a6cc0",
+    "selectedFiles": [
+      "apps/3000-home/cypress/support/e2e.ts"
+    ],
+    "collectedAt": "2026-03-08T04:10:48.229Z"
+  },
+  "files": [
+    {
+      "id": "apps/3000-home/cypress/support/e2e.ts",
+      "oldPath": "apps/3000-home/cypress/support/e2e.ts",
+      "newPath": "apps/3000-home/cypress/support/e2e.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/3000-home/cypress/support/e2e.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 18,
+          "endLine": 18
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

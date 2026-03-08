@@ -1,0 +1,87 @@
+[
+  {
+    "tracking_name": "docs/rtk-query/usage/infinite-queries.mdx",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=docs%2Frtk-query%2Fusage%2Finfinite-queries.mdx&old_oid=0d0ec7e9c50be3ee40f3a8d0e9c4beb824fb637c&old_mode=33188&new_filename=docs%2Frtk-query%2Fusage%2Finfinite-queries.mdx&new_oid=c43dd025728fcd1f99d329987bc5e77db08ee4a9&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "docs/rtk-query/usage/infinite-queries.mdx",
+      "oid": "0d0ec7e9c50be3ee40f3a8d0e9c4beb824fb637c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "docs/rtk-query/usage/infinite-queries.mdx",
+      "oid": "c43dd025728fcd1f99d329987bc5e77db08ee4a9",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "f3d5f738418aae92a4299a262f20af8b1a28de51c413918c5932e9ecf67eb4d5"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/core/buildThunks.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildThunks.ts&old_oid=37f6606c7ca87e2c01e70312d99269e7bd85028a&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Fcore%2FbuildThunks.ts&new_oid=81ca5d38a7b90fdb0f12b7ff2a7dee38cb233f37&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/toolkit/src/query/core/buildThunks.ts",
+      "oid": "37f6606c7ca87e2c01e70312d99269e7bd85028a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/core/buildThunks.ts",
+      "oid": "81ca5d38a7b90fdb0f12b7ff2a7dee38cb233f37",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0ffe77a934f2eff0ea79dcc0022def9a4888740a0ce9f2cc82e3f61212753a61"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/endpointDefinitions.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts&old_oid=44e46e351937ebe2819daeaa8391f81e32e61d6a&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2FendpointDefinitions.ts&new_oid=d69b976d21933340a4be0d799829b44bb0d7f6cc&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/toolkit/src/query/endpointDefinitions.ts",
+      "oid": "44e46e351937ebe2819daeaa8391f81e32e61d6a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/endpointDefinitions.ts",
+      "oid": "d69b976d21933340a4be0d799829b44bb0d7f6cc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0488a200c74c32442afa991afb0a92f96df8ff2d20ac74ad7bc76d8d701a59db"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/react/buildHooks.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts&old_oid=1f08eab47bd9e7399946257a4b7f56a0cba173ae&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts&new_oid=4c8ca51bef3daa0c6cc9f3dee3d9443f406a85f9&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/toolkit/src/query/react/buildHooks.ts",
+      "oid": "1f08eab47bd9e7399946257a4b7f56a0cba173ae",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/react/buildHooks.ts",
+      "oid": "4c8ca51bef3daa0c6cc9f3dee3d9443f406a85f9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "73c1158d8e3a3d7e65694702b3a588f33308713c72ac94cf478f341dd4cf0494"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/tests/infiniteQueries.test-d.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts&old_oid=e305b5e788f5979111fd74a3d8f01d2bcc225679&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Ftests%2FinfiniteQueries.test-d.ts&new_oid=2ada1aef09cf7316abdb96435d9e0d844c44fe95&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/toolkit/src/query/tests/infiniteQueries.test-d.ts",
+      "oid": "e305b5e788f5979111fd74a3d8f01d2bcc225679",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/tests/infiniteQueries.test-d.ts",
+      "oid": "2ada1aef09cf7316abdb96435d9e0d844c44fe95",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7d6b758fbf254ab44d3506abdbc9943fabf8e3a89788e06048ec3212d70c6cab"
+  }
+]

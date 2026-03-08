@@ -1,0 +1,13 @@
+diff --git a/packages/react/src/components/pagination/index.ts b/packages/react/src/components/pagination/index.ts
+index 17155593001..3b653811a6a 100644
+--- a/packages/react/src/components/pagination/index.ts
++++ b/packages/react/src/components/pagination/index.ts
+@@ -19,6 +19,8 @@ export type {
+   PaginationNextTriggerProps,
+   PaginationEllipsisProps,
+   PaginationItemProps,
++  PaginationPageChangeDetails,
++  PaginationPageSizeChangeDetails,
+   PaginationPageTextProps,
+   PaginationItemsProps,
+ } from "./pagination"

@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-reduxjs-redux-toolkit-4818",
+  "language": "ts",
+  "kind": "real",
+  "description": "reduxjs/redux-toolkit#4818: Fix infinite query lifecycle callback data types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "reduxjs/redux-toolkit",
+    "prNumber": 4818,
+    "prUrl": "https://github.com/reduxjs/redux-toolkit/pull/4818",
+    "baseSha": "2ef6966a4eb2f642767fc1f0ed55f7dc5ea65242",
+    "headSha": "3d8b771d0604ee019787747eaceecbbdb37b79ed",
+    "selectedFiles": [
+      "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts"
+    ],
+    "collectedAt": "2026-03-08T02:17:22.220Z"
+  },
+  "files": [
+    {
+      "id": "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts",
+      "oldPath": "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts",
+      "newPath": "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/toolkit/src/query/core/buildMiddleware/cacheLifecycle.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 358,
+          "endLine": 358
+        },
+        "newRange": {
+          "startLine": 358,
+          "endLine": 358
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

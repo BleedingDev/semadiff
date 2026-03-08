@@ -1,0 +1,1273 @@
+diff --git a/.changeset/rename-node-modules-option.md b/.changeset/rename-node-modules-option.md
+new file mode 100644
+index 00000000000..a2602c73422
+--- /dev/null
++++ b/.changeset/rename-node-modules-option.md
+@@ -0,0 +1,5 @@
++---
++'@module-federation/enhanced': minor
++---
++
++rename the share resolver option to `allowNodeModulesSuffixMatch` and update generated schemas, declarations, and tests to use the new name.
+diff --git a/.github/workflows/build-and-test.yml b/.github/workflows/build-and-test.yml
+index 99c50605645..72b01f90d59 100644
+--- a/.github/workflows/build-and-test.yml
++++ b/.github/workflows/build-and-test.yml
+@@ -19,6 +19,14 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+@@ -30,17 +38,13 @@ jobs:
+           node-version: '18'
+           cache: 'pnpm'
+ 
+-      - name: Cache Browsers
+-        uses: actions/cache@v3
+-        id: browsers-cache
+-        with:
+-          path: |
+-            ~/.cache/ms-playwright
+-            ~/.cache/Cypress
+-          key: ${{ runner.os }}-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}
+-
+       - name: Set Playwright cache status
+-        run: echo "PLAYWRIGHT_CACHE_HIT=${{ steps.browsers-cache.outputs.cache-hit }}" >> $GITHUB_ENV
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
+ 
+       - name: Set Nx SHA
+         uses: nrwl/nx-set-shas@v3
+diff --git a/.github/workflows/build-metro.yml b/.github/workflows/build-metro.yml
+index d3c35cc7d71..9098b0ad531 100644
+--- a/.github/workflows/build-metro.yml
++++ b/.github/workflows/build-metro.yml
+@@ -16,6 +16,14 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/devtools.yml b/.github/workflows/devtools.yml
+index e6620243d48..ee0cdb710c2 100644
+--- a/.github/workflows/devtools.yml
++++ b/.github/workflows/devtools.yml
+@@ -20,6 +20,14 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+@@ -31,17 +39,13 @@ jobs:
+           node-version: '18'
+           cache: 'pnpm'
+ 
+-      - name: Cache Browsers
+-        uses: actions/cache@v3
+-        id: browsers-cache
+-        with:
+-          path: |
+-            ~/.cache/ms-playwright
+-            ~/.cache/Cypress
+-          key: ${{ runner.os }}-browsers-${{ hashFiles('**/pnpm-lock.yaml') }}
+-
+       - name: Set Playwright cache status
+-        run: echo "PLAYWRIGHT_CACHE_HIT=${{ steps.browsers-cache.outputs.cache-hit }}" >> $GITHUB_ENV
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
+ 
+       - name: Set Nx SHA
+         uses: nrwl/nx-set-shas@v3
+diff --git a/.github/workflows/e2e-manifest.yml b/.github/workflows/e2e-manifest.yml
+index 3dde0e92ae5..1da7d86b9b8 100644
+--- a/.github/workflows/e2e-manifest.yml
++++ b/.github/workflows/e2e-manifest.yml
+@@ -14,6 +14,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-modern-ssr.yml b/.github/workflows/e2e-modern-ssr.yml
+index 37b35913b55..d2b3888f334 100644
+--- a/.github/workflows/e2e-modern-ssr.yml
++++ b/.github/workflows/e2e-modern-ssr.yml
+@@ -13,6 +13,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-modern.yml b/.github/workflows/e2e-modern.yml
+index d0a0795f928..9df4c45f115 100644
+--- a/.github/workflows/e2e-modern.yml
++++ b/.github/workflows/e2e-modern.yml
+@@ -14,6 +14,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-next-dev.yml b/.github/workflows/e2e-next-dev.yml
+index d4cdf3782e9..f382b8d0f8c 100644
+--- a/.github/workflows/e2e-next-dev.yml
++++ b/.github/workflows/e2e-next-dev.yml
+@@ -13,6 +13,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-next-prod.yml b/.github/workflows/e2e-next-prod.yml
+index c87445b3094..794fc88c6d4 100644
+--- a/.github/workflows/e2e-next-prod.yml
++++ b/.github/workflows/e2e-next-prod.yml
+@@ -13,6 +13,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-node.yml b/.github/workflows/e2e-node.yml
+index d195a07ae25..15909f7f02e 100644
+--- a/.github/workflows/e2e-node.yml
++++ b/.github/workflows/e2e-node.yml
+@@ -14,6 +14,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-router.yml b/.github/workflows/e2e-router.yml
+index c4d7a13cabd..5d8c6cfbf43 100644
+--- a/.github/workflows/e2e-router.yml
++++ b/.github/workflows/e2e-router.yml
+@@ -14,6 +14,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/e2e-runtime.yml b/.github/workflows/e2e-runtime.yml
+index 39ad7af2141..ec5652d8d48 100644
+--- a/.github/workflows/e2e-runtime.yml
++++ b/.github/workflows/e2e-runtime.yml
+@@ -14,6 +14,22 @@ jobs:
+         with:
+           fetch-depth: 0
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
++      - name: Set Playwright cache status
++        run: |
++          if [ -d "$HOME/.cache/ms-playwright" ] || [ -d "$HOME/.cache/Cypress" ]; then
++            echo "PLAYWRIGHT_CACHE_HIT=true" >> $GITHUB_ENV
++          else
++            echo "PLAYWRIGHT_CACHE_HIT=false" >> $GITHUB_ENV
++          fi
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/release-pull-request.yml b/.github/workflows/release-pull-request.yml
+index 6d93bf2d4c8..5a8a6abebda 100644
+--- a/.github/workflows/release-pull-request.yml
++++ b/.github/workflows/release-pull-request.yml
+@@ -25,6 +25,14 @@ jobs:
+           # This makes Actions fetch only one branch to release
+           fetch-depth: 10
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
+       - name: Install Pnpm
+         run: |
+           corepack prepare pnpm@8.11.0 --activate
+diff --git a/.github/workflows/release.yml b/.github/workflows/release.yml
+index ab16dcc3078..69e4971e771 100644
+--- a/.github/workflows/release.yml
++++ b/.github/workflows/release.yml
+@@ -31,6 +31,14 @@ jobs:
+           fetch-depth: 25
+           ref: ${{ github.event.inputs.branch }}
+ 
++      - name: Cache Tool Downloads
++        uses: actions/cache@v3
++        with:
++          path: ~/.cache
++          key: ${{ runner.os }}-toolcache-${{ hashFiles('pnpm-lock.yaml') }}
++          restore-keys: |
++            ${{ runner.os }}-toolcache-
++
+       # Use corepack to install pnpm
+       - name: Setup Pnpm
+         run: |
+diff --git a/apps/website-new/docs/en/configure/shared.mdx b/apps/website-new/docs/en/configure/shared.mdx
+index 70bc231ec94..06cdef1119e 100644
+--- a/apps/website-new/docs/en/configure/shared.mdx
++++ b/apps/website-new/docs/en/configure/shared.mdx
+@@ -21,6 +21,7 @@ interface SharedConfig {
+   eager?: boolean;
+   shareScope?: string;
+   import?: string | false;
++  allowNodeModulesSuffixMatch?: boolean;
+ }
+ ```
+ 
+@@ -96,6 +97,16 @@ Control import path of shared dependencies, default value is `undefined` .
+ 
+ If set to `false`, this shared will not be packaged into the product, and only the `shared` provided by the consumer will be used. Therefore, please make sure that the consumer has provided the corresponding `shared` before setting.
+ 
++## allowNodeModulesSuffixMatch
++
++- Type: `boolean`
++- Required: No
++- Default: `false`
++
++Enables a fallback lookup that matches shared modules by the portion of their resolved path that appears after `node_modules/`. Turn this on when your host and remote resolve the same package through different absolute paths (for example, due to pnpm hoisting, symlinks, or custom bundler loaders) but you still want them to be considered the same shared module.
++
++> Previously this option was called `nodeModulesReconstructedLookup`.
++
+ ## FAQ
+ 
+ ### When to use shared dependencies
+@@ -129,4 +140,3 @@ Add the shared dependencies in the `shared` configuration of the {props.name ||
+ import ObjectShared from '@components/common/configure/object-shared'
+ 
+ {props.objectShared || React.createElement(ObjectShared)}
+-
+diff --git a/apps/website-new/docs/zh/configure/shared.mdx b/apps/website-new/docs/zh/configure/shared.mdx
+index 4f3597453b4..07ceb3e0de9 100644
+--- a/apps/website-new/docs/zh/configure/shared.mdx
++++ b/apps/website-new/docs/zh/configure/shared.mdx
+@@ -21,6 +21,7 @@ interface SharedConfig {
+   eager?: boolean;
+   shareScope?: string;
+   import?: string | false;
++  allowNodeModulesSuffixMatch?: boolean;
+ }
+ ```
+ 
+@@ -96,6 +97,16 @@ new ModuleFederationPlugin({
+ 
+ 若设置为 `false` ，则不会将此 shared 打包到产物中，仅使用消费者提供的 `shared`。 因此设置前请确认消费者已提供对应 `shared`。
+ 
++## allowNodeModulesSuffixMatch
++
++- 类型：`boolean`
++- 是否必填：否
++- 默认值：`false`
++
++开启后，共享解析会使用模块解析路径中 `node_modules/` 之后的部分进行后缀匹配。当宿主与远程通过不同的绝对路径解析同一依赖（例如 pnpm hoisting、软链接或自定义打包器加载路径）时，可以借助该选项依然匹配到同一个共享模块。
++
++> 该选项此前名为 `nodeModulesReconstructedLookup`。
++
+ ## FAQ
+ 
+ ### 何时使用共享依赖
+@@ -130,4 +141,3 @@ import React from 'react';
+ import ObjectShared from '@components/common/configure/object-shared'
+ 
+ {props.objectShared || React.createElement(ObjectShared)}
+-
+diff --git a/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedModule.d.ts b/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedModule.d.ts
+index 56d5104f027..f6b1c82e12d 100644
+--- a/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedModule.d.ts
++++ b/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedModule.d.ts
+@@ -77,6 +77,6 @@ export type ConsumeOptions = {
+   /**
+    * Enable reconstructed lookup for node_modules paths for this share item
+    */
+-  nodeModulesReconstructedLookup?: boolean;
++  allowNodeModulesSuffixMatch?: boolean;
+ };
+ const TYPES = new Set(['consume-shared']);
+diff --git a/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedPlugin.d.ts b/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedPlugin.d.ts
+index 4ba358ac47e..7f29717fd3f 100644
+--- a/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedPlugin.d.ts
++++ b/packages/enhanced/src/declarations/plugins/sharing/ConsumeSharedPlugin.d.ts
+@@ -92,5 +92,5 @@ export interface ConsumesConfig {
+   request?: string;
+   exclude?: IncludeExcludeOptions;
+   include?: IncludeExcludeOptions;
+-  nodeModulesReconstructedLookup?: boolean;
++  allowNodeModulesSuffixMatch?: boolean;
+ }
+diff --git a/packages/enhanced/src/declarations/plugins/sharing/ProvideSharedPlugin.d.ts b/packages/enhanced/src/declarations/plugins/sharing/ProvideSharedPlugin.d.ts
+index b5b0e17abe5..378dcba8f6b 100644
+--- a/packages/enhanced/src/declarations/plugins/sharing/ProvideSharedPlugin.d.ts
++++ b/packages/enhanced/src/declarations/plugins/sharing/ProvideSharedPlugin.d.ts
+@@ -90,7 +90,7 @@ export interface ProvidesConfig {
+   /**
+    * Node modules reconstructed lookup.
+    */
+-  nodeModulesReconstructedLookup?: any;
++  allowNodeModulesSuffixMatch?: any;
+   /**
+    * Original prefix for prefix matches (internal use).
+    */
+diff --git a/packages/enhanced/src/declarations/plugins/sharing/SharePlugin.d.ts b/packages/enhanced/src/declarations/plugins/sharing/SharePlugin.d.ts
+index 23569c8a395..cb6c3a97c90 100644
+--- a/packages/enhanced/src/declarations/plugins/sharing/SharePlugin.d.ts
++++ b/packages/enhanced/src/declarations/plugins/sharing/SharePlugin.d.ts
+@@ -98,7 +98,7 @@ export interface SharedConfig {
+   /**
+    * Node modules reconstructed lookup.
+    */
+-  nodeModulesReconstructedLookup?: boolean;
++  allowNodeModulesSuffixMatch?: boolean;
+ }
+ 
+ export interface IncludeExcludeOptions {
+diff --git a/packages/enhanced/src/lib/sharing/ConsumeSharedPlugin.ts b/packages/enhanced/src/lib/sharing/ConsumeSharedPlugin.ts
+index 3c6ac01f756..7ca621558a5 100644
+--- a/packages/enhanced/src/lib/sharing/ConsumeSharedPlugin.ts
++++ b/packages/enhanced/src/lib/sharing/ConsumeSharedPlugin.ts
+@@ -108,7 +108,7 @@ class ConsumeSharedPlugin {
+                 request: key,
+                 include: undefined,
+                 exclude: undefined,
+-                nodeModulesReconstructedLookup: undefined,
++                allowNodeModulesSuffixMatch: undefined,
+               }
+             : // key is a request/key
+               // item is a version
+@@ -127,7 +127,7 @@ class ConsumeSharedPlugin {
+                 request: key,
+                 include: undefined,
+                 exclude: undefined,
+-                nodeModulesReconstructedLookup: undefined,
++                allowNodeModulesSuffixMatch: undefined,
+               };
+         return result;
+       },
+@@ -154,7 +154,7 @@ class ConsumeSharedPlugin {
+           issuerLayer: item.issuerLayer ? item.issuerLayer : undefined,
+           layer: item.layer ? item.layer : undefined,
+           request,
+-          nodeModulesReconstructedLookup: item.nodeModulesReconstructedLookup,
++          allowNodeModulesSuffixMatch: item.allowNodeModulesSuffixMatch,
+         } as ConsumeOptions;
+       },
+     );
+@@ -541,7 +541,7 @@ class ConsumeSharedPlugin {
+ 
+                   if (
+                     moduleMatch !== undefined &&
+-                    moduleMatch.nodeModulesReconstructedLookup
++                    moduleMatch.allowNodeModulesSuffixMatch
+                   ) {
+                     return boundCreateConsumeSharedModule(
+                       compilation,
+@@ -618,7 +618,7 @@ class ConsumeSharedPlugin {
+               // Also check prefixed consumes with modulePathAfterNodeModules
+               if (modulePathAfterNodeModules) {
+                 for (const [prefix, options] of prefixedConsumes) {
+-                  if (!options.nodeModulesReconstructedLookup) {
++                  if (!options.allowNodeModulesSuffixMatch) {
+                     continue;
+                   }
+                   // Refined issuerLayer matching logic for reconstructed path
+diff --git a/packages/enhanced/src/lib/sharing/ProvideSharedPlugin.ts b/packages/enhanced/src/lib/sharing/ProvideSharedPlugin.ts
+index 5a8a018a919..9de60ba5df0 100644
+--- a/packages/enhanced/src/lib/sharing/ProvideSharedPlugin.ts
++++ b/packages/enhanced/src/lib/sharing/ProvideSharedPlugin.ts
+@@ -97,7 +97,7 @@ class ProvideSharedPlugin {
+           request: item,
+           exclude: undefined,
+           include: undefined,
+-          nodeModulesReconstructedLookup: false,
++          allowNodeModulesSuffixMatch: false,
+         };
+         return result;
+       },
+@@ -115,7 +115,7 @@ class ProvideSharedPlugin {
+           request,
+           exclude: item.exclude,
+           include: item.include,
+-          nodeModulesReconstructedLookup: !!item.nodeModulesReconstructedLookup,
++          allowNodeModulesSuffixMatch: !!item.allowNodeModulesSuffixMatch,
+         };
+       },
+     );
+@@ -343,7 +343,7 @@ class ProvideSharedPlugin {
+ 
+                 if (
+                   configFromReconstructedDirect !== undefined &&
+-                  configFromReconstructedDirect.nodeModulesReconstructedLookup &&
++                  configFromReconstructedDirect.allowNodeModulesSuffixMatch &&
+                   !resolvedProvideMap.has(lookupKeyForResource)
+                 ) {
+                   this.provideSharedModule(
+@@ -363,7 +363,7 @@ class ProvideSharedPlugin {
+                     prefixLookupKey,
+                     originalPrefixConfig,
+                   ] of prefixMatchProvides) {
+-                    if (!originalPrefixConfig.nodeModulesReconstructedLookup) {
++                    if (!originalPrefixConfig.allowNodeModulesSuffixMatch) {
+                       continue;
+                     }
+                     const configuredPrefix =
+diff --git a/packages/enhanced/src/lib/sharing/SharePlugin.ts b/packages/enhanced/src/lib/sharing/SharePlugin.ts
+index 91db28d090f..e65806279c0 100644
+--- a/packages/enhanced/src/lib/sharing/SharePlugin.ts
++++ b/packages/enhanced/src/lib/sharing/SharePlugin.ts
+@@ -72,8 +72,7 @@ class SharePlugin {
+           request: options.request || key,
+           exclude: options.exclude,
+           include: options.include,
+-          nodeModulesReconstructedLookup:
+-            options.nodeModulesReconstructedLookup,
++          allowNodeModulesSuffixMatch: options.allowNodeModulesSuffixMatch,
+         },
+       }),
+     );
+@@ -92,8 +91,7 @@ class SharePlugin {
+           request: options.request || options.import || key,
+           exclude: options.exclude,
+           include: options.include,
+-          nodeModulesReconstructedLookup:
+-            options.nodeModulesReconstructedLookup,
++          allowNodeModulesSuffixMatch: options.allowNodeModulesSuffixMatch,
+         },
+       }));
+ 
+diff --git a/packages/enhanced/src/schemas/container/ModuleFederationPlugin.check.ts b/packages/enhanced/src/schemas/container/ModuleFederationPlugin.check.ts
+index a2c17aab47a..666cb30205d 100644
+--- a/packages/enhanced/src/schemas/container/ModuleFederationPlugin.check.ts
++++ b/packages/enhanced/src/schemas/container/ModuleFederationPlugin.check.ts
+@@ -256,7 +256,7 @@ const t = {
+           singleton: { type: 'boolean' },
+           strictVersion: { type: 'boolean' },
+           version: { anyOf: [{ enum: [!1] }, { type: 'string' }] },
+-          nodeModulesReconstructedLookup: { type: 'boolean' },
++          allowNodeModulesSuffixMatch: { type: 'boolean' },
+         },
+       },
+       SharedItem: { type: 'string', minLength: 1 },
+@@ -1482,7 +1482,7 @@ const h = {
+       singleton: { type: 'boolean' },
+       strictVersion: { type: 'boolean' },
+       version: { anyOf: [{ enum: [!1] }, { type: 'string' }] },
+-      nodeModulesReconstructedLookup: { type: 'boolean' },
++      allowNodeModulesSuffixMatch: { type: 'boolean' },
+     },
+   },
+   b = {
+@@ -2004,13 +2004,12 @@ function v(
+                                   } else l = !0;
+                                   if (l)
+                                     if (
+-                                      void 0 !==
+-                                      e.nodeModulesReconstructedLookup
++                                      void 0 !== e.allowNodeModulesSuffixMatch
+                                     ) {
+                                       const t = i;
+                                       if (
+                                         'boolean' !=
+-                                        typeof e.nodeModulesReconstructedLookup
++                                        typeof e.allowNodeModulesSuffixMatch
+                                       )
+                                         return (
+                                           (v.errors = [
+diff --git a/packages/enhanced/src/schemas/container/ModuleFederationPlugin.json b/packages/enhanced/src/schemas/container/ModuleFederationPlugin.json
+index ce527938064..7cec0462f36 100644
+--- a/packages/enhanced/src/schemas/container/ModuleFederationPlugin.json
++++ b/packages/enhanced/src/schemas/container/ModuleFederationPlugin.json
+@@ -500,7 +500,7 @@
+             }
+           ]
+         },
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths for this share item",
+           "type": "boolean"
+         }
+diff --git a/packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts b/packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts
+index 8c7f55aac82..4d162dd7a3e 100644
+--- a/packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts
++++ b/packages/enhanced/src/schemas/container/ModuleFederationPlugin.ts
+@@ -539,7 +539,7 @@ export default {
+             },
+           ],
+         },
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description:
+             'Enable reconstructed lookup for node_modules paths for this share item',
+           type: 'boolean',
+diff --git a/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.check.ts b/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.check.ts
+index 506aab0ac50..20cf71cbbbd 100644
+--- a/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.check.ts
++++ b/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.check.ts
+@@ -30,7 +30,7 @@ const r = {
+       strictVersion: { type: 'boolean' },
+       exclude: { $ref: '#/definitions/IncludeExcludeOptions' },
+       include: { $ref: '#/definitions/IncludeExcludeOptions' },
+-      nodeModulesReconstructedLookup: { type: 'boolean' },
++      allowNodeModulesSuffixMatch: { type: 'boolean' },
+     },
+   },
+   e = Object.prototype.hasOwnProperty;
+@@ -498,12 +498,12 @@ function t(
+                                 } else f = !0;
+                                 if (f)
+                                   if (
+-                                    void 0 !== s.nodeModulesReconstructedLookup
++                                    void 0 !== s.allowNodeModulesSuffixMatch
+                                   ) {
+                                     const r = p;
+                                     if (
+                                       'boolean' !=
+-                                      typeof s.nodeModulesReconstructedLookup
++                                      typeof s.allowNodeModulesSuffixMatch
+                                     )
+                                       return (
+                                         (t.errors = [
+@@ -761,15 +761,15 @@ function o(
+                   {
+                     const r = l;
+                     for (const r in e)
+-                      if ('nodeModulesReconstructedLookup' !== r)
++                      if ('allowNodeModulesSuffixMatch' !== r)
+                         return (
+                           (o.errors = [{ params: { additionalProperty: r } }]),
+                           !1
+                         );
+                     if (
+                       r === l &&
+-                      void 0 !== e.nodeModulesReconstructedLookup &&
+-                      'boolean' != typeof e.nodeModulesReconstructedLookup
++                      void 0 !== e.allowNodeModulesSuffixMatch &&
++                      'boolean' != typeof e.allowNodeModulesSuffixMatch
+                     )
+                       return (o.errors = [{ params: { type: 'boolean' } }]), !1;
+                   }
+diff --git a/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.json b/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.json
+index 8359703b42f..331cf235708 100644
+--- a/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.json
++++ b/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.json
+@@ -113,7 +113,7 @@
+           "description": "Filter consumed modules based on the request path (only include matches).",
+           "$ref": "#/definitions/IncludeExcludeOptions"
+         },
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths for this share item",
+           "type": "boolean"
+         }
+@@ -214,7 +214,7 @@
+       "type": "object",
+       "additionalProperties": false,
+       "properties": {
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths",
+           "type": "boolean"
+         }
+diff --git a/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.ts b/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.ts
+index cf7fad3b09a..0ffb151c45c 100644
+--- a/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.ts
++++ b/packages/enhanced/src/schemas/sharing/ConsumeSharedPlugin.ts
+@@ -130,7 +130,7 @@ export default {
+             'Filter consumed modules based on the request path (only include matches).',
+           $ref: '#/definitions/IncludeExcludeOptions',
+         },
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description:
+             'Enable reconstructed lookup for node_modules paths for this share item',
+           type: 'boolean',
+@@ -238,7 +238,7 @@ export default {
+       type: 'object',
+       additionalProperties: false,
+       properties: {
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description: 'Enable reconstructed lookup for node_modules paths',
+           type: 'boolean',
+         },
+diff --git a/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.check.ts b/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.check.ts
+index 9cfefb7beb8..c6a4a194c1a 100644
+--- a/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.check.ts
++++ b/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.check.ts
+@@ -27,7 +27,7 @@ const r = {
+       version: { anyOf: [{ enum: [!1] }, { type: 'string' }] },
+       exclude: { $ref: '#/definitions/IncludeExcludeOptions' },
+       include: { $ref: '#/definitions/IncludeExcludeOptions' },
+-      nodeModulesReconstructedLookup: { type: 'boolean' },
++      allowNodeModulesSuffixMatch: { type: 'boolean' },
+     },
+   },
+   e = Object.prototype.hasOwnProperty;
+@@ -557,13 +557,11 @@ function t(
+                                 f = e === p;
+                               } else f = !0;
+                               if (f)
+-                                if (
+-                                  void 0 !== s.nodeModulesReconstructedLookup
+-                                ) {
++                                if (void 0 !== s.allowNodeModulesSuffixMatch) {
+                                   const r = p;
+                                   if (
+                                     'boolean' !=
+-                                    typeof s.nodeModulesReconstructedLookup
++                                    typeof s.allowNodeModulesSuffixMatch
+                                   )
+                                     return (
+                                       (t.errors = [
+@@ -820,15 +818,15 @@ function o(
+                   {
+                     const r = l;
+                     for (const r in e)
+-                      if ('nodeModulesReconstructedLookup' !== r)
++                      if ('allowNodeModulesSuffixMatch' !== r)
+                         return (
+                           (o.errors = [{ params: { additionalProperty: r } }]),
+                           !1
+                         );
+                     if (
+                       r === l &&
+-                      void 0 !== e.nodeModulesReconstructedLookup &&
+-                      'boolean' != typeof e.nodeModulesReconstructedLookup
++                      void 0 !== e.allowNodeModulesSuffixMatch &&
++                      'boolean' != typeof e.allowNodeModulesSuffixMatch
+                     )
+                       return (o.errors = [{ params: { type: 'boolean' } }]), !1;
+                   }
+diff --git a/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.json b/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.json
+index 3cad084a82b..9cfb437732a 100644
+--- a/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.json
++++ b/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.json
+@@ -109,7 +109,7 @@
+           "description": "Options for including only certain versions or requests of the provided module. Cannot be used with 'exclude'.",
+           "$ref": "#/definitions/IncludeExcludeOptions"
+         },
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths for this share item",
+           "type": "boolean"
+         }
+@@ -198,7 +198,7 @@
+       "type": "object",
+       "additionalProperties": false,
+       "properties": {
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths",
+           "type": "boolean"
+         }
+diff --git a/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.ts b/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.ts
+index 9485e305aaf..a18bb1bee7e 100644
+--- a/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.ts
++++ b/packages/enhanced/src/schemas/sharing/ProvideSharedPlugin.ts
+@@ -127,7 +127,7 @@ export default {
+             "Options for including only certain versions or requests of the provided module. Cannot be used with 'exclude'.",
+           $ref: '#/definitions/IncludeExcludeOptions',
+         },
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description:
+             'Enable reconstructed lookup for node_modules paths for this share item',
+           type: 'boolean',
+@@ -231,7 +231,7 @@ export default {
+       type: 'object',
+       additionalProperties: false,
+       properties: {
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description: 'Enable reconstructed lookup for node_modules paths',
+           type: 'boolean',
+         },
+diff --git a/packages/enhanced/src/schemas/sharing/SharePlugin.check.ts b/packages/enhanced/src/schemas/sharing/SharePlugin.check.ts
+index 661d4dfbe00..1bdc610e00d 100644
+--- a/packages/enhanced/src/schemas/sharing/SharePlugin.check.ts
++++ b/packages/enhanced/src/schemas/sharing/SharePlugin.check.ts
+@@ -29,7 +29,7 @@ const r = {
+       request: { type: 'string', minLength: 1 },
+       layer: { type: 'string', minLength: 1 },
+       issuerLayer: { type: 'string', minLength: 1 },
+-      nodeModulesReconstructedLookup: { type: 'boolean' },
++      allowNodeModulesSuffixMatch: { type: 'boolean' },
+     },
+   },
+   e = {
+@@ -550,13 +550,12 @@ function s(
+                                   } else u = !0;
+                                   if (u)
+                                     if (
+-                                      void 0 !==
+-                                      n.nodeModulesReconstructedLookup
++                                      void 0 !== n.allowNodeModulesSuffixMatch
+                                     ) {
+                                       const r = f;
+                                       if (
+                                         'boolean' !=
+-                                        typeof n.nodeModulesReconstructedLookup
++                                        typeof n.allowNodeModulesSuffixMatch
+                                       )
+                                         return (
+                                           (s.errors = [
+@@ -827,7 +826,7 @@ function i(
+                     {
+                       const r = l;
+                       for (const r in e)
+-                        if ('nodeModulesReconstructedLookup' !== r)
++                        if ('allowNodeModulesSuffixMatch' !== r)
+                           return (
+                             (i.errors = [
+                               { params: { additionalProperty: r } },
+@@ -836,8 +835,8 @@ function i(
+                           );
+                       if (
+                         r === l &&
+-                        void 0 !== e.nodeModulesReconstructedLookup &&
+-                        'boolean' != typeof e.nodeModulesReconstructedLookup
++                        void 0 !== e.allowNodeModulesSuffixMatch &&
++                        'boolean' != typeof e.allowNodeModulesSuffixMatch
+                       )
+                         return (
+                           (i.errors = [{ params: { type: 'boolean' } }]), !1
+diff --git a/packages/enhanced/src/schemas/sharing/SharePlugin.json b/packages/enhanced/src/schemas/sharing/SharePlugin.json
+index f2e8836d8ce..74b9525a690 100644
+--- a/packages/enhanced/src/schemas/sharing/SharePlugin.json
++++ b/packages/enhanced/src/schemas/sharing/SharePlugin.json
+@@ -126,7 +126,7 @@
+           "type": "string",
+           "minLength": 1
+         },
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths for this share item",
+           "type": "boolean"
+         }
+@@ -228,7 +228,7 @@
+       "type": "object",
+       "additionalProperties": false,
+       "properties": {
+-        "nodeModulesReconstructedLookup": {
++        "allowNodeModulesSuffixMatch": {
+           "description": "Enable reconstructed lookup for node_modules paths",
+           "type": "boolean"
+         }
+diff --git a/packages/enhanced/src/schemas/sharing/SharePlugin.ts b/packages/enhanced/src/schemas/sharing/SharePlugin.ts
+index 2772f2a38ef..ef427886ccc 100644
+--- a/packages/enhanced/src/schemas/sharing/SharePlugin.ts
++++ b/packages/enhanced/src/schemas/sharing/SharePlugin.ts
+@@ -146,7 +146,7 @@ export default {
+           type: 'string',
+           minLength: 1,
+         },
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description:
+             'Enable reconstructed lookup for node_modules paths for this share item',
+           type: 'boolean',
+@@ -263,7 +263,7 @@ export default {
+       type: 'object',
+       additionalProperties: false,
+       properties: {
+-        nodeModulesReconstructedLookup: {
++        allowNodeModulesSuffixMatch: {
+           description: 'Enable reconstructed lookup for node_modules paths',
+           type: 'boolean',
+         },
+diff --git a/packages/enhanced/test/compiler-unit/sharing/SharePlugin.test.ts b/packages/enhanced/test/compiler-unit/sharing/SharePlugin.test.ts
+index c9445c29a0c..e88d49a3e95 100644
+--- a/packages/enhanced/test/compiler-unit/sharing/SharePlugin.test.ts
++++ b/packages/enhanced/test/compiler-unit/sharing/SharePlugin.test.ts
+@@ -99,7 +99,7 @@ describe('SharePlugin Compiler Integration', () => {
+             request: /components/,
+             version: '^17.0.0',
+           },
+-          nodeModulesReconstructedLookup: true,
++          allowNodeModulesSuffixMatch: true,
+         },
+         lodash: {
+           version: '4.17.21',
+@@ -192,7 +192,7 @@ describe('SharePlugin Compiler Integration', () => {
+         react: '^17.0.0',
+       },
+       experiments: {
+-        nodeModulesReconstructedLookup: true,
++        allowNodeModulesSuffixMatch: true,
+       },
+     });
+ 
+@@ -209,7 +209,7 @@ describe('SharePlugin Compiler Integration', () => {
+             request: /Button|Modal/,
+             version: '^1.0.0',
+           },
+-          nodeModulesReconstructedLookup: true,
++          allowNodeModulesSuffixMatch: true,
+           singleton: true,
+           eager: false,
+         },
+@@ -242,7 +242,7 @@ describe('SharePlugin Compiler Integration', () => {
+           },
+           'utils/': {
+             version: '1.0.0',
+-            nodeModulesReconstructedLookup: true,
++            allowNodeModulesSuffixMatch: true,
+           },
+         },
+       });
+diff --git a/packages/enhanced/test/configCases/sharing/share-deep-module/webpack.config.js b/packages/enhanced/test/configCases/sharing/share-deep-module/webpack.config.js
+index 8efb8323f9b..e6626967168 100644
+--- a/packages/enhanced/test/configCases/sharing/share-deep-module/webpack.config.js
++++ b/packages/enhanced/test/configCases/sharing/share-deep-module/webpack.config.js
+@@ -10,7 +10,7 @@ module.exports = {
+       shared: {
+         shared: {},
+         'shared/directory/': {
+-          nodeModulesReconstructedLookup: true,
++          allowNodeModulesSuffixMatch: true,
+         },
+       },
+     }),
+diff --git a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.buildMeta.test.ts b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.buildMeta.test.ts
+index ad6872c9946..3ee1dc18ff5 100644
+--- a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.buildMeta.test.ts
++++ b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.buildMeta.test.ts
+@@ -63,7 +63,7 @@ describe('ConsumeSharedPlugin - BuildMeta Copying', () => {
+         request: 'react',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       });
+ 
+       // Create a mock fallback module with buildMeta/buildInfo
+@@ -152,7 +152,7 @@ describe('ConsumeSharedPlugin - BuildMeta Copying', () => {
+         request: 'lodash',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       });
+ 
+       // Create a mock fallback module with different buildMeta/buildInfo
+@@ -235,7 +235,7 @@ describe('ConsumeSharedPlugin - BuildMeta Copying', () => {
+         request: 'missing-meta',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       });
+ 
+       // Store original buildMeta/buildInfo
+@@ -330,7 +330,7 @@ describe('ConsumeSharedPlugin - BuildMeta Copying', () => {
+         request: 'no-import',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       });
+ 
+       const originalBuildMeta = mockConsumeSharedModule.buildMeta;
+@@ -380,7 +380,7 @@ describe('ConsumeSharedPlugin - BuildMeta Copying', () => {
+         request: 'missing-fallback',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       });
+ 
+       const originalBuildMeta = mockConsumeSharedModule.buildMeta;
+@@ -436,7 +436,7 @@ describe('ConsumeSharedPlugin - BuildMeta Copying', () => {
+         request: 'spread-test',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       });
+ 
+       // Create a fallback module with nested objects to test deep copying
+diff --git a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.constructor.test.ts b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.constructor.test.ts
+index a34775fcd79..490845fe0f4 100644
+--- a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.constructor.test.ts
++++ b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.constructor.test.ts
+@@ -224,7 +224,7 @@ describe('ConsumeSharedPlugin', () => {
+         import: undefined,
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       };
+ 
+       const mockCompilation = {
+diff --git a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.include-filtering.test.ts b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.include-filtering.test.ts
+index c61e8d426fe..4e8410fa057 100644
+--- a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.include-filtering.test.ts
++++ b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.include-filtering.test.ts
+@@ -91,7 +91,7 @@ describe('ConsumeSharedPlugin', () => {
+           version: '^1.0.0', // Should match
+         },
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       };
+ 
+       mockResolver.resolve.mockImplementation(successResolve);
+@@ -127,7 +127,7 @@ describe('ConsumeSharedPlugin', () => {
+           version: '^2.0.0', // Won't match 1.5.0
+         },
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       };
+ 
+       mockResolver.resolve.mockImplementation(
+@@ -172,7 +172,7 @@ describe('ConsumeSharedPlugin', () => {
+           version: '^1.0.0',
+         },
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       };
+ 
+       mockResolver.resolve.mockImplementation(successResolve);
+@@ -210,7 +210,7 @@ describe('ConsumeSharedPlugin', () => {
+           fallbackVersion: '1.5.0', // Should satisfy ^2.0.0? No, should NOT satisfy
+         },
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       };
+ 
+       mockResolver.resolve.mockImplementation(successResolve);
+@@ -245,7 +245,7 @@ describe('ConsumeSharedPlugin', () => {
+           version: '^2.0.0',
+         },
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       };
+ 
+       const result = await plugin.createConsumeSharedModule(
+diff --git a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.integration.test.ts b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.integration.test.ts
+index 408164a3f22..db9792b0358 100644
+--- a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.integration.test.ts
++++ b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.integration.test.ts
+@@ -220,7 +220,7 @@ describe('ConsumeSharedPlugin integration scenarios', () => {
+         request: 'react',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       },
+     );
+ 
+@@ -268,7 +268,7 @@ describe('ConsumeSharedPlugin integration scenarios', () => {
+         request: 'react',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       },
+     );
+ 
+@@ -306,7 +306,7 @@ describe('ConsumeSharedPlugin integration scenarios', () => {
+         request: 'react',
+         include: undefined,
+         exclude: undefined,
+-        nodeModulesReconstructedLookup: undefined,
++        allowNodeModulesSuffixMatch: undefined,
+       },
+     );
+ 
+diff --git a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.version-resolution.test.ts b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.version-resolution.test.ts
+index b6fcd8af7b1..2189496fc14 100644
+--- a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.version-resolution.test.ts
++++ b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/ConsumeSharedPlugin.version-resolution.test.ts
+@@ -84,7 +84,7 @@ describe('ConsumeSharedPlugin', () => {
+             request: 'failing-module',
+             include: undefined,
+             exclude: undefined,
+-            nodeModulesReconstructedLookup: undefined,
++            allowNodeModulesSuffixMatch: undefined,
+           },
+         );
+ 
+@@ -175,7 +175,7 @@ describe('ConsumeSharedPlugin', () => {
+             request: 'package-error',
+             include: undefined,
+             exclude: undefined,
+-            nodeModulesReconstructedLookup: undefined,
++            allowNodeModulesSuffixMatch: undefined,
+           },
+         );
+ 
+@@ -268,7 +268,7 @@ describe('ConsumeSharedPlugin', () => {
+             request: 'missing-package',
+             include: undefined,
+             exclude: undefined,
+-            nodeModulesReconstructedLookup: undefined,
++            allowNodeModulesSuffixMatch: undefined,
+           },
+         );
+ 
+@@ -345,12 +345,12 @@ describe('ConsumeSharedPlugin', () => {
+     });
+ 
+     describe('utility integration tests', () => {
+-      it('should properly configure nodeModulesReconstructedLookup', () => {
++      it('should properly configure allowNodeModulesSuffixMatch', () => {
+         const plugin = new ConsumeSharedPlugin({
+           shareScope: 'default',
+           consumes: {
+             'node-module': {
+-              nodeModulesReconstructedLookup: true,
++              allowNodeModulesSuffixMatch: true,
+             },
+             'regular-module': {},
+           },
+@@ -363,10 +363,8 @@ describe('ConsumeSharedPlugin', () => {
+           ([key]) => key === 'regular-module',
+         );
+ 
+-        expect(nodeModule![1].nodeModulesReconstructedLookup).toBe(true);
+-        expect(
+-          regularModule![1].nodeModulesReconstructedLookup,
+-        ).toBeUndefined();
++        expect(nodeModule![1].allowNodeModulesSuffixMatch).toBe(true);
++        expect(regularModule![1].allowNodeModulesSuffixMatch).toBeUndefined();
+       });
+ 
+       it('should handle multiple shareScope configurations', () => {
+@@ -614,7 +612,7 @@ describe('ConsumeSharedPlugin', () => {
+           request: 'concurrent-module',
+           include: undefined,
+           exclude: undefined,
+-          nodeModulesReconstructedLookup: undefined,
++          allowNodeModulesSuffixMatch: undefined,
+         };
+ 
+         // Start multiple concurrent resolutions
+diff --git a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/helpers.ts b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/helpers.ts
+index 45210ee8d49..a8ffed245bf 100644
+--- a/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/helpers.ts
++++ b/packages/enhanced/test/unit/sharing/ConsumeSharedPlugin/helpers.ts
+@@ -28,7 +28,7 @@ const defaultConfig: BaseConfig = {
+   request: 'test-module',
+   include: undefined,
+   exclude: undefined,
+-  nodeModulesReconstructedLookup: undefined,
++  allowNodeModulesSuffixMatch: undefined,
+   packageName: undefined,
+ };
+ 
+diff --git a/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.constructor.test.ts b/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.constructor.test.ts
+index 7bcd545fb27..6953536311b 100644
+--- a/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.constructor.test.ts
++++ b/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.constructor.test.ts
+@@ -24,7 +24,7 @@ type ProvideConfig = {
+   include?: ProvideFilterConfig;
+   exclude?: ProvideFilterConfig;
+   layer?: string;
+-  nodeModulesReconstructedLookup?: boolean;
++  allowNodeModulesSuffixMatch?: boolean;
+   import?: string;
+ } & Record<string, unknown>;
+ 
+diff --git a/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.filtering.test.ts b/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.filtering.test.ts
+index a275372ecf3..26cc1704696 100644
+--- a/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.filtering.test.ts
++++ b/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.filtering.test.ts
+@@ -48,7 +48,7 @@ type ProvideConfig = {
+   include?: ProvideFilterConfig;
+   exclude?: ProvideFilterConfig;
+   layer?: string;
+-  nodeModulesReconstructedLookup?: boolean;
++  allowNodeModulesSuffixMatch?: boolean;
+   import?: string;
+ } & Record<string, unknown>;
+ 
+diff --git a/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.module-matching.test.ts b/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.module-matching.test.ts
+index ede25f92f94..bed27e53771 100644
+--- a/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.module-matching.test.ts
++++ b/packages/enhanced/test/unit/sharing/ProvideSharedPlugin/ProvideSharedPlugin.module-matching.test.ts
+@@ -637,7 +637,7 @@ describe('ProvideSharedPlugin', () => {
+           provides: {
+             'lodash/': {
+               version: '4.17.0',
+-              nodeModulesReconstructedLookup: true,
++              allowNodeModulesSuffixMatch: true,
+             },
+           },
+         });
+@@ -699,7 +699,7 @@ describe('ProvideSharedPlugin', () => {
+           provides: {
+             'lodash/': {
+               version: '4.17.0',
+-              nodeModulesReconstructedLookup: true,
++              allowNodeModulesSuffixMatch: true,
+               include: {
+                 request: /utils/, // Should match reconstructed path
+               },

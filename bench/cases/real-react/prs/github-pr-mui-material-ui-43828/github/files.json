@@ -1,0 +1,98 @@
+[
+  {
+    "sha": "bfbd505f82f8fa7b5d590f915bc7da53d5cce4c9",
+    "filename": "packages/mui-base/src/unstable_useModal/ModalManager.test.ts",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 4,
+    "changes": 8,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-base%2Fsrc%2Funstable_useModal%2FModalManager.test.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-base%2Fsrc%2Funstable_useModal%2FModalManager.test.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-base%2Fsrc%2Funstable_useModal%2FModalManager.test.ts?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -135,8 +135,8 @@ describe('ModalManager', () => {\n       modalManager.add(modal, container1);\n       modalManager.mount(modal, {});\n       expect(container1.style.overflow).to.equal('hidden');\n-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);\n-      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(document)}px`);\n+      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);\n+      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(window)}px`);\n       modalManager.remove(modal);\n       expect(container1.style.overflow).to.equal('');\n       expect(container1.style.paddingRight).to.equal('20px');\n@@ -171,8 +171,8 @@ describe('ModalManager', () => {\n       modalManager.add(modal, container1);\n       modalManager.mount(modal, {});\n       expect(container1.style.overflow).to.equal('hidden');\n-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);\n-      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(document)}px`);\n+      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);\n+      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(window)}px`);\n       modalManager.remove(modal);\n       expect(container1.style.overflow).to.equal('');\n       expect(container1.style.paddingRight).to.equal('20px');"
+  },
+  {
+    "sha": "89a76e61cf9dac04257c1a49cbff5c49a85addb0",
+    "filename": "packages/mui-base/src/unstable_useModal/ModalManager.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-base%2Fsrc%2Funstable_useModal%2FModalManager.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-base%2Fsrc%2Funstable_useModal%2FModalManager.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-base%2Fsrc%2Funstable_useModal%2FModalManager.ts?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -100,7 +100,7 @@ function handleContainer(containerInfo: Container, props: ManagedModalProps) {\n   if (!props.disableScrollLock) {\n     if (isOverflowing(container)) {\n       // Compute the size before applying overflow hidden to avoid any scroll jumps.\n-      const scrollbarSize = getScrollbarSize(ownerDocument(container));\n+      const scrollbarSize = getScrollbarSize(ownerWindow(container));\n \n       restoreStyle.push({\n         value: container.style.paddingRight,"
+  },
+  {
+    "sha": "6774b003ad9f00a35ddf84bedd1000b638623b46",
+    "filename": "packages/mui-material/src/MenuList/MenuList.js",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 1,
+    "changes": 3,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FMenuList%2FMenuList.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FMenuList%2FMenuList.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2FMenuList%2FMenuList.js?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -7,6 +7,7 @@ import List from '../List';\n import getScrollbarSize from '../utils/getScrollbarSize';\n import useForkRef from '../utils/useForkRef';\n import useEnhancedEffect from '../utils/useEnhancedEffect';\n+import { ownerWindow } from '../utils';\n \n function nextItem(list, item, disableListWrap) {\n   if (list === item) {\n@@ -130,7 +131,7 @@ const MenuList = React.forwardRef(function MenuList(props, ref) {\n         // of the menu.\n         const noExplicitWidth = !listRef.current.style.width;\n         if (containerElement.clientHeight < listRef.current.clientHeight && noExplicitWidth) {\n-          const scrollbarSize = `${getScrollbarSize(ownerDocument(containerElement))}px`;\n+          const scrollbarSize = `${getScrollbarSize(ownerWindow(containerElement))}px`;\n           listRef.current.style[direction === 'rtl' ? 'paddingLeft' : 'paddingRight'] =\n             scrollbarSize;\n           listRef.current.style.width = `calc(100% + ${scrollbarSize})`;"
+  },
+  {
+    "sha": "1b4b7ae33278fb5d17e6deea3c94e69d91225f74",
+    "filename": "packages/mui-material/src/MenuList/MenuList.test.js",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FMenuList%2FMenuList.test.js",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FMenuList%2FMenuList.test.js",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2FMenuList%2FMenuList.test.js?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -63,7 +63,7 @@ describe('<MenuList />', () => {\n   });\n \n   describe('actions: adjustStyleForScrollbar', () => {\n-    const expectedPadding = `${getScrollbarSize(document)}px`;\n+    const expectedPadding = `${getScrollbarSize(window)}px`;\n \n     it('should not adjust style when container element height is greater', () => {\n       const menuListActionsRef = React.createRef();"
+  },
+  {
+    "sha": "bfbd505f82f8fa7b5d590f915bc7da53d5cce4c9",
+    "filename": "packages/mui-material/src/Modal/ModalManager.test.ts",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 4,
+    "changes": 8,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FModal%2FModalManager.test.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FModal%2FModalManager.test.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2FModal%2FModalManager.test.ts?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -135,8 +135,8 @@ describe('ModalManager', () => {\n       modalManager.add(modal, container1);\n       modalManager.mount(modal, {});\n       expect(container1.style.overflow).to.equal('hidden');\n-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);\n-      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(document)}px`);\n+      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);\n+      expect(fixedNode.style.paddingRight).to.equal(`${14 + getScrollbarSize(window)}px`);\n       modalManager.remove(modal);\n       expect(container1.style.overflow).to.equal('');\n       expect(container1.style.paddingRight).to.equal('20px');\n@@ -171,8 +171,8 @@ describe('ModalManager', () => {\n       modalManager.add(modal, container1);\n       modalManager.mount(modal, {});\n       expect(container1.style.overflow).to.equal('hidden');\n-      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(document)}px`);\n-      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(document)}px`);\n+      expect(container1.style.paddingRight).to.equal(`${20 + getScrollbarSize(window)}px`);\n+      expect(fixedNode.style.paddingRight).to.equal(`${getScrollbarSize(window)}px`);\n       modalManager.remove(modal);\n       expect(container1.style.overflow).to.equal('');\n       expect(container1.style.paddingRight).to.equal('20px');"
+  },
+  {
+    "sha": "89a76e61cf9dac04257c1a49cbff5c49a85addb0",
+    "filename": "packages/mui-material/src/Modal/ModalManager.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FModal%2FModalManager.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-material%2Fsrc%2FModal%2FModalManager.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-material%2Fsrc%2FModal%2FModalManager.ts?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -100,7 +100,7 @@ function handleContainer(containerInfo: Container, props: ManagedModalProps) {\n   if (!props.disableScrollLock) {\n     if (isOverflowing(container)) {\n       // Compute the size before applying overflow hidden to avoid any scroll jumps.\n-      const scrollbarSize = getScrollbarSize(ownerDocument(container));\n+      const scrollbarSize = getScrollbarSize(ownerWindow(container));\n \n       restoreStyle.push({\n         value: container.style.paddingRight,"
+  },
+  {
+    "sha": "75409922795a6b2cfbdbb78ba3fc7841de425dda",
+    "filename": "packages/mui-utils/src/getScrollbarSize/getScrollbarSize.test.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-utils%2Fsrc%2FgetScrollbarSize%2FgetScrollbarSize.test.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-utils%2Fsrc%2FgetScrollbarSize%2FgetScrollbarSize.test.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-utils%2Fsrc%2FgetScrollbarSize%2FgetScrollbarSize.test.ts?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -28,6 +28,6 @@ describe('getScrollbarSize', () => {\n     document.head.appendChild(styleElement);\n     divElement.style.height = '2000px';\n     document.body.appendChild(divElement);\n-    expect(getScrollbarSize(document)).to.equal(5);\n+    expect(getScrollbarSize(window)).to.equal(5);\n   });\n });"
+  },
+  {
+    "sha": "2cc378ca44a12483f22b5d2f8b25573549667f3c",
+    "filename": "packages/mui-utils/src/getScrollbarSize/getScrollbarSize.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/mui/material-ui/blob/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-utils%2Fsrc%2FgetScrollbarSize%2FgetScrollbarSize.ts",
+    "raw_url": "https://github.com/mui/material-ui/raw/3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc/packages%2Fmui-utils%2Fsrc%2FgetScrollbarSize%2FgetScrollbarSize.ts",
+    "contents_url": "https://api.github.com/repos/mui/material-ui/contents/packages%2Fmui-utils%2Fsrc%2FgetScrollbarSize%2FgetScrollbarSize.ts?ref=3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "patch": "@@ -1,7 +1,7 @@\n // A change of the browser zoom change the scrollbar size.\n // Credit https://github.com/twbs/bootstrap/blob/488fd8afc535ca3a6ad4dc581f5e89217b6a36ac/js/src/util/scrollbar.js#L14-L18\n-export default function getScrollbarSize(doc: Document): number {\n+export default function getScrollbarSize(win: Window = window): number {\n   // https://developer.mozilla.org/en-US/docs/Web/API/Window/innerWidth#usage_notes\n-  const documentWidth = doc.documentElement.clientWidth;\n-  return Math.abs(doc.defaultView!.innerWidth - documentWidth);\n+  const documentWidth = win.document.documentElement.clientWidth;\n+  return win.innerWidth - documentWidth;\n }"
+  }
+]

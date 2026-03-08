@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-43828",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/material-ui#43828: [core][Drawer] Refactor getScrollbarSize usages",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 43828,
+    "prUrl": "https://github.com/mui/material-ui/pull/43828",
+    "baseSha": "43c14e038a0ac5c92e58b760b43ebac3fe28b028",
+    "headSha": "3f8687a6e7c919d5373dd4454ea19c6e7f7b37fc",
+    "selectedFiles": [
+      "packages/mui-base/src/unstable_useModal/ModalManager.ts"
+    ],
+    "collectedAt": "2026-03-08T03:39:34.894Z"
+  },
+  "files": [
+    {
+      "id": "packages/mui-base/src/unstable_useModal/ModalManager.ts",
+      "oldPath": "packages/mui-base/src/unstable_useModal/ModalManager.ts",
+      "newPath": "packages/mui-base/src/unstable_useModal/ModalManager.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/mui-base/src/unstable_useModal/ModalManager.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 103,
+          "endLine": 103
+        },
+        "newRange": {
+          "startLine": 103,
+          "endLine": 103
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "sha": "7ab0bad2358ed21c6066b55ef4d0dee152424755",
+    "filename": ".changeset/fix-global-install-output.md",
+    "status": "added",
+    "additions": 6,
+    "deletions": 0,
+    "changes": 6,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/2fe240b22ed97bdcfa89f62c1989324b338d7d50/.changeset%2Ffix-global-install-output.md",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/2fe240b22ed97bdcfa89f62c1989324b338d7d50/.changeset%2Ffix-global-install-output.md",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/.changeset%2Ffix-global-install-output.md?ref=2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+    "patch": "@@ -0,0 +1,6 @@\n+---\n+\"@pnpm/default-reporter\": patch\n+\"pnpm\": patch\n+---\n+\n+Fixed the output of global install to show a clean install summary instead of displaying ugly temporary directory paths in progress output."
+  },
+  {
+    "sha": "e159e9041f6d5204a0e01a2a0081fdd53442483a",
+    "filename": "cli/default-reporter/src/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/cli%2Fdefault-reporter%2Fsrc%2Findex.ts?ref=2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+    "patch": "@@ -275,7 +275,7 @@ export function toOutput$ (\n       throttleProgress: opts.reportingOptions?.throttleProgress,\n       width: opts.reportingOptions?.outputMaxWidth,\n       hideAddedPkgsProgress: opts.reportingOptions?.hideAddedPkgsProgress,\n-      hideProgressPrefix: opts.reportingOptions?.hideProgressPrefix ?? (cmd === 'dlx'),\n+      hideProgressPrefix: opts.reportingOptions?.hideProgressPrefix ?? (cmd === 'dlx' || opts.context.config?.global === true),\n       hideLifecycleOutput: opts.reportingOptions?.hideLifecycleOutput,\n       hideLifecyclePrefix: opts.reportingOptions?.hideLifecyclePrefix,\n       approveBuildsInstructionText: opts.reportingOptions?.approveBuildsInstructionText,"
+  },
+  {
+    "sha": "916c38f6e149267c612e38678005a8b69a228a71",
+    "filename": "cli/default-reporter/src/reporterForClient/pkgsDiff.ts",
+    "status": "modified",
+    "additions": 5,
+    "deletions": 3,
+    "changes": 8,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FpkgsDiff.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FpkgsDiff.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FpkgsDiff.ts?ref=2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+    "patch": "@@ -42,20 +42,22 @@ export function getPkgsDiff (\n     packageManifest: Rx.Observable<logs.PackageManifestLog>\n   },\n   opts: {\n-    prefix: string\n+    prefix?: string\n   }\n ): Rx.Observable<PkgsDiff> {\n   const deprecationSet$ = log$.deprecation\n     .pipe(\n-      filter((log) => log.prefix === opts.prefix),\n+      filter((log) => !opts.prefix || log.prefix === opts.prefix),\n       scan((acc, log) => {\n         acc.add(log.pkgId)\n         return acc\n       }, new Set()),\n       startWith(new Set())\n     )\n \n-  const filterPrefix = filter((log: { prefix: string }) => log.prefix === opts.prefix)\n+  const filterPrefix = opts.prefix\n+    ? filter((log: { prefix: string }) => log.prefix === opts.prefix)\n+    : <T>(x: Rx.Observable<T>) => x\n   const pkgsDiff$ = Rx.combineLatest(\n     log$.root.pipe(filterPrefix),\n     deprecationSet$"
+  },
+  {
+    "sha": "affa96805fad3acb4503a4ebd39eb7ccfe8d0b3e",
+    "filename": "cli/default-reporter/src/reporterForClient/reportSummary.ts",
+    "status": "modified",
+    "additions": 2,
+    "deletions": 6,
+    "changes": 8,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/cli%2Fdefault-reporter%2Fsrc%2FreporterForClient%2FreportSummary.ts?ref=2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+    "patch": "@@ -46,7 +46,7 @@ export function reportSummary (\n     pnpmConfig?: Config\n   }\n ): Rx.Observable<Rx.Observable<{ msg: string }>> {\n-  const pkgsDiff$ = getPkgsDiff(log$, { prefix: opts.cwd })\n+  const pkgsDiff$ = getPkgsDiff(log$, { prefix: opts.pnpmConfig?.global ? undefined : opts.cwd })\n \n   const summaryLog$ = log$.summary.pipe(take(1))\n   const _printDiffs = printDiffs.bind(null, { cmd: opts.cmd, prefix: opts.cwd, pnpmConfig: opts.pnpmConfig })\n@@ -68,11 +68,7 @@ export function reportSummary (\n           }\n           if (diffs.length > 0) {\n             msg += EOL\n-            if (opts.pnpmConfig?.global) {\n-              msg += chalk.cyanBright(`${opts.cwd}:`)\n-            } else {\n-              msg += chalk.cyanBright(`${propertyByDependencyType[depType] as string}:`)\n-            }\n+            msg += chalk.cyanBright(opts.pnpmConfig?.global ? 'global:' : `${propertyByDependencyType[depType] as string}:`)\n             msg += EOL\n             msg += _printDiffs(diffs, depType)\n             msg += EOL"
+  },
+  {
+    "sha": "7d89eada96464c2c0f2b4c459474881ea591c464",
+    "filename": "cli/default-reporter/test/index.ts",
+    "status": "modified",
+    "additions": 1,
+    "deletions": 1,
+    "changes": 2,
+    "blob_url": "https://github.com/pnpm/pnpm/blob/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Ftest%2Findex.ts",
+    "raw_url": "https://github.com/pnpm/pnpm/raw/2fe240b22ed97bdcfa89f62c1989324b338d7d50/cli%2Fdefault-reporter%2Ftest%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/pnpm/pnpm/contents/cli%2Fdefault-reporter%2Ftest%2Findex.ts?ref=2fe240b22ed97bdcfa89f62c1989324b338d7d50",
+    "patch": "@@ -404,7 +404,7 @@ test('prints summary for global installation', async () => {\n \n   const output = await firstValueFrom(output$.pipe(take(1), map(normalizeNewline)))\n   expect(output).toBe(EOL + `\\\n-${h1(`${prefix}:`)}\n+${h1('global:')}\n ${ADD} bar ${versionColor('2.0.0')}\n ${ADD} foo ${versionColor('1.0.0')} ${versionColor('(2.0.0 is available)')}\n `)"
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "sha": "72c306a1aca474e5013a48537550f431dc85107b",
+    "filename": ".changeset/clean-starfishes-trade.md",
+    "status": "added",
+    "additions": 7,
+    "deletions": 0,
+    "changes": 7,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/.changeset%2Fclean-starfishes-trade.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/.changeset%2Fclean-starfishes-trade.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Fclean-starfishes-trade.md?ref=9bc1a100e9e80bdf479443e7a7275c6c3f1226c6",
+    "patch": "@@ -0,0 +1,7 @@\n+---\n+\"@zag-js/react\": patch\n+\"@zag-js/solid\": patch\n+\"@zag-js/vue\": patch\n+---\n+\n+Remove `useSetup` hook"
+  },
+  {
+    "sha": "21c0efcb0898a4500026332f0ad8b099bbd8cb4d",
+    "filename": "packages/frameworks/react/src/index.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/packages%2Fframeworks%2Freact%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/packages%2Fframeworks%2Freact%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Freact%2Fsrc%2Findex.ts?ref=9bc1a100e9e80bdf479443e7a7275c6c3f1226c6",
+    "patch": "@@ -2,5 +2,4 @@ export { mergeProps } from \"@zag-js/core\"\n export type { ContextFrom, EventFrom, StateFrom } from \"@zag-js/core\"\n export * from \"./use-actor\"\n export * from \"./use-machine\"\n-export * from \"./use-setup\"\n export * from \"./normalize-props\""
+  },
+  {
+    "sha": "70e1c38f3cea2df5eb161c6117597b02297124ad",
+    "filename": "packages/frameworks/react/src/use-setup.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 26,
+    "changes": 26,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/146aa1364dd83f197104fdb2ac27b5a7896b4c8f/packages%2Fframeworks%2Freact%2Fsrc%2Fuse-setup.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/146aa1364dd83f197104fdb2ac27b5a7896b4c8f/packages%2Fframeworks%2Freact%2Fsrc%2Fuse-setup.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Freact%2Fsrc%2Fuse-setup.ts?ref=146aa1364dd83f197104fdb2ac27b5a7896b4c8f",
+    "patch": "@@ -1,26 +0,0 @@\n-import type { StateMachine as S } from \"@zag-js/core\"\n-import { useEffect, useRef } from \"react\"\n-\n-export type UseSetupProps = {\n-  send: (evt: S.Event<S.AnyEventObject>) => void\n-  id: string | undefined\n-}\n-\n-export function useSetup<T extends HTMLElement = HTMLDivElement>(props: UseSetupProps) {\n-  const { send, id } = props\n-  const ref = useRef<T>(null)\n-  const hasId = useRef(false)\n-\n-  useEffect(() => {\n-    if (!id || hasId.current) return\n-    hasId.current = true\n-\n-    const el = ref.current\n-    const doc = el?.ownerDocument\n-    const root = el?.getRootNode()\n-\n-    send({ type: \"SETUP\", doc, root, id })\n-  }, [id])\n-\n-  return ref\n-}"
+  },
+  {
+    "sha": "e89c3187659cc55404918d697c5f200a2ff3be9e",
+    "filename": "packages/frameworks/solid/src/index.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/packages%2Fframeworks%2Fsolid%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/packages%2Fframeworks%2Fsolid%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fsolid%2Fsrc%2Findex.ts?ref=9bc1a100e9e80bdf479443e7a7275c6c3f1226c6",
+    "patch": "@@ -3,4 +3,3 @@ export type { ContextFrom, EventFrom, StateFrom } from \"@zag-js/core\"\n export * from \"./normalize-props\"\n export * from \"./use-actor\"\n export * from \"./use-machine\"\n-export * from \"./use-setup\""
+  },
+  {
+    "sha": "b10ede76f6c841f2c126fe3299e24c9720ca4828",
+    "filename": "packages/frameworks/solid/src/use-setup.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 23,
+    "changes": 23,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/146aa1364dd83f197104fdb2ac27b5a7896b4c8f/packages%2Fframeworks%2Fsolid%2Fsrc%2Fuse-setup.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/146aa1364dd83f197104fdb2ac27b5a7896b4c8f/packages%2Fframeworks%2Fsolid%2Fsrc%2Fuse-setup.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fsolid%2Fsrc%2Fuse-setup.ts?ref=146aa1364dd83f197104fdb2ac27b5a7896b4c8f",
+    "patch": "@@ -1,23 +0,0 @@\n-import type { StateMachine as S } from \"@zag-js/core\"\n-import { createSignal, onMount } from \"solid-js\"\n-\n-export type UseSetupProps = {\n-  send: (evt: S.Event<S.AnyEventObject>) => void\n-  id: string\n-}\n-\n-export function useSetup<T extends HTMLElement = HTMLDivElement>(props: UseSetupProps) {\n-  const { send, id } = props\n-  const [node, setNode] = createSignal<T>()\n-\n-  onMount(() => {\n-    const el = node()\n-\n-    const doc = el?.ownerDocument\n-    const root = el?.getRootNode()\n-\n-    send({ type: \"SETUP\", doc, root, id })\n-  })\n-\n-  return setNode\n-}"
+  },
+  {
+    "sha": "f852c373f5b32c7389497c2764b3d31a58d0ebc4",
+    "filename": "packages/frameworks/vue/src/index.ts",
+    "status": "modified",
+    "additions": 0,
+    "deletions": 1,
+    "changes": 1,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/packages%2Fframeworks%2Fvue%2Fsrc%2Findex.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/9bc1a100e9e80bdf479443e7a7275c6c3f1226c6/packages%2Fframeworks%2Fvue%2Fsrc%2Findex.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fvue%2Fsrc%2Findex.ts?ref=9bc1a100e9e80bdf479443e7a7275c6c3f1226c6",
+    "patch": "@@ -3,5 +3,4 @@ export type { ContextFrom, EventFrom, StateFrom } from \"@zag-js/core\"\n export * from \"./normalize-props\"\n export * from \"./use-actor\"\n export * from \"./use-machine\"\n-export * from \"./use-setup\"\n export * from \"./use-snapshot\""
+  },
+  {
+    "sha": "010a5bfc1ac62530535ea370397c56cea0209cf8",
+    "filename": "packages/frameworks/vue/src/use-setup.ts",
+    "status": "removed",
+    "additions": 0,
+    "deletions": 27,
+    "changes": 27,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/146aa1364dd83f197104fdb2ac27b5a7896b4c8f/packages%2Fframeworks%2Fvue%2Fsrc%2Fuse-setup.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/146aa1364dd83f197104fdb2ac27b5a7896b4c8f/packages%2Fframeworks%2Fvue%2Fsrc%2Fuse-setup.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fframeworks%2Fvue%2Fsrc%2Fuse-setup.ts?ref=146aa1364dd83f197104fdb2ac27b5a7896b4c8f",
+    "patch": "@@ -1,27 +0,0 @@\n-import type { StateMachine as S } from \"@zag-js/core\"\n-import { ComputedRef, isRef, onMounted, ref, Ref } from \"vue\"\n-\n-type MaybeRef<T> = T | Ref<T> | ComputedRef<T>\n-type MaybeElementRef<T> = MaybeRef<T | null>\n-\n-export type UseSetupProps = {\n-  id: ComputedRef<string> | string\n-  send: (evt: S.Event<S.AnyEventObject>) => void\n-}\n-\n-export function useSetup<T extends HTMLElement = HTMLDivElement>(props: UseSetupProps) {\n-  const { id, send } = props\n-  const nodeRef = ref<MaybeElementRef<T>>(null)\n-\n-  onMounted(() => {\n-    const el = nodeRef.value\n-\n-    const doc = el?.ownerDocument\n-    const root = el?.getRootNode()\n-    const uid = isRef(id) ? id.value : id\n-\n-    send({ type: \"SETUP\", doc, root, id: uid })\n-  })\n-\n-  return nodeRef\n-}"
+  }
+]

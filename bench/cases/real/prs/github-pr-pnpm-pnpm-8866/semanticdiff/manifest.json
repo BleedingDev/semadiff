@@ -1,0 +1,1624 @@
+[
+  {
+    "tracking_name": ".changeset/swift-trainers-unite.md",
+    "diff": "/gh/pnpm/pnpm/diff?new_filename=.changeset%2Fswift-trainers-unite.md&new_oid=ee7b3576399d4b445e48d9954b2a98a5292dc466&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": ".changeset/swift-trainers-unite.md",
+      "oid": "ee7b3576399d4b445e48d9954b2a98a5292dc466",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "1fa2edda4f33d2cacf06470975c6aacadd74d0195f0f01077c05e40966e73c02"
+  },
+  {
+    "tracking_name": ".meta-updater/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=.meta-updater%2Fsrc%2Findex.ts&old_oid=6f090cf80149aee75c06a6cd150b8b070812baaa&old_mode=33188&new_filename=.meta-updater%2Fsrc%2Findex.ts&new_oid=ae8d315dd0d3ca8a41638eeafa7a0e91e27fe584&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": ".meta-updater/src/index.ts",
+      "oid": "6f090cf80149aee75c06a6cd150b8b070812baaa",
+      "mode": 33188
+    },
+    "new": {
+      "name": ".meta-updater/src/index.ts",
+      "oid": "ae8d315dd0d3ca8a41638eeafa7a0e91e27fe584",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e3c95ff9d56a7df3c9c560c7c65f35562a766ffb4fd2e791249b3959f3e45fd8"
+  },
+  {
+    "tracking_name": "__fixtures__/fixtureWithLinks/general/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=__fixtures__%2FfixtureWithLinks%2Fgeneral%2Fpnpm-lock.yaml&old_oid=23e7742f2dab77c08345c70502115b8f0d38f121&old_mode=33188&new_filename=__fixtures__%2FfixtureWithLinks%2Fgeneral%2Fpnpm-lock.yaml&new_oid=6de7ec04697a23f1b059b10d7316f07bd86916b2&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "__fixtures__/fixtureWithLinks/general/pnpm-lock.yaml",
+      "oid": "23e7742f2dab77c08345c70502115b8f0d38f121",
+      "mode": 33188
+    },
+    "new": {
+      "name": "__fixtures__/fixtureWithLinks/general/pnpm-lock.yaml",
+      "oid": "6de7ec04697a23f1b059b10d7316f07bd86916b2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "184a21d0719e54e84050ff3eb780f37dbca044a153756d4845ae666dd07ec16e"
+  },
+  {
+    "tracking_name": "__fixtures__/fixtureWithLinks/with-links-only/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=__fixtures__%2FfixtureWithLinks%2Fwith-links-only%2Fpnpm-lock.yaml&old_oid=91d86925f9975f9e2492e43866b214c041756047&old_mode=33188&new_filename=__fixtures__%2FfixtureWithLinks%2Fwith-links-only%2Fpnpm-lock.yaml&new_oid=f39449349e9a629d96bd19137f02c0d1db6b7f98&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "__fixtures__/fixtureWithLinks/with-links-only/pnpm-lock.yaml",
+      "oid": "91d86925f9975f9e2492e43866b214c041756047",
+      "mode": 33188
+    },
+    "new": {
+      "name": "__fixtures__/fixtureWithLinks/with-links-only/pnpm-lock.yaml",
+      "oid": "f39449349e9a629d96bd19137f02c0d1db6b7f98",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e070a4713654de346b31c4e18ac46405237a2536ace465e8e4fb9870cce503a5"
+  },
+  {
+    "tracking_name": "__fixtures__/has-major-outdated-deps/node_modules/.pnpm/lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=__fixtures__%2Fhas-major-outdated-deps%2Fnode_modules%2F.pnpm%2Flock.yaml&old_oid=b82f33f6e2592913e22da41e22edb89082ccef74&old_mode=33188&new_filename=__fixtures__%2Fhas-major-outdated-deps%2Fnode_modules%2F.pnpm%2Flock.yaml&new_oid=7bccd4e95b73569f5312a4d07e8319f6e0d5f659&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "__fixtures__/has-major-outdated-deps/node_modules/.pnpm/lock.yaml",
+      "oid": "b82f33f6e2592913e22da41e22edb89082ccef74",
+      "mode": 33188
+    },
+    "new": {
+      "name": "__fixtures__/has-major-outdated-deps/node_modules/.pnpm/lock.yaml",
+      "oid": "7bccd4e95b73569f5312a4d07e8319f6e0d5f659",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "00c1071e08bdabcd83ab9a9b4fa4f40d39266bb9d05cecb9e48ced756a0a51b6"
+  },
+  {
+    "tracking_name": "__fixtures__/has-major-outdated-deps/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=__fixtures__%2Fhas-major-outdated-deps%2Fpnpm-lock.yaml&old_oid=2168cf36ae640f5a68aba425aefe45f3fa4d78ab&old_mode=33188&new_filename=__fixtures__%2Fhas-major-outdated-deps%2Fpnpm-lock.yaml&new_oid=a9f2a789b5736a85eeab3d23537bdea4c0911fd2&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "__fixtures__/has-major-outdated-deps/pnpm-lock.yaml",
+      "oid": "2168cf36ae640f5a68aba425aefe45f3fa4d78ab",
+      "mode": 33188
+    },
+    "new": {
+      "name": "__fixtures__/has-major-outdated-deps/pnpm-lock.yaml",
+      "oid": "a9f2a789b5736a85eeab3d23537bdea4c0911fd2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7c1e0835dd057eea844ba39193f7dcb50316c552075d113011249bed2576d991"
+  },
+  {
+    "tracking_name": "__utils__/assert-project/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=__utils__%2Fassert-project%2Fsrc%2Findex.ts&old_oid=28abd3aff20d7e61d85fa7d14b4ed62324cd14b4&old_mode=33188&new_filename=__utils__%2Fassert-project%2Fsrc%2Findex.ts&new_oid=388f27965c6663dd1fc42c5bea6c85cd4bd152c1&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "__utils__/assert-project/src/index.ts",
+      "oid": "28abd3aff20d7e61d85fa7d14b4ed62324cd14b4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "__utils__/assert-project/src/index.ts",
+      "oid": "388f27965c6663dd1fc42c5bea6c85cd4bd152c1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "86a51fd3b8bd201b518529cf00d9eee1937195d08e5dc71ea420ac68789b1a76"
+  },
+  {
+    "tracking_name": "dedupe/check/src/dedupeDiffCheck.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=dedupe%2Fcheck%2Fsrc%2FdedupeDiffCheck.ts&old_oid=7f2243dcc1cdc1cf80245e957086e0fc8e867eff&old_mode=33188&new_filename=dedupe%2Fcheck%2Fsrc%2FdedupeDiffCheck.ts&new_oid=603a06edf533ba98eba0c294bb966c63a11ce253&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "dedupe/check/src/dedupeDiffCheck.ts",
+      "oid": "7f2243dcc1cdc1cf80245e957086e0fc8e867eff",
+      "mode": 33188
+    },
+    "new": {
+      "name": "dedupe/check/src/dedupeDiffCheck.ts",
+      "oid": "603a06edf533ba98eba0c294bb966c63a11ce253",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4695074ed58ad170c9b9478864f46ac01381abcad6ad866e72052acff1b8bfd6"
+  },
+  {
+    "tracking_name": "dedupe/check/test/dedupeDiffCheck.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=dedupe%2Fcheck%2Ftest%2FdedupeDiffCheck.ts&old_oid=1f0960891148adc7bf416a0ea574355dad2683c3&old_mode=33188&new_filename=dedupe%2Fcheck%2Ftest%2FdedupeDiffCheck.ts&new_oid=36c64c7b6f819deabf86cba199eb066cea0e5725&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "dedupe/check/test/dedupeDiffCheck.ts",
+      "oid": "1f0960891148adc7bf416a0ea574355dad2683c3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "dedupe/check/test/dedupeDiffCheck.ts",
+      "oid": "36c64c7b6f819deabf86cba199eb066cea0e5725",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "92bc58171499329d01511d568a601f7fd196e8bf398c620c53d015b56ffa9624"
+  },
+  {
+    "tracking_name": "deps/graph-builder/src/lockfileToDepGraph.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=deps%2Fgraph-builder%2Fsrc%2FlockfileToDepGraph.ts&old_oid=3e34ce1ad729fb821e16330ad3bd12df82b08526&old_mode=33188&new_filename=deps%2Fgraph-builder%2Fsrc%2FlockfileToDepGraph.ts&new_oid=3ea90a5014b130f9564cc200d0e869079b7c9a59&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "deps/graph-builder/src/lockfileToDepGraph.ts",
+      "oid": "3e34ce1ad729fb821e16330ad3bd12df82b08526",
+      "mode": 33188
+    },
+    "new": {
+      "name": "deps/graph-builder/src/lockfileToDepGraph.ts",
+      "oid": "3ea90a5014b130f9564cc200d0e869079b7c9a59",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8f173ae5dd8336cb7827d67503e35b3f1ffc0b2018c80d940f04ef375b161614"
+  },
+  {
+    "tracking_name": "deps/status/src/assertLockfilesEqual.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=deps%2Fstatus%2Fsrc%2FassertLockfilesEqual.ts&old_oid=73befb5d9e39d190a2d46ac940b465a10c3d07fa&old_mode=33188&new_filename=deps%2Fstatus%2Fsrc%2FassertLockfilesEqual.ts&new_oid=4f76d90af1cede395879e7b91f7c0c8e157c2437&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "deps/status/src/assertLockfilesEqual.ts",
+      "oid": "73befb5d9e39d190a2d46ac940b465a10c3d07fa",
+      "mode": 33188
+    },
+    "new": {
+      "name": "deps/status/src/assertLockfilesEqual.ts",
+      "oid": "4f76d90af1cede395879e7b91f7c0c8e157c2437",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "dacb17250e0720226409467fe3f7f0e1817818e64397be74fdfadc22b729c9f9"
+  },
+  {
+    "tracking_name": "deps/status/src/checkDepsStatus.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=deps%2Fstatus%2Fsrc%2FcheckDepsStatus.ts&old_oid=9866e2d4599b55b44a70c92ec4a2d7cbeaf9af81&old_mode=33188&new_filename=deps%2Fstatus%2Fsrc%2FcheckDepsStatus.ts&new_oid=f02d9007edfa1db374a9422c671efe5b117c895c&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "old": {
+      "name": "deps/status/src/checkDepsStatus.ts",
+      "oid": "9866e2d4599b55b44a70c92ec4a2d7cbeaf9af81",
+      "mode": 33188
+    },
+    "new": {
+      "name": "deps/status/src/checkDepsStatus.ts",
+      "oid": "f02d9007edfa1db374a9422c671efe5b117c895c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f4436eab443cf67aea9b1b5ace313742ade05849ab9b78911680ff391dd3fae1"
+  },
+  {
+    "tracking_name": "deps/status/test/assertLockfilesEqual.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=deps%2Fstatus%2Ftest%2FassertLockfilesEqual.test.ts&old_oid=b3e39df2a5d41a1ce473e79a14ebdb9f4872dd27&old_mode=33188&new_filename=deps%2Fstatus%2Ftest%2FassertLockfilesEqual.test.ts&new_oid=398d2c1ece9b435b9bc5623f2916218d791a5509&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "old": {
+      "name": "deps/status/test/assertLockfilesEqual.test.ts",
+      "oid": "b3e39df2a5d41a1ce473e79a14ebdb9f4872dd27",
+      "mode": 33188
+    },
+    "new": {
+      "name": "deps/status/test/assertLockfilesEqual.test.ts",
+      "oid": "398d2c1ece9b435b9bc5623f2916218d791a5509",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "be06cec3e57516fab78f4c80541fe13b8a84f485cf45d9b53f082a2eec3e0a8d"
+  },
+  {
+    "tracking_name": "exec/plugin-commands-rebuild/src/implementation/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=exec%2Fplugin-commands-rebuild%2Fsrc%2Fimplementation%2Findex.ts&old_oid=fd6cf60a751adc57a70509f0f933c35df796549d&old_mode=33188&new_filename=exec%2Fplugin-commands-rebuild%2Fsrc%2Fimplementation%2Findex.ts&new_oid=5dc8cefa308e315f0586496292292411172a1344&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "old": {
+      "name": "exec/plugin-commands-rebuild/src/implementation/index.ts",
+      "oid": "fd6cf60a751adc57a70509f0f933c35df796549d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "exec/plugin-commands-rebuild/src/implementation/index.ts",
+      "oid": "5dc8cefa308e315f0586496292292411172a1344",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "220d610400e26314f003af89a0f80aad3e0765ae7938faf03d47521ec081b877"
+  },
+  {
+    "tracking_name": "hooks/pnpmfile/src/Hooks.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=hooks%2Fpnpmfile%2Fsrc%2FHooks.ts&old_oid=145208723f743a4fc1f5e9e30883390c0178326d&old_mode=33188&new_filename=hooks%2Fpnpmfile%2Fsrc%2FHooks.ts&new_oid=7580f9afa2255f9e2915116a2732099ee3a59f7b&new_mode=33188",
+    "file": "diffs/diff-015.json",
+    "old": {
+      "name": "hooks/pnpmfile/src/Hooks.ts",
+      "oid": "145208723f743a4fc1f5e9e30883390c0178326d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "hooks/pnpmfile/src/Hooks.ts",
+      "oid": "7580f9afa2255f9e2915116a2732099ee3a59f7b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3f9ce1aaea8084c4143a3a19ac7ba4a7e5d0621bb1189ff77803149acd0bd08b"
+  },
+  {
+    "tracking_name": "hooks/types/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=hooks%2Ftypes%2Fsrc%2Findex.ts&old_oid=9c2711ac1a4d9d868f0cdc740e09c4294496642b&old_mode=33188&new_filename=hooks%2Ftypes%2Fsrc%2Findex.ts&new_oid=b801742f139164df36eaf86cefb3bab804a5a9cc&new_mode=33188",
+    "file": "diffs/diff-016.json",
+    "old": {
+      "name": "hooks/types/src/index.ts",
+      "oid": "9c2711ac1a4d9d868f0cdc740e09c4294496642b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "hooks/types/src/index.ts",
+      "oid": "b801742f139164df36eaf86cefb3bab804a5a9cc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "db396c5b934b7f2dba6e834fef06cd400b278fe3911915121bccb4562dc5ba25"
+  },
+  {
+    "tracking_name": "lockfile/audit/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Faudit%2Fsrc%2Findex.ts&old_oid=09b73b343554916b6bc83c57d3e8436ca18c6a7f&old_mode=33188&new_filename=lockfile%2Faudit%2Fsrc%2Findex.ts&new_oid=aedae24ec6b21fc57abcc70028373981edbbe446&new_mode=33188",
+    "file": "diffs/diff-017.json",
+    "old": {
+      "name": "lockfile/audit/src/index.ts",
+      "oid": "09b73b343554916b6bc83c57d3e8436ca18c6a7f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/audit/src/index.ts",
+      "oid": "aedae24ec6b21fc57abcc70028373981edbbe446",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1d04db99fbf1f2bee7e3845d4705bf335af8b55bbe1b8591900858df8f6a6a74"
+  },
+  {
+    "tracking_name": "lockfile/audit/src/lockfileToAuditTree.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Faudit%2Fsrc%2FlockfileToAuditTree.ts&old_oid=7d884797b1327877df28418b6e3afa1905909ca3&old_mode=33188&new_filename=lockfile%2Faudit%2Fsrc%2FlockfileToAuditTree.ts&new_oid=a8be5f7a1ca299fc458bc5591225b6500573a14f&new_mode=33188",
+    "file": "diffs/diff-018.json",
+    "old": {
+      "name": "lockfile/audit/src/lockfileToAuditTree.ts",
+      "oid": "7d884797b1327877df28418b6e3afa1905909ca3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/audit/src/lockfileToAuditTree.ts",
+      "oid": "a8be5f7a1ca299fc458bc5591225b6500573a14f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "13d6f36060d57882b0cdff21774e4077633d7daa817c7a4102324b150f53cc1e"
+  },
+  {
+    "tracking_name": "lockfile/detect-dep-types/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fdetect-dep-types%2Fsrc%2Findex.ts&old_oid=5f7407217da555f2a921c2ac5d30535570f4b969&old_mode=33188&new_filename=lockfile%2Fdetect-dep-types%2Fsrc%2Findex.ts&new_oid=f52af434aa719ae4c4f868a51df5b769295197ff&new_mode=33188",
+    "file": "diffs/diff-019.json",
+    "old": {
+      "name": "lockfile/detect-dep-types/src/index.ts",
+      "oid": "5f7407217da555f2a921c2ac5d30535570f4b969",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/detect-dep-types/src/index.ts",
+      "oid": "f52af434aa719ae4c4f868a51df5b769295197ff",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "cf2d667964eb61367ee632526f2fe5ccddaf14cc623d8ab960da6f197f70611d"
+  },
+  {
+    "tracking_name": "lockfile/filtering/src/filterLockfile.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffiltering%2Fsrc%2FfilterLockfile.ts&old_oid=aad13ed92b354b17052c4a5f596d69519b6cf722&old_mode=33188&new_filename=lockfile%2Ffiltering%2Fsrc%2FfilterLockfile.ts&new_oid=e95a88b78713491e14bae4327efbe278cf74c032&new_mode=33188",
+    "file": "diffs/diff-020.json",
+    "old": {
+      "name": "lockfile/filtering/src/filterLockfile.ts",
+      "oid": "aad13ed92b354b17052c4a5f596d69519b6cf722",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/filtering/src/filterLockfile.ts",
+      "oid": "e95a88b78713491e14bae4327efbe278cf74c032",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "620d67787d4066e1c92215791ed4737cf6066322492948cd0e0dfde4a4ef7428"
+  },
+  {
+    "tracking_name": "lockfile/filtering/src/filterLockfileByImporters.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffiltering%2Fsrc%2FfilterLockfileByImporters.ts&old_oid=6823c25c15a581757028e0709e497d7d636e934f&old_mode=33188&new_filename=lockfile%2Ffiltering%2Fsrc%2FfilterLockfileByImporters.ts&new_oid=00f3be3cf5f852eec2619ef8172629c192072db7&new_mode=33188",
+    "file": "diffs/diff-021.json",
+    "old": {
+      "name": "lockfile/filtering/src/filterLockfileByImporters.ts",
+      "oid": "6823c25c15a581757028e0709e497d7d636e934f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/filtering/src/filterLockfileByImporters.ts",
+      "oid": "00f3be3cf5f852eec2619ef8172629c192072db7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "447b73a5b79635b46c30f35db58c3176c6ac5f556006d161c50cb454f86f7ef4"
+  },
+  {
+    "tracking_name": "lockfile/filtering/src/filterLockfileByImportersAndEngine.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffiltering%2Fsrc%2FfilterLockfileByImportersAndEngine.ts&old_oid=b16749f42213329c80417e5aa901eb3cbfa57dab&old_mode=33188&new_filename=lockfile%2Ffiltering%2Fsrc%2FfilterLockfileByImportersAndEngine.ts&new_oid=7fba769450ab502bc7628cd8949a32324a7fcf4c&new_mode=33188",
+    "file": "diffs/diff-022.json",
+    "old": {
+      "name": "lockfile/filtering/src/filterLockfileByImportersAndEngine.ts",
+      "oid": "b16749f42213329c80417e5aa901eb3cbfa57dab",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/filtering/src/filterLockfileByImportersAndEngine.ts",
+      "oid": "7fba769450ab502bc7628cd8949a32324a7fcf4c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2a1115bbd3ca1ff10ca03d8a1e95be4fa2584e7addf85dbdeabf39dd77ef0f9b"
+  },
+  {
+    "tracking_name": "lockfile/fs/package.json",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Fpackage.json&old_oid=4805ef7dc2e2af3bcc0dbb4ec2ec519a4f488c8b&old_mode=33188&new_filename=lockfile%2Ffs%2Fpackage.json&new_oid=b3ace6e55891626a53fb3db1f8dbec4d419a5cf9&new_mode=33188",
+    "file": "diffs/diff-023.json",
+    "old": {
+      "name": "lockfile/fs/package.json",
+      "oid": "4805ef7dc2e2af3bcc0dbb4ec2ec519a4f488c8b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/package.json",
+      "oid": "b3ace6e55891626a53fb3db1f8dbec4d419a5cf9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5f27f5e455cb7c4e825507a5ab3591d96dc0a0a0c5774e30014d21bb3fd38a08"
+  },
+  {
+    "tracking_name": "lockfile/fs/src/gitMergeFile.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Fsrc%2FgitMergeFile.ts&old_oid=7116ae5d961555959238c42af63a767a65afcb45&old_mode=33188&new_filename=lockfile%2Ffs%2Fsrc%2FgitMergeFile.ts&new_oid=bd06e3bb262de1c38086838c795b5667f0f72016&new_mode=33188",
+    "file": "diffs/diff-024.json",
+    "old": {
+      "name": "lockfile/fs/src/gitMergeFile.ts",
+      "oid": "7116ae5d961555959238c42af63a767a65afcb45",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/src/gitMergeFile.ts",
+      "oid": "bd06e3bb262de1c38086838c795b5667f0f72016",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c36f52b300d61e52e30f510aedb8a9102b373640db10ecfc82813d720d7fc841"
+  },
+  {
+    "tracking_name": "lockfile/fs/src/lockfileFormatConverters.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Fsrc%2FlockfileFormatConverters.ts&old_oid=a33ac1347b9c5637c0d6d30b540986417c037088&old_mode=33188&new_filename=lockfile%2Ffs%2Fsrc%2FlockfileFormatConverters.ts&new_oid=b0ec2c5c9f0419de3ee1292241e5b12007a48abe&new_mode=33188",
+    "file": "diffs/diff-025.json",
+    "old": {
+      "name": "lockfile/fs/src/lockfileFormatConverters.ts",
+      "oid": "a33ac1347b9c5637c0d6d30b540986417c037088",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/src/lockfileFormatConverters.ts",
+      "oid": "b0ec2c5c9f0419de3ee1292241e5b12007a48abe",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "797748a651325e969bc13eec03cc54b395a13740e11bc8c4d44b3f04e96aba19"
+  },
+  {
+    "tracking_name": "lockfile/fs/src/read.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Fsrc%2Fread.ts&old_oid=b5dda8e40161fd4177a07a9b7ef2f79c12505142&old_mode=33188&new_filename=lockfile%2Ffs%2Fsrc%2Fread.ts&new_oid=24e9f162c6b1d12e92cd93ed41afa39b779e2492&new_mode=33188",
+    "file": "diffs/diff-026.json",
+    "old": {
+      "name": "lockfile/fs/src/read.ts",
+      "oid": "b5dda8e40161fd4177a07a9b7ef2f79c12505142",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/src/read.ts",
+      "oid": "24e9f162c6b1d12e92cd93ed41afa39b779e2492",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3f729624ad82119cc62e0074298eff12fa7b70b57b7ce695b54a529a70fe84ae"
+  },
+  {
+    "tracking_name": "lockfile/fs/src/sortLockfileKeys.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Fsrc%2FsortLockfileKeys.ts&old_oid=e8156fd4baca4dc6e243fc836b4f6962f4fe7d9a&old_mode=33188&new_filename=lockfile%2Ffs%2Fsrc%2FsortLockfileKeys.ts&new_oid=a34b0812d31e01e01a923ddac201b4dd80039fb4&new_mode=33188",
+    "file": "diffs/diff-027.json",
+    "old": {
+      "name": "lockfile/fs/src/sortLockfileKeys.ts",
+      "oid": "e8156fd4baca4dc6e243fc836b4f6962f4fe7d9a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/src/sortLockfileKeys.ts",
+      "oid": "a34b0812d31e01e01a923ddac201b4dd80039fb4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ab02f41879c54e0cdecbae8fb1a194170036d7c2e1a16b5eca1c28939f681656"
+  },
+  {
+    "tracking_name": "lockfile/fs/src/write.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Fsrc%2Fwrite.ts&old_oid=0dcb98eac620d6fd7df8477d2c507597185855a8&old_mode=33188&new_filename=lockfile%2Ffs%2Fsrc%2Fwrite.ts&new_oid=60ac2b1b48455e51fe1f5cbe65095477bb98381c&new_mode=33188",
+    "file": "diffs/diff-028.json",
+    "old": {
+      "name": "lockfile/fs/src/write.ts",
+      "oid": "0dcb98eac620d6fd7df8477d2c507597185855a8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/src/write.ts",
+      "oid": "60ac2b1b48455e51fe1f5cbe65095477bb98381c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b7fe625028b75b3c381c3c8cc9667324e1208eaae86d3a768ce73bf62bb843d3"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/fixtures/2/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F2%2Fpnpm-lock.yaml&old_oid=fe028d7a41e3950591519cd0650b7f07da1013c9&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F2%2Fpnpm-lock.yaml&new_oid=f7fe87e4f000a61ee33ffc1d797a657d06735341&new_mode=33188",
+    "file": "diffs/diff-029.json",
+    "old": {
+      "name": "lockfile/fs/test/fixtures/2/pnpm-lock.yaml",
+      "oid": "fe028d7a41e3950591519cd0650b7f07da1013c9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/fixtures/2/pnpm-lock.yaml",
+      "oid": "f7fe87e4f000a61ee33ffc1d797a657d06735341",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "44ae1b79e465984c008a5a475a31c4d46783a7989e2d4c539020a251e5e22c6f"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/fixtures/6/pnpm-lock.branch.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F6%2Fpnpm-lock.branch.yaml&old_oid=3b1c1a7d518eafb0ea2c76d1eeacbbed29c995d0&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F6%2Fpnpm-lock.branch.yaml&new_oid=b8b5dcc103ba57226a545dd793abf83dced1e25e&new_mode=33188",
+    "file": "diffs/diff-030.json",
+    "old": {
+      "name": "lockfile/fs/test/fixtures/6/pnpm-lock.branch.yaml",
+      "oid": "3b1c1a7d518eafb0ea2c76d1eeacbbed29c995d0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/fixtures/6/pnpm-lock.branch.yaml",
+      "oid": "b8b5dcc103ba57226a545dd793abf83dced1e25e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c2945ae851df5b0d8fb9328ecb96c45021c434a6a37dbdd9fc4a5e9262d35f9d"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/fixtures/6/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F6%2Fpnpm-lock.yaml&old_oid=d8399c013fa5e8473bae209d548b00202b543afc&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F6%2Fpnpm-lock.yaml&new_oid=5b27f6ea9f59d19f2430e21b0f74e9275474494c&new_mode=33188",
+    "file": "diffs/diff-031.json",
+    "old": {
+      "name": "lockfile/fs/test/fixtures/6/pnpm-lock.yaml",
+      "oid": "d8399c013fa5e8473bae209d548b00202b543afc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/fixtures/6/pnpm-lock.yaml",
+      "oid": "5b27f6ea9f59d19f2430e21b0f74e9275474494c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5274bd1593bada342b9209832884c9b97636d639a7a6676e51cad53ea597045a"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/fixtures/7/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F7%2Fpnpm-lock.yaml&old_oid=7b8f360e1dc8458427b1061e4f23a743abeed6c4&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2Ffixtures%2F7%2Fpnpm-lock.yaml&new_oid=9ebdaaece59d0efd312595346675226cf9b82824&new_mode=33188",
+    "file": "diffs/diff-032.json",
+    "old": {
+      "name": "lockfile/fs/test/fixtures/7/pnpm-lock.yaml",
+      "oid": "7b8f360e1dc8458427b1061e4f23a743abeed6c4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/fixtures/7/pnpm-lock.yaml",
+      "oid": "9ebdaaece59d0efd312595346675226cf9b82824",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6bab36c1c91b476de5cd5e46ec77ce99df5f2e9c95dc6baa20c4563fdcf52643"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/lockfileFormatConverters.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2FlockfileFormatConverters.test.ts&old_oid=567536538fa20e3e00126774b2c24f86cf47b96e&old_mode=33188",
+    "file": "diffs/diff-033.json",
+    "old": {
+      "name": "lockfile/fs/test/lockfileFormatConverters.test.ts",
+      "oid": "567536538fa20e3e00126774b2c24f86cf47b96e",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "b80d6b0a526de951e0408f63c30d85c365bebe3f204465417ea7c8d166bb81ad"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/lockfileV6Converters.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2FlockfileV6Converters.test.ts&old_oid=c776d6423a49968d0746c8ec18f67a197bb5c154&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2FlockfileV6Converters.test.ts&new_oid=597136005bf2fc014013a7a28dc3040228265c15&new_mode=33188",
+    "file": "diffs/diff-034.json",
+    "old": {
+      "name": "lockfile/fs/test/lockfileV6Converters.test.ts",
+      "oid": "c776d6423a49968d0746c8ec18f67a197bb5c154",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/lockfileV6Converters.test.ts",
+      "oid": "597136005bf2fc014013a7a28dc3040228265c15",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "28d61cdf2a8d0636666be849aedd51a40e8ca8cd448e29e446b07a8e7d6d41de"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/normalizeLockfile.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2FnormalizeLockfile.test.ts&old_oid=fbc80a1b369c94c5f9705d1ca675f075a4148ec9&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2FnormalizeLockfile.test.ts&new_oid=e1de23a84d68d8c77406cf60860d64c85c744a45&new_mode=33188",
+    "file": "diffs/diff-035.json",
+    "old": {
+      "name": "lockfile/fs/test/normalizeLockfile.test.ts",
+      "oid": "fbc80a1b369c94c5f9705d1ca675f075a4148ec9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/normalizeLockfile.test.ts",
+      "oid": "e1de23a84d68d8c77406cf60860d64c85c744a45",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3622b6bd1e5f187feea0892ba9191dcf53527cec331b7bbf13dc09902a592c9e"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/read.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2Fread.test.ts&old_oid=13f07017b09928d866deaa14ce04701e734ce533&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2Fread.test.ts&new_oid=2954bd4588d078d8ecdecd297edb105e0e7ca81f&new_mode=33188",
+    "file": "diffs/diff-036.json",
+    "old": {
+      "name": "lockfile/fs/test/read.test.ts",
+      "oid": "13f07017b09928d866deaa14ce04701e734ce533",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/read.test.ts",
+      "oid": "2954bd4588d078d8ecdecd297edb105e0e7ca81f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "46ea3bfac75213d9525699e7713af947a1343587f641d3a09136bffb11ffc903"
+  },
+  {
+    "tracking_name": "lockfile/fs/test/write.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftest%2Fwrite.test.ts&old_oid=6de0547cb896dc4533746e86ded0600b6e12cf1b&old_mode=33188&new_filename=lockfile%2Ffs%2Ftest%2Fwrite.test.ts&new_oid=42e5aabe2ca2546082779d221e5aadda76cbac63&new_mode=33188",
+    "file": "diffs/diff-037.json",
+    "old": {
+      "name": "lockfile/fs/test/write.test.ts",
+      "oid": "6de0547cb896dc4533746e86ded0600b6e12cf1b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/test/write.test.ts",
+      "oid": "42e5aabe2ca2546082779d221e5aadda76cbac63",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9c4a0790ba37196ed141ca2f5ba5157e69ab308065de8876aee4707dff070d56"
+  },
+  {
+    "tracking_name": "lockfile/fs/tsconfig.json",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ffs%2Ftsconfig.json&old_oid=d5e415657e978fef82e8585c596509585d5bc64c&old_mode=33188&new_filename=lockfile%2Ffs%2Ftsconfig.json&new_oid=c3a8e744f00ac24a0db3d1c1cca908bada6405cc&new_mode=33188",
+    "file": "diffs/diff-038.json",
+    "old": {
+      "name": "lockfile/fs/tsconfig.json",
+      "oid": "d5e415657e978fef82e8585c596509585d5bc64c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/fs/tsconfig.json",
+      "oid": "c3a8e744f00ac24a0db3d1c1cca908bada6405cc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c2d8a5efca834e1e49caf88bcdd215bd8b11144e3c7192e1e54b3664aa53fb92"
+  },
+  {
+    "tracking_name": "lockfile/lockfile-to-pnp/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Flockfile-to-pnp%2Fsrc%2Findex.ts&old_oid=879cd212fd71af38f4e1377a9cff2e486e9513ec&old_mode=33188&new_filename=lockfile%2Flockfile-to-pnp%2Fsrc%2Findex.ts&new_oid=5c3bb01cee0997875363d3f7c436bdb35d73daf5&new_mode=33188",
+    "file": "diffs/diff-039.json",
+    "old": {
+      "name": "lockfile/lockfile-to-pnp/src/index.ts",
+      "oid": "879cd212fd71af38f4e1377a9cff2e486e9513ec",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/lockfile-to-pnp/src/index.ts",
+      "oid": "5c3bb01cee0997875363d3f7c436bdb35d73daf5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "50f6dae98854771e8c2b8bc8e3d73294cc53041d94fe621aed9950426802b744"
+  },
+  {
+    "tracking_name": "lockfile/merger/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fmerger%2Fsrc%2Findex.ts&old_oid=37ff2720f7a4eed27469cf2c17793ae0a96cb37e&old_mode=33188&new_filename=lockfile%2Fmerger%2Fsrc%2Findex.ts&new_oid=07ee2d38c86e6a1fa05a57975e0775caa23afe95&new_mode=33188",
+    "file": "diffs/diff-040.json",
+    "old": {
+      "name": "lockfile/merger/src/index.ts",
+      "oid": "37ff2720f7a4eed27469cf2c17793ae0a96cb37e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/merger/src/index.ts",
+      "oid": "07ee2d38c86e6a1fa05a57975e0775caa23afe95",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d3cdbb447abc5708d681274c2d62b8ad17a5c87664c764e48452ec9cdbb75854"
+  },
+  {
+    "tracking_name": "lockfile/merger/test/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fmerger%2Ftest%2Findex.ts&old_oid=cdd75d1ddec7be42362f1268d47da280559d0539&old_mode=33188&new_filename=lockfile%2Fmerger%2Ftest%2Findex.ts&new_oid=47615c563235e335551ec5381ed028e841247ce8&new_mode=33188",
+    "file": "diffs/diff-041.json",
+    "old": {
+      "name": "lockfile/merger/test/index.ts",
+      "oid": "cdd75d1ddec7be42362f1268d47da280559d0539",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/merger/test/index.ts",
+      "oid": "47615c563235e335551ec5381ed028e841247ce8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e610d7732d0f5e1dea6e5ae13b67233cff92ca7add8bead7a9a0d349c73d2f3c"
+  },
+  {
+    "tracking_name": "lockfile/plugin-commands-audit/test/fixtures/has-vulnerabilities/pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fplugin-commands-audit%2Ftest%2Ffixtures%2Fhas-vulnerabilities%2Fpnpm-lock.yaml&old_oid=2d9e80525eb6515532d604e60498c5474d1b736a&old_mode=33188&new_filename=lockfile%2Fplugin-commands-audit%2Ftest%2Ffixtures%2Fhas-vulnerabilities%2Fpnpm-lock.yaml&new_oid=4ed957540672802e26d5e688b87606cdb6456257&new_mode=33188",
+    "file": "diffs/diff-042.json",
+    "old": {
+      "name": "lockfile/plugin-commands-audit/test/fixtures/has-vulnerabilities/pnpm-lock.yaml",
+      "oid": "2d9e80525eb6515532d604e60498c5474d1b736a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/plugin-commands-audit/test/fixtures/has-vulnerabilities/pnpm-lock.yaml",
+      "oid": "4ed957540672802e26d5e688b87606cdb6456257",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6a44dd77b9e2ff442035f96a6c69e9c8ea9c4c10e353f25125b578a191f5cda2"
+  },
+  {
+    "tracking_name": "lockfile/pruner/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fpruner%2Fsrc%2Findex.ts&old_oid=23aaa0b4d319acd0814ffec2f54d0ee076f62ca9&old_mode=33188&new_filename=lockfile%2Fpruner%2Fsrc%2Findex.ts&new_oid=7975ea8dd8c57e348fa5d33f082ba3d2f9cef6d9&new_mode=33188",
+    "file": "diffs/diff-043.json",
+    "old": {
+      "name": "lockfile/pruner/src/index.ts",
+      "oid": "23aaa0b4d319acd0814ffec2f54d0ee076f62ca9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/pruner/src/index.ts",
+      "oid": "7975ea8dd8c57e348fa5d33f082ba3d2f9cef6d9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9beb8771711fd1ea38f958e4babd72d9c1bce0eddfa3e3d8a2328b3e2e4be38a"
+  },
+  {
+    "tracking_name": "lockfile/settings-checker/src/getOutdatedLockfileSetting.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fsettings-checker%2Fsrc%2FgetOutdatedLockfileSetting.ts&old_oid=14cb38af235aeac779a36cef3a701b86cb849d78&old_mode=33188&new_filename=lockfile%2Fsettings-checker%2Fsrc%2FgetOutdatedLockfileSetting.ts&new_oid=473652652be81d0bb68ebd5e443a74923c5b53b5&new_mode=33188",
+    "file": "diffs/diff-044.json",
+    "old": {
+      "name": "lockfile/settings-checker/src/getOutdatedLockfileSetting.ts",
+      "oid": "14cb38af235aeac779a36cef3a701b86cb849d78",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/settings-checker/src/getOutdatedLockfileSetting.ts",
+      "oid": "473652652be81d0bb68ebd5e443a74923c5b53b5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0a92b60b954f62112a9b9ccb2dad6fbc0e2a108a3ff4794307a45445e062fa1d"
+  },
+  {
+    "tracking_name": "lockfile/types/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ftypes%2Fsrc%2Findex.ts&old_oid=06b788e92017be527e0ab6245d84d325716c04ab&old_mode=33188&new_filename=lockfile%2Ftypes%2Fsrc%2Findex.ts&new_oid=69122cd2cf8e8e73d33968a81dca1a786f55b755&new_mode=33188",
+    "file": "diffs/diff-045.json",
+    "old": {
+      "name": "lockfile/types/src/index.ts",
+      "oid": "06b788e92017be527e0ab6245d84d325716c04ab",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/types/src/index.ts",
+      "oid": "69122cd2cf8e8e73d33968a81dca1a786f55b755",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "50011bd10d83d4cde238fd59f18cf2cbc6d2302a92212f1c8ed60b01985066a8"
+  },
+  {
+    "tracking_name": "lockfile/types/src/lockfileFileTypes.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Ftypes%2Fsrc%2FlockfileFileTypes.ts&old_oid=28d1b63e8415954cbfe065dc2c8cac56683af4b6&old_mode=33188&new_filename=lockfile%2Ftypes%2Fsrc%2FlockfileFileTypes.ts&new_oid=a537bb8a86a98bac416848370327950dd5e10bbd&new_mode=33188",
+    "file": "diffs/diff-046.json",
+    "old": {
+      "name": "lockfile/types/src/lockfileFileTypes.ts",
+      "oid": "28d1b63e8415954cbfe065dc2c8cac56683af4b6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/types/src/lockfileFileTypes.ts",
+      "oid": "a537bb8a86a98bac416848370327950dd5e10bbd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "79894ca3bf5de0becb8e9e0d5e1389189a334a9f11c33f92a0e04b7e88e0d523"
+  },
+  {
+    "tracking_name": "lockfile/utils/src/extendProjectsWithTargetDirs.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Futils%2Fsrc%2FextendProjectsWithTargetDirs.ts&old_oid=dd70752232e3ccb0ab48837ac2c8b80df22ddcfe&old_mode=33188&new_filename=lockfile%2Futils%2Fsrc%2FextendProjectsWithTargetDirs.ts&new_oid=f460263cb1534f4e4bf7d8fdbdb962437a1b1928&new_mode=33188",
+    "file": "diffs/diff-047.json",
+    "old": {
+      "name": "lockfile/utils/src/extendProjectsWithTargetDirs.ts",
+      "oid": "dd70752232e3ccb0ab48837ac2c8b80df22ddcfe",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/utils/src/extendProjectsWithTargetDirs.ts",
+      "oid": "f460263cb1534f4e4bf7d8fdbdb962437a1b1928",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e36a8cf3cb5c8d78b9a104f01689354a788d70b9859b11a54d42f067447fe801"
+  },
+  {
+    "tracking_name": "lockfile/verification/src/allProjectsAreUpToDate.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fverification%2Fsrc%2FallProjectsAreUpToDate.ts&old_oid=bfd83ee8436e46923a2099a3ce580efec6a183a9&old_mode=33188&new_filename=lockfile%2Fverification%2Fsrc%2FallProjectsAreUpToDate.ts&new_oid=bc437b159aaad8d37e1d203d6835c47e9ef92919&new_mode=33188",
+    "file": "diffs/diff-048.json",
+    "old": {
+      "name": "lockfile/verification/src/allProjectsAreUpToDate.ts",
+      "oid": "bfd83ee8436e46923a2099a3ce580efec6a183a9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/verification/src/allProjectsAreUpToDate.ts",
+      "oid": "bc437b159aaad8d37e1d203d6835c47e9ef92919",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8f3f87d835e71175e7229a8476434ac7192c09a4593f72702dc7f1a5e1cd9880"
+  },
+  {
+    "tracking_name": "lockfile/verification/test/allProjectsAreUpToDate.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fverification%2Ftest%2FallProjectsAreUpToDate.test.ts&old_oid=3c110df0b9e9b0a7c8acbcdd2d8722ad6ca4d25b&old_mode=33188&new_filename=lockfile%2Fverification%2Ftest%2FallProjectsAreUpToDate.test.ts&new_oid=917fc20c431aef77bf9bcf8ce96c09cfd981075d&new_mode=33188",
+    "file": "diffs/diff-049.json",
+    "old": {
+      "name": "lockfile/verification/test/allProjectsAreUpToDate.test.ts",
+      "oid": "3c110df0b9e9b0a7c8acbcdd2d8722ad6ca4d25b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/verification/test/allProjectsAreUpToDate.test.ts",
+      "oid": "917fc20c431aef77bf9bcf8ce96c09cfd981075d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a9370393fe1d23785301c5035c49c60a61327065317af9fc4f01e0d9d8952a9d"
+  },
+  {
+    "tracking_name": "lockfile/walker/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=lockfile%2Fwalker%2Fsrc%2Findex.ts&old_oid=59d2ba7127b983d1f41593b828634fbf6cb1fdb4&old_mode=33188&new_filename=lockfile%2Fwalker%2Fsrc%2Findex.ts&new_oid=afc4feaf3990057e9f35c5eebffd82664af27e82&new_mode=33188",
+    "file": "diffs/diff-050.json",
+    "old": {
+      "name": "lockfile/walker/src/index.ts",
+      "oid": "59d2ba7127b983d1f41593b828634fbf6cb1fdb4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "lockfile/walker/src/index.ts",
+      "oid": "afc4feaf3990057e9f35c5eebffd82664af27e82",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5e7ee4267ab8fd648f644273e326a4c9e701aaf5e652e24582436bd0bbcb2baa"
+  },
+  {
+    "tracking_name": "modules-mounter/daemon/src/createFuseHandlers.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=modules-mounter%2Fdaemon%2Fsrc%2FcreateFuseHandlers.ts&old_oid=b0a86cfd2cfc2a13ea54ba72fa3063bbf7113313&old_mode=33188&new_filename=modules-mounter%2Fdaemon%2Fsrc%2FcreateFuseHandlers.ts&new_oid=07d96e4622f9528ed6e4fd061373be6310638436&new_mode=33188",
+    "file": "diffs/diff-051.json",
+    "old": {
+      "name": "modules-mounter/daemon/src/createFuseHandlers.ts",
+      "oid": "b0a86cfd2cfc2a13ea54ba72fa3063bbf7113313",
+      "mode": 33188
+    },
+    "new": {
+      "name": "modules-mounter/daemon/src/createFuseHandlers.ts",
+      "oid": "07d96e4622f9528ed6e4fd061373be6310638436",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9eb86f6e9244ebc8d756cf9831c3067a87ccda3c2ba07d7dfb59c0113f5569e0"
+  },
+  {
+    "tracking_name": "modules-mounter/daemon/src/makeVirtualNodeModules.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=modules-mounter%2Fdaemon%2Fsrc%2FmakeVirtualNodeModules.ts&old_oid=1dc91b1f03d79e7ab2d5d646453f66a7b1ba0e44&old_mode=33188&new_filename=modules-mounter%2Fdaemon%2Fsrc%2FmakeVirtualNodeModules.ts&new_oid=b9ffe7751786440fc09335c5fed804f4f9a48d56&new_mode=33188",
+    "file": "diffs/diff-052.json",
+    "old": {
+      "name": "modules-mounter/daemon/src/makeVirtualNodeModules.ts",
+      "oid": "1dc91b1f03d79e7ab2d5d646453f66a7b1ba0e44",
+      "mode": 33188
+    },
+    "new": {
+      "name": "modules-mounter/daemon/src/makeVirtualNodeModules.ts",
+      "oid": "b9ffe7751786440fc09335c5fed804f4f9a48d56",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2cc6970c1ce50e7e33fdf3dc89f21d730782456db67da9f617ac4c5ee21c0d2e"
+  },
+  {
+    "tracking_name": "packages/calc-dep-state/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=packages%2Fcalc-dep-state%2Fsrc%2Findex.ts&old_oid=169cd6e8a0cf594d534bb0369e8bc6981fb203b4&old_mode=33188&new_filename=packages%2Fcalc-dep-state%2Fsrc%2Findex.ts&new_oid=dfde66fc49e7ae597c35e68bf8ac8e8f9f94293e&new_mode=33188",
+    "file": "diffs/diff-053.json",
+    "old": {
+      "name": "packages/calc-dep-state/src/index.ts",
+      "oid": "169cd6e8a0cf594d534bb0369e8bc6981fb203b4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/calc-dep-state/src/index.ts",
+      "oid": "dfde66fc49e7ae597c35e68bf8ac8e8f9f94293e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d32c3887e38b4cfb1706edd23b064526eb7edcde2d068fd4445354e0bc0415c7"
+  },
+  {
+    "tracking_name": "pkg-manager/core/src/install/extendInstallOptions.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Fsrc%2Finstall%2FextendInstallOptions.ts&old_oid=31e8d7567dd5113e60f3faa5ee496900996d9a8c&old_mode=33188&new_filename=pkg-manager%2Fcore%2Fsrc%2Finstall%2FextendInstallOptions.ts&new_oid=fa5d6be57af6f0be9e2ace602d6adfe946bfa58a&new_mode=33188",
+    "file": "diffs/diff-054.json",
+    "old": {
+      "name": "pkg-manager/core/src/install/extendInstallOptions.ts",
+      "oid": "31e8d7567dd5113e60f3faa5ee496900996d9a8c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/src/install/extendInstallOptions.ts",
+      "oid": "fa5d6be57af6f0be9e2ace602d6adfe946bfa58a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a1c2443550b79ef101112a1352bb1f1cbb9f482c43e13d026d5941b0e32bf9fe"
+  },
+  {
+    "tracking_name": "pkg-manager/core/src/install/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Fsrc%2Finstall%2Findex.ts&old_oid=2eeb9d35a45a5da28391e6730f1a6353d388e165&old_mode=33188&new_filename=pkg-manager%2Fcore%2Fsrc%2Finstall%2Findex.ts&new_oid=b2e4bb30c93360fa2a184a9a89df97193651c09c&new_mode=33188",
+    "file": "diffs/diff-055.json",
+    "old": {
+      "name": "pkg-manager/core/src/install/index.ts",
+      "oid": "2eeb9d35a45a5da28391e6730f1a6353d388e165",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/src/install/index.ts",
+      "oid": "b2e4bb30c93360fa2a184a9a89df97193651c09c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a55b2b46e823dcaad7516caa87322e721f68b86dd9f3287dff3919f16c523da7"
+  },
+  {
+    "tracking_name": "pkg-manager/core/src/install/link.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Fsrc%2Finstall%2Flink.ts&old_oid=353f06a61200c94d71c2003cbee4cac158be3aee&old_mode=33188&new_filename=pkg-manager%2Fcore%2Fsrc%2Finstall%2Flink.ts&new_oid=ae22a29cdf7e4e0b21e206d225464df74b901a83&new_mode=33188",
+    "file": "diffs/diff-056.json",
+    "old": {
+      "name": "pkg-manager/core/src/install/link.ts",
+      "oid": "353f06a61200c94d71c2003cbee4cac158be3aee",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/src/install/link.ts",
+      "oid": "ae22a29cdf7e4e0b21e206d225464df74b901a83",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7afa7dbf5153f29bd229c57524ea3c18e2da23dbc089bbd784984dbbb25a2472"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/excludeLinksFromLockfile.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FexcludeLinksFromLockfile.ts&old_oid=575bccbf28af8709e13f4e8f411756372f43720e&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FexcludeLinksFromLockfile.ts&new_oid=5f874795fcd46089cdd2c4b3e2019464c8b17bcf&new_mode=33188",
+    "file": "diffs/diff-057.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/excludeLinksFromLockfile.ts",
+      "oid": "575bccbf28af8709e13f4e8f411756372f43720e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/excludeLinksFromLockfile.ts",
+      "oid": "5f874795fcd46089cdd2c4b3e2019464c8b17bcf",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6d5838507303dda4e4704a3fe751cb745de990f28bcf8e30bb979c0078e4341e"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/fixLockfile.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FfixLockfile.ts&old_oid=db95fb26f865fe708a136c370faf4eb432b45081&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FfixLockfile.ts&new_oid=f9765067c33c6c6e719861da03df94989cd9b16f&new_mode=33188",
+    "file": "diffs/diff-058.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/fixLockfile.ts",
+      "oid": "db95fb26f865fe708a136c370faf4eb432b45081",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/fixLockfile.ts",
+      "oid": "f9765067c33c6c6e719861da03df94989cd9b16f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "21a71008dbb878409c32f966162c3ed3bb441b9550a1032dd5d3592e464aaf22"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/hooks.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Fhooks.ts&old_oid=6469765105974366ec54dfcc23177db0c01b487c&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Fhooks.ts&new_oid=c8a089423a9b468314d0c42febcaf70c7cb16748&new_mode=33188",
+    "file": "diffs/diff-059.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/hooks.ts",
+      "oid": "6469765105974366ec54dfcc23177db0c01b487c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/hooks.ts",
+      "oid": "c8a089423a9b468314d0c42febcaf70c7cb16748",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "635ab09fa5dca0108397094bfccc621e749324a0b1385217694c29e404d1d095"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/local.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Flocal.ts&old_oid=48e41722176e06f8883528ee0cd82570bbf16d0b&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Flocal.ts&new_oid=c17aa976c79173f7a4871245cf288d3099d5c3d3&new_mode=33188",
+    "file": "diffs/diff-060.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/local.ts",
+      "oid": "48e41722176e06f8883528ee0cd82570bbf16d0b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/local.ts",
+      "oid": "c17aa976c79173f7a4871245cf288d3099d5c3d3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5af8d1d8948f89d356523a13be824b271ab6d9cbd79655715b1ba355ed2921ba"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/lockfileDir.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FlockfileDir.ts&old_oid=c448f0828fd143af4e8927dcddf25f33dbc0229e&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FlockfileDir.ts&new_oid=9b83529b50391f10a4c4dba851b9aae5c0cd7a27&new_mode=33188",
+    "file": "diffs/diff-061.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/lockfileDir.ts",
+      "oid": "c448f0828fd143af4e8927dcddf25f33dbc0229e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/lockfileDir.ts",
+      "oid": "9b83529b50391f10a4c4dba851b9aae5c0cd7a27",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3573deaa80037f0651c7752e7ff8f43408870522787e86c7122f54a81c652077"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/optionalDependencies.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FoptionalDependencies.ts&old_oid=fe73b40c3815d216cb816dc36be29bde6d4db714&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FoptionalDependencies.ts&new_oid=731a767f4f8469b7e854266c2d01e2c137790697&new_mode=33188",
+    "file": "diffs/diff-062.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/optionalDependencies.ts",
+      "oid": "fe73b40c3815d216cb816dc36be29bde6d4db714",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/optionalDependencies.ts",
+      "oid": "731a767f4f8469b7e854266c2d01e2c137790697",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ec1fe2147c27b22e9ee3424f1efb610e69e4db2507f2411a682988a595a0b94d"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/overrides.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Foverrides.ts&old_oid=dea4c41c050c0894dd6d7ca954d0fd09be2c72b0&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Foverrides.ts&new_oid=6f91a07f34f3d58f24fee71d08f0aea758d2d0fc&new_mode=33188",
+    "file": "diffs/diff-063.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/overrides.ts",
+      "oid": "dea4c41c050c0894dd6d7ca954d0fd09be2c72b0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/overrides.ts",
+      "oid": "6f91a07f34f3d58f24fee71d08f0aea758d2d0fc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fd4ce3c74c48f281549f0d3d6bceaa3b3e879b513427c8562548c34054b1ec4a"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/peerDependencies.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FpeerDependencies.ts&old_oid=71792975ed120eb00768e45bfd15a49fa5efd04e&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FpeerDependencies.ts&new_oid=1a7ba188f27a64041c74ba25f233e2ca3aea70dd&new_mode=33188",
+    "file": "diffs/diff-064.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/peerDependencies.ts",
+      "oid": "71792975ed120eb00768e45bfd15a49fa5efd04e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/peerDependencies.ts",
+      "oid": "1a7ba188f27a64041c74ba25f233e2ca3aea70dd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "00f0a3d50591464f44a807f0e833d5b1c35e2ac331dd54376e559050aaa6f524"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/update.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Fupdate.ts&old_oid=a72b5ea8956cbf190247bdf33f30c6b338623cb2&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2Fupdate.ts&new_oid=af2f337adab404415eae0e2eacc51ecd38e352f6&new_mode=33188",
+    "file": "diffs/diff-065.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/update.ts",
+      "oid": "a72b5ea8956cbf190247bdf33f30c6b338623cb2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/update.ts",
+      "oid": "af2f337adab404415eae0e2eacc51ecd38e352f6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2818bd86342dc45ce8f18aeae407d1f17c4c83b9b24ecf8bcef63f75d82ea3ca"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/install/updatingPkgJson.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FupdatingPkgJson.ts&old_oid=3e764e545f5ae3e0287afb7952badd662b59966c&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Finstall%2FupdatingPkgJson.ts&new_oid=ed265e5cea8cc4c0ba3055ddcdd13aa1a05de4c6&new_mode=33188",
+    "file": "diffs/diff-066.json",
+    "old": {
+      "name": "pkg-manager/core/test/install/updatingPkgJson.ts",
+      "oid": "3e764e545f5ae3e0287afb7952badd662b59966c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/install/updatingPkgJson.ts",
+      "oid": "ed265e5cea8cc4c0ba3055ddcdd13aa1a05de4c6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "272576a7f0f9ec0aa356bfa63ecb1fccb367e4c553bcada4af9a37e36db40348"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/lockfile.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Flockfile.ts&old_oid=758ddb2bdeac78d18aa057ab9b52e3f1c694db9c&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Flockfile.ts&new_oid=78aa190ad548763ff05210872dbe6bebb575380f&new_mode=33188",
+    "file": "diffs/diff-067.json",
+    "old": {
+      "name": "pkg-manager/core/test/lockfile.ts",
+      "oid": "758ddb2bdeac78d18aa057ab9b52e3f1c694db9c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/lockfile.ts",
+      "oid": "78aa190ad548763ff05210872dbe6bebb575380f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7a5adfdd88aa5f07a6a1565961975b0b31d34186446382fa34e98b219d0b78c9"
+  },
+  {
+    "tracking_name": "pkg-manager/core/test/uninstall.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fcore%2Ftest%2Funinstall.ts&old_oid=9c3f51349165dbdfc9e40376c8c372cfc8a64d23&old_mode=33188&new_filename=pkg-manager%2Fcore%2Ftest%2Funinstall.ts&new_oid=15d2c2d312e507dd6309ffb481768542837de33e&new_mode=33188",
+    "file": "diffs/diff-068.json",
+    "old": {
+      "name": "pkg-manager/core/test/uninstall.ts",
+      "oid": "9c3f51349165dbdfc9e40376c8c372cfc8a64d23",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/core/test/uninstall.ts",
+      "oid": "15d2c2d312e507dd6309ffb481768542837de33e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3084fae294f286247cbcd1a8aa6976b5a3b35f1dd5ce9bfb81c64443c372b366"
+  },
+  {
+    "tracking_name": "pkg-manager/get-context/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fget-context%2Fsrc%2Findex.ts&old_oid=9dcad4dac8c39e41a51146ed905c2e36a962b176&old_mode=33188&new_filename=pkg-manager%2Fget-context%2Fsrc%2Findex.ts&new_oid=03ec1b927122bf5dae595c3a06286a734c8ac245&new_mode=33188",
+    "file": "diffs/diff-069.json",
+    "old": {
+      "name": "pkg-manager/get-context/src/index.ts",
+      "oid": "9dcad4dac8c39e41a51146ed905c2e36a962b176",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/get-context/src/index.ts",
+      "oid": "03ec1b927122bf5dae595c3a06286a734c8ac245",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a380408ce01a6abf32649c5364319c4dce2214519cfef8ef23bf606b470b51cf"
+  },
+  {
+    "tracking_name": "pkg-manager/get-context/src/readLockfiles.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fget-context%2Fsrc%2FreadLockfiles.ts&old_oid=c3e968907085e0fd13a1ea11623a6c4a890f93e3&old_mode=33188&new_filename=pkg-manager%2Fget-context%2Fsrc%2FreadLockfiles.ts&new_oid=0c15c03780da962a45347d03e6348e933e63da15&new_mode=33188",
+    "file": "diffs/diff-070.json",
+    "old": {
+      "name": "pkg-manager/get-context/src/readLockfiles.ts",
+      "oid": "c3e968907085e0fd13a1ea11623a6c4a890f93e3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/get-context/src/readLockfiles.ts",
+      "oid": "0c15c03780da962a45347d03e6348e933e63da15",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "709db684a61209476d159f038c899f3b1c1d4cea89f7ac36364ad33b2ae28661"
+  },
+  {
+    "tracking_name": "pkg-manager/headless/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fheadless%2Fsrc%2Findex.ts&old_oid=ff82470ab1d00b2bbaa5f0b6fbc8384bfb30ecd2&old_mode=33188&new_filename=pkg-manager%2Fheadless%2Fsrc%2Findex.ts&new_oid=f51f120bf94f98738fe8887912a4a89d4e37337e&new_mode=33188",
+    "file": "diffs/diff-071.json",
+    "old": {
+      "name": "pkg-manager/headless/src/index.ts",
+      "oid": "ff82470ab1d00b2bbaa5f0b6fbc8384bfb30ecd2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/headless/src/index.ts",
+      "oid": "f51f120bf94f98738fe8887912a4a89d4e37337e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1579013e37182aad995e17e0d1c2cb2b634b7939792c986844808513344ded68"
+  },
+  {
+    "tracking_name": "pkg-manager/headless/src/lockfileToHoistedDepGraph.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fheadless%2Fsrc%2FlockfileToHoistedDepGraph.ts&old_oid=022e3d6e1b606d9319cc016fdee928854f63458b&old_mode=33188&new_filename=pkg-manager%2Fheadless%2Fsrc%2FlockfileToHoistedDepGraph.ts&new_oid=9c1c06fb351a0fcc12a2922878bd8df7265403ce&new_mode=33188",
+    "file": "diffs/diff-072.json",
+    "old": {
+      "name": "pkg-manager/headless/src/lockfileToHoistedDepGraph.ts",
+      "oid": "022e3d6e1b606d9319cc016fdee928854f63458b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/headless/src/lockfileToHoistedDepGraph.ts",
+      "oid": "9c1c06fb351a0fcc12a2922878bd8df7265403ce",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f8f9197d80d6bd43492c1ec360cd03c62a7a6b64d738ef200127565e0aebb5f3"
+  },
+  {
+    "tracking_name": "pkg-manager/hoist/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fhoist%2Fsrc%2Findex.ts&old_oid=757bdc52b8dedc652c42306c5976bb71b2ebabeb&old_mode=33188&new_filename=pkg-manager%2Fhoist%2Fsrc%2Findex.ts&new_oid=efb0e8a6c423027fd391e9c6486e690df57d0e47&new_mode=33188",
+    "file": "diffs/diff-073.json",
+    "old": {
+      "name": "pkg-manager/hoist/src/index.ts",
+      "oid": "757bdc52b8dedc652c42306c5976bb71b2ebabeb",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/hoist/src/index.ts",
+      "oid": "efb0e8a6c423027fd391e9c6486e690df57d0e47",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fe196d451d5884a7fc35f1186700d38669fc2bcd7ac6db920191d2c0fee7e660"
+  },
+  {
+    "tracking_name": "pkg-manager/modules-cleaner/src/prune.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fmodules-cleaner%2Fsrc%2Fprune.ts&old_oid=81bd4a8a52a3934d27d3c9a7a083370380dfd13e&old_mode=33188&new_filename=pkg-manager%2Fmodules-cleaner%2Fsrc%2Fprune.ts&new_oid=a00fe71d992a9b045bbebeb43d17fde3f0f53858&new_mode=33188",
+    "file": "diffs/diff-074.json",
+    "old": {
+      "name": "pkg-manager/modules-cleaner/src/prune.ts",
+      "oid": "81bd4a8a52a3934d27d3c9a7a083370380dfd13e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/modules-cleaner/src/prune.ts",
+      "oid": "a00fe71d992a9b045bbebeb43d17fde3f0f53858",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "494d01d2e936696b2af0a7338260c27cbc5fb00345ee2506a086d38f974b8365"
+  },
+  {
+    "tracking_name": "pkg-manager/plugin-commands-installation/src/installDeps.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fplugin-commands-installation%2Fsrc%2FinstallDeps.ts&old_oid=cbb1a9dd510e2753eb214d73ef03a347c1c3b382&old_mode=33188&new_filename=pkg-manager%2Fplugin-commands-installation%2Fsrc%2FinstallDeps.ts&new_oid=0bdec507b0e153a7f7995af9905c11345b4fdc74&new_mode=33188",
+    "file": "diffs/diff-075.json",
+    "old": {
+      "name": "pkg-manager/plugin-commands-installation/src/installDeps.ts",
+      "oid": "cbb1a9dd510e2753eb214d73ef03a347c1c3b382",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/plugin-commands-installation/src/installDeps.ts",
+      "oid": "0bdec507b0e153a7f7995af9905c11345b4fdc74",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5e0ed0c5020a36bc0bf7c098de1d46bf306ee6e79195c676ac995ee5540b2bb9"
+  },
+  {
+    "tracking_name": "pkg-manager/plugin-commands-installation/test/addRecursive.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2FaddRecursive.ts&old_oid=92962a579f056979f09925cd35cb2ebff4e1f021&old_mode=33188&new_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2FaddRecursive.ts&new_oid=076121236e781fad3449f39172e58bc3e6cce903&new_mode=33188",
+    "file": "diffs/diff-076.json",
+    "old": {
+      "name": "pkg-manager/plugin-commands-installation/test/addRecursive.ts",
+      "oid": "92962a579f056979f09925cd35cb2ebff4e1f021",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/plugin-commands-installation/test/addRecursive.ts",
+      "oid": "076121236e781fad3449f39172e58bc3e6cce903",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "664fb45c3612abf00d31d5fbe5133ec4790f8e2cd5f56e33dc831705bd708d84"
+  },
+  {
+    "tracking_name": "pkg-manager/plugin-commands-installation/test/dedupe.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2Fdedupe.ts&old_oid=20c813c8fa1f70606c0e8a5a68b63309b0048b74&old_mode=33188&new_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2Fdedupe.ts&new_oid=2ec3241529c11393ad35908eee0a0d92c73e383f&new_mode=33188",
+    "file": "diffs/diff-077.json",
+    "old": {
+      "name": "pkg-manager/plugin-commands-installation/test/dedupe.ts",
+      "oid": "20c813c8fa1f70606c0e8a5a68b63309b0048b74",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/plugin-commands-installation/test/dedupe.ts",
+      "oid": "2ec3241529c11393ad35908eee0a0d92c73e383f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "bb0a866362d49c989dbec78431c7a116532da897e9a7a660563bb58d00f82e3d"
+  },
+  {
+    "tracking_name": "pkg-manager/plugin-commands-installation/test/update/interactive.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2Fupdate%2Finteractive.ts&old_oid=07d06152caba43ed42887d41ee87707e976ae160&old_mode=33188&new_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2Fupdate%2Finteractive.ts&new_oid=f124ed663a936cc57611e9221732f93a3d1ecadf&new_mode=33188",
+    "file": "diffs/diff-078.json",
+    "old": {
+      "name": "pkg-manager/plugin-commands-installation/test/update/interactive.ts",
+      "oid": "07d06152caba43ed42887d41ee87707e976ae160",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/plugin-commands-installation/test/update/interactive.ts",
+      "oid": "f124ed663a936cc57611e9221732f93a3d1ecadf",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f82702092e73632f4de5df64ebf5f3f1eed5546d3161b3253cc6147e6cb3d5e3"
+  },
+  {
+    "tracking_name": "pkg-manager/plugin-commands-installation/test/update/recursive.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2Fupdate%2Frecursive.ts&old_oid=1d24d39ffb5125f5089d3994b7df8c946393ae97&old_mode=33188&new_filename=pkg-manager%2Fplugin-commands-installation%2Ftest%2Fupdate%2Frecursive.ts&new_oid=246bc589edd2d18c748f96692b0e2d9376e1abda&new_mode=33188",
+    "file": "diffs/diff-079.json",
+    "old": {
+      "name": "pkg-manager/plugin-commands-installation/test/update/recursive.ts",
+      "oid": "1d24d39ffb5125f5089d3994b7df8c946393ae97",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/plugin-commands-installation/test/update/recursive.ts",
+      "oid": "246bc589edd2d18c748f96692b0e2d9376e1abda",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c716835252557336d8471f4ef5956b804e48e1c061cb9c78806127e37a42dd3e"
+  },
+  {
+    "tracking_name": "pkg-manager/real-hoist/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Freal-hoist%2Fsrc%2Findex.ts&old_oid=e56776827a465147ce44f2699b770bd5a4cb5d9f&old_mode=33188&new_filename=pkg-manager%2Freal-hoist%2Fsrc%2Findex.ts&new_oid=f76141880608cb3fb3798c76785109b3f3bc4559&new_mode=33188",
+    "file": "diffs/diff-080.json",
+    "old": {
+      "name": "pkg-manager/real-hoist/src/index.ts",
+      "oid": "e56776827a465147ce44f2699b770bd5a4cb5d9f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/real-hoist/src/index.ts",
+      "oid": "f76141880608cb3fb3798c76785109b3f3bc4559",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "203eaa10a97226737143f91947d84ca6458f3b18c886f1fa8c5c2fde49815b71"
+  },
+  {
+    "tracking_name": "pkg-manager/resolve-dependencies/src/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2Findex.ts&old_oid=1a4da9b931edfc4fe759ce00096d406693ea2c21&old_mode=33188&new_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2Findex.ts&new_oid=9bc0df9e42ec7942919435f0ee5efb9cd8f28698&new_mode=33188",
+    "file": "diffs/diff-081.json",
+    "old": {
+      "name": "pkg-manager/resolve-dependencies/src/index.ts",
+      "oid": "1a4da9b931edfc4fe759ce00096d406693ea2c21",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/resolve-dependencies/src/index.ts",
+      "oid": "9bc0df9e42ec7942919435f0ee5efb9cd8f28698",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f07609f178e1cb78da53c4532059db3919c224b798e1be919f703d971e2fd998"
+  },
+  {
+    "tracking_name": "pkg-manager/resolve-dependencies/src/resolveDependencies.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2FresolveDependencies.ts&old_oid=5082cf3111b0c67d66d1187a2fda082fb22017da&old_mode=33188&new_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2FresolveDependencies.ts&new_oid=9afef9eea4062281e92eebb7c2e5f5b7386a720f&new_mode=33188",
+    "file": "diffs/diff-082.json",
+    "old": {
+      "name": "pkg-manager/resolve-dependencies/src/resolveDependencies.ts",
+      "oid": "5082cf3111b0c67d66d1187a2fda082fb22017da",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/resolve-dependencies/src/resolveDependencies.ts",
+      "oid": "9afef9eea4062281e92eebb7c2e5f5b7386a720f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "cde1b8a7bbba772475e06dbae7364c2350eaba6a4aafd88d92d1df6294374ff9"
+  },
+  {
+    "tracking_name": "pkg-manager/resolve-dependencies/src/resolveDependencyTree.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2FresolveDependencyTree.ts&old_oid=a559fa3dd195eda55a7c224de7a7a581447aaf3a&old_mode=33188&new_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2FresolveDependencyTree.ts&new_oid=17bb94f1425e8dc6049c32f883f45f00e96740ee&new_mode=33188",
+    "file": "diffs/diff-083.json",
+    "old": {
+      "name": "pkg-manager/resolve-dependencies/src/resolveDependencyTree.ts",
+      "oid": "a559fa3dd195eda55a7c224de7a7a581447aaf3a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/resolve-dependencies/src/resolveDependencyTree.ts",
+      "oid": "17bb94f1425e8dc6049c32f883f45f00e96740ee",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1b584cd790df9b295fe50729fc93ccd8088f2f7f85851ea3f6732cd69fc2183c"
+  },
+  {
+    "tracking_name": "pkg-manager/resolve-dependencies/src/updateLockfile.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2FupdateLockfile.ts&old_oid=4514de64e8e289752755af7681077dbed52cad56&old_mode=33188&new_filename=pkg-manager%2Fresolve-dependencies%2Fsrc%2FupdateLockfile.ts&new_oid=d1adf3af03bf9a1b84c0aeb6a75495207a1bbbc8&new_mode=33188",
+    "file": "diffs/diff-084.json",
+    "old": {
+      "name": "pkg-manager/resolve-dependencies/src/updateLockfile.ts",
+      "oid": "4514de64e8e289752755af7681077dbed52cad56",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pkg-manager/resolve-dependencies/src/updateLockfile.ts",
+      "oid": "d1adf3af03bf9a1b84c0aeb6a75495207a1bbbc8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "442a196eaaf44a979b9055644250dc8fbf053c8f047099f3a2deae559a15397e"
+  },
+  {
+    "tracking_name": "pnpm-lock.yaml",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm-lock.yaml&old_oid=1a90db487bf88549af3e8753e6c573ab6fc8adaf&old_mode=33188&new_filename=pnpm-lock.yaml&new_oid=6e2b51faa57f73081f972805b3c482b9023de372&new_mode=33188",
+    "file": "diffs/diff-085.json",
+    "old": {
+      "name": "pnpm-lock.yaml",
+      "oid": "1a90db487bf88549af3e8753e6c573ab6fc8adaf",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm-lock.yaml",
+      "oid": "6e2b51faa57f73081f972805b3c482b9023de372",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "32824c984905bb02bc7ffcef96a77addd1f1602cff71a11fbbfdd7f53ee026bb"
+  },
+  {
+    "tracking_name": "pnpm/test/install/hooks.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Ftest%2Finstall%2Fhooks.ts&old_oid=735c13c98e95b73fdd96e2aa6966b96939e5b492&old_mode=33188&new_filename=pnpm%2Ftest%2Finstall%2Fhooks.ts&new_oid=0f6f8a43f12d1967ce0f9f295f2fec07bb3e2848&new_mode=33188",
+    "file": "diffs/diff-086.json",
+    "old": {
+      "name": "pnpm/test/install/hooks.ts",
+      "oid": "735c13c98e95b73fdd96e2aa6966b96939e5b492",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/test/install/hooks.ts",
+      "oid": "0f6f8a43f12d1967ce0f9f295f2fec07bb3e2848",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fa40bb39f64d34136a012c7cc6186b880ba56ebdeaf5d5a1e548022f56792011"
+  },
+  {
+    "tracking_name": "pnpm/test/install/misc.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Ftest%2Finstall%2Fmisc.ts&old_oid=6d5bf2d0e7f45a49c5cd04fde7833e979cd76029&old_mode=33188&new_filename=pnpm%2Ftest%2Finstall%2Fmisc.ts&new_oid=3e92464c8fae6ca1398a2261422bcf3550a08bce&new_mode=33188",
+    "file": "diffs/diff-087.json",
+    "old": {
+      "name": "pnpm/test/install/misc.ts",
+      "oid": "6d5bf2d0e7f45a49c5cd04fde7833e979cd76029",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/test/install/misc.ts",
+      "oid": "3e92464c8fae6ca1398a2261422bcf3550a08bce",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9ad18cfcfe7bf2ccad4eadaed2137910cbbb41b0e5e1633447f108bcf18c6c07"
+  },
+  {
+    "tracking_name": "pnpm/test/monorepo/dedupePeers.test.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Ftest%2Fmonorepo%2FdedupePeers.test.ts&old_oid=4d72e5ba3ca571872ceed3ddf0c844ed4227cfc7&old_mode=33188&new_filename=pnpm%2Ftest%2Fmonorepo%2FdedupePeers.test.ts&new_oid=2c093a21ddee65c53f45274e9b4ff5b8c8bb1334&new_mode=33188",
+    "file": "diffs/diff-088.json",
+    "old": {
+      "name": "pnpm/test/monorepo/dedupePeers.test.ts",
+      "oid": "4d72e5ba3ca571872ceed3ddf0c844ed4227cfc7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/test/monorepo/dedupePeers.test.ts",
+      "oid": "2c093a21ddee65c53f45274e9b4ff5b8c8bb1334",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "44718bd93512f79150f840e956e081ca8a4fd61132edc46c42453879575e96d0"
+  },
+  {
+    "tracking_name": "pnpm/test/monorepo/index.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Ftest%2Fmonorepo%2Findex.ts&old_oid=7e09f249d3cd113eef53a99c27becbbb27482b2c&old_mode=33188&new_filename=pnpm%2Ftest%2Fmonorepo%2Findex.ts&new_oid=991bbebe5a261283b81da7f0bb10928ba6286b3e&new_mode=33188",
+    "file": "diffs/diff-089.json",
+    "old": {
+      "name": "pnpm/test/monorepo/index.ts",
+      "oid": "7e09f249d3cd113eef53a99c27becbbb27482b2c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/test/monorepo/index.ts",
+      "oid": "991bbebe5a261283b81da7f0bb10928ba6286b3e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a33fbe94fc64b583eb97226d7993705654c247987a10cf376df5aae7e9b5f37f"
+  },
+  {
+    "tracking_name": "pnpm/test/monorepo/peerDependencies.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Ftest%2Fmonorepo%2FpeerDependencies.ts&old_oid=d7f35afa9935e8a857c970fe211b3398032ca90a&old_mode=33188&new_filename=pnpm%2Ftest%2Fmonorepo%2FpeerDependencies.ts&new_oid=fe14eeb62fcbefe93bb424f54ac6bac16cc39037&new_mode=33188",
+    "file": "diffs/diff-090.json",
+    "old": {
+      "name": "pnpm/test/monorepo/peerDependencies.ts",
+      "oid": "d7f35afa9935e8a857c970fe211b3398032ca90a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/test/monorepo/peerDependencies.ts",
+      "oid": "fe14eeb62fcbefe93bb424f54ac6bac16cc39037",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "315dd6af1ae17d67a7bffb96fd686364ef5139c13814588852beaccbaa9d93aa"
+  },
+  {
+    "tracking_name": "pnpm/test/recursive/misc.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=pnpm%2Ftest%2Frecursive%2Fmisc.ts&old_oid=28d5045801a0925162bc5ce0a109c2cf31e329e2&old_mode=33188&new_filename=pnpm%2Ftest%2Frecursive%2Fmisc.ts&new_oid=5696933d905967bf4cd186b6a146636534e9b86c&new_mode=33188",
+    "file": "diffs/diff-091.json",
+    "old": {
+      "name": "pnpm/test/recursive/misc.ts",
+      "oid": "28d5045801a0925162bc5ce0a109c2cf31e329e2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "pnpm/test/recursive/misc.ts",
+      "oid": "5696933d905967bf4cd186b6a146636534e9b86c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "63fc12bf1b75aa6b4c60e8e7cd9d9cc10ff7a7373a80f72da64f1e69d1d5f9ab"
+  },
+  {
+    "tracking_name": "reviewing/dependencies-hierarchy/src/buildDependenciesHierarchy.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=reviewing%2Fdependencies-hierarchy%2Fsrc%2FbuildDependenciesHierarchy.ts&old_oid=a28dd8297f16ce08904c5defc44690e5c9707f4a&old_mode=33188&new_filename=reviewing%2Fdependencies-hierarchy%2Fsrc%2FbuildDependenciesHierarchy.ts&new_oid=841de15fd9851b23ca178d9d136358627ff14738&new_mode=33188",
+    "file": "diffs/diff-092.json",
+    "old": {
+      "name": "reviewing/dependencies-hierarchy/src/buildDependenciesHierarchy.ts",
+      "oid": "a28dd8297f16ce08904c5defc44690e5c9707f4a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "reviewing/dependencies-hierarchy/src/buildDependenciesHierarchy.ts",
+      "oid": "841de15fd9851b23ca178d9d136358627ff14738",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "52868d8e5080b8b50b86280cab4e09ec6862515dac7cea3c901492d2de62a216"
+  },
+  {
+    "tracking_name": "reviewing/license-scanner/src/licenses.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=reviewing%2Flicense-scanner%2Fsrc%2Flicenses.ts&old_oid=8ff06b769ef0cc6f7ce0169788839683826cd6fa&old_mode=33188&new_filename=reviewing%2Flicense-scanner%2Fsrc%2Flicenses.ts&new_oid=7005e9abaee86d2be0a9e54df07219a705422675&new_mode=33188",
+    "file": "diffs/diff-093.json",
+    "old": {
+      "name": "reviewing/license-scanner/src/licenses.ts",
+      "oid": "8ff06b769ef0cc6f7ce0169788839683826cd6fa",
+      "mode": 33188
+    },
+    "new": {
+      "name": "reviewing/license-scanner/src/licenses.ts",
+      "oid": "7005e9abaee86d2be0a9e54df07219a705422675",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f3684a6147343fc47c3141e65d34d340eaf57c9ddc0c9dd3cb0bbe55d209edbf"
+  },
+  {
+    "tracking_name": "reviewing/license-scanner/src/lockfileToLicenseNodeTree.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=reviewing%2Flicense-scanner%2Fsrc%2FlockfileToLicenseNodeTree.ts&old_oid=3e3c89b5c74527899387d80e996c9735a188d3cc&old_mode=33188&new_filename=reviewing%2Flicense-scanner%2Fsrc%2FlockfileToLicenseNodeTree.ts&new_oid=090b117b8bd2a71d1e928a976e13884b652c35cb&new_mode=33188",
+    "file": "diffs/diff-094.json",
+    "old": {
+      "name": "reviewing/license-scanner/src/lockfileToLicenseNodeTree.ts",
+      "oid": "3e3c89b5c74527899387d80e996c9735a188d3cc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "reviewing/license-scanner/src/lockfileToLicenseNodeTree.ts",
+      "oid": "090b117b8bd2a71d1e928a976e13884b652c35cb",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ce4d52432c487a2365f89dded5cef9006f66f913d98359ac064cb19237efde5a"
+  },
+  {
+    "tracking_name": "reviewing/license-scanner/test/licenses.spec.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=reviewing%2Flicense-scanner%2Ftest%2Flicenses.spec.ts&old_oid=217ffaf22578f5f615f30c667cf5df61e79e7e68&old_mode=33188&new_filename=reviewing%2Flicense-scanner%2Ftest%2Flicenses.spec.ts&new_oid=037fbfe5ac358bfb289fd1e269e7dfc0f59601f4&new_mode=33188",
+    "file": "diffs/diff-095.json",
+    "old": {
+      "name": "reviewing/license-scanner/test/licenses.spec.ts",
+      "oid": "217ffaf22578f5f615f30c667cf5df61e79e7e68",
+      "mode": 33188
+    },
+    "new": {
+      "name": "reviewing/license-scanner/test/licenses.spec.ts",
+      "oid": "037fbfe5ac358bfb289fd1e269e7dfc0f59601f4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "703cad18516fa868bd5c478c11183327011e89b8a46455e9db89a899edaa749b"
+  },
+  {
+    "tracking_name": "reviewing/outdated/src/outdated.ts",
+    "diff": "/gh/pnpm/pnpm/diff?old_filename=reviewing%2Foutdated%2Fsrc%2Foutdated.ts&old_oid=7dc55ff72e8466d10b17453403bae1d872ddf07d&old_mode=33188&new_filename=reviewing%2Foutdated%2Fsrc%2Foutdated.ts&new_oid=2e783b7e3952c6fb5508a53e6a434fa6b9bee26f&new_mode=33188",
+    "file": "diffs/diff-096.json",
+    "old": {
+      "name": "reviewing/outdated/src/outdated.ts",
+      "oid": "7dc55ff72e8466d10b17453403bae1d872ddf07d",
+      "mode": 33188
+    },
+    "new": {
+      "name": "reviewing/outdated/src/outdated.ts",
+      "oid": "2e783b7e3952c6fb5508a53e6a434fa6b9bee26f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6e40feeeda3826d9b528c4006d2f1968da06828a08ac08dc89eae58c099faf32"
+  }
+]

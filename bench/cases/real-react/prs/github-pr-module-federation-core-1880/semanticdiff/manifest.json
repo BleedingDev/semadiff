@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/runtime/src/utils/plugin.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fruntime%2Fsrc%2Futils%2Fplugin.ts&old_oid=51550f41bd34c82f32a75c63d22fb1fc320c6998&old_mode=33188&new_filename=packages%2Fruntime%2Fsrc%2Futils%2Fplugin.ts&new_oid=79693d5991c90c01c3a95b3cde0644eb1a30c51e&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/runtime/src/utils/plugin.ts",
+      "oid": "51550f41bd34c82f32a75c63d22fb1fc320c6998",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/runtime/src/utils/plugin.ts",
+      "oid": "79693d5991c90c01c3a95b3cde0644eb1a30c51e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0c4cc14c61c3d6b53abee9963435642a05a1d25decaf764e10a91c4dc1552d67"
+  }
+]

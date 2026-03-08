@@ -1,0 +1,104 @@
+{
+  "id": "github-pr-mui-material-ui-37034",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/material-ui#37034: [internal] Allow type alias as well in hooks API docs generation",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 37034,
+    "prUrl": "https://github.com/mui/material-ui/pull/37034",
+    "baseSha": "fe90fe90b28bf357bec47eaf9641d6bc3a862bd1",
+    "headSha": "9c12b4c9286c60d9b7a80511b40a9bfe32bc0116",
+    "selectedFiles": [
+      "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts"
+    ],
+    "collectedAt": "2026-03-08T03:42:34.060Z"
+  },
+  "files": [
+    {
+      "id": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+      "oldPath": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+      "newPath": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 373,
+          "endLine": 376
+        },
+        "newRange": {
+          "startLine": 373,
+          "endLine": 373
+        }
+      },
+      {
+        "fileId": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 381,
+          "endLine": 381
+        },
+        "newRange": {
+          "startLine": 378,
+          "endLine": 378
+        }
+      },
+      {
+        "fileId": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 385,
+          "endLine": 385
+        },
+        "newRange": {
+          "startLine": 382,
+          "endLine": 382
+        }
+      },
+      {
+        "fileId": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 402,
+          "endLine": 402
+        },
+        "newRange": {
+          "startLine": 399,
+          "endLine": 399
+        }
+      },
+      {
+        "fileId": "packages/api-docs-builder/ApiBuilders/HookApiBuilder.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 436,
+          "endLine": 437
+        },
+        "newRange": {
+          "startLine": 433,
+          "endLine": 434
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,1500 @@
+diff --git a/.changeset/odd-snails-greet.md b/.changeset/odd-snails-greet.md
+new file mode 100644
+index 00000000000..6618ccbd660
+--- /dev/null
++++ b/.changeset/odd-snails-greet.md
+@@ -0,0 +1,5 @@
++---
++'@module-federation/metro': patch
++---
++
++refactor and harden Metro module federation config handling by deduplicating normalized runtime plugins, tightening option validation, and improving warnings for unsupported/deprecated options, including deprecating `plugins` in favor of `runtimePlugins`.
+diff --git a/apps/metro-example-host/ios/Podfile.lock b/apps/metro-example-host/ios/Podfile.lock
+index e884a7c0a15..2371e98e88d 100644
+--- a/apps/metro-example-host/ios/Podfile.lock
++++ b/apps/metro-example-host/ios/Podfile.lock
+@@ -2422,7 +2422,7 @@ SPEC CHECKSUMS:
+   React-timing: a275a1c2e6112dba17f8f7dd496d439213bbea0d
+   React-utils: 449a6e1fd53886510e284e80bdbb1b1c6db29452
+   ReactAppDependencyProvider: 3267432b637c9b38e86961b287f784ee1b08dde0
+-  ReactCodegen: d308d08c58717331dcf82d0129efa8b73e28a64c
++  ReactCodegen: 2539080349c02b1edbf525d0a392df99f984f34b
+   ReactCommon: b028d09a66e60ebd83ca59d8cc9a1216360db147
+   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
+   Yoga: 395b5d614cd7cbbfd76b05d01bd67230a6ad004e
+diff --git a/apps/metro-example-host/metro.config.js b/apps/metro-example-host/metro.config.js
+index 421bcac5c2b..d9940291da5 100644
+--- a/apps/metro-example-host/metro.config.js
++++ b/apps/metro-example-host/metro.config.js
+@@ -52,7 +52,7 @@ module.exports = withModuleFederation(
+       },
+     },
+     shareStrategy: 'loaded-first',
+-    plugins: [path.resolve(__dirname, './runtime-plugin.ts')],
++    runtimePlugins: [path.resolve(__dirname, './runtime-plugin.ts')],
+   },
+   {
+     flags: {
+diff --git a/apps/website-new/docs/en/guide/build-plugins/plugins-metro.mdx b/apps/website-new/docs/en/guide/build-plugins/plugins-metro.mdx
+index d71a80c4a1b..343e67353ed 100644
+--- a/apps/website-new/docs/en/guide/build-plugins/plugins-metro.mdx
++++ b/apps/website-new/docs/en/guide/build-plugins/plugins-metro.mdx
+@@ -238,6 +238,11 @@ export interface ModuleFederationConfig {
+   exposes?: Record<string, string>;
+   shared?: Shared;
+   shareStrategy?: 'loaded-first' | 'version-first';
++  runtimePlugins?: string[];
++  /**
++   * @deprecated Use runtimePlugins instead.
++   * Scheduled for removal in the next major version.
++   */
+   plugins?: string[];
+ }
+ ```
+@@ -254,6 +259,14 @@ export interface SharedConfig {
+ }
+ ```
+ 
++#### Unsupported Option Warnings
++
++Metro currently supports only a subset of the shared Module Federation config options.
++When unsupported options are provided, Metro emits warnings during validation that those options are **not supported and will have no effect**.
++
++Use `runtimePlugins` for runtime plugin paths.
++`plugins` is deprecated and will be removed in the next major version.
++
+ ## Examples and Best Practices
+ 
+ The configuration follows the standard [Module Federation configuration format](https://module-federation.io/configure/). For comprehensive information about Module Federation concepts, configuration options, and usage patterns, please refer to the official [Module Federation documentation](https://module-federation.io/).
+diff --git a/apps/website-new/docs/zh/guide/build-plugins/plugins-metro.mdx b/apps/website-new/docs/zh/guide/build-plugins/plugins-metro.mdx
+index a6cd2d0bf07..7970a2333ee 100644
+--- a/apps/website-new/docs/zh/guide/build-plugins/plugins-metro.mdx
++++ b/apps/website-new/docs/zh/guide/build-plugins/plugins-metro.mdx
+@@ -240,6 +240,11 @@ export interface ModuleFederationConfig {
+   exposes?: Record<string, string>;
+   shared?: Shared;
+   shareStrategy?: 'loaded-first' | 'version-first';
++  runtimePlugins?: string[];
++  /**
++   * @deprecated 请改用 runtimePlugins。
++   * 计划在下一个 major 版本移除。
++   */
+   plugins?: string[];
+ }
+ ```
+@@ -256,9 +261,17 @@ export interface SharedConfig {
+ }
+ ```
+ 
++#### 不支持选项告警
++
++Metro 当前只支持共享 Module Federation 配置中的一部分选项。
++当传入不支持的选项时，Metro 会在校验阶段输出告警，明确这些选项**不受支持且不会生效**。
++
++运行时插件路径请使用 `runtimePlugins`。
++`plugins` 已废弃，并将在下一个 major 版本移除。
++
+ ## 示例与最佳实践
+ 
+ 配置遵循标准的 [模块联邦配置格式](https://module-federation.io/configure/)。  
+ 关于模块联邦的概念、配置选项和使用模式的完整信息，请参考官方 [模块联邦文档](https://module-federation.io/)。  
+ 
+-要查看可运行的示例和详细实现指南，请访问 [Module Federation Metro 仓库](https://github.com/module-federation/metro)，其中包含多个示例应用，展示了不同的使用模式和集成方式。
+\ No newline at end of file
++要查看可运行的示例和详细实现指南，请访问 [Module Federation Metro 仓库](https://github.com/module-federation/metro)，其中包含多个示例应用，展示了不同的使用模式和集成方式。
+diff --git a/packages/metro-core/__tests__/plugin/normalize-options.spec.ts b/packages/metro-core/__tests__/plugin/normalize-options.spec.ts
+new file mode 100644
+index 00000000000..2126d7582ac
+--- /dev/null
++++ b/packages/metro-core/__tests__/plugin/normalize-options.spec.ts
+@@ -0,0 +1,112 @@
++import path from 'node:path';
++import { vol } from 'memfs';
++import { afterEach, describe, expect, it, vi } from 'vitest';
++
++vi.mock('node:fs', () => {
++  const memfs = require('memfs').fs;
++  return { ...memfs, default: memfs };
++});
++
++import { normalizeOptions } from '../../src/plugin/normalize-options';
++
++let projectCount = 0;
++
++function createProjectRoot() {
++  projectCount += 1;
++  const projectRoot = `/virtual/metro-core-${projectCount}`;
++  vol.fromJSON({
++    [path.join(projectRoot, 'package.json')]: JSON.stringify({
++      dependencies: {
++        react: '19.1.0',
++        'react-native': '0.80.0',
++      },
++    }),
++  });
++  return projectRoot;
++}
++
++function getShared() {
++  return {
++    react: {
++      singleton: true,
++      eager: false,
++      version: '19.1.0',
++      requiredVersion: '19.1.0',
++    },
++    'react-native': {
++      singleton: true,
++      eager: false,
++      version: '0.80.0',
++      requiredVersion: '0.80.0',
++    },
++  };
++}
++
++describe('normalizeOptions', () => {
++  afterEach(() => {
++    vol.reset();
++    vi.restoreAllMocks();
++  });
++
++  it('supports runtimePlugins as the primary config field', () => {
++    const projectRoot = createProjectRoot();
++    const tmpDirPath = path.join(projectRoot, 'node_modules', '.mf');
++    vol.mkdirSync(tmpDirPath, { recursive: true });
++
++    const runtimePluginPath = path.join(projectRoot, 'runtime-plugin.js');
++    vol.writeFileSync(runtimePluginPath, 'module.exports = () => ({})');
++
++    const normalized = normalizeOptions(
++      {
++        name: 'MetroHost',
++        shared: getShared(),
++        runtimePlugins: [runtimePluginPath],
++      } as any,
++      { projectRoot, tmpDirPath },
++    );
++
++    const metroCorePluginPath = require.resolve(
++      '../../src/modules/metroCorePlugin.ts',
++    );
++    expect(normalized.plugins).toEqual([
++      path.relative(tmpDirPath, metroCorePluginPath),
++      path.relative(tmpDirPath, runtimePluginPath),
++    ]);
++  });
++
++  it('deduplicates runtime plugins while preserving order', () => {
++    const projectRoot = createProjectRoot();
++    const tmpDirPath = path.join(projectRoot, 'node_modules', '.mf');
++    vol.mkdirSync(tmpDirPath, { recursive: true });
++
++    const runtimePluginPath = path.join(projectRoot, 'runtime-plugin.js');
++    const runtimePluginTwoPath = path.join(
++      projectRoot,
++      'runtime-plugin-two.js',
++    );
++    vol.writeFileSync(runtimePluginPath, 'module.exports = () => ({})');
++    vol.writeFileSync(runtimePluginTwoPath, 'module.exports = () => ({})');
++
++    const normalized = normalizeOptions(
++      {
++        name: 'MetroHost',
++        shared: getShared(),
++        runtimePlugins: [
++          runtimePluginPath,
++          runtimePluginPath,
++          runtimePluginTwoPath,
++        ],
++      } as any,
++      { projectRoot, tmpDirPath },
++    );
++
++    const metroCorePluginPath = require.resolve(
++      '../../src/modules/metroCorePlugin.ts',
++    );
++    expect(normalized.plugins).toEqual([
++      path.relative(tmpDirPath, metroCorePluginPath),
++      path.relative(tmpDirPath, runtimePluginPath),
++      path.relative(tmpDirPath, runtimePluginTwoPath),
++    ]);
++  });
++});
+diff --git a/packages/metro-core/__tests__/plugin/validate-options.spec.ts b/packages/metro-core/__tests__/plugin/validate-options.spec.ts
+new file mode 100644
+index 00000000000..fc329920b8c
+--- /dev/null
++++ b/packages/metro-core/__tests__/plugin/validate-options.spec.ts
+@@ -0,0 +1,118 @@
++import { afterEach, describe, expect, it, vi } from 'vitest';
++import { validateOptions } from '../../src/plugin/validate-options';
++
++function getValidConfig() {
++  return {
++    name: 'MetroHost',
++    filename: 'mf-manifest.bundle',
++    remotes: {},
++    shared: {
++      react: {
++        singleton: true,
++        eager: true,
++        version: '19.1.0',
++        requiredVersion: '19.1.0',
++      },
++      'react-native': {
++        singleton: true,
++        eager: true,
++        version: '0.80.0',
++        requiredVersion: '0.80.0',
++      },
++    },
++  };
++}
++
++describe('validateOptions', () => {
++  afterEach(() => {
++    vi.restoreAllMocks();
++  });
++
++  it('warns when unsupported options are configured', () => {
++    const warnSpy = vi
++      .spyOn(console, 'warn')
++      .mockImplementation(() => undefined);
++
++    validateOptions({
++      ...getValidConfig(),
++      manifest: true,
++    } as any);
++
++    expect(warnSpy).toHaveBeenCalled();
++    expect(warnSpy.mock.calls.join('\n')).toContain('manifest');
++    expect(warnSpy.mock.calls.join('\n')).toContain('will have no effect');
++  });
++
++  it('warns that runtime plugin params are not supported', () => {
++    const warnSpy = vi
++      .spyOn(console, 'warn')
++      .mockImplementation(() => undefined);
++
++    validateOptions({
++      ...getValidConfig(),
++      runtimePlugins: [['/tmp/runtime-plugin.js', { answer: 42 }]],
++    } as any);
++
++    expect(warnSpy).toHaveBeenCalled();
++    expect(warnSpy.mock.calls.join('\n')).toContain('runtimePlugins[0][1]');
++    expect(warnSpy.mock.calls.join('\n')).toContain('will have no effect');
++  });
++
++  it('does not warn for runtime plugin tuple without params', () => {
++    const warnSpy = vi
++      .spyOn(console, 'warn')
++      .mockImplementation(() => undefined);
++
++    validateOptions({
++      ...getValidConfig(),
++      runtimePlugins: [['/tmp/runtime-plugin.js']],
++    } as any);
++
++    expect(warnSpy).not.toHaveBeenCalled();
++  });
++
++  it('warns when deprecated plugins is used', () => {
++    const warnSpy = vi
++      .spyOn(console, 'warn')
++      .mockImplementation(() => undefined);
++
++    validateOptions({
++      ...getValidConfig(),
++      plugins: ['/tmp/runtime-plugin.js'],
++    } as any);
++
++    expect(warnSpy).toHaveBeenCalled();
++    expect(warnSpy.mock.calls.join('\n')).toContain('deprecated');
++    expect(warnSpy.mock.calls.join('\n')).toContain('runtimePlugins');
++  });
++
++  it('throws for unsupported advanced remotes format', () => {
++    expect(() =>
++      validateOptions({
++        ...getValidConfig(),
++        remotes: {
++          mini: {
++            external: 'mini@http://localhost:8081/mf-manifest.json',
++          },
++        },
++      } as any),
++    ).toThrow('remotes');
++  });
++
++  it('throws for unsupported shared shorthand format', () => {
++    expect(() =>
++      validateOptions({
++        ...getValidConfig(),
++        shared: {
++          react: 'react',
++          'react-native': {
++            singleton: true,
++            eager: true,
++            version: '0.80.0',
++            requiredVersion: '0.80.0',
++          },
++        },
++      } as any),
++    ).toThrow('shared');
++  });
++});
+diff --git a/packages/metro-core/__tests__/plugin/with-module-federation.spec.ts b/packages/metro-core/__tests__/plugin/with-module-federation.spec.ts
+new file mode 100644
+index 00000000000..800f8d683d3
+--- /dev/null
++++ b/packages/metro-core/__tests__/plugin/with-module-federation.spec.ts
+@@ -0,0 +1,146 @@
++import path from 'node:path';
++import { vol } from 'memfs';
++import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
++
++vi.mock('node:fs', () => {
++  const memfs = require('memfs').fs;
++  return { ...memfs, default: memfs };
++});
++
++vi.mock('../../src/plugin/babel-transformer', () => ({
++  createBabelTransformer: vi.fn(
++    ({ tmpDirPath }: { tmpDirPath: string }) =>
++      `${tmpDirPath}/babel-transformer.js`,
++  ),
++}));
++
++import { withModuleFederation } from '../../src/plugin';
++
++let projectCount = 0;
++
++function createProjectRoot() {
++  projectCount += 1;
++  const projectRoot = `/virtual/metro-core-${projectCount}`;
++  vol.fromJSON({
++    [path.join(projectRoot, 'index.js')]: 'console.log("hello");',
++    [path.join(projectRoot, 'babel-transformer.js')]: '',
++    [path.join(projectRoot, 'package.json')]: JSON.stringify({
++      dependencies: {
++        react: '19.1.0',
++        'react-native': '0.80.0',
++      },
++    }),
++  });
++  return projectRoot;
++}
++
++function getValidConfig() {
++  return {
++    name: 'MetroHost',
++    remotes: {},
++    shared: {
++      react: {
++        singleton: true,
++        eager: true,
++        version: '19.1.0',
++        requiredVersion: '19.1.0',
++      },
++      'react-native': {
++        singleton: true,
++        eager: true,
++        version: '0.80.0',
++        requiredVersion: '0.80.0',
++      },
++    },
++  };
++}
++
++function createMetroConfig(projectRoot: string) {
++  return {
++    projectRoot,
++    serializer: {
++      getModulesRunBeforeMainModule: vi.fn(() => []),
++      getPolyfills: vi.fn(() => []),
++    },
++    transformer: {
++      babelTransformerPath: path.join(projectRoot, 'babel-transformer.js'),
++    },
++    resolver: {},
++    server: {},
++  } as any;
++}
++
++describe('withModuleFederation', () => {
++  const originalArgv = process.argv.slice();
++
++  beforeEach(() => {
++    process.argv[2] = 'start';
++  });
++
++  afterEach(() => {
++    process.argv = originalArgv.slice();
++    delete (global as any).__METRO_FEDERATION_CONFIG;
++    delete (global as any).__METRO_FEDERATION_HOST_ENTRY_PATH;
++    delete (global as any).__METRO_FEDERATION_REMOTE_ENTRY_PATH;
++    delete (global as any).__METRO_FEDERATION_MANIFEST_PATH;
++    vol.reset();
++    vi.restoreAllMocks();
++  });
++
++  it('uses runtimePlugins in normalized federation config', () => {
++    const projectRoot = createProjectRoot();
++    const metroConfig = createMetroConfig(projectRoot);
++    const runtimePluginPath = path.join(projectRoot, 'runtime-plugin.js');
++    vol.writeFileSync(runtimePluginPath, 'module.exports = () => ({})');
++
++    withModuleFederation(metroConfig, {
++      ...getValidConfig(),
++      runtimePlugins: [runtimePluginPath],
++    } as any);
++
++    const normalized = (global as any).__METRO_FEDERATION_CONFIG;
++    const tmpDirPath = path.join(projectRoot, 'node_modules', '.mf');
++    expect(normalized.plugins).toContain(
++      path.relative(tmpDirPath, runtimePluginPath),
++    );
++  });
++
++  it('warns when deprecated plugins is used', () => {
++    const projectRoot = createProjectRoot();
++    const metroConfig = createMetroConfig(projectRoot);
++    const runtimePluginPath = path.join(projectRoot, 'runtime-plugin.js');
++    vol.writeFileSync(runtimePluginPath, 'module.exports = () => ({})');
++    const warnSpy = vi
++      .spyOn(console, 'warn')
++      .mockImplementation(() => undefined);
++
++    withModuleFederation(metroConfig, {
++      ...getValidConfig(),
++      plugins: [runtimePluginPath],
++    } as any);
++
++    expect(warnSpy).toHaveBeenCalled();
++    expect(warnSpy.mock.calls.join('\n')).toContain('deprecated');
++  });
++
++  it('warns only once when runtime plugin params are provided', () => {
++    const projectRoot = createProjectRoot();
++    const metroConfig = createMetroConfig(projectRoot);
++    const runtimePluginPath = path.join(projectRoot, 'runtime-plugin.js');
++    vol.writeFileSync(runtimePluginPath, 'module.exports = () => ({})');
++    const warnSpy = vi
++      .spyOn(console, 'warn')
++      .mockImplementation(() => undefined);
++
++    withModuleFederation(metroConfig, {
++      ...getValidConfig(),
++      runtimePlugins: [[runtimePluginPath, { answer: 42 }]],
++    } as any);
++
++    const warnings = warnSpy.mock.calls
++      .flat()
++      .filter((entry) => String(entry).includes('runtimePlugins[0][1]'));
++
++    expect(warnings).toHaveLength(1);
++  });
++});
+diff --git a/packages/metro-core/jest.config.ts b/packages/metro-core/jest.config.ts
+deleted file mode 100644
+index 1a001ba94d3..00000000000
+--- a/packages/metro-core/jest.config.ts
++++ /dev/null
+@@ -1,10 +0,0 @@
+-export default {
+-  displayName: '@module-federation/metro',
+-  preset: '../../jest.preset.js',
+-  testEnvironment: 'node',
+-  transform: {
+-    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.spec.json' }],
+-  },
+-  moduleFileExtensions: ['ts', 'js', 'html'],
+-  coverageDirectory: '../../coverage/packages/metro-core',
+-};
+diff --git a/packages/metro-core/package.json b/packages/metro-core/package.json
+index 0b205f62e84..9e6b2c51971 100644
+--- a/packages/metro-core/package.json
++++ b/packages/metro-core/package.json
+@@ -57,6 +57,8 @@
+   },
+   "scripts": {
+     "build": "rslib build",
++    "test": "vitest run --config vitest.config.mts",
++    "test:watch": "vitest --config vitest.config.mts",
+     "typecheck": "tsc --noEmit"
+   },
+   "dependencies": {
+@@ -88,6 +90,7 @@
+     "@typescript-eslint/parser": "8.54.0",
+     "@types/node": "^20.19.5",
+     "@types/react": "^19.1.0",
++    "memfs": "4.46.0",
+     "metro": "^0.82.1",
+     "metro-config": "^0.82.1",
+     "metro-file-map": "^0.82.1",
+diff --git a/packages/metro-core/project.json b/packages/metro-core/project.json
+index d8a99d86317..d15db81236e 100644
+--- a/packages/metro-core/project.json
++++ b/packages/metro-core/project.json
+@@ -13,12 +13,10 @@
+       }
+     },
+     "test": {
+-      "executor": "@nx/jest:jest",
++      "executor": "@nx/vite:test",
+       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+       "options": {
+-        "jestConfig": "packages/metro-core/jest.config.ts",
+-        "passWithNoTests": true,
+-        "watchman": false
++        "configFile": "packages/metro-core/vitest.config.mts"
+       }
+     },
+     "lint": {
+diff --git a/packages/metro-core/src/logger.ts b/packages/metro-core/src/logger.ts
+new file mode 100644
+index 00000000000..744de2fe2fb
+--- /dev/null
++++ b/packages/metro-core/src/logger.ts
+@@ -0,0 +1,6 @@
++import { createLogger } from '@module-federation/sdk';
++import { PLUGIN_IDENTIFIER } from './plugin/constants';
++
++const logger = createLogger(PLUGIN_IDENTIFIER);
++
++export default logger;
+diff --git a/packages/metro-core/src/modules/asyncRequire.ts b/packages/metro-core/src/modules/asyncRequire.ts
+index 5445e344634..27c735345f2 100644
+--- a/packages/metro-core/src/modules/asyncRequire.ts
++++ b/packages/metro-core/src/modules/asyncRequire.ts
+@@ -65,7 +65,6 @@ function buildLoadBundleAsyncWrapper() {
+   const registry = require('mf:remote-module-registry');
+ 
+   const __loadBundleAsync =
+-    // @ts-expect-error dynamic key access on global object
+     globalThis[`${__METRO_GLOBAL_PREFIX__ ?? ''}__loadBundleAsync`];
+ 
+   const loadBundleAsync =
+@@ -125,10 +124,8 @@ if (!process.env.EXPO_OS) {
+     buildAsyncRequire,
+   } = require('@expo/metro-runtime/src/async-require/buildAsyncRequire');
+ 
+-  // @ts-expect-error dynamic key access on global object
+   global[`${__METRO_GLOBAL_PREFIX__}__loadBundleAsync`] = buildAsyncRequire();
+ }
+ 
+-// @ts-expect-error dynamic key access on global object
+ global[`${__METRO_GLOBAL_PREFIX__}__loadBundleAsync`] =
+   buildLoadBundleAsyncWrapper();
+diff --git a/packages/metro-core/src/modules/asyncStartup.tsx b/packages/metro-core/src/modules/asyncStartup.tsx
+index 7bc3c30de6c..844d25e51f0 100644
+--- a/packages/metro-core/src/modules/asyncStartup.tsx
++++ b/packages/metro-core/src/modules/asyncStartup.tsx
+@@ -2,6 +2,7 @@ import type { Federation } from '@module-federation/runtime';
+ import React from 'react';
+ 
+ declare global {
++  // @ts-expect-error -- Intentional redeclaration for Metro/React Native runtime global.
+   // eslint-disable-next-line no-var
+   var __DEV__: boolean;
+   // eslint-disable-next-line no-var
+diff --git a/packages/metro-core/src/modules/metroCorePlugin.ts b/packages/metro-core/src/modules/metroCorePlugin.ts
+index a904006ba3a..95c0377b076 100644
+--- a/packages/metro-core/src/modules/metroCorePlugin.ts
++++ b/packages/metro-core/src/modules/metroCorePlugin.ts
+@@ -1,9 +1,10 @@
+ import type {
+   Federation,
+-  FederationRuntimePlugin,
++  ModuleFederationRuntimePlugin,
+ } from '@module-federation/runtime';
+ 
+ declare global {
++  // @ts-expect-error -- Intentional redeclaration for Metro/React Native runtime global.
+   // eslint-disable-next-line no-var
+   var __DEV__: boolean;
+   // eslint-disable-next-line no-var
+@@ -42,13 +43,12 @@ const buildUrlForEntryBundle = (entry: string) => {
+   return entry;
+ };
+ 
+-const MetroCorePlugin: () => FederationRuntimePlugin = () => ({
++const MetroCorePlugin: () => ModuleFederationRuntimePlugin = () => ({
+   name: 'metro-core-plugin',
+   loadEntry: async ({ remoteInfo }) => {
+     const { entry, entryGlobalName } = remoteInfo;
+ 
+     const __loadBundleAsync =
+-      // @ts-expect-error dynamic key access on global object
+       globalThis[`${__METRO_GLOBAL_PREFIX__ ?? ''}__loadBundleAsync`];
+ 
+     const loadBundleAsync =
+diff --git a/packages/metro-core/src/plugin/constants.ts b/packages/metro-core/src/plugin/constants.ts
+index 19324b0b12c..0a9d07868e5 100644
+--- a/packages/metro-core/src/plugin/constants.ts
++++ b/packages/metro-core/src/plugin/constants.ts
+@@ -4,6 +4,8 @@ export const ASYNC_REQUIRE = 'mf:async-require';
+ export const REMOTE_MODULE_REGISTRY = 'mf:remote-module-registry';
+ export const REMOTE_HMR_SETUP = 'mf:remote-hmr';
+ 
++export const PLUGIN_IDENTIFIER = '[ Module Federation Metro ]';
++
+ // defaults
+ export const DEFAULT_ENTRY_FILENAME = 'remoteEntry.bundle';
+ 
+diff --git a/packages/metro-core/src/plugin/generators.ts b/packages/metro-core/src/plugin/generators.ts
+index 809f95fbcd0..f2e6a6b3b81 100644
+--- a/packages/metro-core/src/plugin/generators.ts
++++ b/packages/metro-core/src/plugin/generators.ts
+@@ -1,6 +1,6 @@
+ import fs from 'node:fs';
+ import path from 'node:path';
+-import type { ModuleFederationConfigNormalized, SharedConfig } from '../types';
++import type { ModuleFederationConfigNormalized, ShareObject } from '../types';
+ 
+ export function getRemoteModule(name: string) {
+   const template = getModuleTemplate('remote-module.js');
+@@ -124,7 +124,7 @@ function generateShared(options: ModuleFederationConfigNormalized) {
+   return sharedString;
+ }
+ 
+-function getSharedModuleEntry(name: string, options: SharedConfig) {
++function getSharedModuleEntry(name: string, options: ShareObject[string]) {
+   const template = {
+     version: options.version,
+     scope: 'default',
+diff --git a/packages/metro-core/src/plugin/manifest.ts b/packages/metro-core/src/plugin/manifest.ts
+index 52ef7a0dc12..1f1575d2e30 100644
+--- a/packages/metro-core/src/plugin/manifest.ts
++++ b/packages/metro-core/src/plugin/manifest.ts
+@@ -105,8 +105,10 @@ function generateShared(
+     return {
+       id: sharedName,
+       name: sharedName,
+-      version: config.shared[sharedName].version,
+-      requiredVersion: config.shared[sharedName].requiredVersion,
++      version: getManifestVersion(config.shared[sharedName].version),
++      requiredVersion: getManifestRequiredVersion(
++        config.shared[sharedName].requiredVersion,
++      ),
+       singleton: config.shared[sharedName].singleton,
+       hash: '',
+       assets,
+@@ -114,6 +116,14 @@ function generateShared(
+   });
+ }
+ 
++function getManifestVersion(version: unknown): string {
++  return typeof version === 'string' ? version : '';
++}
++
++function getManifestRequiredVersion(requiredVersion: unknown): string {
++  return typeof requiredVersion === 'string' ? requiredVersion : '*';
++}
++
+ function getEmptyAssets(): StatsAssets {
+   return {
+     js: {
+diff --git a/packages/metro-core/src/plugin/normalize-options.ts b/packages/metro-core/src/plugin/normalize-options.ts
+index 57c0ca090f4..d69b47c5bfb 100644
+--- a/packages/metro-core/src/plugin/normalize-options.ts
++++ b/packages/metro-core/src/plugin/normalize-options.ts
+@@ -3,7 +3,7 @@ import path from 'node:path';
+ import type {
+   ModuleFederationConfig,
+   ModuleFederationConfigNormalized,
+-  Shared,
++  ShareObject,
+ } from '../types';
+ import { DEFAULT_ENTRY_FILENAME } from './constants';
+ 
+@@ -17,26 +17,55 @@ export function normalizeOptions(
+   { projectRoot, tmpDirPath }: ProjectConfig,
+ ): ModuleFederationConfigNormalized {
+   const shared = getNormalizedShared(options, projectRoot);
++  const remotes = getNormalizedRemotes(options);
++  const exposes = getNormalizedExposes(options);
+   const shareStrategy = getNormalizedShareStrategy(options);
+   const plugins = getNormalizedPlugins(options, tmpDirPath);
+ 
+   return {
+-    name: options.name,
++    // validated in validateOptions before normalization
++    name: options.name as string,
+     filename: options.filename ?? DEFAULT_ENTRY_FILENAME,
+-    remotes: options.remotes ?? {},
+-    exposes: options.exposes ?? {},
++    remotes,
++    exposes,
+     shared,
+     shareStrategy,
+     plugins,
+   };
+ }
+ 
++function getNormalizedRemotes(
++  options: ModuleFederationConfig,
++): Record<string, string> {
++  return { ...((options.remotes ?? {}) as Record<string, string>) };
++}
++
++function getNormalizedExposes(
++  options: ModuleFederationConfig,
++): Record<string, string> {
++  return { ...((options.exposes ?? {}) as Record<string, string>) };
++}
++
+ function getNormalizedShared(
+   options: ModuleFederationConfig,
+   projectRoot: string,
+-): Shared {
++): ShareObject {
+   const pkg = getProjectPackageJson(projectRoot);
+-  const shared = options.shared ?? {};
++  const sharedInput = options.shared ?? {};
++  const shared = Object.entries(sharedInput).reduce(
++    (acc, [sharedName, config]) => {
++      if (typeof config === 'string') {
++        return acc;
++      }
++
++      const metroSharedConfig = {
++        ...(config as ShareObject[string]),
++      };
++      acc[sharedName] = metroSharedConfig;
++      return acc;
++    },
++    {} as ShareObject,
++  );
+ 
+   // force all shared modules in host to be eager
+   if (!options.exposes) {
+@@ -75,11 +104,45 @@ function getNormalizedPlugins(
+   options: ModuleFederationConfig,
+   tmpDirPath: string,
+ ) {
++  const runtimePlugins = getNormalizedRuntimePlugins(options);
+   const plugins = options.plugins ?? [];
++
+   // auto-inject 'metro-core-plugin' runtime plugin
+-  plugins.unshift(require.resolve('../modules/metroCorePlugin.ts'));
++  const allPlugins = [
++    require.resolve('../modules/metroCorePlugin.ts'),
++    ...runtimePlugins,
++    ...plugins,
++  ];
++
++  const deduplicatedPlugins = Array.from(new Set(allPlugins));
++
+   // make paths relative to the tmp dir
+-  return plugins.map((pluginPath) => path.relative(tmpDirPath, pluginPath));
++  return deduplicatedPlugins.map((pluginPath) =>
++    path.relative(tmpDirPath, pluginPath),
++  );
++}
++
++function getNormalizedRuntimePlugins(
++  options: ModuleFederationConfig,
++): string[] {
++  const runtimePlugins = options.runtimePlugins ?? [];
++  const normalizedRuntimePlugins: string[] = [];
++
++  runtimePlugins.forEach((runtimePlugin) => {
++    if (typeof runtimePlugin === 'string') {
++      normalizedRuntimePlugins.push(runtimePlugin);
++      return;
++    }
++
++    if (Array.isArray(runtimePlugin)) {
++      const [pluginPath] = runtimePlugin;
++      if (typeof pluginPath === 'string') {
++        normalizedRuntimePlugins.push(pluginPath);
++      }
++    }
++  });
++
++  return normalizedRuntimePlugins;
+ }
+ 
+ function getProjectPackageJson(projectRoot: string): {
+diff --git a/packages/metro-core/src/plugin/serializer.ts b/packages/metro-core/src/plugin/serializer.ts
+index cec91e81fdd..5eed40ba573 100644
+--- a/packages/metro-core/src/plugin/serializer.ts
++++ b/packages/metro-core/src/plugin/serializer.ts
+@@ -1,7 +1,7 @@
+ import path from 'node:path';
+ import type { Module, ReadOnlyGraph, SerializerOptions } from 'metro';
+ import type { SerializerConfigT } from 'metro-config';
+-import type { ModuleFederationConfigNormalized, Shared } from '../types';
++import type { ModuleFederationConfigNormalized, ShareObject } from '../types';
+ import { ConfigError } from '../utils/errors';
+ import {
+   CountingSet,
+@@ -80,7 +80,7 @@ function collectSyncRemoteModules(
+   return Array.from(syncRemoteModules);
+ }
+ 
+-function collectSyncSharedModules(graph: ReadOnlyGraph, _shared: Shared) {
++function collectSyncSharedModules(graph: ReadOnlyGraph, _shared: ShareObject) {
+   const sharedImports = new Set(
+     Object.keys(_shared).map((sharedName) => {
+       return _shared[sharedName].import || sharedName;
+@@ -150,7 +150,7 @@ function generateVirtualModule(name: string, code: string): Module {
+         type: 'js/script/virtual',
+         data: {
+           code,
+-          // @ts-ignore
++          // @ts-expect-error -- Metro virtual module data includes lineCount.
+           lineCount: 1,
+           map: [],
+         },
+diff --git a/packages/metro-core/src/plugin/validate-options.ts b/packages/metro-core/src/plugin/validate-options.ts
+index 4643fbbeca7..f4d124307b3 100644
+--- a/packages/metro-core/src/plugin/validate-options.ts
++++ b/packages/metro-core/src/plugin/validate-options.ts
+@@ -1,7 +1,44 @@
+-import type { ModuleFederationConfig, Shared } from '../types';
++import type { ModuleFederationConfig, ShareObject } from '../types';
++import logger from '../logger';
+ import { ConfigError } from '../utils';
+ 
+-function validateName(name: string) {
++const unsupportedTopLevelOptions: (keyof ModuleFederationConfig)[] = [
++  'library',
++  'remoteType',
++  'runtime',
++  'shareScope',
++  'getPublicPath',
++  'implementation',
++  'manifest',
++  'dev',
++  'dts',
++  'dataPrefetch',
++  'virtualRuntimeEntry',
++  'experiments',
++  'bridge',
++  'async',
++  'treeShakingDir',
++  'injectTreeShakingUsedExports',
++  'treeShakingSharedExcludePlugins',
++  'treeShakingSharedPlugins',
++];
++
++const unsupportedSharedFields = [
++  'packageName',
++  'shareKey',
++  'shareScope',
++  'strictVersion',
++  'treeShaking',
++  'shareStrategy',
++];
++
++const warningSet = new Set<string>();
++
++function validateName(name: string | undefined) {
++  if (!name || typeof name !== 'string') {
++    throw new ConfigError("Option 'name' is required.");
++  }
++
+   const validEcmaIdentifierRegex =
+     // biome-ignore lint/suspicious/noMisleadingCharacterClass: works
+     /^[$_\p{ID_Start}][$_\u{200C}\u{200D}\p{ID_Continue}]*$/u;
+@@ -27,7 +64,7 @@ function validateFilename(filename: string | undefined) {
+   }
+ }
+ 
+-function validateShared(shared: Shared | undefined) {
++function validateShared(shared: ModuleFederationConfig['shared']) {
+   if (!shared) {
+     throw new ConfigError('Shared configuration is required.');
+   }
+@@ -40,19 +77,27 @@ function validateShared(shared: Shared | undefined) {
+     throw new ConfigError('Array format is not supported for shared.');
+   }
+ 
++  if (!isPlainObject(shared)) {
++    throw new ConfigError('Shared must be an object.');
++  }
++
++  const sharedObject = shared as ShareObject;
++
+   // validate react & react-native present
+-  if (!('react' in shared)) {
++  if (!('react' in sharedObject)) {
+     throw new ConfigError("Dependency 'react' must be present in shared.");
+   }
+ 
+-  if (!('react-native' in shared)) {
++  if (!('react-native' in sharedObject)) {
+     throw new ConfigError(
+       "Dependency 'react-native' must be present in shared.",
+     );
+   }
+ 
+   // validate shared module names
+-  for (const sharedName of Object.keys(shared)) {
++  for (const sharedName of Object.keys(sharedObject)) {
++    const sharedConfig = sharedObject[sharedName] as unknown;
++
+     // disallow relative paths
+     if (sharedName.startsWith('./') || sharedName.startsWith('../')) {
+       throw new ConfigError(
+@@ -74,16 +119,164 @@ function validateShared(shared: Shared | undefined) {
+           'You need to list all deep imports explicitly.',
+       );
+     }
++
++    if (!isPlainObject(sharedConfig)) {
++      throw new ConfigError(
++        `Unsupported shared format for '${sharedName}'. Metro only supports object notation for shared modules.`,
++      );
++    }
++
++    if (
++      'import' in sharedConfig &&
++      sharedConfig.import !== false &&
++      typeof sharedConfig.import !== 'string'
++    ) {
++      throw new ConfigError(
++        `Unsupported shared.import value for '${sharedName}'. Only string and false are supported in Metro.`,
++      );
++    }
++
++    for (const unsupportedField of unsupportedSharedFields) {
++      if (unsupportedField in sharedConfig) {
++        warnUnsupported(
++          `shared.${sharedName}.${unsupportedField}`,
++          `Option 'shared.${sharedName}.${unsupportedField}' is not supported in Metro and will have no effect.`,
++        );
++      }
++    }
++  }
++}
++
++function validateRemotes(remotes: ModuleFederationConfig['remotes']) {
++  if (typeof remotes === 'undefined') {
++    return;
++  }
++
++  if (!isPlainObject(remotes)) {
++    throw new ConfigError(
++      'Unsupported remotes format. Metro only supports remotes as Record<string, string>.',
++    );
++  }
++
++  for (const remoteConfig of Object.values(remotes)) {
++    if (typeof remoteConfig !== 'string') {
++      throw new ConfigError(
++        'Unsupported remotes format. Metro only supports remotes as Record<string, string>.',
++      );
++    }
+   }
+ }
+ 
++function validateExposes(exposes: ModuleFederationConfig['exposes']) {
++  if (typeof exposes === 'undefined') {
++    return;
++  }
++
++  if (!isPlainObject(exposes)) {
++    throw new ConfigError(
++      'Unsupported exposes format. Metro only supports exposes as Record<string, string>.',
++    );
++  }
++
++  for (const exposeConfig of Object.values(exposes)) {
++    if (typeof exposeConfig !== 'string') {
++      throw new ConfigError(
++        'Unsupported exposes format. Metro only supports exposes as Record<string, string>.',
++      );
++    }
++  }
++}
++
++function validateRuntimePlugins(
++  runtimePlugins: ModuleFederationConfig['runtimePlugins'],
++) {
++  if (typeof runtimePlugins === 'undefined') {
++    return;
++  }
++
++  if (!Array.isArray(runtimePlugins)) {
++    throw new ConfigError('runtimePlugins must be an array.');
++  }
++
++  runtimePlugins.forEach((runtimePlugin, index) => {
++    if (typeof runtimePlugin === 'string') {
++      return;
++    }
++
++    if (!Array.isArray(runtimePlugin)) {
++      throw new ConfigError(
++        'runtimePlugins entries must be either a string or a tuple of [path, params].',
++      );
++    }
++
++    const [pluginPath, pluginParams] = runtimePlugin;
++    if (typeof pluginPath !== 'string') {
++      throw new ConfigError(
++        `Invalid runtimePlugins[${index}] path. Expected a string path.`,
++      );
++    }
++
++    if (typeof pluginParams !== 'undefined') {
++      warnUnsupported(
++        `runtimePlugins[${index}][1]`,
++        `Option 'runtimePlugins[${index}][1]' is not supported in Metro and will have no effect.`,
++      );
++    }
++  });
++}
++
++function validateUnsupportedTopLevelOptions(options: ModuleFederationConfig) {
++  unsupportedTopLevelOptions.forEach((unsupportedOption) => {
++    if (typeof options[unsupportedOption] !== 'undefined') {
++      warnUnsupported(
++        String(unsupportedOption),
++        `Option '${String(unsupportedOption)}' is not supported in Metro and will have no effect.`,
++      );
++    }
++  });
++}
++
++function validateDeprecatedOptions(options: ModuleFederationConfig) {
++  if (options.plugins && options.plugins.length > 0) {
++    warnUnsupported(
++      'deprecated.plugins',
++      "The 'plugins' option is deprecated. Use 'runtimePlugins' instead. " +
++        "Support for 'plugins' will be removed in the next major version.",
++    );
++  }
++}
++
++function warnUnsupported(key: string, message: string) {
++  if (warningSet.has(key)) {
++    return;
++  }
++
++  warningSet.add(key);
++  logger.warn(message);
++}
++
++function isPlainObject(value: unknown): value is Record<string, unknown> {
++  return typeof value === 'object' && value !== null && !Array.isArray(value);
++}
++
+ export function validateOptions(options: ModuleFederationConfig) {
++  // warn for known but unsupported options
++  validateUnsupportedTopLevelOptions(options);
++  validateDeprecatedOptions(options);
++
+   // validate name
+   validateName(options.name);
+ 
+   // validate filename
+   validateFilename(options.filename);
+ 
++  // validate remotes / exposes subset support
++  validateRemotes(options.remotes);
++  validateExposes(options.exposes);
++
++  // validate runtime plugins subset support
++  validateRuntimePlugins(options.runtimePlugins);
++
+   // validate shared
+   validateShared(options.shared);
+ }
+diff --git a/packages/metro-core/src/types.ts b/packages/metro-core/src/types.ts
+index 4bc30485000..d4e09ca4b49 100644
+--- a/packages/metro-core/src/types.ts
++++ b/packages/metro-core/src/types.ts
+@@ -1,25 +1,25 @@
+-export interface SharedConfig {
+-  singleton: boolean;
+-  eager: boolean;
+-  version: string;
+-  requiredVersion: string;
+-  import?: false;
++import type { moduleFederationPlugin } from '@module-federation/sdk';
++
++export interface ModuleFederationConfig
++  extends moduleFederationPlugin.ModuleFederationPluginOptions {
++  /**
++   * @deprecated Use runtimePlugins instead. Scheduled for removal in the next major version.
++   */
++  plugins?: string[];
+ }
+ 
+-export type Shared = Record<string, SharedConfig>;
++export type ShareObject = Record<string, moduleFederationPlugin.SharedConfig>;
+ 
+-export interface ModuleFederationConfig {
++export interface ModuleFederationConfigNormalized {
+   name: string;
+-  filename?: string;
+-  remotes?: Record<string, string>;
+-  exposes?: Record<string, string>;
+-  shared?: Shared;
+-  shareStrategy?: 'loaded-first' | 'version-first';
+-  plugins?: string[];
++  filename: string;
++  remotes: Record<string, string>;
++  exposes: Record<string, string>;
++  shared: ShareObject;
++  shareStrategy: moduleFederationPlugin.SharedStrategy;
++  plugins: string[];
+ }
+ 
+-export type ModuleFederationConfigNormalized = Required<ModuleFederationConfig>;
+-
+ export type ModuleFederationExtraOptions = {
+   flags?: MetroMFFlags;
+ };
+diff --git a/packages/metro-core/tsconfig.json b/packages/metro-core/tsconfig.json
+index 2c0aa558177..c2e1f1b1166 100644
+--- a/packages/metro-core/tsconfig.json
++++ b/packages/metro-core/tsconfig.json
+@@ -3,6 +3,7 @@
+   "include": ["src"],
+   "compilerOptions": {
+     "rootDir": "src",
++    "jsx": "react-jsx",
+     "paths": {
+       "metro/private/*": ["metro/src/*"]
+     }
+diff --git a/packages/metro-core/tsconfig.lib.json b/packages/metro-core/tsconfig.lib.json
+index 33eca2c2cdf..ce71b83a01e 100644
+--- a/packages/metro-core/tsconfig.lib.json
++++ b/packages/metro-core/tsconfig.lib.json
+@@ -6,5 +6,5 @@
+     "types": ["node"]
+   },
+   "include": ["src/**/*.ts"],
+-  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
++  "exclude": ["vitest.config.mts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+ }
+diff --git a/packages/metro-core/tsconfig.spec.json b/packages/metro-core/tsconfig.spec.json
+index 0d3c604ea76..87a3cf65d5e 100644
+--- a/packages/metro-core/tsconfig.spec.json
++++ b/packages/metro-core/tsconfig.spec.json
+@@ -4,12 +4,12 @@
+     "outDir": "../../dist/out-tsc",
+     "module": "commonjs",
+     "moduleResolution": "node10",
+-    "types": ["jest", "node"]
++    "types": ["vitest/globals", "node"]
+   },
+   "include": [
+-    "jest.config.ts",
+-    "src/**/*.test.ts",
+-    "src/**/*.spec.ts",
++    "vitest.config.mts",
++    "__tests__/**/*.test.ts",
++    "__tests__/**/*.spec.ts",
+     "src/**/*.d.ts"
+   ]
+ }
+diff --git a/packages/metro-core/vitest.config.mts b/packages/metro-core/vitest.config.mts
+new file mode 100644
+index 00000000000..a0988637797
+--- /dev/null
++++ b/packages/metro-core/vitest.config.mts
+@@ -0,0 +1,10 @@
++import { defineConfig } from 'vitest/config';
++
++export default defineConfig({
++  cacheDir: '../../node_modules/.vitest/metro-core',
++  test: {
++    environment: 'node',
++    include: ['__tests__/**/*.spec.ts', '__tests__/**/*.test.ts'],
++    globals: true,
++  },
++});
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index c39b3fa4709..0a896198c97 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -3421,6 +3421,9 @@ importers:
+       '@typescript-eslint/parser':
+         specifier: 8.54.0
+         version: 8.54.0(eslint@9.26.0(hono@4.11.7)(jiti@2.6.1))(typescript@5.9.3)
++      memfs:
++        specifier: 4.46.0
++        version: 4.46.0
+       metro:
+         specifier: ^0.82.1
+         version: 0.82.5
+@@ -3553,13 +3556,13 @@ importers:
+     devDependencies:
+       '@modern-js/app-tools':
+         specifier: 2.70.5
+-        version: 2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(@swc/core@1.15.10(@swc/helpers@0.5.18))(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.57.0)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(ts-node@10.9.2(@swc/core@1.15.10(@swc/helpers@0.5.18))(@types/node@22.19.9)(typescript@5.8.2))(tsconfig-paths@4.2.0)(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)
++        version: 2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(@swc/core@1.15.10(@swc/helpers@0.5.18))(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.57.0)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(ts-node@10.9.2(@swc/core@1.15.10(@swc/helpers@0.5.18))(@types/node@22.19.9)(typescript@5.8.2))(tsconfig-paths@4.2.0)(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)
+       '@modern-js/module-tools':
+         specifier: 2.70.5
+         version: 2.70.5(@types/node@22.19.9)(typescript@5.8.2)
+       '@modern-js/runtime':
+         specifier: 2.70.5
+-        version: 2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)
++        version: 2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)
+       '@modern-js/server-runtime':
+         specifier: 2.70.5
+         version: 2.70.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+@@ -32484,7 +32487,7 @@ snapshots:
+       - webpack-hot-middleware
+       - webpack-plugin-serve
+ 
+-  '@modern-js/app-tools@2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(@swc/core@1.15.10(@swc/helpers@0.5.18))(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.57.0)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(ts-node@10.9.2(@swc/core@1.15.10(@swc/helpers@0.5.18))(@types/node@22.19.9)(typescript@5.8.2))(tsconfig-paths@4.2.0)(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)':
++  '@modern-js/app-tools@2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(@swc/core@1.15.10(@swc/helpers@0.5.18))(encoding@0.1.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(rollup@4.57.0)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(ts-node@10.9.2(@swc/core@1.15.10(@swc/helpers@0.5.18))(@types/node@22.19.9)(typescript@5.8.2))(tsconfig-paths@4.2.0)(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)':
+     dependencies:
+       '@babel/parser': 7.28.6
+       '@babel/traverse': 7.28.6
+@@ -32501,7 +32504,7 @@ snapshots:
+       '@modern-js/server-core': 2.70.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+       '@modern-js/server-utils': 2.70.5(@babel/traverse@7.28.6)(@rsbuild/core@1.7.3)
+       '@modern-js/types': 2.70.5
+-      '@modern-js/uni-builder': 2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(esbuild@0.25.5)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)
++      '@modern-js/uni-builder': 2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(esbuild@0.25.5)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)
+       '@modern-js/utils': 2.70.5
+       '@rsbuild/core': 1.7.3
+       '@rsbuild/plugin-node-polyfill': 1.4.3(@rsbuild/core@1.7.3)
+@@ -33304,7 +33307,7 @@ snapshots:
+       react-dom: 19.2.4(react@19.2.4)
+       react-server-dom-webpack: 19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4))
+ 
+-  '@modern-js/render@2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)':
++  '@modern-js/render@2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)':
+     dependencies:
+       '@modern-js/types': 2.70.5
+       '@modern-js/utils': 2.70.5
+@@ -33447,7 +33450,7 @@ snapshots:
+       - react-server-dom-webpack
+       - supports-color
+ 
+-  '@modern-js/runtime@2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)':
++  '@modern-js/runtime@2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)':
+     dependencies:
+       '@babel/core': 7.28.6
+       '@babel/types': 7.28.6
+@@ -33457,7 +33460,7 @@ snapshots:
+       '@modern-js/plugin': 2.70.5
+       '@modern-js/plugin-data-loader': 2.70.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+       '@modern-js/plugin-v2': 2.70.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+-      '@modern-js/render': 2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)
++      '@modern-js/render': 2.70.5(react-dom@19.2.4(react@19.2.4))(react-server-dom-webpack@19.2.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(react@19.2.4)
+       '@modern-js/runtime-utils': 2.70.5(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+       '@modern-js/types': 2.70.5
+       '@modern-js/utils': 2.70.5
+@@ -34150,7 +34153,7 @@ snapshots:
+       - webpack-hot-middleware
+       - webpack-plugin-serve
+ 
+-  '@modern-js/uni-builder@2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(esbuild@0.25.5)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)':
++  '@modern-js/uni-builder@2.70.5(@rspack/core@1.7.5(@swc/helpers@0.5.18))(esbuild@0.25.5)(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(type-fest@4.41.0)(typescript@5.8.2)(webpack-cli@5.1.4)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)':
+     dependencies:
+       '@babel/core': 7.28.6
+       '@babel/preset-react': 7.28.5(@babel/core@7.28.6)
+@@ -34158,12 +34161,12 @@ snapshots:
+       '@modern-js/babel-preset': 2.70.5(@rsbuild/core@1.7.3)
+       '@modern-js/flight-server-transform-plugin': 2.70.5
+       '@modern-js/utils': 2.70.5
+-      '@pmmmwh/react-refresh-webpack-plugin': 0.5.16(react-refresh@0.14.2)(type-fest@4.41.0)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      '@pmmmwh/react-refresh-webpack-plugin': 0.5.16(react-refresh@0.14.2)(type-fest@4.41.0)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       '@rsbuild/core': 1.7.3
+       '@rsbuild/plugin-assets-retry': 1.5.2(@rsbuild/core@1.7.3)
+       '@rsbuild/plugin-babel': 1.1.0(@rsbuild/core@1.7.3)
+       '@rsbuild/plugin-check-syntax': 1.6.1(@rsbuild/core@1.7.3)
+-      '@rsbuild/plugin-css-minimizer': 1.1.1(@rsbuild/core@1.7.3)(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      '@rsbuild/plugin-css-minimizer': 1.1.1(@rsbuild/core@1.7.3)(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       '@rsbuild/plugin-less': 1.6.0(@rsbuild/core@1.7.3)
+       '@rsbuild/plugin-pug': 1.3.2(@rsbuild/core@1.7.3)
+       '@rsbuild/plugin-react': 1.4.5(@rsbuild/core@1.7.3)(webpack-hot-middleware@2.26.1)
+@@ -34180,7 +34183,7 @@ snapshots:
+       '@swc/core': 1.15.8(@swc/helpers@0.5.18)
+       '@swc/helpers': 0.5.18
+       autoprefixer: 10.4.23(postcss@8.5.6)
+-      babel-loader: 9.2.1(@babel/core@7.28.6)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      babel-loader: 9.2.1(@babel/core@7.28.6)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       babel-plugin-import: 1.13.8
+       babel-plugin-styled-components: 1.13.3(styled-components@6.1.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+       babel-plugin-transform-react-remove-prop-types: 0.4.24
+@@ -34189,7 +34192,7 @@ snapshots:
+       es-module-lexer: 1.7.0
+       glob: 9.3.5
+       html-minifier-terser: 7.2.0
+-      html-webpack-plugin: 5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      html-webpack-plugin: 5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       jiti: 1.21.7
+       lodash: 4.17.23
+       magic-string: 0.30.21
+@@ -34204,11 +34207,11 @@ snapshots:
+       postcss-page-break: 3.0.4(postcss@8.5.6)
+       react-refresh: 0.14.2
+       rspack-manifest-plugin: 5.0.3(@rspack/core@1.7.5(@swc/helpers@0.5.18))
+-      terser-webpack-plugin: 5.3.14(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      terser-webpack-plugin: 5.3.14(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       ts-deepmerge: 7.0.2
+-      ts-loader: 9.4.4(typescript@5.8.2)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+-      webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)
+-      webpack-subresource-integrity: 5.1.0(html-webpack-plugin@5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      ts-loader: 9.4.4(typescript@5.8.2)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      webpack: 5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)
++      webpack-subresource-integrity: 5.1.0(html-webpack-plugin@5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+     transitivePeerDependencies:
+       - '@parcel/css'
+       - '@rspack/core'
+@@ -36429,7 +36432,7 @@ snapshots:
+       webpack-dev-server: 5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4))
+       webpack-hot-middleware: 2.26.1
+ 
+-  '@pmmmwh/react-refresh-webpack-plugin@0.5.16(react-refresh@0.14.2)(type-fest@4.41.0)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))':
++  '@pmmmwh/react-refresh-webpack-plugin@0.5.16(react-refresh@0.14.2)(type-fest@4.41.0)(webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack-hot-middleware@2.26.1)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))':
+     dependencies:
+       ansi-html: 0.0.9
+       core-js-pure: 3.48.0
+@@ -36442,7 +36445,7 @@ snapshots:
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)
+     optionalDependencies:
+       type-fest: 4.41.0
+-      webpack-dev-server: 5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      webpack-dev-server: 5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       webpack-hot-middleware: 2.26.1
+ 
+   '@pnpm/config.env-replace@1.1.0': {}
+@@ -39349,7 +39352,7 @@ snapshots:
+       - lightningcss
+       - webpack
+ 
+-  '@rsbuild/plugin-css-minimizer@1.1.1(@rsbuild/core@1.7.3)(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))':
++  '@rsbuild/plugin-css-minimizer@1.1.1(@rsbuild/core@1.7.3)(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))':
+     dependencies:
+       css-minimizer-webpack-plugin: 7.0.2(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       reduce-configs: 1.1.1
+@@ -39847,9 +39850,9 @@ snapshots:
+   '@rsbuild/webpack@1.6.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.5(@swc/helpers@0.5.18))(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)':
+     dependencies:
+       '@rsbuild/core': 1.7.3
+-      copy-webpack-plugin: 11.0.0(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+-      html-webpack-plugin: 5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+-      mini-css-extract-plugin: 2.9.4(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      copy-webpack-plugin: 11.0.0(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      html-webpack-plugin: 5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      mini-css-extract-plugin: 2.9.4(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       picocolors: 1.1.1
+       reduce-configs: 1.1.1
+       tsconfig-paths-webpack-plugin: 4.2.0
+@@ -45389,7 +45392,7 @@ snapshots:
+       schema-utils: 4.3.3
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4)
+ 
+-  babel-loader@9.2.1(@babel/core@7.28.6)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  babel-loader@9.2.1(@babel/core@7.28.6)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       '@babel/core': 7.28.6
+       find-cache-dir: 4.0.0
+@@ -46729,7 +46732,7 @@ snapshots:
+       serialize-javascript: 6.0.2
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4)
+ 
+-  copy-webpack-plugin@11.0.0(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  copy-webpack-plugin@11.0.0(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       fast-glob: 3.3.2
+       glob-parent: 6.0.2
+@@ -50943,7 +50946,7 @@ snapshots:
+       '@rspack/core': 1.7.5(@swc/helpers@0.5.18)
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4)
+ 
+-  html-webpack-plugin@5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  html-webpack-plugin@5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       '@types/html-minifier-terser': 6.1.0
+       html-minifier-terser: 6.1.0
+@@ -53956,7 +53959,7 @@ snapshots:
+       tapable: 2.2.1
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4)
+ 
+-  mini-css-extract-plugin@2.9.4(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  mini-css-extract-plugin@2.9.4(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       schema-utils: 4.3.3
+       tapable: 2.2.1
+@@ -61045,7 +61048,7 @@ snapshots:
+       '@swc/core': 1.15.8(@swc/helpers@0.5.18)
+       esbuild: 0.25.5
+ 
+-  terser-webpack-plugin@5.3.14(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  terser-webpack-plugin@5.3.14(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       '@jridgewell/trace-mapping': 0.3.31
+       jest-worker: 27.5.1
+@@ -61105,7 +61108,7 @@ snapshots:
+       '@swc/core': 1.15.10(@swc/helpers@0.5.18)
+       esbuild: 0.25.0
+ 
+-  terser-webpack-plugin@5.3.16(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  terser-webpack-plugin@5.3.16(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       '@jridgewell/trace-mapping': 0.3.31
+       jest-worker: 27.5.1
+@@ -61530,7 +61533,7 @@ snapshots:
+       babel-jest: 29.7.0(@babel/core@7.28.6)
+       esbuild: 0.25.0
+ 
+-  ts-loader@9.4.4(typescript@5.8.2)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  ts-loader@9.4.4(typescript@5.8.2)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       chalk: 4.1.2
+       enhanced-resolve: 5.19.0
+@@ -62993,7 +62996,7 @@ snapshots:
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.18.20)(webpack-cli@5.1.4)
+     optional: true
+ 
+-  webpack-dev-middleware@7.4.5(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  webpack-dev-middleware@7.4.5(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       colorette: 2.0.20
+       memfs: 4.46.0
+@@ -63116,7 +63119,7 @@ snapshots:
+       - utf-8-validate
+     optional: true
+ 
+-  webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  webpack-dev-server@5.2.3(webpack-cli@5.1.4)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       '@types/bonjour': 3.5.13
+       '@types/connect-history-api-fallback': 1.5.4
+@@ -63144,7 +63147,7 @@ snapshots:
+       serve-index: 1.9.2
+       sockjs: 0.3.24
+       spdy: 4.0.2
+-      webpack-dev-middleware: 7.4.5(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      webpack-dev-middleware: 7.4.5(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       ws: 8.18.0
+     optionalDependencies:
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)
+@@ -63313,12 +63316,12 @@ snapshots:
+     optionalDependencies:
+       html-webpack-plugin: 5.6.6(@rspack/core@1.3.9(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.0)(webpack-cli@5.1.4))
+ 
+-  webpack-subresource-integrity@5.1.0(html-webpack-plugin@5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
++  webpack-subresource-integrity@5.1.0(html-webpack-plugin@5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)):
+     dependencies:
+       typed-assert: 1.0.9
+       webpack: 5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4)
+     optionalDependencies:
+-      html-webpack-plugin: 5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      html-webpack-plugin: 5.6.6(@rspack/core@1.7.5(@swc/helpers@0.5.18))(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+ 
+   webpack-virtual-modules@0.6.2: {}
+ 
+@@ -63448,7 +63451,7 @@ snapshots:
+       neo-async: 2.6.2
+       schema-utils: 4.3.3
+       tapable: 2.3.0
+-      terser-webpack-plugin: 5.3.16(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.8(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
++      terser-webpack-plugin: 5.3.16(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack@5.104.1(@swc/core@1.15.10(@swc/helpers@0.5.18))(esbuild@0.25.5)(webpack-cli@5.1.4))
+       watchpack: 2.5.1
+       webpack-sources: 3.3.3
+     optionalDependencies:

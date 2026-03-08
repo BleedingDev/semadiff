@@ -1,0 +1,53 @@
+diff --git a/apps/website-new/docs/en/plugin/dev/index.mdx b/apps/website-new/docs/en/plugin/dev/index.mdx
+index 573478da3d6..e05846a7aa6 100644
+--- a/apps/website-new/docs/en/plugin/dev/index.mdx
++++ b/apps/website-new/docs/en/plugin/dev/index.mdx
+@@ -534,6 +534,36 @@ const changeScriptAttributePlugin: () => FederationRuntimePlugin = function () {
+ };
+ ```
+ 
++### fetch
++The `fetch` function allows customizing the request that fetches the manifest JSON. A successful `Response` must yield a valid JSON.
++
++`AsyncHook`
++
++- **Type**
++
++```typescript
++function fetch(manifestUrl: string, requestInit: RequestInit): Promise<Response> | void | false;
++```
++
++- Example for including the credentials when fetching the manifest JSON:
++
++```typescript
++// fetch-manifest-with-credentials-plugin.ts
++import type { FederationRuntimePlugin } from '@module-federation/enhanced/runtime';
++
++export default function (): FederationRuntimePlugin {
++  return {
++    name: 'fetch-manifest-with-credentials-plugin',
++    fetch(manifestUrl, requestInit) {
++      return fetch(manifestUrl, {
++        ...requestInit,
++        credentials: 'include'
++      });
++    },
++  }
++};
++```
++
+ ### loadEntry
+ The `loadEntry` function allows for full customization of remotes, enabling you to extend and create new remote types. The following two simple examples demonstrate loading JSON data and module delegation.
+ 
+diff --git a/packages/runtime/src/core.ts b/packages/runtime/src/core.ts
+index 27f28103335..941a400d6e3 100644
+--- a/packages/runtime/src/core.ts
++++ b/packages/runtime/src/core.ts
+@@ -110,7 +110,6 @@ export class FederationHost {
+       ],
+       HTMLLinkElement | void
+     >(),
+-    // only work for manifest , so not open to the public yet
+     fetch: new AsyncHook<
+       [string, RequestInit],
+       Promise<Response> | void | false

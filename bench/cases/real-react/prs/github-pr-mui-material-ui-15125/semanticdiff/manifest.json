@@ -1,0 +1,14 @@
+[
+  {
+    "tracking_name": "docs/src/pages/utils/portal/SimplePortal.tsx",
+    "diff": "/gh/mui/material-ui/diff?new_filename=docs%2Fsrc%2Fpages%2Futils%2Fportal%2FSimplePortal.tsx&new_oid=81e642dd6f339a693c89ef7b6f554aac532fcded&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "new": {
+      "name": "docs/src/pages/utils/portal/SimplePortal.tsx",
+      "oid": "81e642dd6f339a693c89ef7b6f554aac532fcded",
+      "mode": 33188
+    },
+    "semantic": false,
+    "github_hash": "af64c3c003e1aa84249bc376586a988dc308645b78f5a4c27e13ab8233644b97"
+  }
+]

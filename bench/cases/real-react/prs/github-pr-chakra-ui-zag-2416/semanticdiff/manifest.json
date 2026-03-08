@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "examples/vanilla-ts/src/component.ts",
+    "diff": "/gh/chakra-ui/zag/diff?old_filename=examples%2Fvanilla-ts%2Fsrc%2Fcomponent.ts&old_oid=b7492a469daa12b5dcec6a673ff9961cd121f6a9&old_mode=33188&new_filename=examples%2Fvanilla-ts%2Fsrc%2Fcomponent.ts&new_oid=dd484d7a531cfe8d530ced4f38fe969480b3d1df&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "examples/vanilla-ts/src/component.ts",
+      "oid": "b7492a469daa12b5dcec6a673ff9961cd121f6a9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "examples/vanilla-ts/src/component.ts",
+      "oid": "dd484d7a531cfe8d530ced4f38fe969480b3d1df",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0213761617c6d84892a04554636e8b821d58dc9c3d1c0baf1cdf69de5644f598"
+  }
+]

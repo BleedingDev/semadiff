@@ -1,0 +1,2331 @@
+[
+  {
+    "tracking_name": "packages/components/src/accordion/accordion-content.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-content.tsx&old_oid=b044482d8193abd270922c8fb76eb93ac2aebea1&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-content.tsx&new_oid=95c6e5bc1440d1e1fc95402a91663dfd4ac406da&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/components/src/accordion/accordion-content.tsx",
+      "oid": "b044482d8193abd270922c8fb76eb93ac2aebea1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/accordion-content.tsx",
+      "oid": "95c6e5bc1440d1e1fc95402a91663dfd4ac406da",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2af7e39dc5e21edf17635d75a0feb7e0992b1602213ff0632c760aa12df4fed8"
+  },
+  {
+    "tracking_name": "packages/components/src/accordion/accordion-icon.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-icon.tsx&old_oid=35644db6f3d34100c56c611039fba7d398484607&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-icon.tsx&new_oid=c9a7738a5767769f315bf3827319375d521dacab&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/components/src/accordion/accordion-icon.tsx",
+      "oid": "35644db6f3d34100c56c611039fba7d398484607",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/accordion-icon.tsx",
+      "oid": "c9a7738a5767769f315bf3827319375d521dacab",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0fc41462e4a24f5f04532424e77f124c1e4bc8b9a6a7d734f4c172eb12572b4b"
+  },
+  {
+    "tracking_name": "packages/components/src/accordion/accordion-item.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-item.tsx&old_oid=d572f36da07068c50834d31e85f241f04d94f18f&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-item.tsx&new_oid=e20fa7f5a261fe4dec283c8c4ead4284090d9544&new_mode=33188",
+    "file": "diffs/diff-003.json",
+    "old": {
+      "name": "packages/components/src/accordion/accordion-item.tsx",
+      "oid": "d572f36da07068c50834d31e85f241f04d94f18f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/accordion-item.tsx",
+      "oid": "e20fa7f5a261fe4dec283c8c4ead4284090d9544",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fafdf006140448f9b73d7fa2d5b6deb8b5717a0bba344fc6078372caefa64d0d"
+  },
+  {
+    "tracking_name": "packages/components/src/accordion/accordion-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-props.ts&old_oid=6b272e4b3ca5faa15f14fe650028ca2c636e4cd1&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion-props.ts&new_oid=2d37deb2e120e279de9bb4759b97eddab0decf2c&new_mode=33188",
+    "file": "diffs/diff-004.json",
+    "old": {
+      "name": "packages/components/src/accordion/accordion-props.ts",
+      "oid": "6b272e4b3ca5faa15f14fe650028ca2c636e4cd1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/accordion-props.ts",
+      "oid": "2d37deb2e120e279de9bb4759b97eddab0decf2c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a00848c974c826bd059dbc56b90dff2a0b8b132e61a7a0ffe5cdcd60bacc9c3b"
+  },
+  {
+    "tracking_name": "packages/components/src/accordion/accordion.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion.stories.tsx&old_oid=94fc7a735dbf29230d32612ca2fb9ae26942a93e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Faccordion.stories.tsx&new_oid=18f3e2f4ff8f60276f20b265d39e5173cab02c4c&new_mode=33188",
+    "file": "diffs/diff-005.json",
+    "old": {
+      "name": "packages/components/src/accordion/accordion.stories.tsx",
+      "oid": "94fc7a735dbf29230d32612ca2fb9ae26942a93e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/accordion.stories.tsx",
+      "oid": "18f3e2f4ff8f60276f20b265d39e5173cab02c4c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ff7aa8966ae634db3b07bc446c8217d4a387fb1defedb42db0d83dc93d936993"
+  },
+  {
+    "tracking_name": "packages/components/src/accordion/use-accordion-item-state.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Fuse-accordion-item-state.ts&old_oid=9dee3abf2422c68b4e5ca552b350ff1df41d3ee3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Fuse-accordion-item-state.ts&new_oid=ebd2d81b70e6031d77a3a9eb980652fffab1c7d6&new_mode=33188",
+    "file": "diffs/diff-006.json",
+    "old": {
+      "name": "packages/components/src/accordion/use-accordion-item-state.ts",
+      "oid": "9dee3abf2422c68b4e5ca552b350ff1df41d3ee3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/use-accordion-item-state.ts",
+      "oid": "ebd2d81b70e6031d77a3a9eb980652fffab1c7d6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5bcfe7fb703a5c26417481f38e184596341b6660b1f362803d571733ff3f53a5"
+  },
+  {
+    "tracking_name": "packages/components/src/accordion/use-accordion.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Fuse-accordion.ts&old_oid=6b114cd760db409864fe75b4af6be149733412ef&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Faccordion%2Fuse-accordion.ts&new_oid=9a7b48f58149b9ac041d58cf0e4c61185ec608a3&new_mode=33188",
+    "file": "diffs/diff-007.json",
+    "old": {
+      "name": "packages/components/src/accordion/use-accordion.ts",
+      "oid": "6b114cd760db409864fe75b4af6be149733412ef",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/accordion/use-accordion.ts",
+      "oid": "9a7b48f58149b9ac041d58cf0e4c61185ec608a3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8d21479efefdeda496f48c3c07d15f978363cc47c4e35bfe7dda1c03b06990ae"
+  },
+  {
+    "tracking_name": "packages/components/src/button/button-context.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-context.ts&old_oid=dbad205038ade6a53e9c6ca23c68acb0335eae2e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-context.ts&new_oid=24a14d02f251787a3e84f2265d28ee2f194799fe&new_mode=33188",
+    "file": "diffs/diff-008.json",
+    "old": {
+      "name": "packages/components/src/button/button-context.ts",
+      "oid": "dbad205038ade6a53e9c6ca23c68acb0335eae2e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/button/button-context.ts",
+      "oid": "24a14d02f251787a3e84f2265d28ee2f194799fe",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "cb45e54736161daace460351c813c95d4bc008b679006f88d7f196b0fb37a04a"
+  },
+  {
+    "tracking_name": "packages/components/src/button/button-group.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-group.test.tsx&old_oid=074fadbbf09821bb92d34891f29b1ac71136d3b9&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-group.test.tsx&new_oid=15f9a1b5b2cbf0325da3a6635d768e5fcc1e7f88&new_mode=33188",
+    "file": "diffs/diff-009.json",
+    "old": {
+      "name": "packages/components/src/button/button-group.test.tsx",
+      "oid": "074fadbbf09821bb92d34891f29b1ac71136d3b9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/button/button-group.test.tsx",
+      "oid": "15f9a1b5b2cbf0325da3a6635d768e5fcc1e7f88",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1d68fc9c020dd0394ea8a27548750f3ee6364aba17a274a210fbc3024c1171cd"
+  },
+  {
+    "tracking_name": "packages/components/src/button/button-group.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-group.tsx&old_oid=205ca14896ba020adb6c185133bfafc6882a9ba0&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-group.tsx&new_oid=4b8e340ef4b4181ea63855b4aeb969748aad4bfa&new_mode=33188",
+    "file": "diffs/diff-010.json",
+    "old": {
+      "name": "packages/components/src/button/button-group.tsx",
+      "oid": "205ca14896ba020adb6c185133bfafc6882a9ba0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/button/button-group.tsx",
+      "oid": "4b8e340ef4b4181ea63855b4aeb969748aad4bfa",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ed507eed86de645e6fdb872ae0258fa2bb7e37d1c0d77c0a634e4dd76781f33c"
+  },
+  {
+    "tracking_name": "packages/components/src/button/button-types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-types.ts&old_oid=1eea7fc58a039a769b79750721ccc725068242c3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton-types.ts&new_oid=e8dbdb0a7c86ef726e4274f6947a1212af77e774&new_mode=33188",
+    "file": "diffs/diff-011.json",
+    "old": {
+      "name": "packages/components/src/button/button-types.ts",
+      "oid": "1eea7fc58a039a769b79750721ccc725068242c3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/button/button-types.ts",
+      "oid": "e8dbdb0a7c86ef726e4274f6947a1212af77e774",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6628e1f2617cbbaea6eba51689b74c902cc1ca643fd4bdbb413fa41356ecc81a"
+  },
+  {
+    "tracking_name": "packages/components/src/button/button.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton.stories.tsx&old_oid=8709bc8deb495714eb0d9a8f69b0558c3a77ce87&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton.stories.tsx&new_oid=21b0bb36f21db130345c9f72cfc063abb9ca9977&new_mode=33188",
+    "file": "diffs/diff-012.json",
+    "old": {
+      "name": "packages/components/src/button/button.stories.tsx",
+      "oid": "8709bc8deb495714eb0d9a8f69b0558c3a77ce87",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/button/button.stories.tsx",
+      "oid": "21b0bb36f21db130345c9f72cfc063abb9ca9977",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "bbf46506abfae1120cf26d18fc3f0eb65d14e9933b2801533ddf16dcb244e573"
+  },
+  {
+    "tracking_name": "packages/components/src/button/button.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton.tsx&old_oid=fb222a8514f628a3408504b8009fc9074da6d11c&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fbutton%2Fbutton.tsx&new_oid=d6e39d8629f767dea3b9134d3a470a7994d1d97c&new_mode=33188",
+    "file": "diffs/diff-013.json",
+    "old": {
+      "name": "packages/components/src/button/button.tsx",
+      "oid": "fb222a8514f628a3408504b8009fc9074da6d11c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/button/button.tsx",
+      "oid": "d6e39d8629f767dea3b9134d3a470a7994d1d97c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "31c5d0e4c3cacae33414a1c73e91c33c8b566c7aaa90a5896838c3baacda10e8"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox-control.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-control.tsx&old_oid=5d341e5902c48c2e8cfddbda6eff01c8060771cf&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-control.tsx&new_oid=64f78c4fa4a85f1906ae071100ebb79f8c53917c&new_mode=33188",
+    "file": "diffs/diff-014.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox-control.tsx",
+      "oid": "5d341e5902c48c2e8cfddbda6eff01c8060771cf",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox-control.tsx",
+      "oid": "64f78c4fa4a85f1906ae071100ebb79f8c53917c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2194f56d58a17c4ccfc808d4e8d2ac81d82e9aa1c450278d2b334a7e521e3d2f"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox-group.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-group.tsx&old_oid=1db37443f481962f842dcf3865b823b1d3aadad3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-group.tsx&new_oid=a77622e5b5568f8ba897cf4caa32643b48785464&new_mode=33188",
+    "file": "diffs/diff-015.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox-group.tsx",
+      "oid": "1db37443f481962f842dcf3865b823b1d3aadad3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox-group.tsx",
+      "oid": "a77622e5b5568f8ba897cf4caa32643b48785464",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1c1d2990612b274cb7b6717f6780ea95858d1f57005cac35e9dfdac82caf62e8"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox-icon.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-icon.tsx&old_oid=df28ebcc4bf5dbafeb15b0f745ad7c90973d7105&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-icon.tsx&new_oid=5abc9c5db186b0031dd2dca3ff459e3dd1ffb9b8&new_mode=33188",
+    "file": "diffs/diff-016.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox-icon.tsx",
+      "oid": "df28ebcc4bf5dbafeb15b0f745ad7c90973d7105",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox-icon.tsx",
+      "oid": "5abc9c5db186b0031dd2dca3ff459e3dd1ffb9b8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4d254f98fb2faa5063e6a7e62a3d615c402b4dfa351b9999ccd64b949a4c3c16"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-props.ts&old_oid=0eb07024504343390e0b86c9848d4ebd346980aa&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-props.ts&new_oid=9d6bd78ddb3accfe004e3e7d88a694584dd4ee5b&new_mode=33188",
+    "file": "diffs/diff-017.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox-props.ts",
+      "oid": "0eb07024504343390e0b86c9848d4ebd346980aa",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox-props.ts",
+      "oid": "9d6bd78ddb3accfe004e3e7d88a694584dd4ee5b",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9d241fd525345ee6e48c19197d080ec7770715f3231914183289a56525e01b8b"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-root.tsx&old_oid=8ac0942919b2b381eadef58afe873274da790594&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-root.tsx&new_oid=363564a9754127f4f32caf4d0f058e51228fe6c3&new_mode=33188",
+    "file": "diffs/diff-018.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox-root.tsx",
+      "oid": "8ac0942919b2b381eadef58afe873274da790594",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox-root.tsx",
+      "oid": "363564a9754127f4f32caf4d0f058e51228fe6c3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f02d3a4edb437dbbebcca6ca49ab42d85e6f99b6028acca738d4263cc0583289"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox-types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-types.ts&old_oid=826541663b9500c2afcfcea3b65c5ef2b42716b4&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox-types.ts&new_oid=e7ba0f0efe288b14c3f76a911bb482aee6645344&new_mode=33188",
+    "file": "diffs/diff-019.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox-types.ts",
+      "oid": "826541663b9500c2afcfcea3b65c5ef2b42716b4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox-types.ts",
+      "oid": "e7ba0f0efe288b14c3f76a911bb482aee6645344",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "653d08fa5e03f27725cbbf463f3cd1efc1afcc79ded040de0147152afc28107c"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox.stories.tsx&old_oid=fd80491fec7bbf89ea3949568b6a05d8a3804458&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox.stories.tsx&new_oid=cd595bbb828d086807aa5e6b856bb7c6b16d4427&new_mode=33188",
+    "file": "diffs/diff-020.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox.stories.tsx",
+      "oid": "fd80491fec7bbf89ea3949568b6a05d8a3804458",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox.stories.tsx",
+      "oid": "cd595bbb828d086807aa5e6b856bb7c6b16d4427",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b77b09e604ec88dc21d6e577f162ac62a9aae3ac535da725ec669224380379d9"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/checkbox.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox.test.tsx&old_oid=bdd935391568b497e6f5528d74355ca6319d5fbc&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fcheckbox.test.tsx&new_oid=9191ac82c751a46f7bf54a960a644ee5daf541f6&new_mode=33188",
+    "file": "diffs/diff-021.json",
+    "old": {
+      "name": "packages/components/src/checkbox/checkbox.test.tsx",
+      "oid": "bdd935391568b497e6f5528d74355ca6319d5fbc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/checkbox.test.tsx",
+      "oid": "9191ac82c751a46f7bf54a960a644ee5daf541f6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1d4e26d08a9f6fa14ed45e12e533611a98831b877fa01775b5980e0dd1e1f497"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/use-checkbox-group.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fuse-checkbox-group.ts&old_oid=577640c1dc9dcc6c269d1bb1e5e876059b663011&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fuse-checkbox-group.ts&new_oid=e84eae393e853fc0e805cd060f1fea5a450f3212&new_mode=33188",
+    "file": "diffs/diff-022.json",
+    "old": {
+      "name": "packages/components/src/checkbox/use-checkbox-group.ts",
+      "oid": "577640c1dc9dcc6c269d1bb1e5e876059b663011",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/use-checkbox-group.ts",
+      "oid": "e84eae393e853fc0e805cd060f1fea5a450f3212",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "92d7d8e49113a4d3f12e45f92f0517880e84b73bb33244e911ca7cc7d999aedf"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/use-checkbox.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fuse-checkbox.ts&old_oid=bfcd6f668b5160732d6d2bb5e28798600c047477&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fuse-checkbox.ts&new_oid=dda6130a8cd4bc8865c496aa08c1fd899954d4b6&new_mode=33188",
+    "file": "diffs/diff-023.json",
+    "old": {
+      "name": "packages/components/src/checkbox/use-checkbox.ts",
+      "oid": "bfcd6f668b5160732d6d2bb5e28798600c047477",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/use-checkbox.ts",
+      "oid": "dda6130a8cd4bc8865c496aa08c1fd899954d4b6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d55085242b214dbd891afa0c95fcb49e9aaa6b28b77c0fc19efe4b79291d02ab"
+  },
+  {
+    "tracking_name": "packages/components/src/checkbox/use-initial-animation-state.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fuse-initial-animation-state.ts&old_oid=fb310085d77d723e3512c8c5f9663e5c56735c47&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fcheckbox%2Fuse-initial-animation-state.ts&new_oid=c239fdeebdeaa1ec171c2a04cb35c49e26f65b77&new_mode=33188",
+    "file": "diffs/diff-024.json",
+    "old": {
+      "name": "packages/components/src/checkbox/use-initial-animation-state.ts",
+      "oid": "fb310085d77d723e3512c8c5f9663e5c56735c47",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/checkbox/use-initial-animation-state.ts",
+      "oid": "c239fdeebdeaa1ec171c2a04cb35c49e26f65b77",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4ce6321adb4186d879eda203f51d96614b1a04e2e8dd7120d4706d6cad2b77ba"
+  },
+  {
+    "tracking_name": "packages/components/src/clickable/clickable.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fclickable%2Fclickable.test.tsx&old_oid=b6dfecfe001a29b863cadf1da98eb66798aae338&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fclickable%2Fclickable.test.tsx&new_oid=0f7e6c49785cd9c0b0aa3c1fd7b309fa14bd8975&new_mode=33188",
+    "file": "diffs/diff-025.json",
+    "old": {
+      "name": "packages/components/src/clickable/clickable.test.tsx",
+      "oid": "b6dfecfe001a29b863cadf1da98eb66798aae338",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/clickable/clickable.test.tsx",
+      "oid": "0f7e6c49785cd9c0b0aa3c1fd7b309fa14bd8975",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5cf90c811f26f6c9889cd10ca170555b031533dea6e0472f9b293bc733537568"
+  },
+  {
+    "tracking_name": "packages/components/src/clickable/use-clickable.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fclickable%2Fuse-clickable.stories.tsx&old_oid=3bb92578c642f46b413a34e1f146b1de08cdf6e2&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fclickable%2Fuse-clickable.stories.tsx&new_oid=af88f654fd62cd1c7657256929ae2ef1516ed92d&new_mode=33188",
+    "file": "diffs/diff-026.json",
+    "old": {
+      "name": "packages/components/src/clickable/use-clickable.stories.tsx",
+      "oid": "3bb92578c642f46b413a34e1f146b1de08cdf6e2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/clickable/use-clickable.stories.tsx",
+      "oid": "af88f654fd62cd1c7657256929ae2ef1516ed92d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4e3e038cf5790c579386593312dfde3916b6d87dfc139319d5e95f4744799760"
+  },
+  {
+    "tracking_name": "packages/components/src/clickable/use-clickable.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fclickable%2Fuse-clickable.ts&old_oid=3212d7be30c9bb89cedc50ac0302f68ad1497dd6&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fclickable%2Fuse-clickable.ts&new_oid=ccff172685ad6026c8043f3260d40a9e2f9566d6&new_mode=33188",
+    "file": "diffs/diff-027.json",
+    "old": {
+      "name": "packages/components/src/clickable/use-clickable.ts",
+      "oid": "3212d7be30c9bb89cedc50ac0302f68ad1497dd6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/clickable/use-clickable.ts",
+      "oid": "ccff172685ad6026c8043f3260d40a9e2f9566d6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "94a7556091a5a83d4c4b8106c508b023183c0ff05be58fe15562357941f82d6e"
+  },
+  {
+    "tracking_name": "packages/components/src/close-button/close-button.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fclose-button%2Fclose-button.stories.tsx&old_oid=2de86080139b54c37ddf9e67fcc5db5ea4c03416&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fclose-button%2Fclose-button.stories.tsx&new_oid=49ceaa06d0e46da3818519782b9caca5311914f3&new_mode=33188",
+    "file": "diffs/diff-028.json",
+    "old": {
+      "name": "packages/components/src/close-button/close-button.stories.tsx",
+      "oid": "2de86080139b54c37ddf9e67fcc5db5ea4c03416",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/close-button/close-button.stories.tsx",
+      "oid": "49ceaa06d0e46da3818519782b9caca5311914f3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4269059cb2a6af44276a72110a790ed4220685626c0416a9118522d13196e39c"
+  },
+  {
+    "tracking_name": "packages/components/src/close-button/close-button.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fclose-button%2Fclose-button.tsx&old_oid=c4b31cf8b5cbbb8c63134ef81782fc1556bf1f01&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fclose-button%2Fclose-button.tsx&new_oid=f0e91816bad0ab884dea047d90e64c3c053bf702&new_mode=33188",
+    "file": "diffs/diff-029.json",
+    "old": {
+      "name": "packages/components/src/close-button/close-button.tsx",
+      "oid": "c4b31cf8b5cbbb8c63134ef81782fc1556bf1f01",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/close-button/close-button.tsx",
+      "oid": "f0e91816bad0ab884dea047d90e64c3c053bf702",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e5c707be029c1baf339578462fc811b6bd7f19eced6590e2efee4dfab16d0b8d"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/dialog-focus-scope.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-focus-scope.tsx&old_oid=f0ca2fbe284d05190d099943719e1258c9183ae3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-focus-scope.tsx&new_oid=7ed7839fee1d101adcbbc5acd45da0bb4997ce98&new_mode=33188",
+    "file": "diffs/diff-030.json",
+    "old": {
+      "name": "packages/components/src/dialog/dialog-focus-scope.tsx",
+      "oid": "f0ca2fbe284d05190d099943719e1258c9183ae3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/dialog-focus-scope.tsx",
+      "oid": "7ed7839fee1d101adcbbc5acd45da0bb4997ce98",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9ff4712074ecf305388c76db2e71923aa291447166a74217684db1adcb585db9"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/dialog-manager.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-manager.ts&old_oid=1ea8dfff074d1cc92af5e24baf85afc66fe50f5a&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-manager.ts&new_oid=5c1d9b38d0101ca39f602f17e41eb8b59d6379f1&new_mode=33188",
+    "file": "diffs/diff-031.json",
+    "old": {
+      "name": "packages/components/src/dialog/dialog-manager.ts",
+      "oid": "1ea8dfff074d1cc92af5e24baf85afc66fe50f5a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/dialog-manager.ts",
+      "oid": "5c1d9b38d0101ca39f602f17e41eb8b59d6379f1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5f5f7dd7d66a8f58f66dfec9894b07f8afab5be83dd1af01846c6041ce0b728d"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/dialog-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-props.ts&old_oid=8964a9bae2a6e1c692ace60cf46f81e43ea06b9a&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-props.ts&new_oid=ec6e1efeae31f41e258843d9ca17ec02286ad1a2&new_mode=33188",
+    "file": "diffs/diff-032.json",
+    "old": {
+      "name": "packages/components/src/dialog/dialog-props.ts",
+      "oid": "8964a9bae2a6e1c692ace60cf46f81e43ea06b9a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/dialog-props.ts",
+      "oid": "ec6e1efeae31f41e258843d9ca17ec02286ad1a2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0d707726799a6c2ce5415e4da9c3ea434a9485ec337be4223dbda274636b1c4a"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/dialog-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-root.tsx&old_oid=927ae662e4af9367a4a2106c8119faff192dff5e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog-root.tsx&new_oid=738a5f806d6e1c29d764f17a9eab27d2b86474f9&new_mode=33188",
+    "file": "diffs/diff-033.json",
+    "old": {
+      "name": "packages/components/src/dialog/dialog-root.tsx",
+      "oid": "927ae662e4af9367a4a2106c8119faff192dff5e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/dialog-root.tsx",
+      "oid": "738a5f806d6e1c29d764f17a9eab27d2b86474f9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "90bb0b7c65dccfd622d7c12e03de9d7d4803e9d43e405ec56c3d67fab345f815"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/dialog.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog.stories.tsx&old_oid=a2c9f27b2554637d516ae9620daa887f3e8c4b6e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog.stories.tsx&new_oid=e07f541070cb75a986f12be64c8bccf78e5b7b82&new_mode=33188",
+    "file": "diffs/diff-034.json",
+    "old": {
+      "name": "packages/components/src/dialog/dialog.stories.tsx",
+      "oid": "a2c9f27b2554637d516ae9620daa887f3e8c4b6e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/dialog.stories.tsx",
+      "oid": "e07f541070cb75a986f12be64c8bccf78e5b7b82",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "04a1ca2c125445812d72a253dfae4a8b5fe4c884e01c22ca115fa28e2b746125"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/dialog.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog.test.tsx&old_oid=fe54e864a33254f6919f17301c648669943153c9&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fdialog.test.tsx&new_oid=5df977aa90891adb43c8e4ff1750f0c292f81c93&new_mode=33188",
+    "file": "diffs/diff-035.json",
+    "old": {
+      "name": "packages/components/src/dialog/dialog.test.tsx",
+      "oid": "fe54e864a33254f6919f17301c648669943153c9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/dialog.test.tsx",
+      "oid": "5df977aa90891adb43c8e4ff1750f0c292f81c93",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "220a4e030907b76230039a3d972b3b6e79bff752d15694584fd490cc4c1af4bf"
+  },
+  {
+    "tracking_name": "packages/components/src/dialog/use-dialog.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fuse-dialog.ts&old_oid=142625e9251184c3d27aa591a1dc8a2b437f3705&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdialog%2Fuse-dialog.ts&new_oid=61649e4d1e24a03e90445d35063bf6cfd43825a1&new_mode=33188",
+    "file": "diffs/diff-036.json",
+    "old": {
+      "name": "packages/components/src/dialog/use-dialog.ts",
+      "oid": "142625e9251184c3d27aa591a1dc8a2b437f3705",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/dialog/use-dialog.ts",
+      "oid": "61649e4d1e24a03e90445d35063bf6cfd43825a1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0349f3862906388b3052f3d95bc9e930522c5b3bfb1ee1ba1d84755be8b053df"
+  },
+  {
+    "tracking_name": "packages/components/src/drawer/drawer-content.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer-content.tsx&old_oid=f2557ab344cded458e200db04496b103a1c319f6&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer-content.tsx&new_oid=52146b5d9ff573dc5b26a0e2a5e11867b99a0c5f&new_mode=33188",
+    "file": "diffs/diff-037.json",
+    "old": {
+      "name": "packages/components/src/drawer/drawer-content.tsx",
+      "oid": "f2557ab344cded458e200db04496b103a1c319f6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/drawer/drawer-content.tsx",
+      "oid": "52146b5d9ff573dc5b26a0e2a5e11867b99a0c5f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b810aa666ae0309304c105cb9f1b0a092b5b9eee159ec6e37e24a24db265616a"
+  },
+  {
+    "tracking_name": "packages/components/src/drawer/drawer-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer-root.tsx&old_oid=5bb41949e16060798dfa3334724280fa4a610d1f&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer-root.tsx&new_oid=a8f176abc87d3344a3025080a66a2da0682a7e16&new_mode=33188",
+    "file": "diffs/diff-038.json",
+    "old": {
+      "name": "packages/components/src/drawer/drawer-root.tsx",
+      "oid": "5bb41949e16060798dfa3334724280fa4a610d1f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/drawer/drawer-root.tsx",
+      "oid": "a8f176abc87d3344a3025080a66a2da0682a7e16",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c0df7c9e92a5f87f2519c1a6206d02f94968bcc19128bf07aa2d9e40ae254f6c"
+  },
+  {
+    "tracking_name": "packages/components/src/drawer/drawer.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer.stories.tsx&old_oid=54d2dafa6c1e6402417c32a2589557bee7959058&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer.stories.tsx&new_oid=a892d3a7c80d799cafe12d4fd0fb64532c992422&new_mode=33188",
+    "file": "diffs/diff-039.json",
+    "old": {
+      "name": "packages/components/src/drawer/drawer.stories.tsx",
+      "oid": "54d2dafa6c1e6402417c32a2589557bee7959058",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/drawer/drawer.stories.tsx",
+      "oid": "a892d3a7c80d799cafe12d4fd0fb64532c992422",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b569eeb8d509d46b9171f4cb72a36c2dbdb49a6b592af4575b2ed29ec12b81b4"
+  },
+  {
+    "tracking_name": "packages/components/src/drawer/drawer.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer.test.tsx&old_oid=4c71b206cb74f73df390db422e0e28a1cdf93819&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fdrawer%2Fdrawer.test.tsx&new_oid=292daeedb430e30d5dfdd93f7579a76d54ad3afe&new_mode=33188",
+    "file": "diffs/diff-040.json",
+    "old": {
+      "name": "packages/components/src/drawer/drawer.test.tsx",
+      "oid": "4c71b206cb74f73df390db422e0e28a1cdf93819",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/drawer/drawer.test.tsx",
+      "oid": "292daeedb430e30d5dfdd93f7579a76d54ad3afe",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "90c47fbf0f5f5fd72e8167fd6e15c46d7603aeed624d345dc5d1f52da53e546e"
+  },
+  {
+    "tracking_name": "packages/components/src/editable/editable-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable-props.ts&old_oid=02b2de71ef4e811937faf0b6663899abcbc5544f&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable-props.ts&new_oid=5997880244624760bf084330477b6d0687a49357&new_mode=33188",
+    "file": "diffs/diff-041.json",
+    "old": {
+      "name": "packages/components/src/editable/editable-props.ts",
+      "oid": "02b2de71ef4e811937faf0b6663899abcbc5544f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/editable/editable-props.ts",
+      "oid": "5997880244624760bf084330477b6d0687a49357",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f7978af348bb918931f0c34eeacca10a1a31b71a4f0b266bf29845d754dd4e94"
+  },
+  {
+    "tracking_name": "packages/components/src/editable/editable-textarea.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable-textarea.test.tsx&old_oid=24a5b1004b407dfeeb73fe4e8fa277d4555d4b66&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable-textarea.test.tsx&new_oid=c83d2b35b82f447928dd5108df41411c821e922f&new_mode=33188",
+    "file": "diffs/diff-042.json",
+    "old": {
+      "name": "packages/components/src/editable/editable-textarea.test.tsx",
+      "oid": "24a5b1004b407dfeeb73fe4e8fa277d4555d4b66",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/editable/editable-textarea.test.tsx",
+      "oid": "c83d2b35b82f447928dd5108df41411c821e922f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1cc68a76109e5aaf4751c8a63caae36e9f9a3cf7ef829153a80fa397741444d1"
+  },
+  {
+    "tracking_name": "packages/components/src/editable/editable.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable.stories.tsx&old_oid=887550949fe646b594376aed848a5ae987c3902c&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable.stories.tsx&new_oid=1c8443c8be3b7927f6746f22bdfea351890b4a0f&new_mode=33188",
+    "file": "diffs/diff-043.json",
+    "old": {
+      "name": "packages/components/src/editable/editable.stories.tsx",
+      "oid": "887550949fe646b594376aed848a5ae987c3902c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/editable/editable.stories.tsx",
+      "oid": "1c8443c8be3b7927f6746f22bdfea351890b4a0f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0e693f7234fa3e4f0c55ee0a615c41183c0d417c6674afc83e805d765b7bfc7c"
+  },
+  {
+    "tracking_name": "packages/components/src/editable/editable.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable.test.tsx&old_oid=872f1df1f7bd51070d29fc639c27365de66e9da4&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Feditable.test.tsx&new_oid=47b3aafb1481732b157b4d7b9a03d90a2596da48&new_mode=33188",
+    "file": "diffs/diff-044.json",
+    "old": {
+      "name": "packages/components/src/editable/editable.test.tsx",
+      "oid": "872f1df1f7bd51070d29fc639c27365de66e9da4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/editable/editable.test.tsx",
+      "oid": "47b3aafb1481732b157b4d7b9a03d90a2596da48",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "82fdf28728b8758db665b7b1cfec178743d0fc4817cf0e72968784306d316db1"
+  },
+  {
+    "tracking_name": "packages/components/src/editable/use-editable.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Fuse-editable.ts&old_oid=623043d6be80cf7ca5117fe60ab8580986dd24c5&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Feditable%2Fuse-editable.ts&new_oid=fa6669c556e6486436a08c0539673db0205bda33&new_mode=33188",
+    "file": "diffs/diff-045.json",
+    "old": {
+      "name": "packages/components/src/editable/use-editable.ts",
+      "oid": "623043d6be80cf7ca5117fe60ab8580986dd24c5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/editable/use-editable.ts",
+      "oid": "fa6669c556e6486436a08c0539673db0205bda33",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "16baa18b928d90c8785c8b790efbb6fedc7d611c54da83549c4054a97f555e7f"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field-error-icon.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-error-icon.tsx&old_oid=ad8bad335b722ba5de17388ab4a710bcce5554b3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-error-icon.tsx&new_oid=f4b7e2ff13fd38ce3fc5de96f63261aeb20e52a6&new_mode=33188",
+    "file": "diffs/diff-046.json",
+    "old": {
+      "name": "packages/components/src/field/field-error-icon.tsx",
+      "oid": "ad8bad335b722ba5de17388ab4a710bcce5554b3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field-error-icon.tsx",
+      "oid": "f4b7e2ff13fd38ce3fc5de96f63261aeb20e52a6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f95cc65b8b9db8430eb7666f39c4dd6ea66daea976204111ac83456ede6a1db3"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field-error-message.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-error-message.tsx&old_oid=ca284073c45dfa8a3243ba89a05963aad5be7642&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-error-message.tsx&new_oid=eb99ab9532775f11b024262929986279d11ba4fc&new_mode=33188",
+    "file": "diffs/diff-047.json",
+    "old": {
+      "name": "packages/components/src/field/field-error-message.tsx",
+      "oid": "ca284073c45dfa8a3243ba89a05963aad5be7642",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field-error-message.tsx",
+      "oid": "eb99ab9532775f11b024262929986279d11ba4fc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a805e110f5b902b26f12a50dc093503033f10614c0afca2364b2496b9f52b041"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field-indicator.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-indicator.tsx&old_oid=14b3ad15f8fc0c586046908bc0c661c6890723dc&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-indicator.tsx&new_oid=7e71223643a0bf839e74e06513148b6983463611&new_mode=33188",
+    "file": "diffs/diff-048.json",
+    "old": {
+      "name": "packages/components/src/field/field-indicator.tsx",
+      "oid": "14b3ad15f8fc0c586046908bc0c661c6890723dc",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field-indicator.tsx",
+      "oid": "7e71223643a0bf839e74e06513148b6983463611",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1b1bae7f935662b4e4dbd20b61b3ae0219dd38d2c848442f084f5f20d0454d6a"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field-label.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-label.tsx&old_oid=d7631dc002a3addc2f0bc0e0569a0d0255b30278&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-label.tsx&new_oid=c3fcb25167b4ebff93e19e720a4305b44bc96c80&new_mode=33188",
+    "file": "diffs/diff-049.json",
+    "old": {
+      "name": "packages/components/src/field/field-label.tsx",
+      "oid": "d7631dc002a3addc2f0bc0e0569a0d0255b30278",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field-label.tsx",
+      "oid": "c3fcb25167b4ebff93e19e720a4305b44bc96c80",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0c6508ebda60cd17c01b2912b2c96aa6a0e17e52182edd9816fb835fea3d7cc6"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-props.ts&old_oid=1f531eb4d966a44f50c17a5967dd13a34fa1d5af&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-props.ts&new_oid=5c62d12f715fdb8423e4d3d51c5282094e3529ed&new_mode=33188",
+    "file": "diffs/diff-050.json",
+    "old": {
+      "name": "packages/components/src/field/field-props.ts",
+      "oid": "1f531eb4d966a44f50c17a5967dd13a34fa1d5af",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field-props.ts",
+      "oid": "5c62d12f715fdb8423e4d3d51c5282094e3529ed",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7ee1ca5d0fcf223a6ae510702c624b71f43b6989422e6840ae9ad819bbec0ff1"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-root.tsx&old_oid=3f79a184a7d85fd039fc2fb21a709d51f87be4d2&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield-root.tsx&new_oid=79a3b46f946f5ce79a82fef195d5d7d4483995e8&new_mode=33188",
+    "file": "diffs/diff-051.json",
+    "old": {
+      "name": "packages/components/src/field/field-root.tsx",
+      "oid": "3f79a184a7d85fd039fc2fb21a709d51f87be4d2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field-root.tsx",
+      "oid": "79a3b46f946f5ce79a82fef195d5d7d4483995e8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f7637c81d0c4c963ffceedc2bc407d27fb04dc76c563e3e2fe5bb94c07c29899"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield.stories.tsx&old_oid=da0137e9fe1215c6bb17f2865d954831ff6f7583&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield.stories.tsx&new_oid=7030b177608faea0467e006993e1775bd655121d&new_mode=33188",
+    "file": "diffs/diff-052.json",
+    "old": {
+      "name": "packages/components/src/field/field.stories.tsx",
+      "oid": "da0137e9fe1215c6bb17f2865d954831ff6f7583",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field.stories.tsx",
+      "oid": "7030b177608faea0467e006993e1775bd655121d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ec04c87be528bf60c6cb08465e0a4306e5c1c0d730e2e7bd9eb5e0fcf84f2f1d"
+  },
+  {
+    "tracking_name": "packages/components/src/field/field.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield.test.tsx&old_oid=9bb5ebb0c60fa638c609cf7a6c6a3e99f9ca5bd6&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ffield.test.tsx&new_oid=89b1ac6b2a89365839475c90474be306dca51716&new_mode=33188",
+    "file": "diffs/diff-053.json",
+    "old": {
+      "name": "packages/components/src/field/field.test.tsx",
+      "oid": "9bb5ebb0c60fa638c609cf7a6c6a3e99f9ca5bd6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/field.test.tsx",
+      "oid": "89b1ac6b2a89365839475c90474be306dca51716",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "87ba21bc294c00244c731c8b0705e7e7cd023b8f57bb3f1bc3599d4d082d5116"
+  },
+  {
+    "tracking_name": "packages/components/src/field/types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ftypes.ts&old_oid=58e4bcf3d046a02c8f0ab20e9754c571171d2760&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Ftypes.ts&new_oid=3a6ce822fa5f77392c65b3de69940db1bf14ccaa&new_mode=33188",
+    "file": "diffs/diff-054.json",
+    "old": {
+      "name": "packages/components/src/field/types.ts",
+      "oid": "58e4bcf3d046a02c8f0ab20e9754c571171d2760",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/types.ts",
+      "oid": "3a6ce822fa5f77392c65b3de69940db1bf14ccaa",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "db680af0f544bc9773dd189adf0e3e8f53d96b487fa1b9180c0ce864331379be"
+  },
+  {
+    "tracking_name": "packages/components/src/field/use-field-provider.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Fuse-field-provider.ts&old_oid=d6cf7f3294311ee5e8901a77c96a511332194441&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Fuse-field-provider.ts&new_oid=5f91b8517a227a1498603813e424c05e085bd6c7&new_mode=33188",
+    "file": "diffs/diff-055.json",
+    "old": {
+      "name": "packages/components/src/field/use-field-provider.ts",
+      "oid": "d6cf7f3294311ee5e8901a77c96a511332194441",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/use-field-provider.ts",
+      "oid": "5f91b8517a227a1498603813e424c05e085bd6c7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "84552cf1798c9c712aeb56a8ddfa9e5958bae59f3c9d7b7523300525feb33a09"
+  },
+  {
+    "tracking_name": "packages/components/src/field/use-field.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Fuse-field.ts&old_oid=0d1936d5e90bcfb099d16a8be20b52bbd96c0ad5&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffield%2Fuse-field.ts&new_oid=7bf186231e533be6aa992b5fe4f37d6d7d20d10a&new_mode=33188",
+    "file": "diffs/diff-056.json",
+    "old": {
+      "name": "packages/components/src/field/use-field.ts",
+      "oid": "0d1936d5e90bcfb099d16a8be20b52bbd96c0ad5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/field/use-field.ts",
+      "oid": "7bf186231e533be6aa992b5fe4f37d6d7d20d10a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a7513448128589b87c7971ad8bb9eb89b8254cef0ec8abaa53be9b1801557e13"
+  },
+  {
+    "tracking_name": "packages/components/src/focus-lock/focus-lock-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffocus-lock%2Ffocus-lock-props.ts&old_oid=5ddd846fe3fa6e364d832238ffdca0c2892bddd7&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffocus-lock%2Ffocus-lock-props.ts&new_oid=6a71251bac7f614ae5377f99f6758531032c5ad1&new_mode=33188",
+    "file": "diffs/diff-057.json",
+    "old": {
+      "name": "packages/components/src/focus-lock/focus-lock-props.ts",
+      "oid": "5ddd846fe3fa6e364d832238ffdca0c2892bddd7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/focus-lock/focus-lock-props.ts",
+      "oid": "6a71251bac7f614ae5377f99f6758531032c5ad1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fcd985c5e9abb891bfa7ec8644a4b19d879bfdee5623e036a4e7add1ba120682"
+  },
+  {
+    "tracking_name": "packages/components/src/focus-lock/focus-lock.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ffocus-lock%2Ffocus-lock.tsx&old_oid=0f55c39180162eb1e8812a3d585d94ffac002041&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ffocus-lock%2Ffocus-lock.tsx&new_oid=a003279daf3d301888adbffade4c46f04535b9f3&new_mode=33188",
+    "file": "diffs/diff-058.json",
+    "old": {
+      "name": "packages/components/src/focus-lock/focus-lock.tsx",
+      "oid": "0f55c39180162eb1e8812a3d585d94ffac002041",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/focus-lock/focus-lock.tsx",
+      "oid": "a003279daf3d301888adbffade4c46f04535b9f3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "52f9ac924f186c26c4084c13870fb653118036e32dee3d01caca2edbb8e5023b"
+  },
+  {
+    "tracking_name": "packages/components/src/input/input.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Finput%2Finput.stories.tsx&old_oid=80dfd6a36220de8b797a8b756f7bd22b7739b9ae&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Finput%2Finput.stories.tsx&new_oid=f153896ffd8ab9b0a5ed23ad5d5165728dbe0623&new_mode=33188",
+    "file": "diffs/diff-059.json",
+    "old": {
+      "name": "packages/components/src/input/input.stories.tsx",
+      "oid": "80dfd6a36220de8b797a8b756f7bd22b7739b9ae",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/input/input.stories.tsx",
+      "oid": "f153896ffd8ab9b0a5ed23ad5d5165728dbe0623",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4796cc72d77cdf9e4f08ac1967d5afc236aafc92d160d5bfaa932e5d56f2f558"
+  },
+  {
+    "tracking_name": "packages/components/src/input/input.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Finput%2Finput.test.tsx&old_oid=60787bcf4127a1ebe107eb00080066b268ac9377&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Finput%2Finput.test.tsx&new_oid=c4194030f91bcdf250f8fe0fd7ea61847623f81e&new_mode=33188",
+    "file": "diffs/diff-060.json",
+    "old": {
+      "name": "packages/components/src/input/input.test.tsx",
+      "oid": "60787bcf4127a1ebe107eb00080066b268ac9377",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/input/input.test.tsx",
+      "oid": "c4194030f91bcdf250f8fe0fd7ea61847623f81e",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "194c02d4f070bc749b6f6ab89034b8ddbcc7beece65b758ed3acaef091c4bb46"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/menu-content.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-content.tsx&old_oid=36349fc184c2aa26cd087cec66c70475e9ee66f9&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-content.tsx&new_oid=8b997dfd0524e54007d489d055dba4904aefcf30&new_mode=33188",
+    "file": "diffs/diff-061.json",
+    "old": {
+      "name": "packages/components/src/menu/menu-content.tsx",
+      "oid": "36349fc184c2aa26cd087cec66c70475e9ee66f9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/menu-content.tsx",
+      "oid": "8b997dfd0524e54007d489d055dba4904aefcf30",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "8af34e5db2243f72db82c918ab04f235c20067e721f060af5763c124e4e90e5e"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/menu-item-option.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-item-option.tsx&old_oid=9dcec2c0a0fd3ade177d7676b32549cdc1ab58d7&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-item-option.tsx&new_oid=84dd105f595b1fea79d02c3d3ef4454103b7be5f&new_mode=33188",
+    "file": "diffs/diff-062.json",
+    "old": {
+      "name": "packages/components/src/menu/menu-item-option.tsx",
+      "oid": "9dcec2c0a0fd3ade177d7676b32549cdc1ab58d7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/menu-item-option.tsx",
+      "oid": "84dd105f595b1fea79d02c3d3ef4454103b7be5f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "54fc1493960a311e744ea188bf3b5705e79c9ac38709cab84111c298bc3bc024"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/menu-item.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-item.tsx&old_oid=f8b6b4372e349aaa144da9fc94e0bded124b2a19&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-item.tsx&new_oid=9b6af8b5fb1d7a40658265afffe3f3e3a9d95536&new_mode=33188",
+    "file": "diffs/diff-063.json",
+    "old": {
+      "name": "packages/components/src/menu/menu-item.tsx",
+      "oid": "f8b6b4372e349aaa144da9fc94e0bded124b2a19",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/menu-item.tsx",
+      "oid": "9b6af8b5fb1d7a40658265afffe3f3e3a9d95536",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e666ccab2284bf21bcf116657393e9a1b13faa5e77f1b13055d848e2f2ec11ae"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/menu-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-root.tsx&old_oid=97c7ac25a3a5776e22670157876ec41129e0bea1&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu-root.tsx&new_oid=786407f5ddaf1557564ed176280d6cf1cdc31988&new_mode=33188",
+    "file": "diffs/diff-064.json",
+    "old": {
+      "name": "packages/components/src/menu/menu-root.tsx",
+      "oid": "97c7ac25a3a5776e22670157876ec41129e0bea1",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/menu-root.tsx",
+      "oid": "786407f5ddaf1557564ed176280d6cf1cdc31988",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "84bf827b2becfc264aa1310cccb0069cbe8974f163e9bb2b8d8028e686458531"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/menu.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu.stories.tsx&old_oid=705994d0655346be4e0fe054636052500a20ad6e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu.stories.tsx&new_oid=8a5a9017adc6d19dd54a443c789b52b3b73da9c5&new_mode=33188",
+    "file": "diffs/diff-065.json",
+    "old": {
+      "name": "packages/components/src/menu/menu.stories.tsx",
+      "oid": "705994d0655346be4e0fe054636052500a20ad6e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/menu.stories.tsx",
+      "oid": "8a5a9017adc6d19dd54a443c789b52b3b73da9c5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1f11677ca53edf7a12a8f966a0f30d11599d5be17bf21cc0d4a4b987011b7366"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/menu.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu.test.tsx&old_oid=612aa2094b27d2a4821175f4629686a3893d0710&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fmenu.test.tsx&new_oid=3d6db1030c76956841f0582c6fe62bed6301ed26&new_mode=33188",
+    "file": "diffs/diff-066.json",
+    "old": {
+      "name": "packages/components/src/menu/menu.test.tsx",
+      "oid": "612aa2094b27d2a4821175f4629686a3893d0710",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/menu.test.tsx",
+      "oid": "3d6db1030c76956841f0582c6fe62bed6301ed26",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6f5c997b3746d415bafea1e958ae5e48fe5a9ba16dcc6640454dec69897db0cc"
+  },
+  {
+    "tracking_name": "packages/components/src/menu/use-menu.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fuse-menu.ts&old_oid=60b51e95e3d146d4b6349511a7227d304f932659&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fmenu%2Fuse-menu.ts&new_oid=783087cc769c140b1032b07eb28fe2160410b3b2&new_mode=33188",
+    "file": "diffs/diff-067.json",
+    "old": {
+      "name": "packages/components/src/menu/use-menu.ts",
+      "oid": "60b51e95e3d146d4b6349511a7227d304f932659",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/menu/use-menu.ts",
+      "oid": "783087cc769c140b1032b07eb28fe2160410b3b2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9fe03b27614192cb3375286485de70f62536f013fab5e25d8e9cc40f4b73adfa"
+  },
+  {
+    "tracking_name": "packages/components/src/native-select/select-field.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnative-select%2Fselect-field.tsx&old_oid=c5049d9af56a99222bd6463f62a6f5b0abdcbcc2&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnative-select%2Fselect-field.tsx&new_oid=56a34845e2df95bfe72c69eab09247de5fd56b56&new_mode=33188",
+    "file": "diffs/diff-068.json",
+    "old": {
+      "name": "packages/components/src/native-select/select-field.tsx",
+      "oid": "c5049d9af56a99222bd6463f62a6f5b0abdcbcc2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/native-select/select-field.tsx",
+      "oid": "56a34845e2df95bfe72c69eab09247de5fd56b56",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2cba93480a9653d08b0298cf5d2b7d95631d5683eff14b7c40792bc830e4693e"
+  },
+  {
+    "tracking_name": "packages/components/src/native-select/select.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnative-select%2Fselect.stories.tsx&old_oid=ca317abc0eba737a4f6961ff7d72fa12b4b8dce2&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnative-select%2Fselect.stories.tsx&new_oid=f8fdb9f9d4b2bd2671a5f1f14beb9897b3c880f6&new_mode=33188",
+    "file": "diffs/diff-069.json",
+    "old": {
+      "name": "packages/components/src/native-select/select.stories.tsx",
+      "oid": "ca317abc0eba737a4f6961ff7d72fa12b4b8dce2",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/native-select/select.stories.tsx",
+      "oid": "f8fdb9f9d4b2bd2671a5f1f14beb9897b3c880f6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e574a544dd9770853048d7db122ad54b5a9ce748a104c729582988e83f0187b4"
+  },
+  {
+    "tracking_name": "packages/components/src/native-select/select.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnative-select%2Fselect.test.tsx&old_oid=c78a79b1c56ac8b53ffc7c5f81955980a11e3945&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnative-select%2Fselect.test.tsx&new_oid=7ebd55c3c0bc4e45f76539de8691be40c975593a&new_mode=33188",
+    "file": "diffs/diff-070.json",
+    "old": {
+      "name": "packages/components/src/native-select/select.test.tsx",
+      "oid": "c78a79b1c56ac8b53ffc7c5f81955980a11e3945",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/native-select/select.test.tsx",
+      "oid": "7ebd55c3c0bc4e45f76539de8691be40c975593a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1f49aebb94ee7d4321aa5f14a2bb024dfaef73ac764dcd4fa4f8c6d8d1681c95"
+  },
+  {
+    "tracking_name": "packages/components/src/number-input/number-input-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fnumber-input-props.ts&old_oid=998755fd7bf3a85f653a6a924fab983228fe8ebd&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fnumber-input-props.ts&new_oid=51eed860bb353e77cfc02a682e010d9f8a07708f&new_mode=33188",
+    "file": "diffs/diff-071.json",
+    "old": {
+      "name": "packages/components/src/number-input/number-input-props.ts",
+      "oid": "998755fd7bf3a85f653a6a924fab983228fe8ebd",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/number-input/number-input-props.ts",
+      "oid": "51eed860bb353e77cfc02a682e010d9f8a07708f",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ab4193a0f5698c2597b4bbf42fd87266a9d889a3f316d5cab635445d30a0b035"
+  },
+  {
+    "tracking_name": "packages/components/src/number-input/number-input.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fnumber-input.stories.tsx&old_oid=a29d3feed36ed537b92303162a3f10954ce3dda6&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fnumber-input.stories.tsx&new_oid=72f22187e5835c9ad4ff7f61d3677c9cd71eed34&new_mode=33188",
+    "file": "diffs/diff-072.json",
+    "old": {
+      "name": "packages/components/src/number-input/number-input.stories.tsx",
+      "oid": "a29d3feed36ed537b92303162a3f10954ce3dda6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/number-input/number-input.stories.tsx",
+      "oid": "72f22187e5835c9ad4ff7f61d3677c9cd71eed34",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "232f073c264d22a5bf6d83db26bf71b079a72d614c27f0fe229c11911ad42491"
+  },
+  {
+    "tracking_name": "packages/components/src/number-input/number-input.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fnumber-input.test.tsx&old_oid=b11af6374f200568875c6e6a4535b4e72498c274&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fnumber-input.test.tsx&new_oid=a0fbe6315b0d77fbc97a4fe65f4cf313ff27e609&new_mode=33188",
+    "file": "diffs/diff-073.json",
+    "old": {
+      "name": "packages/components/src/number-input/number-input.test.tsx",
+      "oid": "b11af6374f200568875c6e6a4535b4e72498c274",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/number-input/number-input.test.tsx",
+      "oid": "a0fbe6315b0d77fbc97a4fe65f4cf313ff27e609",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9c34620ca7f4202005abaa4e28a3249b0fdc7e5121438cc3dd8cd14aa0173d9f"
+  },
+  {
+    "tracking_name": "packages/components/src/number-input/use-number-input.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fuse-number-input.ts&old_oid=21f95a06630f8b386584f3a226aca2211929501b&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fnumber-input%2Fuse-number-input.ts&new_oid=e3d7f0648dda7334cd679fef9d5be260014af0ee&new_mode=33188",
+    "file": "diffs/diff-074.json",
+    "old": {
+      "name": "packages/components/src/number-input/use-number-input.ts",
+      "oid": "21f95a06630f8b386584f3a226aca2211929501b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/number-input/use-number-input.ts",
+      "oid": "e3d7f0648dda7334cd679fef9d5be260014af0ee",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3c4d0f8fcac4293f6a630e9b75070e2ce4280f923df4dcb24f4b4a701269d627"
+  },
+  {
+    "tracking_name": "packages/components/src/pin-input/pin-input-context.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpin-input%2Fpin-input-context.ts&old_oid=1d5cbd94a7423eff0a49790016591803bd9c3540&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpin-input%2Fpin-input-context.ts&new_oid=a2555a33a3f4399dfd663a1b9b2c96f71ae19bc5&new_mode=33188",
+    "file": "diffs/diff-075.json",
+    "old": {
+      "name": "packages/components/src/pin-input/pin-input-context.ts",
+      "oid": "1d5cbd94a7423eff0a49790016591803bd9c3540",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/pin-input/pin-input-context.ts",
+      "oid": "a2555a33a3f4399dfd663a1b9b2c96f71ae19bc5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c22fe0ee77b193f3871ff65d3762f4e6e7b8e79902cef43a222ffce1c15e1a08"
+  },
+  {
+    "tracking_name": "packages/components/src/pin-input/use-pin-input.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpin-input%2Fuse-pin-input.ts&old_oid=c31a1649edbf9a761f874b8a8d0bf4a4068865eb&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpin-input%2Fuse-pin-input.ts&new_oid=929ec2ba103264f759a7fb4fd6639a2ef87f913a&new_mode=33188",
+    "file": "diffs/diff-076.json",
+    "old": {
+      "name": "packages/components/src/pin-input/use-pin-input.ts",
+      "oid": "c31a1649edbf9a761f874b8a8d0bf4a4068865eb",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/pin-input/use-pin-input.ts",
+      "oid": "929ec2ba103264f759a7fb4fd6639a2ef87f913a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "a47ff1c4799b1a8a662580a663b78c4eedd2c54f8d2c2882ecd95acb44100593"
+  },
+  {
+    "tracking_name": "packages/components/src/popover/popover-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover-root.tsx&old_oid=aed9b3743a287f73ee18edaa6bb2731564b6df83&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover-root.tsx&new_oid=dd8459cc8fcc7f1ee6d35799565e69ba0a77a825&new_mode=33188",
+    "file": "diffs/diff-077.json",
+    "old": {
+      "name": "packages/components/src/popover/popover-root.tsx",
+      "oid": "aed9b3743a287f73ee18edaa6bb2731564b6df83",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popover/popover-root.tsx",
+      "oid": "dd8459cc8fcc7f1ee6d35799565e69ba0a77a825",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ff835aa93e4d95689f84bedcfb3da58cc680933ae583afa1c9a4878faebd0402"
+  },
+  {
+    "tracking_name": "packages/components/src/popover/popover-transition.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover-transition.tsx&old_oid=96f052f69e10e79508ec55157d0bb0cd3b492506&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover-transition.tsx&new_oid=c3905a5c924889efd099c1a2095dc12411c478a9&new_mode=33188",
+    "file": "diffs/diff-078.json",
+    "old": {
+      "name": "packages/components/src/popover/popover-transition.tsx",
+      "oid": "96f052f69e10e79508ec55157d0bb0cd3b492506",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popover/popover-transition.tsx",
+      "oid": "c3905a5c924889efd099c1a2095dc12411c478a9",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "38de51f6f030824fece0232ce7133f7c823adb27f25c105c6e04b1bc6e389b14"
+  },
+  {
+    "tracking_name": "packages/components/src/popover/popover.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover.stories.tsx&old_oid=9ada5cc132f534952c54a8b42653c3c935fb48a9&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover.stories.tsx&new_oid=bc18617898ab37943a66b56e345a44751484f32c&new_mode=33188",
+    "file": "diffs/diff-079.json",
+    "old": {
+      "name": "packages/components/src/popover/popover.stories.tsx",
+      "oid": "9ada5cc132f534952c54a8b42653c3c935fb48a9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popover/popover.stories.tsx",
+      "oid": "bc18617898ab37943a66b56e345a44751484f32c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "03f8afc6940c54ccebcea02c9dc1e48441c440600542fdd7e95030373bab78ea"
+  },
+  {
+    "tracking_name": "packages/components/src/popover/popover.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover.test.tsx&old_oid=c5eb5c6ee3b71b288aa3559162f3d45d6c8d83d6&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fpopover.test.tsx&new_oid=6be52057d40ab502ad989c6b0e0c13bbe4eff7af&new_mode=33188",
+    "file": "diffs/diff-080.json",
+    "old": {
+      "name": "packages/components/src/popover/popover.test.tsx",
+      "oid": "c5eb5c6ee3b71b288aa3559162f3d45d6c8d83d6",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popover/popover.test.tsx",
+      "oid": "6be52057d40ab502ad989c6b0e0c13bbe4eff7af",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "bdbb1e27133a55d703ba8f86b837ca293083017bf24683b796371e5a078643bb"
+  },
+  {
+    "tracking_name": "packages/components/src/popover/use-popover.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fuse-popover.ts&old_oid=c28c914e2592a4d1fb9346dd5c7b6ecec0c3f66b&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopover%2Fuse-popover.ts&new_oid=870d51799f2cfdf4ec6d35245abc5c2ca94fd0a0&new_mode=33188",
+    "file": "diffs/diff-081.json",
+    "old": {
+      "name": "packages/components/src/popover/use-popover.ts",
+      "oid": "c28c914e2592a4d1fb9346dd5c7b6ecec0c3f66b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popover/use-popover.ts",
+      "oid": "870d51799f2cfdf4ec6d35245abc5c2ca94fd0a0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c82986e93832d39dca3ee209ad2572f67fbdf758c267636bb7b38ff22716bc4c"
+  },
+  {
+    "tracking_name": "packages/components/src/popper/popper.new.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopper%2Fpopper.new.stories.tsx&old_oid=95dc8c60cff6d56c0f859b5cc5626cfdb5e30ad8&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopper%2Fpopper.new.stories.tsx&new_oid=f90017fd23a1808404c260159df5b115bec8f322&new_mode=33188",
+    "file": "diffs/diff-082.json",
+    "old": {
+      "name": "packages/components/src/popper/popper.new.stories.tsx",
+      "oid": "95dc8c60cff6d56c0f859b5cc5626cfdb5e30ad8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popper/popper.new.stories.tsx",
+      "oid": "f90017fd23a1808404c260159df5b115bec8f322",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d5623f747741a5683d647e4e44b28a4d0e0e9bc6d4ad8d933f610be02fe4413f"
+  },
+  {
+    "tracking_name": "packages/components/src/popper/popper.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fpopper%2Fpopper.stories.tsx&old_oid=84421f0f6a542ec4b043aa608b0162b8eb8f4295&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fpopper%2Fpopper.stories.tsx&new_oid=b04460121e994caa2d73c2e58ea532b72fd07b01&new_mode=33188",
+    "file": "diffs/diff-083.json",
+    "old": {
+      "name": "packages/components/src/popper/popper.stories.tsx",
+      "oid": "84421f0f6a542ec4b043aa608b0162b8eb8f4295",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/popper/popper.stories.tsx",
+      "oid": "b04460121e994caa2d73c2e58ea532b72fd07b01",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0d46f506bc2d90ea64da65f774fca7062de9d28ab503c2e54c461886e20f0a44"
+  },
+  {
+    "tracking_name": "packages/components/src/progress-circular/circular-progress-circle.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-circle.tsx&old_oid=49d27c9b7c2674a63cfed2d8746a54fb52daf61e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-circle.tsx&new_oid=762741093231be47acfb5133cbac3222842a05ee&new_mode=33188",
+    "file": "diffs/diff-084.json",
+    "old": {
+      "name": "packages/components/src/progress-circular/circular-progress-circle.tsx",
+      "oid": "49d27c9b7c2674a63cfed2d8746a54fb52daf61e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress-circular/circular-progress-circle.tsx",
+      "oid": "762741093231be47acfb5133cbac3222842a05ee",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "03848ad3f10c8a81f000f3d09f4d042ea4e9d32e2fa9d3600b5141ba26f08f36"
+  },
+  {
+    "tracking_name": "packages/components/src/progress-circular/circular-progress-filled-track.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-filled-track.tsx&old_oid=a36bbfe581d08a9e8a186935b50a4b598fb05629&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-filled-track.tsx&new_oid=495caf99df274ecd6f33eb5b56849d16dc2f3799&new_mode=33188",
+    "file": "diffs/diff-085.json",
+    "old": {
+      "name": "packages/components/src/progress-circular/circular-progress-filled-track.tsx",
+      "oid": "a36bbfe581d08a9e8a186935b50a4b598fb05629",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress-circular/circular-progress-filled-track.tsx",
+      "oid": "495caf99df274ecd6f33eb5b56849d16dc2f3799",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d8328c2e4e861c425f5838c9fdd26c5a61a2951fffb97390c36a44b4ff7f49ac"
+  },
+  {
+    "tracking_name": "packages/components/src/progress-circular/circular-progress-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-root.tsx&old_oid=cd0322b5adca5213a19d5568cdf7be4a67083d82&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-root.tsx&new_oid=a4d6c7e09af9c08d493c722f066b04b0e533bced&new_mode=33188",
+    "file": "diffs/diff-086.json",
+    "old": {
+      "name": "packages/components/src/progress-circular/circular-progress-root.tsx",
+      "oid": "cd0322b5adca5213a19d5568cdf7be4a67083d82",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress-circular/circular-progress-root.tsx",
+      "oid": "a4d6c7e09af9c08d493c722f066b04b0e533bced",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "65ecb07c2f6ad2c8a335f9f934738ce7166dcc89e2667e4d90c4de211e3def01"
+  },
+  {
+    "tracking_name": "packages/components/src/progress-circular/circular-progress-types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-types.ts&old_oid=72b5ec562c66c19955e25bd4c752990937d2c477&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress-types.ts&new_oid=dcc56c7c5ac4ee11bb6729cc1d6595a83d456188&new_mode=33188",
+    "file": "diffs/diff-087.json",
+    "old": {
+      "name": "packages/components/src/progress-circular/circular-progress-types.ts",
+      "oid": "72b5ec562c66c19955e25bd4c752990937d2c477",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress-circular/circular-progress-types.ts",
+      "oid": "dcc56c7c5ac4ee11bb6729cc1d6595a83d456188",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7e57ef14eadf91498173c59e150f9d9a49397ff8369f0123cfb63beb75f8f794"
+  },
+  {
+    "tracking_name": "packages/components/src/progress-circular/circular-progress.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress.stories.tsx&old_oid=3762cf9dbd005e87c6e1414708358a757dae6c5e&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress-circular%2Fcircular-progress.stories.tsx&new_oid=134ebdeda26775891317491d5554aa53494ce1a7&new_mode=33188",
+    "file": "diffs/diff-088.json",
+    "old": {
+      "name": "packages/components/src/progress-circular/circular-progress.stories.tsx",
+      "oid": "3762cf9dbd005e87c6e1414708358a757dae6c5e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress-circular/circular-progress.stories.tsx",
+      "oid": "134ebdeda26775891317491d5554aa53494ce1a7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1139ee460ff58a5adaca4e91775e770f8029dc28c719305d7b8167d5f5c9a222"
+  },
+  {
+    "tracking_name": "packages/components/src/progress/progress-filled-track.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress-filled-track.tsx&old_oid=0dabbe260a7911102635cb2b4eced02db55806e5&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress-filled-track.tsx&new_oid=6b8a1bcd9266bb6790f5d2cee42b5f14c5b590cc&new_mode=33188",
+    "file": "diffs/diff-089.json",
+    "old": {
+      "name": "packages/components/src/progress/progress-filled-track.tsx",
+      "oid": "0dabbe260a7911102635cb2b4eced02db55806e5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress/progress-filled-track.tsx",
+      "oid": "6b8a1bcd9266bb6790f5d2cee42b5f14c5b590cc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4bb0e8e3c207190faebcfb8461774b1b3f3b0d23c664f4e47746b00250945f97"
+  },
+  {
+    "tracking_name": "packages/components/src/progress/progress-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress-props.ts&old_oid=ceeb9c503f146e89fbc1c229b3f551c0a753a1ca&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress-props.ts&new_oid=ad3ecbc379d15a21ed3b7a8515c591bf0c78109c&new_mode=33188",
+    "file": "diffs/diff-090.json",
+    "old": {
+      "name": "packages/components/src/progress/progress-props.ts",
+      "oid": "ceeb9c503f146e89fbc1c229b3f551c0a753a1ca",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress/progress-props.ts",
+      "oid": "ad3ecbc379d15a21ed3b7a8515c591bf0c78109c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "24531f8113935b0ef734a84c8c54f7f6c64f366605989c65414021a403ead27e"
+  },
+  {
+    "tracking_name": "packages/components/src/progress/progress-types.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress-types.ts&old_oid=154607041e967ba78c08b844200f0dc1852d919a&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress-types.ts&new_oid=609963760cd876ea24b2364c8974b851fab3cffe&new_mode=33188",
+    "file": "diffs/diff-091.json",
+    "old": {
+      "name": "packages/components/src/progress/progress-types.ts",
+      "oid": "154607041e967ba78c08b844200f0dc1852d919a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress/progress-types.ts",
+      "oid": "609963760cd876ea24b2364c8974b851fab3cffe",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f406cec5a0c77d0abd27bf898ceec1e016e9a8d1768319836d4c4133dce61cdc"
+  },
+  {
+    "tracking_name": "packages/components/src/progress/progress.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress.stories.tsx&old_oid=eff851504ea3865df431331c3e55b644706f29b8&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fprogress%2Fprogress.stories.tsx&new_oid=65d478d44bc89a4fd8ccdecd365b188365c67e13&new_mode=33188",
+    "file": "diffs/diff-092.json",
+    "old": {
+      "name": "packages/components/src/progress/progress.stories.tsx",
+      "oid": "eff851504ea3865df431331c3e55b644706f29b8",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/progress/progress.stories.tsx",
+      "oid": "65d478d44bc89a4fd8ccdecd365b188365c67e13",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "757c7694e87ccf372a50845874f86c3072172c332da8c2e9a5c658496e54ba1f"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/radio-group-context.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-context.ts&old_oid=41fe49a16492ea04af8223ce75a2beae260e4db9&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-context.ts&new_oid=1222c352949c3e81f8a7d61edbb59d15741795dc&new_mode=33188",
+    "file": "diffs/diff-093.json",
+    "old": {
+      "name": "packages/components/src/radio-group/radio-group-context.ts",
+      "oid": "41fe49a16492ea04af8223ce75a2beae260e4db9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/radio-group-context.ts",
+      "oid": "1222c352949c3e81f8a7d61edbb59d15741795dc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "c177e0a19b7e0e667edd9fb7f315c392b8170b3ff44cd6ede96e2bd754dbc5bc"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/radio-group-item.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-item.test.tsx&old_oid=0810866f59375566015cdde6b9fd206a01f3335f&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-item.test.tsx&new_oid=c052f21b235597408d7cd5eaa0e19817b935b5f5&new_mode=33188",
+    "file": "diffs/diff-094.json",
+    "old": {
+      "name": "packages/components/src/radio-group/radio-group-item.test.tsx",
+      "oid": "0810866f59375566015cdde6b9fd206a01f3335f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/radio-group-item.test.tsx",
+      "oid": "c052f21b235597408d7cd5eaa0e19817b935b5f5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "05d9d3333f09ff18741c1b1a75b2da158659a4ab4468297e7390a9813d4d6607"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/radio-group-item.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-item.tsx&old_oid=cc5c4e2db968d2efbe602165550844ced8bb1569&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-item.tsx&new_oid=e9b5926cdb815dd7e792487634f14ae927171011&new_mode=33188",
+    "file": "diffs/diff-095.json",
+    "old": {
+      "name": "packages/components/src/radio-group/radio-group-item.tsx",
+      "oid": "cc5c4e2db968d2efbe602165550844ced8bb1569",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/radio-group-item.tsx",
+      "oid": "e9b5926cdb815dd7e792487634f14ae927171011",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7b93fba85dbec36615961e07e616a1e44d083f10bea7c290605eb24cbdb973be"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/radio-group-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-props.ts&old_oid=c6004197247cae032a04022fda76c5fb7b49719a&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group-props.ts&new_oid=471dca8093fa7bc2a824d62d4061db61b822006a&new_mode=33188",
+    "file": "diffs/diff-096.json",
+    "old": {
+      "name": "packages/components/src/radio-group/radio-group-props.ts",
+      "oid": "c6004197247cae032a04022fda76c5fb7b49719a",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/radio-group-props.ts",
+      "oid": "471dca8093fa7bc2a824d62d4061db61b822006a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "39186a06a711b38394f9a228c04c1231f02f69970087f90c420a4f9fb9770ec0"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/radio-group.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group.stories.tsx&old_oid=72737c58571fd50b5730e7faa6a190f77a04c3de&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group.stories.tsx&new_oid=40154db25c98d66835a762ae9a069e4248de1e57&new_mode=33188",
+    "file": "diffs/diff-097.json",
+    "old": {
+      "name": "packages/components/src/radio-group/radio-group.stories.tsx",
+      "oid": "72737c58571fd50b5730e7faa6a190f77a04c3de",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/radio-group.stories.tsx",
+      "oid": "40154db25c98d66835a762ae9a069e4248de1e57",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "65b765bd5d21029efb8aabe01a00d261e7024755b54cd331d92b4ac4e1e69c99"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/radio-group.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group.test.tsx&old_oid=bdc8003ff81dcbeab3b8e8a065381c23d988a298&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fradio-group.test.tsx&new_oid=b08b8b9ff180f7428c314810c7f35a9157e7f4fc&new_mode=33188",
+    "file": "diffs/diff-098.json",
+    "old": {
+      "name": "packages/components/src/radio-group/radio-group.test.tsx",
+      "oid": "bdc8003ff81dcbeab3b8e8a065381c23d988a298",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/radio-group.test.tsx",
+      "oid": "b08b8b9ff180f7428c314810c7f35a9157e7f4fc",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "4f0017763222ecb9d9cf614cfb990ad01e1b22523c2097933dec8b5a85e4bc91"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/use-radio-group.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fuse-radio-group.ts&old_oid=d77c49f44d4edc6edc3b487c1bee6fced67acd29&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fuse-radio-group.ts&new_oid=39fd41cd2e30d748c3641e5aac2fedf3c2b5a2a2&new_mode=33188",
+    "file": "diffs/diff-099.json",
+    "old": {
+      "name": "packages/components/src/radio-group/use-radio-group.ts",
+      "oid": "d77c49f44d4edc6edc3b487c1bee6fced67acd29",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/use-radio-group.ts",
+      "oid": "39fd41cd2e30d748c3641e5aac2fedf3c2b5a2a2",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "97a6767d9510a4e1b8eab0932b7441d5a7a856ba3cf70902d7da713f79cd9b92"
+  },
+  {
+    "tracking_name": "packages/components/src/radio-group/use-radio.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fuse-radio.ts&old_oid=ad6ddece325c34110f6b661b8365d755384a7340&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fradio-group%2Fuse-radio.ts&new_oid=31c3baf372c9233a6aecf6acd3ad144e0dfd1003&new_mode=33188",
+    "file": "diffs/diff-100.json",
+    "old": {
+      "name": "packages/components/src/radio-group/use-radio.ts",
+      "oid": "ad6ddece325c34110f6b661b8365d755384a7340",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/radio-group/use-radio.ts",
+      "oid": "31c3baf372c9233a6aecf6acd3ad144e0dfd1003",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "22595f9eb43c6e8d0198789fbbd0119037244baf6d835ee4bd492fb0c763f4af"
+  },
+  {
+    "tracking_name": "packages/components/src/slider/slider.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fslider%2Fslider.stories.tsx&old_oid=d8530354ea51e0e1814c579dfa740487fb3fd75f&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fslider%2Fslider.stories.tsx&new_oid=a5a28396ea670f9a2038b1be5e7cfac9119a7635&new_mode=33188",
+    "file": "diffs/diff-101.json",
+    "old": {
+      "name": "packages/components/src/slider/slider.stories.tsx",
+      "oid": "d8530354ea51e0e1814c579dfa740487fb3fd75f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/slider/slider.stories.tsx",
+      "oid": "a5a28396ea670f9a2038b1be5e7cfac9119a7635",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "af397660a823ddeec59388598959c72d1c9701adf9396f836d56e72cf2ee1da8"
+  },
+  {
+    "tracking_name": "packages/components/src/slider/use-range-slider.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fslider%2Fuse-range-slider.ts&old_oid=09371469e0104c23141767ff00ae900c18f43d19&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fslider%2Fuse-range-slider.ts&new_oid=a19a5d632e2ab0174370151f57a90ac667f40b29&new_mode=33188",
+    "file": "diffs/diff-102.json",
+    "old": {
+      "name": "packages/components/src/slider/use-range-slider.ts",
+      "oid": "09371469e0104c23141767ff00ae900c18f43d19",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/slider/use-range-slider.ts",
+      "oid": "a19a5d632e2ab0174370151f57a90ac667f40b29",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "d8f145ac4a75ba456ff5c448357ab120c77e6b941b12c810112f8b82c5439312"
+  },
+  {
+    "tracking_name": "packages/components/src/slider/use-slider.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fslider%2Fuse-slider.ts&old_oid=28e31e6041b7b8b75a2b4171b90362feb067ecad&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fslider%2Fuse-slider.ts&new_oid=7981031130be7f69ed0b04f773cded67e9a55d74&new_mode=33188",
+    "file": "diffs/diff-103.json",
+    "old": {
+      "name": "packages/components/src/slider/use-slider.ts",
+      "oid": "28e31e6041b7b8b75a2b4171b90362feb067ecad",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/slider/use-slider.ts",
+      "oid": "7981031130be7f69ed0b04f773cded67e9a55d74",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "44368c94b17b72dc6268ec45ee9b3f07059bf0d919581735a2cdf123d9d68c7d"
+  },
+  {
+    "tracking_name": "packages/components/src/switch/switch-root.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fswitch%2Fswitch-root.tsx&old_oid=debdf7792ea324e26c4fa014e775ee9edca05960&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fswitch%2Fswitch-root.tsx&new_oid=36b284f92d5b6331e70bdc113e8adfe1c1f26035&new_mode=33188",
+    "file": "diffs/diff-104.json",
+    "old": {
+      "name": "packages/components/src/switch/switch-root.tsx",
+      "oid": "debdf7792ea324e26c4fa014e775ee9edca05960",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/switch/switch-root.tsx",
+      "oid": "36b284f92d5b6331e70bdc113e8adfe1c1f26035",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "deda7e19ec9fa9b908dee5e3b6abf745dab046d0a4de862a8a292893dfc121a5"
+  },
+  {
+    "tracking_name": "packages/components/src/switch/switch.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fswitch%2Fswitch.stories.tsx&old_oid=9a22c1c4c05e0a5cc9ff77b72f44fb1ec6a7876f&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fswitch%2Fswitch.stories.tsx&new_oid=7fd406fb0fd08d2c468e20467e810fa6c34bd31d&new_mode=33188",
+    "file": "diffs/diff-105.json",
+    "old": {
+      "name": "packages/components/src/switch/switch.stories.tsx",
+      "oid": "9a22c1c4c05e0a5cc9ff77b72f44fb1ec6a7876f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/switch/switch.stories.tsx",
+      "oid": "7fd406fb0fd08d2c468e20467e810fa6c34bd31d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "ce47b536273d1539e43bcdc5bd1f7312826165e8a7b92a915a4cb776d7696a60"
+  },
+  {
+    "tracking_name": "packages/components/src/switch/switch.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Fswitch%2Fswitch.test.tsx&old_oid=1b1287aee4b5267ba1d3c9ff7a57ac94f30cd057&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Fswitch%2Fswitch.test.tsx&new_oid=7539152359a11ac310b947be60ffa0ab32fe5552&new_mode=33188",
+    "file": "diffs/diff-106.json",
+    "old": {
+      "name": "packages/components/src/switch/switch.test.tsx",
+      "oid": "1b1287aee4b5267ba1d3c9ff7a57ac94f30cd057",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/switch/switch.test.tsx",
+      "oid": "7539152359a11ac310b947be60ffa0ab32fe5552",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1a4c16b8e6c4c186256503d9bd46f3123d7a74ba0e183bcdc61b09f2439283e1"
+  },
+  {
+    "tracking_name": "packages/components/src/table/react-table.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftable%2Freact-table.stories.tsx&old_oid=b988e45a27d3016c255d4df65beb16c2810a1039&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftable%2Freact-table.stories.tsx&new_oid=3f379c1a2c956b5cdbf185ee508602608412ca7c&new_mode=33188",
+    "file": "diffs/diff-107.json",
+    "old": {
+      "name": "packages/components/src/table/react-table.stories.tsx",
+      "oid": "b988e45a27d3016c255d4df65beb16c2810a1039",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/table/react-table.stories.tsx",
+      "oid": "3f379c1a2c956b5cdbf185ee508602608412ca7c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7e3381f9b3cd960c57c47003fdf7fa48d8c8c3e2a7cfe95ff94862d655c1d633"
+  },
+  {
+    "tracking_name": "packages/components/src/tabs/tab-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Ftab-props.ts&old_oid=bfbdd938397d1e72f6c1bbf6f43f0fb0cdd4b458&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Ftab-props.ts&new_oid=97193aa9d4c0bcc562bf6db3de6f52802040ebd1&new_mode=33188",
+    "file": "diffs/diff-108.json",
+    "old": {
+      "name": "packages/components/src/tabs/tab-props.ts",
+      "oid": "bfbdd938397d1e72f6c1bbf6f43f0fb0cdd4b458",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tabs/tab-props.ts",
+      "oid": "97193aa9d4c0bcc562bf6db3de6f52802040ebd1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "e69eb774bf6ba151ebd97b4c2fc0aa5b12a1bb443e209f7e9c2ae3e5a8bd0846"
+  },
+  {
+    "tracking_name": "packages/components/src/tabs/tabs.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Ftabs.stories.tsx&old_oid=1054d425d633a52499e23502d1f62b7cd31d6eb3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Ftabs.stories.tsx&new_oid=dcbcd5f379af47ae746a7acf3d341ee2213eacdb&new_mode=33188",
+    "file": "diffs/diff-109.json",
+    "old": {
+      "name": "packages/components/src/tabs/tabs.stories.tsx",
+      "oid": "1054d425d633a52499e23502d1f62b7cd31d6eb3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tabs/tabs.stories.tsx",
+      "oid": "dcbcd5f379af47ae746a7acf3d341ee2213eacdb",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0911c4a0927b9c97823c5e14d21d6c69e03f204c5307b949457ab58a3cabe7b4"
+  },
+  {
+    "tracking_name": "packages/components/src/tabs/tabs.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Ftabs.test.tsx&old_oid=3169dca4416c7b9ddf24fc340ca5bb671734e36b&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Ftabs.test.tsx&new_oid=017c30ff6ad4ab003bcbc9e77724ef0c6002e107&new_mode=33188",
+    "file": "diffs/diff-110.json",
+    "old": {
+      "name": "packages/components/src/tabs/tabs.test.tsx",
+      "oid": "3169dca4416c7b9ddf24fc340ca5bb671734e36b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tabs/tabs.test.tsx",
+      "oid": "017c30ff6ad4ab003bcbc9e77724ef0c6002e107",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "5556fe9b558aa934ca61c6f21de34d5f7d5109f18651e2a1bacc7b55292024ab"
+  },
+  {
+    "tracking_name": "packages/components/src/tabs/use-tab-content.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Fuse-tab-content.ts&old_oid=3ca6a0c62a118e3a130eed0f98f744f88369c980&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Fuse-tab-content.ts&new_oid=692fa27faa6902356f281554ac705fdbc5b23da5&new_mode=33188",
+    "file": "diffs/diff-111.json",
+    "old": {
+      "name": "packages/components/src/tabs/use-tab-content.ts",
+      "oid": "3ca6a0c62a118e3a130eed0f98f744f88369c980",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tabs/use-tab-content.ts",
+      "oid": "692fa27faa6902356f281554ac705fdbc5b23da5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "b742eaf1d569904f2a4cbeb1b617fd94df3c3722970e36f132429e258f515b5c"
+  },
+  {
+    "tracking_name": "packages/components/src/tabs/use-tab.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Fuse-tab.ts&old_oid=90b5690e63602b6813bd6242f01e0ee975d581af&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Fuse-tab.ts&new_oid=493ed6b45130876ca566388261925d046f699be3&new_mode=33188",
+    "file": "diffs/diff-112.json",
+    "old": {
+      "name": "packages/components/src/tabs/use-tab.ts",
+      "oid": "90b5690e63602b6813bd6242f01e0ee975d581af",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tabs/use-tab.ts",
+      "oid": "493ed6b45130876ca566388261925d046f699be3",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "3ac13ad0999dc09b5465346c80f21c1f8201d8c3206d202518087e49f2393dd3"
+  },
+  {
+    "tracking_name": "packages/components/src/tabs/use-tabs.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Fuse-tabs.ts&old_oid=959614e7bfbba5248899860c7e5775341067bb69&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftabs%2Fuse-tabs.ts&new_oid=692cad32b07b9f5b436f21fb44cfad92fd19e1e4&new_mode=33188",
+    "file": "diffs/diff-113.json",
+    "old": {
+      "name": "packages/components/src/tabs/use-tabs.ts",
+      "oid": "959614e7bfbba5248899860c7e5775341067bb69",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tabs/use-tabs.ts",
+      "oid": "692cad32b07b9f5b436f21fb44cfad92fd19e1e4",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1d2700b5fafc43ffe555f52eaa65d13e65a0ace100082fe139a138183372dd86"
+  },
+  {
+    "tracking_name": "packages/components/src/tag/tag-close-trigger.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftag%2Ftag-close-trigger.tsx&old_oid=1ab8ff98477021aaf2140e0a884a7f5f1e8328be&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftag%2Ftag-close-trigger.tsx&new_oid=7bee7214590fe115a6d41a7f95226f59a7d20c6a&new_mode=33188",
+    "file": "diffs/diff-114.json",
+    "old": {
+      "name": "packages/components/src/tag/tag-close-trigger.tsx",
+      "oid": "1ab8ff98477021aaf2140e0a884a7f5f1e8328be",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tag/tag-close-trigger.tsx",
+      "oid": "7bee7214590fe115a6d41a7f95226f59a7d20c6a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "99fb92f117c16e2ac928416011f1cf45118116d9b5903ba9cb9d0dbbe44a6716"
+  },
+  {
+    "tracking_name": "packages/components/src/textarea/textarea.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftextarea%2Ftextarea.stories.tsx&old_oid=4d49cded3e0c50c783cd171570e8671207ad564b&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftextarea%2Ftextarea.stories.tsx&new_oid=32f6f514ddd7d2f820d2b4d8b56c9fdf81d97620&new_mode=33188",
+    "file": "diffs/diff-115.json",
+    "old": {
+      "name": "packages/components/src/textarea/textarea.stories.tsx",
+      "oid": "4d49cded3e0c50c783cd171570e8671207ad564b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/textarea/textarea.stories.tsx",
+      "oid": "32f6f514ddd7d2f820d2b4d8b56c9fdf81d97620",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "99c11164f55fac09df94c02d9d1576f0cf47fd19e6b33b7fb6e786e2fdc6149e"
+  },
+  {
+    "tracking_name": "packages/components/src/tooltip/tooltip-positioner.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip-positioner.tsx&old_oid=8bbe63b5fe4ca6a15a5118951a28e6057f496663&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip-positioner.tsx&new_oid=659c48b52a81dd574cbcbf6e0422b0cf3d3fdba0&new_mode=33188",
+    "file": "diffs/diff-116.json",
+    "old": {
+      "name": "packages/components/src/tooltip/tooltip-positioner.tsx",
+      "oid": "8bbe63b5fe4ca6a15a5118951a28e6057f496663",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tooltip/tooltip-positioner.tsx",
+      "oid": "659c48b52a81dd574cbcbf6e0422b0cf3d3fdba0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0227573c5b0d17d4d557cf150b1700919139f7fa1de2babc11d0de37b5bf1161"
+  },
+  {
+    "tracking_name": "packages/components/src/tooltip/tooltip-props.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip-props.ts&old_oid=3c183820cb36cbf20e6b84e4017626949e51143b&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip-props.ts&new_oid=ca60c3f21823474ec47ff0ffa1476895f731909d&new_mode=33188",
+    "file": "diffs/diff-117.json",
+    "old": {
+      "name": "packages/components/src/tooltip/tooltip-props.ts",
+      "oid": "3c183820cb36cbf20e6b84e4017626949e51143b",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tooltip/tooltip-props.ts",
+      "oid": "ca60c3f21823474ec47ff0ffa1476895f731909d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "474add54cc786ceab344b1143407be815798ea02f581dcedfb7d49a61057375c"
+  },
+  {
+    "tracking_name": "packages/components/src/tooltip/tooltip.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip.stories.tsx&old_oid=e6f04f6453db4c04238f37427e28c1acce4c40cb&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip.stories.tsx&new_oid=4cecc3ec74e8744b6723add25d8ad160942b3938&new_mode=33188",
+    "file": "diffs/diff-118.json",
+    "old": {
+      "name": "packages/components/src/tooltip/tooltip.stories.tsx",
+      "oid": "e6f04f6453db4c04238f37427e28c1acce4c40cb",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tooltip/tooltip.stories.tsx",
+      "oid": "4cecc3ec74e8744b6723add25d8ad160942b3938",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "914894c1ed92e6e1121678ded12648fa9a30855fa48387134dc4d9a4765bded9"
+  },
+  {
+    "tracking_name": "packages/components/src/tooltip/tooltip.test.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip.test.tsx&old_oid=b399e1ebeeb49befde90e15d367d5f30ed05b2f7&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Ftooltip.test.tsx&new_oid=9d0bc745253432785efb72a03dba616827cb2aa5&new_mode=33188",
+    "file": "diffs/diff-119.json",
+    "old": {
+      "name": "packages/components/src/tooltip/tooltip.test.tsx",
+      "oid": "b399e1ebeeb49befde90e15d367d5f30ed05b2f7",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tooltip/tooltip.test.tsx",
+      "oid": "9d0bc745253432785efb72a03dba616827cb2aa5",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "87751193f570b8fdcb6fed96af4b8bdfea5cb937e702f1cb548adc773fd0417c"
+  },
+  {
+    "tracking_name": "packages/components/src/tooltip/use-tooltip.stories.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Fuse-tooltip.stories.tsx&old_oid=2425c6cfa1df852fe983bf3716d9289b30a80eb3&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Fuse-tooltip.stories.tsx&new_oid=e94296df80d3c88e896176b0b61b98720c71b398&new_mode=33188",
+    "file": "diffs/diff-120.json",
+    "old": {
+      "name": "packages/components/src/tooltip/use-tooltip.stories.tsx",
+      "oid": "2425c6cfa1df852fe983bf3716d9289b30a80eb3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tooltip/use-tooltip.stories.tsx",
+      "oid": "e94296df80d3c88e896176b0b61b98720c71b398",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "64e8c9f4197ff0939ec0dd94f2198a0784d7b4d70a309fd6faff607abab5b8fa"
+  },
+  {
+    "tracking_name": "packages/components/src/tooltip/use-tooltip.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Fuse-tooltip.ts&old_oid=539445e9457d0a6f3e63bbedcf4a851b78c8e225&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftooltip%2Fuse-tooltip.ts&new_oid=cf7b1de00b9e9acd3e3e22fd6722dfc0669d3f30&new_mode=33188",
+    "file": "diffs/diff-121.json",
+    "old": {
+      "name": "packages/components/src/tooltip/use-tooltip.ts",
+      "oid": "539445e9457d0a6f3e63bbedcf4a851b78c8e225",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/tooltip/use-tooltip.ts",
+      "oid": "cf7b1de00b9e9acd3e3e22fd6722dfc0669d3f30",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "986092fcc6320342efc3576b21aa06a52d1bf7a41a2e3782d46a8e515a71b96e"
+  },
+  {
+    "tracking_name": "packages/components/src/transition/collapse.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fcollapse.tsx&old_oid=11032ef39fe6fe4bcb951c236e2a19d96fb2d980&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fcollapse.tsx&new_oid=99ccd6bdaddfc60b703ce193af3ad21b149e4e92&new_mode=33188",
+    "file": "diffs/diff-122.json",
+    "old": {
+      "name": "packages/components/src/transition/collapse.tsx",
+      "oid": "11032ef39fe6fe4bcb951c236e2a19d96fb2d980",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/transition/collapse.tsx",
+      "oid": "99ccd6bdaddfc60b703ce193af3ad21b149e4e92",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "287b8529d4296053b5e2c5a9d2b0749bed427f8fc33855a22ae748f465cb51f9"
+  },
+  {
+    "tracking_name": "packages/components/src/transition/fade.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Ffade.tsx&old_oid=cae32729536005691238e7e5e445e921c3900160&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Ffade.tsx&new_oid=64f6d3d310163696dfb1552256698bdc091a84cd&new_mode=33188",
+    "file": "diffs/diff-123.json",
+    "old": {
+      "name": "packages/components/src/transition/fade.tsx",
+      "oid": "cae32729536005691238e7e5e445e921c3900160",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/transition/fade.tsx",
+      "oid": "64f6d3d310163696dfb1552256698bdc091a84cd",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "1e5652f89df7001cdefd578b35d1e05dacc3d95049198fb8b297271ca6007973"
+  },
+  {
+    "tracking_name": "packages/components/src/transition/scale-fade.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fscale-fade.tsx&old_oid=fded6c7640145a1f4bf2f82c1b7eb30aa0da53fb&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fscale-fade.tsx&new_oid=e36e744f423000c84d50898800c8588a30f94d60&new_mode=33188",
+    "file": "diffs/diff-124.json",
+    "old": {
+      "name": "packages/components/src/transition/scale-fade.tsx",
+      "oid": "fded6c7640145a1f4bf2f82c1b7eb30aa0da53fb",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/transition/scale-fade.tsx",
+      "oid": "e36e744f423000c84d50898800c8588a30f94d60",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "f51aa46c569e1725ee33eb823d9de60bce6c94e24653dbf14cf7531f402671f6"
+  },
+  {
+    "tracking_name": "packages/components/src/transition/slide-fade.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fslide-fade.tsx&old_oid=3ad38bd1fa82dd6a7c9d3aa0976aa57f511695ed&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fslide-fade.tsx&new_oid=558efdab78c753189335a3c83e880cbb5817fd73&new_mode=33188",
+    "file": "diffs/diff-125.json",
+    "old": {
+      "name": "packages/components/src/transition/slide-fade.tsx",
+      "oid": "3ad38bd1fa82dd6a7c9d3aa0976aa57f511695ed",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/transition/slide-fade.tsx",
+      "oid": "558efdab78c753189335a3c83e880cbb5817fd73",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0d91162dda20e93a7467c919e81e1c0759fa313652bf32c1ce3315761754124c"
+  },
+  {
+    "tracking_name": "packages/components/src/transition/slide.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fslide.tsx&old_oid=7a5d5b8e41aab886137955c83531dbf2781cbed0&old_mode=33188&new_filename=packages%2Fcomponents%2Fsrc%2Ftransition%2Fslide.tsx&new_oid=06dfecabf9b9086177b201f22216316f57640c25&new_mode=33188",
+    "file": "diffs/diff-126.json",
+    "old": {
+      "name": "packages/components/src/transition/slide.tsx",
+      "oid": "7a5d5b8e41aab886137955c83531dbf2781cbed0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/components/src/transition/slide.tsx",
+      "oid": "06dfecabf9b9086177b201f22216316f57640c25",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "0e47065cfa1206bd881c347a45c65ad0ae586a94f365896b1ca8e5b46ad915b8"
+  },
+  {
+    "tracking_name": "packages/hooks/src/use-animation-state.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fhooks%2Fsrc%2Fuse-animation-state.ts&old_oid=7b1f627ff6d65d83d92d74f6e507fc49c2570c55&old_mode=33188&new_filename=packages%2Fhooks%2Fsrc%2Fuse-animation-state.ts&new_oid=1e6d8263e3518fe13412cf75fdcb7874d92d71ea&new_mode=33188",
+    "file": "diffs/diff-127.json",
+    "old": {
+      "name": "packages/hooks/src/use-animation-state.ts",
+      "oid": "7b1f627ff6d65d83d92d74f6e507fc49c2570c55",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/hooks/src/use-animation-state.ts",
+      "oid": "1e6d8263e3518fe13412cf75fdcb7874d92d71ea",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fc0e4c0d025424c309f6e65e679ed868128a66fd573b240d31d3e4a97dd63a4b"
+  },
+  {
+    "tracking_name": "packages/hooks/src/use-disclosure.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Fhooks%2Fsrc%2Fuse-disclosure.ts&old_oid=da18c6fb50e4ef5d719960a50b82839e78d27b37&old_mode=33188&new_filename=packages%2Fhooks%2Fsrc%2Fuse-disclosure.ts&new_oid=eeb28094b61d16ccabdc4dfaf85dd4e1b046dedb&new_mode=33188",
+    "file": "diffs/diff-128.json",
+    "old": {
+      "name": "packages/hooks/src/use-disclosure.ts",
+      "oid": "da18c6fb50e4ef5d719960a50b82839e78d27b37",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/hooks/src/use-disclosure.ts",
+      "oid": "eeb28094b61d16ccabdc4dfaf85dd4e1b046dedb",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "9976e060b9c50d4a4174f994250845d69038eb3cc576ed0fd450c051a7f30a90"
+  },
+  {
+    "tracking_name": "packages/test-utils/src/focus.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Ftest-utils%2Fsrc%2Ffocus.ts&old_oid=8fd529a827c90c393ddfc6f4b8383d6cad58daf3&old_mode=33188&new_filename=packages%2Ftest-utils%2Fsrc%2Ffocus.ts&new_oid=b57e66d937c33a450157ceacd0ab58a03385b6d0&new_mode=33188",
+    "file": "diffs/diff-129.json",
+    "old": {
+      "name": "packages/test-utils/src/focus.ts",
+      "oid": "8fd529a827c90c393ddfc6f4b8383d6cad58daf3",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/test-utils/src/focus.ts",
+      "oid": "b57e66d937c33a450157ceacd0ab58a03385b6d0",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "142712835dc73a70488f941c41e12d8c0763803290b130913c6e64332ff9b771"
+  },
+  {
+    "tracking_name": "packages/theme/src/components/progress.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Ftheme%2Fsrc%2Fcomponents%2Fprogress.ts&old_oid=ec22211a698196ebfe2573ee1aa079ec29e5961e&old_mode=33188&new_filename=packages%2Ftheme%2Fsrc%2Fcomponents%2Fprogress.ts&new_oid=ca2dc107a6a247ee862493dcef93a818a671b744&new_mode=33188",
+    "file": "diffs/diff-130.json",
+    "old": {
+      "name": "packages/theme/src/components/progress.ts",
+      "oid": "ec22211a698196ebfe2573ee1aa079ec29e5961e",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/theme/src/components/progress.ts",
+      "oid": "ca2dc107a6a247ee862493dcef93a818a671b744",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "32e7e2b4c3e0f9622f414f03718b76cd92cbbd63a34ca63f13a712141f91c0f7"
+  },
+  {
+    "tracking_name": "packages/utils/src/focusable.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Futils%2Fsrc%2Ffocusable.ts&old_oid=f751d5f48b439f4b6986a5086025d3ea459c4f3c&old_mode=33188&new_filename=packages%2Futils%2Fsrc%2Ffocusable.ts&new_oid=74dba65642396a5fd714523c8b8cc7ecee68c7f1&new_mode=33188",
+    "file": "diffs/diff-131.json",
+    "old": {
+      "name": "packages/utils/src/focusable.ts",
+      "oid": "f751d5f48b439f4b6986a5086025d3ea459c4f3c",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/utils/src/focusable.ts",
+      "oid": "74dba65642396a5fd714523c8b8cc7ecee68c7f1",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "db53e1e3d8c3f376d6cbf84048663a2a0941fcc2185479b11ae9fa61a5ff3871"
+  },
+  {
+    "tracking_name": "packages/utils/src/is-element.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Futils%2Fsrc%2Fis-element.ts&old_oid=f6f13cd5cffb414745dcf56ac5508fce2133adf0&old_mode=33188&new_filename=packages%2Futils%2Fsrc%2Fis-element.ts&new_oid=78f73c11f5dacc7dbcfa465ddcf2385ee276b1d6&new_mode=33188",
+    "file": "diffs/diff-132.json",
+    "old": {
+      "name": "packages/utils/src/is-element.ts",
+      "oid": "f6f13cd5cffb414745dcf56ac5508fce2133adf0",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/utils/src/is-element.ts",
+      "oid": "78f73c11f5dacc7dbcfa465ddcf2385ee276b1d6",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "bad20530603a8b8bac19f4607d38f3b4aef2226501ce3860054649c4bec62441"
+  },
+  {
+    "tracking_name": "packages/utils/src/tabbable.ts",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=packages%2Futils%2Fsrc%2Ftabbable.ts&old_oid=df472de07c18ef171fe82bc9b317ab56a47ac025&old_mode=33188&new_filename=packages%2Futils%2Fsrc%2Ftabbable.ts&new_oid=054ef3a44ecafaebdfe3232920c11dc2d3763462&new_mode=33188",
+    "file": "diffs/diff-133.json",
+    "old": {
+      "name": "packages/utils/src/tabbable.ts",
+      "oid": "df472de07c18ef171fe82bc9b317ab56a47ac025",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/utils/src/tabbable.ts",
+      "oid": "054ef3a44ecafaebdfe3232920c11dc2d3763462",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "fa5a8b66aaee637e45bb7c3e8cfd3965783036eeabc63bc43265f82c735d38e1"
+  },
+  {
+    "tracking_name": "website/src/components/algolia-search.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=website%2Fsrc%2Fcomponents%2Falgolia-search.tsx&old_oid=7f3f59b4aedbe5b64477858bce1b8ab30513fc3f&old_mode=33188&new_filename=website%2Fsrc%2Fcomponents%2Falgolia-search.tsx&new_oid=b6697abc4009fa7ddf5a3d8d9215a8e0693f3406&new_mode=33188",
+    "file": "diffs/diff-134.json",
+    "old": {
+      "name": "website/src/components/algolia-search.tsx",
+      "oid": "7f3f59b4aedbe5b64477858bce1b8ab30513fc3f",
+      "mode": 33188
+    },
+    "new": {
+      "name": "website/src/components/algolia-search.tsx",
+      "oid": "b6697abc4009fa7ddf5a3d8d9215a8e0693f3406",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "6721f4ffe9eb21e02311e79156053dc448316afdfb2e0ae27476dd9071d1857d"
+  },
+  {
+    "tracking_name": "website/src/components/header.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=website%2Fsrc%2Fcomponents%2Fheader.tsx&old_oid=6d442693e2f75706a5b7e6bdd1b7b21ee76fdbaf&old_mode=33188&new_filename=website%2Fsrc%2Fcomponents%2Fheader.tsx&new_oid=f96c924fe9c12d9172636660a9e9295106f18a1a&new_mode=33188",
+    "file": "diffs/diff-135.json",
+    "old": {
+      "name": "website/src/components/header.tsx",
+      "oid": "6d442693e2f75706a5b7e6bdd1b7b21ee76fdbaf",
+      "mode": 33188
+    },
+    "new": {
+      "name": "website/src/components/header.tsx",
+      "oid": "f96c924fe9c12d9172636660a9e9295106f18a1a",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "2d2b330f3b91c0baaa4950b7aa8f9ed417c2083101e99072fae230e590b882b5"
+  },
+  {
+    "tracking_name": "website/src/components/mobile-nav.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=website%2Fsrc%2Fcomponents%2Fmobile-nav.tsx&old_oid=bb5561485dbf0e4f4aec07c4c23aaff6cae76c67&old_mode=33188&new_filename=website%2Fsrc%2Fcomponents%2Fmobile-nav.tsx&new_oid=f1ed9b0d663e28297a4b1a24d7d37839701524ef&new_mode=33188",
+    "file": "diffs/diff-136.json",
+    "old": {
+      "name": "website/src/components/mobile-nav.tsx",
+      "oid": "bb5561485dbf0e4f4aec07c4c23aaff6cae76c67",
+      "mode": 33188
+    },
+    "new": {
+      "name": "website/src/components/mobile-nav.tsx",
+      "oid": "f1ed9b0d663e28297a4b1a24d7d37839701524ef",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "7713a19595192694642b898de0bf400dc98c09e5d5e1c6a4261a5991479fe326"
+  },
+  {
+    "tracking_name": "website/src/components/omni-search.tsx",
+    "diff": "/gh/chakra-ui/chakra-ui/diff?old_filename=website%2Fsrc%2Fcomponents%2Fomni-search.tsx&old_oid=1d0fca680251eb529bf3041835797bf0c0217df5&old_mode=33188&new_filename=website%2Fsrc%2Fcomponents%2Fomni-search.tsx&new_oid=662b5d77dbcb33969a5901a15437f494fac51bb7&new_mode=33188",
+    "file": "diffs/diff-137.json",
+    "old": {
+      "name": "website/src/components/omni-search.tsx",
+      "oid": "1d0fca680251eb529bf3041835797bf0c0217df5",
+      "mode": 33188
+    },
+    "new": {
+      "name": "website/src/components/omni-search.tsx",
+      "oid": "662b5d77dbcb33969a5901a15437f494fac51bb7",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "47c19037ef712044826d8f34198984d2fb0983baa423fbac0f0347bfc466a9b4"
+  }
+]

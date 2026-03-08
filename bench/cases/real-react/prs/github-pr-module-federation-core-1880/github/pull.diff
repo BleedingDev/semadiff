@@ -1,0 +1,46 @@
+diff --git a/.changeset/honest-peas-dress.md b/.changeset/honest-peas-dress.md
+new file mode 100644
+index 00000000000..76fc81d1e3f
+--- /dev/null
++++ b/.changeset/honest-peas-dress.md
+@@ -0,0 +1,5 @@
++---
++'@module-federation/runtime': patch
++---
++
++fix: rename usePlugins to prevent swc react-refresh from throwing errors when replacing variables
+diff --git a/packages/runtime/src/utils/hooks/pluginSystem.ts b/packages/runtime/src/utils/hooks/pluginSystem.ts
+index 357f2d14f9d..b53518c667b 100644
+--- a/packages/runtime/src/utils/hooks/pluginSystem.ts
++++ b/packages/runtime/src/utils/hooks/pluginSystem.ts
+@@ -17,7 +17,7 @@ export class PluginSystem<T extends Record<string, any>> {
+     this.lifecycleKeys = Object.keys(lifecycle);
+   }
+ 
+-  usePlugin(plugin: Plugin<T>): void {
++  applyPlugin(plugin: Plugin<T>): void {
+     assert(isPlainObject(plugin), 'Plugin configuration is invalid.');
+     // The plugin's name is mandatory and must be unique
+     const pluginName = plugin.name;
+@@ -67,7 +67,7 @@ export class PluginSystem<T extends Record<string, any>> {
+         !this.registerPlugins[pluginName],
+         `The plugin "${pluginName}" has a conflict and cannot be inherited.`,
+       );
+-      this.usePlugin(registerPlugins[pluginName]);
++      this.applyPlugin(registerPlugins[pluginName]);
+     });
+   }
+ }
+diff --git a/packages/runtime/src/utils/plugin.ts b/packages/runtime/src/utils/plugin.ts
+index 51550f41bd3..79693d5991c 100644
+--- a/packages/runtime/src/utils/plugin.ts
++++ b/packages/runtime/src/utils/plugin.ts
+@@ -24,7 +24,7 @@ export function registerPlugins(
+   if (plugins && plugins.length > 0) {
+     plugins.forEach((plugin) => {
+       hookInstances.forEach((hookInstance) => {
+-        hookInstance.usePlugin(plugin);
++        hookInstance.applyPlugin(plugin);
+       });
+     });
+   }

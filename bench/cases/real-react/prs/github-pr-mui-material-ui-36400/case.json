@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-mui-material-ui-36400",
+  "language": "ts",
+  "kind": "real",
+  "description": "mui/material-ui#36400: [base] Refactor the compound components building blocks",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 36400,
+    "prUrl": "https://github.com/mui/material-ui/pull/36400",
+    "baseSha": "e05f16c4c5070a69abaa143d513a1f831f8dbfb9",
+    "headSha": "6070647410ddf11eeedeffe98948c12889d08b43",
+    "selectedFiles": [
+      "packages/mui-base/src/useButton/useButton.ts"
+    ],
+    "collectedAt": "2026-03-08T03:39:27.293Z"
+  },
+  "files": [
+    {
+      "id": "packages/mui-base/src/useButton/useButton.ts",
+      "oldPath": "packages/mui-base/src/useButton/useButton.ts",
+      "newPath": "packages/mui-base/src/useButton/useButton.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/mui-base/src/useButton/useButton.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 238,
+          "endLine": 238
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/nextjs-mf/client/RemoteContainer.ts",
+    "diff": "/gh/module-federation/core/diff?old_filename=packages%2Fnextjs-mf%2Fclient%2FRemoteContainer.ts&old_oid=f0db296cbfcd98aee0176ba3c50edcc5fb7eb7a9&old_mode=33188&new_filename=packages%2Fnextjs-mf%2Fclient%2FRemoteContainer.ts&new_oid=1ff7f8d49d5cf071fec22724ca2682c9f2074bf8&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/nextjs-mf/client/RemoteContainer.ts",
+      "oid": "f0db296cbfcd98aee0176ba3c50edcc5fb7eb7a9",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/nextjs-mf/client/RemoteContainer.ts",
+      "oid": "1ff7f8d49d5cf071fec22724ca2682c9f2074bf8",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "14667363dd5b6d1af8f31a4d295e2f831fbed63ba89bd184e471580a2e505ebe"
+  }
+]

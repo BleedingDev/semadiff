@@ -1,0 +1,1350 @@
+diff --git a/.changeset/witty-cougars-wait.md b/.changeset/witty-cougars-wait.md
+new file mode 100644
+index 0000000000..9a1b8408b8
+--- /dev/null
++++ b/.changeset/witty-cougars-wait.md
+@@ -0,0 +1,73 @@
++---
++"@zag-js/interact-outside": patch
++"@zag-js/stringify-state": patch
++"@zag-js/highlight-word": patch
++"@zag-js/text-selection": patch
++"@zag-js/floating-panel": patch
++"@zag-js/focus-visible": patch
++"@zag-js/signature-pad": patch
++"@zag-js/element-rect": patch
++"@zag-js/element-size": patch
++"@zag-js/color-picker": patch
++"@zag-js/number-input": patch
++"@zag-js/rating-group": patch
++"@zag-js/toggle-group": patch
++"@zag-js/aria-hidden": patch
++"@zag-js/color-utils": patch
++"@zag-js/dismissable": patch
++"@zag-js/live-region": patch
++"@zag-js/collapsible": patch
++"@zag-js/date-picker": patch
++"@zag-js/file-upload": patch
++"@zag-js/radio-group": patch
++"@zag-js/time-picker": patch
++"@zag-js/collection": patch
++"@zag-js/file-utils": patch
++"@zag-js/form-utils": patch
++"@zag-js/i18n-utils": patch
++"@zag-js/hover-card": patch
++"@zag-js/pagination": patch
++"@zag-js/tags-input": patch
++"@zag-js/dom-event": patch
++"@zag-js/dom-query": patch
++"@zag-js/accordion": patch
++"@zag-js/clipboard": patch
++"@zag-js/pin-input": patch
++"@zag-js/tree-view": patch
++"@zag-js/preact": patch
++"@zag-js/svelte": patch
++"@zag-js/carousel": patch
++"@zag-js/checkbox": patch
++"@zag-js/combobox": patch
++"@zag-js/editable": patch
++"@zag-js/presence": patch
++"@zag-js/progress": patch
++"@zag-js/splitter": patch
++"@zag-js/react": patch
++"@zag-js/solid": patch
++"@zag-js/popover": patch
++"@zag-js/qr-code": patch
++"@zag-js/tooltip": patch
++"@zag-js/number-utils": patch
++"@zag-js/popper": patch
++"@zag-js/avatar": patch
++"@zag-js/dialog": patch
++"@zag-js/select": patch
++"@zag-js/slider": patch
++"@zag-js/switch": patch
++"@zag-js/vue": patch
++"@zag-js/steps": patch
++"@zag-js/timer": patch
++"@zag-js/toast": patch
++"@zag-js/utils": patch
++"@zag-js/rect-utils": patch
++"@zag-js/menu": patch
++"@zag-js/tabs": patch
++"@zag-js/tour": patch
++"@zag-js/store": patch
++"@zag-js/types": patch
++"@zag-js/core": patch
++"@zag-js/docs": patch
++---
++
++Add better support for TS exactOptionalPropertyTypes setting.
+diff --git a/packages/core/src/memo.ts b/packages/core/src/memo.ts
+index 695ba64765..3446c57093 100644
+--- a/packages/core/src/memo.ts
++++ b/packages/core/src/memo.ts
+@@ -6,7 +6,7 @@ export function memo<TDeps extends any[], TDepArgs, TResult>(
+   getDeps: (depArgs: TDepArgs) => [...TDeps],
+   fn: (...args: NoInfer<[...TDeps]>) => TResult,
+   opts?: {
+-    onChange?: (result: TResult) => void
++    onChange?: ((result: TResult) => void) | undefined
+   },
+ ): (depArgs: TDepArgs) => TResult {
+   let deps: any[] = []
+diff --git a/packages/core/src/types.ts b/packages/core/src/types.ts
+index 70e363d0dc..ee1768baa0 100644
+--- a/packages/core/src/types.ts
++++ b/packages/core/src/types.ts
+@@ -33,11 +33,11 @@ type TrackFn = (deps: AnyFunction[], fn: VoidFunction) => void
+ export interface BindableParams<T> {
+   defaultValue?: T | undefined
+   value?: T | undefined
+-  hash?: (a: T) => string
+-  isEqual?: (a: T, b: T | undefined) => boolean
+-  onChange?: (value: T, prev: T | undefined) => void
+-  debug?: string
+-  sync?: boolean
++  hash?: ((a: T) => string) | undefined
++  isEqual?: ((a: T, b: T | undefined) => boolean) | undefined
++  onChange?: ((value: T, prev: T | undefined) => void) | undefined
++  debug?: string | undefined
++  sync?: boolean | undefined
+ }
+ 
+ export type ValueOrFn<T> = T | ((prev: T) => T)
+@@ -86,8 +86,8 @@ export interface Scope {
+ }
+ 
+ type EventType<T = any> = T & {
+-  previousEvent?: T & { [key: string]: any }
+-  src?: string
++  previousEvent?: (T & { [key: string]: any }) | undefined
++  src?: string | undefined
+   [key: string]: any
+ }
+ 
+@@ -118,10 +118,10 @@ export interface Params<T extends Dict> {
+ export type GuardFn<T extends Dict> = (params: Params<T>) => boolean
+ 
+ export interface Transition<T extends Dict> {
+-  target?: T["state"]
+-  actions?: T["action"][]
+-  guard?: T["guard"] | GuardFn<T>
+-  reenter?: boolean
++  target?: T["state"] | undefined
++  actions?: T["action"][] | undefined
++  guard?: T["guard"] | GuardFn<T> | undefined
++  reenter?: boolean | undefined
+ }
+ 
+ type MaybeArray<T> = T | T[]
+@@ -145,45 +145,61 @@ export type ActionsOrFn<T extends Dict> = T["action"][] | ((params: Params<T>) =
+ export type EffectsOrFn<T extends Dict> = T["effect"][] | ((params: Params<T>) => T["effect"][] | undefined)
+ 
+ export interface Machine<T extends Dict> {
+-  debug?: boolean
+-  props?: (params: PropsParams<T>) => T["props"]
+-  context?: (params: ContextParams<T>) => {
+-    [K in keyof T["context"]]: Bindable<T["context"][K]>
+-  }
+-  computed?: {
+-    [K in keyof T["computed"]]: (params: ComputedParams<T>) => T["computed"][K]
+-  }
++  debug?: boolean | undefined
++  props?: ((params: PropsParams<T>) => T["props"]) | undefined
++  context?:
++    | ((params: ContextParams<T>) => {
++        [K in keyof T["context"]]: Bindable<T["context"][K]>
++      })
++    | undefined
++  computed?:
++    | {
++        [K in keyof T["computed"]]: (params: ComputedParams<T>) => T["computed"][K]
++      }
++    | undefined
+   initialState: (params: { prop: PropFn<T> }) => T["state"]
+-  entry?: ActionsOrFn<T>
+-  exit?: ActionsOrFn<T>
+-  effects?: EffectsOrFn<T>
+-  refs?: (params: RefsParams<T>) => T["refs"]
+-  watch?: (params: Params<T>) => void
+-  on?: {
+-    [E in T["event"]["type"]]?: Transition<T> | Array<Transition<T>>
+-  }
+-  states: {
+-    [K in T["state"]]: {
+-      tags?: T["tag"][]
+-      entry?: ActionsOrFn<T>
+-      exit?: ActionsOrFn<T>
+-      effects?: EffectsOrFn<T>
+-      on?: {
++  entry?: ActionsOrFn<T> | undefined
++  exit?: ActionsOrFn<T> | undefined
++  effects?: EffectsOrFn<T> | undefined
++  refs?: ((params: RefsParams<T>) => T["refs"]) | undefined
++  watch?: ((params: Params<T>) => void) | undefined
++  on?:
++    | {
+         [E in T["event"]["type"]]?: Transition<T> | Array<Transition<T>>
+       }
++    | undefined
++  states: {
++    [K in T["state"]]: {
++      tags?: T["tag"][] | undefined
++      entry?: ActionsOrFn<T> | undefined
++      exit?: ActionsOrFn<T> | undefined
++      effects?: EffectsOrFn<T> | undefined
++      on?:
++        | {
++            [E in T["event"]["type"]]?: Transition<T> | Array<Transition<T>>
++          }
++        | undefined
+     }
+   }
+-  implementations?: {
+-    guards?: {
+-      [K in T["guard"]]: (params: Params<T>) => boolean
+-    }
+-    actions?: {
+-      [K in T["action"]]: (params: Params<T>) => void
+-    }
+-    effects?: {
+-      [K in T["effect"]]: (params: Params<T>) => void | VoidFunction
+-    }
+-  }
++  implementations?:
++    | {
++        guards?:
++          | {
++              [K in T["guard"]]: (params: Params<T>) => boolean
++            }
++          | undefined
++        actions?:
++          | {
++              [K in T["action"]]: (params: Params<T>) => void
++            }
++          | undefined
++        effects?:
++          | {
++              [K in T["effect"]]: (params: Params<T>) => void | VoidFunction
++            }
++          | undefined
++      }
++    | undefined
+ }
+ 
+ interface MachineBaseProps {
+@@ -194,16 +210,16 @@ interface MachineBaseProps {
+ }
+ 
+ export interface MachineSchema {
+-  props?: MachineBaseProps
+-  context?: Record<string, any>
+-  refs?: Record<string, any>
+-  computed?: Record<string, any>
+-  state?: string
+-  tag?: string
+-  guard?: string
+-  action?: string
+-  effect?: string
+-  event?: { type: string } & Dict
++  props?: MachineBaseProps | undefined
++  context?: Record<string, any> | undefined
++  refs?: Record<string, any> | undefined
++  computed?: Record<string, any> | undefined
++  state?: string | undefined
++  tag?: string | undefined
++  guard?: string | undefined
++  action?: string | undefined
++  effect?: string | undefined
++  event?: ({ type: string } & Dict) | undefined
+ }
+ 
+ type State<T extends MachineSchema> = Bindable<T["state"]> & {
+diff --git a/packages/docs/src/index.ts b/packages/docs/src/index.ts
+index e045dc0989..7c6b2bdf62 100644
+--- a/packages/docs/src/index.ts
++++ b/packages/docs/src/index.ts
+@@ -50,7 +50,7 @@ export function getAccessibilityDoc(key: AccessibilityDocKey): AccessibilityDoc
+ interface Prop {
+   type: string
+   description: string
+-  defaultValue?: string
++  defaultValue?: string | undefined
+ }
+ 
+ export interface ApiDoc {
+diff --git a/packages/frameworks/preact/src/portal.tsx b/packages/frameworks/preact/src/portal.tsx
+index 1f9e4cbf10..764323ca7a 100644
+--- a/packages/frameworks/preact/src/portal.tsx
++++ b/packages/frameworks/preact/src/portal.tsx
+@@ -9,9 +9,9 @@ import {
+ } from "preact/compat"
+ 
+ export interface PortalProps {
+-  disabled?: boolean
+-  container?: RefObject<HTMLElement>
+-  getRootNode?: () => ShadowRoot | Document | Node
++  disabled?: boolean | undefined
++  container?: RefObject<HTMLElement> | undefined
++  getRootNode?: (() => ShadowRoot | Document | Node) | undefined
+ }
+ 
+ export const Portal = (props: PropsWithChildren<PortalProps>): JSX.Element => {
+diff --git a/packages/frameworks/react/src/portal.tsx b/packages/frameworks/react/src/portal.tsx
+index 58aedede96..9e1347c3c4 100644
+--- a/packages/frameworks/react/src/portal.tsx
++++ b/packages/frameworks/react/src/portal.tsx
+@@ -3,9 +3,9 @@ import * as React from "react"
+ import { createPortal } from "react-dom"
+ 
+ export interface PortalProps {
+-  disabled?: boolean
+-  container?: RefObject<HTMLElement>
+-  getRootNode?: () => ShadowRoot | Document | Node
++  disabled?: boolean | undefined
++  container?: RefObject<HTMLElement> | undefined
++  getRootNode?: (() => ShadowRoot | Document | Node) | undefined
+ }
+ 
+ export const Portal = (props: PropsWithChildren<PortalProps>): JSX.Element => {
+diff --git a/packages/frameworks/svelte/src/normalize-props.ts b/packages/frameworks/svelte/src/normalize-props.ts
+index 3f763b7cfc..a73ac964c0 100644
+--- a/packages/frameworks/svelte/src/normalize-props.ts
++++ b/packages/frameworks/svelte/src/normalize-props.ts
+@@ -16,7 +16,7 @@ const propMap: Record<string, string> = {
+ 
+ export type PropTypes = SvelteHTMLElements & {
+   element: HTMLAttributes<HTMLElement>
+-  style?: HTMLAttributes<HTMLElement>["style"]
++  style?: HTMLAttributes<HTMLElement>["style"] | undefined
+ }
+ 
+ export function toStyleString(style: Record<string, number | string>) {
+diff --git a/packages/frameworks/svelte/src/portal.ts b/packages/frameworks/svelte/src/portal.ts
+index a0e15a48fe..1bcf930bf4 100644
+--- a/packages/frameworks/svelte/src/portal.ts
++++ b/packages/frameworks/svelte/src/portal.ts
+@@ -1,7 +1,7 @@
+ export interface PortalActionProps {
+-  disabled?: boolean
+-  container?: HTMLElement
+-  getRootNode?: () => ShadowRoot | Document | Node
++  disabled?: boolean | undefined
++  container?: HTMLElement | undefined
++  getRootNode?: (() => ShadowRoot | Document | Node) | undefined
+ }
+ 
+ export function portal(node: HTMLElement, props: PortalActionProps = {}) {
+diff --git a/packages/frameworks/vue/src/normalize-props.ts b/packages/frameworks/vue/src/normalize-props.ts
+index b517f380c2..401e32e96a 100644
+--- a/packages/frameworks/vue/src/normalize-props.ts
++++ b/packages/frameworks/vue/src/normalize-props.ts
+@@ -2,8 +2,8 @@ import { createNormalizer } from "@zag-js/types"
+ import type * as Vue from "vue"
+ 
+ type ReservedProps = {
+-  key?: string | number | symbol
+-  ref?: Vue.VNodeRef
++  key?: string | number | symbol | undefined
++  ref?: Vue.VNodeRef | undefined
+ }
+ 
+ type Attrs<T> = T & ReservedProps
+diff --git a/packages/machines/async-list/src/async-list.types.ts b/packages/machines/async-list/src/async-list.types.ts
+index 69bd9d2194..8955a24dd7 100644
+--- a/packages/machines/async-list/src/async-list.types.ts
++++ b/packages/machines/async-list/src/async-list.types.ts
+@@ -16,7 +16,7 @@ export interface LoadDetails<C> {
+ 
+ export interface LoadResult<T, C> {
+   items: T[]
+-  cursor?: C
++  cursor?: C | undefined
+ }
+ 
+ export interface SortDetails<T> {
+@@ -34,7 +34,7 @@ export interface AsyncListProps<T, C> {
+   /**
+    * The function to call when the list is sorted
+    */
+-  sort?: (args: SortDetails<T>) => Promise<{ items: T[] }> | { items: T[] } | undefined
++  sort?: ((args: SortDetails<T>) => Promise<{ items: T[] }> | { items: T[] } | undefined) | undefined
+   /**
+    * The initial items to display
+    */
+@@ -58,11 +58,11 @@ export interface AsyncListProps<T, C> {
+   /**
+    * The function to call when the list is loaded successfully
+    */
+-  onSuccess?: (details: { items: T[] }) => void | undefined
++  onSuccess?: ((details: { items: T[] }) => void | undefined) | undefined
+   /**
+    * The function to call when the list fails to load
+    */
+-  onError?: (details: { error: Error }) => void | undefined
++  onError?: ((details: { error: Error }) => void | undefined) | undefined
+ }
+ 
+ export interface AsyncListSchema<T, C> {
+@@ -71,9 +71,9 @@ export interface AsyncListSchema<T, C> {
+   context: {
+     items: T[]
+     filterText: string
+-    cursor?: C
+-    sortDescriptor?: SortDescriptor
+-    error?: any
++    cursor?: C | undefined
++    sortDescriptor?: SortDescriptor | undefined
++    error?: any | undefined
+   }
+   refs: {
+     abort: AbortController | null
+diff --git a/packages/machines/avatar/src/avatar.types.ts b/packages/machines/avatar/src/avatar.types.ts
+index cc1d547f56..7ec1ef10ca 100644
+--- a/packages/machines/avatar/src/avatar.types.ts
++++ b/packages/machines/avatar/src/avatar.types.ts
+@@ -39,8 +39,8 @@ export interface AvatarSchema {
+   effect: "trackImageRemoval" | "trackSrcChange"
+   action: "invokeOnLoad" | "invokeOnError" | "checkImageStatus"
+   event:
+-    | { type: "img.loaded"; src?: string }
+-    | { type: "img.error"; src?: string }
++    | { type: "img.loaded"; src?: string | undefined }
++    | { type: "img.error"; src?: string | undefined }
+     | { type: "img.unmount" }
+     | { type: "src.change" }
+   state: "loading" | "error" | "loaded"
+diff --git a/packages/machines/color-picker/src/color-picker.types.ts b/packages/machines/color-picker/src/color-picker.types.ts
+index 0d242d1d23..047957d495 100644
+--- a/packages/machines/color-picker/src/color-picker.types.ts
++++ b/packages/machines/color-picker/src/color-picker.types.ts
+@@ -8,7 +8,7 @@ export type ExtendedColorChannel = ColorChannel | "hex" | "css"
+ 
+ interface EyeDropper {
+   new (): EyeDropper
+-  open: (options?: { signal?: AbortSignal }) => Promise<{ sRGBHex: string }>
++  open: (options?: { signal?: AbortSignal | undefined }) => Promise<{ sRGBHex: string }>
+   [Symbol.toStringTag]: "EyeDropper"
+ }
+ 
+diff --git a/packages/machines/file-upload/src/file-upload.types.ts b/packages/machines/file-upload/src/file-upload.types.ts
+index 5b6247ead8..a6b0d39d44 100644
+--- a/packages/machines/file-upload/src/file-upload.types.ts
++++ b/packages/machines/file-upload/src/file-upload.types.ts
+@@ -194,7 +194,7 @@ export interface DropzoneProps {
+   /**
+    * Whether to disable the click event on the dropzone
+    */
+-  disableClick?: boolean
++  disableClick?: boolean | undefined
+ }
+ 
+ export interface FileUploadApi<T extends PropTypes = PropTypes> {
+diff --git a/packages/machines/listbox/src/listbox.types.ts b/packages/machines/listbox/src/listbox.types.ts
+index 24c315ef93..619862c25c 100644
+--- a/packages/machines/listbox/src/listbox.types.ts
++++ b/packages/machines/listbox/src/listbox.types.ts
+@@ -82,7 +82,7 @@ export interface ListboxProps<T extends CollectionItem = CollectionItem>
+   /**
+    * The controlled key of the highlighted item
+    */
+-  highlightedValue?: string | null
++  highlightedValue?: string | null | undefined
+   /**
+    * The initial value of the highlighted item when opened.
+    * Use when you don't need to control the highlighted value of the listbox.
+diff --git a/packages/machines/menu/src/menu.dom.ts b/packages/machines/menu/src/menu.dom.ts
+index 7317e0bf92..6ab19de83a 100644
+--- a/packages/machines/menu/src/menu.dom.ts
++++ b/packages/machines/menu/src/menu.dom.ts
+@@ -36,13 +36,19 @@ const isMatch = (el: HTMLElement, value: string | null) => {
+   return el.id === value || el.dataset.value === value
+ }
+ 
+-export const getNextEl = (ctx: Scope, opts: { loop?: boolean; value: string | null; loopFocus: boolean }) => {
++export const getNextEl = (
++  ctx: Scope,
++  opts: { loop?: boolean | undefined; value: string | null; loopFocus: boolean },
++) => {
+   const items = getElements(ctx)
+   const index = items.findIndex((el) => isMatch(el, opts.value))
+   return next(items, index, { loop: opts.loop ?? opts.loopFocus })
+ }
+ 
+-export const getPrevEl = (ctx: Scope, opts: { loop?: boolean; value: string | null; loopFocus: boolean }) => {
++export const getPrevEl = (
++  ctx: Scope,
++  opts: { loop?: boolean | undefined; value: string | null; loopFocus: boolean },
++) => {
+   const items = getElements(ctx)
+   const index = items.findIndex((el) => isMatch(el, opts.value))
+   return prev(items, index, { loop: opts.loop ?? opts.loopFocus })
+diff --git a/packages/machines/menu/src/menu.types.ts b/packages/machines/menu/src/menu.types.ts
+index c10108c205..a82a19d315 100644
+--- a/packages/machines/menu/src/menu.types.ts
++++ b/packages/machines/menu/src/menu.types.ts
+@@ -199,7 +199,7 @@ export interface ItemListenerProps {
+   /**
+    * Function called when the item is selected
+    */
+-  onSelect?: VoidFunction
++  onSelect?: VoidFunction | undefined
+ }
+ 
+ export interface OptionItemProps extends Partial<ItemProps> {
+@@ -259,9 +259,9 @@ export interface ItemGroupLabelProps {
+ 
+ export interface ItemBaseProps {
+   value: string
+-  disabled?: boolean
+-  checked?: boolean
+-  valueText?: string
++  disabled?: boolean | undefined
++  checked?: boolean | undefined
++  valueText?: string | undefined
+ }
+ 
+ export interface MenuApi<T extends PropTypes = PropTypes> {
+diff --git a/packages/machines/navigation-menu/src/navigation-menu.types.ts b/packages/machines/navigation-menu/src/navigation-menu.types.ts
+index 9897e9c962..4b40d8baac 100644
+--- a/packages/machines/navigation-menu/src/navigation-menu.types.ts
++++ b/packages/machines/navigation-menu/src/navigation-menu.types.ts
+@@ -143,7 +143,7 @@ export interface LinkProps {
+   /**
+    * Function called when the link is selected
+    */
+-  onSelect?: (event: CustomEvent) => void
++  onSelect?: ((event: CustomEvent) => void) | undefined
+ }
+ 
+ export interface NavigationMenuApi<T extends PropTypes = PropTypes> {
+diff --git a/packages/machines/qr-code/src/qr-code.types.ts b/packages/machines/qr-code/src/qr-code.types.ts
+index 7e1afd242c..c4f130cf31 100644
+--- a/packages/machines/qr-code/src/qr-code.types.ts
++++ b/packages/machines/qr-code/src/qr-code.types.ts
+@@ -83,7 +83,7 @@ export interface DownloadTriggerProps {
+   /**
+    * The quality of the image.
+    */
+-  quality?: number
++  quality?: number | undefined
+   /**
+    * The name of the file.
+    */
+diff --git a/packages/machines/select/src/select.types.ts b/packages/machines/select/src/select.types.ts
+index 4c2e1eb7db..c02ba410ac 100644
+--- a/packages/machines/select/src/select.types.ts
++++ b/packages/machines/select/src/select.types.ts
+@@ -124,7 +124,7 @@ export interface SelectProps<T extends CollectionItem = CollectionItem>
+   /**
+    * The controlled key of the highlighted item
+    */
+-  highlightedValue?: string | null
++  highlightedValue?: string | null | undefined
+   /**
+    * The initial value of the highlighted item when opened.
+    * Use when you don't need to control the highlighted value of the select.
+diff --git a/packages/machines/splitter/src/splitter.types.ts b/packages/machines/splitter/src/splitter.types.ts
+index 6e593f5f16..c3ca7f88ca 100644
+--- a/packages/machines/splitter/src/splitter.types.ts
++++ b/packages/machines/splitter/src/splitter.types.ts
+@@ -108,7 +108,7 @@ export interface SplitterProps extends DirectionProperty, CommonProperties {
+   /**
+    * The number of pixels to resize the panel by when the keyboard is used.
+    */
+-  keyboardResizeBy?: number | null
++  keyboardResizeBy?: number | null | undefined
+   /**
+    * The nonce for the injected splitter cursor stylesheet.
+    */
+diff --git a/packages/machines/splitter/src/utils/panel.ts b/packages/machines/splitter/src/utils/panel.ts
+index 9f04e564e2..82c4aec692 100644
+--- a/packages/machines/splitter/src/utils/panel.ts
++++ b/packages/machines/splitter/src/utils/panel.ts
+@@ -75,7 +75,7 @@ export function getPanelFlexBoxStyle({
+   dragState: DragState | null
+   panels: PanelData[]
+   panelIndex: number
+-  precision?: number
++  precision?: number | undefined
+ }): Style {
+   const size = sizes[panelIndex]
+ 
+diff --git a/packages/machines/tabs/src/tabs.dom.ts b/packages/machines/tabs/src/tabs.dom.ts
+index 6effca9c58..6f9affc004 100644
+--- a/packages/machines/tabs/src/tabs.dom.ts
++++ b/packages/machines/tabs/src/tabs.dom.ts
+@@ -21,9 +21,9 @@ export const getElements = (ctx: Scope) => {
+ 
+ export const getFirstTriggerEl = (ctx: Scope) => first(getElements(ctx))
+ export const getLastTriggerEl = (ctx: Scope) => last(getElements(ctx))
+-export const getNextTriggerEl = (ctx: Scope, opts: { value: string; loopFocus?: boolean }) =>
++export const getNextTriggerEl = (ctx: Scope, opts: { value: string; loopFocus?: boolean | undefined }) =>
+   nextById(getElements(ctx), getTriggerId(ctx, opts.value), opts.loopFocus)
+-export const getPrevTriggerEl = (ctx: Scope, opts: { value: string; loopFocus?: boolean }) =>
++export const getPrevTriggerEl = (ctx: Scope, opts: { value: string; loopFocus?: boolean | undefined }) =>
+   prevById(getElements(ctx), getTriggerId(ctx, opts.value), opts.loopFocus)
+ 
+ export const getOffsetRect = (el: HTMLElement | undefined) => {
+diff --git a/packages/machines/time-picker/src/time-picker.types.ts b/packages/machines/time-picker/src/time-picker.types.ts
+index 38db8221d5..2c199b0648 100644
+--- a/packages/machines/time-picker/src/time-picker.types.ts
++++ b/packages/machines/time-picker/src/time-picker.types.ts
+@@ -96,7 +96,7 @@ export interface TimePickerProps extends DirectionProperty, CommonProperties {
+   /**
+    * The steps of each time unit.
+    */
+-  steps?: { hour?: number; minute?: number; second?: number } | undefined
++  steps?: { hour?: number | undefined; minute?: number | undefined; second?: number | undefined } | undefined
+   /**
+    * Whether to show the seconds.
+    */
+diff --git a/packages/machines/toast/src/toast.types.ts b/packages/machines/toast/src/toast.types.ts
+index b4170aab9f..fd01d5b2c0 100644
+--- a/packages/machines/toast/src/toast.types.ts
++++ b/packages/machines/toast/src/toast.types.ts
+@@ -110,21 +110,21 @@ export interface ToastProps<T = any> extends Omit<CommonProperties, "id">, Optio
+    * @internal
+    * The index of the toast
+    */
+-  index?: number
++  index?: number | undefined
+   /**
+    * @internal
+    * Whether the toast is stacked
+    */
+-  stacked?: boolean
++  stacked?: boolean | undefined
+   /**
+    * @internal
+    * The event to be dispatched
+    */
+-  message?: any
++  message?: any | undefined
+   /**
+    * The gap of the toast
+    */
+-  gap?: number
++  gap?: number | undefined
+   /**
+    * @internal
+    * The parent of the toast
+@@ -134,7 +134,7 @@ export interface ToastProps<T = any> extends Omit<CommonProperties, "id">, Optio
+    * @internal
+    * Whether to dismiss the toast
+    */
+-  dismiss?: boolean
++  dismiss?: boolean | undefined
+ }
+ 
+ type ToastPropsWithDefault = "type" | "parent" | "duration" | "id" | "removeDelay"
+@@ -357,9 +357,9 @@ export interface ToastStore<V = any> {
+ type MaybeFunction<Value, Args> = Value | ((arg: Args) => Value)
+ 
+ export interface PromiseOptions<V, O = any> {
+-  loading?: Omit<Options<O>, "type">
+-  success?: MaybeFunction<Omit<Options<O>, "type">, V>
+-  error?: MaybeFunction<Omit<Options<O>, "type">, unknown>
++  loading?: Omit<Options<O>, "type"> | undefined
++  success?: MaybeFunction<Omit<Options<O>, "type">, V> | undefined
++  error?: MaybeFunction<Omit<Options<O>, "type">, unknown> | undefined
+   finally?: (() => void | Promise<void>) | undefined
+ }
+ 
+diff --git a/packages/machines/tour/src/tour.types.ts b/packages/machines/tour/src/tour.types.ts
+index 26791c8cab..f2fd397cd9 100644
+--- a/packages/machines/tour/src/tour.types.ts
++++ b/packages/machines/tour/src/tour.types.ts
+@@ -65,7 +65,7 @@ export interface StepBaseDetails {
+   /**
+    * The offset between the content and the target
+    */
+-  offset?: { mainAxis?: number; crossAxis?: number } | undefined
++  offset?: { mainAxis?: number | undefined; crossAxis?: number | undefined } | undefined
+   /**
+    * Additional metadata of the step
+    */
+diff --git a/packages/store/src/proxy-computed.ts b/packages/store/src/proxy-computed.ts
+index 627e395f01..6cbab5213a 100644
+--- a/packages/store/src/proxy-computed.ts
++++ b/packages/store/src/proxy-computed.ts
+@@ -7,7 +7,7 @@ export function proxyWithComputed<T extends object, U extends object>(
+       | ((snap: Snapshot<T>) => U[K])
+       | {
+           get: (snap: Snapshot<T>) => U[K]
+-          set?: (state: T, newValue: U[K]) => void
++          set?: ((state: T, newValue: U[K]) => void) | undefined
+         }
+   },
+ ) {
+@@ -19,7 +19,7 @@ export function proxyWithComputed<T extends object, U extends object>(
+     const computedFn = computedFns[key]
+     const { get, set } = (typeof computedFn === "function" ? { get: computedFn } : computedFn) as {
+       get: (snap: Snapshot<T>) => U[typeof key]
+-      set?: (state: T, newValue: U[typeof key]) => void
++      set?: ((state: T, newValue: U[typeof key]) => void) | undefined
+     }
+     const desc: PropertyDescriptor = {}
+     desc.get = () => get(snapshot(proxyObject))
+diff --git a/packages/types/src/jsx.ts b/packages/types/src/jsx.ts
+index b6c81bd6c7..ff9412c77f 100644
+--- a/packages/types/src/jsx.ts
++++ b/packages/types/src/jsx.ts
+@@ -614,7 +614,7 @@ export namespace JSX {
+     // RDFa Attributes
+     about?: string | undefined
+     datatype?: string | undefined
+-    inlist?: any
++    inlist?: any | undefined
+     prefix?: string | undefined
+     property?: string | undefined
+     resource?: string | undefined
+@@ -680,7 +680,7 @@ export namespace JSX {
+     default?: boolean | undefined
+     defer?: boolean | undefined
+     disabled?: boolean | undefined
+-    download?: any
++    download?: any | undefined
+     encType?: string | undefined
+     form?: string | undefined
+     formAction?: string | undefined
+@@ -772,7 +772,7 @@ export namespace JSX {
+   type HTMLAttributeAnchorTarget = "_self" | "_blank" | "_parent" | "_top" | (string & {})
+ 
+   export interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
+-    download?: any
++    download?: any | undefined
+     href?: string | undefined
+     hrefLang?: string | undefined
+     media?: string | undefined
+@@ -788,7 +788,7 @@ export namespace JSX {
+   export interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
+     alt?: string | undefined
+     coords?: string | undefined
+-    download?: any
++    download?: any | undefined
+     href?: string | undefined
+     hrefLang?: string | undefined
+     media?: string | undefined
+@@ -951,7 +951,7 @@ export namespace JSX {
+     | (string & {})
+ 
+   export interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
+-    webkitdirectory?: any
++    webkitdirectory?: any | undefined
+     accept?: string | undefined
+     alt?: string | undefined
+     autoComplete?: string | undefined
+@@ -1259,7 +1259,7 @@ export namespace JSX {
+     // Other HTML properties supported by SVG elements in browsers
+     role?: AriaRole | undefined
+     tabIndex?: number | undefined
+-    crossOrigin?: any
++    crossOrigin?: any | undefined
+ 
+     // SVG Specific attributes
+     accentHeight?: number | string | undefined
+diff --git a/packages/utilities/aria-hidden/src/index.ts b/packages/utilities/aria-hidden/src/index.ts
+index 6d6a4e3366..feb2490059 100644
+--- a/packages/utilities/aria-hidden/src/index.ts
++++ b/packages/utilities/aria-hidden/src/index.ts
+@@ -10,7 +10,7 @@ type Targets = Array<MaybeElement>
+ type TargetsOrFn = Targets | (() => Targets)
+ 
+ type Options = {
+-  defer?: boolean
++  defer?: boolean | undefined
+ }
+ 
+ export function ariaHidden(targetsOrFn: TargetsOrFn, options: Options = {}) {
+diff --git a/packages/utilities/collection/src/tree-collection.ts b/packages/utilities/collection/src/tree-collection.ts
+index 008c93c77e..b4309eccb7 100644
+--- a/packages/utilities/collection/src/tree-collection.ts
++++ b/packages/utilities/collection/src/tree-collection.ts
+@@ -297,7 +297,10 @@ export class TreeCollection<T = TreeNode> {
+     return this.getNodeChildren(node).length > 0 || this.getNodeChildrenCount(node) != null
+   }
+ 
+-  getBranchValues = (rootNode = this.rootNode, opts: TreeSkipOptions<T> & { depth?: number } = {}): string[] => {
++  getBranchValues = (
++    rootNode = this.rootNode,
++    opts: TreeSkipOptions<T> & { depth?: number | undefined } = {},
++  ): string[] => {
+     let values: string[] = []
+     visit(rootNode, {
+       getChildren: this.getNodeChildren,
+diff --git a/packages/utilities/collection/src/tree-visit.ts b/packages/utilities/collection/src/tree-visit.ts
+index 719691948f..15521bca8d 100644
+--- a/packages/utilities/collection/src/tree-visit.ts
++++ b/packages/utilities/collection/src/tree-visit.ts
+@@ -456,7 +456,7 @@ export type IndexPath = number[]
+ 
+ export interface BaseOptions<T> {
+   getChildren: (node: T, indexPath: IndexPath) => T[]
+-  reuseIndexPath?: boolean
++  reuseIndexPath?: boolean | undefined
+ }
+ 
+ export interface FindOptions<T> extends BaseOptions<T> {
+@@ -517,12 +517,12 @@ interface TreeVisitStack<T> {
+    * -1        => skipped
+    * n         => nth child
+    */
+-  state?: number
++  state?: number | undefined
+ 
+   /**
+    * Cached children, so we only call getChildren once per node
+    */
+-  children?: T[]
++  children?: T[] | undefined
+ }
+ 
+ export type TreeVisitEnterReturnValue = void | "skip" | "stop"
+diff --git a/packages/utilities/collection/src/types.ts b/packages/utilities/collection/src/types.ts
+index 7752d136d4..d6478d1030 100644
+--- a/packages/utilities/collection/src/types.ts
++++ b/packages/utilities/collection/src/types.ts
+@@ -38,11 +38,11 @@ export interface CollectionOptions<T extends CollectionItem = CollectionItem> ex
+   /**
+    * Function to group items
+    */
+-  groupBy?: (item: T, index: number) => string
++  groupBy?: ((item: T, index: number) => string) | undefined
+   /**
+    * Function to sort items
+    */
+-  groupSort?: ((a: string, b: string) => number) | string[] | "asc" | "desc"
++  groupSort?: ((a: string, b: string) => number) | string[] | "asc" | "desc" | undefined
+ }
+ 
+ // ==============================
+@@ -64,7 +64,7 @@ export interface TreeCollectionOptions<T> extends Partial<TreeCollectionMethods<
+ export type TreeNode = any
+ 
+ export type FilePathTreeNode<T = TreeNode> = T & {
+-  children?: FilePathTreeNode<T>[]
++  children?: FilePathTreeNode<T>[] | undefined
+ }
+ 
+ export interface FlatTreeNodeMeta {
+@@ -84,5 +84,5 @@ export interface TreeSkipFnArgs<T> {
+ export type TreeSkipFn<T> = (args: TreeSkipFnArgs<T>) => boolean | void
+ 
+ export interface TreeSkipOptions<T> {
+-  skip?: TreeSkipFn<T>
++  skip?: TreeSkipFn<T> | undefined
+ }
+diff --git a/packages/utilities/collection/tests/grid-collection.test.ts b/packages/utilities/collection/tests/grid-collection.test.ts
+index 8888aed7eb..c41e7340b9 100644
+--- a/packages/utilities/collection/tests/grid-collection.test.ts
++++ b/packages/utilities/collection/tests/grid-collection.test.ts
+@@ -3,7 +3,7 @@ import { GridCollection } from "../src"
+ interface Item {
+   label: string
+   value: string
+-  disabled?: boolean
++  disabled?: boolean | undefined
+ }
+ 
+ const items: Item[] = [
+diff --git a/packages/utilities/collection/tests/list-collection.test.ts b/packages/utilities/collection/tests/list-collection.test.ts
+index 62e60b08c3..cdb1d5a215 100644
+--- a/packages/utilities/collection/tests/list-collection.test.ts
++++ b/packages/utilities/collection/tests/list-collection.test.ts
+@@ -3,7 +3,7 @@ import { ListCollection } from "../src"
+ interface Item {
+   label: string
+   value: string
+-  disabled?: boolean
++  disabled?: boolean | undefined
+ }
+ 
+ interface GroupItem extends Item {
+@@ -194,7 +194,12 @@ describe("list collection", () => {
+   })
+ 
+   test("group entries", () => {
+-    const collection = new ListCollection<{ label: string; value: string; type: string; disabled?: boolean }>({
++    const collection = new ListCollection<{
++      label: string
++      value: string
++      type: string
++      disabled?: boolean | undefined
++    }>({
+       items: [
+         { label: "React", value: "react", type: "framework" },
+         { label: "Vue", value: "vue", type: "framework" },
+diff --git a/packages/utilities/collection/tests/tree-collection.test.ts b/packages/utilities/collection/tests/tree-collection.test.ts
+index 9c38573be4..9207884eaa 100644
+--- a/packages/utilities/collection/tests/tree-collection.test.ts
++++ b/packages/utilities/collection/tests/tree-collection.test.ts
+@@ -4,7 +4,7 @@ import { diagram } from "./tree-diagram"
+ 
+ interface Node {
+   value: string
+-  children?: Array<Node>
++  children?: Array<Node> | undefined
+ }
+ 
+ let tree: TreeCollection<Node>
+@@ -576,10 +576,10 @@ describe("tree / siblings", () => {
+ describe("tree / flatten", () => {
+   interface TestNode {
+     value: string
+-    label?: string
+-    disabled?: boolean
+-    customProp?: string
+-    children?: TestNode[]
++    label?: string | undefined
++    disabled?: boolean | undefined
++    customProp?: string | undefined
++    children?: TestNode[] | undefined
+   }
+ 
+   const complexTree: TestNode = {
+diff --git a/packages/utilities/collection/tests/tree-diagram.ts b/packages/utilities/collection/tests/tree-diagram.ts
+index 3ef4a2acfb..139fe52f5c 100644
+--- a/packages/utilities/collection/tests/tree-diagram.ts
++++ b/packages/utilities/collection/tests/tree-diagram.ts
+@@ -15,7 +15,7 @@ interface Line {
+ interface DiagramOptions<T> {
+   getLabel: (node: T, indexPath: number[]) => string
+   getChildren: (node: T, indexPath: number[]) => T[]
+-  flattenSingleChildNodes?: boolean
++  flattenSingleChildNodes?: boolean | undefined
+ }
+ 
+ function nodeDiagram<T>(node: T | null, indexPath: number[], options: DiagramOptions<T>): Line[] {
+diff --git a/packages/utilities/collection/tests/tree-skip.test.ts b/packages/utilities/collection/tests/tree-skip.test.ts
+index 31296a2402..1e8a3ae01d 100644
+--- a/packages/utilities/collection/tests/tree-skip.test.ts
++++ b/packages/utilities/collection/tests/tree-skip.test.ts
+@@ -3,7 +3,7 @@ import { TreeCollection } from "../src/tree-collection"
+ interface Item {
+   id: string
+   name: string
+-  children?: Item[]
++  children?: Item[] | undefined
+ }
+ 
+ let tree: TreeCollection<Item>
+diff --git a/packages/utilities/core/src/array.ts b/packages/utilities/core/src/array.ts
+index 2b580347f6..b2cf745473 100644
+--- a/packages/utilities/core/src/array.ts
++++ b/packages/utilities/core/src/array.ts
+@@ -39,8 +39,8 @@ export function clear<T>(v: T[]): T[] {
+ }
+ 
+ export type IndexOptions = {
+-  step?: number
+-  loop?: boolean
++  step?: number | undefined
++  loop?: boolean | undefined
+ }
+ 
+ export function nextIndex<T>(v: T[], idx: number, opts: IndexOptions = {}): number {
+diff --git a/packages/utilities/dismissable/src/dismissable-layer.ts b/packages/utilities/dismissable/src/dismissable-layer.ts
+index d2cb4ec2d8..c750ffbfe3 100644
+--- a/packages/utilities/dismissable/src/dismissable-layer.ts
++++ b/packages/utilities/dismissable/src/dismissable-layer.ts
+@@ -149,7 +149,7 @@ export function trackDismissableElement(nodeOrFn: NodeOrFn, options: Dismissable
+   }
+ }
+ 
+-export function trackDismissableBranch(nodeOrFn: NodeOrFn, options: { defer?: boolean } = {}) {
++export function trackDismissableBranch(nodeOrFn: NodeOrFn, options: { defer?: boolean | undefined } = {}) {
+   const { defer } = options
+   const func = defer ? raf : (v: any) => v()
+   const cleanups: (VoidFunction | undefined)[] = []
+diff --git a/packages/utilities/dom-query/src/form.ts b/packages/utilities/dom-query/src/form.ts
+index 67687c0c25..476b075b6e 100644
+--- a/packages/utilities/dom-query/src/form.ts
++++ b/packages/utilities/dom-query/src/form.ts
+@@ -44,7 +44,7 @@ export function setElementChecked(el: HTMLInputElement | null, checked: boolean)
+ 
+ export interface InputValueEventOptions {
+   value: string | number
+-  bubbles?: boolean
++  bubbles?: boolean | undefined
+ }
+ 
+ export function dispatchInputValueEvent(el: HTMLElementWithValue | null, options: InputValueEventOptions) {
+@@ -61,7 +61,7 @@ export function dispatchInputValueEvent(el: HTMLElementWithValue | null, options
+ 
+ export interface CheckedEventOptions {
+   checked: boolean
+-  bubbles?: boolean
++  bubbles?: boolean | undefined
+ }
+ 
+ export function dispatchInputCheckedEvent(el: HTMLInputElement | null, options: CheckedEventOptions) {
+diff --git a/packages/utilities/dom-query/src/point.ts b/packages/utilities/dom-query/src/point.ts
+index ed326b7b22..14ffebfb7d 100644
+--- a/packages/utilities/dom-query/src/point.ts
++++ b/packages/utilities/dom-query/src/point.ts
+@@ -2,7 +2,7 @@ import { clamp } from "./shared"
+ import type { Point } from "./types"
+ 
+ export interface PercentValueOptions {
+-  inverted?: boolean | { x?: boolean; y?: boolean } | undefined
++  inverted?: boolean | { x?: boolean | undefined; y?: boolean | undefined } | undefined
+   dir?: "ltr" | "rtl" | undefined
+   orientation?: "vertical" | "horizontal" | undefined
+ }
+diff --git a/packages/utilities/dom-query/src/searchable.ts b/packages/utilities/dom-query/src/searchable.ts
+index ed220c8279..04f78784f7 100644
+--- a/packages/utilities/dom-query/src/searchable.ts
++++ b/packages/utilities/dom-query/src/searchable.ts
+@@ -24,7 +24,7 @@ const match = (valueText: string, query: string) => {
+ export interface SearchableItem {
+   id: string
+   textContent: string | null
+-  dataset?: any
++  dataset?: any | undefined
+ }
+ 
+ export function getByText<T extends SearchableItem>(
+diff --git a/packages/utilities/file-utils/src/download-file.ts b/packages/utilities/file-utils/src/download-file.ts
+index c635173359..cce746f190 100644
+--- a/packages/utilities/file-utils/src/download-file.ts
++++ b/packages/utilities/file-utils/src/download-file.ts
+@@ -14,19 +14,19 @@ export interface DownloadFileOptions {
+   /**
+    * The window environment
+    */
+-  win?: typeof window
++  win?: typeof window | undefined
+   /**
+    * Whether to add a BOM (Byte Order Mark) to the file.
+    * Useful for CSV files.
+    */
+-  appendBOM?: boolean
++  appendBOM?: boolean | undefined
+   /**
+    * The timeout in milliseconds to revoke the object URL.
+    * This is a safeguard for when the browser has not finished reading the
+    * file data from memory before the URL is revoked.
+    * @default 0
+    */
+-  revokeTimeout?: number
++  revokeTimeout?: number | undefined
+ }
+ 
+ const BOM_REGEX = /^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i
+diff --git a/packages/utilities/focus-trap/src/focus-trap.ts b/packages/utilities/focus-trap/src/focus-trap.ts
+index 3c5de890c4..cc7d9b8133 100644
+--- a/packages/utilities/focus-trap/src/focus-trap.ts
++++ b/packages/utilities/focus-trap/src/focus-trap.ts
+@@ -599,7 +599,7 @@ export class FocusTrap {
+ 
+   private getNodeForOption = (
+     optionName: keyof FocusTrapOptions,
+-    { hasFallback = false, params = [] }: { hasFallback?: boolean; params?: any[] } = {},
++    { hasFallback = false, params = [] }: { hasFallback?: boolean | undefined; params?: any[] | undefined } = {},
+   ) => {
+     let optionValue: any = this.config[optionName]
+     if (typeof optionValue === "function") optionValue = optionValue(...params)
+diff --git a/packages/utilities/focus-trap/src/types.ts b/packages/utilities/focus-trap/src/types.ts
+index e2f0026cc2..168ea112f7 100644
+--- a/packages/utilities/focus-trap/src/types.ts
++++ b/packages/utilities/focus-trap/src/types.ts
+@@ -26,37 +26,37 @@ export interface FocusTrapOptions {
+    * A function that will be called **before** sending focus to the
+    * target element upon activation.
+    */
+-  onActivate?: VoidFunction
++  onActivate?: VoidFunction | undefined
+ 
+   /**
+    * A function that will be called **after** focus has been sent to the
+    * target element upon activation.
+    */
+-  onPostActivate?: VoidFunction
++  onPostActivate?: VoidFunction | undefined
+ 
+   /**
+    * A function that will be called immediately after the trap's state is updated to be paused.
+    */
+-  onPause?: VoidFunction
++  onPause?: VoidFunction | undefined
+ 
+   /**
+    * A function that will be called after the trap has been completely paused and is no longer
+    *  managing/trapping focus.
+    */
+-  onPostPause?: VoidFunction
++  onPostPause?: VoidFunction | undefined
+ 
+   /**
+    * A function that will be called immediately after the trap's state is updated to be active
+    *  again, but prior to updating its knowledge of what nodes are tabbable within its containers,
+    *  and prior to actively managing/trapping focus.
+    */
+-  onUnpause?: VoidFunction
++  onUnpause?: VoidFunction | undefined
+ 
+   /**
+    * A function that will be called after the trap has been completely unpaused and is once
+    *  again managing/trapping focus.
+    */
+-  onPostUnpause?: VoidFunction
++  onPostUnpause?: VoidFunction | undefined
+ 
+   /**
+    * A function for determining if it is safe to send focus to the focus trap
+@@ -69,20 +69,20 @@ export interface FocusTrapOptions {
+    * dialogs that fade in and out. When a dialog fades in, there is a brief delay
+    * between the activation of the trap and the trap element being focusable.
+    */
+-  checkCanFocusTrap?: (containers: Array<HTMLElement | SVGElement>) => Promise<void>
++  checkCanFocusTrap?: ((containers: Array<HTMLElement | SVGElement>) => Promise<void>) | undefined
+ 
+   /**
+    * A function that will be called **before** sending focus to the
+    * trigger element upon deactivation.
+    */
+-  onDeactivate?: VoidFunction
++  onDeactivate?: VoidFunction | undefined
+ 
+   /**
+    * A function that will be called after the trap is deactivated, after `onDeactivate`.
+    * If `returnFocus` was set, it will be called **after** focus has been sent to the trigger
+    * element upon deactivation; otherwise, it will be called after deactivation completes.
+    */
+-  onPostDeactivate?: VoidFunction
++  onPostDeactivate?: VoidFunction | undefined
+   /**
+    * A function for determining if it is safe to send focus back to the `trigger` element.
+    *
+@@ -98,7 +98,7 @@ export interface FocusTrapOptions {
+    * This handler is **not** called if the `returnFocusOnDeactivate` configuration option
+    * (or the `returnFocus` deactivation option) is falsy.
+    */
+-  checkCanReturnFocus?: (trigger: HTMLElement | SVGElement) => Promise<void>
++  checkCanReturnFocus?: ((trigger: HTMLElement | SVGElement) => Promise<void>) | undefined
+ 
+   /**
+    * By default, when a focus trap is activated the first element in the
+@@ -128,12 +128,12 @@ export interface FocusTrapOptions {
+    * is active if things change such that there are no longer any tabbable nodes
+    * in the trap.
+    */
+-  fallbackFocus?: FocusTarget
++  fallbackFocus?: FocusTarget | undefined
+   /**
+    * Default: `true`. If `false`, when the trap is deactivated,
+    * focus will *not* return to the element that had focus before activation.
+    */
+-  returnFocusOnDeactivate?: boolean
++  returnFocusOnDeactivate?: boolean | undefined
+   /**
+    * By default, focus trap on deactivation will return to the element
+    * that was focused before activation.
+@@ -141,6 +141,7 @@ export interface FocusTrapOptions {
+   setReturnFocus?:
+     | FocusTargetValueOrFalse
+     | ((nodeFocusedBeforeActivation: HTMLElement | SVGElement) => FocusTargetValueOrFalse)
++    | undefined
+   /**
+    * Default: `true`. If `false` or returns `false`, the `Escape` key will not trigger
+    * deactivation of the focus trap. This can be useful if you want
+@@ -148,7 +149,7 @@ export interface FocusTrapOptions {
+    * way out. Note that if a function is given, it's only called if the ESC key
+    * was pressed.
+    */
+-  escapeDeactivates?: boolean | KeyboardEventToBoolean
++  escapeDeactivates?: boolean | KeyboardEventToBoolean | undefined
+   /**
+    * If `true` or returns `true`, a click outside the focus trap will
+    * deactivate the focus trap and allow the click event to do its thing (i.e.
+@@ -156,7 +157,7 @@ export interface FocusTrapOptions {
+    * precedence** over `allowOutsideClick` when it's set to `true`, causing
+    * that option to be ignored. Default: `false`.
+    */
+-  clickOutsideDeactivates?: boolean | MouseEventToBoolean
++  clickOutsideDeactivates?: boolean | MouseEventToBoolean | undefined
+   /**
+    * If set and is or returns `true`, a click outside the focus trap will not
+    * be prevented, even when `clickOutsideDeactivates` is `false`. When
+@@ -165,31 +166,31 @@ export interface FocusTrapOptions {
+    * if (and even which) clicks are allowed outside the trap in conjunction
+    * with `clickOutsideDeactivates: false`. Default: `false`.
+    */
+-  allowOutsideClick?: boolean | MouseEventToBoolean
++  allowOutsideClick?: boolean | MouseEventToBoolean | undefined
+   /**
+    * By default, focus() will scroll to the element if not in viewport.
+    * It can produce unintended effects like scrolling back to the top of a modal.
+    * If set to `true`, no scroll will happen.
+    */
+-  preventScroll?: boolean
++  preventScroll?: boolean | undefined
+   /**
+    * Default: `true`. Delays the autofocus when the focus trap is activated.
+    * This prevents elements within the focusable element from capturing
+    * the event that triggered the focus trap activation.
+    */
+-  delayInitialFocus?: boolean
++  delayInitialFocus?: boolean | undefined
+   /**
+    * Default: `window.document`. Document where the focus trap will be active.
+    * This allows to use FocusTrap in an iFrame context.
+    */
+-  document?: Document
++  document?: Document | undefined
+   /**
+    * Determines if the given keyboard event is a "tab forward" event that will move
+    * the focus to the next trapped element in tab order. Defaults to the `TAB` key.
+    * Use this to override the trap's behavior if you want to use arrow keys to control
+    * keyboard navigation within the trap, for example. Also see `isKeyBackward()` option.
+    */
+-  isKeyForward?: KeyboardEventToBoolean
++  isKeyForward?: KeyboardEventToBoolean | undefined
+ 
+   /**
+    * Determines if the given keyboard event is a "tab backward" event that will move
+@@ -197,11 +198,11 @@ export interface FocusTrapOptions {
+    * Use this to override the trap's behavior if you want to use arrow keys to control
+    * keyboard navigation within the trap, for example. Also see `isKeyForward()` option.
+    */
+-  isKeyBackward?: KeyboardEventToBoolean
++  isKeyBackward?: KeyboardEventToBoolean | undefined
+   /**
+    * Default: `[]`. An array of FocusTrap instances that will be managed by this FocusTrap.
+    */
+-  trapStack?: any[]
++  trapStack?: any[] | undefined
+ }
+ 
+ interface ContainerGroup {
+@@ -217,9 +218,9 @@ interface ContainerGroup {
+ }
+ 
+ export interface FindNextNodeOptions {
+-  target?: HTMLElement | null
+-  event?: FocusEvent | KeyboardEvent
+-  isBackward?: boolean
++  target?: HTMLElement | null | undefined
++  event?: FocusEvent | KeyboardEvent | undefined
++  isBackward?: boolean | undefined
+ }
+ 
+ export interface FocusTrapState {
+diff --git a/packages/utilities/highlight-word/src/types.ts b/packages/utilities/highlight-word/src/types.ts
+index 9b9f7b5d00..369c148092 100644
+--- a/packages/utilities/highlight-word/src/types.ts
++++ b/packages/utilities/highlight-word/src/types.ts
+@@ -2,11 +2,11 @@ export interface HighlightRegexOptions {
+   /**
+    * Whether to ignore case while matching
+    */
+-  ignoreCase?: boolean
++  ignoreCase?: boolean | undefined
+   /**
+    * Whether to match multiple instances of the query
+    */
+-  matchAll?: boolean
++  matchAll?: boolean | undefined
+ }
+ 
+ export interface HighlightWordProps extends HighlightRegexOptions {
+@@ -43,5 +43,5 @@ export interface HighlightSpan {
+   /**
+    * Whether the span is a match
+    */
+-  match?: boolean
++  match?: boolean | undefined
+ }
+diff --git a/packages/utilities/i18n-utils/src/locale.ts b/packages/utilities/i18n-utils/src/locale.ts
+index d0fcbf3662..bade1849b0 100644
+--- a/packages/utilities/i18n-utils/src/locale.ts
++++ b/packages/utilities/i18n-utils/src/locale.ts
+@@ -9,7 +9,7 @@ export interface Locale {
+ 
+ declare global {
+   interface Navigator {
+-    userLanguage?: string
++    userLanguage?: string | undefined
+   }
+ }
+ 
+diff --git a/packages/utilities/popper/src/get-placement.ts b/packages/utilities/popper/src/get-placement.ts
+index 1990b65be8..c861ada0ac 100644
+--- a/packages/utilities/popper/src/get-placement.ts
++++ b/packages/utilities/popper/src/get-placement.ts
+@@ -217,7 +217,7 @@ function getPlacementImpl(referenceOrVirtual: MaybeRectElement, floating: MaybeE
+ export function getPlacement(
+   referenceOrFn: MaybeFn<MaybeRectElement>,
+   floatingOrFn: MaybeFn<MaybeElement>,
+-  opts: PositioningOptions & { defer?: boolean } = {},
++  opts: PositioningOptions & { defer?: boolean | undefined } = {},
+ ) {
+   const { defer, ...options } = opts
+   const func = defer ? raf : (v: any) => v()
+diff --git a/packages/utilities/popper/src/types.ts b/packages/utilities/popper/src/types.ts
+index 761cc54a0d..b31d31f78b 100644
+--- a/packages/utilities/popper/src/types.ts
++++ b/packages/utilities/popper/src/types.ts
+@@ -32,7 +32,7 @@ export interface PositioningOptions {
+   /**
+    * The offset of the floating element
+    */
+-  offset?: { mainAxis?: number; crossAxis?: number } | undefined
++  offset?: { mainAxis?: number | undefined; crossAxis?: number | undefined } | undefined
+   /**
+    * The main axis offset or gap between the reference and floating elements
+    */
+diff --git a/packages/utilities/rect/src/from-element.ts b/packages/utilities/rect/src/from-element.ts
+index edaa71c5b5..657e237f1b 100644
+--- a/packages/utilities/rect/src/from-element.ts
++++ b/packages/utilities/rect/src/from-element.ts
+@@ -19,11 +19,11 @@ export type ElementRectOptions = {
+   /**
+    * Whether to exclude the element's scrollbar size from the calculation.
+    */
+-  excludeScrollbar?: boolean
++  excludeScrollbar?: boolean | undefined
+   /**
+    * Whether to exclude the element's borders from the calculation.
+    */
+-  excludeBorders?: boolean
++  excludeBorders?: boolean | undefined
+ }
+ 
+ function getClientRect(el: HTMLElement, opts: ElementRectOptions = {}) {
+diff --git a/packages/utilities/rect/src/from-window.ts b/packages/utilities/rect/src/from-window.ts
+index 8f018d9961..1d03eee5ce 100644
+--- a/packages/utilities/rect/src/from-window.ts
++++ b/packages/utilities/rect/src/from-window.ts
+@@ -5,7 +5,7 @@ export type WindowRectOptions = {
+   /**
+    * Whether to exclude the element's scrollbar size from the calculation.
+    */
+-  excludeScrollbar?: boolean
++  excludeScrollbar?: boolean | undefined
+ }
+ 
+ /**
+diff --git a/packages/utilities/stringify-state/src/json-format-highlight.d.ts b/packages/utilities/stringify-state/src/json-format-highlight.d.ts
+index 8a714de215..e02b19e0fa 100644
+--- a/packages/utilities/stringify-state/src/json-format-highlight.d.ts
++++ b/packages/utilities/stringify-state/src/json-format-highlight.d.ts
+@@ -1,11 +1,11 @@
+ declare module "json-format-highlight" {
+   export interface FormatOptions {
+-    keyColor?: string
+-    numberColor?: string
+-    stringColor?: string
+-    trueColor?: string
+-    falseColor?: string
+-    nullColor?: string
++    keyColor?: string | undefined
++    numberColor?: string | undefined
++    stringColor?: string | undefined
++    trueColor?: string | undefined
++    falseColor?: string | undefined
++    nullColor?: string | undefined
+   }
+ 
+   export default function formatHighlight(code: string, options?: Options): string

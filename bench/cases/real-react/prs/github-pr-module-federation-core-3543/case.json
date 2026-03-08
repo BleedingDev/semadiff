@@ -1,0 +1,52 @@
+{
+  "id": "github-pr-module-federation-core-3543",
+  "language": "ts",
+  "kind": "real",
+  "description": "module-federation/core#3543: fix(bridge-react): prevent destroy/render the remote component every time after the states changed",
+  "source": {
+    "kind": "github-pr",
+    "repository": "module-federation/core",
+    "prNumber": 3543,
+    "prUrl": "https://github.com/module-federation/core/pull/3543",
+    "baseSha": "3081511c92407633e18a4a7c36f273f59f756b12",
+    "headSha": "8b897e9816479347b9ce119b8e61db0b0e80fd2e",
+    "selectedFiles": [
+      "apps/router-demo/router-remote1-2001/rsbuild.config.ts"
+    ],
+    "collectedAt": "2026-03-08T04:14:28.569Z"
+  },
+  "files": [
+    {
+      "id": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+      "oldPath": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+      "newPath": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "apps/router-demo/router-remote1-2001/rsbuild.config.ts",
+        "type": "insert",
+        "newRange": {
+          "startLine": 42,
+          "endLine": 42
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

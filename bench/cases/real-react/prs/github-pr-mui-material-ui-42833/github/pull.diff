@@ -1,0 +1,372 @@
+diff --git a/benchmark/server/scenarios/docs.js b/benchmark/server/scenarios/docs.js
+index 88d540cedf27f5..25fa13feb8cbed 100644
+--- a/benchmark/server/scenarios/docs.js
++++ b/benchmark/server/scenarios/docs.js
+@@ -4,7 +4,7 @@ import path from 'path';
+ import Benchmark from 'benchmark';
+ import * as React from 'react';
+ import * as ReactDOMServer from 'react-dom/server';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import Markdown from 'docs/data/material/getting-started/templates/blog/Markdown';
+ import { createStore } from 'redux';
+ import { Provider } from 'react-redux';
+diff --git a/docs/data/joy/customization/theme-colors/PaletteThemeViewer.js b/docs/data/joy/customization/theme-colors/PaletteThemeViewer.js
+index 64158366e5b73b..76173c936b4606 100644
+--- a/docs/data/joy/customization/theme-colors/PaletteThemeViewer.js
++++ b/docs/data/joy/customization/theme-colors/PaletteThemeViewer.js
+@@ -10,7 +10,7 @@ import LightMode from '@mui/icons-material/LightModeOutlined';
+ import DarkMode from '@mui/icons-material/DarkModeOutlined';
+ import InfoOutlined from '@mui/icons-material/InfoOutlined';
+ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+-import useClipboardCopy from 'docs/src/modules/utils/useClipboardCopy';
++import { useClipboardCopy } from '@mui/docs/CodeCopy';
+ 
+ const defaultTheme = extendTheme();
+ 
+diff --git a/docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx b/docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx
+index 8e89311bce9efe..6a499db926f7ee 100644
+--- a/docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx
++++ b/docs/data/joy/customization/theme-colors/PaletteThemeViewer.tsx
+@@ -10,7 +10,7 @@ import LightMode from '@mui/icons-material/LightModeOutlined';
+ import DarkMode from '@mui/icons-material/DarkModeOutlined';
+ import InfoOutlined from '@mui/icons-material/InfoOutlined';
+ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+-import useClipboardCopy from 'docs/src/modules/utils/useClipboardCopy';
++import { useClipboardCopy } from '@mui/docs/CodeCopy';
+ 
+ const defaultTheme = extendTheme();
+ 
+diff --git a/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.js b/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.js
+index 50f0c7d32c3f4d..0c9df501673a87 100644
+--- a/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.js
++++ b/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.js
+@@ -8,7 +8,7 @@ import Sheet from '@mui/joy/Sheet';
+ import LightMode from '@mui/icons-material/LightModeOutlined';
+ import DarkMode from '@mui/icons-material/DarkModeOutlined';
+ import Check from '@mui/icons-material/CheckCircle';
+-import useClipboardCopy from 'docs/src/modules/utils/useClipboardCopy';
++import { useClipboardCopy } from '@mui/docs/CodeCopy';
+ 
+ const Table = styled('table')(({ theme }) => ({
+   border: '1px solid',
+diff --git a/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.tsx b/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.tsx
+index 7e8c858c6492f9..489f81fd724232 100644
+--- a/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.tsx
++++ b/docs/data/joy/customization/theme-shadow/ShadowThemeViewer.tsx
+@@ -8,7 +8,7 @@ import Sheet from '@mui/joy/Sheet';
+ import LightMode from '@mui/icons-material/LightModeOutlined';
+ import DarkMode from '@mui/icons-material/DarkModeOutlined';
+ import Check from '@mui/icons-material/CheckCircle';
+-import useClipboardCopy from 'docs/src/modules/utils/useClipboardCopy';
++import { useClipboardCopy } from '@mui/docs/CodeCopy';
+ 
+ const Table = styled('table')(({ theme }) => ({
+   border: '1px solid',
+diff --git a/docs/src/BrandingProvider.tsx b/docs/src/BrandingProvider.tsx
+deleted file mode 100644
+index 29f4ba3bcbcd72..00000000000000
+--- a/docs/src/BrandingProvider.tsx
++++ /dev/null
+@@ -1,4 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/branding`
+-
+-export { BrandingProvider as default } from '@mui/docs/branding';
+diff --git a/docs/src/components/action/InfoCard.tsx b/docs/src/components/action/InfoCard.tsx
+deleted file mode 100644
+index 9dc1f1de938493..00000000000000
+--- a/docs/src/components/action/InfoCard.tsx
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/InfoCard`
+-
+-export * from '@mui/docs/InfoCard';
+-export { InfoCard as default } from '@mui/docs/InfoCard';
+diff --git a/docs/src/modules/brandingTheme.ts b/docs/src/modules/brandingTheme.ts
+deleted file mode 100644
+index b96d36bb7e25a1..00000000000000
+--- a/docs/src/modules/brandingTheme.ts
++++ /dev/null
+@@ -1,4 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/branding`
+-
+-export * from '@mui/docs/branding';
+diff --git a/docs/src/modules/components/ApiPage.js b/docs/src/modules/components/ApiPage.js
+index d2189cf882ce16..abb59ef7b7df7f 100644
+--- a/docs/src/modules/components/ApiPage.js
++++ b/docs/src/modules/components/ApiPage.js
+@@ -11,7 +11,7 @@ import { useTranslate, useUserLanguage } from '@mui/docs/i18n';
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
+ import { BrandingProvider } from '@mui/docs/branding';
+ import { SectionTitle } from '@mui/docs/SectionTitle';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import AppLayoutDocs from 'docs/src/modules/components/AppLayoutDocs';
+ import Ad from 'docs/src/modules/components/Ad';
+ import PropertiesSection, {
+diff --git a/docs/src/modules/components/CodeCopyButton.tsx b/docs/src/modules/components/CodeCopyButton.tsx
+deleted file mode 100644
+index 4fa72ee1c541e0..00000000000000
+--- a/docs/src/modules/components/CodeCopyButton.tsx
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/CodeCopy`
+-import { CodeCopyButton } from '@mui/docs/CodeCopy';
+-
+-export default CodeCopyButton;
+diff --git a/docs/src/modules/components/ComponentLinkHeader.js b/docs/src/modules/components/ComponentLinkHeader.js
+deleted file mode 100644
+index a443a9f82b5742..00000000000000
+--- a/docs/src/modules/components/ComponentLinkHeader.js
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/ComponentLinkHeader`
+-import { ComponentLinkHeader } from '@mui/docs/ComponentLinkHeader';
+-
+-export default ComponentLinkHeader;
+diff --git a/docs/src/modules/components/ComponentPageTabs.js b/docs/src/modules/components/ComponentPageTabs.js
+index 2df06f6c092222..01d11c22d90cc9 100644
+--- a/docs/src/modules/components/ComponentPageTabs.js
++++ b/docs/src/modules/components/ComponentPageTabs.js
+@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
+ import { useRouter } from 'next/router';
+ import { styled } from '@mui/material/styles';
+ import Box from '@mui/material/Box';
+-import { useTranslate } from 'docs/src/modules/utils/i18n';
++import { useTranslate } from '@mui/docs/i18n';
+ import { Link } from '@mui/docs/Link';
+ 
+ export const HEIGHT = 50;
+diff --git a/docs/src/modules/components/ComponentsApiContent.js b/docs/src/modules/components/ComponentsApiContent.js
+index d95054442d0a23..8122abab22fafb 100644
+--- a/docs/src/modules/components/ComponentsApiContent.js
++++ b/docs/src/modules/components/ComponentsApiContent.js
+@@ -7,7 +7,7 @@ import { exactProp } from '@mui/utils';
+ import { useTranslate, useUserLanguage } from '@mui/docs/i18n';
+ import { SectionTitle } from '@mui/docs/SectionTitle';
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import PropertiesSection from 'docs/src/modules/components/ApiPage/sections/PropertiesSection';
+ import ClassesSection from 'docs/src/modules/components/ApiPage/sections/ClassesSection';
+ import SlotsSection from 'docs/src/modules/components/ApiPage/sections/SlotsSection';
+diff --git a/docs/src/modules/components/DemoEditor.tsx b/docs/src/modules/components/DemoEditor.tsx
+index 25680a5d755ff3..6add281ed1fc95 100644
+--- a/docs/src/modules/components/DemoEditor.tsx
++++ b/docs/src/modules/components/DemoEditor.tsx
+@@ -4,10 +4,9 @@ import Box from '@mui/material/Box';
+ import { NoSsr } from '@mui/base/NoSsr';
+ import { styled, alpha, useTheme } from '@mui/material/styles';
+ import prism from '@mui/internal-markdown/prism';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
+-import CodeCopyButton from 'docs/src/modules/components/CodeCopyButton';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
++import { CodeCopyButton, useCodeCopy } from '@mui/docs/CodeCopy';
+ import { useTranslate } from '@mui/docs/i18n';
+-import { useCodeCopy } from '@mui/docs/CodeCopy';
+ import { blueDark } from '@mui/docs/branding';
+ 
+ const StyledMarkdownElement = styled(MarkdownElement)(({ theme }) => [
+diff --git a/docs/src/modules/components/DiamondSponsors.js b/docs/src/modules/components/DiamondSponsors.js
+index 817a4526e9003a..607abd325b3cff 100644
+--- a/docs/src/modules/components/DiamondSponsors.js
++++ b/docs/src/modules/components/DiamondSponsors.js
+@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
+ import Divider from '@mui/material/Divider';
+ import Typography from '@mui/material/Typography';
+ import { Link } from '@mui/docs/Link';
+-import { useTranslate } from 'docs/src/modules/utils/i18n';
++import { useTranslate } from '@mui/docs/i18n';
+ 
+ const NativeLink = styled('a')(({ theme }) => ({
+   boxSizing: 'border-box', // TODO have CssBaseline in the Next.js layout
+diff --git a/docs/src/modules/components/HighlightedCode.js b/docs/src/modules/components/HighlightedCode.js
+deleted file mode 100644
+index 16848d1f2cfac8..00000000000000
+--- a/docs/src/modules/components/HighlightedCode.js
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/HighlightedCode`
+-import { HighlightedCode } from '@mui/docs/HighlightedCode';
+-
+-export default HighlightedCode;
+diff --git a/docs/src/modules/components/HighlightedCodeWithTabs.tsx b/docs/src/modules/components/HighlightedCodeWithTabs.tsx
+index fd5103c19cf40a..07da33774837d8 100644
+--- a/docs/src/modules/components/HighlightedCodeWithTabs.tsx
++++ b/docs/src/modules/components/HighlightedCodeWithTabs.tsx
+@@ -5,7 +5,7 @@ import { TabsList as TabsListBase } from '@mui/base/TabsList';
+ import { TabPanel as TabPanelBase } from '@mui/base/TabPanel';
+ import { Tab as TabBase } from '@mui/base/Tab';
+ import useLocalStorageState from '@mui/utils/useLocalStorageState';
+-import HighlightedCode from './HighlightedCode';
++import { HighlightedCode } from '@mui/docs/HighlightedCode';
+ 
+ export const CodeTabList = styled(TabsListBase)<{
+   ownerState: { mounted: boolean; contained?: boolean };
+diff --git a/docs/src/modules/components/HooksApiContent.js b/docs/src/modules/components/HooksApiContent.js
+index 54df39d647f90c..5ced9c90549e98 100644
+--- a/docs/src/modules/components/HooksApiContent.js
++++ b/docs/src/modules/components/HooksApiContent.js
+@@ -7,7 +7,7 @@ import { useTranslate, useUserLanguage } from '@mui/docs/i18n';
+ import { SectionTitle } from '@mui/docs/SectionTitle';
+ import PropertiesSection from 'docs/src/modules/components/ApiPage/sections/PropertiesSection';
+ import { HighlightedCode } from '@mui/docs/HighlightedCode';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import { DEFAULT_API_LAYOUT_STORAGE_KEYS } from 'docs/src/modules/components/ApiPage/sections/ToggleDisplayOption';
+ 
+ function getTranslatedHeader(t, header, text) {
+diff --git a/docs/src/modules/components/Link.tsx b/docs/src/modules/components/Link.tsx
+deleted file mode 100644
+index 6a3fba0c136afe..00000000000000
+--- a/docs/src/modules/components/Link.tsx
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/i18n`
+-
+-export * from '@mui/docs/Link';
+-export { Link as default } from '@mui/docs/Link';
+diff --git a/docs/src/modules/components/MarkdownElement.js b/docs/src/modules/components/MarkdownElement.js
+deleted file mode 100644
+index 539a4656084b4a..00000000000000
+--- a/docs/src/modules/components/MarkdownElement.js
++++ /dev/null
+@@ -1,6 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/MarkdownElement`
+-
+-import { MarkdownElement } from '@mui/docs/MarkdownElement';
+-
+-export default MarkdownElement;
+diff --git a/docs/src/modules/components/RichMarkdownElement.js b/docs/src/modules/components/RichMarkdownElement.js
+index b41bf70bcdd5de..ca5c09fba3516a 100644
+--- a/docs/src/modules/components/RichMarkdownElement.js
++++ b/docs/src/modules/components/RichMarkdownElement.js
+@@ -1,7 +1,7 @@
+ import * as React from 'react';
+ import PropTypes from 'prop-types';
+ import { useTranslate, useUserLanguage } from '@mui/docs/i18n';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import HighlightedCodeWithTabs from 'docs/src/modules/components/HighlightedCodeWithTabs';
+ import Demo from 'docs/src/modules/components/Demo';
+ 
+diff --git a/docs/src/modules/components/TopLayoutBlog.js b/docs/src/modules/components/TopLayoutBlog.js
+index e2ca94a6219610..98a1490bf8a80a 100644
+--- a/docs/src/modules/components/TopLayoutBlog.js
++++ b/docs/src/modules/components/TopLayoutBlog.js
+@@ -14,7 +14,7 @@ import AppHeader from 'docs/src/layouts/AppHeader';
+ import AppContainer from 'docs/src/modules/components/AppContainer';
+ import AppFooter from 'docs/src/layouts/AppFooter';
+ import HeroEnd from 'docs/src/components/home/HeroEnd';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import RichMarkdownElement from 'docs/src/modules/components/RichMarkdownElement';
+ import { pathnameToLanguage } from 'docs/src/modules/utils/helpers';
+ import ROUTES from 'docs/src/route';
+diff --git a/docs/src/modules/components/TopLayoutCareers.js b/docs/src/modules/components/TopLayoutCareers.js
+index 8b22f0950ca308..d5db9dd8248ba5 100644
+--- a/docs/src/modules/components/TopLayoutCareers.js
++++ b/docs/src/modules/components/TopLayoutCareers.js
+@@ -8,9 +8,9 @@ import AppContainer from 'docs/src/modules/components/AppContainer';
+ import AppFooter from 'docs/src/layouts/AppFooter';
+ import AppHeader from 'docs/src/layouts/AppHeader';
+ import BrandingCssVarsProvider from 'docs/src/BrandingCssVarsProvider';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ import { Link } from '@mui/docs/Link';
+-import { useTranslate } from 'docs/src/modules/utils/i18n';
++import { useTranslate } from '@mui/docs/i18n';
+ 
+ const StyledDiv = styled('div')(({ theme }) => ({
+   flex: '1 0 100%',
+diff --git a/docs/src/modules/utils/CodeCopy.tsx b/docs/src/modules/utils/CodeCopy.tsx
+deleted file mode 100644
+index a5f38002898f65..00000000000000
+--- a/docs/src/modules/utils/CodeCopy.tsx
++++ /dev/null
+@@ -1,4 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/CodeCopy`
+-
+-export * from '@mui/docs/CodeCopy';
+diff --git a/docs/src/modules/utils/i18n.js b/docs/src/modules/utils/i18n.js
+deleted file mode 100644
+index 5c77a699a0063e..00000000000000
+--- a/docs/src/modules/utils/i18n.js
++++ /dev/null
+@@ -1,4 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/i18n`
+-
+-export * from '@mui/docs/i18n';
+diff --git a/docs/src/modules/utils/useClipboardCopy.ts b/docs/src/modules/utils/useClipboardCopy.ts
+deleted file mode 100644
+index 817efb527c4c30..00000000000000
+--- a/docs/src/modules/utils/useClipboardCopy.ts
++++ /dev/null
+@@ -1,5 +0,0 @@
+-// Backwards compatibility for Toolpad and X.
+-// TODO: remove when Toolpad and X migrated to `@mui/docs/CodeCopy`
+-import { useClipboardCopy } from '@mui/docs/CodeCopy';
+-
+-export default useClipboardCopy;
+diff --git a/docs/src/pages/production-error/ErrorDecoder.js b/docs/src/pages/production-error/ErrorDecoder.js
+index 59c85abb9a6cc7..1498a55b2b4373 100644
+--- a/docs/src/pages/production-error/ErrorDecoder.js
++++ b/docs/src/pages/production-error/ErrorDecoder.js
+@@ -4,7 +4,7 @@ import Link from '@mui/material/Link';
+ import Typography from '@mui/material/Typography';
+ import { styled } from '@mui/material/styles';
+ import { renderMarkdown } from '@mui/internal-markdown';
+-import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
++import { MarkdownElement } from '@mui/docs/MarkdownElement';
+ 
+ const ErrorMessageSection = styled('div')({
+   // reset display: block from Demo
+diff --git a/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-actual.js b/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-actual.js
+index 04b760ec9ff1a2..631c75ba8fa7a3 100644
+--- a/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-actual.js
++++ b/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-actual.js
+@@ -17,7 +17,7 @@ import GlobalStyles from '@mui/material/GlobalStyles';
+ import { alpha, styled } from '@mui/material/styles';
+ import { LANGUAGES_SSR } from 'docs/config';
+ import Link from 'docs/src/modules/components/Link';
+-import { useTranslate, useUserLanguage } from 'docs/src/modules/utils/i18n';
++import { useTranslate, useUserLanguage } from '@mui/docs/i18n';
+ import useLazyCSS from 'docs/src/modules/utils/useLazyCSS';
+ import getUrlProduct from 'docs/src/modules/utils/getUrlProduct';
+ 
+diff --git a/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-expected.js b/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-expected.js
+index 4bb39853b13ef7..e83202eae425e5 100644
+--- a/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-expected.js
++++ b/packages/mui-codemod/src/v5.0.0/theme-spacing.test/large-expected.js
+@@ -17,7 +17,7 @@ import GlobalStyles from '@mui/material/GlobalStyles';
+ import { alpha, styled } from '@mui/material/styles';
+ import { LANGUAGES_SSR } from 'docs/config';
+ import Link from 'docs/src/modules/components/Link';
+-import { useTranslate, useUserLanguage } from 'docs/src/modules/utils/i18n';
++import { useTranslate, useUserLanguage } from '@mui/docs/i18n';
+ import useLazyCSS from 'docs/src/modules/utils/useLazyCSS';
+ import getUrlProduct from 'docs/src/modules/utils/getUrlProduct';
+ 
+diff --git a/packages/mui-docs/src/branding/BrandingProvider.tsx b/packages/mui-docs/src/branding/BrandingProvider.tsx
+index 235cac1821f175..d4767c0b36124e 100644
+--- a/packages/mui-docs/src/branding/BrandingProvider.tsx
++++ b/packages/mui-docs/src/branding/BrandingProvider.tsx
+@@ -7,7 +7,7 @@ export interface BrandingProviderProps {
+   /**
+    * If not `undefined`, the provider is considered nesting and does not render NextNProgressBar & CssBaseline
+    */
+-  mode: 'light' | 'dark';
++  mode?: 'light' | 'dark';
+ }
+ 
+ export function BrandingProvider(props: BrandingProviderProps) {

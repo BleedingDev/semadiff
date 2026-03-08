@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-mui-material-ui-47634",
+  "language": "tsx",
+  "kind": "real",
+  "description": "mui/material-ui#47634: [website] Fix unclickable banner in the pricing page",
+  "source": {
+    "kind": "github-pr",
+    "repository": "mui/material-ui",
+    "prNumber": 47634,
+    "prUrl": "https://github.com/mui/material-ui/pull/47634",
+    "baseSha": "c2df49d944ea091e83636d28d484a4394bd0ed92",
+    "headSha": "3ac3dcc80b3720c0e80428247bb4cb52d8703719",
+    "selectedFiles": [
+      "docs/src/components/pricing/PricingTable.tsx"
+    ],
+    "collectedAt": "2026-03-08T03:37:55.978Z"
+  },
+  "files": [
+    {
+      "id": "docs/src/components/pricing/PricingTable.tsx",
+      "oldPath": "docs/src/components/pricing/PricingTable.tsx",
+      "newPath": "docs/src/components/pricing/PricingTable.tsx",
+      "status": "modified",
+      "language": "tsx",
+      "beforePath": "file-01-before.tsx",
+      "afterPath": "file-01-after.tsx"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "docs/src/components/pricing/PricingTable.tsx",
+        "type": "update",
+        "oldRange": {
+          "startLine": 1290,
+          "endLine": 1290
+        },
+        "newRange": {
+          "startLine": 1290,
+          "endLine": 1290
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

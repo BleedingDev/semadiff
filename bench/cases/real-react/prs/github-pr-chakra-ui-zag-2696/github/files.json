@@ -1,0 +1,38 @@
+[
+  {
+    "sha": "4bb71d72132c0654be91256e90ab4a6d7b200980",
+    "filename": ".changeset/silver-stars-cross.md",
+    "status": "added",
+    "additions": 5,
+    "deletions": 0,
+    "changes": 5,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/088a96e9fb42c89f9d556b5e5611564d64a50baa/.changeset%2Fsilver-stars-cross.md",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/088a96e9fb42c89f9d556b5e5611564d64a50baa/.changeset%2Fsilver-stars-cross.md",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/.changeset%2Fsilver-stars-cross.md?ref=088a96e9fb42c89f9d556b5e5611564d64a50baa",
+    "patch": "@@ -0,0 +1,5 @@\n+---\n+\"@zag-js/menu\": patch\n+---\n+\n+Make child and parent menu service types more precise"
+  },
+  {
+    "sha": "4da034c09f1f49da572776e64d439a8bec1d9036",
+    "filename": "packages/machines/menu/src/menu.machine.ts",
+    "status": "modified",
+    "additions": 4,
+    "deletions": 4,
+    "changes": 8,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/088a96e9fb42c89f9d556b5e5611564d64a50baa/packages%2Fmachines%2Fmenu%2Fsrc%2Fmenu.machine.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/088a96e9fb42c89f9d556b5e5611564d64a50baa/packages%2Fmachines%2Fmenu%2Fsrc%2Fmenu.machine.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Fmenu%2Fsrc%2Fmenu.machine.ts?ref=088a96e9fb42c89f9d556b5e5611564d64a50baa",
+    "patch": "@@ -1,4 +1,4 @@\n-import { createGuards, createMachine, type Scope, type Service } from \"@zag-js/core\"\n+import { createGuards, createMachine, type Scope } from \"@zag-js/core\"\n import { trackDismissableElement } from \"@zag-js/dismissable\"\n import {\n   addDomEvent,\n@@ -16,7 +16,7 @@ import { getPlacement, getPlacementSide, type Placement } from \"@zag-js/popper\"\n import { getElementPolygon, isPointInPolygon, type Point } from \"@zag-js/rect-utils\"\n import { isEqual } from \"@zag-js/utils\"\n import * as dom from \"./menu.dom\"\n-import type { MenuSchema, MenuService } from \"./menu.types\"\n+import type { ChildMenuService, MenuSchema, ParentMenuService } from \"./menu.types\"\n \n const { not, and, or } = createGuards<MenuSchema>()\n \n@@ -838,7 +838,7 @@ export const machine = createMachine<MenuSchema>({\n   },\n })\n \n-function closeRootMenu(ctx: { parent: Service<MenuSchema> | null }) {\n+function closeRootMenu(ctx: { parent: ParentMenuService | null }) {\n   let parent = ctx.parent\n   while (parent && parent.context.get(\"isSubmenu\")) {\n     parent = parent.refs.get(\"parent\")\n@@ -851,7 +851,7 @@ function isWithinPolygon(polygon: Point[] | null, point: Point) {\n   return isPointInPolygon(polygon, point)\n }\n \n-function resolveItemId(children: Record<string, MenuService>, value: string | null, scope: Scope) {\n+function resolveItemId(children: Record<string, ChildMenuService>, value: string | null, scope: Scope) {\n   const hasChildren = Object.keys(children).length > 0\n   if (!value) return null\n   if (!hasChildren) {"
+  },
+  {
+    "sha": "2116069db05bb9a8825e87dd6ade133bf24e10ed",
+    "filename": "packages/machines/menu/src/menu.types.ts",
+    "status": "modified",
+    "additions": 13,
+    "deletions": 4,
+    "changes": 17,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/088a96e9fb42c89f9d556b5e5611564d64a50baa/packages%2Fmachines%2Fmenu%2Fsrc%2Fmenu.types.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/088a96e9fb42c89f9d556b5e5611564d64a50baa/packages%2Fmachines%2Fmenu%2Fsrc%2Fmenu.types.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Fmenu%2Fsrc%2Fmenu.types.ts?ref=088a96e9fb42c89f9d556b5e5611564d64a50baa",
+    "patch": "@@ -142,8 +142,8 @@ export interface MenuSchema {\n     highlightedId: string | null\n   }\n   refs: {\n-    parent: Service<MenuSchema> | null\n-    children: Record<string, Service<MenuSchema>>\n+    parent: ParentMenuService | null\n+    children: Record<string, ChildMenuService>\n     typeaheadState: TypeaheadState\n     positioningOverride: Partial<PositioningOptions>\n   }\n@@ -162,6 +162,15 @@ export type MenuService = Service<MenuSchema>\n \n export type MenuMachine = Machine<MenuSchema>\n \n+/**\n+ * Minimal interface required for child menu relationship.\n+ */\n+export type ChildMenuService = Pick<MenuService, \"prop\" | \"send\" | \"scope\">\n+/**\n+ * Minimal interface required for parent menu relationship.\n+ */\n+export type ParentMenuService = Pick<MenuService, \"prop\" | \"send\" | \"refs\" | \"context\">\n+\n /* -----------------------------------------------------------------------------\n  * Component API\n  * -----------------------------------------------------------------------------*/\n@@ -284,11 +293,11 @@ export interface MenuApi<T extends PropTypes = PropTypes> {\n   /**\n    * Function to register a parent menu. This is used for submenus\n    */\n-  setParent: (parent: MenuService) => void\n+  setParent: (parent: ParentMenuService) => void\n   /**\n    * Function to register a child menu. This is used for submenus\n    */\n-  setChild: (child: MenuService) => void\n+  setChild: (child: ChildMenuService) => void\n   /**\n    * Function to reposition the popover\n    */"
+  }
+]

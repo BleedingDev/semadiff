@@ -1,0 +1,19 @@
+[
+  {
+    "tracking_name": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+    "diff": "/gh/mui/material-ui/diff?old_filename=packages%2Fmui-utils%2Fsrc%2FuseForkRef%2FuseForkRef.ts&old_oid=dd1db1a23ed87b48920cab2b46ccd457db7156c4&old_mode=33188&new_filename=packages%2Fmui-utils%2Fsrc%2FuseForkRef%2FuseForkRef.ts&new_oid=16aad38df254bdd48bbed06cc32272e266dae76d&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+      "oid": "dd1db1a23ed87b48920cab2b46ccd457db7156c4",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/mui-utils/src/useForkRef/useForkRef.ts",
+      "oid": "16aad38df254bdd48bbed06cc32272e266dae76d",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "867746f1b17c4d9c72d47200a2fffd347596a04a793c46d3a08c231a80f62f07"
+  }
+]

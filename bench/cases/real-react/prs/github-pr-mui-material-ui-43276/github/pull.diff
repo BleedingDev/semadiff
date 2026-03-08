@@ -1,0 +1,736 @@
+diff --git a/docs/data/joy/components/input/DebouncedInput.js b/docs/data/joy/components/input/DebouncedInput.js
+index f4769b889bbb0a..40d37e1817749f 100644
+--- a/docs/data/joy/components/input/DebouncedInput.js
++++ b/docs/data/joy/components/input/DebouncedInput.js
+@@ -7,7 +7,7 @@ import Box from '@mui/joy/Box';
+ function DebounceInput(props) {
+   const { handleDebounce, debounceTimeout, ...other } = props;
+ 
+-  const timerRef = React.useRef();
++  const timerRef = React.useRef(undefined);
+ 
+   const handleChange = (event) => {
+     clearTimeout(timerRef.current);
+diff --git a/docs/data/joy/components/input/DebouncedInput.tsx b/docs/data/joy/components/input/DebouncedInput.tsx
+index 82bd594ca50a5d..d171661866bf7c 100644
+--- a/docs/data/joy/components/input/DebouncedInput.tsx
++++ b/docs/data/joy/components/input/DebouncedInput.tsx
+@@ -11,7 +11,9 @@ type DebounceProps = {
+ function DebounceInput(props: InputProps & DebounceProps) {
+   const { handleDebounce, debounceTimeout, ...other } = props;
+ 
+-  const timerRef = React.useRef<ReturnType<typeof setTimeout>>();
++  const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
++    undefined,
++  );
+ 
+   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+     clearTimeout(timerRef.current);
+diff --git a/docs/data/joy/components/snackbar/SnackbarHideDuration.js b/docs/data/joy/components/snackbar/SnackbarHideDuration.js
+index 5afb57f8b8b6ad..229e77b7e7b083 100644
+--- a/docs/data/joy/components/snackbar/SnackbarHideDuration.js
++++ b/docs/data/joy/components/snackbar/SnackbarHideDuration.js
+@@ -10,9 +10,9 @@ export default function SnackbarHideDuration() {
+   const [open, setOpen] = React.useState(false);
+   const [duration, setDuration] = React.useState();
+   const [left, setLeft] = React.useState();
+-  const timer = React.useRef();
++  const timer = React.useRef(undefined);
+   const countdown = () => {
+-    timer.current = window.setInterval(() => {
++    timer.current = setInterval(() => {
+       setLeft((prev) => (prev === undefined ? prev : Math.max(0, prev - 100)));
+     }, 100);
+   };
+diff --git a/docs/data/joy/components/snackbar/SnackbarHideDuration.tsx b/docs/data/joy/components/snackbar/SnackbarHideDuration.tsx
+index e6afcb634665c2..8f03e03aae64e8 100644
+--- a/docs/data/joy/components/snackbar/SnackbarHideDuration.tsx
++++ b/docs/data/joy/components/snackbar/SnackbarHideDuration.tsx
+@@ -10,9 +10,9 @@ export default function SnackbarHideDuration() {
+   const [open, setOpen] = React.useState(false);
+   const [duration, setDuration] = React.useState<undefined | number>();
+   const [left, setLeft] = React.useState<undefined | number>();
+-  const timer = React.useRef<undefined | number>();
++  const timer = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined);
+   const countdown = () => {
+-    timer.current = window.setInterval(() => {
++    timer.current = setInterval(() => {
+       setLeft((prev) => (prev === undefined ? prev : Math.max(0, prev - 100)));
+     }, 100);
+   };
+diff --git a/docs/data/material/components/progress/CircularIntegration.js b/docs/data/material/components/progress/CircularIntegration.js
+index 1c885b355996da..adb2accfe4cd9a 100644
+--- a/docs/data/material/components/progress/CircularIntegration.js
++++ b/docs/data/material/components/progress/CircularIntegration.js
+@@ -10,7 +10,7 @@ import SaveIcon from '@mui/icons-material/Save';
+ export default function CircularIntegration() {
+   const [loading, setLoading] = React.useState(false);
+   const [success, setSuccess] = React.useState(false);
+-  const timer = React.useRef();
++  const timer = React.useRef(undefined);
+ 
+   const buttonSx = {
+     ...(success && {
+diff --git a/docs/data/material/components/progress/CircularIntegration.tsx b/docs/data/material/components/progress/CircularIntegration.tsx
+index c32a5957a42fb8..c0e3761c48905b 100644
+--- a/docs/data/material/components/progress/CircularIntegration.tsx
++++ b/docs/data/material/components/progress/CircularIntegration.tsx
+@@ -10,7 +10,7 @@ import SaveIcon from '@mui/icons-material/Save';
+ export default function CircularIntegration() {
+   const [loading, setLoading] = React.useState(false);
+   const [success, setSuccess] = React.useState(false);
+-  const timer = React.useRef<ReturnType<typeof setTimeout>>();
++  const timer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+ 
+   const buttonSx = {
+     ...(success && {
+diff --git a/docs/data/material/components/progress/DelayingAppearance.js b/docs/data/material/components/progress/DelayingAppearance.js
+index df2b050772e529..0844371d452fbf 100644
+--- a/docs/data/material/components/progress/DelayingAppearance.js
++++ b/docs/data/material/components/progress/DelayingAppearance.js
+@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
+ export default function DelayingAppearance() {
+   const [loading, setLoading] = React.useState(false);
+   const [query, setQuery] = React.useState('idle');
+-  const timerRef = React.useRef();
++  const timerRef = React.useRef(undefined);
+ 
+   React.useEffect(
+     () => () => {
+diff --git a/docs/data/material/components/progress/DelayingAppearance.tsx b/docs/data/material/components/progress/DelayingAppearance.tsx
+index a6784fd2d359d8..024769f55ca7a0 100644
+--- a/docs/data/material/components/progress/DelayingAppearance.tsx
++++ b/docs/data/material/components/progress/DelayingAppearance.tsx
+@@ -8,7 +8,9 @@ import Typography from '@mui/material/Typography';
+ export default function DelayingAppearance() {
+   const [loading, setLoading] = React.useState(false);
+   const [query, setQuery] = React.useState('idle');
+-  const timerRef = React.useRef<ReturnType<typeof setTimeout>>();
++  const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(
++    undefined,
++  );
+ 
+   React.useEffect(
+     () => () => {
+diff --git a/docs/pages/base-ui/api/use-autocomplete.json b/docs/pages/base-ui/api/use-autocomplete.json
+index 994ebed0543af0..0a4ac4aaf008aa 100644
+--- a/docs/pages/base-ui/api/use-autocomplete.json
++++ b/docs/pages/base-ui/api/use-autocomplete.json
+@@ -147,8 +147,8 @@
+     },
+     "unstable_isActiveElementInListbox": {
+       "type": {
+-        "name": "(listbox: React.RefObject&lt;HTMLElement&gt;) =&gt; boolean",
+-        "description": "(listbox: React.RefObject&lt;HTMLElement&gt;) =&gt; boolean"
++        "name": "(listbox: React.RefObject&lt;HTMLElement | null&gt;) =&gt; boolean",
++        "description": "(listbox: React.RefObject&lt;HTMLElement | null&gt;) =&gt; boolean"
+       }
+     },
+     "value": {
+diff --git a/docs/src/components/animation/FlashCode.tsx b/docs/src/components/animation/FlashCode.tsx
+index 570e319e2eb360..ce1564ff11ed9f 100644
+--- a/docs/src/components/animation/FlashCode.tsx
++++ b/docs/src/components/animation/FlashCode.tsx
+@@ -29,7 +29,7 @@ const FlashCode = React.forwardRef(function FlashCode(
+     startLine?: number;
+     lineHeight?: number | string;
+   },
+-  ref: React.Ref<HTMLDivElement>,
++  ref: React.ForwardedRef<HTMLDivElement>,
+ ) {
+   const { children, startLine = 0, endLine = startLine, lineHeight = '0.75rem', ...other } = props;
+ 
+diff --git a/docs/src/modules/components/JoyThemeBuilder.tsx b/docs/src/modules/components/JoyThemeBuilder.tsx
+index 6d7245e7a2005f..834d439b77594d 100644
+--- a/docs/src/modules/components/JoyThemeBuilder.tsx
++++ b/docs/src/modules/components/JoyThemeBuilder.tsx
+@@ -978,7 +978,11 @@ function filterGlobalVariantTokens(palette: Partial<PaletteVariant>, variant: Va
+   return tokens;
+ }
+ 
+-type StateReducer<T> = (state: T, action: Partial<T>) => T;
++type ReducerState = {
++  hover: boolean;
++  active: boolean;
++  disabled: boolean;
++};
+ 
+ function GlobalVariantForm({
+   color,
+@@ -996,13 +1000,14 @@ function GlobalVariantForm({
+   onRemove: (token: string) => void;
+ }) {
+   const [selectedVariant, setSelectedVariant] = React.useState<VariantProp>('solid');
+-  const [states, setStates] = React.useReducer<
+-    StateReducer<{ hover: boolean; active: boolean; disabled: boolean }>
+-  >((prevState, action) => ({ ...prevState, ...action }), {
+-    hover: false,
+-    active: false,
+-    disabled: false,
+-  });
++  const [states, setStates] = React.useReducer(
++    (prevState: ReducerState, action: Partial<ReducerState>) => ({ ...prevState, ...action }),
++    {
++      hover: false,
++      active: false,
++      disabled: false,
++    },
++  );
+   const themeDefaultValue = filterGlobalVariantTokens(themeDefaultValueProp, selectedVariant);
+   const value = filterGlobalVariantTokens(valueProp, selectedVariant);
+   const mergedValue = { ...themeDefaultValue, ...value };
+diff --git a/packages/mui-base/src/Button/Button.tsx b/packages/mui-base/src/Button/Button.tsx
+index 816c3e9c4f1c71..ce9dd0ce7fa9cb 100644
+--- a/packages/mui-base/src/Button/Button.tsx
++++ b/packages/mui-base/src/Button/Button.tsx
+@@ -46,7 +46,7 @@ const Button = React.forwardRef(function Button<RootComponentType extends React.
+     ...other
+   } = props;
+ 
+-  const buttonRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement>();
++  const buttonRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement | null>(null);
+ 
+   let rootElementName = rootElementNameProp;
+ 
+diff --git a/packages/mui-base/src/Tab/Tab.tsx b/packages/mui-base/src/Tab/Tab.tsx
+index d63b03374d05bd..6147ba91e90ed3 100644
+--- a/packages/mui-base/src/Tab/Tab.tsx
++++ b/packages/mui-base/src/Tab/Tab.tsx
+@@ -45,7 +45,7 @@ const Tab = React.forwardRef(function Tab<RootComponentType extends React.Elemen
+     ...other
+   } = props;
+ 
+-  const tabRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement>();
++  const tabRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement | null>(null);
+   const handleRef = useForkRef(tabRef, forwardedRef);
+ 
+   const { active, highlighted, selected, getRootProps } = useTab({
+diff --git a/packages/mui-base/src/useAutocomplete/useAutocomplete.d.ts b/packages/mui-base/src/useAutocomplete/useAutocomplete.d.ts
+index 8c4e7eec43b466..989af6b831b3c1 100644
+--- a/packages/mui-base/src/useAutocomplete/useAutocomplete.d.ts
++++ b/packages/mui-base/src/useAutocomplete/useAutocomplete.d.ts
+@@ -49,7 +49,7 @@ export interface UseAutocompleteProps<
+    * Temporary for Joy UI because the parent listbox is the document object
+    * TODO v6: Normalize the logic and remove this param.
+    */
+-  unstable_isActiveElementInListbox?: (listbox: React.RefObject<HTMLElement>) => boolean;
++  unstable_isActiveElementInListbox?: (listbox: React.RefObject<HTMLElement | null>) => boolean;
+   /**
+    * If `true`, the portion of the selected suggestion that the user hasn't typed,
+    * known as the completion string, appears inline after the input cursor in the textbox.
+diff --git a/packages/mui-base/src/useButton/useButton.ts b/packages/mui-base/src/useButton/useButton.ts
+index d87c184f4755cb..4ddbfe62169954 100644
+--- a/packages/mui-base/src/useButton/useButton.ts
++++ b/packages/mui-base/src/useButton/useButton.ts
+@@ -34,7 +34,7 @@ export function useButton(parameters: UseButtonParameters = {}): UseButtonReturn
+     type,
+     rootElementName: rootElementNameProp,
+   } = parameters;
+-  const buttonRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement>();
++  const buttonRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement | null>(null);
+ 
+   const [active, setActive] = React.useState<boolean>(false);
+ 
+@@ -200,7 +200,7 @@ export function useButton(parameters: UseButtonParameters = {}): UseButtonReturn
+     }
+     if (disabled) {
+       buttonProps['aria-disabled'] = disabled as boolean;
+-      buttonProps.tabIndex = focusableWhenDisabled ? tabIndex ?? 0 : -1;
++      buttonProps.tabIndex = focusableWhenDisabled ? (tabIndex ?? 0) : -1;
+     }
+   }
+ 
+diff --git a/packages/mui-base/src/useCompound/useCompound.test.tsx b/packages/mui-base/src/useCompound/useCompound.test.tsx
+index c1790ce7848d04..8b129653e67882 100644
+--- a/packages/mui-base/src/useCompound/useCompound.test.tsx
++++ b/packages/mui-base/src/useCompound/useCompound.test.tsx
+@@ -4,7 +4,7 @@ import { render } from '@mui/internal-test-utils';
+ import { CompoundComponentContext, useCompoundParent } from './useCompoundParent';
+ import { useCompoundItem } from './useCompoundItem';
+ 
+-type ItemValue = { value: string; ref: React.RefObject<HTMLSpanElement> };
++type ItemValue = { value: string; ref: React.RefObject<HTMLSpanElement | null> };
+ 
+ describe('compound components', () => {
+   describe('useCompoundParent', () => {
+@@ -188,7 +188,7 @@ describe('compound components', () => {
+         const { children } = props;
+         const { contextValue } = useCompoundParent<
+           string,
+-          { ref: React.RefObject<HTMLSpanElement> }
++          { ref: React.RefObject<HTMLSpanElement | null> }
+         >();
+ 
+         return (
+@@ -240,7 +240,7 @@ describe('compound components', () => {
+         const { children } = props;
+         const { contextValue } = useCompoundParent<
+           number,
+-          { ref: React.RefObject<HTMLLIElement> }
++          { ref: React.RefObject<HTMLLIElement | null> }
+         >();
+ 
+         return (
+@@ -256,7 +256,7 @@ describe('compound components', () => {
+ 
+       function Child() {
+         const ref = React.useRef<HTMLLIElement>(null);
+-        const { id } = useCompoundItem<string, { ref: React.RefObject<HTMLLIElement> }>(
++        const { id } = useCompoundItem<string, { ref: React.RefObject<HTMLLIElement | null> }>(
+           idGenerator,
+           React.useMemo(() => ({ ref }), []),
+         );
+diff --git a/packages/mui-base/src/useCompound/useCompoundParent.ts b/packages/mui-base/src/useCompound/useCompoundParent.ts
+index 8cc2dad24b6efe..99f0b2082704ff 100644
+--- a/packages/mui-base/src/useCompound/useCompoundParent.ts
++++ b/packages/mui-base/src/useCompound/useCompoundParent.ts
+@@ -47,7 +47,10 @@ if (process.env.NODE_ENV !== 'production') {
+   CompoundComponentContext.displayName = 'CompoundComponentContext';
+ }
+ 
+-export interface UseCompoundParentReturnValue<Key, Subitem extends { ref: React.RefObject<Node> }> {
++export interface UseCompoundParentReturnValue<
++  Key,
++  Subitem extends { ref: React.RefObject<Node | null> },
++> {
+   /**
+    * The value for the CompoundComponentContext provider.
+    */
+@@ -63,7 +66,7 @@ export interface UseCompoundParentReturnValue<Key, Subitem extends { ref: React.
+ /**
+  * Sorts the subitems by their position in the DOM.
+  */
+-function sortSubitems<Key, Subitem extends { ref: React.RefObject<Node> }>(
++function sortSubitems<Key, Subitem extends { ref: React.RefObject<Node | null> }>(
+   subitems: Map<Key, Subitem>,
+ ) {
+   const subitemsArray = Array.from(subitems.keys()).map((key) => {
+@@ -100,7 +103,7 @@ function sortSubitems<Key, Subitem extends { ref: React.RefObject<Node> }>(
+  */
+ export function useCompoundParent<
+   Key,
+-  Subitem extends { ref: React.RefObject<Node> },
++  Subitem extends { ref: React.RefObject<Node | null> },
+ >(): UseCompoundParentReturnValue<Key, Subitem> {
+   const [subitems, setSubitems] = React.useState(new Map<Key, Subitem>());
+   const subitemKeys = React.useRef(new Set<Key>());
+diff --git a/packages/mui-base/src/useMenu/menuReducer.ts b/packages/mui-base/src/useMenu/menuReducer.ts
+index 74ffc00361bbe0..ecdf640b4fe16f 100644
+--- a/packages/mui-base/src/useMenu/menuReducer.ts
++++ b/packages/mui-base/src/useMenu/menuReducer.ts
+@@ -3,7 +3,7 @@ import { ActionWithContext } from '../utils/useControllableReducer.types';
+ import { MenuInternalState } from './useMenu.types';
+ 
+ export type MenuActionContext = ListActionContext<string> & {
+-  listboxRef: React.RefObject<HTMLElement>;
++  listboxRef: React.RefObject<HTMLElement | null>;
+ };
+ 
+ export function menuReducer(
+diff --git a/packages/mui-base/src/useMenuItem/useMenuItem.types.ts b/packages/mui-base/src/useMenuItem/useMenuItem.types.ts
+index 8f5231685ec892..ed8ea501838a62 100644
+--- a/packages/mui-base/src/useMenuItem/useMenuItem.types.ts
++++ b/packages/mui-base/src/useMenuItem/useMenuItem.types.ts
+@@ -11,7 +11,7 @@ export interface MenuItemMetadata {
+   id: string;
+   disabled: boolean;
+   label?: string;
+-  ref: React.RefObject<HTMLElement>;
++  ref: React.RefObject<HTMLElement | null>;
+ }
+ 
+ export type UseMenuItemRootSlotProps<ExternalProps = {}> = ExternalProps &
+diff --git a/packages/mui-base/src/useOption/useOption.types.ts b/packages/mui-base/src/useOption/useOption.types.ts
+index 0bc3ee4cf14d23..e64f59bef52229 100644
+--- a/packages/mui-base/src/useOption/useOption.types.ts
++++ b/packages/mui-base/src/useOption/useOption.types.ts
+@@ -4,7 +4,7 @@ export interface SelectOption<Value> {
+   value: Value;
+   label: React.ReactNode;
+   disabled?: boolean;
+-  ref: React.RefObject<HTMLElement>;
++  ref: React.RefObject<HTMLElement | null>;
+   id?: string;
+ }
+ 
+diff --git a/packages/mui-base/src/useSlider/useSlider.ts b/packages/mui-base/src/useSlider/useSlider.ts
+index 37dbea1d3fbec0..e39ee3862e2540 100644
+--- a/packages/mui-base/src/useSlider/useSlider.ts
++++ b/packages/mui-base/src/useSlider/useSlider.ts
+@@ -218,7 +218,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+     value: valueProp,
+   } = parameters;
+ 
+-  const touchId = React.useRef<number>();
++  const touchId = React.useRef<number | undefined>(undefined);
+   // We can't use the :active browser pseudo-classes.
+   // - The active state isn't triggered when clicking on the rail.
+   // - The active state isn't transferred when inversing a range slider.
+@@ -267,7 +267,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+ 
+   const [focusedThumbIndex, setFocusedThumbIndex] = React.useState(-1);
+ 
+-  const sliderRef = React.useRef<HTMLSpanElement>();
++  const sliderRef = React.useRef<HTMLSpanElement | null>(null);
+   const handleRef = useForkRef(ref, sliderRef);
+ 
+   const createHandleHiddenInputFocus =
+@@ -396,7 +396,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+       changeValue(event, event.target.valueAsNumber);
+     };
+ 
+-  const previousIndex = React.useRef<number>();
++  const previousIndex = React.useRef<number | undefined>(undefined);
+   let axis = orientation;
+   if (isRtl && orientation === 'horizontal') {
+     axis += '-reverse';
+@@ -712,7 +712,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+       type: 'range',
+       min: parameters.min,
+       max: parameters.max,
+-      step: parameters.step === null && parameters.marks ? 'any' : parameters.step ?? undefined,
++      step: parameters.step === null && parameters.marks ? 'any' : (parameters.step ?? undefined),
+       disabled,
+       ...externalProps,
+       ...mergedEventHandlers,
+diff --git a/packages/mui-base/src/useTabs/TabsProvider.tsx b/packages/mui-base/src/useTabs/TabsProvider.tsx
+index 31d8aebd939315..2731205d1a8511 100644
+--- a/packages/mui-base/src/useTabs/TabsProvider.tsx
++++ b/packages/mui-base/src/useTabs/TabsProvider.tsx
+@@ -5,7 +5,7 @@ import { CompoundComponentContext, CompoundComponentContextValue } from '../useC
+ 
+ export type TabPanelMetadata = {
+   id: string | undefined;
+-  ref: React.RefObject<HTMLElement>;
++  ref: React.RefObject<HTMLElement | null>;
+ };
+ 
+ export type TabsProviderValue = CompoundComponentContextValue<string | number, TabPanelMetadata> &
+diff --git a/packages/mui-base/src/useTabs/useTabs.ts b/packages/mui-base/src/useTabs/useTabs.ts
+index b399e5092843f6..2fc70b3860c4b3 100644
+--- a/packages/mui-base/src/useTabs/useTabs.ts
++++ b/packages/mui-base/src/useTabs/useTabs.ts
+@@ -8,7 +8,7 @@ import { TabPanelMetadata } from './TabsProvider';
+ export interface TabMetadata {
+   disabled: boolean;
+   id: string | undefined;
+-  ref: React.RefObject<HTMLElement>;
++  ref: React.RefObject<HTMLElement | null>;
+ }
+ 
+ type IdLookupFunction = (id: string | number) => string | undefined;
+diff --git a/packages/mui-base/src/utils/useMessageBus.ts b/packages/mui-base/src/utils/useMessageBus.ts
+index b7246f9b0b4bce..4cfab271580c1f 100644
+--- a/packages/mui-base/src/utils/useMessageBus.ts
++++ b/packages/mui-base/src/utils/useMessageBus.ts
+@@ -40,7 +40,7 @@ export function createMessageBus(): MessageBus {
+  * @ignore - internal hook.
+  */
+ export function useMessageBus() {
+-  const bus = React.useRef<MessageBus>();
++  const bus = React.useRef<MessageBus | undefined>(undefined);
+   if (!bus.current) {
+     bus.current = createMessageBus();
+   }
+diff --git a/packages/mui-base/test/describeConformanceUnstyled.tsx b/packages/mui-base/test/describeConformanceUnstyled.tsx
+index b1f4090155d82a..cd8a29c547b055 100644
+--- a/packages/mui-base/test/describeConformanceUnstyled.tsx
++++ b/packages/mui-base/test/describeConformanceUnstyled.tsx
+@@ -267,7 +267,7 @@ function testSlotPropsProp(
+   });
+ }
+ 
+-function testClassName(element: React.ReactElement, getOptions: () => ConformanceOptions) {
++function testClassName(element: React.ReactElement<any>, getOptions: () => ConformanceOptions) {
+   it('applies the className to the root component', async () => {
+     const { render } = getOptions();
+ 
+diff --git a/packages/mui-docs/src/Ad/Ad.tsx b/packages/mui-docs/src/Ad/Ad.tsx
+index b056ca5ec54a7d..9b47adcc8d6ed6 100644
+--- a/packages/mui-docs/src/Ad/Ad.tsx
++++ b/packages/mui-docs/src/Ad/Ad.tsx
+@@ -146,7 +146,7 @@ export function Ad() {
+   const ad = React.useContext(AdContext);
+   const eventLabel = label ? `${label}-${ad.placement}-${adShape}` : null;
+ 
+-  const timerAdblock = React.useRef<ReturnType<typeof setTimeout>>();
++  const timerAdblock = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+ 
+   const checkAdblock = React.useCallback(
+     (attempt = 1) => {
+diff --git a/packages/mui-docs/src/CodeCopy/useClipboardCopy.ts b/packages/mui-docs/src/CodeCopy/useClipboardCopy.ts
+index 9979a455775ae5..9a280651553303 100644
+--- a/packages/mui-docs/src/CodeCopy/useClipboardCopy.ts
++++ b/packages/mui-docs/src/CodeCopy/useClipboardCopy.ts
+@@ -3,7 +3,7 @@ import clipboardCopy from 'clipboard-copy';
+ 
+ export default function useClipboardCopy() {
+   const [isCopied, setIsCopied] = React.useState(false);
+-  const timeout = React.useRef<ReturnType<typeof setTimeout>>();
++  const timeout = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+ 
+   React.useEffect(
+     () => () => {
+diff --git a/packages/mui-joy/src/Autocomplete/Autocomplete.tsx b/packages/mui-joy/src/Autocomplete/Autocomplete.tsx
+index 8f5662ef65e6de..3134be0881ccf3 100644
+--- a/packages/mui-joy/src/Autocomplete/Autocomplete.tsx
++++ b/packages/mui-joy/src/Autocomplete/Autocomplete.tsx
+@@ -45,7 +45,7 @@ import useSlot from '../utils/useSlot';
+ 
+ type OwnerState = Omit<AutocompleteOwnerState<any, any, any, any>, 'onChange' | 'defaultValue'>;
+ 
+-const defaultIsActiveElementInListbox = (listboxRef: React.RefObject<HTMLElement>) =>
++const defaultIsActiveElementInListbox = (listboxRef: React.RefObject<HTMLElement | null>) =>
+   listboxRef.current !== null && listboxRef.current.contains(document.activeElement);
+ // @ts-ignore
+ const defaultGetOptionLabel = (option) => option.label ?? option;
+diff --git a/packages/mui-joy/src/ButtonGroup/ButtonGroup.tsx b/packages/mui-joy/src/ButtonGroup/ButtonGroup.tsx
+index b90562734a6c9d..a9af27749a00b1 100644
+--- a/packages/mui-joy/src/ButtonGroup/ButtonGroup.tsx
++++ b/packages/mui-joy/src/ButtonGroup/ButtonGroup.tsx
+@@ -18,6 +18,7 @@ import ButtonGroupContext from './ButtonGroupContext';
+ import useSlot from '../utils/useSlot';
+ import buttonClasses from '../Button/buttonClasses';
+ import iconButtonClasses from '../IconButton/iconButtonClasses';
++import { DividerProps } from '../Divider';
+ 
+ const useUtilityClasses = (ownerState: ButtonGroupOwnerState) => {
+   const { size, variant, color, orientation } = ownerState;
+@@ -236,11 +237,11 @@ const ButtonGroup = React.forwardRef(function ButtonGroup(inProps, ref) {
+           }
+           const extraProps: Record<string, any> = {};
+           if (isMuiElement(child, ['Divider'])) {
+-            extraProps.inset = 'inset' in child.props ? child.props.inset : 'context';
++            const childProps = child.props as DividerProps;
++            extraProps.inset = childProps?.inset ?? 'context';
+ 
+             const dividerOrientation = orientation === 'vertical' ? 'horizontal' : 'vertical';
+-            extraProps.orientation =
+-              'orientation' in child.props ? child.props.orientation : dividerOrientation;
++            extraProps.orientation = childProps?.orientation ?? dividerOrientation;
+             extraProps.role = 'presentation';
+             extraProps.component = 'span';
+           }
+diff --git a/packages/mui-joy/src/Card/Card.tsx b/packages/mui-joy/src/Card/Card.tsx
+index 3fdd38efa29774..7ee7eda5de52d1 100644
+--- a/packages/mui-joy/src/Card/Card.tsx
++++ b/packages/mui-joy/src/Card/Card.tsx
+@@ -15,6 +15,7 @@ import { getCardUtilityClass } from './cardClasses';
+ import { CardProps, CardOwnerState, CardTypeMap } from './CardProps';
+ import { resolveSxValue } from '../styles/styleUtils';
+ import useSlot from '../utils/useSlot';
++import { DividerProps } from '../Divider';
+ 
+ const useUtilityClasses = (ownerState: CardOwnerState) => {
+   const { size, variant, color, orientation } = ownerState;
+@@ -166,11 +167,11 @@ const Card = React.forwardRef(function Card(inProps, ref) {
+         }
+         const extraProps: Record<string, any> = {};
+         if (isMuiElement(child, ['Divider'])) {
+-          extraProps.inset = 'inset' in child.props ? child.props.inset : 'context';
++          const childProps = child.props as DividerProps;
++          extraProps.inset = childProps?.inset ?? 'context';
+ 
+           const dividerOrientation = orientation === 'vertical' ? 'horizontal' : 'vertical';
+-          extraProps.orientation =
+-            'orientation' in child.props ? child.props.orientation : dividerOrientation;
++          extraProps.orientation = childProps?.orientation ?? dividerOrientation;
+         }
+         if (index === 0) {
+           extraProps['data-first-child'] = '';
+diff --git a/packages/mui-joy/src/ListItem/ListItem.tsx b/packages/mui-joy/src/ListItem/ListItem.tsx
+index 3e9eb9baba8cc0..00c73d6a801214 100644
+--- a/packages/mui-joy/src/ListItem/ListItem.tsx
++++ b/packages/mui-joy/src/ListItem/ListItem.tsx
+@@ -11,7 +11,7 @@ import { unstable_composeClasses as composeClasses } from '@mui/base/composeClas
+ import { styled, useThemeProps } from '../styles';
+ 
+ import useSlot from '../utils/useSlot';
+-import { ListItemOwnerState, ListItemTypeMap } from './ListItemProps';
++import { ListItemOwnerState, ListItemProps, ListItemTypeMap } from './ListItemProps';
+ import listItemClasses, { getListItemUtilityClass } from './listItemClasses';
+ import NestedListContext from '../List/NestedListContext';
+ import RowListContext from '../List/RowListContext';
+@@ -256,7 +256,7 @@ const ListItem = React.forwardRef(function ListItem(inProps, ref) {
+                   ...(index === 0 && { 'data-first-child': '' }),
+                   ...(isMuiElement(child, ['ListItem']) && {
+                     // The ListItem of ListItem should not be 'li'
+-                    component: child.props.component || 'div',
++                    component: (child.props as ListItemProps)?.component || 'div',
+                   }),
+                 })
+               : child,
+diff --git a/packages/mui-joy/src/ModalDialog/ModalDialog.tsx b/packages/mui-joy/src/ModalDialog/ModalDialog.tsx
+index 36c6da2fd58d8d..633ee0ee3b2d2f 100644
+--- a/packages/mui-joy/src/ModalDialog/ModalDialog.tsx
++++ b/packages/mui-joy/src/ModalDialog/ModalDialog.tsx
+@@ -18,6 +18,7 @@ import ModalDialogSizeContext from './ModalDialogSizeContext';
+ import ModalDialogVariantColorContext from './ModalDialogVariantColorContext';
+ import useSlot from '../utils/useSlot';
+ import { StyledCardRoot } from '../Card/Card';
++import { DividerProps } from '../Divider';
+ 
+ const useUtilityClasses = (ownerState: ModalDialogOwnerState) => {
+   const { variant, color, size, layout } = ownerState;
+@@ -195,11 +196,11 @@ const ModalDialog = React.forwardRef(function ModalDialog(inProps, ref) {
+             }
+             const extraProps: Record<string, any> = {};
+             if (isMuiElement(child, ['Divider'])) {
+-              extraProps.inset = 'inset' in child.props ? child.props.inset : 'context';
++              const childProps = child.props as DividerProps;
++              extraProps.inset = childProps?.inset ?? 'context';
+ 
+               const dividerOrientation = orientation === 'vertical' ? 'horizontal' : 'vertical';
+-              extraProps.orientation =
+-                'orientation' in child.props ? child.props.orientation : dividerOrientation;
++              extraProps.orientation = childProps?.orientation ?? dividerOrientation;
+             }
+             if (index === 0) {
+               extraProps['data-first-child'] = '';
+diff --git a/packages/mui-joy/src/Tab/Tab.tsx b/packages/mui-joy/src/Tab/Tab.tsx
+index 493758e11fe364..b8b84b45e3c5dc 100644
+--- a/packages/mui-joy/src/Tab/Tab.tsx
++++ b/packages/mui-joy/src/Tab/Tab.tsx
+@@ -150,7 +150,7 @@ const Tab = React.forwardRef(function Tab(inProps, ref) {
+     ...other
+   } = props;
+ 
+-  const tabRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement>();
++  const tabRef = React.useRef<HTMLButtonElement | HTMLAnchorElement | HTMLElement | null>(null);
+   const handleRef = useForkRef(tabRef, ref) as React.RefCallback<Element>;
+ 
+   const { active, focusVisible, setFocusVisible, selected, getRootProps } = useTab({
+diff --git a/packages/mui-joy/src/ToggleButtonGroup/ToggleButtonGroup.tsx b/packages/mui-joy/src/ToggleButtonGroup/ToggleButtonGroup.tsx
+index 85282d67ef56aa..82b747a653e911 100644
+--- a/packages/mui-joy/src/ToggleButtonGroup/ToggleButtonGroup.tsx
++++ b/packages/mui-joy/src/ToggleButtonGroup/ToggleButtonGroup.tsx
+@@ -21,6 +21,7 @@ import useSlot from '../utils/useSlot';
+ import { StyledButtonGroup } from '../ButtonGroup/ButtonGroup';
+ import ButtonGroupContext from '../ButtonGroup/ButtonGroupContext';
+ import ToggleButtonGroupContext from './ToggleButtonGroupContext';
++import { DividerProps } from '../Divider';
+ 
+ interface InternalChangeEventHandler<Value> {
+   (event: React.MouseEvent, value: Value | Array<Value> | null): void;
+@@ -161,11 +162,11 @@ const ToggleButtonGroup = React.forwardRef(function ToggleButtonGroup<
+             }
+             const extraProps: Record<string, any> = {};
+             if (isMuiElement(child, ['Divider'])) {
+-              extraProps.inset = 'inset' in child.props ? child.props.inset : 'context';
++              const childProps = child.props as DividerProps;
++              extraProps.inset = childProps?.inset ?? 'context';
+ 
+               const dividerOrientation = orientation === 'vertical' ? 'horizontal' : 'vertical';
+-              extraProps.orientation =
+-                'orientation' in child.props ? child.props.orientation : dividerOrientation;
++              extraProps.orientation = childProps?.orientation ?? dividerOrientation;
+               extraProps.role = 'presentation';
+               extraProps.component = 'span';
+             }
+diff --git a/packages/mui-joy/src/Tooltip/Tooltip.tsx b/packages/mui-joy/src/Tooltip/Tooltip.tsx
+index 3966f0ae960d10..50b77460533588 100644
+--- a/packages/mui-joy/src/Tooltip/Tooltip.tsx
++++ b/packages/mui-joy/src/Tooltip/Tooltip.tsx
+@@ -262,7 +262,7 @@ const Tooltip = React.forwardRef(function Tooltip(inProps, ref) {
+ 
+   const id = useId(idProp);
+ 
+-  const prevUserSelect: React.MutableRefObject<string | undefined> = React.useRef();
++  const prevUserSelect = React.useRef<string | undefined>(undefined);
+   const stopTouchInteraction = useEventCallback(() => {
+     if (prevUserSelect.current !== undefined) {
+       // TODO: uncomment once we enable eslint-plugin-react-compiler // eslint-disable-next-line react-compiler/react-compiler -- WebkitUserSelect is required outside the component
+diff --git a/packages/mui-material/src/Slider/useSlider.ts b/packages/mui-material/src/Slider/useSlider.ts
+index 5f7ab6b85709a5..ba97c4adb1ab01 100644
+--- a/packages/mui-material/src/Slider/useSlider.ts
++++ b/packages/mui-material/src/Slider/useSlider.ts
+@@ -220,7 +220,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+     value: valueProp,
+   } = parameters;
+ 
+-  const touchId = React.useRef<number>();
++  const touchId = React.useRef<number | undefined>(undefined);
+   // We can't use the :active browser pseudo-classes.
+   // - The active state isn't triggered when clicking on the rail.
+   // - The active state isn't transferred when inversing a range slider.
+@@ -269,7 +269,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+ 
+   const [focusedThumbIndex, setFocusedThumbIndex] = React.useState(-1);
+ 
+-  const sliderRef = React.useRef<HTMLSpanElement>();
++  const sliderRef = React.useRef<HTMLSpanElement | null>(null);
+   const handleRef = useForkRef(ref, sliderRef);
+ 
+   const createHandleHiddenInputFocus =
+@@ -398,7 +398,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+       changeValue(event, event.target.valueAsNumber);
+     };
+ 
+-  const previousIndex = React.useRef<number>();
++  const previousIndex = React.useRef<number | undefined>(undefined);
+   let axis = orientation;
+   if (isRtl && orientation === 'horizontal') {
+     axis += '-reverse';
+@@ -714,7 +714,7 @@ export function useSlider(parameters: UseSliderParameters): UseSliderReturnValue
+       type: 'range',
+       min: parameters.min,
+       max: parameters.max,
+-      step: parameters.step === null && parameters.marks ? 'any' : parameters.step ?? undefined,
++      step: parameters.step === null && parameters.marks ? 'any' : (parameters.step ?? undefined),
+       disabled,
+       ...externalProps,
+       ...mergedEventHandlers,
+diff --git a/packages/mui-material/src/styles/styled.spec.tsx b/packages/mui-material/src/styles/styled.spec.tsx
+index 8053428c818c6a..b6646c7845c926 100644
+--- a/packages/mui-material/src/styles/styled.spec.tsx
++++ b/packages/mui-material/src/styles/styled.spec.tsx
+@@ -125,8 +125,8 @@ function Button({
+             return styles;
+           },
+           startIcon: ({ ownerState: { startIcon, endIcon } }) => [
+-            startIcon && { marginRight: 8 },
+-            endIcon && { marginLeft: 8 },
++            !!startIcon && { marginRight: 8 },
++            !!endIcon && { marginLeft: 8 },
+           ],
+         },
+       },
+diff --git a/packages/mui-material/src/useAutocomplete/useAutocomplete.d.ts b/packages/mui-material/src/useAutocomplete/useAutocomplete.d.ts
+index 411ee953534e64..8cb5fdd9e06cbf 100644
+--- a/packages/mui-material/src/useAutocomplete/useAutocomplete.d.ts
++++ b/packages/mui-material/src/useAutocomplete/useAutocomplete.d.ts
+@@ -49,7 +49,7 @@ export interface UseAutocompleteProps<
+    * Temporary for Joy UI because the parent listbox is the document object
+    * TODO v6: Normalize the logic and remove this param.
+    */
+-  unstable_isActiveElementInListbox?: (listbox: React.RefObject<HTMLElement>) => boolean;
++  unstable_isActiveElementInListbox?: (listbox: React.RefObject<HTMLElement | null>) => boolean;
+   /**
+    * If `true`, the portion of the selected suggestion that the user hasn't typed,
+    * known as the completion string, appears inline after the input cursor in the textbox.
+diff --git a/packages/mui-system/src/Grid/createGrid.tsx b/packages/mui-system/src/Grid/createGrid.tsx
+index 4fb1ed788d94a2..0f43262e5ffc7a 100644
+--- a/packages/mui-system/src/Grid/createGrid.tsx
++++ b/packages/mui-system/src/Grid/createGrid.tsx
+@@ -171,7 +171,7 @@ export default function createGrid(
+         {React.Children.map(children, (child) => {
+           if (React.isValidElement(child) && isMuiElement(child, ['Grid'])) {
+             return React.cloneElement(child, {
+-              unstable_level: (child.props as any).unstable_level ?? level + 1,
++              unstable_level: (child.props as GridProps)?.unstable_level ?? level + 1,
+             } as GridProps);
+           }
+           return child;
+diff --git a/packages/mui-utils/src/setRef/setRef.spec.tsx b/packages/mui-utils/src/setRef/setRef.spec.tsx
+index c9c90757c0d8af..a5be046dd0914a 100644
+--- a/packages/mui-utils/src/setRef/setRef.spec.tsx
++++ b/packages/mui-utils/src/setRef/setRef.spec.tsx
+@@ -2,7 +2,7 @@ import * as React from 'react';
+ import setRef from './setRef';
+ 
+ function MyRef() {
+-  const ref = React.useRef<HTMLDivElement>();
++  const ref = React.useRef<HTMLDivElement | null>(null);
+ 
+   const handleRef = React.useCallback((node: HTMLDivElement) => {
+     setRef(ref, node);

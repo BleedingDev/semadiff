@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-typestrong-ts-node-1266",
+  "language": "ts",
+  "kind": "real",
+  "description": "typeStrong/ts-node#1266: Refactor codebase into separate files, and enable `importsNotUsedAsValues: error`",
+  "source": {
+    "kind": "github-pr",
+    "repository": "typeStrong/ts-node",
+    "prNumber": 1266,
+    "prUrl": "https://github.com/TypeStrong/ts-node/pull/1266",
+    "baseSha": "5c6efa424831aa75d118ad26e8f2917f82f290eb",
+    "headSha": "cb1eb1abe5deca95406c1ce2f4737f11fc555da3",
+    "selectedFiles": [
+      "src/index.spec.ts"
+    ],
+    "collectedAt": "2026-03-08T02:22:31.854Z"
+  },
+  "files": [
+    {
+      "id": "src/index.spec.ts",
+      "oldPath": "src/index.spec.ts",
+      "newPath": "src/index.spec.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "src/index.spec.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 31,
+          "endLine": 31
+        },
+        "newRange": {
+          "startLine": 31,
+          "endLine": 31
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

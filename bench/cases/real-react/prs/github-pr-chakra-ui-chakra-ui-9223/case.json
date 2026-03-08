@@ -1,0 +1,68 @@
+{
+  "id": "github-pr-chakra-ui-chakra-ui-9223",
+  "language": "ts",
+  "kind": "real",
+  "description": "chakra-ui/chakra-ui#9223: fix: export factory types",
+  "source": {
+    "kind": "github-pr",
+    "repository": "chakra-ui/chakra-ui",
+    "prNumber": 9223,
+    "prUrl": "https://github.com/chakra-ui/chakra-ui/pull/9223",
+    "baseSha": "304ead4d10f30a202a8b8a49b7bddddef047727b",
+    "headSha": "5b8c20629530b09cc27c3039bb876d58ba3081d2",
+    "selectedFiles": [
+      "packages/react/src/styled-system/factory.types.ts"
+    ],
+    "collectedAt": "2026-03-08T03:58:55.777Z"
+  },
+  "files": [
+    {
+      "id": "packages/react/src/styled-system/factory.types.ts",
+      "oldPath": "packages/react/src/styled-system/factory.types.ts",
+      "newPath": "packages/react/src/styled-system/factory.types.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/react/src/styled-system/factory.types.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 51,
+          "endLine": 51
+        },
+        "newRange": {
+          "startLine": 51,
+          "endLine": 51
+        }
+      },
+      {
+        "fileId": "packages/react/src/styled-system/factory.types.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 53,
+          "endLine": 53
+        },
+        "newRange": {
+          "startLine": 53,
+          "endLine": 53
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

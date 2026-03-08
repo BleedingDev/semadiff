@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-5104",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5104: refactor: remove unnecessary await in test",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5104,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5104",
+    "baseSha": "0313553db1bca4a023ff4767503befc025689188",
+    "headSha": "6c9e285ebcf17b8d820d315b02b7231b5468f789",
+    "selectedFiles": [
+      "packages/zod/src/v4/classic/tests/set.test.ts"
+    ],
+    "collectedAt": "2026-03-08T02:14:31.838Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/classic/tests/set.test.ts",
+      "oldPath": "packages/zod/src/v4/classic/tests/set.test.ts",
+      "newPath": "packages/zod/src/v4/classic/tests/set.test.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/classic/tests/set.test.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 42,
+          "endLine": 42
+        },
+        "newRange": {
+          "startLine": 42,
+          "endLine": 42
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

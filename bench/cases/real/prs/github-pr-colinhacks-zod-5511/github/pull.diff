@@ -1,0 +1,54 @@
+diff --git a/packages/zod/src/v4/classic/tests/fix-json-issue.test.ts b/packages/zod/src/v4/classic/tests/fix-json-issue.test.ts
+new file mode 100644
+index 0000000000..35a77cf8f6
+--- /dev/null
++++ b/packages/zod/src/v4/classic/tests/fix-json-issue.test.ts
+@@ -0,0 +1,26 @@
++import { expect, test } from "vitest";
++import { type infer as _infer, json, nullable, object, pipe, transform } from "../../mini/index.js";
++// biome-ignore lint/correctness/noUnusedImports: This import verifies the type is exported
++import type { _ZodMiniJSONSchema } from "../../mini/schemas.js";
++
++const DataType = object({
++  data: json(),
++});
++type DataType = _infer<typeof DataType>;
++
++// biome-ignore lint/suspicious/noExportsInTest: This export is required to reproduce TS4023
++export const Container = object({
++  contained: pipe(
++    nullable(DataType),
++    transform<DataType | null>(
++      (v) =>
++        v ?? {
++          data: "",
++        }
++    )
++  ),
++});
++
++test("issue reproduction should compile without type errors", () => {
++  expect(Container).toBeDefined();
++});
+diff --git a/packages/zod/src/v4/mini/schemas.ts b/packages/zod/src/v4/mini/schemas.ts
+index 6f5ee30f42..19455cee61 100644
+--- a/packages/zod/src/v4/mini/schemas.ts
++++ b/packages/zod/src/v4/mini/schemas.ts
+@@ -1649,7 +1649,7 @@ export const stringbool: (_params?: string | core.$ZodStringBoolParams) => ZodMi
+ // json
+ 
+ // json
+-type _ZodMiniJSONSchema = ZodMiniUnion<
++export type _ZodMiniJSONSchema = ZodMiniUnion<
+   [
+     ZodMiniString,
+     ZodMiniNumber,
+@@ -1659,7 +1659,7 @@ type _ZodMiniJSONSchema = ZodMiniUnion<
+     ZodMiniRecord<ZodMiniString<string>, ZodMiniJSONSchema>,
+   ]
+ >;
+-type _ZodMiniJSONSchemaInternals = _ZodMiniJSONSchema["_zod"];
++export type _ZodMiniJSONSchemaInternals = _ZodMiniJSONSchema["_zod"];
+ 
+ export interface ZodMiniJSONSchemaInternals extends _ZodMiniJSONSchemaInternals {
+   output: util.JSONType;

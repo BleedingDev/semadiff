@@ -1,0 +1,14 @@
+[
+  {
+    "sha": "d88155395b81527071ac13fcd7011efbad2c3290",
+    "filename": "packages/machines/cascade-select/src/cascade-select.connect.ts",
+    "status": "modified",
+    "additions": 3,
+    "deletions": 3,
+    "changes": 6,
+    "blob_url": "https://github.com/chakra-ui/zag/blob/b7602b297d1733caeedcf7c5a1ca61c4afe281f3/packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts",
+    "raw_url": "https://github.com/chakra-ui/zag/raw/b7602b297d1733caeedcf7c5a1ca61c4afe281f3/packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts",
+    "contents_url": "https://api.github.com/repos/chakra-ui/zag/contents/packages%2Fmachines%2Fcascade-select%2Fsrc%2Fcascade-select.connect.ts?ref=b7602b297d1733caeedcf7c5a1ca61c4afe281f3",
+    "patch": "@@ -146,7 +146,7 @@ export function connect<T extends PropTypes, V = TreeNode>(\n         dir: prop(\"dir\"),\n         id: dom.getControlId(scope),\n         \"data-disabled\": dataAttr(disabled),\n-        \"data-focused\": dataAttr(focused),\n+        \"data-focus\": dataAttr(focused),\n         \"data-readonly\": dataAttr(prop(\"readOnly\")),\n         \"data-invalid\": dataAttr(prop(\"invalid\")),\n         \"data-state\": open ? \"open\" : \"closed\",\n@@ -168,7 +168,7 @@ export function connect<T extends PropTypes, V = TreeNode>(\n         \"data-disabled\": dataAttr(disabled),\n         \"data-readonly\": dataAttr(prop(\"readOnly\")),\n         \"data-invalid\": dataAttr(prop(\"invalid\")),\n-        \"data-focused\": dataAttr(focused),\n+        \"data-focus\": dataAttr(focused),\n         \"data-placement\": currentPlacement,\n         \"data-placeholder-shown\": dataAttr(!hasSelectedItems),\n         disabled,\n@@ -444,7 +444,7 @@ export function connect<T extends PropTypes, V = TreeNode>(\n         dir: prop(\"dir\"),\n         \"data-disabled\": dataAttr(disabled),\n         \"data-invalid\": dataAttr(prop(\"invalid\")),\n-        \"data-focused\": dataAttr(focused),\n+        \"data-focus\": dataAttr(focused),\n       })\n     },\n "
+  }
+]

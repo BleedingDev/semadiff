@@ -1,0 +1,56 @@
+{
+  "id": "github-pr-colinhacks-zod-5338",
+  "language": "ts",
+  "kind": "real",
+  "description": "colinhacks/zod#5338: fix(url): reflect the specified regex correctly in error",
+  "source": {
+    "kind": "github-pr",
+    "repository": "colinhacks/zod",
+    "prNumber": 5338,
+    "prUrl": "https://github.com/colinhacks/zod/pull/5338",
+    "baseSha": "5c2602ceb8be8941c64bbe5ac7d92cc174ae6f7e",
+    "headSha": "b55f06f0bd12b9059b5e1469b7bd3713e995291b",
+    "selectedFiles": [
+      "packages/zod/src/v4/core/schemas.ts"
+    ],
+    "collectedAt": "2026-03-08T02:11:46.015Z"
+  },
+  "files": [
+    {
+      "id": "packages/zod/src/v4/core/schemas.ts",
+      "oldPath": "packages/zod/src/v4/core/schemas.ts",
+      "newPath": "packages/zod/src/v4/core/schemas.ts",
+      "status": "modified",
+      "language": "ts",
+      "beforePath": "file-01-before.ts",
+      "afterPath": "file-01-after.ts"
+    }
+  ],
+  "truth": {
+    "operations": [
+      {
+        "fileId": "packages/zod/src/v4/core/schemas.ts",
+        "type": "update",
+        "oldRange": {
+          "startLine": 492,
+          "endLine": 492
+        },
+        "newRange": {
+          "startLine": 492,
+          "endLine": 492
+        }
+      }
+    ],
+    "moves": [],
+    "renames": [],
+    "entities": [],
+    "entityChanges": [],
+    "graphEdges": [],
+    "impact": []
+  },
+  "capabilities": {
+    "review": true,
+    "entity": false,
+    "graph": false
+  }
+}

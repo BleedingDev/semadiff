@@ -1,0 +1,36 @@
+[
+  {
+    "tracking_name": "packages/toolkit/src/query/react/buildHooks.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts&old_oid=2c99172a7b29d83c8ae9a6c4e2f2d1758084e2ed&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2FbuildHooks.ts&new_oid=68461cd9fe28520fa0269451b6759654a39bb970&new_mode=33188",
+    "file": "diffs/diff-001.json",
+    "old": {
+      "name": "packages/toolkit/src/query/react/buildHooks.ts",
+      "oid": "2c99172a7b29d83c8ae9a6c4e2f2d1758084e2ed",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/react/buildHooks.ts",
+      "oid": "68461cd9fe28520fa0269451b6759654a39bb970",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "73c1158d8e3a3d7e65694702b3a588f33308713c72ac94cf478f341dd4cf0494"
+  },
+  {
+    "tracking_name": "packages/toolkit/src/query/react/index.ts",
+    "diff": "/gh/reduxjs/redux-toolkit/diff?old_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2Findex.ts&old_oid=c99f4d645294aa844250d1c65e972a3a56ffbfed&old_mode=33188&new_filename=packages%2Ftoolkit%2Fsrc%2Fquery%2Freact%2Findex.ts&new_oid=2351bdc3f6eb5f497c6a5975047354df5c28821c&new_mode=33188",
+    "file": "diffs/diff-002.json",
+    "old": {
+      "name": "packages/toolkit/src/query/react/index.ts",
+      "oid": "c99f4d645294aa844250d1c65e972a3a56ffbfed",
+      "mode": 33188
+    },
+    "new": {
+      "name": "packages/toolkit/src/query/react/index.ts",
+      "oid": "2351bdc3f6eb5f497c6a5975047354df5c28821c",
+      "mode": 33188
+    },
+    "semantic": true,
+    "github_hash": "15f7a036196b9a94877b014b88a510a40dc856ec5fc2c5531c46554d36895e7f"
+  }
+]
