@@ -9,6 +9,20 @@ SemaDiff reads configuration from (lowest to highest priority):
 
 The CLI command `semadiff config` prints the resolved config plus provenance for each field.
 
+Inside this repository, use the local Bun runner:
+
+```bash
+./scripts/semadiff config
+```
+
+With an installed CLI:
+
+```bash
+semadiff config
+```
+
+The resolved settings apply to `diff`, `git-external`, `difftool`, and `git-hybrid`.
+
 ## JSON Config Shape
 
 ```json
@@ -51,6 +65,16 @@ All fields are optional; missing values fall back to defaults.
 - `SEMADIFF_TELEMETRY_ENABLED` = `true|false`
 - `SEMADIFF_TELEMETRY_EXPORTER` = `console|otlp-http|otlp-grpc`
 - `SEMADIFF_TELEMETRY_ENDPOINT` = `http://127.0.0.1:4318/v1/traces`
+
+## Common Workflow
+
+```bash
+# Inspect the current merged config and field provenance
+./scripts/semadiff config
+
+# Override one setting for a single command
+SEMADIFF_RENDERER_LAYOUT=side-by-side ./scripts/semadiff diff old.ts new.ts
+```
 
 ## Notes
 
