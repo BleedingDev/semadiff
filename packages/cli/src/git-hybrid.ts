@@ -406,6 +406,7 @@ function collectCommitChanges(
         "-M",
         "--diff-filter=ACDMR",
         "--no-commit-id",
+        "--root",
         "-r",
         commit,
       ],

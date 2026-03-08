@@ -152,6 +152,370 @@ describe("chooseSemanticRowsWithFallback", () => {
   });
 });
 
+describe("line-view heuristics", () => {
+  const makeInsertRows = (count: number) =>
+    Array.from({ length: count }, (_, index) => ({
+      type: "insert" as const,
+      oldLine: null,
+      newLine: index + 1,
+      text: `const line${index + 1} = ${index + 1};`,
+    }));
+
+  test("prefers rows by line impact only when the delta and ratio thresholds are exceeded", () => {
+    expect(
+      __testing.shouldPreferRowsByLineImpact(
+        makeInsertRows(4),
+        makeInsertRows(4)
+      )
+    ).toBe(false);
+    expect(
+      __testing.shouldPreferRowsByLineImpact(
+        makeInsertRows(4),
+        makeInsertRows(6)
+      )
+    ).toBe(false);
+    expect(
+      __testing.shouldPreferRowsByLineImpact(
+        makeInsertRows(4),
+        makeInsertRows(8)
+      )
+    ).toBe(true);
+  });
+
+  test("prefers operation-anchored rows only for large diff volumes within the ratio budget", () => {
+    expect(
+      __testing.shouldPreferOperationAnchoredRows([], makeInsertRows(50))
+    ).toBe(false);
+    expect(
+      __testing.shouldPreferOperationAnchoredRows(
+        makeInsertRows(30),
+        makeInsertRows(39)
+      )
+    ).toBe(false);
+    expect(
+      __testing.shouldPreferOperationAnchoredRows(
+        makeInsertRows(40),
+        makeInsertRows(50)
+      )
+    ).toBe(true);
+    expect(
+      __testing.shouldPreferOperationAnchoredRows(
+        makeInsertRows(61),
+        makeInsertRows(50)
+      )
+    ).toBe(false);
+  });
+
+  test("filters low-information semantic rows unless preservation is requested", () => {
+    const rows = [
+      { type: "gap" as const, oldLine: null, newLine: null, text: "..." },
+      { type: "hunk" as const, oldLine: null, newLine: null, text: "@@" },
+      {
+        type: "replace" as const,
+        oldLine: 1,
+        newLine: 1,
+        oldText: "const value = 'old';",
+        newText: 'const value = "old";',
+      },
+      {
+        type: "replace" as const,
+        oldLine: 2,
+        newLine: 2,
+        oldText: "const value = 1;",
+        newText: "const result = 2;",
+      },
+      {
+        type: "insert" as const,
+        oldLine: null,
+        newLine: 3,
+        text: "}",
+      },
+      {
+        type: "delete" as const,
+        oldLine: 4,
+        newLine: null,
+        text: "{",
+      },
+      {
+        type: "move" as const,
+        oldLine: 5,
+        newLine: 8,
+        text: "const moved = true;",
+      },
+    ];
+
+    const normalize = (line: string) =>
+      line.replaceAll("'", '"').replaceAll("value", "result");
+
+    expect(__testing.filterSemanticRows(rows, normalize)).toEqual([
+      rows[3],
+      rows[6],
+    ]);
+    expect(__testing.filterSemanticRows(rows, normalize, true)).toEqual([
+      rows[3],
+      rows[4],
+      rows[5],
+      rows[6],
+    ]);
+  });
+
+  test("filters lockfile header churn while keeping package entries", () => {
+    const rows = [
+      {
+        type: "insert" as const,
+        oldLine: null,
+        newLine: 1,
+        text: "dependencies:",
+      },
+      {
+        type: "delete" as const,
+        oldLine: 2,
+        newLine: null,
+        text: "peerDependencies:",
+      },
+      {
+        type: "insert" as const,
+        oldLine: null,
+        newLine: 3,
+        text: "react:",
+      },
+    ];
+
+    expect(__testing.filterLockfileRows(rows)).toEqual([rows[2]]);
+  });
+
+  test("projects AST-matched inserts back into equal rows while preserving anchors", () => {
+    const emptyMarks = {
+      changedOld: new Set<number>(),
+      changedNew: new Set<number>(),
+      movedOld: new Set<number>(),
+      movedNew: new Set<number>(),
+    };
+
+    expect(
+      __testing.filterAstProjectedRows(
+        [
+          {
+            type: "delete",
+            oldLine: 2,
+            newLine: null,
+            text: "foo();",
+          },
+          {
+            type: "insert",
+            oldLine: null,
+            newLine: 2,
+            text: "foo();",
+          },
+        ],
+        emptyMarks,
+        new Map([[2, ["foo"]]]),
+        new Map([[2, ["foo"]]])
+      )
+    ).toEqual([
+      {
+        type: "equal",
+        oldLine: null,
+        newLine: 2,
+        text: "foo();",
+      },
+    ]);
+
+    expect(
+      __testing.filterAstProjectedRows(
+        [
+          {
+            type: "delete",
+            oldLine: 3,
+            newLine: null,
+            text: "return foo;",
+          },
+          {
+            type: "insert",
+            oldLine: null,
+            newLine: 3,
+            text: "items: {",
+          },
+        ],
+        emptyMarks,
+        new Map([[3, ["foo"]]]),
+        new Map([[3, ["items"]]])
+      )
+    ).toEqual([
+      {
+        type: "insert",
+        oldLine: null,
+        newLine: 3,
+        text: "items: {",
+      },
+      {
+        type: "delete",
+        oldLine: 3,
+        newLine: null,
+        text: "return foo;",
+      },
+    ]);
+
+    expect(
+      __testing.filterAstProjectedRows(
+        [
+          {
+            type: "delete",
+            oldLine: 4,
+            newLine: null,
+            text: "bar();",
+          },
+          {
+            type: "gap",
+            oldLine: null,
+            newLine: null,
+            text: "...",
+          },
+        ],
+        {
+          ...emptyMarks,
+          changedOld: new Set([4]),
+        },
+        new Map([[4, ["bar"]]]),
+        new Map()
+      )
+    ).toEqual([
+      {
+        type: "delete",
+        oldLine: 4,
+        newLine: null,
+        text: "bar();",
+      },
+      {
+        type: "gap",
+        oldLine: null,
+        newLine: null,
+        text: "...",
+      },
+    ]);
+  });
+
+  test("can expand discontinuities with or without synthesized changed rows", () => {
+    const changedGapRows = [
+      { type: "equal" as const, oldLine: 1, newLine: 1, text: "keep" },
+      { type: "equal" as const, oldLine: 3, newLine: 3, text: "tail" },
+    ];
+    const deleteGapRows = [
+      { type: "equal" as const, oldLine: 1, newLine: 1, text: "keep" },
+      { type: "equal" as const, oldLine: 3, newLine: 2, text: "tail" },
+    ];
+    const insertGapRows = [
+      { type: "equal" as const, oldLine: 1, newLine: 1, text: "keep" },
+      { type: "equal" as const, oldLine: 2, newLine: 3, text: "tail" },
+    ];
+
+    expect(
+      __testing.expandLineDiscontinuities(
+        changedGapRows,
+        ["keep", "before", "tail"].join("\n"),
+        ["keep", "after", "tail"].join("\n"),
+        false
+      )
+    ).toEqual(changedGapRows);
+    expect(
+      __testing.expandLineDiscontinuities(
+        changedGapRows,
+        ["keep", "before", "tail"].join("\n"),
+        ["keep", "after", "tail"].join("\n"),
+        true
+      )
+    ).toEqual([
+      changedGapRows[0],
+      {
+        type: "replace",
+        oldLine: 2,
+        newLine: 2,
+        oldText: "before",
+        newText: "after",
+      },
+      changedGapRows[1],
+    ]);
+
+    expect(
+      __testing.expandLineDiscontinuities(
+        deleteGapRows,
+        ["keep", "removed", "tail"].join("\n"),
+        ["keep", "tail"].join("\n"),
+        true
+      )
+    ).toEqual([
+      deleteGapRows[0],
+      {
+        type: "delete",
+        oldLine: 2,
+        newLine: null,
+        text: "removed",
+      },
+      deleteGapRows[1],
+    ]);
+
+    expect(
+      __testing.expandLineDiscontinuities(
+        insertGapRows,
+        ["keep", "tail"].join("\n"),
+        ["keep", "added", "tail"].join("\n"),
+        true
+      )
+    ).toEqual([
+      insertGapRows[0],
+      {
+        type: "insert",
+        oldLine: null,
+        newLine: 2,
+        text: "added",
+      },
+      insertGapRows[1],
+    ]);
+  });
+
+  test("can synthesize equal, changed, deleted, and inserted context rows", () => {
+    expect(
+      __testing.buildSyntheticContextRow(1, 1, ["same"], ["same"], true)
+    ).toEqual({
+      type: "equal",
+      oldLine: 1,
+      newLine: 1,
+      text: "same",
+    });
+    expect(
+      __testing.buildSyntheticContextRow(1, 1, ["before"], ["after"], false)
+    ).toBeNull();
+    expect(
+      __testing.buildSyntheticContextRow(1, 1, ["before"], ["after"], true)
+    ).toEqual({
+      type: "replace",
+      oldLine: 1,
+      newLine: 1,
+      oldText: "before",
+      newText: "after",
+    });
+    expect(
+      __testing.buildSyntheticContextRow(1, null, ["removed"], [], true)
+    ).toEqual({
+      type: "delete",
+      oldLine: 1,
+      newLine: null,
+      text: "removed",
+    });
+    expect(
+      __testing.buildSyntheticContextRow(null, 1, [], ["added"], true)
+    ).toEqual({
+      type: "insert",
+      oldLine: null,
+      newLine: 1,
+      text: "added",
+    });
+    expect(
+      __testing.buildSyntheticContextRow(null, null, [], [], true)
+    ).toBeNull();
+  });
+});
+
 describe("buildOperationAnchoredRows", () => {
   const identity = (line: string) => line;
   const range = (startLine: number, endLine: number) => ({

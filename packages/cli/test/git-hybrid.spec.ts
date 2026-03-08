@@ -1,5 +1,11 @@
 import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -11,6 +17,11 @@ import {
 
 const FROM_TO_ERROR_RE = /--from and --to/;
 const SINGLE_SOURCE_ERROR_RE = /Choose only one input source/;
+const STDIN_ARRAY_ERROR_RE = /JSON array/;
+const STDIN_STATUS_ERROR_RE = /Unsupported file change status/;
+const STDIN_OLD_TEXT_ERROR_RE = /oldText/;
+const STDIN_OBJECT_ERROR_RE = /to be an object/;
+const STDIN_NEW_TEXT_ERROR_RE = /newText/;
 const tempDirectories: string[] = [];
 
 function git(cwd: string, args: readonly string[]) {
@@ -83,6 +94,23 @@ describe("git hybrid helpers", () => {
         stdinFileChanges: false,
       })
     ).toThrow(SINGLE_SOURCE_ERROR_RE);
+    expect(
+      resolveGitHybridMode({
+        workingTree: false,
+        staged: false,
+        commit: "  HEAD~1  ",
+        stdinFileChanges: false,
+      })
+    ).toEqual({ kind: "commit", commit: "HEAD~1" });
+    expect(
+      resolveGitHybridMode({
+        workingTree: false,
+        staged: false,
+        from: "  HEAD~2 ",
+        to: " HEAD ",
+        stdinFileChanges: false,
+      })
+    ).toEqual({ kind: "range", from: "HEAD~2", to: "HEAD" });
   });
 
   test("parses stdin file changes and infers status", () => {
@@ -123,6 +151,103 @@ describe("git hybrid helpers", () => {
     ]);
   });
 
+  test("parses stdin rename and delete changes with explicit statuses", () => {
+    const changes = parseStdinFileChanges(
+      JSON.stringify([
+        {
+          oldPath: "src/old.ts",
+          newPath: "src/new.ts",
+          status: "renamed",
+          oldText: "export const oldValue = 1;\n",
+          newText: "export const newValue = 1;\n",
+        },
+        {
+          oldPath: "src/removed.ts",
+          oldText: "export const removed = true;\n",
+        },
+      ])
+    );
+
+    expect(changes).toEqual([
+      {
+        id: "src/new.ts",
+        oldPath: "src/old.ts",
+        newPath: "src/new.ts",
+        status: "renamed",
+        oldText: "export const oldValue = 1;\n",
+        newText: "export const newValue = 1;\n",
+      },
+      {
+        id: "src/removed.ts",
+        oldPath: "src/removed.ts",
+        newPath: null,
+        status: "deleted",
+        oldText: "export const removed = true;\n",
+        newText: "",
+      },
+    ]);
+  });
+
+  test("infers renamed stdin changes when paths differ", () => {
+    const changes = parseStdinFileChanges(
+      JSON.stringify([
+        {
+          oldPath: "src/old-name.ts",
+          newPath: "src/new-name.ts",
+          oldText: "export const value = 1;\n",
+          newText: "export const value = 2;\n",
+        },
+      ])
+    );
+
+    expect(changes).toEqual([
+      {
+        id: "src/new-name.ts",
+        oldPath: "src/old-name.ts",
+        newPath: "src/new-name.ts",
+        status: "renamed",
+        oldText: "export const value = 1;\n",
+        newText: "export const value = 2;\n",
+      },
+    ]);
+  });
+
+  test("rejects invalid stdin file change payloads", () => {
+    expect(() =>
+      parseStdinFileChanges(JSON.stringify({ invalid: true }))
+    ).toThrow(STDIN_ARRAY_ERROR_RE);
+    expect(() =>
+      parseStdinFileChanges(
+        JSON.stringify([{ newPath: "src/file.ts", status: "copied" }])
+      )
+    ).toThrow(STDIN_STATUS_ERROR_RE);
+    expect(() =>
+      parseStdinFileChanges(
+        JSON.stringify([
+          {
+            oldPath: "src/value.ts",
+            newPath: "src/value.ts",
+            newText: "export const value = 2;\n",
+          },
+        ])
+      )
+    ).toThrow(STDIN_OLD_TEXT_ERROR_RE);
+    expect(() => parseStdinFileChanges(JSON.stringify([null]))).toThrow(
+      STDIN_OBJECT_ERROR_RE
+    );
+    expect(() =>
+      parseStdinFileChanges(
+        JSON.stringify([
+          {
+            oldPath: "src/value.ts",
+            newPath: "src/value.ts",
+            oldText: "export const value = 1;\n",
+          },
+        ])
+      )
+    ).toThrow(STDIN_NEW_TEXT_ERROR_RE);
+  });
+
   test("collects working tree changes including untracked files", () => {
     const repositoryRoot = initRepository();
     writeRepoFile(repositoryRoot, "src/value.ts", "export const value = 1;\n");
@@ -160,6 +285,33 @@ describe("git hybrid helpers", () => {
     });
   });
 
+  test("collects added files from a repository without a HEAD commit", () => {
+    const repositoryRoot = initRepository();
+    writeRepoFile(
+      repositoryRoot,
+      "src/first.ts",
+      "export const firstCommit = false;\n"
+    );
+
+    const result = collectGitFileChanges({
+      cwd: repositoryRoot,
+      mode: { kind: "working-tree" },
+    });
+
+    expect(result.source.kind).toBe("working-tree");
+    expect(result.source.repositoryRoot?.endsWith(repositoryRoot)).toBe(true);
+    expect(result.changes).toEqual([
+      {
+        id: "src/first.ts",
+        oldPath: null,
+        newPath: "src/first.ts",
+        status: "added",
+        oldText: "",
+        newText: "export const firstCommit = false;\n",
+      },
+    ]);
+  });
+
   test("reads staged content from the index instead of the working tree", () => {
     const repositoryRoot = initRepository();
     writeRepoFile(repositoryRoot, "src/value.ts", "export const value = 1;\n");
@@ -182,6 +334,46 @@ describe("git hybrid helpers", () => {
       oldText: "export const value = 1;\n",
       newText: "export const value = 2;\n",
     });
+  });
+
+  test("collects deleted working-tree files and the initial commit against the empty tree", () => {
+    const repositoryRoot = initRepository();
+    writeRepoFile(repositoryRoot, "src/value.ts", "export const value = 1;\n");
+    const initialCommit = commitAll(repositoryRoot, "initial");
+
+    const commitResult = collectGitFileChanges({
+      cwd: repositoryRoot,
+      mode: { kind: "commit", commit: initialCommit },
+    });
+
+    expect(commitResult.changes).toEqual([
+      {
+        id: "src/value.ts",
+        oldPath: null,
+        newPath: "src/value.ts",
+        status: "added",
+        oldText: "",
+        newText: "export const value = 1;\n",
+      },
+    ]);
+
+    unlinkSync(resolve(repositoryRoot, "src/value.ts"));
+
+    const workingTreeResult = collectGitFileChanges({
+      cwd: repositoryRoot,
+      mode: { kind: "working-tree" },
+    });
+
+    expect(workingTreeResult.changes).toEqual([
+      {
+        id: "src/value.ts",
+        oldPath: "src/value.ts",
+        newPath: null,
+        status: "deleted",
+        oldText: "export const value = 1;\n",
+        newText: "",
+      },
+    ]);
   });
 
   test("collects renamed commit and range changes", () => {

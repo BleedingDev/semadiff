@@ -15,3 +15,4 @@ packages/**/dist-types
 packages/**/.turbo
 packages/parser-tree-sitter-wasm/src/semadiff-wasm
 .env
+isolate-*-v8.log

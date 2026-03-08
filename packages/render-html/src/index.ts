@@ -6223,10 +6223,17 @@ export function renderHtml(
 }
 
 export const __testing = {
+  buildSyntheticContextRow,
   buildContextualMovePairs,
   buildOperationAnchoredRows,
   chooseSemanticRowsWithFallback,
   countChangedLineVolume,
+  expandLineDiscontinuities,
+  filterAstProjectedRows,
+  filterLockfileRows,
+  filterSemanticRows,
   hasMeaningfulRawLineChanges,
   renderInlineDiff,
+  shouldPreferOperationAnchoredRows,
+  shouldPreferRowsByLineImpact,
 };

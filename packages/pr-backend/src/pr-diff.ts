@@ -217,12 +217,14 @@ const PrFileSummaryJson = Schema.fromJsonString(PrFileSummarySchema);
 const FileDiffPayloadJson = Schema.fromJsonString(FileDiffPayloadSchema);
 const FileDiffDocumentJson = Schema.fromJsonString(FileDiffDocumentSchema);
 
-const parseCachedJson = <S extends Schema.Top>(
-  _schema: S,
+const parseCachedJson = <
+  S extends Schema.Top & { readonly DecodingServices: never },
+>(
+  schema: S,
   value: string
 ): Option.Option<S["Type"]> => {
   try {
-    return Option.some(JSON.parse(value) as S["Type"]);
+    return Option.some(Schema.decodeUnknownSync(schema)(value));
   } catch {
     return Option.none();
   }

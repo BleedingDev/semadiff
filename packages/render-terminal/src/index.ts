@@ -222,12 +222,21 @@ function extractLinePayload(html: string): LinePayload | null {
   if (!jsonText) {
     return null;
   }
-  const parsed = JSON.parse(jsonText);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch {
+    return null;
+  }
   if (!parsed || typeof parsed !== "object") {
     return null;
   }
-  const rows = Array.isArray(parsed.rows) ? parsed.rows : [];
-  const lineLayout = parsed.lineLayout === "unified" ? "unified" : "split";
+  const payload = parsed as {
+    rows?: unknown;
+    lineLayout?: unknown;
+  };
+  const rows = Array.isArray(payload.rows) ? payload.rows : [];
+  const lineLayout = payload.lineLayout === "unified" ? "unified" : "split";
   return { rows, lineLayout };
 }
 
@@ -436,7 +445,7 @@ function renderLineDiff(
       showSummary: false,
       showFilePath: false,
       layout: "embed" as const,
-      virtualize: false,
+      virtualize: true,
       ...(options.language ? { language: options.language } : {}),
     };
     const html = renderHtml(diff, renderOptions);

@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { describe, expect, test } from "vitest";
+import type { BenchmarkAdapter } from "../src/index.js";
 import {
   loadBenchmarkCases,
   runBenchmarkComparisonSuite,
@@ -7,6 +8,7 @@ import {
 import type { BenchmarkCaseEvaluation } from "../src/types.js";
 
 const caseRoot = join(import.meta.dirname, "../../../bench/cases/gold/micro");
+const MISSING_TOOL_RESULT_RE = /Missing benchmark result for tool missing/;
 
 function zeroSummaryPerformance(summary: {
   performance: {
@@ -802,5 +804,64 @@ describe("benchmark comparison harness", () => {
     expect(review).not.toBeNull();
     expect(review?.actualMoves).toBeGreaterThan(0);
     expect(review?.moveRecall).toBeGreaterThan(0);
+  });
+
+  test("fails fast when an adapter result is missing from a case report", () => {
+    const benchmarkCase = loadBenchmarkCases(caseRoot)[0];
+    expect(benchmarkCase).toBeDefined();
+    if (!benchmarkCase) {
+      throw new Error("Expected a benchmark case to exist.");
+    }
+
+    const workingAdapter: BenchmarkAdapter = {
+      tool: "working",
+      toolVersion: "1.0.0",
+      supportedCapabilities: benchmarkCase.capabilities,
+      runCase(caseInput) {
+        return {
+          tool: "working",
+          toolVersion: "1.0.0",
+          caseId: caseInput.id,
+          capabilities: caseInput.capabilities,
+          result: {
+            durationMs: 1,
+            operations: [],
+            moves: [],
+            renames: [],
+            entities: { old: [], new: [] },
+            entityChanges: [],
+            reviewRows: [],
+          },
+        };
+      },
+    };
+    const mismatchedAdapter: BenchmarkAdapter = {
+      tool: "missing",
+      toolVersion: "1.0.0",
+      supportedCapabilities: benchmarkCase.capabilities,
+      runCase(caseInput) {
+        return {
+          tool: "unexpected",
+          toolVersion: "1.0.0",
+          caseId: caseInput.id,
+          capabilities: caseInput.capabilities,
+          result: {
+            durationMs: 1,
+            operations: [],
+            moves: [],
+            renames: [],
+            entities: { old: [], new: [] },
+            entityChanges: [],
+            reviewRows: [],
+          },
+        };
+      },
+    };
+
+    expect(() =>
+      runBenchmarkComparisonSuite([benchmarkCase], {
+        adapters: [workingAdapter, mismatchedAdapter],
+      })
+    ).toThrow(MISSING_TOOL_RESULT_RE);
   });
 });

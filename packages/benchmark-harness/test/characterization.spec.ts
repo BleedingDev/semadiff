@@ -242,7 +242,9 @@ describe("render surface characterization", () => {
             ],
           },
           "terminal": {
-            "lines": "Unable to render line diff.",
+            "lines": "@@ -1,1 +1,1 @@
+      1   - export const value = 1;
+        1 + export const value = 2;",
             "semantic": "~ update 1",
           },
         },
@@ -366,7 +368,11 @@ describe("render surface characterization", () => {
             ],
           },
           "terminal": {
-            "lines": "Unable to render line diff.",
+            "lines": "@@ -1,2 +1,2 @@
+      1   - export function compute(foo: number) {
+        1 + export function compute(bar: number) {
+      2   -   return foo + foo;
+        2 +   return bar + bar;",
             "semantic": "~ update 1
 
       Renames:
@@ -586,7 +592,12 @@ describe("render surface characterization", () => {
             ],
           },
           "terminal": {
-            "lines": "Unable to render line diff.",
+            "lines": "@@ -1,4 +5,4 @@
+      1 5 > export function a() {
+      2 6 >   const value = 1;
+      3   -   return value;
+        7 +   return value + 0;
+      4 8 > }",
             "semantic": "> move 1 -> 5
         ~ update 1",
           },

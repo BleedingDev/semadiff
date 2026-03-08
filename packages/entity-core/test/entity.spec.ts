@@ -576,6 +576,172 @@ describe("entity sidecar", () => {
     `);
   });
 
+  test("extracts default-exported classes and functions plus function-valued variables", async () => {
+    const functionText = [
+      "export default function DefaultWidget() {",
+      "  return 1;",
+      "}",
+      "",
+      "export const buildValue = () => 2;",
+      "export const buildOther = function namedFactory() {",
+      "  return 3;",
+      "};",
+      "const count = 4;",
+    ].join("\n");
+    const classText = [
+      "export default class DefaultView {",
+      '  "save"() {',
+      "    return true;",
+      "  }",
+      "  0() {",
+      "    return false;",
+      "  }",
+      "}",
+    ].join("\n");
+
+    const functionEntities = extractEntitiesFromRoot({
+      root: await parseRoot(functionText, "js"),
+      text: functionText,
+      language: "js",
+      path: "src/defaults.js",
+    });
+    const classEntities = extractEntitiesFromRoot({
+      root: await parseRoot(classText, "js"),
+      text: classText,
+      language: "js",
+      path: "src/default-class.js",
+    });
+
+    expect(
+      functionEntities.map((entity) => ({
+        kind: entity.kind,
+        name: entity.name,
+        exported: entity.exported,
+      }))
+    ).toEqual([
+      { kind: "function", name: "DefaultWidget", exported: true },
+      { kind: "function", name: "buildValue", exported: true },
+      { kind: "function", name: "buildOther", exported: true },
+      { kind: "variable", name: "count", exported: false },
+    ]);
+    expect(
+      classEntities.map((entity) => ({
+        kind: entity.kind,
+        name: entity.name,
+        parentName: entity.parentName ?? null,
+        exported: entity.exported,
+      }))
+    ).toEqual([
+      {
+        kind: "class",
+        name: "DefaultView",
+        parentName: null,
+        exported: true,
+      },
+      {
+        kind: "method",
+        name: "save",
+        parentName: "DefaultView",
+        exported: true,
+      },
+      {
+        kind: "method",
+        name: "0",
+        parentName: "DefaultView",
+        exported: true,
+      },
+    ]);
+  });
+
+  test("names anonymous default exports and skips unsupported declarations", async () => {
+    const functionText = [
+      "export default function () {",
+      "  return 1;",
+      "}",
+    ].join("\n");
+    const classText = [
+      "export default class {",
+      "  value = 1;",
+      "}",
+      "",
+      "class Empty {}",
+      "const [item] = [1];",
+    ].join("\n");
+    const expressionText = "export default 1;";
+
+    const functionEntities = extractEntitiesFromRoot({
+      root: await parseRoot(functionText, "js"),
+      text: functionText,
+      language: "js",
+    });
+    const classEntities = extractEntitiesFromRoot({
+      root: await parseRoot(classText, "js"),
+      text: classText,
+      language: "js",
+      path: "src/anonymous.js",
+    });
+    const expressionEntities = extractEntitiesFromRoot({
+      root: await parseRoot(expressionText, "js"),
+      text: expressionText,
+      language: "js",
+      path: "src/expression.js",
+    });
+
+    expect(functionEntities).toEqual([
+      {
+        id: "<memory>::function::default::1:16",
+        kind: "function",
+        name: "default",
+        range: {
+          start: { line: 1, column: 16 },
+          end: { line: 3, column: 1 },
+        },
+        exported: true,
+      },
+    ]);
+    expect(
+      classEntities.map((entity) => ({
+        kind: entity.kind,
+        name: entity.name,
+        parentName: entity.parentName ?? null,
+        exported: entity.exported,
+      }))
+    ).toEqual([
+      {
+        kind: "class",
+        name: "default",
+        parentName: null,
+        exported: true,
+      },
+      {
+        kind: "class",
+        name: "Empty",
+        parentName: null,
+        exported: false,
+      },
+    ]);
+    expect(expressionEntities).toEqual([]);
+  });
+
+  test("returns no entities for unsupported languages or malformed roots", () => {
+    expect(
+      extractEntitiesFromRoot({
+        root: { body: [] },
+        text: "",
+        language: "json",
+        path: "fixtures/data.json",
+      })
+    ).toEqual([]);
+    expect(
+      extractEntitiesFromRoot({
+        root: null,
+        text: "export const value = 1;",
+        language: "ts",
+        path: "src/value.ts",
+      })
+    ).toEqual([]);
+  });
+
   test("builds a hybrid diff document without changing the diff payload", async () => {
     const oldText = "export const value = 1;\n";
     const newText = "export const value = 2;\n";
@@ -716,5 +882,80 @@ describe("entity sidecar", () => {
         },
       }
     `);
+  });
+
+  test("emits added and deleted entity changes for unmatched sources", async () => {
+    const deletedText = "export function removedThing() {\n  return 1;\n}\n";
+    const addedText = "export function addedThing() {\n  return 2;\n}\n";
+
+    const deletedDocument = buildEntityDocument({
+      diff: structuralDiff(deletedText, "", { language: "ts" }),
+      oldText: deletedText,
+      newText: "",
+      language: "ts",
+      oldRoot: await parseRoot(deletedText, "ts"),
+      newRoot: await parseRoot("", "ts"),
+      oldPath: "src/deleted.ts",
+      newPath: "src/deleted.ts",
+    });
+    const addedDocument = buildEntityDocument({
+      diff: structuralDiff("", addedText, { language: "ts" }),
+      oldText: "",
+      newText: addedText,
+      language: "ts",
+      oldRoot: await parseRoot("", "ts"),
+      newRoot: await parseRoot(addedText, "ts"),
+      oldPath: "src/added.ts",
+      newPath: "src/added.ts",
+    });
+
+    expect(deletedDocument?.changes).toEqual([
+      expect.objectContaining({
+        kind: "function",
+        changeKinds: ["deleted"],
+        before: expect.objectContaining({ name: "removedThing" }),
+      }),
+    ]);
+    expect(addedDocument?.changes).toEqual([
+      expect.objectContaining({
+        kind: "function",
+        changeKinds: ["added"],
+        after: expect.objectContaining({ name: "addedThing" }),
+      }),
+    ]);
+  });
+
+  test("classifies rename and move pairs without requiring a diff payload", async () => {
+    const oldText = "export function beforeName() {\n  return 1;\n}\n";
+    const newText = "export function afterName() {\n  return 1;\n}\n";
+
+    const entityDocument = buildEntityDocumentFromSources({
+      sources: [
+        {
+          oldText,
+          newText,
+          language: "ts",
+          oldRoot: await parseRoot(oldText, "ts"),
+          newRoot: await parseRoot(newText, "ts"),
+          oldPath: "src/old-name.ts",
+          newPath: "src/new-name.ts",
+        },
+      ],
+    });
+
+    expect(entityDocument?.changes).toEqual([
+      expect.objectContaining({
+        kind: "function",
+        changeKinds: ["renamed", "moved"],
+        before: expect.objectContaining({
+          name: "beforeName",
+          path: "src/old-name.ts",
+        }),
+        after: expect.objectContaining({
+          name: "afterName",
+          path: "src/new-name.ts",
+        }),
+      }),
+    ]);
   });
 });
