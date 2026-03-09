@@ -11,20 +11,20 @@ const STRICT = ARGS.has("--strict");
 
 const SCAN_ROOTS = ["packages", "apps", "e2e"];
 const CODE_FILE_EXTENSIONS = new Set([
-  ".ts",
-  ".tsx",
-  ".mts",
-  ".cts",
-  ".js",
-  ".mjs",
+	".ts",
+	".tsx",
+	".mts",
+	".cts",
+	".js",
+	".mjs",
 ]);
 const SKIP_DIRS = new Set([
-  ".git",
-  "node_modules",
-  ".output",
-  "dist",
-  "coverage",
-  ".next",
+	".git",
+	"node_modules",
+	".output",
+	"dist",
+	"coverage",
+	".next",
 ]);
 
 const NEWLINE_SPLIT_RE = /\r?\n/;
@@ -38,452 +38,452 @@ const EFFECT_RANGE_HAS_4_RE = /4(\.|$)/;
 const EFFECT_RANGE_HAS_BETA_RE = /beta/i;
 
 const REMOVED_API_PATTERNS = [
-  {
-    name: "Context.Tag",
-    regex: /\bContext\.Tag\(/g,
-    note: "Effect v4 removes Context.Tag in favor of ServiceMap.Service.",
-  },
-  {
-    name: "Effect.Service",
-    regex: /\bEffect\.Service</g,
-    note: "Effect v4 removes Effect.Service in favor of ServiceMap.Service.",
-  },
-  {
-    name: "Effect.catchAll",
-    regex: /\bEffect\.catchAll\(/g,
-    note: "Effect v4 renames catchAll to catch.",
-  },
-  {
-    name: "Effect.Service.Default usage",
-    regex: /\.Default\b/g,
-    note: "Effect.Service.Default is removed in Effect v4.",
-  },
-  {
-    name: "Effect.Service dependencies option",
-    regex: /\bdependencies:\s*\[/g,
-    note: "Effect.Service dependencies option is removed in Effect v4.",
-  },
+	{
+		name: "Context.Tag",
+		regex: /\bContext\.Tag\(/g,
+		note: "Effect v4 removes Context.Tag in favor of ServiceMap.Service.",
+	},
+	{
+		name: "Effect.Service",
+		regex: /\bEffect\.Service</g,
+		note: "Effect v4 removes Effect.Service in favor of ServiceMap.Service.",
+	},
+	{
+		name: "Effect.catchAll",
+		regex: /\bEffect\.catchAll\(/g,
+		note: "Effect v4 renames catchAll to catch.",
+	},
+	{
+		name: "Effect.Service.Default usage",
+		regex: /\.Default\b/g,
+		note: "Effect.Service.Default is removed in Effect v4.",
+	},
+	{
+		name: "Effect.Service dependencies option",
+		regex: /\bdependencies:\s*\[/g,
+		note: "Effect.Service dependencies option is removed in Effect v4.",
+	},
 ];
 
 const DEPENDENCY_NAMES = [
-  "effect",
-  "@effect/vitest",
-  "@effect/cli",
-  "@effect/platform",
-  "@effect/platform-node",
-  "@effect/language-service",
+	"effect",
+	"@effect/vitest",
+	"@effect/cli",
+	"@effect/platform",
+	"@effect/platform-node",
+	"@effect/language-service",
 ];
 const DISALLOWED_EFFECT_PACKAGES = new Set([
-  "@effect/cli",
-  "@effect/platform",
-  "@effect/language-service",
+	"@effect/cli",
+	"@effect/platform",
+	"@effect/language-service",
 ]);
 
 function writeLine(text = "") {
-  process.stdout.write(`${text}\n`);
+	process.stdout.write(`${text}\n`);
 }
 
 function statExists(filePath) {
-  try {
-    statSync(filePath);
-    return true;
-  } catch {
-    return false;
-  }
+	try {
+		statSync(filePath);
+		return true;
+	} catch {
+		return false;
+	}
 }
 
 function collectCodeFiles(dir, files) {
-  const entries = readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      if (SKIP_DIRS.has(entry.name)) {
-        continue;
-      }
-      collectCodeFiles(fullPath, files);
-      continue;
-    }
-    if (!entry.isFile()) {
-      continue;
-    }
-    const ext = path.extname(entry.name);
-    if (CODE_FILE_EXTENSIONS.has(ext)) {
-      files.push(fullPath);
-    }
-  }
+	const entries = readdirSync(dir, { withFileTypes: true });
+	for (const entry of entries) {
+		const fullPath = path.join(dir, entry.name);
+		if (entry.isDirectory()) {
+			if (SKIP_DIRS.has(entry.name)) {
+				continue;
+			}
+			collectCodeFiles(fullPath, files);
+			continue;
+		}
+		if (!entry.isFile()) {
+			continue;
+		}
+		const ext = path.extname(entry.name);
+		if (CODE_FILE_EXTENSIONS.has(ext)) {
+			files.push(fullPath);
+		}
+	}
 }
 
 function getLineInfo(content, index) {
-  const linesBeforeMatch = content.slice(0, index).split(NEWLINE_SPLIT_RE);
-  const line = linesBeforeMatch.length;
-  const currentLine = content.split(NEWLINE_SPLIT_RE)[line - 1] ?? "";
-  return { line, snippet: currentLine.trim() };
+	const linesBeforeMatch = content.slice(0, index).split(NEWLINE_SPLIT_RE);
+	const line = linesBeforeMatch.length;
+	const currentLine = content.split(NEWLINE_SPLIT_RE)[line - 1] ?? "";
+	return { line, snippet: currentLine.trim() };
 }
 
 function scanRemovedApis(files) {
-  const results = REMOVED_API_PATTERNS.map((pattern) => ({
-    name: pattern.name,
-    note: pattern.note,
-    count: 0,
-    matches: [],
-  }));
+	const results = REMOVED_API_PATTERNS.map((pattern) => ({
+		name: pattern.name,
+		note: pattern.note,
+		count: 0,
+		matches: [],
+	}));
 
-  for (const file of files) {
-    const content = readFileSync(file, "utf8");
-    for (const [idx, pattern] of REMOVED_API_PATTERNS.entries()) {
-      pattern.regex.lastIndex = 0;
-      let match = pattern.regex.exec(content);
-      while (match) {
-        const info = getLineInfo(content, match.index);
-        results[idx].count += 1;
-        if (results[idx].matches.length < 20) {
-          results[idx].matches.push({
-            file: path.relative(ROOT, file),
-            line: info.line,
-            snippet: info.snippet,
-          });
-        }
-        match = pattern.regex.exec(content);
-      }
-    }
-  }
+	for (const file of files) {
+		const content = readFileSync(file, "utf8");
+		for (const [idx, pattern] of REMOVED_API_PATTERNS.entries()) {
+			pattern.regex.lastIndex = 0;
+			let match = pattern.regex.exec(content);
+			while (match) {
+				const info = getLineInfo(content, match.index);
+				results[idx].count += 1;
+				if (results[idx].matches.length < 20) {
+					results[idx].matches.push({
+						file: path.relative(ROOT, file),
+						line: info.line,
+						snippet: info.snippet,
+					});
+				}
+				match = pattern.regex.exec(content);
+			}
+		}
+	}
 
-  return results;
+	return results;
 }
 
 function readJson(filePath) {
-  return JSON.parse(readFileSync(filePath, "utf8"));
+	return JSON.parse(readFileSync(filePath, "utf8"));
 }
 
 function listPackageJsonFiles() {
-  const packageJsonFiles = [path.join(ROOT, "package.json")];
-  for (const topLevel of ["packages", "apps"]) {
-    const rootDir = path.join(ROOT, topLevel);
-    if (!statExists(rootDir)) {
-      continue;
-    }
-    const children = readdirSync(rootDir, { withFileTypes: true });
-    for (const child of children) {
-      if (!child.isDirectory()) {
-        continue;
-      }
-      const manifest = path.join(rootDir, child.name, "package.json");
-      if (statExists(manifest)) {
-        packageJsonFiles.push(manifest);
-      }
-    }
-  }
-  return packageJsonFiles;
+	const packageJsonFiles = [path.join(ROOT, "package.json")];
+	for (const topLevel of ["packages", "apps"]) {
+		const rootDir = path.join(ROOT, topLevel);
+		if (!statExists(rootDir)) {
+			continue;
+		}
+		const children = readdirSync(rootDir, { withFileTypes: true });
+		for (const child of children) {
+			if (!child.isDirectory()) {
+				continue;
+			}
+			const manifest = path.join(rootDir, child.name, "package.json");
+			if (statExists(manifest)) {
+				packageJsonFiles.push(manifest);
+			}
+		}
+	}
+	return packageJsonFiles;
 }
 
 function collectDependencyUsage() {
-  const manifests = listPackageJsonFiles();
-  const usage = new Map();
-  for (const dep of DEPENDENCY_NAMES) {
-    usage.set(dep, []);
-  }
-  for (const manifestPath of manifests) {
-    const manifest = readJson(manifestPath);
-    const sections = [
-      manifest.dependencies ?? {},
-      manifest.devDependencies ?? {},
-      manifest.peerDependencies ?? {},
-      manifest.optionalDependencies ?? {},
-    ];
-    for (const dep of DEPENDENCY_NAMES) {
-      const match = sections
-        .map((section) => section[dep])
-        .find((value) => value !== undefined);
-      if (match) {
-        usage.get(dep)?.push({
-          manifest: path.relative(ROOT, manifestPath),
-          range: match,
-        });
-      }
-    }
-  }
-  return usage;
+	const manifests = listPackageJsonFiles();
+	const usage = new Map();
+	for (const dep of DEPENDENCY_NAMES) {
+		usage.set(dep, []);
+	}
+	for (const manifestPath of manifests) {
+		const manifest = readJson(manifestPath);
+		const sections = [
+			manifest.dependencies ?? {},
+			manifest.devDependencies ?? {},
+			manifest.peerDependencies ?? {},
+			manifest.optionalDependencies ?? {},
+		];
+		for (const dep of DEPENDENCY_NAMES) {
+			const match = sections
+				.map((section) => section[dep])
+				.find((value) => value !== undefined);
+			if (match) {
+				usage.get(dep)?.push({
+					manifest: path.relative(ROOT, manifestPath),
+					range: match,
+				});
+			}
+		}
+	}
+	return usage;
 }
 
 function npmViewQuery(spec, field = "version") {
-  const stdout = execFileSync("npm", ["view", spec, field, "--json"], {
-    cwd: ROOT,
-    stdio: ["ignore", "pipe", "pipe"],
-    encoding: "utf8",
-  }).trim();
-  if (!stdout) {
-    return null;
-  }
-  return JSON.parse(stdout);
+	const stdout = execFileSync("npm", ["view", spec, field, "--json"], {
+		cwd: ROOT,
+		stdio: ["ignore", "pipe", "pipe"],
+		encoding: "utf8",
+	}).trim();
+	if (!stdout) {
+		return null;
+	}
+	return JSON.parse(stdout);
 }
 
 function npmView(name, field = "version") {
-  return npmViewQuery(`${name}@latest`, field);
+	return npmViewQuery(`${name}@latest`, field);
 }
 
 function npmViewPackage(name, field = "version") {
-  return npmViewQuery(name, field);
+	return npmViewQuery(name, field);
 }
 
 function npmViewSpec(spec, field = "version") {
-  return npmViewQuery(spec, field);
+	return npmViewQuery(spec, field);
 }
 
 function npmVersionExists(spec) {
-  try {
-    const stdout = execFileSync("npm", ["view", spec, "version", "--json"], {
-      cwd: ROOT,
-      stdio: ["ignore", "pipe", "pipe"],
-      encoding: "utf8",
-    }).trim();
-    return Boolean(stdout && JSON.parse(stdout));
-  } catch {
-    return false;
-  }
+	try {
+		const stdout = execFileSync("npm", ["view", spec, "version", "--json"], {
+			cwd: ROOT,
+			stdio: ["ignore", "pipe", "pipe"],
+			encoding: "utf8",
+		}).trim();
+		return Boolean(stdout && JSON.parse(stdout));
+	} catch {
+		return false;
+	}
 }
 
 function normalizeVersion(value) {
-  if (Array.isArray(value)) {
-    const last = value.at(-1);
-    return typeof last === "string" ? last : null;
-  }
-  return typeof value === "string" ? value : null;
+	if (Array.isArray(value)) {
+		const last = value.at(-1);
+		return typeof last === "string" ? last : null;
+	}
+	return typeof value === "string" ? value : null;
 }
 
 function normalizeDistTags(value) {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? value
-    : null;
+	return value && typeof value === "object" && !Array.isArray(value)
+		? value
+		: null;
 }
 
 function rangeTargetsBeta(range) {
-  return typeof range === "string" && EFFECT_RANGE_HAS_BETA_RE.test(range);
+	return typeof range === "string" && EFFECT_RANGE_HAS_BETA_RE.test(range);
 }
 
 function pickRegistrySpec(dep, usedBy) {
-  const declaredRanges = [...new Set(usedBy.map((entry) => entry.range))];
-  const firstRange = declaredRanges.find(
-    (range) =>
-      typeof range === "string" &&
-      range.length > 0 &&
-      !range.startsWith("workspace:")
-  );
-  return firstRange ? `${dep}@${firstRange}` : `${dep}@latest`;
+	const declaredRanges = [...new Set(usedBy.map((entry) => entry.range))];
+	const firstRange = declaredRanges.find(
+		(range) =>
+			typeof range === "string" &&
+			range.length > 0 &&
+			!range.startsWith("workspace:"),
+	);
+	return firstRange ? `${dep}@${firstRange}` : `${dep}@latest`;
 }
 
 function effectRangeSupportsV4(range) {
-  if (!range) {
-    return null;
-  }
-  return (
-    EFFECT_RANGE_EXACT_4_RE.test(range) ||
-    EFFECT_RANGE_CARET_4_RE.test(range) ||
-    EFFECT_RANGE_TILDE_4_RE.test(range) ||
-    EFFECT_RANGE_GTE_4_RE.test(range) ||
-    EFFECT_RANGE_LT_5_RE.test(range) ||
-    (EFFECT_RANGE_OR_RE.test(range) && EFFECT_RANGE_HAS_4_RE.test(range))
-  );
+	if (!range) {
+		return null;
+	}
+	return (
+		EFFECT_RANGE_EXACT_4_RE.test(range) ||
+		EFFECT_RANGE_CARET_4_RE.test(range) ||
+		EFFECT_RANGE_TILDE_4_RE.test(range) ||
+		EFFECT_RANGE_GTE_4_RE.test(range) ||
+		EFFECT_RANGE_LT_5_RE.test(range) ||
+		(EFFECT_RANGE_OR_RE.test(range) && EFFECT_RANGE_HAS_4_RE.test(range))
+	);
 }
 
 function emptyDependencyStatus(dep, usedBy) {
-  return {
-    dependency: dep,
-    usedBy,
-    checkedSpec: null,
-    latestVersion: null,
-    latestBetaVersion: null,
-    resolvedVersion: null,
-    peerEffectRange: null,
-    supportsEffectV4: null,
-    onLatestBeta: null,
-    error: null,
-  };
+	return {
+		dependency: dep,
+		usedBy,
+		checkedSpec: null,
+		latestVersion: null,
+		latestBetaVersion: null,
+		resolvedVersion: null,
+		peerEffectRange: null,
+		supportsEffectV4: null,
+		onLatestBeta: null,
+		error: null,
+	};
 }
 
 function collectDependencyStatus(dep, usedBy) {
-  try {
-    const distTags = normalizeDistTags(npmViewPackage(dep, "dist-tags"));
-    const latestVersion = normalizeVersion(
-      distTags?.latest ?? npmView(dep, "version")
-    );
-    const latestBetaVersion = normalizeVersion(distTags?.beta);
-    const checkedSpec = pickRegistrySpec(dep, usedBy);
-    const resolvedVersion = normalizeVersion(
-      npmViewSpec(checkedSpec, "version")
-    );
-    const peerDependencies = resolvedVersion
-      ? npmViewSpec(`${dep}@${resolvedVersion}`, "peerDependencies")
-      : npmViewSpec(checkedSpec, "peerDependencies");
-    const peerEffectRange =
-      peerDependencies && typeof peerDependencies === "object"
-        ? (peerDependencies.effect ?? null)
-        : null;
-    let supportsEffectV4 = null;
-    if (dep === "effect") {
-      const ranges = usedBy.map((entry) => entry.range);
-      supportsEffectV4 =
-        ranges.length === 0
-          ? npmVersionExists("effect@beta")
-          : ranges.every((range) => effectRangeSupportsV4(range) === true);
-    } else if (peerEffectRange) {
-      supportsEffectV4 = effectRangeSupportsV4(peerEffectRange);
-    }
-    const onLatestBeta =
-      latestBetaVersion &&
-      resolvedVersion &&
-      usedBy.some((entry) => rangeTargetsBeta(entry.range))
-        ? resolvedVersion === latestBetaVersion
-        : null;
-    return {
-      dependency: dep,
-      usedBy,
-      checkedSpec,
-      latestVersion,
-      latestBetaVersion,
-      resolvedVersion,
-      peerEffectRange,
-      supportsEffectV4,
-      onLatestBeta,
-      error: null,
-    };
-  } catch (cause) {
-    return {
-      dependency: dep,
-      usedBy,
-      checkedSpec: null,
-      latestVersion: null,
-      latestBetaVersion: null,
-      resolvedVersion: null,
-      peerEffectRange: null,
-      supportsEffectV4: null,
-      onLatestBeta: null,
-      error: cause instanceof Error ? cause.message : String(cause),
-    };
-  }
+	try {
+		const distTags = normalizeDistTags(npmViewPackage(dep, "dist-tags"));
+		const latestVersion = normalizeVersion(
+			distTags?.latest ?? npmView(dep, "version"),
+		);
+		const latestBetaVersion = normalizeVersion(distTags?.beta);
+		const checkedSpec = pickRegistrySpec(dep, usedBy);
+		const resolvedVersion = normalizeVersion(
+			npmViewSpec(checkedSpec, "version"),
+		);
+		const peerDependencies = resolvedVersion
+			? npmViewSpec(`${dep}@${resolvedVersion}`, "peerDependencies")
+			: npmViewSpec(checkedSpec, "peerDependencies");
+		const peerEffectRange =
+			peerDependencies && typeof peerDependencies === "object"
+				? (peerDependencies.effect ?? null)
+				: null;
+		let supportsEffectV4 = null;
+		if (dep === "effect") {
+			const ranges = usedBy.map((entry) => entry.range);
+			supportsEffectV4 =
+				ranges.length === 0
+					? npmVersionExists("effect@beta")
+					: ranges.every((range) => effectRangeSupportsV4(range) === true);
+		} else if (peerEffectRange) {
+			supportsEffectV4 = effectRangeSupportsV4(peerEffectRange);
+		}
+		const onLatestBeta =
+			latestBetaVersion &&
+			resolvedVersion &&
+			usedBy.some((entry) => rangeTargetsBeta(entry.range))
+				? resolvedVersion === latestBetaVersion
+				: null;
+		return {
+			dependency: dep,
+			usedBy,
+			checkedSpec,
+			latestVersion,
+			latestBetaVersion,
+			resolvedVersion,
+			peerEffectRange,
+			supportsEffectV4,
+			onLatestBeta,
+			error: null,
+		};
+	} catch (error) {
+		return {
+			dependency: dep,
+			usedBy,
+			checkedSpec: null,
+			latestVersion: null,
+			latestBetaVersion: null,
+			resolvedVersion: null,
+			peerEffectRange: null,
+			supportsEffectV4: null,
+			onLatestBeta: null,
+			error: error instanceof Error ? error.message : String(error),
+		};
+	}
 }
 
 function collectRegistryStatus(usage) {
-  return DEPENDENCY_NAMES.map((dep) => {
-    const usedBy = usage.get(dep) ?? [];
-    if (usedBy.length === 0) {
-      return emptyDependencyStatus(dep, usedBy);
-    }
-    return collectDependencyStatus(dep, usedBy);
-  });
+	return DEPENDENCY_NAMES.map((dep) => {
+		const usedBy = usage.get(dep) ?? [];
+		if (usedBy.length === 0) {
+			return emptyDependencyStatus(dep, usedBy);
+		}
+		return collectDependencyStatus(dep, usedBy);
+	});
 }
 
 function buildRemovedApiBlockers(apiUsage) {
-  const blockers = [];
-  for (const usage of apiUsage) {
-    if (usage.count === 0) {
-      continue;
-    }
-    blockers.push({
-      kind: "removed-api",
-      title: `${usage.name} appears ${usage.count} time(s)`,
-      detail: usage.note,
-    });
-  }
-  return blockers;
+	const blockers = [];
+	for (const usage of apiUsage) {
+		if (usage.count === 0) {
+			continue;
+		}
+		blockers.push({
+			kind: "removed-api",
+			title: `${usage.name} appears ${usage.count} time(s)`,
+			detail: usage.note,
+		});
+	}
+	return blockers;
 }
 
 function buildDependencyBlockers(dep) {
-  if (dep.usedBy.length === 0) {
-    return [];
-  }
-  if (dep.error) {
-    return [
-      {
-        kind: "registry-error",
-        title: `Failed checking ${dep.dependency}`,
-        detail: dep.error,
-      },
-    ];
-  }
+	if (dep.usedBy.length === 0) {
+		return [];
+	}
+	if (dep.error) {
+		return [
+			{
+				kind: "registry-error",
+				title: `Failed checking ${dep.dependency}`,
+				detail: dep.error,
+			},
+		];
+	}
 
-  const blockers = [];
-  if (dep.dependency !== "effect" && dep.supportsEffectV4 === false) {
-    blockers.push({
-      kind: "peer-constraint",
-      title: `${dep.dependency}@${dep.resolvedVersion ?? dep.latestVersion ?? "latest"} does not declare effect v4 support`,
-      detail: `checked=${dep.checkedSpec ?? "latest"}, peerDependencies.effect=${
-        dep.peerEffectRange ?? "not declared"
-      }`,
-    });
-  }
-  if (DISALLOWED_EFFECT_PACKAGES.has(dep.dependency)) {
-    blockers.push({
-      kind: "consolidation-regression",
-      title: `${dep.dependency} should not be required in the v4-consolidated workspace`,
-      detail: `remove ${dep.dependency} usage from manifests: ${dep.usedBy
-        .map((entry) => `${entry.manifest} (${entry.range})`)
-        .join(", ")}`,
-    });
-  }
-  if (dep.onLatestBeta === false) {
-    blockers.push({
-      kind: "beta-version-lag",
-      title: `${dep.dependency}@${dep.resolvedVersion} is not on latest beta`,
-      detail: `latest beta=${dep.latestBetaVersion ?? "unknown"}, checked=${
-        dep.checkedSpec ?? "latest"
-      }`,
-    });
-  }
-  return blockers;
+	const blockers = [];
+	if (dep.dependency !== "effect" && dep.supportsEffectV4 === false) {
+		blockers.push({
+			kind: "peer-constraint",
+			title: `${dep.dependency}@${dep.resolvedVersion ?? dep.latestVersion ?? "latest"} does not declare effect v4 support`,
+			detail: `checked=${dep.checkedSpec ?? "latest"}, peerDependencies.effect=${
+				dep.peerEffectRange ?? "not declared"
+			}`,
+		});
+	}
+	if (DISALLOWED_EFFECT_PACKAGES.has(dep.dependency)) {
+		blockers.push({
+			kind: "consolidation-regression",
+			title: `${dep.dependency} should not be required in the v4-consolidated workspace`,
+			detail: `remove ${dep.dependency} usage from manifests: ${dep.usedBy
+				.map((entry) => `${entry.manifest} (${entry.range})`)
+				.join(", ")}`,
+		});
+	}
+	if (dep.onLatestBeta === false) {
+		blockers.push({
+			kind: "beta-version-lag",
+			title: `${dep.dependency}@${dep.resolvedVersion} is not on latest beta`,
+			detail: `latest beta=${dep.latestBetaVersion ?? "unknown"}, checked=${
+				dep.checkedSpec ?? "latest"
+			}`,
+		});
+	}
+	return blockers;
 }
 
 function buildBlockers(apiUsage, registryStatus) {
-  return [
-    ...buildRemovedApiBlockers(apiUsage),
-    ...registryStatus.flatMap(buildDependencyBlockers),
-  ];
+	return [
+		...buildRemovedApiBlockers(apiUsage),
+		...registryStatus.flatMap(buildDependencyBlockers),
+	];
 }
 
 function printSummary(report) {
-  writeLine("Effect v4 readiness report");
-  writeLine(`Generated: ${report.generatedAt}`);
-  writeLine(`Ready now: ${report.ready ? "yes" : "no"}`);
-  writeLine("");
-  writeLine("Removed API usage:");
-  for (const usage of report.removedApiUsage) {
-    writeLine(`- ${usage.name}: ${usage.count}`);
-  }
-  writeLine("");
-  writeLine("Dependency compatibility:");
-  for (const dep of report.registryStatus) {
-    if (dep.usedBy.length === 0) {
-      continue;
-    }
-    writeLine(
-      `- ${dep.dependency}: latest=${dep.latestVersion ?? "unknown"}, beta=${
-        dep.latestBetaVersion ?? "n/a"
-      }, checked=${
-        dep.checkedSpec ?? "latest"
-      }, resolved=${dep.resolvedVersion ?? "unknown"}, peer.effect=${
-        dep.peerEffectRange ?? "n/a"
-      }, supportsV4=${
-        dep.supportsEffectV4 === null ? "unknown" : String(dep.supportsEffectV4)
-      }, onLatestBeta=${
-        dep.onLatestBeta === null ? "n/a" : String(dep.onLatestBeta)
-      }`
-    );
-  }
-  if (report.blockers.length === 0) {
-    return;
-  }
-  writeLine("");
-  writeLine("Blockers:");
-  for (const blocker of report.blockers) {
-    writeLine(`- [${blocker.kind}] ${blocker.title} (${blocker.detail})`);
-  }
+	writeLine("Effect v4 readiness report");
+	writeLine(`Generated: ${report.generatedAt}`);
+	writeLine(`Ready now: ${report.ready ? "yes" : "no"}`);
+	writeLine("");
+	writeLine("Removed API usage:");
+	for (const usage of report.removedApiUsage) {
+		writeLine(`- ${usage.name}: ${usage.count}`);
+	}
+	writeLine("");
+	writeLine("Dependency compatibility:");
+	for (const dep of report.registryStatus) {
+		if (dep.usedBy.length === 0) {
+			continue;
+		}
+		writeLine(
+			`- ${dep.dependency}: latest=${dep.latestVersion ?? "unknown"}, beta=${
+				dep.latestBetaVersion ?? "n/a"
+			}, checked=${
+				dep.checkedSpec ?? "latest"
+			}, resolved=${dep.resolvedVersion ?? "unknown"}, peer.effect=${
+				dep.peerEffectRange ?? "n/a"
+			}, supportsV4=${
+				dep.supportsEffectV4 === null ? "unknown" : String(dep.supportsEffectV4)
+			}, onLatestBeta=${
+				dep.onLatestBeta === null ? "n/a" : String(dep.onLatestBeta)
+			}`,
+		);
+	}
+	if (report.blockers.length === 0) {
+		return;
+	}
+	writeLine("");
+	writeLine("Blockers:");
+	for (const blocker of report.blockers) {
+		writeLine(`- [${blocker.kind}] ${blocker.title} (${blocker.detail})`);
+	}
 }
 
 const files = [];
 for (const scanRoot of SCAN_ROOTS) {
-  const fullPath = path.join(ROOT, scanRoot);
-  if (statExists(fullPath)) {
-    collectCodeFiles(fullPath, files);
-  }
+	const fullPath = path.join(ROOT, scanRoot);
+	if (statExists(fullPath)) {
+		collectCodeFiles(fullPath, files);
+	}
 }
 
 const removedApiUsage = scanRemovedApis(files);
@@ -492,19 +492,19 @@ const registryStatus = collectRegistryStatus(dependencyUsage);
 const blockers = buildBlockers(removedApiUsage, registryStatus);
 
 const report = {
-  generatedAt: new Date().toISOString(),
-  ready: blockers.length === 0,
-  removedApiUsage,
-  registryStatus,
-  blockers,
+	generatedAt: new Date().toISOString(),
+	ready: blockers.length === 0,
+	removedApiUsage,
+	registryStatus,
+	blockers,
 };
 
 if (JSON_OUTPUT) {
-  writeLine(JSON.stringify(report, null, 2));
+	writeLine(JSON.stringify(report, null, 2));
 } else {
-  printSummary(report);
+	printSummary(report);
 }
 
 if (STRICT && blockers.length > 0) {
-  process.exitCode = 1;
+	process.exitCode = 1;
 }

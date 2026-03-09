@@ -1,9 +1,11 @@
 import { join } from "node:path";
+
 import { describe, expect, test } from "vitest";
+
 import type { BenchmarkAdapter } from "../src/index.js";
 import {
-  loadBenchmarkCases,
-  runBenchmarkComparisonSuite,
+	loadBenchmarkCases,
+	runBenchmarkComparisonSuite,
 } from "../src/index.js";
 import type { BenchmarkCaseEvaluation } from "../src/types.js";
 
@@ -11,73 +13,73 @@ const caseRoot = join(import.meta.dirname, "../../../bench/cases/gold/micro");
 const MISSING_TOOL_RESULT_RE = /Missing benchmark result for tool missing/;
 
 function zeroSummaryPerformance(summary: {
-  performance: {
-    totalRuntimeMs: number;
-    medianRuntimeMs: number | null;
-    p95RuntimeMs: number | null;
-  };
+	performance: {
+		totalRuntimeMs: number;
+		medianRuntimeMs: number | null;
+		p95RuntimeMs: number | null;
+	};
 }) {
-  return {
-    ...summary,
-    performance: {
-      ...summary.performance,
-      totalRuntimeMs: 0,
-      medianRuntimeMs: 0,
-      p95RuntimeMs: 0,
-    },
-  };
+	return {
+		...summary,
+		performance: {
+			...summary.performance,
+			totalRuntimeMs: 0,
+			medianRuntimeMs: 0,
+			p95RuntimeMs: 0,
+		},
+	};
 }
 
 function stripDuration(value: {
-  tool: string;
-  evaluation: BenchmarkCaseEvaluation;
-  output: {
-    tool: string;
-    caseId: string;
-    capabilities: unknown;
-    result: { durationMs: number };
-  };
+	tool: string;
+	evaluation: BenchmarkCaseEvaluation;
+	output: {
+		tool: string;
+		caseId: string;
+		capabilities: unknown;
+		result: { durationMs: number };
+	};
 }) {
-  return {
-    tool: value.tool,
-    evaluation: {
-      ...value.evaluation,
-      performance: {
-        ...value.evaluation.performance,
-        runtimeMs: 0,
-      },
-    },
-    output: {
-      ...value.output,
-      result: {
-        ...value.output.result,
-        durationMs: 0,
-      },
-    },
-  };
+	return {
+		tool: value.tool,
+		evaluation: {
+			...value.evaluation,
+			performance: {
+				...value.evaluation.performance,
+				runtimeMs: 0,
+			},
+		},
+		output: {
+			...value.output,
+			result: {
+				...value.output.result,
+				durationMs: 0,
+			},
+		},
+	};
 }
 
 describe("benchmark comparison harness", () => {
-  test("compares semadiff and git diff across lanes", () => {
-    const report = runBenchmarkComparisonSuite(loadBenchmarkCases(caseRoot), {
-      caseRoot,
-      tools: ["semadiff", "git-diff"],
-    });
+	test("compares semadiff and git diff across lanes", () => {
+		const report = runBenchmarkComparisonSuite(loadBenchmarkCases(caseRoot), {
+			caseRoot,
+			tools: ["semadiff", "git-diff"],
+		});
 
-    expect({
-      tools: report.tools.map((entry) => ({
-        tool: entry.tool,
-        summary: zeroSummaryPerformance(entry.summary),
-      })),
-      cases: report.cases
-        .filter((entry) =>
-          ["move-with-edit-ts-001", "update-ts-001"].includes(entry.caseId)
-        )
-        .map((entry) => ({
-          caseId: entry.caseId,
-          results: entry.results.map((result) => stripDuration(result)),
-        })),
-    }).toMatchInlineSnapshot(`
+		expect({
+			tools: report.tools.map((entry) => ({
+				tool: entry.tool,
+				summary: zeroSummaryPerformance(entry.summary),
+			})),
+			cases: report.cases
+				.filter((entry) =>
+					["move-with-edit-ts-001", "update-ts-001"].includes(entry.caseId),
+				)
+				.map((entry) => ({
+					caseId: entry.caseId,
+					results: entry.results.map((result) => stripDuration(result)),
+				})),
+		}).toMatchInlineSnapshot(`
       {
         "cases": [
           {
@@ -784,84 +786,84 @@ describe("benchmark comparison harness", () => {
         ],
       }
     `);
-  });
+	});
 
-  test("detects moved lines from git diff --color-moved", () => {
-    const report = runBenchmarkComparisonSuite(loadBenchmarkCases(caseRoot), {
-      caseRoot,
-      tools: ["git-diff-color-moved"],
-    });
+	test("detects moved lines from git diff --color-moved", () => {
+		const report = runBenchmarkComparisonSuite(loadBenchmarkCases(caseRoot), {
+			caseRoot,
+			tools: ["git-diff-color-moved"],
+		});
 
-    const moveWithEdit = report.cases.find(
-      (entry) => entry.caseId === "move-with-edit-ts-001"
-    );
-    const result = moveWithEdit?.results[0];
-    const review =
-      result?.evaluation.review.status === "scored"
-        ? result.evaluation.review
-        : null;
+		const moveWithEdit = report.cases.find(
+			(entry) => entry.caseId === "move-with-edit-ts-001",
+		);
+		const result = moveWithEdit?.results[0];
+		const review =
+			result?.evaluation.review.status === "scored"
+				? result.evaluation.review
+				: null;
 
-    expect(review).not.toBeNull();
-    expect(review?.actualMoves).toBeGreaterThan(0);
-    expect(review?.moveRecall).toBeGreaterThan(0);
-  });
+		expect(review).not.toBeNull();
+		expect(review?.actualMoves).toBeGreaterThan(0);
+		expect(review?.moveRecall).toBeGreaterThan(0);
+	});
 
-  test("fails fast when an adapter result is missing from a case report", () => {
-    const benchmarkCase = loadBenchmarkCases(caseRoot)[0];
-    expect(benchmarkCase).toBeDefined();
-    if (!benchmarkCase) {
-      throw new Error("Expected a benchmark case to exist.");
-    }
+	test("fails fast when an adapter result is missing from a case report", () => {
+		const benchmarkCase = loadBenchmarkCases(caseRoot)[0];
+		expect(benchmarkCase).toBeDefined();
+		if (!benchmarkCase) {
+			throw new Error("Expected a benchmark case to exist.");
+		}
 
-    const workingAdapter: BenchmarkAdapter = {
-      tool: "working",
-      toolVersion: "1.0.0",
-      supportedCapabilities: benchmarkCase.capabilities,
-      runCase(caseInput) {
-        return {
-          tool: "working",
-          toolVersion: "1.0.0",
-          caseId: caseInput.id,
-          capabilities: caseInput.capabilities,
-          result: {
-            durationMs: 1,
-            operations: [],
-            moves: [],
-            renames: [],
-            entities: { old: [], new: [] },
-            entityChanges: [],
-            reviewRows: [],
-          },
-        };
-      },
-    };
-    const mismatchedAdapter: BenchmarkAdapter = {
-      tool: "missing",
-      toolVersion: "1.0.0",
-      supportedCapabilities: benchmarkCase.capabilities,
-      runCase(caseInput) {
-        return {
-          tool: "unexpected",
-          toolVersion: "1.0.0",
-          caseId: caseInput.id,
-          capabilities: caseInput.capabilities,
-          result: {
-            durationMs: 1,
-            operations: [],
-            moves: [],
-            renames: [],
-            entities: { old: [], new: [] },
-            entityChanges: [],
-            reviewRows: [],
-          },
-        };
-      },
-    };
+		const workingAdapter: BenchmarkAdapter = {
+			tool: "working",
+			toolVersion: "1.0.0",
+			supportedCapabilities: benchmarkCase.capabilities,
+			runCase(caseInput) {
+				return {
+					tool: "working",
+					toolVersion: "1.0.0",
+					caseId: caseInput.id,
+					capabilities: caseInput.capabilities,
+					result: {
+						durationMs: 1,
+						operations: [],
+						moves: [],
+						renames: [],
+						entities: { old: [], new: [] },
+						entityChanges: [],
+						reviewRows: [],
+					},
+				};
+			},
+		};
+		const mismatchedAdapter: BenchmarkAdapter = {
+			tool: "missing",
+			toolVersion: "1.0.0",
+			supportedCapabilities: benchmarkCase.capabilities,
+			runCase(caseInput) {
+				return {
+					tool: "unexpected",
+					toolVersion: "1.0.0",
+					caseId: caseInput.id,
+					capabilities: caseInput.capabilities,
+					result: {
+						durationMs: 1,
+						operations: [],
+						moves: [],
+						renames: [],
+						entities: { old: [], new: [] },
+						entityChanges: [],
+						reviewRows: [],
+					},
+				};
+			},
+		};
 
-    expect(() =>
-      runBenchmarkComparisonSuite([benchmarkCase], {
-        adapters: [workingAdapter, mismatchedAdapter],
-      })
-    ).toThrow(MISSING_TOOL_RESULT_RE);
-  });
+		expect(() =>
+			runBenchmarkComparisonSuite([benchmarkCase], {
+				adapters: [workingAdapter, mismatchedAdapter],
+			}),
+		).toThrow(MISSING_TOOL_RESULT_RE);
+	});
 });

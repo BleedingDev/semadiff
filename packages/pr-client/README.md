@@ -16,7 +16,7 @@ Promise and Effect clients for the SemaDiff PR diff API.
 import { createHttpPrDiffClient } from "@semadiff/pr-client";
 
 const client = createHttpPrDiffClient({
-  baseUrl: "https://your-app.example.com",
+	baseUrl: "https://your-app.example.com",
 });
 ```
 

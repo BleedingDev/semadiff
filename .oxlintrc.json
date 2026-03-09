@@ -1,0 +1,196 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"extends": [
+		"./node_modules/ultracite/config/oxlint/core/.oxlintrc.json",
+		"./node_modules/ultracite/config/oxlint/react/.oxlintrc.json"
+	],
+	"ignorePatterns": [
+		"tree-sitter/**",
+		"dist/**",
+		"coverage/**",
+		"packages/test-corpus/fixtures/**",
+		"packages/**/test/fixtures/**",
+		"bench/cases/**",
+		"**/__fixtures__/**",
+		"**/*.snap",
+		"**/*.snap.*",
+		"apps/pr-viewer/src/routeTree.gen.ts"
+	],
+	"rules": {
+		"arrow-body-style": "off",
+		"complexity": "off",
+		"eqeqeq": "off",
+		"func-names": "off",
+		"func-style": "off",
+		"import/no-relative-parent-imports": "off",
+		"jest/consistent-test-it": "off",
+		"jest/max-expects": "off",
+		"jest/no-conditional-expect": "off",
+		"jest/no-conditional-in-test": "off",
+		"jest/no-hooks": "off",
+		"jest/no-large-snapshots": "off",
+		"jest/no-alias-methods": "off",
+		"jest/prefer-lowercase-title": "off",
+		"jest/prefer-mock-return-shorthand": "off",
+		"jest/prefer-strict-equal": "off",
+		"jest/prefer-to-have-length": "off",
+		"jest/require-to-throw-message": "off",
+		"jest/require-top-level-describe": "off",
+		"max-statements": "off",
+		"max-classes-per-file": "off",
+		"no-eq-null": "off",
+		"no-loop-func": "off",
+		"no-negated-condition": "off",
+		"no-plusplus": "off",
+		"no-shadow": "off",
+		"no-use-before-define": "off",
+		"no-console": "error",
+		"no-useless-return": "off",
+		"preserve-caught-error": "off",
+		"prefer-destructuring": "off",
+		"sort-keys": "off",
+		"import/consistent-type-specifier-style": "off",
+		"promise/avoid-new": "off",
+		"promise/prefer-await-to-callbacks": "off",
+		"promise/prefer-await-to-then": "off",
+		"react_perf/jsx-no-new-function-as-prop": "off",
+		"require-await": "off",
+		"typescript/ban-types": "off",
+		"typescript/consistent-type-imports": "off",
+		"typescript/array-type": "off",
+		"unicorn/consistent-existence-index-check": "off",
+		"unicorn/consistent-function-scoping": "off",
+		"unicorn/escape-case": "off",
+		"unicorn/no-array-for-each": "off",
+		"unicorn/no-array-reduce": "off",
+		"unicorn/prefer-dom-node-append": "off",
+		"unicorn/prefer-dom-node-dataset": "off",
+		"unicorn/prefer-math-trunc": "off",
+		"unicorn/prefer-native-coercion-functions": "off",
+		"unicorn/prefer-query-selector": "off",
+		"unicorn/prefer-response-static-json": "off",
+		"unicorn/prefer-spread": "off",
+		"unicorn/prefer-string-replace-all": "off",
+		"unicorn/prefer-ternary": "off",
+		"unicorn/prefer-type-error": "off",
+		"unicorn/no-array-sort": "off",
+		"unicorn/no-immediate-mutation": "off",
+		"unicorn/no-new-array": "off",
+		"unicorn/no-useless-fallback-in-spread": "off",
+		"unicorn/no-useless-undefined": "off",
+		"unicorn/prefer-code-point": "off",
+		"unicorn/switch-case-braces": "off",
+		"vitest/consistent-test-filename": "off",
+		"vitest/no-importing-vitest-globals": "off",
+		"vitest/prefer-called-once": "off",
+		"vitest/prefer-describe-function-title": "off",
+		"vitest/prefer-to-be-falsy": "off",
+		"vitest/prefer-to-be-truthy": "off"
+	},
+	"overrides": [
+		{
+			"files": ["packages/**/src/index.ts"],
+			"rules": {
+				"no-barrel-file": "off"
+			}
+		},
+		{
+			"files": [
+				"apps/pr-viewer/src/logger.ts",
+				"packages/github-extension/src/logger.ts"
+			],
+			"rules": {
+				"no-console": "off"
+			}
+		},
+		{
+			"files": [
+				"packages/core/src/**",
+				"packages/parsers/src/**",
+				"packages/parser-*/src/**",
+				"packages/render-*/src/**"
+			],
+			"rules": {
+				"complexity": "off",
+				"import/no-default-export": "error",
+				"import/no-commonjs": "error",
+				"node/no-process-env": "error"
+			}
+		},
+		{
+			"files": [
+				"**/*.test.ts",
+				"**/*.test.tsx",
+				"**/*.test.js",
+				"**/*.test.jsx",
+				"**/*.spec.ts",
+				"**/*.spec.tsx",
+				"**/*.spec.js",
+				"**/*.spec.jsx",
+				"**/__tests__/**/*.ts",
+				"**/__tests__/**/*.tsx",
+				"**/__tests__/**/*.js",
+				"**/__tests__/**/*.jsx",
+				"apps/pr-viewer/src/tests/**",
+				"e2e/**/*.ts"
+			],
+			"plugins": ["jest", "vitest"],
+			"rules": {
+				"import/no-relative-parent-imports": "off",
+				"jest/consistent-test-it": "off",
+				"jest/max-expects": "off",
+				"jest/no-alias-methods": "off",
+				"jest/no-conditional-expect": "off",
+				"jest/no-conditional-in-test": "off",
+				"jest/no-hooks": "off",
+				"jest/no-large-snapshots": "off",
+				"jest/prefer-lowercase-title": "off",
+				"jest/prefer-mock-return-shorthand": "off",
+				"jest/require-top-level-describe": "off",
+				"no-bitwise": "off",
+				"jest/prefer-strict-equal": "off",
+				"jest/prefer-to-have-length": "off",
+				"jest/require-to-throw-message": "off",
+				"typescript/no-explicit-any": "off",
+				"vitest/consistent-test-filename": "off",
+				"vitest/no-importing-vitest-globals": "off",
+				"vitest/prefer-called-once": "off",
+				"vitest/prefer-describe-function-title": "off",
+				"vitest/prefer-to-be-falsy": "off",
+				"vitest/prefer-to-be-truthy": "off"
+			}
+		},
+		{
+			"files": [
+				"scripts/*.mjs",
+				"scripts/**/*.mjs",
+				"scripts/*.js",
+				"scripts/**/*.js",
+				"e2e/*.ts",
+				"e2e/**/*.ts",
+				"e2e/*.js",
+				"e2e/**/*.js",
+				"packages/cli/src/*.ts",
+				"packages/cli/src/**/*.ts",
+				"packages/benchmark-harness/src/*.ts",
+				"packages/benchmark-harness/src/**/*.ts",
+				"packages/react-ui/src/*.ts",
+				"packages/react-ui/src/**/*.ts",
+				"packages/react-ui/src/*.tsx",
+				"packages/react-ui/src/**/*.tsx"
+			],
+			"rules": {
+				"promise/prefer-await-to-then": "off",
+				"require-await": "off",
+				"react/iframe-missing-sandbox": "off",
+				"react_perf/jsx-no-new-function-as-prop": "off"
+			}
+		},
+		{
+			"files": ["packages/github-extension/src/content.ts"],
+			"rules": {
+				"no-alert": "off"
+			}
+		}
+	]
+}

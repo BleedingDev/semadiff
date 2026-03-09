@@ -3,6 +3,7 @@
 Pusha projekt till GitHub och starta Ralph på VM.
 
 ## Usage
+
 ```
 /prompts:ralph-deploy
 /prompts:ralph-deploy --overnight   # Stäng av VM när klar
@@ -10,7 +11,8 @@ Pusha projekt till GitHub och starta Ralph på VM.
 ```
 
 ## Prerequisites
-- IMPLEMENTATION_PLAN.md eller specs/*.md måste finnas
+
+- IMPLEMENTATION_PLAN.md eller specs/\*.md måste finnas
 - VM måste vara konfigurerad (~/.ralph-vm)
 - GitHub repo måste finnas
 
@@ -86,6 +88,7 @@ fi
 ```
 
 Om requirements FAILAR:
+
 - Visa vad som saknas
 - Ge instruktioner för manuell fix (speciellt auth)
 - STOPPA deploy tills fixat
@@ -95,6 +98,7 @@ Om requirements OK → fortsätt till steg 3.
 **STEG 3: KOLLA CODEX AUTH PÅ VM**
 
 Kör via SSH för att kolla om Codex är autentiserad:
+
 ```bash
 source ~/.ralph-vm
 ssh $VM_USER@$VM_IP "codex --version 2>/dev/null && echo 'CODEX_OK' || echo 'CODEX_MISSING'"
@@ -105,6 +109,7 @@ Om `CODEX_MISSING` eller första gången:
 Läs `.ralph/config.json` för att se `codex.auth_method`:
 
 **Om `account`:**
+
 ```
 ⚠️  Codex behöver autentiseras på VM:en (första gången)
 
@@ -116,9 +121,11 @@ Kör följande:
 
 Detta behöver bara göras en gång per VM.
 ```
+
 **STOPPA** och vänta på att användaren gör detta.
 
 **Om `api_key`:**
+
 ```
 ⚠️  OPENAI_API_KEY behöver sättas på VM:en
 
@@ -128,6 +135,7 @@ Kör följande:
   3. source ~/.bashrc
   4. Kör /prompts:ralph-deploy igen
 ```
+
 **STOPPA** och vänta på att användaren gör detta.
 
 Om Codex redan fungerar → fortsätt till steg 4.
@@ -150,11 +158,13 @@ Vilken mode vill du köra Ralph i?
 ```
 
 Spara valet:
+
 - Standard → `RALPH_FLAGS="--orchestrate"`
 - Quick → `RALPH_FLAGS=""`
 - Inferno → `RALPH_FLAGS="--orchestrate --parallel"`
 
 **STEG 5: PUSHA TILL GITHUB**
+
 ```bash
 git add -A
 git commit -m "Deploy: $(date +%Y-%m-%d_%H:%M)" || true
@@ -164,6 +174,7 @@ git push origin main
 **STEG 6: STARTA PÅ VM**
 
 Använd RALPH_FLAGS från steg 3. Kör via SSH:
+
 ```bash
 # Hämta VM-config
 source ~/.ralph-vm
@@ -202,12 +213,14 @@ EOF
 ```
 
 **MODES:**
+
 - Standard: `--orchestrate` (E2E + auto-CR)
 - Quick: (inga flaggor) - bara build verify
 - Inferno: `--orchestrate --parallel` (allt)
 
 **STEG 7: BEKRÄFTA**
 Skriv ut:
+
 ```
 ✅ DEPLOY KLAR!
 
@@ -222,6 +235,7 @@ När klar:
 ```
 
 **VIKTIGT:**
+
 - Använd `gh repo clone` INTE `git clone` (hanterar auth)
 - Kör ralph.sh i bakgrunden med nohup
 - Ge användaren kommandon för att följa progress

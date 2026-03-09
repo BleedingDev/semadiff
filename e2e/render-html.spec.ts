@@ -1,48 +1,50 @@
 import { execSync } from "node:child_process";
+
 import { expect, test } from "@playwright/test";
+
 import { decodeJson, distFileUrl, runBunEval } from "./helpers.js";
 
 const renderHtmlUrl = distFileUrl(
-  "packages",
-  "render-html",
-  "dist",
-  "index.js"
+	"packages",
+	"render-html",
+	"dist",
+	"index.js",
 );
 
 test("large diff renders without crash", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}'; const ops = Array.from({ length: 500 }, (_, idx) => ({ id: 'op-' + idx, type: 'update', oldText: 'old', newText: 'new' })); const diff = { version: '0.1.0', operations: ops, moves: [], renames: [] }; const length = renderHtml(diff, { maxOperations: 100 }).length; console.log(JSON.stringify({ length }));`
-  );
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}'; const ops = Array.from({ length: 500 }, (_, idx) => ({ id: 'op-' + idx, type: 'update', oldText: 'old', newText: 'new' })); const diff = { version: '0.1.0', operations: ops, moves: [], renames: [] }; const length = renderHtml(diff, { maxOperations: 100 }).length; console.log(JSON.stringify({ length }));`,
+	);
 
-  const lastLine = output.trim().split("\n").at(-1) ?? "";
-  const parsed = decodeJson<{ length: number }>(lastLine);
-  expect(parsed.length).toBeGreaterThan(0);
+	const lastLine = output.trim().split("\n").at(-1) ?? "";
+	const parsed = decodeJson<{ length: number }>(lastLine);
+	expect(parsed.length).toBeGreaterThan(0);
 });
 
 test("virtualized output embeds data payload", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}'; const ops = Array.from({ length: 50 }, (_, idx) => ({ id: 'op-' + idx, type: 'update', oldText: 'old', newText: 'new' })); const diff = { version: '0.1.0', operations: ops, moves: [], renames: [] }; const html = renderHtml(diff, { virtualize: true, maxOperations: 10 }); console.log(JSON.stringify({ length: html.length, hasData: html.includes('__SEMADIFF_DATA__'), hasStatus: html.includes('sd-status') }));`
-  );
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}'; const ops = Array.from({ length: 50 }, (_, idx) => ({ id: 'op-' + idx, type: 'update', oldText: 'old', newText: 'new' })); const diff = { version: '0.1.0', operations: ops, moves: [], renames: [] }; const html = renderHtml(diff, { virtualize: true, maxOperations: 10 }); console.log(JSON.stringify({ length: html.length, hasData: html.includes('__SEMADIFF_DATA__'), hasStatus: html.includes('sd-status') }));`,
+	);
 
-  const parsed = decodeJson<{
-    length: number;
-    hasData: boolean;
-    hasStatus: boolean;
-  }>(output);
-  expect(parsed.length).toBeGreaterThan(0);
-  expect(parsed.hasData).toBe(true);
-  expect(parsed.hasStatus).toBe(true);
+	const parsed = decodeJson<{
+		length: number;
+		hasData: boolean;
+		hasStatus: boolean;
+	}>(output);
+	expect(parsed.length).toBeGreaterThan(0);
+	expect(parsed.hasData).toBe(true);
+	expect(parsed.hasStatus).toBe(true);
 });
 
 test("split line rows keep insert/delete on the correct side", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}';
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}';
 const makeDiff = (ops) => ({ version: '0.1.0', operations: ops, moves: [], renames: [] });
 const range = (line) => ({ start: { line, column: 1 }, end: { line, column: 2 } });
 const insertHtml = renderHtml(makeDiff([{ id: 'op-insert', type: 'insert', newRange: range(2), newText: 'added' }]), {
@@ -72,31 +74,31 @@ console.log(JSON.stringify({
   deleteNewBlank: /sd-cell--new"><\\/div>/.test(deleteRow),
   wrapsCode: insertHtml.includes('.sd-code {\\n  white-space: pre-wrap;'),
   hasCellBackgroundTint: insertHtml.includes('.sd-line--insert .sd-cell--new {\\n  background: rgba('),
-}));`
-  );
+}));`,
+	);
 
-  const parsed = decodeJson<{
-    insertOldBlank: boolean;
-    insertNewHasText: boolean;
-    deleteOldHasText: boolean;
-    deleteNewBlank: boolean;
-    wrapsCode: boolean;
-    hasCellBackgroundTint: boolean;
-  }>(output);
+	const parsed = decodeJson<{
+		insertOldBlank: boolean;
+		insertNewHasText: boolean;
+		deleteOldHasText: boolean;
+		deleteNewBlank: boolean;
+		wrapsCode: boolean;
+		hasCellBackgroundTint: boolean;
+	}>(output);
 
-  expect(parsed.insertOldBlank).toBe(true);
-  expect(parsed.insertNewHasText).toBe(true);
-  expect(parsed.deleteOldHasText).toBe(true);
-  expect(parsed.deleteNewBlank).toBe(true);
-  expect(parsed.wrapsCode).toBe(true);
-  expect(parsed.hasCellBackgroundTint).toBe(false);
+	expect(parsed.insertOldBlank).toBe(true);
+	expect(parsed.insertNewHasText).toBe(true);
+	expect(parsed.deleteOldHasText).toBe(true);
+	expect(parsed.deleteNewBlank).toBe(true);
+	expect(parsed.wrapsCode).toBe(true);
+	expect(parsed.hasCellBackgroundTint).toBe(false);
 });
 
 test("semantic line mode auto-picks lower-noise rows when raw is cleaner", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}';
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}';
 const diff = {
   version: '0.1.0',
   operations: [
@@ -137,23 +139,23 @@ const rawHtml = renderHtml(diff, {
 console.log(JSON.stringify({
   semanticKinds: rowKinds(semanticHtml),
   rawKinds: rowKinds(rawHtml),
-}));`
-  );
+}));`,
+	);
 
-  const parsed = decodeJson<{
-    semanticKinds: string[];
-    rawKinds: string[];
-  }>(output);
+	const parsed = decodeJson<{
+		semanticKinds: string[];
+		rawKinds: string[];
+	}>(output);
 
-  expect(parsed.rawKinds).toEqual(["replace", "delete"]);
-  expect(parsed.semanticKinds).toEqual(parsed.rawKinds);
+	expect(parsed.rawKinds).toEqual(["replace", "delete"]);
+	expect(parsed.semanticKinds).toEqual(parsed.rawKinds);
 });
 
 test("unified line view highlights only changed token for delete/insert pairs", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}';
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}';
 const diff = {
   version: '0.1.0',
   operations: [
@@ -184,25 +186,25 @@ const html = renderHtml(diff, {
 const hasInlineAdd = html.includes('sd-inline-add');
 const hasWholeLineTint = html.includes('<span class="sd-inline-add">import "./.next/dev/types/routes.d.ts";</span>');
 const hasDevToken = html.includes('dev');
-console.log(JSON.stringify({ hasInlineAdd, hasWholeLineTint, hasDevToken }));`
-  );
+console.log(JSON.stringify({ hasInlineAdd, hasWholeLineTint, hasDevToken }));`,
+	);
 
-  const parsed = decodeJson<{
-    hasInlineAdd: boolean;
-    hasWholeLineTint: boolean;
-    hasDevToken: boolean;
-  }>(output);
+	const parsed = decodeJson<{
+		hasInlineAdd: boolean;
+		hasWholeLineTint: boolean;
+		hasDevToken: boolean;
+	}>(output);
 
-  expect(parsed.hasInlineAdd).toBe(true);
-  expect(parsed.hasDevToken).toBe(true);
-  expect(parsed.hasWholeLineTint).toBe(false);
+	expect(parsed.hasInlineAdd).toBe(true);
+	expect(parsed.hasDevToken).toBe(true);
+	expect(parsed.hasWholeLineTint).toBe(false);
 });
 
 test("semantic line mode suppresses AST-projected formatting rows", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}';
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}';
 const oldText = 'const config =\\n  transpilePackages: ["@new-engine/ui", "@techsio/analytics"],\\n};';
 const newText = 'const config =\\n  transpilePackages: [\\n    "@new-engine/ui",\\n    "@techsio/analytics",\\n    "@techsio/storefront-data",\\n  ],\\n};';
 const diff = {
@@ -289,49 +291,49 @@ console.log(JSON.stringify({
     withTokensSplitHtml.includes('Raw line diff is shown'),
   hasUnifiedGapRows: withTokensUnifiedRows.some((row) => row.type === "gap"),
   hasSplitGapRows: withTokensSplitRows.some((row) => row.type === "gap"),
-}));`
-  );
+}));`,
+	);
 
-  const parsed = decodeJson<{
-    withTokenUnifiedRows: string[];
-    withTokenSplitRows: string[];
-    withoutTokenUnifiedRows: string[];
-    unifiedUiTypes: string[];
-    splitUiTypes: string[];
-    unifiedAnalyticsTypes: string[];
-    splitAnalyticsTypes: string[];
-    unifiedStorefrontTypes: string[];
-    splitStorefrontTypes: string[];
-    unifiedClosingTypes: string[];
-    splitClosingTypes: string[];
-    hasFallbackWarning: boolean;
-    hasUnifiedGapRows: boolean;
-    hasSplitGapRows: boolean;
-  }>(output);
+	const parsed = decodeJson<{
+		withTokenUnifiedRows: string[];
+		withTokenSplitRows: string[];
+		withoutTokenUnifiedRows: string[];
+		unifiedUiTypes: string[];
+		splitUiTypes: string[];
+		unifiedAnalyticsTypes: string[];
+		splitAnalyticsTypes: string[];
+		unifiedStorefrontTypes: string[];
+		splitStorefrontTypes: string[];
+		unifiedClosingTypes: string[];
+		splitClosingTypes: string[];
+		hasFallbackWarning: boolean;
+		hasUnifiedGapRows: boolean;
+		hasSplitGapRows: boolean;
+	}>(output);
 
-  expect(parsed.withTokenUnifiedRows.length).toBeGreaterThan(4);
-  expect(parsed.withTokenSplitRows.length).toBeGreaterThan(4);
-  expect(parsed.withoutTokenUnifiedRows.length).toBeGreaterThan(
-    parsed.withTokenUnifiedRows.length
-  );
-  expect(parsed.unifiedUiTypes).not.toContain("insert");
-  expect(parsed.splitUiTypes).not.toContain("insert");
-  expect(parsed.unifiedAnalyticsTypes).not.toContain("insert");
-  expect(parsed.splitAnalyticsTypes).not.toContain("insert");
-  expect(parsed.unifiedStorefrontTypes).toContain("insert");
-  expect(parsed.splitStorefrontTypes).toContain("insert");
-  expect(parsed.unifiedClosingTypes).not.toContain("insert");
-  expect(parsed.splitClosingTypes).not.toContain("insert");
-  expect(parsed.hasFallbackWarning).toBe(false);
-  expect(parsed.hasUnifiedGapRows).toBe(false);
-  expect(parsed.hasSplitGapRows).toBe(false);
+	expect(parsed.withTokenUnifiedRows.length).toBeGreaterThan(4);
+	expect(parsed.withTokenSplitRows.length).toBeGreaterThan(4);
+	expect(parsed.withoutTokenUnifiedRows.length).toBeGreaterThan(
+		parsed.withTokenUnifiedRows.length,
+	);
+	expect(parsed.unifiedUiTypes).not.toContain("insert");
+	expect(parsed.splitUiTypes).not.toContain("insert");
+	expect(parsed.unifiedAnalyticsTypes).not.toContain("insert");
+	expect(parsed.splitAnalyticsTypes).not.toContain("insert");
+	expect(parsed.unifiedStorefrontTypes).toContain("insert");
+	expect(parsed.splitStorefrontTypes).toContain("insert");
+	expect(parsed.unifiedClosingTypes).not.toContain("insert");
+	expect(parsed.splitClosingTypes).not.toContain("insert");
+	expect(parsed.hasFallbackWarning).toBe(false);
+	expect(parsed.hasUnifiedGapRows).toBe(false);
+	expect(parsed.hasSplitGapRows).toBe(false);
 });
 
 test("line view keeps full context when contextLines is -1", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { renderHtml } from '${renderHtmlUrl}';
+	const output = runBunEval(
+		`import { renderHtml } from '${renderHtmlUrl}';
 const oldText = 'line-1\\nline-2\\nline-3\\nline-4\\nline-5\\nline-6\\nline-7\\n';
 const newText = 'line-1\\nline-2\\nline-3\\nline-4-updated\\nline-5\\nline-6\\nline-7\\n';
 const diff = {
@@ -378,25 +380,25 @@ console.log(JSON.stringify({
   hasGapRows: rows.some((row) => row.type === "gap"),
   hasHiddenLabel: html.includes("lines hidden"),
   hasBoundaryLine: rows.some((row) => String(row.text ?? row.newText ?? row.oldText ?? "").includes("line-7")),
-}));`
-  );
+}));`,
+	);
 
-  const parsed = decodeJson<{
-    hasGapRows: boolean;
-    hasHiddenLabel: boolean;
-    hasBoundaryLine: boolean;
-  }>(output);
+	const parsed = decodeJson<{
+		hasGapRows: boolean;
+		hasHiddenLabel: boolean;
+		hasBoundaryLine: boolean;
+	}>(output);
 
-  expect(parsed.hasGapRows).toBe(false);
-  expect(parsed.hasHiddenLabel).toBe(false);
-  expect(parsed.hasBoundaryLine).toBe(true);
+	expect(parsed.hasGapRows).toBe(false);
+	expect(parsed.hasHiddenLabel).toBe(false);
+	expect(parsed.hasBoundaryLine).toBe(true);
 });
 
 test("semantic line selection falls back to raw rows for meaningful hidden changes", () => {
-  execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
+	execSync("pnpm --filter @semadiff/render-html build", { stdio: "inherit" });
 
-  const output = runBunEval(
-    `import { __testing } from '${renderHtmlUrl}';
+	const output = runBunEval(
+		`import { __testing } from '${renderHtmlUrl}';
 const semanticRows = [{ type: "equal", oldLine: 1, newLine: 1, text: "context" }];
 const meaningfulRawRows = [
   {
@@ -437,14 +439,14 @@ console.log(
       cosmeticSelected[0]?.type === "equal" &&
       cosmeticSelected[0]?.text === "context",
   })
-);`
-  );
+);`,
+	);
 
-  const parsed = decodeJson<{
-    meaningfulUsesRaw: boolean;
-    cosmeticKeepsSemantic: boolean;
-  }>(output);
+	const parsed = decodeJson<{
+		meaningfulUsesRaw: boolean;
+		cosmeticKeepsSemantic: boolean;
+	}>(output);
 
-  expect(parsed.meaningfulUsesRaw).toBe(true);
-  expect(parsed.cosmeticKeepsSemantic).toBe(true);
+	expect(parsed.meaningfulUsesRaw).toBe(true);
+	expect(parsed.cosmeticKeepsSemantic).toBe(true);
 });

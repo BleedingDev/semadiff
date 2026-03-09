@@ -1,31 +1,31 @@
 {
-  "name": "@semadiff/github-extension",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "bun ../../scripts/copy-wasm.mjs && bun ../../scripts/verify-wasm-assets.mjs --dir packages/github-extension/public/semadiff-wasm && tsc -p tsconfig.json && vite build && bun ../../scripts/verify-wasm-assets.mjs --dir packages/github-extension/dist/semadiff-wasm",
-    "preview": "vite preview",
-    "lint": "biome lint ."
-  },
-  "dependencies": {
-    "@semadiff/core": "workspace:*",
-    "@semadiff/parser-tree-sitter-wasm": "workspace:*",
-    "@semadiff/parsers": "workspace:*",
-    "@semadiff/review-guide": "workspace:*",
-    "@semadiff/render-html": "workspace:*",
-    "effect": "4.0.0-beta.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.10",
-    "vite": "^5.4.8"
-  }
+	"name": "@semadiff/github-extension",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "bun ../../scripts/copy-wasm.mjs && bun ../../scripts/verify-wasm-assets.mjs --dir packages/github-extension/public/semadiff-wasm && tsc -p tsconfig.json && vite build && bun ../../scripts/verify-wasm-assets.mjs --dir packages/github-extension/dist/semadiff-wasm",
+		"preview": "vite preview",
+		"lint": "ultracite check ."
+	},
+	"dependencies": {
+		"@semadiff/core": "workspace:*",
+		"@semadiff/parser-tree-sitter-wasm": "workspace:*",
+		"@semadiff/parsers": "workspace:*",
+		"@semadiff/render-html": "workspace:*",
+		"@semadiff/review-guide": "workspace:*",
+		"effect": "4.0.0-beta.5",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.5",
+		"@types/react-dom": "^18.3.0",
+		"@vitejs/plugin-react": "^4.3.1",
+		"autoprefixer": "^10.4.20",
+		"postcss": "^8.4.41",
+		"tailwindcss": "^3.4.10",
+		"vite": "^5.4.8"
+	}
 }

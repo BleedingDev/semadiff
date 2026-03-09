@@ -1,13 +1,15 @@
 import {
-  chmodSync,
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
+	chmodSync,
+	mkdirSync,
+	mkdtempSync,
+	rmSync,
+	writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
 import { afterEach, describe, expect, test } from "vitest";
+
 import { type BenchmarkCase, resolveBenchmarkAdapter } from "../src/index.js";
 
 const tempDirectories: string[] = [];
@@ -16,79 +18,79 @@ const originalPath = process.env.PATH;
 const SEMANTICDIFF_ERROR_RE = /cache hydration failed/;
 
 function createTempDirectory(prefix: string) {
-  const directory = mkdtempSync(join(tmpdir(), prefix));
-  tempDirectories.push(directory);
-  return directory;
+	const directory = mkdtempSync(join(tmpdir(), prefix));
+	tempDirectories.push(directory);
+	return directory;
 }
 
 function writeExecutable(tempDir: string, name: string, body: string) {
-  const executablePath = join(tempDir, name);
-  writeFileSync(executablePath, body, "utf8");
-  chmodSync(executablePath, 0o755);
-  return executablePath;
+	const executablePath = join(tempDir, name);
+	writeFileSync(executablePath, body, "utf8");
+	chmodSync(executablePath, 0o755);
+	return executablePath;
 }
 
 function makeBenchmarkCase(files: BenchmarkCase["files"]): BenchmarkCase {
-  return makeBenchmarkCaseAtSource(
-    join(process.cwd(), "tmp", "adapter-fixture", "case.json"),
-    files
-  );
+	return makeBenchmarkCaseAtSource(
+		join(process.cwd(), "tmp", "adapter-fixture", "case.json"),
+		files,
+	);
 }
 
 function makeBenchmarkCaseAtSource(
-  sourcePath: string,
-  files: BenchmarkCase["files"]
+	sourcePath: string,
+	files: BenchmarkCase["files"],
 ): BenchmarkCase {
-  return {
-    id: "adapter-fixture",
-    language: "ts",
-    kind: "micro",
-    description: "Adapter fixture",
-    files,
-    truth: {
-      operations: [],
-      moves: [],
-      renames: [],
-      entities: [],
-      entityChanges: [],
-      graphEdges: [],
-      impact: [],
-    },
-    capabilities: {
-      review: true,
-      entity: true,
-      graph: false,
-    },
-    sourcePath,
-  };
+	return {
+		id: "adapter-fixture",
+		language: "ts",
+		kind: "micro",
+		description: "Adapter fixture",
+		files,
+		truth: {
+			operations: [],
+			moves: [],
+			renames: [],
+			entities: [],
+			entityChanges: [],
+			graphEdges: [],
+			impact: [],
+		},
+		capabilities: {
+			review: true,
+			entity: true,
+			graph: false,
+		},
+		sourcePath,
+	};
 }
 
 afterEach(() => {
-  while (tempDirectories.length > 0) {
-    const directory = tempDirectories.pop();
-    if (directory) {
-      rmSync(directory, { recursive: true, force: true });
-    }
-  }
-  if (originalSemBin) {
-    process.env.SEM_BIN = originalSemBin;
-  } else {
-    Reflect.deleteProperty(process.env, "SEM_BIN");
-  }
-  if (originalPath) {
-    process.env.PATH = originalPath;
-  } else {
-    Reflect.deleteProperty(process.env, "PATH");
-  }
+	while (tempDirectories.length > 0) {
+		const directory = tempDirectories.pop();
+		if (directory) {
+			rmSync(directory, { recursive: true, force: true });
+		}
+	}
+	if (originalSemBin) {
+		process.env.SEM_BIN = originalSemBin;
+	} else {
+		Reflect.deleteProperty(process.env, "SEM_BIN");
+	}
+	if (originalPath) {
+		process.env.PATH = originalPath;
+	} else {
+		Reflect.deleteProperty(process.env, "PATH");
+	}
 });
 
 describe("benchmark adapters", () => {
-  test("projects entity-only sem output from a local sem binary", () => {
-    const tempDir = createTempDirectory("benchmark-sem-script-");
-    const semBin = writeExecutable(
-      tempDir,
-      "sem",
-      `#!/usr/bin/env node
+	test("projects entity-only sem output from a local sem binary", () => {
+		const tempDir = createTempDirectory("benchmark-sem-script-");
+		const semBin = writeExecutable(
+			tempDir,
+			"sem",
+			`#!/usr/bin/env node
 const fs = require("node:fs");
 const args = process.argv.slice(2);
 if (args[0] === "--version") {
@@ -179,91 +181,91 @@ if (args[0] === "diff") {
   process.exit(0);
 }
 process.exit(1);
-`
-    );
-    process.env.SEM_BIN = semBin;
+`,
+		);
+		process.env.SEM_BIN = semBin;
 
-    const adapter = resolveBenchmarkAdapter("sem");
-    const result = adapter.runCase(
-      makeBenchmarkCase([
-        {
-          id: "src/value.ts",
-          oldPath: "src/value.ts",
-          newPath: "src/value.ts",
-          status: "modified",
-          language: "ts",
-          before: "export function compute(x: number) {\n  return x;\n}\n",
-          after:
-            "export function compute(value: number) {\n  return value + 1;\n}\n",
-        },
-        {
-          id: "src/new.ts",
-          oldPath: null,
-          newPath: "src/new.ts",
-          status: "added",
-          language: "ts",
-          before: "",
-          after: "export const created = true;\n",
-        },
-        {
-          id: "src/removed.ts",
-          oldPath: "src/removed.ts",
-          newPath: null,
-          status: "deleted",
-          language: "ts",
-          before: "export class Removed {}\n",
-          after: "",
-        },
-        {
-          id: "src/renamed.ts",
-          oldPath: "src/original.ts",
-          newPath: "src/renamed.ts",
-          status: "renamed",
-          language: "ts",
-          before: "export function previousName() {\n  return 1;\n}\n",
-          after: "export function nextName() {\n  return 1;\n}\n",
-        },
-        {
-          id: "src/b.ts",
-          oldPath: "src/a.ts",
-          newPath: "src/b.ts",
-          status: "renamed",
-          language: "ts",
-          before: "export function movedThing() {\n  return 1;\n}\n",
-          after: "export function movedThing() {\n  return 1;\n}\n",
-        },
-      ])
-    );
+		const adapter = resolveBenchmarkAdapter("sem");
+		const result = adapter.runCase(
+			makeBenchmarkCase([
+				{
+					id: "src/value.ts",
+					oldPath: "src/value.ts",
+					newPath: "src/value.ts",
+					status: "modified",
+					language: "ts",
+					before: "export function compute(x: number) {\n  return x;\n}\n",
+					after:
+						"export function compute(value: number) {\n  return value + 1;\n}\n",
+				},
+				{
+					id: "src/new.ts",
+					oldPath: null,
+					newPath: "src/new.ts",
+					status: "added",
+					language: "ts",
+					before: "",
+					after: "export const created = true;\n",
+				},
+				{
+					id: "src/removed.ts",
+					oldPath: "src/removed.ts",
+					newPath: null,
+					status: "deleted",
+					language: "ts",
+					before: "export class Removed {}\n",
+					after: "",
+				},
+				{
+					id: "src/renamed.ts",
+					oldPath: "src/original.ts",
+					newPath: "src/renamed.ts",
+					status: "renamed",
+					language: "ts",
+					before: "export function previousName() {\n  return 1;\n}\n",
+					after: "export function nextName() {\n  return 1;\n}\n",
+				},
+				{
+					id: "src/b.ts",
+					oldPath: "src/a.ts",
+					newPath: "src/b.ts",
+					status: "renamed",
+					language: "ts",
+					before: "export function movedThing() {\n  return 1;\n}\n",
+					after: "export function movedThing() {\n  return 1;\n}\n",
+				},
+			]),
+		);
 
-    expect(result.tool).toBe("sem");
-    expect(result.capabilities).toEqual({
-      review: false,
-      entity: true,
-      graph: false,
-    });
-    expect(
-      result.result.entityChanges.map((change) => change.changeKinds[0])
-    ).toEqual(["modified", "added", "deleted", "renamed", "moved"]);
-    expect(result.result.entities.old).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "compute", kind: "function" }),
-        expect.objectContaining({ name: "Removed", kind: "class" }),
-      ])
-    );
-    expect(result.result.entities.new).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ name: "created", kind: "variable" }),
-        expect.objectContaining({ name: "nextName", kind: "function" }),
-      ])
-    );
-  });
+		expect(result.tool).toBe("sem");
+		expect(result.capabilities).toEqual({
+			review: false,
+			entity: true,
+			graph: false,
+		});
+		expect(
+			result.result.entityChanges.map((change) => change.changeKinds[0]),
+		).toEqual(["modified", "added", "deleted", "renamed", "moved"]);
+		expect(result.result.entities.old).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ name: "compute", kind: "function" }),
+				expect.objectContaining({ name: "Removed", kind: "class" }),
+			]),
+		);
+		expect(result.result.entities.new).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ name: "created", kind: "variable" }),
+				expect.objectContaining({ name: "nextName", kind: "function" }),
+			]),
+		);
+	});
 
-  test("parses difftastic JSON review rows from a local difft binary", () => {
-    const tempDir = createTempDirectory("benchmark-difft-script-");
-    writeExecutable(
-      tempDir,
-      "difft",
-      `#!/usr/bin/env node
+	test("parses difftastic JSON review rows from a local difft binary", () => {
+		const tempDir = createTempDirectory("benchmark-difft-script-");
+		writeExecutable(
+			tempDir,
+			"difft",
+			`#!/usr/bin/env node
 const args = process.argv.slice(2);
 if (args[0] === "--version") {
   console.log("difft 1.0.0");
@@ -284,228 +286,228 @@ console.log(JSON.stringify([{
     {}
   ]]
 }]));
-`
-    );
-    process.env.PATH = `${tempDir}:${originalPath ?? ""}`;
+`,
+		);
+		process.env.PATH = `${tempDir}:${originalPath ?? ""}`;
 
-    const adapter = resolveBenchmarkAdapter("difft");
-    const result = adapter.runCase(
-      makeBenchmarkCase([
-        {
-          id: "src/value.ts",
-          oldPath: "src/value.ts",
-          newPath: "src/value.ts",
-          status: "modified",
-          language: "ts",
-          before: "oldValue\nremovedLine\n",
-          after: "newValue\naddedLine\n",
-        },
-      ])
-    );
+		const adapter = resolveBenchmarkAdapter("difft");
+		const result = adapter.runCase(
+			makeBenchmarkCase([
+				{
+					id: "src/value.ts",
+					oldPath: "src/value.ts",
+					newPath: "src/value.ts",
+					status: "modified",
+					language: "ts",
+					before: "oldValue\nremovedLine\n",
+					after: "newValue\naddedLine\n",
+				},
+			]),
+		);
 
-    expect(result.tool).toBe("difftastic");
-    expect(result.result.reviewRows).toEqual([
-      {
-        fileId: "src/value.ts",
-        type: "replace",
-        oldLine: 1,
-        newLine: 1,
-        oldText: "oldValue",
-        newText: "newValue",
-      },
-      {
-        fileId: "src/value.ts",
-        type: "delete",
-        oldLine: 2,
-        oldText: "removedLine",
-      },
-      {
-        fileId: "src/value.ts",
-        type: "insert",
-        newLine: 2,
-        newText: "addedLine",
-      },
-    ]);
-  });
+		expect(result.tool).toBe("difftastic");
+		expect(result.result.reviewRows).toEqual([
+			{
+				fileId: "src/value.ts",
+				type: "replace",
+				oldLine: 1,
+				newLine: 1,
+				oldText: "oldValue",
+				newText: "newValue",
+			},
+			{
+				fileId: "src/value.ts",
+				type: "delete",
+				oldLine: 2,
+				oldText: "removedLine",
+			},
+			{
+				fileId: "src/value.ts",
+				type: "insert",
+				newLine: 2,
+				newText: "addedLine",
+			},
+		]);
+	});
 
-  test("returns no difftastic review rows when the tool emits no JSON chunks", () => {
-    const tempDir = createTempDirectory("benchmark-difft-empty-");
-    writeExecutable(
-      tempDir,
-      "difft",
-      `#!/usr/bin/env node
+	test("returns no difftastic review rows when the tool emits no JSON chunks", () => {
+		const tempDir = createTempDirectory("benchmark-difft-empty-");
+		writeExecutable(
+			tempDir,
+			"difft",
+			`#!/usr/bin/env node
 const args = process.argv.slice(2);
 if (args[0] === "--version") {
   console.log("difft 1.0.0");
   process.exit(0);
 }
 console.log("");
-`
-    );
-    process.env.PATH = `${tempDir}:${originalPath ?? ""}`;
+`,
+		);
+		process.env.PATH = `${tempDir}:${originalPath ?? ""}`;
 
-    const adapter = resolveBenchmarkAdapter("difft");
-    const result = adapter.runCase(
-      makeBenchmarkCase([
-        {
-          id: "src/value.ts",
-          oldPath: "src/value.ts",
-          newPath: "src/value.ts",
-          status: "modified",
-          language: "ts",
-          before: "oldValue\n",
-          after: "newValue\n",
-        },
-      ])
-    );
+		const adapter = resolveBenchmarkAdapter("difft");
+		const result = adapter.runCase(
+			makeBenchmarkCase([
+				{
+					id: "src/value.ts",
+					oldPath: "src/value.ts",
+					newPath: "src/value.ts",
+					status: "modified",
+					language: "ts",
+					before: "oldValue\n",
+					after: "newValue\n",
+				},
+			]),
+		);
 
-    expect(result.result.reviewRows).toEqual([]);
-  });
+		expect(result.result.reviewRows).toEqual([]);
+	});
 
-  test("parses git diff review rows for changed files", () => {
-    const adapter = resolveBenchmarkAdapter("git-diff");
-    const result = adapter.runCase(
-      makeBenchmarkCase([
-        {
-          id: "src/value.ts",
-          oldPath: "src/value.ts",
-          newPath: "src/value.ts",
-          status: "modified",
-          language: "ts",
-          before: "const keep = true;\nconst value = 1;\n",
-          after: "const keep = true;\nconst value = 2;\nconst added = 3;\n",
-        },
-      ])
-    );
+	test("parses git diff review rows for changed files", () => {
+		const adapter = resolveBenchmarkAdapter("git-diff");
+		const result = adapter.runCase(
+			makeBenchmarkCase([
+				{
+					id: "src/value.ts",
+					oldPath: "src/value.ts",
+					newPath: "src/value.ts",
+					status: "modified",
+					language: "ts",
+					before: "const keep = true;\nconst value = 1;\n",
+					after: "const keep = true;\nconst value = 2;\nconst added = 3;\n",
+				},
+			]),
+		);
 
-    expect(result.tool).toBe("git-diff");
-    expect(result.result.reviewRows).toEqual([
-      {
-        fileId: "src/value.ts",
-        type: "delete",
-        oldLine: 2,
-        oldText: "const value = 1;",
-      },
-      {
-        fileId: "src/value.ts",
-        type: "insert",
-        newLine: 2,
-        newText: "const value = 2;",
-      },
-      {
-        fileId: "src/value.ts",
-        type: "insert",
-        newLine: 3,
-        newText: "const added = 3;",
-      },
-    ]);
-  });
+		expect(result.tool).toBe("git-diff");
+		expect(result.result.reviewRows).toEqual([
+			{
+				fileId: "src/value.ts",
+				type: "delete",
+				oldLine: 2,
+				oldText: "const value = 1;",
+			},
+			{
+				fileId: "src/value.ts",
+				type: "insert",
+				newLine: 2,
+				newText: "const value = 2;",
+			},
+			{
+				fileId: "src/value.ts",
+				type: "insert",
+				newLine: 3,
+				newText: "const added = 3;",
+			},
+		]);
+	});
 
-  test("reads cached semanticdiff manifests and surfaces cached error payloads", () => {
-    const tempDir = createTempDirectory("benchmark-semanticdiff-");
-    const caseDir = join(tempDir, "case");
-    const semanticdiffDir = join(caseDir, "semanticdiff");
-    const caseFilePath = join(caseDir, "case.json");
-    mkdirSync(semanticdiffDir, { recursive: true });
-    writeFileSync(caseFilePath, "{}", "utf8");
-    writeFileSync(
-      join(semanticdiffDir, "manifest.json"),
-      JSON.stringify(
-        [
-          { tracking_name: "src/value.ts", file: "value.json" },
-          { tracking_name: "src/value.ts" },
-          { file: "ignored.json" },
-        ],
-        null,
-        2
-      ),
-      "utf8"
-    );
-    writeFileSync(
-      join(semanticdiffDir, "value.json"),
-      JSON.stringify({
-        blocks: [
-          {
-            old_column: [
-              { line: 1, content: "oldValue", change: 1 },
-              { line: 2, content: "removedLine", change: 1 },
-            ],
-            new_column: [
-              { line: 1, content: "newValue", change: 1 },
-              { line: null, content: "", change: 0 },
-            ],
-          },
-          {
-            old_column: [],
-            new_column: [{ line: 3, content: "addedLine", change: 1 }],
-          },
-        ],
-      }),
-      "utf8"
-    );
+	test("reads cached semanticdiff manifests and surfaces cached error payloads", () => {
+		const tempDir = createTempDirectory("benchmark-semanticdiff-");
+		const caseDir = join(tempDir, "case");
+		const semanticdiffDir = join(caseDir, "semanticdiff");
+		const caseFilePath = join(caseDir, "case.json");
+		mkdirSync(semanticdiffDir, { recursive: true });
+		writeFileSync(caseFilePath, "{}", "utf8");
+		writeFileSync(
+			join(semanticdiffDir, "manifest.json"),
+			JSON.stringify(
+				[
+					{ tracking_name: "src/value.ts", file: "value.json" },
+					{ tracking_name: "src/value.ts" },
+					{ file: "ignored.json" },
+				],
+				null,
+				2,
+			),
+			"utf8",
+		);
+		writeFileSync(
+			join(semanticdiffDir, "value.json"),
+			JSON.stringify({
+				blocks: [
+					{
+						old_column: [
+							{ line: 1, content: "oldValue", change: 1 },
+							{ line: 2, content: "removedLine", change: 1 },
+						],
+						new_column: [
+							{ line: 1, content: "newValue", change: 1 },
+							{ line: null, content: "", change: 0 },
+						],
+					},
+					{
+						old_column: [],
+						new_column: [{ line: 3, content: "addedLine", change: 1 }],
+					},
+				],
+			}),
+			"utf8",
+		);
 
-    const adapter = resolveBenchmarkAdapter("semanticdiff");
-    const result = adapter.runCase(
-      makeBenchmarkCaseAtSource(caseFilePath, [
-        {
-          id: "src/value.ts",
-          oldPath: "src/value.ts",
-          newPath: "src/value.ts",
-          status: "modified",
-          language: "ts",
-          before: "oldValue\nremovedLine\n",
-          after: "newValue\naddedLine\n",
-        },
-      ])
-    );
+		const adapter = resolveBenchmarkAdapter("semanticdiff");
+		const result = adapter.runCase(
+			makeBenchmarkCaseAtSource(caseFilePath, [
+				{
+					id: "src/value.ts",
+					oldPath: "src/value.ts",
+					newPath: "src/value.ts",
+					status: "modified",
+					language: "ts",
+					before: "oldValue\nremovedLine\n",
+					after: "newValue\naddedLine\n",
+				},
+			]),
+		);
 
-    expect(result.tool).toBe("semanticdiff");
-    expect(result.result.reviewRows).toEqual([
-      {
-        fileId: "src/value.ts",
-        type: "replace",
-        oldLine: 1,
-        newLine: 1,
-        oldText: "oldValue",
-        newText: "newValue",
-      },
-      {
-        fileId: "src/value.ts",
-        type: "delete",
-        oldLine: 2,
-        oldText: "removedLine",
-      },
-      {
-        fileId: "src/value.ts",
-        type: "insert",
-        newLine: 3,
-        newText: "addedLine",
-      },
-    ]);
+		expect(result.tool).toBe("semanticdiff");
+		expect(result.result.reviewRows).toEqual([
+			{
+				fileId: "src/value.ts",
+				type: "replace",
+				oldLine: 1,
+				newLine: 1,
+				oldText: "oldValue",
+				newText: "newValue",
+			},
+			{
+				fileId: "src/value.ts",
+				type: "delete",
+				oldLine: 2,
+				oldText: "removedLine",
+			},
+			{
+				fileId: "src/value.ts",
+				type: "insert",
+				newLine: 3,
+				newText: "addedLine",
+			},
+		]);
 
-    writeFileSync(
-      join(semanticdiffDir, "value.json"),
-      JSON.stringify({
-        type: "error",
-        error: { message: "cache hydration failed" },
-      }),
-      "utf8"
-    );
+		writeFileSync(
+			join(semanticdiffDir, "value.json"),
+			JSON.stringify({
+				type: "error",
+				error: { message: "cache hydration failed" },
+			}),
+			"utf8",
+		);
 
-    expect(() =>
-      adapter.runCase(
-        makeBenchmarkCaseAtSource(caseFilePath, [
-          {
-            id: "src/value.ts",
-            oldPath: "src/value.ts",
-            newPath: "src/value.ts",
-            status: "modified",
-            language: "ts",
-            before: "oldValue\nremovedLine\n",
-            after: "newValue\naddedLine\n",
-          },
-        ])
-      )
-    ).toThrow(SEMANTICDIFF_ERROR_RE);
-  });
+		expect(() =>
+			adapter.runCase(
+				makeBenchmarkCaseAtSource(caseFilePath, [
+					{
+						id: "src/value.ts",
+						oldPath: "src/value.ts",
+						newPath: "src/value.ts",
+						status: "modified",
+						language: "ts",
+						before: "oldValue\nremovedLine\n",
+						after: "newValue\naddedLine\n",
+					},
+				]),
+			),
+		).toThrow(SEMANTICDIFF_ERROR_RE);
+	});
 });

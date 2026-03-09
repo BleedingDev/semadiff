@@ -4,6 +4,7 @@ SemaDiff is a semantic diff toolkit for code review workflows.
 The main entry point is the `semadiff` CLI: use it directly on files, feed it git ranges, or wire it into `git diff` and `git difftool`.
 
 It includes:
+
 - a CLI (`@semadiff/cli`)
 - a GitHub extension overlay (`@semadiff/github-extension`)
 - a PR viewer app (`apps/pr-viewer`)

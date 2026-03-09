@@ -27,28 +27,28 @@ The resolved settings apply to `diff`, `git-external`, `difftool`, and `git-hybr
 
 ```json
 {
-  "normalizers": {
-    "global": {
-      "whitespace": true,
-      "tailwind": true,
-      "importOrder": false,
-      "numericLiterals": false
-    },
-    "perLanguage": {
-      "tsx": {
-        "tailwind": true
-      }
-    }
-  },
-  "renderer": {
-    "format": "ansi",
-    "layout": "unified"
-  },
-  "telemetry": {
-    "enabled": false,
-    "exporter": "console",
-    "endpoint": "http://127.0.0.1:4318/v1/traces"
-  }
+	"normalizers": {
+		"global": {
+			"whitespace": true,
+			"tailwind": true,
+			"importOrder": false,
+			"numericLiterals": false
+		},
+		"perLanguage": {
+			"tsx": {
+				"tailwind": true
+			}
+		}
+	},
+	"renderer": {
+		"format": "ansi",
+		"layout": "unified"
+	},
+	"telemetry": {
+		"enabled": false,
+		"exporter": "console",
+		"endpoint": "http://127.0.0.1:4318/v1/traces"
+	}
 }
 ```
 

@@ -3,11 +3,13 @@
 Document bugs and issues found during testing, generate new specs for Ralph to fix.
 
 ## Usage
+
 ```
 /prompts:ralph-change-request
 ```
 
 ## Prerequisites
+
 - App has been built by Ralph (`/prompts:ralph-deploy` completed)
 - Testing has been done (`/prompts:ralph-review` completed)
 - Issues/bugs have been identified
@@ -15,6 +17,7 @@ Document bugs and issues found during testing, generate new specs for Ralph to f
 ## Language Setting
 
 **FIRST: Detect language automatically**
+
 ```bash
 LANG=$(grep -o '"language"[[:space:]]*:[[:space:]]*"[^"]*"' .ralph/config.json 2>/dev/null | cut -d'"' -f4)
 echo "Language: ${LANG:-en}"
@@ -23,6 +26,7 @@ echo "Language: ${LANG:-en}"
 Use the detected language (default: English) for ALL output (CR docs, specs, user prompts).
 
 ## Output
+
 - `docs/CHANGE_REQUEST.md` - Problem documentation
 - `specs/CR-*.md` - New spec files for fixes
 
@@ -31,6 +35,7 @@ Use the detected language (default: English) for ALL output (CR docs, specs, use
 **PHASE 1: COLLECT PROBLEMS**
 
 Ask the user (in configured language):
+
 ```
 🔍 Change Request
 
@@ -61,36 +66,43 @@ Create `docs/CHANGE_REQUEST.md`:
 # Change Request - [DATE]
 
 ## Summary
+
 {1-2 sentences about what was found}
 
 ## Categories
 
 ### 🐛 Bugs
-| # | Problem | Affects | Priority |
-|---|---------|---------|----------|
-| B1 | {description} | {feature} | HIGH/MED/LOW |
+
+| #   | Problem       | Affects   | Priority     |
+| --- | ------------- | --------- | ------------ |
+| B1  | {description} | {feature} | HIGH/MED/LOW |
 
 ### ⚠️ Incomplete
-| # | Feature | Status | Missing |
-|---|---------|--------|---------|
-| I1 | {feature} | {%} | {what} |
+
+| #   | Feature   | Status | Missing |
+| --- | --------- | ------ | ------- |
+| I1  | {feature} | {%}    | {what}  |
 
 ### ❌ Missing
-| # | Feature | Spec Reference |
-|---|---------|----------------|
-| M1 | {feature} | {original-spec} |
+
+| #   | Feature   | Spec Reference  |
+| --- | --------- | --------------- |
+| M1  | {feature} | {original-spec} |
 
 ### 💡 Enhancements (Optional)
-| # | Suggestion | Value |
-|---|------------|-------|
-| E1 | {suggestion} | {value} |
+
+| #   | Suggestion   | Value   |
+| --- | ------------ | ------- |
+| E1  | {suggestion} | {value} |
 
 ---
 
 ## Original Specs
+
 {List which specs were run}
 
 ## Testing Done
+
 {Summary of testing}
 ```
 
@@ -106,6 +118,7 @@ specs/
 ```
 
 **Spec format for fixes:**
+
 ```markdown
 # CR-XX: {Brief description}
 
@@ -113,16 +126,19 @@ specs/
 {Fix}: {What needs to be done}
 
 ## Requirements
+
 - {Concrete requirement 1}
 - {Concrete requirement 2}
 
 ## Done when
+
 - [ ] Build passes
 - [ ] {Specific verification of fix}
 - [ ] Regression: {existing functionality still works}
 ```
 
 **IMPORTANT:**
+
 - Keep specs MINIMAL (max 15 lines)
 - One spec = one problem
 - Include regression test in "Done when"
@@ -136,15 +152,18 @@ Add CR tasks to `docs/IMPLEMENTATION_PLAN.md`:
 ## Change Request Tasks
 
 ### CR-Fixes (Priority: Critical)
+
 - [ ] CR-01: {fix}
 - [ ] CR-02: {fix}
 - [ ] **HARD STOP** - Verify all CR fixes
 
 ### CR-Enhancements (Priority: Low)
+
 - [ ] CR-03: {enhancement}
 ```
 
 **WHEN DONE:**
+
 ```
 CHANGE_REQUEST_DONE
 

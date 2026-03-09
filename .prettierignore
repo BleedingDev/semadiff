@@ -1,0 +1,10 @@
+tree-sitter/
+dist/
+coverage/
+packages/test-corpus/fixtures/
+packages/**/test/fixtures/
+bench/cases/
+**/__fixtures__/
+**/*.snap
+**/*.snap.*
+apps/pr-viewer/src/routeTree.gen.ts

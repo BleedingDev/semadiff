@@ -1,48 +1,49 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+
 import { describe, expect, test } from "vitest";
+
 import { structuralDiff } from "../src/diff";
 
 const fixturesDir = join(import.meta.dirname, "fixtures");
 
 function readFixturePair(name: string) {
-  return {
-    oldText: readFileSync(join(fixturesDir, name, "old.ts"), "utf8"),
-    newText: readFileSync(join(fixturesDir, name, "new.ts"), "utf8"),
-  };
+	return {
+		oldText: readFileSync(join(fixturesDir, name, "old.ts"), "utf8"),
+		newText: readFileSync(join(fixturesDir, name, "new.ts"), "utf8"),
+	};
 }
 
 function projectDiff(oldText: string, newText: string) {
-  const diff = structuralDiff(oldText, newText, { language: "ts" });
-  return {
-    operations: diff.operations.map((operation) => ({
-      type: operation.type,
-      oldStartLine: operation.oldRange?.start.line ?? null,
-      newStartLine: operation.newRange?.start.line ?? null,
-      oldText: operation.oldText ?? null,
-      newText: operation.newText ?? null,
-      moveId: operation.meta?.moveId ?? null,
-    })),
-    moves: diff.moves.map((move) => ({
-      confidence: Number(move.confidence.toFixed(2)),
-      sourceStartLine: move.sourceRange?.start.line ?? null,
-      targetStartLine: move.targetRange?.start.line ?? null,
-    })),
-    renames: diff.renames.map((rename) => ({
-      from: rename.from,
-      to: rename.to,
-      occurrences: rename.occurrences,
-      confidence: Number(rename.confidence.toFixed(2)),
-    })),
-  };
+	const diff = structuralDiff(oldText, newText, { language: "ts" });
+	return {
+		operations: diff.operations.map((operation) => ({
+			type: operation.type,
+			oldStartLine: operation.oldRange?.start.line ?? null,
+			newStartLine: operation.newRange?.start.line ?? null,
+			oldText: operation.oldText ?? null,
+			newText: operation.newText ?? null,
+			moveId: operation.meta?.moveId ?? null,
+		})),
+		moves: diff.moves.map((move) => ({
+			confidence: Number(move.confidence.toFixed(2)),
+			sourceStartLine: move.sourceRange?.start.line ?? null,
+			targetStartLine: move.targetRange?.start.line ?? null,
+		})),
+		renames: diff.renames.map((rename) => ({
+			from: rename.from,
+			to: rename.to,
+			occurrences: rename.occurrences,
+			confidence: Number(rename.confidence.toFixed(2)),
+		})),
+	};
 }
 
 describe("diff characterization", () => {
-  test("update fixture stays a single update operation", () => {
-    const fixture = readFixturePair("update");
-    expect(
-      projectDiff(fixture.oldText, fixture.newText)
-    ).toMatchInlineSnapshot(`
+	test("update fixture stays a single update operation", () => {
+		const fixture = readFixturePair("update");
+		expect(projectDiff(fixture.oldText, fixture.newText))
+			.toMatchInlineSnapshot(`
       {
         "moves": [],
         "operations": [
@@ -60,13 +61,12 @@ describe("diff characterization", () => {
         "renames": [],
       }
     `);
-  });
+	});
 
-  test("rename fixture stays grouped as one rename", () => {
-    const fixture = readFixturePair("rename");
-    expect(
-      projectDiff(fixture.oldText, fixture.newText)
-    ).toMatchInlineSnapshot(`
+	test("rename fixture stays grouped as one rename", () => {
+		const fixture = readFixturePair("rename");
+		expect(projectDiff(fixture.oldText, fixture.newText))
+			.toMatchInlineSnapshot(`
       {
         "moves": [],
         "operations": [
@@ -93,13 +93,12 @@ describe("diff characterization", () => {
         ],
       }
     `);
-  });
+	});
 
-  test("move fixture keeps move + nested update linkage", () => {
-    const fixture = readFixturePair("move");
-    expect(
-      projectDiff(fixture.oldText, fixture.newText)
-    ).toMatchInlineSnapshot(`
+	test("move fixture keeps move + nested update linkage", () => {
+		const fixture = readFixturePair("move");
+		expect(projectDiff(fixture.oldText, fixture.newText))
+			.toMatchInlineSnapshot(`
       {
         "moves": [
           {
@@ -145,5 +144,5 @@ describe("diff characterization", () => {
         "renames": [],
       }
     `);
-  });
+	});
 });

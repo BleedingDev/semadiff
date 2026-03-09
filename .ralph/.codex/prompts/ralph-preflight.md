@@ -3,12 +3,14 @@
 Generera och verifiera preflight checklist innan development startar.
 
 ## Usage
+
 ```
 /prompts:ralph-preflight
 /prompts:ralph-preflight --check    # Verifiera befintlig PREFLIGHT.md
 ```
 
 ## Prerequisites
+
 - `docs/PRD.md` måste finnas (kör `/prompts:ralph-idea` eller `/prompts:ralph-discover` först)
 
 ## Instructions
@@ -16,6 +18,7 @@ Generera och verifiera preflight checklist innan development startar.
 **STEG 1: LÄS PRD**
 
 Läs `docs/PRD.md` och identifiera:
+
 1. Alla externa integrationer
 2. Alla API:er som behövs
 3. Teknisk stack och hosting
@@ -78,6 +81,7 @@ MANUAL SETUP:
 **STEG 4: GATE CHECK**
 
 Om användaren svarar "ja":
+
 ```
 ✅ PREFLIGHT COMPLETE
 
@@ -89,6 +93,7 @@ Nästa steg:
 ```
 
 Om användaren svarar "nej":
+
 ```
 ⚠️ PREFLIGHT INCOMPLETE
 
@@ -99,6 +104,7 @@ Kör /prompts:ralph-preflight --check när du är klar.
 ```
 
 **VIKTIGT:**
+
 - STOPPA INTE om preflight inte är klar
 - Användaren måste aktivt bekräfta
 - `/prompts:ralph-deploy` ska vägra köra om PREFLIGHT inte är READY

@@ -1,6 +1,7 @@
 # Agent Instructions
 
 <!-- effect-solutions:start -->
+
 ## Effect Best Practices
 
 **IMPORTANT:** Always consult effect-solutions before writing Effect code.
@@ -12,6 +13,7 @@
 Topics: quick-start, project-setup, tsconfig, basics, services-and-layers, data-modeling, error-handling, config, testing, cli.
 
 Never guess at Effect patterns - check the guide first.
+
 <!-- effect-solutions:end -->
 
 ## Local Effect Source
@@ -19,13 +21,15 @@ Never guess at Effect patterns - check the guide first.
 The Effect repository is cloned to `.reference/effect` for reference.
 
 ## Subagents
+
 - ALWAYS wait for all subagents to complete before yielding.
 - Spawn subagents automatically when:
 - Parallelizable work (e.g., install + verify, npm test + typecheck, multiple tasks from plan)
 - Long-running or blocking tasks where a worker can run independently.
-Isolation for risky changes or checks
+  Isolation for risky changes or checks
 
 ## Dev Server (pr-viewer) - IPv4/IPv6 Safe Start
+
 - Always run with Bun and bind explicitly to IPv4 to avoid localhost IPv6 issues:
   `bun --bun run dev -- --host 127.0.0.1 --port 3000 --strictPort`
 - If devtools are enabled, set `TANSTACK_DEVTOOLS_PORT` to a known-free port (default 42070 can conflict).
@@ -35,6 +39,7 @@ Isolation for risky changes or checks
 - If connection fails, check the dev log and port conflicts before retrying.
 
 <!-- BEGIN BEADS INTEGRATION -->
+
 ## Issue Tracking with bd (beads)
 
 **IMPORTANT**: This project uses **bd (beads)** for ALL issue tracking. Do NOT use markdown TODOs, task lists, or other tracking methods.
@@ -140,6 +145,7 @@ For more details, see README.md and docs/QUICKSTART.md.
 7. **Hand off** - Provide context for next session
 
 **CRITICAL RULES:**
+
 - Work is NOT complete until `git push` succeeds
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push

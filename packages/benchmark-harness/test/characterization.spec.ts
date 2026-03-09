@@ -1,5 +1,7 @@
 import { join } from "node:path";
+
 import { describe, expect, test } from "vitest";
+
 import type { NormalizerLanguage } from "../../core/src/index.ts";
 import { renderJson, structuralDiff } from "../../core/src/index.ts";
 import { renderFileDiffHtml } from "../../pr-backend/src/pr-diff.ts";
@@ -11,140 +13,140 @@ import { extractLinePayloadFromHtml } from "../src/run.js";
 const caseRoot = join(import.meta.dirname, "../../../bench/cases/gold/micro");
 
 function extractSemanticOpTypes(html: string) {
-  return [
-    ...html.matchAll(
-      /<article class="sd-op sd-op--(insert|delete|update|move)"/g
-    ),
-  ].map((match) => match[1]);
+	return [
+		...html.matchAll(
+			/<article class="sd-op sd-op--(insert|delete|update|move)"/g,
+		),
+	].map((match) => match[1]);
 }
 
 function extractSummaryCards(html: string) {
-  return [
-    ...html.matchAll(
-      /sd-summary-label">([^<]+)<\/div>\s*<div class="sd-summary-value">([^<]+)<\/div>/g
-    ),
-  ].map((match) => ({
-    label: match[1],
-    value: match[2],
-  }));
+	return [
+		...html.matchAll(
+			/sd-summary-label">([^<]+)<\/div>\s*<div class="sd-summary-value">([^<]+)<\/div>/g,
+		),
+	].map((match) => ({
+		label: match[1],
+		value: match[2],
+	}));
 }
 
 function extractPills(html: string) {
-  return [...html.matchAll(/<span class="sd-pill">([^<]+)<\/span>/g)].map(
-    (match) => match[1]
-  );
+	return [...html.matchAll(/<span class="sd-pill">([^<]+)<\/span>/g)].map(
+		(match) => match[1],
+	);
 }
 
 function extractLineRowTypes(html: string) {
-  return [
-    ...html.matchAll(/sd-line sd-line--(equal|insert|delete|replace|move)/g),
-  ].map((match) => match[1]);
+	return [
+		...html.matchAll(/sd-line sd-line--(equal|insert|delete|replace|move)/g),
+	].map((match) => match[1]);
 }
 
 function projectJson(
-  oldText: string,
-  newText: string,
-  language: NormalizerLanguage
+	oldText: string,
+	newText: string,
+	language: NormalizerLanguage,
 ) {
-  const diff = structuralDiff(oldText, newText, { language });
-  return JSON.parse(renderJson(diff)) as unknown;
+	const diff = structuralDiff(oldText, newText, { language });
+	return JSON.parse(renderJson(diff)) as unknown;
 }
 
 function characterizeCase(caseId: string) {
-  const benchmarkCase = loadBenchmarkCases(caseRoot).find(
-    (entry) => entry.id === caseId
-  );
-  if (!benchmarkCase) {
-    throw new Error(`Unknown benchmark case: ${caseId}`);
-  }
-  const file = benchmarkCase.files[0];
-  if (!file) {
-    throw new Error(`Case ${caseId} does not have a primary file.`);
-  }
+	const benchmarkCase = loadBenchmarkCases(caseRoot).find(
+		(entry) => entry.id === caseId,
+	);
+	if (!benchmarkCase) {
+		throw new Error(`Unknown benchmark case: ${caseId}`);
+	}
+	const file = benchmarkCase.files[0];
+	if (!file) {
+		throw new Error(`Case ${caseId} does not have a primary file.`);
+	}
 
-  const diff = structuralDiff(file.before, file.after, {
-    language: benchmarkCase.language,
-    detectMoves: true,
-  });
-  const semanticHtml = renderHtml(diff, {
-    oldText: file.before,
-    newText: file.after,
-    language: benchmarkCase.language,
-    filePath: file.newPath ?? file.oldPath ?? file.id,
-    view: "semantic",
-  });
-  const lineHtml = renderHtml(diff, {
-    oldText: file.before,
-    newText: file.after,
-    language: benchmarkCase.language,
-    filePath: file.newPath ?? file.oldPath ?? file.id,
-    view: "lines",
-    lineMode: "semantic",
-    lineLayout: "split",
-    contextLines: 0,
-    virtualize: true,
-  });
-  const prHtml = renderFileDiffHtml({
-    filename: file.newPath ?? file.oldPath ?? file.id,
-    diff,
-    language: benchmarkCase.language,
-    oldText: file.before,
-    newText: file.after,
-    oldTokens: undefined,
-    newTokens: undefined,
-    contextLines: 0,
-    lineLayout: "split",
-    lineMode: "semantic",
-    hideComments: false,
-  });
+	const diff = structuralDiff(file.before, file.after, {
+		language: benchmarkCase.language,
+		detectMoves: true,
+	});
+	const semanticHtml = renderHtml(diff, {
+		oldText: file.before,
+		newText: file.after,
+		language: benchmarkCase.language,
+		filePath: file.newPath ?? file.oldPath ?? file.id,
+		view: "semantic",
+	});
+	const lineHtml = renderHtml(diff, {
+		oldText: file.before,
+		newText: file.after,
+		language: benchmarkCase.language,
+		filePath: file.newPath ?? file.oldPath ?? file.id,
+		view: "lines",
+		lineMode: "semantic",
+		lineLayout: "split",
+		contextLines: 0,
+		virtualize: true,
+	});
+	const prHtml = renderFileDiffHtml({
+		filename: file.newPath ?? file.oldPath ?? file.id,
+		diff,
+		language: benchmarkCase.language,
+		oldText: file.before,
+		newText: file.after,
+		oldTokens: undefined,
+		newTokens: undefined,
+		contextLines: 0,
+		lineLayout: "split",
+		lineMode: "semantic",
+		hideComments: false,
+	});
 
-  return {
-    id: benchmarkCase.id,
-    json: projectJson(file.before, file.after, benchmarkCase.language),
-    terminal: {
-      semantic: renderTerminal(diff, {
-        format: "plain",
-        view: "semantic",
-      }),
-      lines: renderTerminal(diff, {
-        format: "plain",
-        view: "lines",
-        layout: "unified",
-        lineMode: "semantic",
-        oldText: file.before,
-        newText: file.after,
-        language: benchmarkCase.language,
-        contextLines: 0,
-      }),
-    },
-    html: {
-      summaryCards: extractSummaryCards(semanticHtml),
-      pills: extractPills(semanticHtml),
-      semanticOpTypes: extractSemanticOpTypes(semanticHtml),
-      lineRows: extractLinePayloadFromHtml(lineHtml).rows.map((row) => ({
-        type: row.type,
-        oldLine: row.oldLine ?? null,
-        newLine: row.newLine ?? null,
-        text: row.text ?? null,
-        oldText: row.oldText ?? null,
-        newText: row.newText ?? null,
-      })),
-    },
-    pr: {
-      semanticOpTypes: extractSemanticOpTypes(prHtml.semanticHtml),
-      lineRowTypes: extractLineRowTypes(prHtml.linesHtml),
-    },
-  };
+	return {
+		id: benchmarkCase.id,
+		json: projectJson(file.before, file.after, benchmarkCase.language),
+		terminal: {
+			semantic: renderTerminal(diff, {
+				format: "plain",
+				view: "semantic",
+			}),
+			lines: renderTerminal(diff, {
+				format: "plain",
+				view: "lines",
+				layout: "unified",
+				lineMode: "semantic",
+				oldText: file.before,
+				newText: file.after,
+				language: benchmarkCase.language,
+				contextLines: 0,
+			}),
+		},
+		html: {
+			summaryCards: extractSummaryCards(semanticHtml),
+			pills: extractPills(semanticHtml),
+			semanticOpTypes: extractSemanticOpTypes(semanticHtml),
+			lineRows: extractLinePayloadFromHtml(lineHtml).rows.map((row) => ({
+				type: row.type,
+				oldLine: row.oldLine ?? null,
+				newLine: row.newLine ?? null,
+				text: row.text ?? null,
+				oldText: row.oldText ?? null,
+				newText: row.newText ?? null,
+			})),
+		},
+		pr: {
+			semanticOpTypes: extractSemanticOpTypes(prHtml.semanticHtml),
+			lineRowTypes: extractLineRowTypes(prHtml.linesHtml),
+		},
+	};
 }
 
 describe("render surface characterization", () => {
-  test("gold micro fixtures stay stable across JSON, terminal, HTML, and PR surfaces", () => {
-    expect([
-      characterizeCase("update-ts-001"),
-      characterizeCase("rename-local-ts-001"),
-      characterizeCase("move-with-edit-ts-001"),
-      characterizeCase("tailwind-reorder-tsx-001"),
-    ]).toMatchInlineSnapshot(`
+	test("gold micro fixtures stay stable across JSON, terminal, HTML, and PR surfaces", () => {
+		expect([
+			characterizeCase("update-ts-001"),
+			characterizeCase("rename-local-ts-001"),
+			characterizeCase("move-with-edit-ts-001"),
+			characterizeCase("tailwind-reorder-tsx-001"),
+		]).toMatchInlineSnapshot(`
       [
         {
           "html": {
@@ -652,5 +654,5 @@ describe("render surface characterization", () => {
         },
       ]
     `);
-  });
+	});
 });

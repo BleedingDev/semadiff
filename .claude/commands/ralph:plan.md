@@ -3,6 +3,7 @@
 Analyze PRD or Change Request and create implementation plan with executable specs.
 
 ## Usage
+
 ```
 /ralph:plan                         # Auto-detect input (PRD or CR)
 /ralph:plan --prd                   # Force PRD mode
@@ -12,22 +13,25 @@ Analyze PRD or Change Request and create implementation plan with executable spe
 
 ## Two Entry Points
 
-| Source | Input | Output |
-|--------|-------|--------|
-| Greenfield (new app) | `docs/PRD.md` | Full spec sequence |
-| Brownfield (changes) | `docs/CHANGE-REQUEST-*.md` | CR-* specs |
+| Source               | Input                      | Output             |
+| -------------------- | -------------------------- | ------------------ |
+| Greenfield (new app) | `docs/PRD.md`              | Full spec sequence |
+| Brownfield (changes) | `docs/CHANGE-REQUEST-*.md` | CR-\* specs        |
 
 ## Prerequisites
+
 - **Greenfield:** `docs/PRD.md` must exist (run `/ralph:discover` first)
 - **Brownfield:** `docs/CHANGE-REQUEST-*.md` must exist (run `/ralph:change-request` first)
 
 ## Output
+
 - `docs/IMPLEMENTATION_PLAN.md` - Overview with epics and tasks
 - `.ralph-specs/*.md` - Executable spec files (this is what Ralph runs on VM)
 
 ## LANGUAGE SETTING
 
 **FIRST: Detect language automatically**
+
 ```bash
 LANG=$(grep -o '"language"[[:space:]]*:[[:space:]]*"[^"]*"' .ralph/config.json 2>/dev/null | cut -d'"' -f4)
 echo "Language: ${LANG:-en}"
@@ -56,6 +60,7 @@ fi
 ```
 
 **Auto-detect logic:**
+
 1. If `CHANGE-REQUEST-*.md` exists → Change Request mode
 2. Else if `PRD.md` exists → PRD mode
 3. Else → Error
@@ -103,6 +108,7 @@ If input is a Change Request, the planning is simplified:
 5. **Update IMPLEMENTATION_PLAN.md** - Add CR section
 
 **CR specs are prefixed with `CR-`:**
+
 ```
 .ralph-specs/
 ├── 01-project-setup.md      # Original specs (if any)
@@ -140,6 +146,7 @@ If input is a Change Request, the planning is simplified:
 ```
 
 For each epic:
+
 1. List all tasks needed
 2. Ensure each task is atomic (one thing)
 3. Add acceptance criteria from PRD
@@ -171,13 +178,13 @@ For each spec:
   5. Annars → nästa spec
 ```
 
-| Check | Question |
-|-------|----------|
-| ✅ PRD Coverage | Täcker specs ALLA must-have features? |
-| ✅ Dependencies | Är beroenden explicit? |
-| ✅ Testability | Har varje spec E2E test criteria? |
-| ✅ Atomicity | Är varje spec EN sak? |
-| ✅ Order | Är ordningen rätt (dependencies first)? |
+| Check           | Question                                |
+| --------------- | --------------------------------------- |
+| ✅ PRD Coverage | Täcker specs ALLA must-have features?   |
+| ✅ Dependencies | Är beroenden explicit?                  |
+| ✅ Testability  | Har varje spec E2E test criteria?       |
+| ✅ Atomicity    | Är varje spec EN sak?                   |
+| ✅ Order        | Är ordningen rätt (dependencies first)? |
 
 ---
 
@@ -191,21 +198,26 @@ For each spec:
 {1-2 sentences what to build}
 
 ## Requirements
+
 - {Concrete requirement 1}
 - {Concrete requirement 2}
 - {Concrete requirement 3}
 
 ## E2E Test
+
 Write test in `e2e/{feature}.spec.ts` that verifies:
+
 - {what test should check}
 
 ## Done when
+
 - [ ] Build passes
 - [ ] E2E test passes
 - [ ] {Specific verification}
 ```
 
 **IMPORTANT:**
+
 - No background/context - Claude reads the code
 - No implementation details - Claude knows how
 - Only WHAT, not HOW
@@ -226,6 +238,7 @@ Write test in `e2e/{feature}.spec.ts` that verifies:
 ```
 
 **CRITICAL - 01-project-setup MUST contain:**
+
 - Vite + React + TypeScript setup (or chosen stack)
 - Tailwind with design tokens from PRD
 - **Playwright installation** (`npx playwright install`)
@@ -239,39 +252,47 @@ Write test in `e2e/{feature}.spec.ts` that verifies:
 ## EXAMPLE SPECS
 
 ### Good spec (minimal):
+
 ```markdown
 # Auth Context
 
 Create React context for authentication with Supabase.
 
 ## Requirements
+
 - AuthProvider wrapper component
 - useAuth hook (user, signIn, signOut, loading)
 - Automatic session refresh on mount
 
 ## E2E Test
+
 Write test in `e2e/auth.spec.ts` that verifies:
+
 - Sign in redirects to home
 - Sign out clears session
 
 ## Done when
+
 - [ ] Build passes
 - [ ] Can sign in/out via hook
 ```
 
 ### Bad spec (too long):
+
 ```markdown
 # Auth Context
 
 ## Background
+
 Authentication is important for...
 [10 lines of unnecessary context]
 
 ## Implementation
+
 1. Create src/contexts/AuthContext.tsx
 2. Import createContext from react
 3. Define AuthContextType interface
-[20 lines of step-by-step implementation]
+   [20 lines of step-by-step implementation]
 ```
 
 ---
@@ -285,43 +306,48 @@ Create `docs/IMPLEMENTATION_PLAN.md`:
 
 ## Epics Overview
 
-| Epic | Name | Specs | Status |
-|------|------|-------|--------|
-| E1 | Project Setup | 01 | pending |
-| E2 | Authentication | 02-04 | pending |
-| E3 | Core Features | 05-08 | pending |
-| E4 | Polish | 09-10 | pending |
+| Epic | Name           | Specs | Status  |
+| ---- | -------------- | ----- | ------- |
+| E1   | Project Setup  | 01    | pending |
+| E2   | Authentication | 02-04 | pending |
+| E3   | Core Features  | 05-08 | pending |
+| E4   | Polish         | 09-10 | pending |
 
 ## Spec Sequence
 
 ### E1: Project Setup (MUST COMPLETE FIRST)
+
 - [ ] 01-project-setup.md
 - **HARD STOP** - Verify build + Playwright works
 
 ### E2: Authentication
+
 - [ ] 02-database-schema.md
 - [ ] 03-auth-context.md
 - [ ] 04-login-page.md
 - **HARD STOP** - Verify login flow works
 
 ### E3: Core Features
+
 - [ ] 05-{feature}.md
 - [ ] 06-{feature}.md
 - [ ] 07-{feature}.md
 - [ ] 08-{feature}.md
 
 ### E4: Polish
+
 - [ ] 09-{feature}.md
 - [ ] 10-{feature}.md
 
 ## Dependencies
-
 ```
+
 01 → 02 → 03 → 04
-          ↓
-     05 → 06 → 07 → 08
-                    ↓
-               09 → 10
+↓
+05 → 06 → 07 → 08
+↓
+09 → 10
+
 ```
 
 ## PRD Traceability
@@ -355,9 +381,10 @@ Create `docs/IMPLEMENTATION_PLAN.md`:
 - **HARD STOP** - Verify all CR changes + regression
 
 ### CR Dependencies
-
 ```
+
 CR-01 → CR-02 → CR-03
+
 ```
 
 ### CR Traceability
@@ -380,33 +407,34 @@ CR-01 → CR-02 → CR-03
 
 ### For PRD (Greenfield)
 
-| Kriterium | Verifiering |
-|-----------|-------------|
-| ✅ Alla PRD must-haves täckta | Traceability komplett |
-| ✅ Specs är atomära | En sak per spec |
-| ✅ Dependencies explicit | Ordning är tydlig |
-| ✅ E2E test för varje spec | Testability klar |
+| Kriterium                          | Verifiering            |
+| ---------------------------------- | ---------------------- |
+| ✅ Alla PRD must-haves täckta      | Traceability komplett  |
+| ✅ Specs är atomära                | En sak per spec        |
+| ✅ Dependencies explicit           | Ordning är tydlig      |
+| ✅ E2E test för varje spec         | Testability klar       |
 | ✅ 01-project-setup har Playwright | Test-loop kommer funka |
-| ✅ Specs är minimala | Max 20 rader |
-| ✅ Inga open questions | Allt är specificerat |
+| ✅ Specs är minimala               | Max 20 rader           |
+| ✅ Inga open questions             | Allt är specificerat   |
 
 ### For Change Request (Brownfield)
 
-| Kriterium | Verifiering |
-|-----------|-------------|
-| ✅ Alla CR requirements täckta | Traceability komplett |
-| ✅ Specs är atomära | En sak per spec |
-| ✅ Dependencies explicit | CR-ordning tydlig |
-| ✅ E2E test för varje spec | Testability klar |
+| Kriterium                       | Verifiering                           |
+| ------------------------------- | ------------------------------------- |
+| ✅ Alla CR requirements täckta  | Traceability komplett                 |
+| ✅ Specs är atomära             | En sak per spec                       |
+| ✅ Dependencies explicit        | CR-ordning tydlig                     |
+| ✅ E2E test för varje spec      | Testability klar                      |
 | ✅ Regression tests inkluderade | Existerande funktionalitet verifieras |
-| ✅ Files to modify listade | Vet vilka filer som påverkas |
-| ✅ Specs är minimala | Max 20 rader |
+| ✅ Files to modify listade      | Vet vilka filer som påverkas          |
+| ✅ Specs är minimala            | Max 20 rader                          |
 
 ---
 
 ## NÄR KLAR
 
 ### For PRD (Greenfield)
+
 ```
 PLANNING_COMPLETE
 
@@ -428,6 +456,7 @@ Next steps:
 ```
 
 ### For Change Request (Brownfield)
+
 ```
 PLANNING_COMPLETE (Change Request)
 

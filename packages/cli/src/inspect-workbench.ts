@@ -3,12 +3,13 @@ import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+
 import type {
-  DiagnosticsBundle,
-  DiffDocument,
-  DiffOperation,
-  ExplainDocument,
-  Range,
+	DiagnosticsBundle,
+	DiffDocument,
+	DiffOperation,
+	ExplainDocument,
+	Range,
 } from "@semadiff/core";
 import type { LanguageId, TokenRange } from "@semadiff/parsers";
 import { renderHtml } from "@semadiff/render-html";
@@ -17,121 +18,121 @@ const DEFAULT_CONTEXT_LINES = 3;
 const EXTERNAL_FONT_IMPORT_RE = /@import url\([^\n]+\);\n\n/;
 
 export interface InspectWorkbenchInput {
-  oldPath: string;
-  newPath: string;
-  oldText: string;
-  newText: string;
-  language?: LanguageId;
-  diff: DiffDocument;
-  explain: ExplainDocument;
-  diagnostics: DiagnosticsBundle;
-  oldTokens?: readonly TokenRange[];
-  newTokens?: readonly TokenRange[];
+	oldPath: string;
+	newPath: string;
+	oldText: string;
+	newText: string;
+	language?: LanguageId;
+	diff: DiffDocument;
+	explain: ExplainDocument;
+	diagnostics: DiagnosticsBundle;
+	oldTokens?: readonly TokenRange[];
+	newTokens?: readonly TokenRange[];
 }
 
 function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;")
+		.replaceAll("'", "&#39;");
 }
 
 function escapeScript(value: string) {
-  return value
-    .replace(/<\/script/gi, "<\\/script")
-    .replace(/\u2028/g, "\\u2028")
-    .replace(/\u2029/g, "\\u2029");
+	return value
+		.replace(/<\/script/gi, "<\\/script")
+		.replace(/\u2028/g, "\\u2028")
+		.replace(/\u2029/g, "\\u2029");
 }
 
 function stripExternalFontImport(html: string) {
-  return html.replace(EXTERNAL_FONT_IMPORT_RE, "");
+	return html.replace(EXTERNAL_FONT_IMPORT_RE, "");
 }
 
 function displayPath(filePath: string) {
-  return filePath === "-" ? "<stdin>" : filePath;
+	return filePath === "-" ? "<stdin>" : filePath;
 }
 
 function formatRange(range?: Range) {
-  if (!range) {
-    return "—";
-  }
-  if (range.start.line === range.end.line) {
-    if (range.start.column === range.end.column) {
-      return `L${range.start.line}:${range.start.column}`;
-    }
-    return `L${range.start.line}:${range.start.column}-${range.end.column}`;
-  }
-  return `L${range.start.line}:${range.start.column}-L${range.end.line}:${range.end.column}`;
+	if (!range) {
+		return "—";
+	}
+	if (range.start.line === range.end.line) {
+		if (range.start.column === range.end.column) {
+			return `L${range.start.line}:${range.start.column}`;
+		}
+		return `L${range.start.line}:${range.start.column}-${range.end.column}`;
+	}
+	return `L${range.start.line}:${range.start.column}-L${range.end.line}:${range.end.column}`;
 }
 
 function formatConfidence(confidence?: number) {
-  return confidence === undefined ? "n/a" : `${Math.round(confidence * 100)}%`;
+	return confidence === undefined ? "n/a" : `${Math.round(confidence * 100)}%`;
 }
 
 function countOperationsByType(diff: DiffDocument) {
-  const counts: Record<DiffOperation["type"], number> = {
-    insert: 0,
-    delete: 0,
-    update: 0,
-    move: 0,
-  };
-  for (const operation of diff.operations) {
-    counts[operation.type] += 1;
-  }
-  return counts;
+	const counts: Record<DiffOperation["type"], number> = {
+		insert: 0,
+		delete: 0,
+		update: 0,
+		move: 0,
+	};
+	for (const operation of diff.operations) {
+		counts[operation.type] += 1;
+	}
+	return counts;
 }
 
 function buildSemanticTokensOption(
-  oldTokens?: readonly TokenRange[],
-  newTokens?: readonly TokenRange[]
+	oldTokens?: readonly TokenRange[],
+	newTokens?: readonly TokenRange[],
 ) {
-  if (!(oldTokens || newTokens)) {
-    return {};
-  }
-  return {
-    semanticTokens: {
-      ...(oldTokens ? { old: oldTokens } : {}),
-      ...(newTokens ? { new: newTokens } : {}),
-    },
-  };
+	if (!(oldTokens || newTokens)) {
+		return {};
+	}
+	return {
+		semanticTokens: {
+			...(oldTokens ? { old: oldTokens } : {}),
+			...(newTokens ? { new: newTokens } : {}),
+		},
+	};
 }
 
 function renderVariantHtml(
-  diff: DiffDocument,
-  options: Parameters<typeof renderHtml>[1]
+	diff: DiffDocument,
+	options: Parameters<typeof renderHtml>[1],
 ) {
-  return stripExternalFontImport(renderHtml(diff, options));
+	return stripExternalFontImport(renderHtml(diff, options));
 }
 
 function buildOperationItems(diff: DiffDocument, explain: ExplainDocument) {
-  if (diff.operations.length === 0) {
-    return '<div class="sdx-empty">No semantic operations were generated for this file pair.</div>';
-  }
+	if (diff.operations.length === 0) {
+		return '<div class="sdx-empty">No semantic operations were generated for this file pair.</div>';
+	}
 
-  const explainById = new Map(
-    explain.operations.map((operation) => [operation.id, operation])
-  );
-  return diff.operations
-    .map((operation) => {
-      const explained = explainById.get(operation.id);
-      const confidence = explained?.confidence ?? operation.meta?.confidence;
-      const pills = [
-        `<span class="sdx-pill">Confidence ${escapeHtml(formatConfidence(confidence))}</span>`,
-        ...(explained?.moveId
-          ? [
-              `<span class="sdx-pill">Move ${escapeHtml(explained.moveId)}</span>`,
-            ]
-          : []),
-        ...(explained?.renameGroupId
-          ? [
-              `<span class="sdx-pill">Rename ${escapeHtml(explained.renameGroupId)}</span>`,
-            ]
-          : []),
-      ].join("");
+	const explainById = new Map(
+		explain.operations.map((operation) => [operation.id, operation]),
+	);
+	return diff.operations
+		.map((operation) => {
+			const explained = explainById.get(operation.id);
+			const confidence = explained?.confidence ?? operation.meta?.confidence;
+			const pills = [
+				`<span class="sdx-pill">Confidence ${escapeHtml(formatConfidence(confidence))}</span>`,
+				...(explained?.moveId
+					? [
+							`<span class="sdx-pill">Move ${escapeHtml(explained.moveId)}</span>`,
+						]
+					: []),
+				...(explained?.renameGroupId
+					? [
+							`<span class="sdx-pill">Rename ${escapeHtml(explained.renameGroupId)}</span>`,
+						]
+					: []),
+			].join("");
 
-      return `<article class="sdx-item">
+			return `<article class="sdx-item">
   <div class="sdx-item-header">
     <div class="sdx-item-title">
       <span class="sdx-type sdx-type--${escapeHtml(operation.type)}">${escapeHtml(operation.type)}</span>
@@ -144,185 +145,185 @@ function buildOperationItems(diff: DiffDocument, explain: ExplainDocument) {
     <div><span class="sdx-range-label">New</span><code>${escapeHtml(formatRange(operation.newRange))}</code></div>
   </div>
   <p class="sdx-item-copy">${escapeHtml(
-    explained?.rationale ?? "Operation generated by structural diff."
-  )}</p>
+		explained?.rationale ?? "Operation generated by structural diff.",
+	)}</p>
   <div class="sdx-pill-row">${pills}</div>
 </article>`;
-    })
-    .join("");
+		})
+		.join("");
 }
 
 function buildMoveItems(diff: DiffDocument, explain: ExplainDocument) {
-  if (diff.moves.length === 0) {
-    return '<div class="sdx-empty">No move groups detected.</div>';
-  }
+	if (diff.moves.length === 0) {
+		return '<div class="sdx-empty">No move groups detected.</div>';
+	}
 
-  const explainById = new Map(explain.moves.map((move) => [move.id, move]));
-  return diff.moves
-    .map((move) => {
-      const explained = explainById.get(move.id);
-      return `<article class="sdx-item">
+	const explainById = new Map(explain.moves.map((move) => [move.id, move]));
+	return diff.moves
+		.map((move) => {
+			const explained = explainById.get(move.id);
+			return `<article class="sdx-item">
   <div class="sdx-item-header">
     <div class="sdx-item-title">
       <span class="sdx-type sdx-type--move">move</span>
       <code>${escapeHtml(move.id)}</code>
     </div>
     <span class="sdx-item-confidence">${escapeHtml(
-      formatConfidence(move.confidence)
-    )}</span>
+			formatConfidence(move.confidence),
+		)}</span>
   </div>
   <div class="sdx-range-grid">
     <div><span class="sdx-range-label">Old</span><code>${escapeHtml(formatRange(move.oldRange))}</code></div>
     <div><span class="sdx-range-label">New</span><code>${escapeHtml(formatRange(move.newRange))}</code></div>
   </div>
   <p class="sdx-item-copy">${escapeHtml(
-    explained?.rationale ??
-      `Move group contains ${move.operations.length} operations.`
-  )}</p>
+		explained?.rationale ??
+			`Move group contains ${move.operations.length} operations.`,
+	)}</p>
   <div class="sdx-pill-row">
     <span class="sdx-pill">${move.operations.length} linked operations</span>
   </div>
 </article>`;
-    })
-    .join("");
+		})
+		.join("");
 }
 
 function buildRenameItems(diff: DiffDocument, explain: ExplainDocument) {
-  if (diff.renames.length === 0) {
-    return '<div class="sdx-empty">No rename groups detected.</div>';
-  }
+	if (diff.renames.length === 0) {
+		return '<div class="sdx-empty">No rename groups detected.</div>';
+	}
 
-  const explainById = new Map(
-    explain.renames.map((rename) => [rename.id, rename])
-  );
-  return diff.renames
-    .map((rename) => {
-      const explained = explainById.get(rename.id);
-      return `<article class="sdx-item">
+	const explainById = new Map(
+		explain.renames.map((rename) => [rename.id, rename]),
+	);
+	return diff.renames
+		.map((rename) => {
+			const explained = explainById.get(rename.id);
+			return `<article class="sdx-item">
   <div class="sdx-item-header">
     <div class="sdx-item-title">
       <span class="sdx-type sdx-type--update">rename</span>
       <code>${escapeHtml(rename.id)}</code>
     </div>
     <span class="sdx-item-confidence">${escapeHtml(
-      formatConfidence(rename.confidence)
-    )}</span>
+			formatConfidence(rename.confidence),
+		)}</span>
   </div>
   <p class="sdx-item-copy"><code>${escapeHtml(rename.from)}</code> → <code>${escapeHtml(rename.to)}</code></p>
   <p class="sdx-item-copy">${escapeHtml(
-    explained?.rationale ??
-      `Rename pattern detected ${rename.occurrences} times.`
-  )}</p>
+		explained?.rationale ??
+			`Rename pattern detected ${rename.occurrences} times.`,
+	)}</p>
   <div class="sdx-pill-row">
     <span class="sdx-pill">${rename.occurrences} occurrences</span>
   </div>
 </article>`;
-    })
-    .join("");
+		})
+		.join("");
 }
 
 export function renderInspectWorkbench(input: InspectWorkbenchInput) {
-  const shownOldPath = displayPath(input.oldPath);
-  const shownNewPath = displayPath(input.newPath);
-  const preferredPath =
-    shownNewPath !== "<stdin>" ? shownNewPath : shownOldPath;
-  const title = `SemaDiff Inspect · ${path.basename(shownOldPath)} ↔ ${path.basename(shownNewPath)}`;
-  const semanticTokensOption = buildSemanticTokensOption(
-    input.oldTokens,
-    input.newTokens
-  );
-  const languageOption = input.language ? { language: input.language } : {};
-  const operationCounts = countOperationsByType(input.diff);
+	const shownOldPath = displayPath(input.oldPath);
+	const shownNewPath = displayPath(input.newPath);
+	const preferredPath =
+		shownNewPath !== "<stdin>" ? shownNewPath : shownOldPath;
+	const title = `SemaDiff Inspect · ${path.basename(shownOldPath)} ↔ ${path.basename(shownNewPath)}`;
+	const semanticTokensOption = buildSemanticTokensOption(
+		input.oldTokens,
+		input.newTokens,
+	);
+	const languageOption = input.language ? { language: input.language } : {};
+	const operationCounts = countOperationsByType(input.diff);
 
-  const views = {
-    semanticStructure: renderVariantHtml(input.diff, {
-      title,
-      filePath: preferredPath,
-      view: "semantic",
-      oldText: input.oldText,
-      newText: input.newText,
-      showBanner: false,
-      showSummary: false,
-      showFilePath: false,
-      layout: "embed",
-      ...languageOption,
-      ...semanticTokensOption,
-    }),
-    semanticUnified: renderVariantHtml(input.diff, {
-      title,
-      filePath: preferredPath,
-      view: "lines",
-      lineMode: "semantic",
-      oldText: input.oldText,
-      newText: input.newText,
-      contextLines: DEFAULT_CONTEXT_LINES,
-      lineLayout: "unified",
-      showBanner: false,
-      showSummary: false,
-      showFilePath: false,
-      layout: "embed",
-      ...languageOption,
-      ...semanticTokensOption,
-    }),
-    semanticSplit: renderVariantHtml(input.diff, {
-      title,
-      filePath: preferredPath,
-      view: "lines",
-      lineMode: "semantic",
-      oldText: input.oldText,
-      newText: input.newText,
-      contextLines: DEFAULT_CONTEXT_LINES,
-      lineLayout: "split",
-      showBanner: false,
-      showSummary: false,
-      showFilePath: false,
-      layout: "embed",
-      ...languageOption,
-      ...semanticTokensOption,
-    }),
-    rawUnified: renderVariantHtml(input.diff, {
-      title,
-      filePath: preferredPath,
-      view: "lines",
-      lineMode: "raw",
-      oldText: input.oldText,
-      newText: input.newText,
-      contextLines: DEFAULT_CONTEXT_LINES,
-      lineLayout: "unified",
-      showBanner: false,
-      showSummary: false,
-      showFilePath: false,
-      layout: "embed",
-      ...languageOption,
-      ...semanticTokensOption,
-    }),
-    rawSplit: renderVariantHtml(input.diff, {
-      title,
-      filePath: preferredPath,
-      view: "lines",
-      lineMode: "raw",
-      oldText: input.oldText,
-      newText: input.newText,
-      contextLines: DEFAULT_CONTEXT_LINES,
-      lineLayout: "split",
-      showBanner: false,
-      showSummary: false,
-      showFilePath: false,
-      layout: "embed",
-      ...languageOption,
-      ...semanticTokensOption,
-    }),
-  };
+	const views = {
+		semanticStructure: renderVariantHtml(input.diff, {
+			title,
+			filePath: preferredPath,
+			view: "semantic",
+			oldText: input.oldText,
+			newText: input.newText,
+			showBanner: false,
+			showSummary: false,
+			showFilePath: false,
+			layout: "embed",
+			...languageOption,
+			...semanticTokensOption,
+		}),
+		semanticUnified: renderVariantHtml(input.diff, {
+			title,
+			filePath: preferredPath,
+			view: "lines",
+			lineMode: "semantic",
+			oldText: input.oldText,
+			newText: input.newText,
+			contextLines: DEFAULT_CONTEXT_LINES,
+			lineLayout: "unified",
+			showBanner: false,
+			showSummary: false,
+			showFilePath: false,
+			layout: "embed",
+			...languageOption,
+			...semanticTokensOption,
+		}),
+		semanticSplit: renderVariantHtml(input.diff, {
+			title,
+			filePath: preferredPath,
+			view: "lines",
+			lineMode: "semantic",
+			oldText: input.oldText,
+			newText: input.newText,
+			contextLines: DEFAULT_CONTEXT_LINES,
+			lineLayout: "split",
+			showBanner: false,
+			showSummary: false,
+			showFilePath: false,
+			layout: "embed",
+			...languageOption,
+			...semanticTokensOption,
+		}),
+		rawUnified: renderVariantHtml(input.diff, {
+			title,
+			filePath: preferredPath,
+			view: "lines",
+			lineMode: "raw",
+			oldText: input.oldText,
+			newText: input.newText,
+			contextLines: DEFAULT_CONTEXT_LINES,
+			lineLayout: "unified",
+			showBanner: false,
+			showSummary: false,
+			showFilePath: false,
+			layout: "embed",
+			...languageOption,
+			...semanticTokensOption,
+		}),
+		rawSplit: renderVariantHtml(input.diff, {
+			title,
+			filePath: preferredPath,
+			view: "lines",
+			lineMode: "raw",
+			oldText: input.oldText,
+			newText: input.newText,
+			contextLines: DEFAULT_CONTEXT_LINES,
+			lineLayout: "split",
+			showBanner: false,
+			showSummary: false,
+			showFilePath: false,
+			layout: "embed",
+			...languageOption,
+			...semanticTokensOption,
+		}),
+	};
 
-  const payload = escapeScript(
-    JSON.stringify({
-      explain: input.explain,
-      diagnostics: input.diagnostics,
-      views,
-    })
-  );
+	const payload = escapeScript(
+		JSON.stringify({
+			explain: input.explain,
+			diagnostics: input.diagnostics,
+			views,
+		}),
+	);
 
-  return `<!doctype html>
+	return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -833,8 +834,8 @@ export function renderInspectWorkbench(input: InspectWorkbenchInput) {
           <div class="sdx-card">
             <div class="sdx-card-label">Diagnostics bundle</div>
             <div class="sdx-card-value">${escapeHtml(
-              input.diagnostics.redacted ? "Redacted" : "Includes code"
-            )}</div>
+							input.diagnostics.redacted ? "Redacted" : "Includes code",
+						)}</div>
           </div>
         </div>
 
@@ -931,10 +932,10 @@ export function renderInspectWorkbench(input: InspectWorkbenchInput) {
               <span class="sdx-pill">${input.diagnostics.summary.moveCount} moves</span>
               <span class="sdx-pill">${input.diagnostics.summary.renameCount} renames</span>
               <span class="sdx-pill">${escapeHtml(
-                input.diagnostics.redacted
-                  ? "Bundle redacted"
-                  : "Bundle includes code"
-              )}</span>
+								input.diagnostics.redacted
+									? "Bundle redacted"
+									: "Bundle includes code",
+							)}</span>
             </div>
           </section>
 
@@ -1068,48 +1069,48 @@ export function renderInspectWorkbench(input: InspectWorkbenchInput) {
 }
 
 export function resolveInspectOutputPath(outputPath?: string) {
-  if (outputPath && outputPath.trim().length > 0) {
-    return path.resolve(outputPath);
-  }
-  const directory = mkdtempSync(path.join(tmpdir(), "semadiff-inspect-"));
-  return path.join(directory, "index.html");
+	if (outputPath && outputPath.trim().length > 0) {
+		return path.resolve(outputPath);
+	}
+	const directory = mkdtempSync(path.join(tmpdir(), "semadiff-inspect-"));
+	return path.join(directory, "index.html");
 }
 
 export function writeInspectWorkbench(outputPath: string, html: string) {
-  mkdirSync(path.dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, html, "utf8");
+	mkdirSync(path.dirname(outputPath), { recursive: true });
+	writeFileSync(outputPath, html, "utf8");
 }
 
 export function openInspectWorkbench(outputPath: string) {
-  const target = pathToFileURL(outputPath).href;
-  let candidates:
-    | readonly { command: string; args: readonly string[] }[]
-    | undefined;
-  if (process.platform === "darwin") {
-    candidates = [{ command: "open", args: [target] }];
-  } else if (process.platform === "win32") {
-    candidates = [{ command: "cmd", args: ["/c", "start", "", target] }];
-  } else {
-    candidates = [
-      { command: "xdg-open", args: [target] },
-      { command: "gio", args: ["open", target] },
-    ];
-  }
+	const target = pathToFileURL(outputPath).href;
+	let candidates:
+		| readonly { command: string; args: readonly string[] }[]
+		| undefined;
+	if (process.platform === "darwin") {
+		candidates = [{ command: "open", args: [target] }];
+	} else if (process.platform === "win32") {
+		candidates = [{ command: "cmd", args: ["/c", "start", "", target] }];
+	} else {
+		candidates = [
+			{ command: "xdg-open", args: [target] },
+			{ command: "gio", args: ["open", target] },
+		];
+	}
 
-  let lastError: unknown;
-  for (const candidate of candidates) {
-    const result = spawnSync(candidate.command, candidate.args, {
-      stdio: "ignore",
-    });
-    if (!result.error && result.status === 0) {
-      return;
-    }
-    lastError =
-      result.error ??
-      new Error(
-        `Failed to open inspect workbench with ${candidate.command} (exit ${result.status ?? "unknown"}).`
-      );
-  }
+	let lastError: unknown;
+	for (const candidate of candidates) {
+		const result = spawnSync(candidate.command, candidate.args, {
+			stdio: "ignore",
+		});
+		if (!result.error && result.status === 0) {
+			return;
+		}
+		lastError =
+			result.error ??
+			new Error(
+				`Failed to open inspect workbench with ${candidate.command} (exit ${result.status ?? "unknown"}).`,
+			);
+	}
 
-  throw lastError ?? new Error("Failed to open inspect workbench.");
+	throw lastError ?? new Error("Failed to open inspect workbench.");
 }

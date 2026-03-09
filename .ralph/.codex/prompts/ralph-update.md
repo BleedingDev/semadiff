@@ -16,12 +16,15 @@ echo "Latest:  $LATEST"
 **STEG 2: JÄMFÖR**
 
 Om CURRENT == LATEST:
+
 ```
 ✅ Ralph is up to date (v$CURRENT)
 ```
+
 KLAR.
 
 Om CURRENT != LATEST:
+
 ```
 💡 Update available: v$CURRENT → v$LATEST
 ```
@@ -29,6 +32,7 @@ Om CURRENT != LATEST:
 **STEG 3: FRÅGA**
 
 Fråga användaren med AskUserQuestion:
+
 ```
 Vill du uppdatera Ralph?
 
@@ -43,6 +47,7 @@ npx ralph-inferno update
 ```
 
 Visa resultat:
+
 ```
 ✅ Ralph updated to v$LATEST
 

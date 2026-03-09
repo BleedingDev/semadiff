@@ -1,24 +1,26 @@
 import type { DiffDocument } from "@semadiff/core";
 import {
-  createDiagnosticsBundle,
-  DiagnosticsBundleSchema,
-  defaultConfig,
-  structuralDiff,
+	createDiagnosticsBundle,
+	DiagnosticsBundleSchema,
+	defaultConfig,
+	structuralDiff,
 } from "@semadiff/core";
-import { renderHtml } from "@semadiff/render-html";
-import "./content.css";
 import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
+
+import "./content.css";
 import { makeRegistry } from "@semadiff/parsers";
+import { renderHtml } from "@semadiff/render-html";
 import { Effect, Schema } from "effect";
+
 import type { BlobResult } from "./blob";
 import { fetchBlob } from "./blob";
 import { logger } from "./logger";
 import {
-  composeExtensionFileGuide,
-  type FileReviewGuide,
-  findExtensionReviewEntry,
-  type PrReviewSummary,
-  summarizeExtensionReview,
+	composeExtensionFileGuide,
+	type FileReviewGuide,
+	findExtensionReviewEntry,
+	type PrReviewSummary,
+	summarizeExtensionReview,
 } from "./review-guide";
 
 const STORAGE_KEY = "semadiff-overlay-open";
@@ -29,1212 +31,1372 @@ const FULL_REPLACE_KEY = "semadiff-full-replace";
 const DIRECT_API_KEY = "semadiff-direct-api";
 const parserRegistry = makeRegistry(treeSitterWasmParsers);
 const TelemetryPayloadSchema = Schema.Struct({
-  span: Schema.String,
-  timestamp: Schema.String,
-  attributes: Schema.Record(Schema.String, Schema.Unknown),
+	span: Schema.String,
+	timestamp: Schema.String,
+	attributes: Schema.Record(Schema.String, Schema.Unknown),
 });
 const OtlpAttributeSchema = Schema.Struct({
-  key: Schema.String,
-  value: Schema.Struct({ stringValue: Schema.String }),
+	key: Schema.String,
+	value: Schema.Struct({ stringValue: Schema.String }),
 });
 const OtlpSpanSchema = Schema.Struct({
-  name: Schema.String,
-  startTimeUnixNano: Schema.String,
-  endTimeUnixNano: Schema.String,
-  attributes: Schema.Array(OtlpAttributeSchema),
+	name: Schema.String,
+	startTimeUnixNano: Schema.String,
+	endTimeUnixNano: Schema.String,
+	attributes: Schema.Array(OtlpAttributeSchema),
 });
 const OtlpScopeSchema = Schema.Struct({
-  scope: Schema.Struct({ name: Schema.String }),
-  spans: Schema.Array(OtlpSpanSchema),
+	scope: Schema.Struct({ name: Schema.String }),
+	spans: Schema.Array(OtlpSpanSchema),
 });
 const OtlpResourceSchema = Schema.Struct({
-  resource: Schema.Struct({ attributes: Schema.Array(OtlpAttributeSchema) }),
-  scopeSpans: Schema.Array(OtlpScopeSchema),
+	resource: Schema.Struct({ attributes: Schema.Array(OtlpAttributeSchema) }),
+	scopeSpans: Schema.Array(OtlpScopeSchema),
 });
 const OtlpPayloadSchema = Schema.Struct({
-  resourceSpans: Schema.Array(OtlpResourceSchema),
+	resourceSpans: Schema.Array(OtlpResourceSchema),
 });
 const TelemetryPayloadJson = Schema.fromJsonString(TelemetryPayloadSchema);
 const OtlpPayloadJson = Schema.fromJsonString(OtlpPayloadSchema);
 const DiagnosticsBundleJson = Schema.fromJsonString(DiagnosticsBundleSchema);
 function getFallbackStorage() {
-  const store = (
-    globalThis as { __semadiffSessionStorage?: Record<string, string> }
-  ).__semadiffSessionStorage;
-  return store && typeof store === "object" ? store : null;
+	const store = (
+		globalThis as { __semadiffSessionStorage?: Record<string, string> }
+	).__semadiffSessionStorage;
+	return store && typeof store === "object" ? store : null;
 }
 
 function readSessionStorage(key: string) {
-  try {
-    const value = sessionStorage.getItem(key);
-    if (value !== null) {
-      return value;
-    }
-  } catch {
-    // Fall back to in-memory storage when sessionStorage is unavailable.
-  }
-  const fallback = getFallbackStorage();
-  return fallback?.[key] ?? null;
+	try {
+		const value = sessionStorage.getItem(key);
+		if (value !== null) {
+			return value;
+		}
+	} catch {
+		// Fall back to in-memory storage when sessionStorage is unavailable.
+	}
+	const fallback = getFallbackStorage();
+	return fallback?.[key] ?? null;
 }
 
 function writeSessionStorage(key: string, value: string) {
-  try {
-    sessionStorage.setItem(key, value);
-  } catch {
-    const fallback = getFallbackStorage();
-    if (fallback) {
-      fallback[key] = value;
-    }
-  }
+	try {
+		sessionStorage.setItem(key, value);
+	} catch {
+		const fallback = getFallbackStorage();
+		if (fallback) {
+			fallback[key] = value;
+		}
+	}
 }
 
 function isDirectApiEnabled() {
-  return (
-    readSessionStorage(DIRECT_API_KEY) === "true" ||
-    document.documentElement.dataset.semadiffDirectApi === "true"
-  );
+	return (
+		readSessionStorage(DIRECT_API_KEY) === "true" ||
+		document.documentElement.dataset.semadiffDirectApi === "true"
+	);
 }
 
 function getCsrfToken() {
-  return (
-    document
-      .querySelector<HTMLMetaElement>("meta[name='csrf-token']")
-      ?.getAttribute("content") ?? null
-  );
+	return (
+		document
+			.querySelector<HTMLMetaElement>("meta[name='csrf-token']")
+			?.getAttribute("content") ?? null
+	);
 }
 
 function buildHeaders() {
-  const token = getCsrfToken();
-  return token ? { "x-csrf-token": token } : {};
+	const token = getCsrfToken();
+	return token ? { "x-csrf-token": token } : {};
 }
 
 function appendIfMissing(formData: FormData, key: string, value?: string) {
-  if (!value || formData.has(key)) {
-    return;
-  }
-  formData.set(key, value);
+	if (!value || formData.has(key)) {
+		return;
+	}
+	formData.set(key, value);
 }
 
 function emitDebugRequest(
-  url: string,
-  formData: FormData,
-  headers: Record<string, string>
+	url: string,
+	formData: FormData,
+	headers: Record<string, string>,
 ) {
-  if (document.documentElement.dataset.semadiffDebug !== "true") {
-    return;
-  }
-  const entries: [string, string][] = [];
-  formData.forEach((value, key) => {
-    entries.push([String(key), String(value)]);
-  });
-  const detail = {
-    url,
-    headers,
-    bodyEntries: entries,
-  };
-  window.dispatchEvent(new CustomEvent("semadiff-debug-request", { detail }));
+	if (document.documentElement.dataset.semadiffDebug !== "true") {
+		return;
+	}
+	const entries: [string, string][] = [];
+	formData.forEach((value, key) => {
+		entries.push([String(key), String(value)]);
+	});
+	const detail = {
+		url,
+		headers,
+		bodyEntries: entries,
+	};
+	window.dispatchEvent(new CustomEvent("semadiff-debug-request", { detail }));
 }
 
 function getFormAction(form?: HTMLFormElement | null) {
-  if (!form) {
-    return "";
-  }
-  return form.getAttribute("action") ?? form.action ?? "";
+	if (!form) {
+		return "";
+	}
+	return form.getAttribute("action") ?? form.action ?? "";
 }
 
 function extractDataAttribute(
-  elements: Array<HTMLElement | null | undefined>,
-  attribute: string
+	elements: Array<HTMLElement | null | undefined>,
+	attribute: string,
 ) {
-  for (const element of elements) {
-    if (!element) {
-      continue;
-    }
-    const value = element.getAttribute(attribute);
-    if (value) {
-      return value;
-    }
-  }
-  return undefined;
+	for (const element of elements) {
+		if (!element) {
+			continue;
+		}
+		const value = element.getAttribute(attribute);
+		if (value) {
+			return value;
+		}
+	}
+	return undefined;
 }
 
 function extractLineMeta(params: {
-  fileNode: HTMLElement;
-  lineNode?: HTMLElement | null;
-  actionNode?: HTMLElement | null;
-  fallbackLine: number | undefined;
+	fileNode: HTMLElement;
+	lineNode?: HTMLElement | null;
+	actionNode?: HTMLElement | null;
+	fallbackLine: number | undefined;
 }) {
-  const { fileNode, lineNode, actionNode, fallbackLine } = params;
-  const sources = [actionNode, lineNode, fileNode];
-  return {
-    lineNumber:
-      extractDataAttribute(sources, "data-line-number") ??
-      (fallbackLine ? String(fallbackLine) : undefined),
-    position: extractDataAttribute(sources, "data-position"),
-    side: extractDataAttribute(sources, "data-side"),
-    commitId: extractDataAttribute(sources, "data-commit-id"),
-    apiUrl:
-      extractDataAttribute(sources, "data-api-url") ??
-      extractDataAttribute(sources, "data-comment-url"),
-    resolveUrl:
-      extractDataAttribute(sources, "data-resolve-url") ??
-      extractDataAttribute(sources, "data-thread-url"),
-  };
+	const { fileNode, lineNode, actionNode, fallbackLine } = params;
+	const sources = [actionNode, lineNode, fileNode];
+	return {
+		lineNumber:
+			extractDataAttribute(sources, "data-line-number") ??
+			(fallbackLine ? String(fallbackLine) : undefined),
+		position: extractDataAttribute(sources, "data-position"),
+		side: extractDataAttribute(sources, "data-side"),
+		commitId: extractDataAttribute(sources, "data-commit-id"),
+		apiUrl:
+			extractDataAttribute(sources, "data-api-url") ??
+			extractDataAttribute(sources, "data-comment-url"),
+		resolveUrl:
+			extractDataAttribute(sources, "data-resolve-url") ??
+			extractDataAttribute(sources, "data-thread-url"),
+	};
 }
 
 async function submitFormAction(params: {
-  url: string;
-  form?: HTMLFormElement | null;
-  bodyOverrides?: Record<string, string | undefined>;
+	url: string;
+	form?: HTMLFormElement | null;
+	bodyOverrides?: Record<string, string | undefined>;
 }) {
-  const { url, form, bodyOverrides } = params;
-  const formData = form ? new FormData(form) : new FormData();
-  if (bodyOverrides) {
-    for (const [key, value] of Object.entries(bodyOverrides)) {
-      appendIfMissing(formData, key, value);
-    }
-  }
-  const headers = buildHeaders();
-  emitDebugRequest(url, formData, headers);
-  const response = await fetch(url, {
-    method: form?.method?.toUpperCase() || "POST",
-    body: formData,
-    headers,
-    credentials: "include",
-    redirect: "follow",
-  });
-  return response;
+	const { url, form, bodyOverrides } = params;
+	const formData = form ? new FormData(form) : new FormData();
+	if (bodyOverrides) {
+		for (const [key, value] of Object.entries(bodyOverrides)) {
+			appendIfMissing(formData, key, value);
+		}
+	}
+	const headers = buildHeaders();
+	emitDebugRequest(url, formData, headers);
+	const response = await fetch(url, {
+		method: form?.method?.toUpperCase() || "POST",
+		body: formData,
+		headers,
+		credentials: "include",
+		redirect: "follow",
+	});
+	return response;
 }
 
 function telemetrySpan(name: string, attributes: Record<string, unknown>) {
-  const enabled = readSessionStorage(TELEMETRY_KEY) === "true";
-  if (!enabled) {
-    return;
-  }
-  const exporter = readSessionStorage(TELEMETRY_EXPORTER_KEY) ?? "console";
-  const timestamp = new Date().toISOString();
-  if (exporter === "console") {
-    const payload = {
-      span: name,
-      timestamp,
-      attributes,
-    };
-    logger.info(Schema.encodeSync(TelemetryPayloadJson)(payload));
-    return;
-  }
-  const endpoint = readSessionStorage(TELEMETRY_ENDPOINT_KEY);
-  if (!endpoint || typeof fetch !== "function") {
-    return;
-  }
-  const nowNs = String(Date.now() * 1_000_000);
-  const body = buildOtlpSpanPayload(name, nowNs, nowNs, attributes);
-  fetch(endpoint, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: Schema.encodeSync(OtlpPayloadJson)(body),
-  }).catch(() => undefined);
+	const enabled = readSessionStorage(TELEMETRY_KEY) === "true";
+	if (!enabled) {
+		return;
+	}
+	const exporter = readSessionStorage(TELEMETRY_EXPORTER_KEY) ?? "console";
+	const timestamp = new Date().toISOString();
+	if (exporter === "console") {
+		const payload = {
+			span: name,
+			timestamp,
+			attributes,
+		};
+		logger.info(Schema.encodeSync(TelemetryPayloadJson)(payload));
+		return;
+	}
+	const endpoint = readSessionStorage(TELEMETRY_ENDPOINT_KEY);
+	if (!endpoint || typeof fetch !== "function") {
+		return;
+	}
+	const nowNs = String(Date.now() * 1_000_000);
+	const body = buildOtlpSpanPayload(name, nowNs, nowNs, attributes);
+	fetch(endpoint, {
+		method: "POST",
+		headers: { "content-type": "application/json" },
+		body: Schema.encodeSync(OtlpPayloadJson)(body),
+	}).catch(() => undefined);
 }
 
 function buildOtlpSpanPayload(
-  name: string,
-  startTimeUnixNano: string,
-  endTimeUnixNano: string,
-  attributes: Record<string, unknown>
+	name: string,
+	startTimeUnixNano: string,
+	endTimeUnixNano: string,
+	attributes: Record<string, unknown>,
 ) {
-  const otelAttributes = Object.entries(attributes).map(([key, value]) => ({
-    key,
-    value: { stringValue: String(value) },
-  }));
-  return {
-    resourceSpans: [
-      {
-        resource: {
-          attributes: [
-            {
-              key: "service.name",
-              value: { stringValue: "semadiff-extension" },
-            },
-          ],
-        },
-        scopeSpans: [
-          {
-            scope: { name: "semadiff-extension" },
-            spans: [
-              {
-                name,
-                startTimeUnixNano,
-                endTimeUnixNano,
-                attributes: otelAttributes,
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  };
+	const otelAttributes = Object.entries(attributes).map(([key, value]) => ({
+		key,
+		value: { stringValue: String(value) },
+	}));
+	return {
+		resourceSpans: [
+			{
+				resource: {
+					attributes: [
+						{
+							key: "service.name",
+							value: { stringValue: "semadiff-extension" },
+						},
+					],
+				},
+				scopeSpans: [
+					{
+						scope: { name: "semadiff-extension" },
+						spans: [
+							{
+								name,
+								startTimeUnixNano,
+								endTimeUnixNano,
+								attributes: otelAttributes,
+							},
+						],
+					},
+				],
+			},
+		],
+	};
 }
 
 function collectFilePaths(): string[] {
-  const files = Array.from(document.querySelectorAll<HTMLElement>("div.file"));
-  return files
-    .map((file) => file.getAttribute("data-path"))
-    .filter((path): path is string => Boolean(path));
+	const files = Array.from(document.querySelectorAll<HTMLElement>("div.file"));
+	return files
+		.map((file) => file.getAttribute("data-path"))
+		.filter((path): path is string => Boolean(path));
 }
 
 let lastDiff: DiffDocument | null = null;
 let lastReviewSummary: PrReviewSummary | null = null;
 const lastFileReviewGuides = new Map<string, FileReviewGuide>();
+let overlayToastRegion: HTMLElement | null = null;
+let overlayDialogHost: HTMLElement | null = null;
+let activeDialogCleanup: (() => void) | null = null;
 
 function emptyDiff(): DiffDocument {
-  return {
-    version: "0.1.0",
-    operations: [],
-    moves: [],
-    renames: [],
-  };
+	return {
+		version: "0.1.0",
+		operations: [],
+		moves: [],
+		renames: [],
+	};
+}
+
+function closeOverlayDialog() {
+	activeDialogCleanup?.();
+	activeDialogCleanup = null;
+}
+
+function showOverlayToast(message: string, tone: "info" | "error" = "info") {
+	if (!overlayToastRegion) {
+		logger.info(message);
+		return;
+	}
+	const toast = document.createElement("div");
+	toast.className = tone === "error" ? "sd-toast sd-toast--error" : "sd-toast";
+	toast.textContent = message;
+	overlayToastRegion.appendChild(toast);
+	window.setTimeout(() => {
+		toast.remove();
+	}, 3500);
+}
+
+function openOverlayDialog(params: {
+	title: string;
+	message: string;
+	confirmLabel: string;
+	cancelLabel?: string;
+	defaultValue?: string;
+	placeholder?: string;
+	requireInput?: boolean;
+}) {
+	closeOverlayDialog();
+	if (!overlayDialogHost) {
+		return Promise.resolve(params.defaultValue ?? null);
+	}
+	const dialogHost = overlayDialogHost;
+
+	return new Promise<string | boolean | null>((resolve) => {
+		const backdrop = document.createElement("div");
+		backdrop.className = "sd-dialog-backdrop";
+
+		const dialog = document.createElement("div");
+		dialog.className = "sd-dialog";
+		dialog.setAttribute("aria-modal", "true");
+		dialog.setAttribute("role", "dialog");
+
+		const title = document.createElement("h2");
+		title.className = "sd-dialog-title";
+		title.textContent = params.title;
+
+		const message = document.createElement("p");
+		message.className = "sd-dialog-copy";
+		message.textContent = params.message;
+		dialog.append(title, message);
+
+		let input: HTMLTextAreaElement | null = null;
+		if (params.requireInput) {
+			input = document.createElement("textarea");
+			input.className = "sd-dialog-input";
+			input.placeholder = params.placeholder ?? "";
+			input.value = params.defaultValue ?? "";
+			dialog.appendChild(input);
+		}
+
+		const actions = document.createElement("div");
+		actions.className = "sd-dialog-actions";
+
+		const cancelButton = document.createElement("button");
+		cancelButton.className = "sd-button";
+		cancelButton.textContent = params.cancelLabel ?? "Cancel";
+
+		const confirmButton = document.createElement("button");
+		confirmButton.className = "sd-button sd-button--ghost";
+		confirmButton.textContent = params.confirmLabel;
+
+		let cleanup = () => undefined;
+		const finish = (value: string | boolean | null) => {
+			cleanup();
+			resolve(value);
+		};
+
+		const onKeyDown = (event: KeyboardEvent) => {
+			if (event.key === "Escape") {
+				event.preventDefault();
+				finish(params.requireInput ? null : false);
+				return;
+			}
+			if (event.key === "Enter" && !event.shiftKey && params.requireInput) {
+				event.preventDefault();
+				finish(input?.value ?? "");
+			}
+		};
+
+		cancelButton.addEventListener("click", () => {
+			finish(params.requireInput ? null : false);
+		});
+		confirmButton.addEventListener("click", () => {
+			if (params.requireInput) {
+				finish(input?.value ?? "");
+				return;
+			}
+			finish(true);
+		});
+		backdrop.addEventListener("click", (event) => {
+			if (event.target === backdrop) {
+				finish(params.requireInput ? null : false);
+			}
+		});
+
+		actions.append(cancelButton, confirmButton);
+		dialog.appendChild(actions);
+		backdrop.appendChild(dialog);
+		dialogHost.appendChild(backdrop);
+		document.addEventListener("keydown", onKeyDown);
+
+		cleanup = () => {
+			document.removeEventListener("keydown", onKeyDown);
+			backdrop.remove();
+			if (activeDialogCleanup === cleanup) {
+				activeDialogCleanup = null;
+			}
+		};
+
+		activeDialogCleanup = cleanup;
+		if (input) {
+			input.focus();
+			input.setSelectionRange(input.value.length, input.value.length);
+			return;
+		}
+		confirmButton.focus();
+	});
+}
+
+function confirmInOverlay(message: string) {
+	return openOverlayDialog({
+		title: "Confirm action",
+		message,
+		confirmLabel: "Continue",
+		cancelLabel: "Cancel",
+	}).then((value) => value === true);
+}
+
+function promptInOverlay(message: string, defaultValue = "") {
+	return openOverlayDialog({
+		title: "Comment text",
+		message,
+		confirmLabel: "Submit",
+		cancelLabel: "Cancel",
+		defaultValue,
+		placeholder: "Write a review comment…",
+		requireInput: true,
+	}).then((value) => {
+		if (typeof value !== "string") {
+			return null;
+		}
+		return value;
+	});
 }
 
 function reportBlobError(
-  errorNode: HTMLElement,
-  path: string,
-  message: string
+	errorNode: HTMLElement,
+	path: string,
+	message: string,
 ) {
-  errorNode.textContent = `Error: ${message}`;
-  telemetrySpan("fetchBlobs", { status: "error", path, error: message });
+	errorNode.textContent = `Error: ${message}`;
+	telemetrySpan("fetchBlobs", { status: "error", path, error: message });
 }
 
 function resolveBlobContents(
-  baseResult: BlobResult,
-  headResult: BlobResult,
-  errorNode: HTMLElement,
-  path: string
+	baseResult: BlobResult,
+	headResult: BlobResult,
+	errorNode: HTMLElement,
+	path: string,
 ) {
-  if (!baseResult.ok) {
-    reportBlobError(errorNode, path, baseResult.error);
-    return null;
-  }
-  if (!headResult.ok) {
-    reportBlobError(errorNode, path, headResult.error);
-    return null;
-  }
-  return {
-    baseContent: baseResult.content,
-    headContent: headResult.content,
-  };
+	if (!baseResult.ok) {
+		reportBlobError(errorNode, path, baseResult.error);
+		return null;
+	}
+	if (!headResult.ok) {
+		reportBlobError(errorNode, path, headResult.error);
+		return null;
+	}
+	return {
+		baseContent: baseResult.content,
+		headContent: headResult.content,
+	};
 }
 
 type LineTarget =
-  | { status: "mapped"; line: number; source: "new" | "old" }
-  | { status: "unmappable"; reason: string };
+	| { status: "mapped"; line: number; source: "new" | "old" }
+	| { status: "unmappable"; reason: string };
 
 function isValidLine(line?: number | null): line is number {
-  return Boolean(line && Number.isFinite(line) && line > 0);
+	return Boolean(line && Number.isFinite(line) && line > 0);
 }
 
 function resolveDiffLineTarget(diff: DiffDocument): LineTarget {
-  const newLine = diff.operations.find((op) => op.newRange?.start.line)
-    ?.newRange?.start.line;
-  if (isValidLine(newLine)) {
-    return { status: "mapped", line: newLine, source: "new" };
-  }
-  const oldLine = diff.operations.find((op) => op.oldRange?.start.line)
-    ?.oldRange?.start.line;
-  if (isValidLine(oldLine)) {
-    return { status: "mapped", line: oldLine, source: "old" };
-  }
-  if (diff.operations.length === 0) {
-    return { status: "unmappable", reason: "no-operations" };
-  }
-  return { status: "unmappable", reason: "missing-line-range" };
+	const newLine = diff.operations.find((op) => op.newRange?.start.line)
+		?.newRange?.start.line;
+	if (isValidLine(newLine)) {
+		return { status: "mapped", line: newLine, source: "new" };
+	}
+	const oldLine = diff.operations.find((op) => op.oldRange?.start.line)
+		?.oldRange?.start.line;
+	if (isValidLine(oldLine)) {
+		return { status: "mapped", line: oldLine, source: "old" };
+	}
+	if (diff.operations.length === 0) {
+		return { status: "unmappable", reason: "no-operations" };
+	}
+	return { status: "unmappable", reason: "missing-line-range" };
 }
 
 function setLineTarget(container: HTMLElement, target: LineTarget) {
-  container.dataset.lineStatus = target.status;
-  if (target.status === "mapped") {
-    container.dataset.line = String(target.line);
-    container.dataset.lineSource = target.source;
-    delete container.dataset.lineReason;
-    return;
-  }
-  delete container.dataset.line;
-  delete container.dataset.lineSource;
-  container.dataset.lineReason = target.reason;
+	container.dataset.lineStatus = target.status;
+	if (target.status === "mapped") {
+		container.dataset.line = String(target.line);
+		container.dataset.lineSource = target.source;
+		delete container.dataset.lineReason;
+		return;
+	}
+	delete container.dataset.line;
+	delete container.dataset.lineSource;
+	container.dataset.lineReason = target.reason;
 }
 
 function getMappedLine(container: HTMLElement): number | null {
-  if (container.dataset.lineStatus !== "mapped") {
-    return null;
-  }
-  const parsed = Number.parseInt(container.dataset.line ?? "", 10);
-  return isValidLine(parsed) ? parsed : null;
+	if (container.dataset.lineStatus !== "mapped") {
+		return null;
+	}
+	const parsed = Number.parseInt(container.dataset.line ?? "", 10);
+	return isValidLine(parsed) ? parsed : null;
 }
 
 const LINE_SPLIT_RE = /\r?\n/;
 
 function countLines(text?: string) {
-  if (!text) {
-    return 0;
-  }
-  return text.split(LINE_SPLIT_RE).length;
+	if (!text) {
+		return 0;
+	}
+	return text.split(LINE_SPLIT_RE).length;
 }
 
 function estimateReduction(diff: DiffDocument) {
-  const operations = diff.operations.length;
-  const changeLines = diff.operations.reduce((total, op) => {
-    return total + countLines(op.oldText) + countLines(op.newText);
-  }, 0);
-  if (operations === 0 || changeLines === 0) {
-    return { percent: 0, operations, changeLines };
-  }
-  const ratio = 1 - operations / changeLines;
-  const clamped = Math.max(0, Math.min(1, ratio));
-  return {
-    percent: Math.round(clamped * 100),
-    operations,
-    changeLines,
-  };
+	const operations = diff.operations.length;
+	const changeLines = diff.operations.reduce((total, op) => {
+		return total + countLines(op.oldText) + countLines(op.newText);
+	}, 0);
+	if (operations === 0 || changeLines === 0) {
+		return { percent: 0, operations, changeLines };
+	}
+	const ratio = 1 - operations / changeLines;
+	const clamped = Math.max(0, Math.min(1, ratio));
+	return {
+		percent: Math.round(clamped * 100),
+		operations,
+		changeLines,
+	};
 }
 
 function formatReviewLabel(value: string) {
-  return value
-    .split("_")
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
-    .join(" ");
+	return value
+		.split("_")
+		.map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+		.join(" ");
 }
 
 function createReviewPill(label: string, modifier?: string) {
-  const pill = document.createElement("span");
-  pill.className = modifier
-    ? `sd-review-pill sd-review-pill--${modifier}`
-    : "sd-review-pill";
-  pill.textContent = label;
-  return pill;
+	const pill = document.createElement("span");
+	pill.className = modifier
+		? `sd-review-pill sd-review-pill--${modifier}`
+		: "sd-review-pill";
+	pill.textContent = label;
+	return pill;
 }
 
 function renderBannerReviewSummary(
-  target: HTMLElement,
-  summary: PrReviewSummary
+	target: HTMLElement,
+	summary: PrReviewSummary,
 ) {
-  target.replaceChildren();
-  target.className = "sd-banner-guide";
+	target.replaceChildren();
+	target.className = "sd-banner-guide";
 
-  const title = document.createElement("div");
-  title.className = "sd-banner-guide-title";
-  title.textContent = "Review queue";
+	const title = document.createElement("div");
+	title.className = "sd-banner-guide-title";
+	title.textContent = "Review queue";
 
-  const copy = document.createElement("div");
-  copy.className = "sd-banner-guide-copy";
-  copy.textContent =
-    summary.themes[0] ??
-    `Queued ${summary.queue.length} file(s) for review guidance.`;
+	const copy = document.createElement("div");
+	copy.className = "sd-banner-guide-copy";
+	copy.textContent =
+		summary.themes[0] ??
+		`Queued ${summary.queue.length} file(s) for review guidance.`;
 
-  const meta = document.createElement("div");
-  meta.className = "sd-banner-guide-meta";
-  meta.textContent = `${summary.queue.length} queued · ${summary.deprioritized.length} deprioritized`;
+	const meta = document.createElement("div");
+	meta.className = "sd-banner-guide-meta";
+	meta.textContent = `${summary.queue.length} queued · ${summary.deprioritized.length} deprioritized`;
 
-  target.append(title, copy, meta);
+	target.append(title, copy, meta);
 }
 
 function renderReviewEntrySummary(
-  target: HTMLElement,
-  entry: ReturnType<typeof findExtensionReviewEntry>
+	target: HTMLElement,
+	entry: ReturnType<typeof findExtensionReviewEntry>,
 ) {
-  target.replaceChildren();
-  target.className = "sd-review-slot";
-  if (!entry) {
-    return;
-  }
+	target.replaceChildren();
+	target.className = "sd-review-slot";
+	if (!entry) {
+		return;
+	}
 
-  const chipRow = document.createElement("div");
-  chipRow.className = "sd-review-chip-row";
-  chipRow.append(
-    createReviewPill(formatReviewLabel(entry.priority), entry.priority),
-    createReviewPill(
-      formatReviewLabel(entry.classification.primaryCategory),
-      "category"
-    )
-  );
+	const chipRow = document.createElement("div");
+	chipRow.className = "sd-review-chip-row";
+	chipRow.append(
+		createReviewPill(formatReviewLabel(entry.priority), entry.priority),
+		createReviewPill(
+			formatReviewLabel(entry.classification.primaryCategory),
+			"category",
+		),
+	);
 
-  const copy = document.createElement("div");
-  copy.className = "sd-review-copy";
-  copy.textContent =
-    entry.reasons[0]?.message ??
-    "Deterministic review guidance will expand after diff load.";
+	const copy = document.createElement("div");
+	copy.className = "sd-review-copy";
+	copy.textContent =
+		entry.reasons[0]?.message ??
+		"Deterministic review guidance will expand after diff load.";
 
-  target.append(chipRow, copy);
+	target.append(chipRow, copy);
 }
 
 function renderFileReviewGuide(target: HTMLElement, guide: FileReviewGuide) {
-  target.replaceChildren();
-  target.className = "sd-review-slot sd-review-slot--detailed";
+	target.replaceChildren();
+	target.className = "sd-review-slot sd-review-slot--detailed";
 
-  const header = document.createElement("div");
-  header.className = "sd-review-chip-row";
-  header.append(
-    createReviewPill(formatReviewLabel(guide.priority), guide.priority),
-    createReviewPill(
-      formatReviewLabel(guide.classification.primaryCategory),
-      "category"
-    )
-  );
+	const header = document.createElement("div");
+	header.className = "sd-review-chip-row";
+	header.append(
+		createReviewPill(formatReviewLabel(guide.priority), guide.priority),
+		createReviewPill(
+			formatReviewLabel(guide.classification.primaryCategory),
+			"category",
+		),
+	);
 
-  const summary = document.createElement("div");
-  summary.className = "sd-review-copy";
-  summary.textContent = guide.summary;
+	const summary = document.createElement("div");
+	summary.className = "sd-review-copy";
+	summary.textContent = guide.summary;
 
-  const reasons = document.createElement("div");
-  reasons.className = "sd-review-list";
-  for (const reason of guide.reasons.slice(0, 2)) {
-    const item = document.createElement("div");
-    item.className = "sd-review-list-item";
-    item.textContent = reason.message;
-    reasons.appendChild(item);
-  }
+	const reasons = document.createElement("div");
+	reasons.className = "sd-review-list";
+	for (const reason of guide.reasons.slice(0, 2)) {
+		const item = document.createElement("div");
+		item.className = "sd-review-list-item";
+		item.textContent = reason.message;
+		reasons.appendChild(item);
+	}
 
-  const questions = document.createElement("div");
-  questions.className = "sd-review-list";
-  for (const question of guide.questions.slice(0, 2)) {
-    const item = document.createElement("div");
-    item.className = "sd-review-list-item";
-    const title = document.createElement("strong");
-    title.textContent = question.question;
-    const rationale = document.createElement("div");
-    rationale.className = "sd-review-copy sd-review-copy--muted";
-    rationale.textContent = question.rationale;
-    item.append(title, rationale);
-    questions.appendChild(item);
-  }
+	const questions = document.createElement("div");
+	questions.className = "sd-review-list";
+	for (const question of guide.questions.slice(0, 2)) {
+		const item = document.createElement("div");
+		item.className = "sd-review-list-item";
+		const title = document.createElement("strong");
+		title.textContent = question.question;
+		const rationale = document.createElement("div");
+		rationale.className = "sd-review-copy sd-review-copy--muted";
+		rationale.textContent = question.rationale;
+		item.append(title, rationale);
+		questions.appendChild(item);
+	}
 
-  const diagnostics = document.createElement("details");
-  diagnostics.className = "sd-review-diagnostics";
-  const diagnosticsSummary = document.createElement("summary");
-  diagnosticsSummary.textContent = "Diagnostics";
-  const diagnosticsMeta = document.createElement("div");
-  diagnosticsMeta.className = "sd-review-diagnostics-meta";
-  diagnosticsMeta.textContent = guide.diagnostics
-    ? `${guide.diagnostics.traceSummary.ruleHitCount} rule hits · ${guide.diagnostics.traceSummary.evidenceCount} evidence refs`
-    : "No diagnostics available.";
-  diagnostics.append(diagnosticsSummary, diagnosticsMeta);
+	const diagnostics = document.createElement("details");
+	diagnostics.className = "sd-review-diagnostics";
+	const diagnosticsSummary = document.createElement("summary");
+	diagnosticsSummary.textContent = "Diagnostics";
+	const diagnosticsMeta = document.createElement("div");
+	diagnosticsMeta.className = "sd-review-diagnostics-meta";
+	diagnosticsMeta.textContent = guide.diagnostics
+		? `${guide.diagnostics.traceSummary.ruleHitCount} rule hits · ${guide.diagnostics.traceSummary.evidenceCount} evidence refs`
+		: "No diagnostics available.";
+	diagnostics.append(diagnosticsSummary, diagnosticsMeta);
 
-  target.append(header, summary);
-  if (guide.reasons.length > 0) {
-    target.appendChild(reasons);
-  }
-  if (guide.questions.length > 0) {
-    target.appendChild(questions);
-  }
-  target.appendChild(diagnostics);
+	target.append(header, summary);
+	if (guide.reasons.length > 0) {
+		target.appendChild(reasons);
+	}
+	if (guide.questions.length > 0) {
+		target.appendChild(questions);
+	}
+	target.appendChild(diagnostics);
 }
 
 function renderDiffResult(params: {
-  diff: DiffDocument;
-  container: HTMLElement;
-  diffSlot: HTMLElement;
-  reviewSlot: HTMLElement;
-  statusText: HTMLElement;
-  statusMeta: HTMLElement;
-  barFill: HTMLElement;
-  metricValue: HTMLElement;
-  aggregate: { operations: number; changeLines: number };
-  oldText: string;
-  newText: string;
-  button: HTMLButtonElement;
-  fileNode: HTMLElement | null;
-  path: string;
+	diff: DiffDocument;
+	container: HTMLElement;
+	diffSlot: HTMLElement;
+	reviewSlot: HTMLElement;
+	statusText: HTMLElement;
+	statusMeta: HTMLElement;
+	barFill: HTMLElement;
+	metricValue: HTMLElement;
+	aggregate: { operations: number; changeLines: number };
+	oldText: string;
+	newText: string;
+	button: HTMLButtonElement;
+	fileNode: HTMLElement | null;
+	path: string;
 }) {
-  const {
-    diff,
-    container,
-    diffSlot,
-    reviewSlot,
-    statusText,
-    statusMeta,
-    barFill,
-    metricValue,
-    aggregate,
-    oldText,
-    newText,
-    button,
-    fileNode,
-    path,
-  } = params;
-  const lineTarget = resolveDiffLineTarget(diff);
-  setLineTarget(container, lineTarget);
-  const reduction = estimateReduction(diff);
-  statusText.textContent = `${reduction.percent}% smaller`;
-  statusMeta.textContent = `${reduction.operations} ops · ${reduction.changeLines} touched lines`;
-  barFill.style.width = `${reduction.percent}%`;
-  aggregate.operations += reduction.operations;
-  aggregate.changeLines += reduction.changeLines;
-  const overallPercent =
-    aggregate.operations === 0 || aggregate.changeLines === 0
-      ? 0
-      : Math.round(
-          Math.max(
-            0,
-            Math.min(1, 1 - aggregate.operations / aggregate.changeLines)
-          ) * 100
-        );
-  metricValue.textContent = `${overallPercent}%`;
-  const html = renderHtml(diff, {
-    maxOperations: 50,
-    virtualize: true,
-    filePath: path,
-    view: "lines",
-    lineMode: "semantic",
-    oldText,
-    newText,
-    contextLines: 3,
-  });
-  const iframe = document.createElement("iframe");
-  iframe.srcdoc = html;
-  diffSlot.appendChild(iframe);
-  container.dataset.loaded = "true";
-  button.textContent = "Loaded";
-  button.disabled = true;
-  const initialReviewPriority = findExtensionReviewEntry(
-    lastReviewSummary,
-    path
-  )?.priority;
-  const guide = composeExtensionFileGuide({
-    path,
-    diff,
-    ...(fileNode?.dataset.semadiffLanguage
-      ? { language: fileNode.dataset.semadiffLanguage }
-      : {}),
-    ...(initialReviewPriority
-      ? { initialPriority: initialReviewPriority }
-      : {}),
-    title: document.title,
-  });
-  lastFileReviewGuides.set(path, guide);
-  renderFileReviewGuide(reviewSlot, guide);
-  telemetrySpan("reviewGuide", {
-    path,
-    priority: guide.priority,
-    reasonCount: guide.reasons.length,
-  });
-  telemetrySpan("render", { path });
+	const {
+		diff,
+		container,
+		diffSlot,
+		reviewSlot,
+		statusText,
+		statusMeta,
+		barFill,
+		metricValue,
+		aggregate,
+		oldText,
+		newText,
+		button,
+		fileNode,
+		path,
+	} = params;
+	const lineTarget = resolveDiffLineTarget(diff);
+	setLineTarget(container, lineTarget);
+	const reduction = estimateReduction(diff);
+	statusText.textContent = `${reduction.percent}% smaller`;
+	statusMeta.textContent = `${reduction.operations} ops · ${reduction.changeLines} touched lines`;
+	barFill.style.width = `${reduction.percent}%`;
+	aggregate.operations += reduction.operations;
+	aggregate.changeLines += reduction.changeLines;
+	const overallPercent =
+		aggregate.operations === 0 || aggregate.changeLines === 0
+			? 0
+			: Math.round(
+					Math.max(
+						0,
+						Math.min(1, 1 - aggregate.operations / aggregate.changeLines),
+					) * 100,
+				);
+	metricValue.textContent = `${overallPercent}%`;
+	const html = renderHtml(diff, {
+		maxOperations: 50,
+		virtualize: true,
+		filePath: path,
+		view: "lines",
+		lineMode: "semantic",
+		oldText,
+		newText,
+		contextLines: 3,
+	});
+	const iframe = document.createElement("iframe");
+	iframe.srcdoc = html;
+	diffSlot.appendChild(iframe);
+	container.dataset.loaded = "true";
+	button.textContent = "Loaded";
+	button.disabled = true;
+	const initialReviewPriority = findExtensionReviewEntry(
+		lastReviewSummary,
+		path,
+	)?.priority;
+	const guide = composeExtensionFileGuide({
+		path,
+		diff,
+		...(fileNode?.dataset.semadiffLanguage
+			? { language: fileNode.dataset.semadiffLanguage }
+			: {}),
+		...(initialReviewPriority
+			? { initialPriority: initialReviewPriority }
+			: {}),
+		title: document.title,
+	});
+	lastFileReviewGuides.set(path, guide);
+	renderFileReviewGuide(reviewSlot, guide);
+	telemetrySpan("reviewGuide", {
+		path,
+		priority: guide.priority,
+		reasonCount: guide.reasons.length,
+	});
+	telemetrySpan("render", { path });
 
-  const fullReplaceEnabled = readSessionStorage(FULL_REPLACE_KEY) === "true";
-  if (fullReplaceEnabled && fileNode) {
-    const replacement = document.createElement("div");
-    replacement.className = "semadiff-replace";
-    const replaceFrame = document.createElement("iframe");
-    replaceFrame.srcdoc = html;
-    replacement.appendChild(replaceFrame);
-    fileNode.insertAdjacentElement("beforebegin", replacement);
-    fileNode.dataset.semadiffHidden = "true";
-    fileNode.style.display = "none";
-  }
+	const fullReplaceEnabled = readSessionStorage(FULL_REPLACE_KEY) === "true";
+	if (fullReplaceEnabled && fileNode) {
+		const replacement = document.createElement("div");
+		replacement.className = "semadiff-replace";
+		const replaceFrame = document.createElement("iframe");
+		replaceFrame.srcdoc = html;
+		replacement.appendChild(replaceFrame);
+		fileNode.before(replacement);
+		fileNode.dataset.semadiffHidden = "true";
+		fileNode.style.display = "none";
+	}
 }
 
 async function loadDiffForFile(params: {
-  baseResult: BlobResult;
-  headResult: BlobResult;
-  path: string;
-  container: HTMLElement;
-  diffSlot: HTMLElement;
-  reviewSlot: HTMLElement;
-  errorNode: HTMLElement;
-  statusText: HTMLElement;
-  statusMeta: HTMLElement;
-  barFill: HTMLElement;
-  metricValue: HTMLElement;
-  aggregate: { operations: number; changeLines: number };
-  button: HTMLButtonElement;
-  fileNode: HTMLElement | null;
+	baseResult: BlobResult;
+	headResult: BlobResult;
+	path: string;
+	container: HTMLElement;
+	diffSlot: HTMLElement;
+	reviewSlot: HTMLElement;
+	errorNode: HTMLElement;
+	statusText: HTMLElement;
+	statusMeta: HTMLElement;
+	barFill: HTMLElement;
+	metricValue: HTMLElement;
+	aggregate: { operations: number; changeLines: number };
+	button: HTMLButtonElement;
+	fileNode: HTMLElement | null;
 }) {
-  const {
-    baseResult,
-    headResult,
-    path,
-    container,
-    diffSlot,
-    reviewSlot,
-    errorNode,
-    statusText,
-    statusMeta,
-    barFill,
-    metricValue,
-    aggregate,
-    button,
-    fileNode,
-  } = params;
-  const contents = resolveBlobContents(baseResult, headResult, errorNode, path);
-  if (!contents) {
-    return;
-  }
+	const {
+		baseResult,
+		headResult,
+		path,
+		container,
+		diffSlot,
+		reviewSlot,
+		errorNode,
+		statusText,
+		statusMeta,
+		barFill,
+		metricValue,
+		aggregate,
+		button,
+		fileNode,
+	} = params;
+	const contents = resolveBlobContents(baseResult, headResult, errorNode, path);
+	if (!contents) {
+		return;
+	}
 
-  telemetrySpan("parse", { path });
-  const [parsedBase, parsedHead] = await Promise.all([
-    Effect.runPromise(
-      parserRegistry.parse({ content: contents.baseContent, path })
-    ),
-    Effect.runPromise(
-      parserRegistry.parse({ content: contents.headContent, path })
-    ),
-  ]);
-  const language =
-    parsedHead.language !== "text" ? parsedHead.language : parsedBase.language;
-  if (fileNode) {
-    fileNode.dataset.semadiffLanguage = language;
-  }
-  telemetrySpan("diff", { path, language });
-  const diff = structuralDiff(contents.baseContent, contents.headContent, {
-    normalizers: defaultConfig.normalizers,
-    language,
-    oldRoot: parsedBase.root,
-    newRoot: parsedHead.root,
-    ...(parsedBase.tokens !== undefined
-      ? { oldTokens: parsedBase.tokens }
-      : {}),
-    ...(parsedHead.tokens !== undefined
-      ? { newTokens: parsedHead.tokens }
-      : {}),
-  });
-  lastDiff = diff;
-  renderDiffResult({
-    diff,
-    container,
-    diffSlot,
-    reviewSlot,
-    statusText,
-    statusMeta,
-    barFill,
-    metricValue,
-    aggregate,
-    oldText: contents.baseContent,
-    newText: contents.headContent,
-    button,
-    fileNode,
-    path,
-  });
+	telemetrySpan("parse", { path });
+	const [parsedBase, parsedHead] = await Promise.all([
+		Effect.runPromise(
+			parserRegistry.parse({ content: contents.baseContent, path }),
+		),
+		Effect.runPromise(
+			parserRegistry.parse({ content: contents.headContent, path }),
+		),
+	]);
+	const language =
+		parsedHead.language !== "text" ? parsedHead.language : parsedBase.language;
+	if (fileNode) {
+		fileNode.dataset.semadiffLanguage = language;
+	}
+	telemetrySpan("diff", { path, language });
+	const diff = structuralDiff(contents.baseContent, contents.headContent, {
+		normalizers: defaultConfig.normalizers,
+		language,
+		oldRoot: parsedBase.root,
+		newRoot: parsedHead.root,
+		...(parsedBase.tokens !== undefined
+			? { oldTokens: parsedBase.tokens }
+			: {}),
+		...(parsedHead.tokens !== undefined
+			? { newTokens: parsedHead.tokens }
+			: {}),
+	});
+	lastDiff = diff;
+	renderDiffResult({
+		diff,
+		container,
+		diffSlot,
+		reviewSlot,
+		statusText,
+		statusMeta,
+		barFill,
+		metricValue,
+		aggregate,
+		oldText: contents.baseContent,
+		newText: contents.headContent,
+		button,
+		fileNode,
+		path,
+	});
 }
 
 function mountOverlay() {
-  if (document.getElementById("semadiff-overlay")) {
-    return;
-  }
+	if (document.getElementById("semadiff-overlay")) {
+		return;
+	}
 
-  const toggle = document.createElement("button");
-  toggle.id = "semadiff-toggle";
-  toggle.textContent = "SemaDiff";
+	const toggle = document.createElement("button");
+	toggle.id = "semadiff-toggle";
+	toggle.textContent = "SemaDiff";
 
-  const overlay = document.createElement("div");
-  overlay.id = "semadiff-overlay";
-  overlay.dataset.open = "false";
+	const overlay = document.createElement("div");
+	overlay.id = "semadiff-overlay";
+	overlay.dataset.open = "false";
 
-  const shell = document.createElement("div");
-  shell.className = "sd-shell";
+	const shell = document.createElement("div");
+	shell.className = "sd-shell";
 
-  const header = document.createElement("div");
-  header.className = "sd-header";
-  const banner = document.createElement("div");
-  banner.className = "sd-banner";
-  const brand = document.createElement("div");
-  brand.className = "sd-brand";
-  brand.append(document.createTextNode("Review changes with "));
-  const badge = document.createElement("span");
-  badge.className = "sd-badge";
-  badge.textContent = "SemaDiff";
-  brand.append(badge);
-  const metric = document.createElement("div");
-  metric.className = "sd-metric";
-  metric.title = "Estimated vs raw line changes";
-  const metricValue = document.createElement("span");
-  metricValue.className = "sd-metric-value";
-  metricValue.textContent = "0%";
-  const metricLabel = document.createElement("span");
-  metricLabel.className = "sd-metric-label";
-  metricLabel.textContent = "smaller";
-  metric.append(metricValue, metricLabel);
-  const bannerGuide = document.createElement("div");
-  bannerGuide.className = "sd-banner-guide";
-  banner.append(brand, bannerGuide, metric);
+	const header = document.createElement("div");
+	header.className = "sd-header";
+	const banner = document.createElement("div");
+	banner.className = "sd-banner";
+	const brand = document.createElement("div");
+	brand.className = "sd-brand";
+	brand.append(document.createTextNode("Review changes with "));
+	const badge = document.createElement("span");
+	badge.className = "sd-badge";
+	badge.textContent = "SemaDiff";
+	brand.append(badge);
+	const metric = document.createElement("div");
+	metric.className = "sd-metric";
+	metric.title = "Estimated vs raw line changes";
+	const metricValue = document.createElement("span");
+	metricValue.className = "sd-metric-value";
+	metricValue.textContent = "0%";
+	const metricLabel = document.createElement("span");
+	metricLabel.className = "sd-metric-label";
+	metricLabel.textContent = "smaller";
+	metric.append(metricValue, metricLabel);
+	const bannerGuide = document.createElement("div");
+	bannerGuide.className = "sd-banner-guide";
+	banner.append(brand, bannerGuide, metric);
 
-  const actions = document.createElement("div");
-  actions.className = "sd-controls";
-  const report = document.createElement("button");
-  report.className = "sd-button sd-button--ghost";
-  report.textContent = "Report bug";
-  report.addEventListener("click", async () => {
-    // biome-ignore lint/suspicious/noAlert: native confirm provides simple opt-in for diagnostics.
-    const includeCode = window.confirm(
-      "Include code snippets in diagnostics? (Default is metadata-only)"
-    );
-    const diagnostics = createDiagnosticsBundle({
-      diff: lastDiff ?? emptyDiff(),
-      includeCode,
-    });
-    const reviewDiagnostics = JSON.stringify(
-      {
-        reviewSummary: lastReviewSummary
-          ? {
-              themes: lastReviewSummary.themes,
-              warnings: lastReviewSummary.warnings,
-              diagnostics: lastReviewSummary.diagnostics,
-            }
-          : null,
-        fileGuides: Array.from(lastFileReviewGuides.values()).map((guide) => ({
-          filename: guide.filename,
-          priority: guide.priority,
-          summary: guide.summary,
-          warnings: guide.warnings,
-          diagnostics: guide.diagnostics,
-        })),
-      },
-      null,
-      2
-    );
-    const body = `Diagnostics:\\n\\n${Schema.encodeSync(DiagnosticsBundleJson)(
-      diagnostics
-    )}\\n\\nReview Guidance:\\n\\n${reviewDiagnostics}`;
-    try {
-      await navigator.clipboard.writeText(body);
-      // biome-ignore lint/suspicious/noAlert: native alert provides immediate feedback.
-      window.alert("Diagnostics copied to clipboard.");
-    } catch {
-      // biome-ignore lint/suspicious/noAlert: native alert provides immediate feedback.
-      window.alert("Unable to copy diagnostics to clipboard.");
-    }
-    const issueUrl = `https://github.com/semadiff/semadiff/issues/new?title=${encodeURIComponent(
-      "SemaDiff overlay issue"
-    )}&body=${encodeURIComponent(body)}`;
-    window.open(issueUrl, "_blank", "noopener");
-  });
-  const close = document.createElement("button");
-  close.className = "sd-button";
-  close.textContent = "Close";
-  close.addEventListener("click", () => setOverlayOpen(false));
-  actions.append(report, close);
-  header.append(banner, actions);
+	const actions = document.createElement("div");
+	actions.className = "sd-controls";
+	const report = document.createElement("button");
+	report.className = "sd-button sd-button--ghost";
+	report.textContent = "Report bug";
+	report.addEventListener("click", async () => {
+		const includeCode = await confirmInOverlay(
+			"Include code snippets in diagnostics? (Default is metadata-only)",
+		);
+		const diagnostics = createDiagnosticsBundle({
+			diff: lastDiff ?? emptyDiff(),
+			includeCode,
+		});
+		const reviewDiagnostics = JSON.stringify(
+			{
+				reviewSummary: lastReviewSummary
+					? {
+							themes: lastReviewSummary.themes,
+							warnings: lastReviewSummary.warnings,
+							diagnostics: lastReviewSummary.diagnostics,
+						}
+					: null,
+				fileGuides: Array.from(lastFileReviewGuides.values()).map((guide) => ({
+					filename: guide.filename,
+					priority: guide.priority,
+					summary: guide.summary,
+					warnings: guide.warnings,
+					diagnostics: guide.diagnostics,
+				})),
+			},
+			null,
+			2,
+		);
+		const body = `Diagnostics:\\n\\n${Schema.encodeSync(DiagnosticsBundleJson)(
+			diagnostics,
+		)}\\n\\nReview Guidance:\\n\\n${reviewDiagnostics}`;
+		try {
+			await navigator.clipboard.writeText(body);
+			showOverlayToast("Diagnostics copied to clipboard.");
+		} catch {
+			showOverlayToast("Unable to copy diagnostics to clipboard.", "error");
+		}
+		const issueUrl = `https://github.com/semadiff/semadiff/issues/new?title=${encodeURIComponent(
+			"SemaDiff overlay issue",
+		)}&body=${encodeURIComponent(body)}`;
+		window.open(issueUrl, "_blank", "noopener");
+	});
+	const close = document.createElement("button");
+	close.className = "sd-button";
+	close.textContent = "Close";
+	close.addEventListener("click", () => setOverlayOpen(false));
+	actions.append(report, close);
+	header.append(banner, actions);
 
-  const list = document.createElement("div");
-  list.className = "sd-table";
-  const files = collectFilePaths();
-  const reviewSummary = summarizeExtensionReview(files, document.title);
-  lastReviewSummary = reviewSummary;
-  renderBannerReviewSummary(bannerGuide, reviewSummary);
-  telemetrySpan("reviewSummary", {
-    fileCount: files.length,
-    queued: reviewSummary.queue.length,
-    deprioritized: reviewSummary.deprioritized.length,
-  });
-  const aggregate = { operations: 0, changeLines: 0 };
-  if (files.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "sd-empty";
-    empty.textContent = "No changed files detected.";
-    list.appendChild(empty);
-  } else {
-    const headRow = document.createElement("div");
-    headRow.className = "sd-row sd-row--head";
-    const headFile = document.createElement("div");
-    headFile.textContent = "File";
-    const headStatus = document.createElement("div");
-    headStatus.textContent = "Status";
-    const headActions = document.createElement("div");
-    headActions.textContent = "Actions";
-    headRow.append(headFile, headStatus, headActions);
-    list.appendChild(headRow);
-  }
-  for (const path of files) {
-    const container = document.createElement("div");
-    container.className = "sd-file";
-    const row = document.createElement("div");
-    row.className = "sd-row";
-    const name = document.createElement("div");
-    name.className = "sd-file-name";
-    name.textContent = path;
+	const list = document.createElement("div");
+	list.className = "sd-table";
+	const files = collectFilePaths();
+	const reviewSummary = summarizeExtensionReview(files, document.title);
+	lastReviewSummary = reviewSummary;
+	renderBannerReviewSummary(bannerGuide, reviewSummary);
+	telemetrySpan("reviewSummary", {
+		fileCount: files.length,
+		queued: reviewSummary.queue.length,
+		deprioritized: reviewSummary.deprioritized.length,
+	});
+	const aggregate = { operations: 0, changeLines: 0 };
+	if (files.length === 0) {
+		const empty = document.createElement("div");
+		empty.className = "sd-empty";
+		empty.textContent = "No changed files detected.";
+		list.appendChild(empty);
+	} else {
+		const headRow = document.createElement("div");
+		headRow.className = "sd-row sd-row--head";
+		const headFile = document.createElement("div");
+		headFile.textContent = "File";
+		const headStatus = document.createElement("div");
+		headStatus.textContent = "Status";
+		const headActions = document.createElement("div");
+		headActions.textContent = "Actions";
+		headRow.append(headFile, headStatus, headActions);
+		list.appendChild(headRow);
+	}
+	for (const path of files) {
+		const container = document.createElement("div");
+		container.className = "sd-file";
+		const row = document.createElement("div");
+		row.className = "sd-row";
+		const name = document.createElement("div");
+		name.className = "sd-file-name";
+		name.textContent = path;
 
-    const status = document.createElement("div");
-    status.className = "sd-status";
-    const bar = document.createElement("div");
-    bar.className = "sd-bar";
-    const barFill = document.createElement("div");
-    barFill.className = "sd-bar-fill";
-    bar.append(barFill);
-    const statusText = document.createElement("div");
-    statusText.className = "sd-status-text";
-    statusText.textContent = "Not loaded";
-    const statusMeta = document.createElement("div");
-    statusMeta.className = "sd-status-meta";
-    statusMeta.textContent = "—";
-    status.append(bar, statusText, statusMeta);
+		const status = document.createElement("div");
+		status.className = "sd-status";
+		const bar = document.createElement("div");
+		bar.className = "sd-bar";
+		const barFill = document.createElement("div");
+		barFill.className = "sd-bar-fill";
+		bar.append(barFill);
+		const statusText = document.createElement("div");
+		statusText.className = "sd-status-text";
+		statusText.textContent = "Not loaded";
+		const statusMeta = document.createElement("div");
+		statusMeta.className = "sd-status-meta";
+		statusMeta.textContent = "—";
+		status.append(bar, statusText, statusMeta);
 
-    const actionsRow = document.createElement("div");
-    actionsRow.className = "sd-actions";
-    const reviewSlot = document.createElement("div");
-    reviewSlot.className = "sd-review-slot";
-    renderReviewEntrySummary(
-      reviewSlot,
-      findExtensionReviewEntry(reviewSummary, path)
-    );
+		const actionsRow = document.createElement("div");
+		actionsRow.className = "sd-actions";
+		const reviewSlot = document.createElement("div");
+		reviewSlot.className = "sd-review-slot";
+		renderReviewEntrySummary(
+			reviewSlot,
+			findExtensionReviewEntry(reviewSummary, path),
+		);
 
-    const diffSlot = document.createElement("div");
-    diffSlot.className = "sd-diff-slot";
-    const button = document.createElement("button");
-    button.textContent = "Load diff";
-    button.addEventListener("click", () => {
-      if (container.querySelector("iframe")) {
-        return;
-      }
-      statusText.textContent = "Loading…";
-      statusMeta.textContent = "Fetching blobs";
-      const fileNode = document.querySelector<HTMLElement>(
-        `div.file[data-path='${path}']`
-      );
-      const baseUrl = fileNode?.dataset.baseBlobUrl;
-      const headUrl =
-        fileNode?.dataset.headBlobUrl ?? fileNode?.dataset.blobUrl;
-      if (!(baseUrl || headUrl)) {
-        statusText.textContent = "Error: Missing blob URLs";
-        statusMeta.textContent = "Unable to load diff.";
-        telemetrySpan("fetchBlobs", {
-          status: "error",
-          path,
-          error: "Missing blob URLs",
-        });
-        return;
-      }
+		const diffSlot = document.createElement("div");
+		diffSlot.className = "sd-diff-slot";
+		const button = document.createElement("button");
+		button.textContent = "Load diff";
+		button.addEventListener("click", () => {
+			if (container.querySelector("iframe")) {
+				return;
+			}
+			statusText.textContent = "Loading…";
+			statusMeta.textContent = "Fetching blobs";
+			const fileNode = document.querySelector<HTMLElement>(
+				`div.file[data-path='${path}']`,
+			);
+			const baseUrl = fileNode?.dataset.baseBlobUrl;
+			const headUrl =
+				fileNode?.dataset.headBlobUrl ?? fileNode?.dataset.blobUrl;
+			if (!(baseUrl || headUrl)) {
+				statusText.textContent = "Error: Missing blob URLs";
+				statusMeta.textContent = "Unable to load diff.";
+				telemetrySpan("fetchBlobs", {
+					status: "error",
+					path,
+					error: "Missing blob URLs",
+				});
+				return;
+			}
 
-      const emptyResult: BlobResult = { ok: true, content: "" };
-      const basePromise = baseUrl
-        ? fetchBlob(baseUrl)
-        : Promise.resolve(emptyResult);
-      const headPromise = headUrl
-        ? fetchBlob(headUrl)
-        : Promise.resolve(emptyResult);
+			const emptyResult: BlobResult = { ok: true, content: "" };
+			const basePromise = baseUrl
+				? fetchBlob(baseUrl)
+				: Promise.resolve(emptyResult);
+			const headPromise = headUrl
+				? fetchBlob(headUrl)
+				: Promise.resolve(emptyResult);
 
-      Promise.all([basePromise, headPromise]).then(([baseResult, headResult]) =>
-        loadDiffForFile({
-          baseResult,
-          headResult,
-          path,
-          container,
-          diffSlot,
-          reviewSlot,
-          errorNode: statusText,
-          statusText,
-          statusMeta,
-          barFill,
-          metricValue,
-          aggregate,
-          button,
-          fileNode,
-        })
-      );
-    });
-    const jump = document.createElement("button");
-    jump.textContent = "Jump";
-    jump.addEventListener("click", () => {
-      const line = getMappedLine(container);
-      if (!line) {
-        // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-        window.alert("No mapped line available. Jumping to file header.");
-        jumpToFile(path);
-        return;
-      }
-      jumpToFile(path, line);
-    });
+			Promise.all([basePromise, headPromise]).then(([baseResult, headResult]) =>
+				loadDiffForFile({
+					baseResult,
+					headResult,
+					path,
+					container,
+					diffSlot,
+					reviewSlot,
+					errorNode: statusText,
+					statusText,
+					statusMeta,
+					barFill,
+					metricValue,
+					aggregate,
+					button,
+					fileNode,
+				}),
+			);
+		});
+		const jump = document.createElement("button");
+		jump.textContent = "Jump";
+		jump.addEventListener("click", () => {
+			const line = getMappedLine(container);
+			if (!line) {
+				showOverlayToast(
+					"No mapped line available. Jumping to file header.",
+					"error",
+				);
+				jumpToFile(path);
+				return;
+			}
+			jumpToFile(path, line);
+		});
 
-    const comment = document.createElement("button");
-    comment.textContent = "Comment";
-    comment.addEventListener("click", () => {
-      const line = getMappedLine(container);
-      if (!line) {
-        // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-        window.alert("No mapped line available for comments.");
-        return;
-      }
-      if (isDirectApiEnabled()) {
-        createCommentViaApi(path, line);
-      } else {
-        openCommentUi(path, line);
-      }
-    });
+		const comment = document.createElement("button");
+		comment.textContent = "Comment";
+		comment.addEventListener("click", () => {
+			const line = getMappedLine(container);
+			if (!line) {
+				showOverlayToast("No mapped line available for comments.", "error");
+				return;
+			}
+			if (isDirectApiEnabled()) {
+				createCommentViaApi(path, line);
+			} else {
+				openCommentUi(path, line);
+			}
+		});
 
-    const resolve = document.createElement("button");
-    resolve.textContent = "Resolve";
-    resolve.addEventListener("click", () => {
-      const line = getMappedLine(container);
-      if (!line) {
-        // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-        window.alert("No mapped line available to resolve.");
-        return;
-      }
-      if (isDirectApiEnabled()) {
-        resolveThreadViaApi(path, line);
-      } else {
-        resolveThread(path, line);
-      }
-    });
+		const resolve = document.createElement("button");
+		resolve.textContent = "Resolve";
+		resolve.addEventListener("click", () => {
+			const line = getMappedLine(container);
+			if (!line) {
+				showOverlayToast("No mapped line available to resolve.", "error");
+				return;
+			}
+			if (isDirectApiEnabled()) {
+				resolveThreadViaApi(path, line);
+			} else {
+				resolveThread(path, line);
+			}
+		});
 
-    actionsRow.append(button, jump, comment, resolve);
-    row.append(name, status, actionsRow);
-    container.append(row, reviewSlot, diffSlot);
-    list.appendChild(container);
-  }
+		actionsRow.append(button, jump, comment, resolve);
+		row.append(name, status, actionsRow);
+		container.append(row, reviewSlot, diffSlot);
+		list.appendChild(container);
+	}
 
-  shell.append(header, list);
-  overlay.append(shell);
-  document.body.append(toggle, overlay);
+	const toastRegion = document.createElement("div");
+	toastRegion.className = "sd-toast-region";
+	overlayToastRegion = toastRegion;
 
-  toggle.addEventListener("click", () => {
-    setOverlayOpen(overlay.dataset.open !== "true");
-  });
+	const dialogHost = document.createElement("div");
+	dialogHost.className = "sd-dialog-host";
+	overlayDialogHost = dialogHost;
 
-  const isOpen = readSessionStorage(STORAGE_KEY) === "true";
-  setOverlayOpen(isOpen);
+	shell.append(header, list);
+	overlay.append(shell, toastRegion, dialogHost);
+	document.body.append(toggle, overlay);
 
-  function setOverlayOpen(open: boolean) {
-    overlay.dataset.open = open ? "true" : "false";
-    writeSessionStorage(STORAGE_KEY, open ? "true" : "false");
-    if (open) {
-      telemetrySpan("overlayOpen", { fileCount: files.length });
-    }
-  }
+	toggle.addEventListener("click", () => {
+		setOverlayOpen(overlay.dataset.open !== "true");
+	});
 
-  window.addEventListener("keydown", (event) => {
-    if (event.key.toLowerCase() === "d" && event.shiftKey && event.ctrlKey) {
-      setOverlayOpen(overlay.dataset.open !== "true");
-    }
-  });
+	const isOpen = readSessionStorage(STORAGE_KEY) === "true";
+	setOverlayOpen(isOpen);
+
+	function setOverlayOpen(open: boolean) {
+		overlay.dataset.open = open ? "true" : "false";
+		writeSessionStorage(STORAGE_KEY, open ? "true" : "false");
+		if (open) {
+			telemetrySpan("overlayOpen", { fileCount: files.length });
+		}
+	}
+
+	window.addEventListener("keydown", (event) => {
+		if (event.key.toLowerCase() === "d" && event.shiftKey && event.ctrlKey) {
+			setOverlayOpen(overlay.dataset.open !== "true");
+		}
+	});
 }
 
 function jumpToFile(path: string, line?: number) {
-  const fileNode = document.querySelector<HTMLElement>(
-    `div.file[data-path='${path}']`
-  );
-  if (!fileNode) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate file in GitHub diff.");
-    return;
-  }
-  const lineNode = findLineNode(fileNode, line);
-  if (lineNode) {
-    lineNode.scrollIntoView({ behavior: "smooth", block: "center" });
-    lineNode.classList.add("semadiff-highlight");
-    setTimeout(() => lineNode.classList.remove("semadiff-highlight"), 2000);
-    return;
-  }
-  fileNode.scrollIntoView({ behavior: "smooth", block: "start" });
-  fileNode.classList.add("semadiff-highlight");
-  setTimeout(() => fileNode.classList.remove("semadiff-highlight"), 2000);
+	const fileNode = document.querySelector<HTMLElement>(
+		`div.file[data-path='${path}']`,
+	);
+	if (!fileNode) {
+		showOverlayToast("Unable to locate file in GitHub diff.", "error");
+		return;
+	}
+	const lineNode = findLineNode(fileNode, line);
+	if (lineNode) {
+		lineNode.scrollIntoView({ behavior: "smooth", block: "center" });
+		lineNode.classList.add("semadiff-highlight");
+		setTimeout(() => lineNode.classList.remove("semadiff-highlight"), 2000);
+		return;
+	}
+	fileNode.scrollIntoView({ behavior: "smooth", block: "start" });
+	fileNode.classList.add("semadiff-highlight");
+	setTimeout(() => fileNode.classList.remove("semadiff-highlight"), 2000);
 }
 
 function openCommentUi(path: string, line?: number) {
-  if (!isValidLine(line)) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to map a line for this comment.");
-    return;
-  }
-  const fileNode = document.querySelector<HTMLElement>(
-    `div.file[data-path='${path}']`
-  );
-  const lineNode = fileNode ? findLineNode(fileNode, line) : null;
-  const commentButton =
-    lineNode?.querySelector<HTMLElement>(".js-add-line-comment") ?? null;
-  if (!commentButton) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to open comment UI for the mapped line.");
-    return;
-  }
-  commentButton.click();
+	if (!isValidLine(line)) {
+		showOverlayToast("Unable to map a line for this comment.", "error");
+		return;
+	}
+	const fileNode = document.querySelector<HTMLElement>(
+		`div.file[data-path='${path}']`,
+	);
+	const lineNode = fileNode ? findLineNode(fileNode, line) : null;
+	const commentButton =
+		lineNode?.querySelector<HTMLElement>(".js-add-line-comment") ?? null;
+	if (!commentButton) {
+		showOverlayToast("Unable to open comment UI for the mapped line.", "error");
+		return;
+	}
+	commentButton.click();
 }
 
 function resolveThread(path: string, line?: number) {
-  if (!isValidLine(line)) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to map a line for this resolution.");
-    return;
-  }
-  const fileNode = document.querySelector<HTMLElement>(
-    `div.file[data-path='${path}']`
-  );
-  const lineNode = fileNode ? findLineNode(fileNode, line) : null;
-  const resolveButton =
-    lineNode?.querySelector<HTMLElement>(".js-resolve-thread") ?? null;
-  if (!resolveButton) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to resolve thread for the mapped line.");
-    return;
-  }
-  resolveButton.click();
+	if (!isValidLine(line)) {
+		showOverlayToast("Unable to map a line for this resolution.", "error");
+		return;
+	}
+	const fileNode = document.querySelector<HTMLElement>(
+		`div.file[data-path='${path}']`,
+	);
+	const lineNode = fileNode ? findLineNode(fileNode, line) : null;
+	const resolveButton =
+		lineNode?.querySelector<HTMLElement>(".js-resolve-thread") ?? null;
+	if (!resolveButton) {
+		showOverlayToast("Unable to resolve thread for the mapped line.", "error");
+		return;
+	}
+	resolveButton.click();
 }
 
 async function createCommentViaApi(path: string, line?: number) {
-  if (!isValidLine(line)) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to map a line for this comment.");
-    return;
-  }
-  const presetBody = document.documentElement.dataset.semadiffCommentBody;
-  // biome-ignore lint/suspicious/noAlert: prompt keeps direct API flow minimal.
-  const body = presetBody ?? window.prompt("Enter comment text");
-  if (!body || body.trim().length === 0) {
-    return;
-  }
-  const fileNode = document.querySelector<HTMLElement>(
-    `div.file[data-path='${path}']`
-  );
-  if (!fileNode) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate file in GitHub diff.");
-    return;
-  }
-  const lineNode = findLineNode(fileNode, line);
-  if (!lineNode) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate the mapped line in GitHub diff.");
-    return;
-  }
-  const commentButton =
-    lineNode?.querySelector<HTMLElement>(".js-add-line-comment") ?? null;
-  const form =
-    lineNode?.querySelector<HTMLFormElement>(".js-inline-comment-form") ??
-    commentButton?.closest("form") ??
-    null;
-  const meta = extractLineMeta({
-    fileNode,
-    lineNode,
-    actionNode: commentButton,
-    fallbackLine: line,
-  });
-  const action =
-    (getFormAction(form) || commentButton?.getAttribute("data-url")) ??
-    meta.apiUrl ??
-    "";
-  if (!action) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate comment endpoint for this file.");
-    return;
-  }
+	if (!isValidLine(line)) {
+		showOverlayToast("Unable to map a line for this comment.", "error");
+		return;
+	}
+	const presetBody = document.documentElement.dataset.semadiffCommentBody;
+	const body = presetBody ?? (await promptInOverlay("Enter comment text"));
+	if (!body || body.trim().length === 0) {
+		return;
+	}
+	const fileNode = document.querySelector<HTMLElement>(
+		`div.file[data-path='${path}']`,
+	);
+	if (!fileNode) {
+		showOverlayToast("Unable to locate file in GitHub diff.", "error");
+		return;
+	}
+	const lineNode = findLineNode(fileNode, line);
+	if (!lineNode) {
+		showOverlayToast(
+			"Unable to locate the mapped line in GitHub diff.",
+			"error",
+		);
+		return;
+	}
+	const commentButton =
+		lineNode?.querySelector<HTMLElement>(".js-add-line-comment") ?? null;
+	const form =
+		lineNode?.querySelector<HTMLFormElement>(".js-inline-comment-form") ??
+		commentButton?.closest("form") ??
+		null;
+	const meta = extractLineMeta({
+		fileNode,
+		lineNode,
+		actionNode: commentButton,
+		fallbackLine: line,
+	});
+	const action =
+		(getFormAction(form) || commentButton?.getAttribute("data-url")) ??
+		meta.apiUrl ??
+		"";
+	if (!action) {
+		showOverlayToast(
+			"Unable to locate comment endpoint for this file.",
+			"error",
+		);
+		return;
+	}
 
-  const bodyField =
-    form?.querySelector<HTMLTextAreaElement>("textarea[name]")?.name ??
-    "comment[body]";
-  const bodyInput = form?.elements.namedItem(bodyField);
-  if (
-    bodyInput instanceof HTMLInputElement ||
-    bodyInput instanceof HTMLTextAreaElement
-  ) {
-    bodyInput.value = body;
-  }
+	const bodyField =
+		form?.querySelector<HTMLTextAreaElement>("textarea[name]")?.name ??
+		"comment[body]";
+	const bodyInput = form?.elements.namedItem(bodyField);
+	if (
+		bodyInput instanceof HTMLInputElement ||
+		bodyInput instanceof HTMLTextAreaElement
+	) {
+		bodyInput.value = body;
+	}
 
-  telemetrySpan("commentApi", { path, line: meta.lineNumber ?? line });
-  try {
-    const response = await submitFormAction({
-      url: action,
-      form,
-      bodyOverrides: {
-        [bodyField]: body,
-        path,
-        line: meta.lineNumber,
-        side: meta.side,
-        position: meta.position,
-        commit_id: meta.commitId,
-      },
-    });
-    if (!response.ok) {
-      // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-      window.alert(`Comment request failed (${response.status}).`);
-      telemetrySpan("commentApi", {
-        path,
-        status: "error",
-        code: response.status,
-      });
-      return;
-    }
-    telemetrySpan("commentApi", { path, status: "ok" });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert(`Comment request failed: ${message}`);
-    telemetrySpan("commentApi", { path, status: "error", message });
-  }
+	telemetrySpan("commentApi", { path, line: meta.lineNumber ?? line });
+	try {
+		const response = await submitFormAction({
+			url: action,
+			form,
+			bodyOverrides: {
+				[bodyField]: body,
+				path,
+				line: meta.lineNumber,
+				side: meta.side,
+				position: meta.position,
+				commit_id: meta.commitId,
+			},
+		});
+		if (!response.ok) {
+			showOverlayToast(`Comment request failed (${response.status}).`, "error");
+			telemetrySpan("commentApi", {
+				path,
+				status: "error",
+				code: response.status,
+			});
+			return;
+		}
+		telemetrySpan("commentApi", { path, status: "ok" });
+		showOverlayToast("Comment submitted.");
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		showOverlayToast(`Comment request failed: ${message}`, "error");
+		telemetrySpan("commentApi", { path, status: "error", message });
+	}
 }
 
 async function resolveThreadViaApi(path: string, line?: number) {
-  if (!isValidLine(line)) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to map a line for this resolution.");
-    return;
-  }
-  const fileNode = document.querySelector<HTMLElement>(
-    `div.file[data-path='${path}']`
-  );
-  if (!fileNode) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate file in GitHub diff.");
-    return;
-  }
-  const lineNode = findLineNode(fileNode, line);
-  if (!lineNode) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate the mapped line in GitHub diff.");
-    return;
-  }
-  const resolveButton =
-    lineNode?.querySelector<HTMLElement>(".js-resolve-thread") ?? null;
-  const form = resolveButton?.closest("form") ?? null;
-  const meta = extractLineMeta({
-    fileNode,
-    lineNode,
-    actionNode: resolveButton,
-    fallbackLine: line,
-  });
-  const action =
-    resolveButton?.getAttribute("data-url") ??
-    (getFormAction(form) || meta.resolveUrl) ??
-    "";
-  if (!action) {
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert("Unable to locate resolve endpoint for this file.");
-    return;
-  }
-  telemetrySpan("resolveApi", { path, line: meta.lineNumber ?? line });
-  try {
-    const response = await submitFormAction({
-      url: action,
-      form,
-      bodyOverrides: {
-        path,
-        line: meta.lineNumber,
-        side: meta.side,
-        position: meta.position,
-        commit_id: meta.commitId,
-      },
-    });
-    if (!response.ok) {
-      // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-      window.alert(`Resolve request failed (${response.status}).`);
-      telemetrySpan("resolveApi", {
-        path,
-        status: "error",
-        code: response.status,
-      });
-      return;
-    }
-    telemetrySpan("resolveApi", { path, status: "ok" });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    // biome-ignore lint/suspicious/noAlert: native alert provides quick user feedback.
-    window.alert(`Resolve request failed: ${message}`);
-    telemetrySpan("resolveApi", { path, status: "error", message });
-  }
+	if (!isValidLine(line)) {
+		showOverlayToast("Unable to map a line for this resolution.", "error");
+		return;
+	}
+	const fileNode = document.querySelector<HTMLElement>(
+		`div.file[data-path='${path}']`,
+	);
+	if (!fileNode) {
+		showOverlayToast("Unable to locate file in GitHub diff.", "error");
+		return;
+	}
+	const lineNode = findLineNode(fileNode, line);
+	if (!lineNode) {
+		showOverlayToast(
+			"Unable to locate the mapped line in GitHub diff.",
+			"error",
+		);
+		return;
+	}
+	const resolveButton =
+		lineNode?.querySelector<HTMLElement>(".js-resolve-thread") ?? null;
+	const form = resolveButton?.closest("form") ?? null;
+	const meta = extractLineMeta({
+		fileNode,
+		lineNode,
+		actionNode: resolveButton,
+		fallbackLine: line,
+	});
+	const action =
+		resolveButton?.getAttribute("data-url") ??
+		(getFormAction(form) || meta.resolveUrl) ??
+		"";
+	if (!action) {
+		showOverlayToast(
+			"Unable to locate resolve endpoint for this file.",
+			"error",
+		);
+		return;
+	}
+	telemetrySpan("resolveApi", { path, line: meta.lineNumber ?? line });
+	try {
+		const response = await submitFormAction({
+			url: action,
+			form,
+			bodyOverrides: {
+				path,
+				line: meta.lineNumber,
+				side: meta.side,
+				position: meta.position,
+				commit_id: meta.commitId,
+			},
+		});
+		if (!response.ok) {
+			showOverlayToast(`Resolve request failed (${response.status}).`, "error");
+			telemetrySpan("resolveApi", {
+				path,
+				status: "error",
+				code: response.status,
+			});
+			return;
+		}
+		telemetrySpan("resolveApi", { path, status: "ok" });
+		showOverlayToast("Thread resolved.");
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		showOverlayToast(`Resolve request failed: ${message}`, "error");
+		telemetrySpan("resolveApi", { path, status: "error", message });
+	}
 }
 
 function findLineNode(fileNode: HTMLElement, line?: number) {
-  if (!isValidLine(line)) {
-    return null;
-  }
-  return fileNode.querySelector<HTMLElement>(`[data-line-number='${line}']`);
+	if (!isValidLine(line)) {
+		return null;
+	}
+	return fileNode.querySelector<HTMLElement>(`[data-line-number='${line}']`);
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", mountOverlay, { once: true });
+	document.addEventListener("DOMContentLoaded", mountOverlay, { once: true });
 } else {
-  mountOverlay();
+	mountOverlay();
 }

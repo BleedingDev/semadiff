@@ -8,74 +8,74 @@ type SupportedLanguage = (typeof languages)[number];
 const LINE_SPLIT_RE = /\r?\n/;
 
 function isSupportedLanguage(
-  language: string | undefined
+	language: string | undefined,
 ): language is SupportedLanguage {
-  return (
-    typeof language === "string" &&
-    languages.includes(language as SupportedLanguage)
-  );
+	return (
+		typeof language === "string" &&
+		languages.includes(language as SupportedLanguage)
+	);
 }
 
 function parseWithLightning(
-  input: ParserInput,
-  language: SupportedLanguage
+	input: ParserInput,
+	language: SupportedLanguage,
 ): ParseResult {
-  const encoder = new TextEncoder();
-  const result = transform({
-    code: encoder.encode(input.content),
-    filename: input.path ?? "input.css",
-    minify: false,
-    sourceMap: false,
-    errorRecovery: true,
-  });
-  const diagnostics = result.warnings.map((warning) => warning.message);
-  const parsed: ParseResult = {
-    language,
-    kind: "tree",
-    text: input.content,
-    lines: input.content.split(LINE_SPLIT_RE),
-    capabilities: {
-      hasAstKinds: true,
-      hasTokenRanges: false,
-      supportsErrorRecovery: true,
-      supportsIncrementalParse: false,
-    },
-    root: result,
-  };
-  return diagnostics.length > 0 ? { ...parsed, diagnostics } : parsed;
+	const encoder = new TextEncoder();
+	const result = transform({
+		code: encoder.encode(input.content),
+		filename: input.path ?? "input.css",
+		minify: false,
+		sourceMap: false,
+		errorRecovery: true,
+	});
+	const diagnostics = result.warnings.map((warning) => warning.message);
+	const parsed: ParseResult = {
+		language,
+		kind: "tree",
+		text: input.content,
+		lines: input.content.split(LINE_SPLIT_RE),
+		capabilities: {
+			hasAstKinds: true,
+			hasTokenRanges: false,
+			supportsErrorRecovery: true,
+			supportsIncrementalParse: false,
+		},
+		root: result,
+	};
+	return diagnostics.length > 0 ? { ...parsed, diagnostics } : parsed;
 }
 
 function toParseErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : String(error);
+	return error instanceof Error ? error.message : String(error);
 }
 
 export const lightningCssParser: Parser = {
-  id: "lightningcss",
-  languages,
-  capabilities: {
-    hasAstKinds: true,
-    hasTokenRanges: false,
-    supportsErrorRecovery: true,
-    supportsIncrementalParse: false,
-  },
-  parse: (input: ParserInput) =>
-    Effect.gen(function* () {
-      const language = input.language;
-      if (!isSupportedLanguage(language)) {
-        return yield* new ParseError({
-          parser: "lightningcss",
-          message: `Unsupported language: ${language ?? "unknown"}`,
-        });
-      }
-      return yield* Effect.try({
-        try: () => parseWithLightning(input, language),
-        catch: (error) =>
-          new ParseError({
-            parser: "lightningcss",
-            message: toParseErrorMessage(error),
-          }),
-      });
-    }),
+	id: "lightningcss",
+	languages,
+	capabilities: {
+		hasAstKinds: true,
+		hasTokenRanges: false,
+		supportsErrorRecovery: true,
+		supportsIncrementalParse: false,
+	},
+	parse: (input: ParserInput) =>
+		Effect.gen(function* () {
+			const language = input.language;
+			if (!isSupportedLanguage(language)) {
+				return yield* new ParseError({
+					parser: "lightningcss",
+					message: `Unsupported language: ${language ?? "unknown"}`,
+				});
+			}
+			return yield* Effect.try({
+				try: () => parseWithLightning(input, language),
+				catch: (error) =>
+					new ParseError({
+						parser: "lightningcss",
+						message: toParseErrorMessage(error),
+					}),
+			});
+		}),
 };
 
 export const lightningCssParsers = [lightningCssParser];

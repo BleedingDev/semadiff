@@ -3,21 +3,25 @@
 Analyze PRD and create implementation plan with executable specs.
 
 ## Usage
+
 ```
 /prompts:ralph-plan                    # Uses docs/PRD.md
 /prompts:ralph-plan --input prd.md     # Custom PRD file
 ```
 
 ## Prerequisites
+
 - `docs/PRD.md` must exist (run `/prompts:ralph-discover` first)
 
 ## Output
+
 - `docs/IMPLEMENTATION_PLAN.md` - Overview with epics and tasks
 - `.ralph-specs/*.md` - Executable spec files (this is what Ralph runs on VM)
 
 ## LANGUAGE SETTING
 
 **FIRST: Detect language automatically**
+
 ```bash
 LANG=$(grep -o '"language"[[:space:]]*:[[:space:]]*"[^"]*"' .ralph/config.json 2>/dev/null | cut -d'"' -f4)
 echo "Language: ${LANG:-en}"
@@ -34,6 +38,7 @@ cat docs/PRD.md 2>/dev/null || echo "PRD not found"
 ```
 
 Om PRD saknas:
+
 ```
 ERROR: docs/PRD.md not found.
 
@@ -79,6 +84,7 @@ Reply with number:
 ```
 
 For each epic:
+
 1. List all tasks needed
 2. Ensure each task is atomic (one thing)
 3. Add acceptance criteria from PRD
@@ -110,13 +116,13 @@ For each spec:
   5. Annars → nästa spec
 ```
 
-| Check | Question |
-|-------|----------|
-| ✅ PRD Coverage | Täcker specs ALLA must-have features? |
-| ✅ Dependencies | Är beroenden explicit? |
-| ✅ Testability | Har varje spec E2E test criteria? |
-| ✅ Atomicity | Är varje spec EN sak? |
-| ✅ Order | Är ordningen rätt (dependencies first)? |
+| Check           | Question                                |
+| --------------- | --------------------------------------- |
+| ✅ PRD Coverage | Täcker specs ALLA must-have features?   |
+| ✅ Dependencies | Är beroenden explicit?                  |
+| ✅ Testability  | Har varje spec E2E test criteria?       |
+| ✅ Atomicity    | Är varje spec EN sak?                   |
+| ✅ Order        | Är ordningen rätt (dependencies first)? |
 
 ---
 
@@ -130,21 +136,26 @@ For each spec:
 {1-2 sentences what to build}
 
 ## Requirements
+
 - {Concrete requirement 1}
 - {Concrete requirement 2}
 - {Concrete requirement 3}
 
 ## E2E Test
+
 Write test in `e2e/{feature}.spec.ts` that verifies:
+
 - {what test should check}
 
 ## Done when
+
 - [ ] Build passes
 - [ ] E2E test passes
 - [ ] {Specific verification}
 ```
 
 **IMPORTANT:**
+
 - No background/context - Codex reads the code
 - No implementation details - Codex knows how
 - Only WHAT, not HOW
@@ -165,6 +176,7 @@ Write test in `e2e/{feature}.spec.ts` that verifies:
 ```
 
 **CRITICAL - 01-project-setup MUST contain:**
+
 - Vite + React + TypeScript setup (or chosen stack)
 - Tailwind with design tokens from PRD
 - **Playwright installation** (`npx playwright install`)
@@ -178,39 +190,47 @@ Write test in `e2e/{feature}.spec.ts` that verifies:
 ## EXAMPLE SPECS
 
 ### Good spec (minimal):
+
 ```markdown
 # Auth Context
 
 Create React context for authentication with Supabase.
 
 ## Requirements
+
 - AuthProvider wrapper component
 - useAuth hook (user, signIn, signOut, loading)
 - Automatic session refresh on mount
 
 ## E2E Test
+
 Write test in `e2e/auth.spec.ts` that verifies:
+
 - Sign in redirects to home
 - Sign out clears session
 
 ## Done when
+
 - [ ] Build passes
 - [ ] Can sign in/out via hook
 ```
 
 ### Bad spec (too long):
+
 ```markdown
 # Auth Context
 
 ## Background
+
 Authentication is important for...
 [10 lines of unnecessary context]
 
 ## Implementation
+
 1. Create src/contexts/AuthContext.tsx
 2. Import createContext from react
 3. Define AuthContextType interface
-[20 lines of step-by-step implementation]
+   [20 lines of step-by-step implementation]
 ```
 
 ---
@@ -224,43 +244,48 @@ Create `docs/IMPLEMENTATION_PLAN.md`:
 
 ## Epics Overview
 
-| Epic | Name | Specs | Status |
-|------|------|-------|--------|
-| E1 | Project Setup | 01 | pending |
-| E2 | Authentication | 02-04 | pending |
-| E3 | Core Features | 05-08 | pending |
-| E4 | Polish | 09-10 | pending |
+| Epic | Name           | Specs | Status  |
+| ---- | -------------- | ----- | ------- |
+| E1   | Project Setup  | 01    | pending |
+| E2   | Authentication | 02-04 | pending |
+| E3   | Core Features  | 05-08 | pending |
+| E4   | Polish         | 09-10 | pending |
 
 ## Spec Sequence
 
 ### E1: Project Setup (MUST COMPLETE FIRST)
+
 - [ ] 01-project-setup.md
 - **HARD STOP** - Verify build + Playwright works
 
 ### E2: Authentication
+
 - [ ] 02-database-schema.md
 - [ ] 03-auth-context.md
 - [ ] 04-login-page.md
 - **HARD STOP** - Verify login flow works
 
 ### E3: Core Features
+
 - [ ] 05-{feature}.md
 - [ ] 06-{feature}.md
 - [ ] 07-{feature}.md
 - [ ] 08-{feature}.md
 
 ### E4: Polish
+
 - [ ] 09-{feature}.md
 - [ ] 10-{feature}.md
 
 ## Dependencies
-
 ```
+
 01 → 02 → 03 → 04
-          ↓
-     05 → 06 → 07 → 08
-                    ↓
-               09 → 10
+↓
+05 → 06 → 07 → 08
+↓
+09 → 10
+
 ```
 
 ## PRD Traceability
@@ -280,15 +305,15 @@ Create `docs/IMPLEMENTATION_PLAN.md`:
 
 ## DEFINITION OF DONE - Planning
 
-| Kriterium | Verifiering |
-|-----------|-------------|
-| ✅ Alla PRD must-haves täckta | Traceability komplett |
-| ✅ Specs är atomära | En sak per spec |
-| ✅ Dependencies explicit | Ordning är tydlig |
-| ✅ E2E test för varje spec | Testability klar |
+| Kriterium                          | Verifiering            |
+| ---------------------------------- | ---------------------- |
+| ✅ Alla PRD must-haves täckta      | Traceability komplett  |
+| ✅ Specs är atomära                | En sak per spec        |
+| ✅ Dependencies explicit           | Ordning är tydlig      |
+| ✅ E2E test för varje spec         | Testability klar       |
 | ✅ 01-project-setup har Playwright | Test-loop kommer funka |
-| ✅ Specs är minimala | Max 20 rader |
-| ✅ Inga open questions | Allt är specificerat |
+| ✅ Specs är minimala               | Max 20 rader           |
+| ✅ Inga open questions             | Allt är specificerat   |
 
 ---
 

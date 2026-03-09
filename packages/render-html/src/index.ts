@@ -1,40 +1,40 @@
 import {
-  type DiffDocument,
-  type DiffOperation,
-  defaultConfig,
-  type NormalizerLanguage,
-  normalizeTextForLanguage,
-  type Range,
+	type DiffDocument,
+	type DiffOperation,
+	defaultConfig,
+	type NormalizerLanguage,
+	normalizeTextForLanguage,
+	type Range,
 } from "@semadiff/core";
 import { Schema } from "effect";
 
 interface SemanticTokenRange {
-  startIndex: number;
-  endIndex: number;
+	startIndex: number;
+	endIndex: number;
 }
 
 export interface HtmlRenderOptions {
-  maxOperations?: number;
-  batchSize?: number;
-  virtualize?: boolean;
-  filePath?: string;
-  title?: string;
-  view?: "semantic" | "lines";
-  lineMode?: "raw" | "semantic";
-  hideComments?: boolean;
-  oldText?: string;
-  newText?: string;
-  contextLines?: number;
-  lineLayout?: "split" | "unified";
-  language?: NormalizerLanguage;
-  showBanner?: boolean;
-  showSummary?: boolean;
-  showFilePath?: boolean;
-  layout?: "full" | "embed";
-  semanticTokens?: {
-    old?: readonly SemanticTokenRange[];
-    new?: readonly SemanticTokenRange[];
-  };
+	maxOperations?: number;
+	batchSize?: number;
+	virtualize?: boolean;
+	filePath?: string;
+	title?: string;
+	view?: "semantic" | "lines";
+	lineMode?: "raw" | "semantic";
+	hideComments?: boolean;
+	oldText?: string;
+	newText?: string;
+	contextLines?: number;
+	lineLayout?: "split" | "unified";
+	language?: NormalizerLanguage;
+	showBanner?: boolean;
+	showSummary?: boolean;
+	showFilePath?: boolean;
+	layout?: "full" | "embed";
+	semanticTokens?: {
+		old?: readonly SemanticTokenRange[];
+		new?: readonly SemanticTokenRange[];
+	};
 }
 
 const baseStyles = `
@@ -458,218 +458,218 @@ body.sd-embed .sd-lines {
 
 const LINE_SPLIT_RE = /\r?\n/;
 const INLINE_TOKEN_RE =
-  /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|[A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
+	/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|[A-Za-z0-9_]+|\s+|[^A-Za-z0-9_\s])/g;
 const SEMANTIC_TOKEN_CONTENT_RE = /[A-Za-z0-9_$"']/;
 const PROJECTION_FRAGMENT_RE = /[^A-Za-z0-9@_./-]+/g;
 
 interface LineEdit {
-  type: "equal" | "insert" | "delete";
-  line: string;
+	type: "equal" | "insert" | "delete";
+	line: string;
 }
 
 interface LineRow {
-  type: "equal" | "insert" | "delete" | "replace" | "gap" | "hunk" | "move";
-  oldLine?: number | null;
-  newLine?: number | null;
-  text?: string;
-  hidden?: number;
-  oldText?: string;
-  newText?: string;
-  header?: string;
+	type: "equal" | "insert" | "delete" | "replace" | "gap" | "hunk" | "move";
+	oldLine?: number | null;
+	newLine?: number | null;
+	text?: string;
+	hidden?: number;
+	oldText?: string;
+	newText?: string;
+	header?: string;
 }
 
 const LineNumberSchema = Schema.Union([Schema.Number, Schema.Null] as const);
 const LineRowSchema = Schema.Struct({
-  type: Schema.Literals([
-    "equal",
-    "insert",
-    "delete",
-    "replace",
-    "gap",
-    "hunk",
-    "move",
-  ] as const),
-  oldLine: Schema.optional(LineNumberSchema),
-  newLine: Schema.optional(LineNumberSchema),
-  text: Schema.optional(Schema.String),
-  hidden: Schema.optional(Schema.Number),
-  oldText: Schema.optional(Schema.String),
-  newText: Schema.optional(Schema.String),
-  header: Schema.optional(Schema.String),
+	type: Schema.Literals([
+		"equal",
+		"insert",
+		"delete",
+		"replace",
+		"gap",
+		"hunk",
+		"move",
+	] as const),
+	oldLine: Schema.optional(LineNumberSchema),
+	newLine: Schema.optional(LineNumberSchema),
+	text: Schema.optional(Schema.String),
+	hidden: Schema.optional(Schema.Number),
+	oldText: Schema.optional(Schema.String),
+	newText: Schema.optional(Schema.String),
+	header: Schema.optional(Schema.String),
 });
 const LinePayloadSchema = Schema.Struct({
-  rows: Schema.Array(LineRowSchema),
-  batchSize: Schema.Number,
-  lineLayout: Schema.Literals(["split", "unified"] as const),
+	rows: Schema.Array(LineRowSchema),
+	batchSize: Schema.Number,
+	lineLayout: Schema.Literals(["split", "unified"] as const),
 });
 const OpsRangeSchema = Schema.Struct({
-  start: Schema.Struct({
-    line: Schema.Number,
-    column: Schema.Number,
-  }),
-  end: Schema.Struct({
-    line: Schema.Number,
-    column: Schema.Number,
-  }),
+	start: Schema.Struct({
+		line: Schema.Number,
+		column: Schema.Number,
+	}),
+	end: Schema.Struct({
+		line: Schema.Number,
+		column: Schema.Number,
+	}),
 });
 const OpsPayloadSchema = Schema.Struct({
-  operations: Schema.Array(
-    Schema.Struct({
-      id: Schema.String,
-      type: Schema.Literals(["insert", "delete", "update", "move"] as const),
-      oldText: Schema.String,
-      newText: Schema.String,
-      confidence: Schema.Union([Schema.Number, Schema.Null] as const),
-      oldRange: Schema.Union([OpsRangeSchema, Schema.Null] as const),
-      newRange: Schema.Union([OpsRangeSchema, Schema.Null] as const),
-    })
-  ),
-  batchSize: Schema.Number,
+	operations: Schema.Array(
+		Schema.Struct({
+			id: Schema.String,
+			type: Schema.Literals(["insert", "delete", "update", "move"] as const),
+			oldText: Schema.String,
+			newText: Schema.String,
+			confidence: Schema.Union([Schema.Number, Schema.Null] as const),
+			oldRange: Schema.Union([OpsRangeSchema, Schema.Null] as const),
+			newRange: Schema.Union([OpsRangeSchema, Schema.Null] as const),
+		}),
+	),
+	batchSize: Schema.Number,
 });
 const LinePayloadJson = Schema.fromJsonString(LinePayloadSchema);
 const OpsPayloadJson = Schema.fromJsonString(OpsPayloadSchema);
 
 function normalizeLineForSemantic(line: string, language?: NormalizerLanguage) {
-  return normalizeTextForLanguage(line, defaultConfig.normalizers, language);
+	return normalizeTextForLanguage(line, defaultConfig.normalizers, language);
 }
 
 function escapeHtml(input: string) {
-  return input
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
+	return input
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
 }
 
 function escapeScript(input: string) {
-  return input.replace(/<\/script>/g, "<\\/script>");
+	return input.replace(/<\/script>/g, "<\\/script>");
 }
 
 function formatRangeDetail(range?: Range) {
-  if (!range) {
-    return "";
-  }
-  const start = `L${range.start.line}:${range.start.column}`;
-  const end = `L${range.end.line}:${range.end.column}`;
-  return `${start}-${end}`;
+	if (!range) {
+		return "";
+	}
+	const start = `L${range.start.line}:${range.start.column}`;
+	const end = `L${range.end.line}:${range.end.column}`;
+	return `${start}-${end}`;
 }
 
 function formatRangeLabel(range?: Range) {
-  if (!range) {
-    return "";
-  }
-  if (range.start.line === range.end.line) {
-    return `L${range.start.line}`;
-  }
-  return `L${range.start.line}-${range.end.line}`;
+	if (!range) {
+		return "";
+	}
+	if (range.start.line === range.end.line) {
+		return `L${range.start.line}`;
+	}
+	return `L${range.start.line}-${range.end.line}`;
 }
 
 function countLines(text?: string) {
-  if (!text) {
-    return 0;
-  }
-  return text.split(LINE_SPLIT_RE).length;
+	if (!text) {
+		return 0;
+	}
+	return text.split(LINE_SPLIT_RE).length;
 }
 
 function previewText(text?: string, limit = 400) {
-  if (!text) {
-    return { value: "", truncated: false };
-  }
-  if (text.length <= limit) {
-    return { value: text, truncated: false };
-  }
-  return { value: `${text.slice(0, limit)}\n…`, truncated: true };
+	if (!text) {
+		return { value: "", truncated: false };
+	}
+	if (text.length <= limit) {
+		return { value: text, truncated: false };
+	}
+	return { value: `${text.slice(0, limit)}\n…`, truncated: true };
 }
 
 function estimateReduction(diff: DiffDocument) {
-  const operations = diff.operations.length;
-  const changeLines = diff.operations.reduce((total, op) => {
-    return total + countLines(op.oldText) + countLines(op.newText);
-  }, 0);
-  if (operations === 0 || changeLines === 0) {
-    return { percent: 0, operations, changeLines };
-  }
-  const ratio = 1 - operations / changeLines;
-  const clamped = Math.max(0, Math.min(1, ratio));
-  return {
-    percent: Math.round(clamped * 100),
-    operations,
-    changeLines,
-  };
+	const operations = diff.operations.length;
+	const changeLines = diff.operations.reduce((total, op) => {
+		return total + countLines(op.oldText) + countLines(op.newText);
+	}, 0);
+	if (operations === 0 || changeLines === 0) {
+		return { percent: 0, operations, changeLines };
+	}
+	const ratio = 1 - operations / changeLines;
+	const clamped = Math.max(0, Math.min(1, ratio));
+	return {
+		percent: Math.round(clamped * 100),
+		operations,
+		changeLines,
+	};
 }
 
 function buildSummary(diff: DiffDocument) {
-  const counts = {
-    insert: 0,
-    delete: 0,
-    update: 0,
-    move: 0,
-  };
-  for (const op of diff.operations) {
-    counts[op.type] += 1;
-  }
-  const touchedLines = diff.operations.reduce((total, op) => {
-    return total + countLines(op.oldText) + countLines(op.newText);
-  }, 0);
-  return {
-    counts,
-    touchedLines,
-    operations: diff.operations.length,
-    moves: diff.moves.length,
-    renames: diff.renames.length,
-  };
+	const counts = {
+		insert: 0,
+		delete: 0,
+		update: 0,
+		move: 0,
+	};
+	for (const op of diff.operations) {
+		counts[op.type] += 1;
+	}
+	const touchedLines = diff.operations.reduce((total, op) => {
+		return total + countLines(op.oldText) + countLines(op.newText);
+	}, 0);
+	return {
+		counts,
+		touchedLines,
+		operations: diff.operations.length,
+		moves: diff.moves.length,
+		renames: diff.renames.length,
+	};
 }
 
 function renderSummary(diff: DiffDocument) {
-  const summary = buildSummary(diff);
-  const cards = [
-    { label: "Operations", value: summary.operations },
-    { label: "Touched Lines", value: summary.touchedLines },
-    { label: "Updates", value: summary.counts.update },
-    { label: "Insertions", value: summary.counts.insert },
-    { label: "Deletions", value: summary.counts.delete },
-    { label: "Moves", value: summary.counts.move },
-  ];
+	const summary = buildSummary(diff);
+	const cards = [
+		{ label: "Operations", value: summary.operations },
+		{ label: "Touched Lines", value: summary.touchedLines },
+		{ label: "Updates", value: summary.counts.update },
+		{ label: "Insertions", value: summary.counts.insert },
+		{ label: "Deletions", value: summary.counts.delete },
+		{ label: "Moves", value: summary.counts.move },
+	];
 
-  const cardMarkup = cards
-    .map(
-      (card) => `
+	const cardMarkup = cards
+		.map(
+			(card) => `
         <div class="sd-summary-card">
           <div class="sd-summary-label">${escapeHtml(card.label)}</div>
           <div class="sd-summary-value">${card.value}</div>
         </div>
-      `
-    )
-    .join("\n");
+      `,
+		)
+		.join("\n");
 
-  const highlights: string[] = [];
-  if (diff.renames.length > 0) {
-    const renames = diff.renames
-      .map(
-        (rename) =>
-          `${escapeHtml(rename.from)} → ${escapeHtml(rename.to)} (${rename.occurrences})`
-      )
-      .join(", ");
-    highlights.push(`<span class="sd-pill">Renames: ${renames}</span>`);
-  }
-  if (diff.moves.length > 0) {
-    highlights.push(`<span class="sd-pill">Moves: ${diff.moves.length}</span>`);
-  }
+	const highlights: string[] = [];
+	if (diff.renames.length > 0) {
+		const renames = diff.renames
+			.map(
+				(rename) =>
+					`${escapeHtml(rename.from)} → ${escapeHtml(rename.to)} (${rename.occurrences})`,
+			)
+			.join(", ");
+		highlights.push(`<span class="sd-pill">Renames: ${renames}</span>`);
+	}
+	if (diff.moves.length > 0) {
+		highlights.push(`<span class="sd-pill">Moves: ${diff.moves.length}</span>`);
+	}
 
-  return `
+	return `
     <section class="sd-summary">${cardMarkup}</section>
     ${highlights.length > 0 ? `<div class="sd-highlight">${highlights.join(" ")}</div>` : ""}
   `;
 }
 
 function renderSide(
-  title: string,
-  text: string,
-  variant: "old" | "new",
-  truncated: boolean
+	title: string,
+	text: string,
+	variant: "old" | "new",
+	truncated: boolean,
 ) {
-  return `
+	return `
     <div class="sd-side sd-side--${variant}">
       <div class="sd-side-title">${escapeHtml(title)}</div>
       <pre>${escapeHtml(text)}</pre>
@@ -679,51 +679,51 @@ function renderSide(
 }
 
 function renderOperation(op: DiffOperation) {
-  const typeLabel = op.type.toUpperCase();
-  const oldPreview = previewText(op.oldText);
-  const newPreview = previewText(op.newText);
-  const oldLabel = formatRangeLabel(op.oldRange);
-  const newLabel = formatRangeLabel(op.newRange);
-  const rangeLabel = [oldLabel, newLabel].filter(Boolean).join(" → ");
-  const rangeDetail = [
-    formatRangeDetail(op.oldRange),
-    formatRangeDetail(op.newRange),
-  ]
-    .filter(Boolean)
-    .join(" → ");
+	const typeLabel = op.type.toUpperCase();
+	const oldPreview = previewText(op.oldText);
+	const newPreview = previewText(op.newText);
+	const oldLabel = formatRangeLabel(op.oldRange);
+	const newLabel = formatRangeLabel(op.newRange);
+	const rangeLabel = [oldLabel, newLabel].filter(Boolean).join(" → ");
+	const rangeDetail = [
+		formatRangeDetail(op.oldRange),
+		formatRangeDetail(op.newRange),
+	]
+		.filter(Boolean)
+		.join(" → ");
 
-  const parts: string[] = [];
-  if (op.type === "insert") {
-    if (newPreview.value) {
-      parts.push(
-        renderSide("After", newPreview.value, "new", newPreview.truncated)
-      );
-    }
-  } else if (op.type === "delete") {
-    if (oldPreview.value) {
-      parts.push(
-        renderSide("Before", oldPreview.value, "old", oldPreview.truncated)
-      );
-    }
-  } else {
-    if (oldPreview.value) {
-      parts.push(
-        renderSide("Before", oldPreview.value, "old", oldPreview.truncated)
-      );
-    }
-    if (newPreview.value) {
-      parts.push(
-        renderSide("After", newPreview.value, "new", newPreview.truncated)
-      );
-    }
-  }
+	const parts: string[] = [];
+	if (op.type === "insert") {
+		if (newPreview.value) {
+			parts.push(
+				renderSide("After", newPreview.value, "new", newPreview.truncated),
+			);
+		}
+	} else if (op.type === "delete") {
+		if (oldPreview.value) {
+			parts.push(
+				renderSide("Before", oldPreview.value, "old", oldPreview.truncated),
+			);
+		}
+	} else {
+		if (oldPreview.value) {
+			parts.push(
+				renderSide("Before", oldPreview.value, "old", oldPreview.truncated),
+			);
+		}
+		if (newPreview.value) {
+			parts.push(
+				renderSide("After", newPreview.value, "new", newPreview.truncated),
+			);
+		}
+	}
 
-  const confidence =
-    typeof op.meta?.confidence === "number"
-      ? `Confidence ${(op.meta.confidence * 100).toFixed(0)}%`
-      : "";
+	const confidence =
+		typeof op.meta?.confidence === "number"
+			? `Confidence ${(op.meta.confidence * 100).toFixed(0)}%`
+			: "";
 
-  return `
+	return `
     <article class="sd-op sd-op--${escapeHtml(op.type)}" data-op-id="${escapeHtml(op.id)}">
       <div class="sd-op-header">
         <span class="sd-op-tag">${escapeHtml(typeLabel)}</span>
@@ -738,1307 +738,1306 @@ function renderOperation(op: DiffOperation) {
 }
 
 function splitLines(text: string) {
-  if (text.length === 0) {
-    return [];
-  }
-  const lines = text.split(LINE_SPLIT_RE);
-  if (lines.length > 1 && lines.at(-1) === "") {
-    lines.pop();
-  }
-  return lines;
+	if (text.length === 0) {
+		return [];
+	}
+	const lines = text.split(LINE_SPLIT_RE);
+	if (lines.length > 1 && lines.at(-1) === "") {
+		lines.pop();
+	}
+	return lines;
 }
 
 function clampTokenIndex(value: number, max: number) {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(max, Math.floor(value)));
+	if (!Number.isFinite(value)) {
+		return 0;
+	}
+	return Math.max(0, Math.min(max, Math.floor(value)));
 }
 
 function buildLineStartOffsets(text: string) {
-  const starts = [0];
-  for (let index = 0; index < text.length; index += 1) {
-    if (text.charCodeAt(index) === 10) {
-      const next = index + 1;
-      if (next < text.length) {
-        starts.push(next);
-      }
-    }
-  }
-  return starts;
+	const starts = [0];
+	for (let index = 0; index < text.length; index += 1) {
+		if (text.charCodeAt(index) === 10) {
+			const next = index + 1;
+			if (next < text.length) {
+				starts.push(next);
+			}
+		}
+	}
+	return starts;
 }
 
 function findLineForOffset(offset: number, lineStarts: number[]) {
-  let low = 0;
-  let high = lineStarts.length - 1;
-  let best = 0;
-  while (low <= high) {
-    const mid = Math.floor((low + high) / 2);
-    const start = lineStarts[mid] ?? 0;
-    if (start <= offset) {
-      best = mid;
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-  return best + 1;
+	let low = 0;
+	let high = lineStarts.length - 1;
+	let best = 0;
+	while (low <= high) {
+		const mid = Math.floor((low + high) / 2);
+		const start = lineStarts[mid] ?? 0;
+		if (start <= offset) {
+			best = mid;
+			low = mid + 1;
+		} else {
+			high = mid - 1;
+		}
+	}
+	return best + 1;
 }
 
 function buildLineTokenMap(
-  text: string,
-  tokens: readonly SemanticTokenRange[] | undefined,
-  language?: NormalizerLanguage
+	text: string,
+	tokens: readonly SemanticTokenRange[] | undefined,
+	language?: NormalizerLanguage,
 ) {
-  const byLine = new Map<number, string[]>();
-  if (!tokens || tokens.length === 0 || text.length === 0) {
-    return byLine;
-  }
-  const lineStarts = buildLineStartOffsets(text);
-  const maxLine = splitLines(text).length;
-  if (maxLine === 0) {
-    return byLine;
-  }
+	const byLine = new Map<number, string[]>();
+	if (!tokens || tokens.length === 0 || text.length === 0) {
+		return byLine;
+	}
+	const lineStarts = buildLineStartOffsets(text);
+	const maxLine = splitLines(text).length;
+	if (maxLine === 0) {
+		return byLine;
+	}
 
-  for (const token of tokens) {
-    const startIndex = clampTokenIndex(token.startIndex, text.length);
-    const endIndex = Math.max(
-      startIndex,
-      clampTokenIndex(token.endIndex, text.length)
-    );
-    if (endIndex <= startIndex) {
-      continue;
-    }
-    const tokenText = text.slice(startIndex, endIndex);
-    const normalized = normalizeTextForLanguage(
-      tokenText,
-      defaultConfig.normalizers,
-      language
-    ).trim();
-    if (!(normalized && SEMANTIC_TOKEN_CONTENT_RE.test(normalized))) {
-      continue;
-    }
-    const line = findLineForOffset(startIndex, lineStarts);
-    if (line < 1 || line > maxLine) {
-      continue;
-    }
-    const list = byLine.get(line);
-    if (list) {
-      list.push(normalized);
-    } else {
-      byLine.set(line, [normalized]);
-    }
-  }
+	for (const token of tokens) {
+		const startIndex = clampTokenIndex(token.startIndex, text.length);
+		const endIndex = Math.max(
+			startIndex,
+			clampTokenIndex(token.endIndex, text.length),
+		);
+		if (endIndex <= startIndex) {
+			continue;
+		}
+		const tokenText = text.slice(startIndex, endIndex);
+		const normalized = normalizeTextForLanguage(
+			tokenText,
+			defaultConfig.normalizers,
+			language,
+		).trim();
+		if (!(normalized && SEMANTIC_TOKEN_CONTENT_RE.test(normalized))) {
+			continue;
+		}
+		const line = findLineForOffset(startIndex, lineStarts);
+		if (line < 1 || line > maxLine) {
+			continue;
+		}
+		const list = byLine.get(line);
+		if (list) {
+			list.push(normalized);
+		} else {
+			byLine.set(line, [normalized]);
+		}
+	}
 
-  return byLine;
+	return byLine;
 }
 
 function addTokenCounts(target: Map<string, number>, tokens: string[]) {
-  for (const token of tokens) {
-    target.set(token, (target.get(token) ?? 0) + 1);
-  }
+	for (const token of tokens) {
+		target.set(token, (target.get(token) ?? 0) + 1);
+	}
 }
 
 function canConsumeTokenCounts(budget: Map<string, number>, tokens: string[]) {
-  if (tokens.length === 0) {
-    return true;
-  }
-  const required = new Map<string, number>();
-  for (const token of tokens) {
-    required.set(token, (required.get(token) ?? 0) + 1);
-  }
-  for (const [token, needed] of required) {
-    if ((budget.get(token) ?? 0) < needed) {
-      return false;
-    }
-  }
-  return true;
+	if (tokens.length === 0) {
+		return true;
+	}
+	const required = new Map<string, number>();
+	for (const token of tokens) {
+		required.set(token, (required.get(token) ?? 0) + 1);
+	}
+	for (const [token, needed] of required) {
+		if ((budget.get(token) ?? 0) < needed) {
+			return false;
+		}
+	}
+	return true;
 }
 
 function consumeTokenCounts(budget: Map<string, number>, tokens: string[]) {
-  if (tokens.length === 0) {
-    return;
-  }
-  const required = new Map<string, number>();
-  for (const token of tokens) {
-    required.set(token, (required.get(token) ?? 0) + 1);
-  }
-  for (const [token, needed] of required) {
-    const next = (budget.get(token) ?? 0) - needed;
-    if (next > 0) {
-      budget.set(token, next);
-    } else {
-      budget.delete(token);
-    }
-  }
+	if (tokens.length === 0) {
+		return;
+	}
+	const required = new Map<string, number>();
+	for (const token of tokens) {
+		required.set(token, (required.get(token) ?? 0) + 1);
+	}
+	for (const [token, needed] of required) {
+		const next = (budget.get(token) ?? 0) - needed;
+		if (next > 0) {
+			budget.set(token, next);
+		} else {
+			budget.delete(token);
+		}
+	}
 }
 
 function tokenizeInline(text: string) {
-  const tokens = text.match(INLINE_TOKEN_RE);
-  if (!tokens || tokens.length === 0) {
-    return [text];
-  }
-  return tokens;
+	const tokens = text.match(INLINE_TOKEN_RE);
+	if (!tokens || tokens.length === 0) {
+		return [text];
+	}
+	return tokens;
 }
 
 function buildInlineComparableTokens(
-  tokens: string[],
-  language?: NormalizerLanguage
+	tokens: string[],
+	language?: NormalizerLanguage,
 ) {
-  if (!language || language === "*" || language === "text") {
-    return tokens;
-  }
-  return tokens.map((token) => {
-    if (token.trim().length === 0) {
-      return token;
-    }
-    return normalizeTextForLanguage(token, defaultConfig.normalizers, language);
-  });
+	if (!language || language === "*" || language === "text") {
+		return tokens;
+	}
+	return tokens.map((token) => {
+		if (token.trim().length === 0) {
+			return token;
+		}
+		return normalizeTextForLanguage(token, defaultConfig.normalizers, language);
+	});
 }
 
 function buildInlineLcsMatrix(
-  oldComparable: string[],
-  newComparable: string[]
+	oldComparable: string[],
+	newComparable: string[],
 ) {
-  const oldLen = oldComparable.length;
-  const newLen = newComparable.length;
-  const lcs = Array.from({ length: oldLen + 1 }, () =>
-    new Array(newLen + 1).fill(0)
-  );
-  for (let i = oldLen - 1; i >= 0; i -= 1) {
-    const currentRow = lcs[i];
-    if (!currentRow) {
-      continue;
-    }
-    for (let j = newLen - 1; j >= 0; j -= 1) {
-      if (oldComparable[i] === newComparable[j]) {
-        currentRow[j] = (lcs[i + 1]?.[j + 1] ?? 0) + 1;
-      } else {
-        currentRow[j] = Math.max(lcs[i + 1]?.[j] ?? 0, currentRow[j + 1] ?? 0);
-      }
-    }
-  }
-  return lcs;
+	const oldLen = oldComparable.length;
+	const newLen = newComparable.length;
+	const lcs = Array.from({ length: oldLen + 1 }, () =>
+		new Array(newLen + 1).fill(0),
+	);
+	for (let i = oldLen - 1; i >= 0; i -= 1) {
+		const currentRow = lcs[i];
+		if (!currentRow) {
+			continue;
+		}
+		for (let j = newLen - 1; j >= 0; j -= 1) {
+			if (oldComparable[i] === newComparable[j]) {
+				currentRow[j] = (lcs[i + 1]?.[j + 1] ?? 0) + 1;
+			} else {
+				currentRow[j] = Math.max(lcs[i + 1]?.[j] ?? 0, currentRow[j + 1] ?? 0);
+			}
+		}
+	}
+	return lcs;
 }
 
 function renderInlineDiffFromComparable(
-  oldTokens: string[],
-  newTokens: string[],
-  oldComparable: string[],
-  newComparable: string[]
+	oldTokens: string[],
+	newTokens: string[],
+	oldComparable: string[],
+	newComparable: string[],
 ) {
-  const lcs = buildInlineLcsMatrix(oldComparable, newComparable);
-  const oldLen = oldTokens.length;
-  const newLen = newTokens.length;
-  let oldHtml = "";
-  let newHtml = "";
-  let i = 0;
-  let j = 0;
-  while (i < oldLen && j < newLen) {
-    if (oldComparable[i] === newComparable[j]) {
-      oldHtml += escapeHtml(oldTokens[i] ?? "");
-      newHtml += escapeHtml(newTokens[j] ?? "");
-      i += 1;
-      j += 1;
-      continue;
-    }
-    if ((lcs[i + 1]?.[j] ?? 0) >= (lcs[i]?.[j + 1] ?? 0)) {
-      oldHtml += `<span class="sd-inline-del">${escapeHtml(oldTokens[i] ?? "")}</span>`;
-      i += 1;
-      continue;
-    }
-    newHtml += `<span class="sd-inline-add">${escapeHtml(newTokens[j] ?? "")}</span>`;
-    j += 1;
-  }
-  while (i < oldLen) {
-    oldHtml += `<span class="sd-inline-del">${escapeHtml(oldTokens[i] ?? "")}</span>`;
-    i += 1;
-  }
-  while (j < newLen) {
-    newHtml += `<span class="sd-inline-add">${escapeHtml(newTokens[j] ?? "")}</span>`;
-    j += 1;
-  }
-  return { oldHtml, newHtml };
+	const lcs = buildInlineLcsMatrix(oldComparable, newComparable);
+	const oldLen = oldTokens.length;
+	const newLen = newTokens.length;
+	let oldHtml = "";
+	let newHtml = "";
+	let i = 0;
+	let j = 0;
+	while (i < oldLen && j < newLen) {
+		if (oldComparable[i] === newComparable[j]) {
+			oldHtml += escapeHtml(oldTokens[i] ?? "");
+			newHtml += escapeHtml(newTokens[j] ?? "");
+			i += 1;
+			j += 1;
+			continue;
+		}
+		if ((lcs[i + 1]?.[j] ?? 0) >= (lcs[i]?.[j + 1] ?? 0)) {
+			oldHtml += `<span class="sd-inline-del">${escapeHtml(oldTokens[i] ?? "")}</span>`;
+			i += 1;
+			continue;
+		}
+		newHtml += `<span class="sd-inline-add">${escapeHtml(newTokens[j] ?? "")}</span>`;
+		j += 1;
+	}
+	while (i < oldLen) {
+		oldHtml += `<span class="sd-inline-del">${escapeHtml(oldTokens[i] ?? "")}</span>`;
+		i += 1;
+	}
+	while (j < newLen) {
+		newHtml += `<span class="sd-inline-add">${escapeHtml(newTokens[j] ?? "")}</span>`;
+		j += 1;
+	}
+	return { oldHtml, newHtml };
 }
 
 function renderInlineDiff(
-  oldText: string,
-  newText: string,
-  language?: NormalizerLanguage
+	oldText: string,
+	newText: string,
+	language?: NormalizerLanguage,
 ) {
-  const oldTokens = tokenizeInline(oldText);
-  const newTokens = tokenizeInline(newText);
-  const oldComparable = buildInlineComparableTokens(oldTokens, language);
-  const newComparable = buildInlineComparableTokens(newTokens, language);
-  return renderInlineDiffFromComparable(
-    oldTokens,
-    newTokens,
-    oldComparable,
-    newComparable
-  );
+	const oldTokens = tokenizeInline(oldText);
+	const newTokens = tokenizeInline(newText);
+	const oldComparable = buildInlineComparableTokens(oldTokens, language);
+	const newComparable = buildInlineComparableTokens(newTokens, language);
+	return renderInlineDiffFromComparable(
+		oldTokens,
+		newTokens,
+		oldComparable,
+		newComparable,
+	);
 }
 
 function renderInlineMarkedText(
-  text: string,
-  className: "sd-inline-add" | "sd-inline-del"
+	text: string,
+	className: "sd-inline-add" | "sd-inline-del",
 ) {
-  if (!text) {
-    return "";
-  }
-  return `<span class="${className}">${escapeHtml(text)}</span>`;
+	if (!text) {
+		return "";
+	}
+	return `<span class="${className}">${escapeHtml(text)}</span>`;
 }
 
 function buildTrivialLineEdits(oldLines: string[], newLines: string[]) {
-  if (oldLines.length === 0) {
-    return newLines.map((line) => ({ type: "insert" as const, line }));
-  }
-  if (newLines.length === 0) {
-    return oldLines.map((line) => ({ type: "delete" as const, line }));
-  }
-  return null;
+	if (oldLines.length === 0) {
+		return newLines.map((line) => ({ type: "insert" as const, line }));
+	}
+	if (newLines.length === 0) {
+		return oldLines.map((line) => ({ type: "delete" as const, line }));
+	}
+	return null;
 }
 
 function diffLines(
-  oldLines: string[],
-  newLines: string[],
-  oldComparable?: string[],
-  newComparable?: string[]
+	oldLines: string[],
+	newLines: string[],
+	oldComparable?: string[],
+	newComparable?: string[],
 ): LineEdit[] {
-  const trivialEdits = buildTrivialLineEdits(oldLines, newLines);
-  if (trivialEdits) {
-    return trivialEdits;
-  }
-  const n = oldLines.length;
-  const m = newLines.length;
-  const compareOld = oldComparable ?? oldLines;
-  const compareNew = newComparable ?? newLines;
-  const max = n + m;
-  const offset = max;
-  const v = new Array(2 * max + 1).fill(0);
-  const trace: number[][] = [];
+	const trivialEdits = buildTrivialLineEdits(oldLines, newLines);
+	if (trivialEdits) {
+		return trivialEdits;
+	}
+	const n = oldLines.length;
+	const m = newLines.length;
+	const compareOld = oldComparable ?? oldLines;
+	const compareNew = newComparable ?? newLines;
+	const max = n + m;
+	const offset = max;
+	const v = new Array(2 * max + 1).fill(0);
+	const trace: number[][] = [];
 
-  for (let d = 0; d <= max; d += 1) {
-    const vSnapshot = v.slice();
-    trace.push(vSnapshot);
+	for (let d = 0; d <= max; d += 1) {
+		const vSnapshot = v.slice();
+		trace.push(vSnapshot);
 
-    for (let k = -d; k <= d; k += 2) {
-      let x: number;
-      const left = v[offset + k - 1] ?? 0;
-      const right = v[offset + k + 1] ?? 0;
-      if (k === -d || (k !== d && left < right)) {
-        x = right;
-      } else {
-        x = left + 1;
-      }
-      let y = x - k;
-      while (x < n && y < m && compareOld[x] === compareNew[y]) {
-        x += 1;
-        y += 1;
-      }
-      v[offset + k] = x;
-      if (x >= n && y >= m) {
-        return backtrackEdits(trace, oldLines, newLines, n, m);
-      }
-    }
-  }
+		for (let k = -d; k <= d; k += 2) {
+			let x: number;
+			const left = v[offset + k - 1] ?? 0;
+			const right = v[offset + k + 1] ?? 0;
+			if (k === -d || (k !== d && left < right)) {
+				x = right;
+			} else {
+				x = left + 1;
+			}
+			let y = x - k;
+			while (x < n && y < m && compareOld[x] === compareNew[y]) {
+				x += 1;
+				y += 1;
+			}
+			v[offset + k] = x;
+			if (x >= n && y >= m) {
+				return backtrackEdits(trace, oldLines, newLines, n, m);
+			}
+		}
+	}
 
-  return backtrackEdits(trace, oldLines, newLines, n, m);
+	return backtrackEdits(trace, oldLines, newLines, n, m);
 }
 
 function selectPrevK(v: number[], offset: number, k: number, d: number) {
-  const left = v[offset + k - 1] ?? 0;
-  const right = v[offset + k + 1] ?? 0;
-  if (k === -d || (k !== d && left < right)) {
-    return k + 1;
-  }
-  return k - 1;
+	const left = v[offset + k - 1] ?? 0;
+	const right = v[offset + k + 1] ?? 0;
+	if (k === -d || (k !== d && left < right)) {
+		return k + 1;
+	}
+	return k - 1;
 }
 
 function drainEqualEdits(
-  edits: LineEdit[],
-  oldLines: string[],
-  x: number,
-  y: number,
-  prevX: number,
-  prevY: number
+	edits: LineEdit[],
+	oldLines: string[],
+	x: number,
+	y: number,
+	prevX: number,
+	prevY: number,
 ) {
-  let nextX = x;
-  let nextY = y;
-  while (nextX > prevX && nextY > prevY) {
-    edits.push({ type: "equal", line: oldLines[nextX - 1] ?? "" });
-    nextX -= 1;
-    nextY -= 1;
-  }
-  return { x: nextX, y: nextY };
+	let nextX = x;
+	let nextY = y;
+	while (nextX > prevX && nextY > prevY) {
+		edits.push({ type: "equal", line: oldLines[nextX - 1] ?? "" });
+		nextX -= 1;
+		nextY -= 1;
+	}
+	return { x: nextX, y: nextY };
 }
 
 function drainRemainingEdits(
-  edits: LineEdit[],
-  oldLines: string[],
-  newLines: string[],
-  x: number,
-  y: number
+	edits: LineEdit[],
+	oldLines: string[],
+	newLines: string[],
+	x: number,
+	y: number,
 ) {
-  let nextX = x;
-  let nextY = y;
-  while (nextX > 0 && nextY > 0) {
-    edits.push({ type: "equal", line: oldLines[nextX - 1] ?? "" });
-    nextX -= 1;
-    nextY -= 1;
-  }
-  while (nextX > 0) {
-    edits.push({ type: "delete", line: oldLines[nextX - 1] ?? "" });
-    nextX -= 1;
-  }
-  while (nextY > 0) {
-    edits.push({ type: "insert", line: newLines[nextY - 1] ?? "" });
-    nextY -= 1;
-  }
-  return { x: nextX, y: nextY };
+	let nextX = x;
+	let nextY = y;
+	while (nextX > 0 && nextY > 0) {
+		edits.push({ type: "equal", line: oldLines[nextX - 1] ?? "" });
+		nextX -= 1;
+		nextY -= 1;
+	}
+	while (nextX > 0) {
+		edits.push({ type: "delete", line: oldLines[nextX - 1] ?? "" });
+		nextX -= 1;
+	}
+	while (nextY > 0) {
+		edits.push({ type: "insert", line: newLines[nextY - 1] ?? "" });
+		nextY -= 1;
+	}
+	return { x: nextX, y: nextY };
 }
 
 function backtrackEdits(
-  trace: number[][],
-  oldLines: string[],
-  newLines: string[],
-  n: number,
-  m: number
+	trace: number[][],
+	oldLines: string[],
+	newLines: string[],
+	n: number,
+	m: number,
 ): LineEdit[] {
-  let x = n;
-  let y = m;
-  const edits: LineEdit[] = [];
+	let x = n;
+	let y = m;
+	const edits: LineEdit[] = [];
 
-  for (let d = trace.length - 1; d > 0; d -= 1) {
-    const v = trace[d];
-    if (!v) {
-      continue;
-    }
-    const offset = (v.length - 1) / 2;
-    const k = x - y;
-    const prevK = selectPrevK(v, offset, k, d);
-    const prevX = v[offset + prevK] ?? 0;
-    const prevY = prevX - prevK;
+	for (let d = trace.length - 1; d > 0; d -= 1) {
+		const v = trace[d];
+		if (!v) {
+			continue;
+		}
+		const offset = (v.length - 1) / 2;
+		const k = x - y;
+		const prevK = selectPrevK(v, offset, k, d);
+		const prevX = v[offset + prevK] ?? 0;
+		const prevY = prevX - prevK;
 
-    const drained = drainEqualEdits(edits, oldLines, x, y, prevX, prevY);
-    x = drained.x;
-    y = drained.y;
+		const drained = drainEqualEdits(edits, oldLines, x, y, prevX, prevY);
+		x = drained.x;
+		y = drained.y;
 
-    if (x === prevX && y > prevY) {
-      edits.push({ type: "insert", line: newLines[y - 1] ?? "" });
-      y -= 1;
-    } else if (y === prevY && x > prevX) {
-      edits.push({ type: "delete", line: oldLines[x - 1] ?? "" });
-      x -= 1;
-    }
-  }
+		if (x === prevX && y > prevY) {
+			edits.push({ type: "insert", line: newLines[y - 1] ?? "" });
+			y -= 1;
+		} else if (y === prevY && x > prevX) {
+			edits.push({ type: "delete", line: oldLines[x - 1] ?? "" });
+			x -= 1;
+		}
+	}
 
-  const drained = drainRemainingEdits(edits, oldLines, newLines, x, y);
-  x = drained.x;
-  y = drained.y;
+	const drained = drainRemainingEdits(edits, oldLines, newLines, x, y);
+	x = drained.x;
+	y = drained.y;
 
-  edits.reverse();
-  return edits;
+	edits.reverse();
+	return edits;
 }
 
 function getLineIndent(line: string) {
-  const match = line.match(LINE_INDENT_RE);
-  return match ? match[0] : "";
+	const match = line.match(LINE_INDENT_RE);
+	return match ? match[0] : "";
 }
 
 function collectDuplicateLineKeys(
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine: (line: string) => string
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const counts = new Map<string, number>();
-  const add = (line: string) => {
-    const key = normalizeLine(line).trim();
-    if (!key) {
-      return;
-    }
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  };
-  for (const line of oldLines) {
-    add(line);
-  }
-  for (const line of newLines) {
-    add(line);
-  }
-  const duplicates = new Set<string>();
-  for (const [key, count] of counts) {
-    if (count > 1) {
-      duplicates.add(key);
-    }
-  }
-  return duplicates;
+	const counts = new Map<string, number>();
+	const add = (line: string) => {
+		const key = normalizeLine(line).trim();
+		if (!key) {
+			return;
+		}
+		counts.set(key, (counts.get(key) ?? 0) + 1);
+	};
+	for (const line of oldLines) {
+		add(line);
+	}
+	for (const line of newLines) {
+		add(line);
+	}
+	const duplicates = new Set<string>();
+	for (const [key, count] of counts) {
+		if (count > 1) {
+			duplicates.add(key);
+		}
+	}
+	return duplicates;
 }
 
 function buildComparableLines(
-  lines: string[],
-  normalizeLine: (line: string) => string,
-  duplicates: Set<string>,
-  importKeys?: (string | null)[]
+	lines: string[],
+	normalizeLine: (line: string) => string,
+	duplicates: Set<string>,
+	importKeys?: (string | null)[],
 ) {
-  const findNeighbor = (start: number, step: number, skipComments: boolean) => {
-    for (
-      let index = start + step;
-      index >= 0 && index < lines.length;
-      index += step
-    ) {
-      const candidate = normalizeLine(lines[index] ?? "").trim();
-      if (candidate) {
-        if (skipComments && COMMENT_ONLY_RE.test(candidate)) {
-          continue;
-        }
-        return candidate.slice(0, 120);
-      }
-    }
-    return "";
-  };
-  return lines.map((line, index) => {
-    const normalized = normalizeLine(line);
-    const trimmed = normalized.trim();
-    if (!trimmed) {
-      return "";
-    }
-    const importKey = importKeys?.[index];
-    if (importKey) {
-      return `${trimmed}__${importKey}`;
-    }
-    if (!duplicates.has(trimmed)) {
-      return trimmed;
-    }
-    const indent = getLineIndent(line);
-    if (COMMENT_ONLY_RE.test(trimmed)) {
-      const prev = findNeighbor(index, -1, true);
-      const next = findNeighbor(index, 1, true);
-      const context = prev || next ? `${prev}__${next}` : "";
-      return context
-        ? `${indent}${trimmed}__${context}`
-        : `${indent}${trimmed}`;
-    }
-    return `${indent}${trimmed}`;
-  });
+	const findNeighbor = (start: number, step: number, skipComments: boolean) => {
+		for (
+			let index = start + step;
+			index >= 0 && index < lines.length;
+			index += step
+		) {
+			const candidate = normalizeLine(lines[index] ?? "").trim();
+			if (candidate) {
+				if (skipComments && COMMENT_ONLY_RE.test(candidate)) {
+					continue;
+				}
+				return candidate.slice(0, 120);
+			}
+		}
+		return "";
+	};
+	return lines.map((line, index) => {
+		const normalized = normalizeLine(line);
+		const trimmed = normalized.trim();
+		if (!trimmed) {
+			return "";
+		}
+		const importKey = importKeys?.[index];
+		if (importKey) {
+			return `${trimmed}__${importKey}`;
+		}
+		if (!duplicates.has(trimmed)) {
+			return trimmed;
+		}
+		const indent = getLineIndent(line);
+		if (COMMENT_ONLY_RE.test(trimmed)) {
+			const prev = findNeighbor(index, -1, true);
+			const next = findNeighbor(index, 1, true);
+			const context = prev || next ? `${prev}__${next}` : "";
+			return context
+				? `${indent}${trimmed}__${context}`
+				: `${indent}${trimmed}`;
+		}
+		return `${indent}${trimmed}`;
+	});
 }
 
 function buildMultilineImportKeys(lines: string[]) {
-  const keys = new Array<string | null>(lines.length).fill(null);
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index] ?? "";
-    if (!MULTILINE_IMPORT_START_RE.test(line)) {
-      continue;
-    }
-    const scanLimit = Math.min(lines.length, index + 20);
-    for (let next = index + 1; next < scanLimit; next += 1) {
-      const candidate = lines[next] ?? "";
-      const match = MULTILINE_IMPORT_FROM_RE.exec(candidate);
-      if (match) {
-        keys[index] = match[1] ?? null;
-        break;
-      }
-      if (candidate.includes(";")) {
-        break;
-      }
-    }
-  }
-  return keys;
+	const keys = new Array<string | null>(lines.length).fill(null);
+	for (let index = 0; index < lines.length; index += 1) {
+		const line = lines[index] ?? "";
+		if (!MULTILINE_IMPORT_START_RE.test(line)) {
+			continue;
+		}
+		const scanLimit = Math.min(lines.length, index + 20);
+		for (let next = index + 1; next < scanLimit; next += 1) {
+			const candidate = lines[next] ?? "";
+			const match = MULTILINE_IMPORT_FROM_RE.exec(candidate);
+			if (match) {
+				keys[index] = match[1] ?? null;
+				break;
+			}
+			if (candidate.includes(";")) {
+				break;
+			}
+		}
+	}
+	return keys;
 }
 
 function buildRawLineRows(
-  oldLines: string[],
-  newLines: string[],
-  lineLayout: "split" | "unified",
-  normalizeLine?: (line: string) => string,
-  useKeyMatching?: boolean,
-  useYamlComparable?: boolean
+	oldLines: string[],
+	newLines: string[],
+	lineLayout: "split" | "unified",
+	normalizeLine?: (line: string) => string,
+	useKeyMatching?: boolean,
+	useYamlComparable?: boolean,
 ): LineRow[] {
-  let oldComparable = oldLines;
-  let newComparable = newLines;
-  if (normalizeLine) {
-    const duplicates = useKeyMatching
-      ? new Set<string>()
-      : collectDuplicateLineKeys(oldLines, newLines, normalizeLine);
-    const importKeys = useKeyMatching
-      ? null
-      : {
-          old: buildMultilineImportKeys(oldLines),
-          next: buildMultilineImportKeys(newLines),
-        };
-    if (useKeyMatching) {
-      oldComparable = buildYamlComparableLines(oldLines, normalizeLine, true);
-      newComparable = buildYamlComparableLines(newLines, normalizeLine, true);
-    } else if (useYamlComparable) {
-      oldComparable = buildYamlComparableLines(oldLines, normalizeLine, false);
-      newComparable = buildYamlComparableLines(newLines, normalizeLine, false);
-    } else {
-      oldComparable = buildComparableLines(
-        oldLines,
-        normalizeLine,
-        duplicates,
-        importKeys?.old ?? undefined
-      );
-      newComparable = buildComparableLines(
-        newLines,
-        normalizeLine,
-        duplicates,
-        importKeys?.next ?? undefined
-      );
-    }
-  }
-  const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
-  const blocks = buildLineBlocks(edits);
-  return buildRowsFromBlocks(
-    blocks,
-    lineLayout,
-    normalizeLine,
-    newLines,
-    useKeyMatching,
-    useYamlComparable,
-    normalizeLine ? oldComparable : undefined,
-    normalizeLine ? newComparable : undefined
-  );
+	let oldComparable = oldLines;
+	let newComparable = newLines;
+	if (normalizeLine) {
+		const duplicates = useKeyMatching
+			? new Set<string>()
+			: collectDuplicateLineKeys(oldLines, newLines, normalizeLine);
+		const importKeys = useKeyMatching
+			? null
+			: {
+					old: buildMultilineImportKeys(oldLines),
+					next: buildMultilineImportKeys(newLines),
+				};
+		if (useKeyMatching) {
+			oldComparable = buildYamlComparableLines(oldLines, normalizeLine, true);
+			newComparable = buildYamlComparableLines(newLines, normalizeLine, true);
+		} else if (useYamlComparable) {
+			oldComparable = buildYamlComparableLines(oldLines, normalizeLine, false);
+			newComparable = buildYamlComparableLines(newLines, normalizeLine, false);
+		} else {
+			oldComparable = buildComparableLines(
+				oldLines,
+				normalizeLine,
+				duplicates,
+				importKeys?.old ?? undefined,
+			);
+			newComparable = buildComparableLines(
+				newLines,
+				normalizeLine,
+				duplicates,
+				importKeys?.next ?? undefined,
+			);
+		}
+	}
+	const edits = diffLines(oldLines, newLines, oldComparable, newComparable);
+	const blocks = buildLineBlocks(edits);
+	return buildRowsFromBlocks(
+		blocks,
+		lineLayout,
+		normalizeLine,
+		newLines,
+		useKeyMatching,
+		useYamlComparable,
+		normalizeLine ? oldComparable : undefined,
+		normalizeLine ? newComparable : undefined,
+	);
 }
 
 function isMoveCandidateLine(text: string) {
-  const trimmed = text.trim();
-  if (!trimmed) {
-    return false;
-  }
-  return MOVE_CANDIDATE_RE.test(trimmed);
+	const trimmed = text.trim();
+	if (!trimmed) {
+		return false;
+	}
+	return MOVE_CANDIDATE_RE.test(trimmed);
 }
 
 function getMoveKey(text: string, normalizeLine: (line: string) => string) {
-  if (!isMoveCandidateLine(text)) {
-    return null;
-  }
-  return normalizeLine(text);
+	if (!isMoveCandidateLine(text)) {
+		return null;
+	}
+	return normalizeLine(text);
 }
 
 function collectInsertMoveCandidates(
-  rows: LineRow[],
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	normalizeLine: (line: string) => string,
 ) {
-  const insertByKey = new Map<string, number[]>();
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (row?.type !== "insert") {
-      continue;
-    }
-    const key = getMoveKey(row.text ?? "", normalizeLine);
-    if (!key) {
-      continue;
-    }
-    const list = insertByKey.get(key);
-    if (list) {
-      list.push(index);
-    } else {
-      insertByKey.set(key, [index]);
-    }
-  }
-  return insertByKey;
+	const insertByKey = new Map<string, number[]>();
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (row?.type !== "insert") {
+			continue;
+		}
+		const key = getMoveKey(row.text ?? "", normalizeLine);
+		if (!key) {
+			continue;
+		}
+		const list = insertByKey.get(key);
+		if (list) {
+			list.push(index);
+		} else {
+			insertByKey.set(key, [index]);
+		}
+	}
+	return insertByKey;
 }
 
 function takeFirstAvailable(list: number[] | undefined, used: Set<number>) {
-  if (!list || list.length === 0) {
-    return null;
-  }
-  let matchIndex = list[0];
-  while (matchIndex !== undefined && used.has(matchIndex)) {
-    list.shift();
-    matchIndex = list[0];
-  }
-  return matchIndex ?? null;
+	if (!list || list.length === 0) {
+		return null;
+	}
+	let matchIndex = list[0];
+	while (matchIndex !== undefined && used.has(matchIndex)) {
+		list.shift();
+		matchIndex = list[0];
+	}
+	return matchIndex ?? null;
 }
 
 function pairIdenticalLineMoves(
-  rows: LineRow[],
-  normalizeLine?: (line: string) => string
+	rows: LineRow[],
+	normalizeLine?: (line: string) => string,
 ) {
-  if (!normalizeLine) {
-    return rows;
-  }
-  const insertByKey = collectInsertMoveCandidates(rows, normalizeLine);
-  if (insertByKey.size === 0) {
-    return rows;
-  }
-  const used = new Set<number>();
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    if (used.has(index)) {
-      continue;
-    }
-    const row = rows[index];
-    if (!row) {
-      continue;
-    }
-    if (row.type !== "delete") {
-      output.push(row);
-      continue;
-    }
-    const text = row.text ?? "";
-    const key = getMoveKey(text, normalizeLine);
-    if (!key) {
-      output.push(row);
-      continue;
-    }
-    const matchIndex = takeFirstAvailable(insertByKey.get(key), used);
-    if (matchIndex === null) {
-      output.push(row);
-      continue;
-    }
-    used.add(matchIndex);
-    const insertRow = rows[matchIndex];
-    output.push({
-      type: "equal",
-      oldLine: row.oldLine ?? null,
-      newLine: insertRow?.newLine ?? null,
-      text,
-    });
-  }
-  return output;
+	if (!normalizeLine) {
+		return rows;
+	}
+	const insertByKey = collectInsertMoveCandidates(rows, normalizeLine);
+	if (insertByKey.size === 0) {
+		return rows;
+	}
+	const used = new Set<number>();
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		if (used.has(index)) {
+			continue;
+		}
+		const row = rows[index];
+		if (!row) {
+			continue;
+		}
+		if (row.type !== "delete") {
+			output.push(row);
+			continue;
+		}
+		const text = row.text ?? "";
+		const key = getMoveKey(text, normalizeLine);
+		if (!key) {
+			output.push(row);
+			continue;
+		}
+		const matchIndex = takeFirstAvailable(insertByKey.get(key), used);
+		if (matchIndex === null) {
+			output.push(row);
+			continue;
+		}
+		used.add(matchIndex);
+		const insertRow = rows[matchIndex];
+		output.push({
+			type: "equal",
+			oldLine: row.oldLine ?? null,
+			newLine: insertRow?.newLine ?? null,
+			text,
+		});
+	}
+	return output;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: shared-row collapse is clearer as a single pass.
 function collapseSharedLineChanges(
-  rows: LineRow[],
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	normalizeLine: (line: string) => string,
 ) {
-  const insertByKey = new Map<string, number[]>();
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (row?.type !== "insert") {
-      continue;
-    }
-    const text = row.text ?? "";
-    if (!isMoveCandidateLine(text)) {
-      continue;
-    }
-    const key = normalizeLine(text).trim();
-    if (!key) {
-      continue;
-    }
-    const list = insertByKey.get(key);
-    if (list) {
-      list.push(index);
-    } else {
-      insertByKey.set(key, [index]);
-    }
-  }
+	const insertByKey = new Map<string, number[]>();
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (row?.type !== "insert") {
+			continue;
+		}
+		const text = row.text ?? "";
+		if (!isMoveCandidateLine(text)) {
+			continue;
+		}
+		const key = normalizeLine(text).trim();
+		if (!key) {
+			continue;
+		}
+		const list = insertByKey.get(key);
+		if (list) {
+			list.push(index);
+		} else {
+			insertByKey.set(key, [index]);
+		}
+	}
 
-  const usedInserts = new Set<number>();
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    if (usedInserts.has(index)) {
-      continue;
-    }
-    const row = rows[index];
-    if (!row) {
-      continue;
-    }
-    if (row.type === "replace") {
-      const oldText = rowOldText(row);
-      if (!isMoveCandidateLine(oldText)) {
-        output.push(row);
-        continue;
-      }
-      const newText = rowNewText(row);
-      const newKey = normalizeLine(newText).trim();
-      if (newKey && !isLowInfoSemanticLine(newKey)) {
-        output.push(row);
-        continue;
-      }
-      const oldKey = normalizeLine(oldText).trim();
-      const matchIndex = takeFirstAvailable(
-        insertByKey.get(oldKey),
-        usedInserts
-      );
-      if (matchIndex === null) {
-        output.push(row);
-        continue;
-      }
-      usedInserts.add(matchIndex);
-      const insertRow = rows[matchIndex];
-      output.push({
-        type: "equal",
-        oldLine: row.oldLine ?? null,
-        newLine: insertRow?.newLine ?? null,
-        text: oldText,
-      });
-      if (newKey && newKey !== oldKey && !isLowInfoSemanticLine(newKey)) {
-        output.push({
-          type: "insert",
-          oldLine: null,
-          newLine: row.newLine ?? null,
-          text: newText,
-        });
-      }
-      continue;
-    }
-    if (row.type !== "delete") {
-      if (row) {
-        output.push(row);
-      }
-      continue;
-    }
-    const text = row.text ?? "";
-    if (!isMoveCandidateLine(text)) {
-      output.push(row);
-      continue;
-    }
-    const key = normalizeLine(text).trim();
-    const matchIndex = takeFirstAvailable(insertByKey.get(key), usedInserts);
-    if (matchIndex === null) {
-      output.push(row);
-      continue;
-    }
-    usedInserts.add(matchIndex);
-    const insertRow = rows[matchIndex];
-    output.push({
-      type: "equal",
-      oldLine: row.oldLine ?? null,
-      newLine: insertRow?.newLine ?? null,
-      text,
-    });
-  }
-  return output;
+	const usedInserts = new Set<number>();
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		if (usedInserts.has(index)) {
+			continue;
+		}
+		const row = rows[index];
+		if (!row) {
+			continue;
+		}
+		if (row.type === "replace") {
+			const oldText = rowOldText(row);
+			if (!isMoveCandidateLine(oldText)) {
+				output.push(row);
+				continue;
+			}
+			const newText = rowNewText(row);
+			const newKey = normalizeLine(newText).trim();
+			if (newKey && !isLowInfoSemanticLine(newKey)) {
+				output.push(row);
+				continue;
+			}
+			const oldKey = normalizeLine(oldText).trim();
+			const matchIndex = takeFirstAvailable(
+				insertByKey.get(oldKey),
+				usedInserts,
+			);
+			if (matchIndex === null) {
+				output.push(row);
+				continue;
+			}
+			usedInserts.add(matchIndex);
+			const insertRow = rows[matchIndex];
+			output.push({
+				type: "equal",
+				oldLine: row.oldLine ?? null,
+				newLine: insertRow?.newLine ?? null,
+				text: oldText,
+			});
+			if (newKey && newKey !== oldKey && !isLowInfoSemanticLine(newKey)) {
+				output.push({
+					type: "insert",
+					oldLine: null,
+					newLine: row.newLine ?? null,
+					text: newText,
+				});
+			}
+			continue;
+		}
+		if (row.type !== "delete") {
+			if (row) {
+				output.push(row);
+			}
+			continue;
+		}
+		const text = row.text ?? "";
+		if (!isMoveCandidateLine(text)) {
+			output.push(row);
+			continue;
+		}
+		const key = normalizeLine(text).trim();
+		const matchIndex = takeFirstAvailable(insertByKey.get(key), usedInserts);
+		if (matchIndex === null) {
+			output.push(row);
+			continue;
+		}
+		usedInserts.add(matchIndex);
+		const insertRow = rows[matchIndex];
+		output.push({
+			type: "equal",
+			oldLine: row.oldLine ?? null,
+			newLine: insertRow?.newLine ?? null,
+			text,
+		});
+	}
+	return output;
 }
 
 function applySemanticRowSuppressions(
-  rows: LineRow[],
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine?: (line: string) => string,
-  useYamlComparable?: boolean,
-  useKeyMatching?: boolean
+	rows: LineRow[],
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine?: (line: string) => string,
+	useYamlComparable?: boolean,
+	useKeyMatching?: boolean,
 ) {
-  if (!normalizeLine) {
-    return rows;
-  }
-  let nextRows = suppressBalancedLineChanges(
-    rows,
-    oldLines,
-    newLines,
-    normalizeLine,
-    useYamlComparable
-  );
-  nextRows = suppressImportBlockStarts(nextRows);
-  nextRows = suppressInlinePropChanges(nextRows, normalizeLine);
-  if (useKeyMatching) {
-    nextRows = suppressRepeatedYamlChanges(
-      nextRows,
-      oldLines,
-      newLines,
-      normalizeLine
-    );
-  }
-  return nextRows;
+	if (!normalizeLine) {
+		return rows;
+	}
+	let nextRows = suppressBalancedLineChanges(
+		rows,
+		oldLines,
+		newLines,
+		normalizeLine,
+		useYamlComparable,
+	);
+	nextRows = suppressImportBlockStarts(nextRows);
+	nextRows = suppressInlinePropChanges(nextRows, normalizeLine);
+	if (useKeyMatching) {
+		nextRows = suppressRepeatedYamlChanges(
+			nextRows,
+			oldLines,
+			newLines,
+			normalizeLine,
+		);
+	}
+	return nextRows;
 }
 
 function buildNormalizedLineCounts(
-  lines: string[],
-  normalizeLine: (line: string) => string
+	lines: string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const counts = new Map<string, number>();
-  for (const line of lines) {
-    const key = normalizeLine(line);
-    if (!key.trim()) {
-      continue;
-    }
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-  return counts;
+	const counts = new Map<string, number>();
+	for (const line of lines) {
+		const key = normalizeLine(line);
+		if (!key.trim()) {
+			continue;
+		}
+		counts.set(key, (counts.get(key) ?? 0) + 1);
+	}
+	return counts;
 }
 
 function suppressBalancedLineChanges(
-  rows: LineRow[],
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine?: (line: string) => string,
-  useYamlComparable?: boolean
+	rows: LineRow[],
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine?: (line: string) => string,
+	useYamlComparable?: boolean,
 ) {
-  if (!normalizeLine || useYamlComparable) {
-    return rows;
-  }
-  const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
-  const newCounts = buildNormalizedLineCounts(newLines, normalizeLine);
-  const balanced = new Set<string>();
-  for (const [key, count] of oldCounts) {
-    if (count > 0 && count === (newCounts.get(key) ?? 0)) {
-      balanced.add(key);
-    }
-  }
-  if (balanced.size === 0) {
-    return rows;
-  }
-  return rows.filter((row) => {
-    if (row?.type !== "insert" && row?.type !== "delete") {
-      return true;
-    }
-    const text = row.text ?? "";
-    if (!isMoveCandidateLine(text)) {
-      return true;
-    }
-    return !balanced.has(normalizeLine(text));
-  });
+	if (!normalizeLine || useYamlComparable) {
+		return rows;
+	}
+	const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
+	const newCounts = buildNormalizedLineCounts(newLines, normalizeLine);
+	const balanced = new Set<string>();
+	for (const [key, count] of oldCounts) {
+		if (count > 0 && count === (newCounts.get(key) ?? 0)) {
+			balanced.add(key);
+		}
+	}
+	if (balanced.size === 0) {
+		return rows;
+	}
+	return rows.filter((row) => {
+		if (row?.type !== "insert" && row?.type !== "delete") {
+			return true;
+		}
+		const text = row.text ?? "";
+		if (!isMoveCandidateLine(text)) {
+			return true;
+		}
+		return !balanced.has(normalizeLine(text));
+	});
 }
 
 function suppressBalancedImportChanges(
-  rows: LineRow[],
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
-  const newCounts = buildNormalizedLineCounts(newLines, normalizeLine);
-  const balanced = new Set<string>();
-  for (const [key, count] of oldCounts) {
-    if (count > 0 && count === (newCounts.get(key) ?? 0)) {
-      balanced.add(key);
-    }
-  }
-  if (balanced.size === 0) {
-    return rows;
-  }
-  return rows.filter((row) => {
-    if (row?.type !== "insert" && row?.type !== "delete") {
-      return true;
-    }
-    const text = row.text ?? "";
-    if (!isImportLine(text)) {
-      return true;
-    }
-    return !balanced.has(normalizeLine(text));
-  });
+	const oldCounts = buildNormalizedLineCounts(oldLines, normalizeLine);
+	const newCounts = buildNormalizedLineCounts(newLines, normalizeLine);
+	const balanced = new Set<string>();
+	for (const [key, count] of oldCounts) {
+		if (count > 0 && count === (newCounts.get(key) ?? 0)) {
+			balanced.add(key);
+		}
+	}
+	if (balanced.size === 0) {
+		return rows;
+	}
+	return rows.filter((row) => {
+		if (row?.type !== "insert" && row?.type !== "delete") {
+			return true;
+		}
+		const text = row.text ?? "";
+		if (!isImportLine(text)) {
+			return true;
+		}
+		return !balanced.has(normalizeLine(text));
+	});
 }
 
 function suppressImportBlockStarts(rows: LineRow[]) {
-  return rows.filter((row) => {
-    if (row?.type !== "insert" && row?.type !== "delete") {
-      return true;
-    }
-    const text = row.text ?? "";
-    return !IMPORT_BLOCK_START_RE.test(text.trim());
-  });
+	return rows.filter((row) => {
+		if (row?.type !== "insert" && row?.type !== "delete") {
+			return true;
+		}
+		const text = row.text ?? "";
+		return !IMPORT_BLOCK_START_RE.test(text.trim());
+	});
 }
 
 function suppressInlinePropChanges(
-  rows: LineRow[],
-  normalizeLine?: (line: string) => string
+	rows: LineRow[],
+	normalizeLine?: (line: string) => string,
 ) {
-  const insertLines = new Set<string>();
-  const deleteLines = new Set<string>();
-  const normalize = (text: string) =>
-    (normalizeLine ? normalizeLine(text) : text).trim();
+	const insertLines = new Set<string>();
+	const deleteLines = new Set<string>();
+	const normalize = (text: string) =>
+		(normalizeLine ? normalizeLine(text) : text).trim();
 
-  const recordLine = (text: string, target: Set<string>) => {
-    if (!text) {
-      return;
-    }
-    const trimmed = text.trim();
-    const match = JSX_PROP_LINE_RE.exec(trimmed);
-    if (!match) {
-      return;
-    }
-    const key = normalize(text);
-    if (!key) {
-      return;
-    }
-    target.add(key);
-  };
+	const recordLine = (text: string, target: Set<string>) => {
+		if (!text) {
+			return;
+		}
+		const trimmed = text.trim();
+		const match = JSX_PROP_LINE_RE.exec(trimmed);
+		if (!match) {
+			return;
+		}
+		const key = normalize(text);
+		if (!key) {
+			return;
+		}
+		target.add(key);
+	};
 
-  for (const row of rows) {
-    if (!row) {
-      continue;
-    }
-    if (row.type === "replace") {
-      recordLine(row.newText ?? "", insertLines);
-      recordLine(row.oldText ?? "", deleteLines);
-    } else if (row.type === "insert") {
-      recordLine(row.text ?? "", insertLines);
-    } else if (row.type === "delete") {
-      recordLine(row.text ?? "", deleteLines);
-    }
-  }
+	for (const row of rows) {
+		if (!row) {
+			continue;
+		}
+		if (row.type === "replace") {
+			recordLine(row.newText ?? "", insertLines);
+			recordLine(row.oldText ?? "", deleteLines);
+		} else if (row.type === "insert") {
+			recordLine(row.text ?? "", insertLines);
+		} else if (row.type === "delete") {
+			recordLine(row.text ?? "", deleteLines);
+		}
+	}
 
-  return rows.filter((row) => {
-    if (!row) {
-      return false;
-    }
-    if (row.type === "delete") {
-      const text = row.text ?? "";
-      if (!JSX_PROP_LINE_RE.test(text.trim())) {
-        return true;
-      }
-      const key = normalize(text);
-      return !(deleteLines.has(key) && insertLines.has(key));
-    }
-    if (row.type === "insert") {
-      const text = row.text ?? "";
-      if (!JSX_PROP_LINE_RE.test(text.trim())) {
-        return true;
-      }
-      const key = normalize(text);
-      return !(insertLines.has(key) && deleteLines.has(key));
-    }
-    return true;
-  });
+	return rows.filter((row) => {
+		if (!row) {
+			return false;
+		}
+		if (row.type === "delete") {
+			const text = row.text ?? "";
+			if (!JSX_PROP_LINE_RE.test(text.trim())) {
+				return true;
+			}
+			const key = normalize(text);
+			return !(deleteLines.has(key) && insertLines.has(key));
+		}
+		if (row.type === "insert") {
+			const text = row.text ?? "";
+			if (!JSX_PROP_LINE_RE.test(text.trim())) {
+				return true;
+			}
+			const key = normalize(text);
+			return !(insertLines.has(key) && deleteLines.has(key));
+		}
+		return true;
+	});
 }
 
 function suppressRepeatedYamlChanges(
-  rows: LineRow[],
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine?: (line: string) => string
+	rows: LineRow[],
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine?: (line: string) => string,
 ) {
-  if (!normalizeLine) {
-    return rows;
-  }
-  const oldCounts = new Map<string, number>();
-  const newCounts = new Map<string, number>();
-  for (const line of oldLines) {
-    const key = normalizeLine(line).trim();
-    if (!key) {
-      continue;
-    }
-    oldCounts.set(key, (oldCounts.get(key) ?? 0) + 1);
-  }
-  for (const line of newLines) {
-    const key = normalizeLine(line).trim();
-    if (!key) {
-      continue;
-    }
-    newCounts.set(key, (newCounts.get(key) ?? 0) + 1);
-  }
-  const shared = new Set<string>();
-  for (const [key, count] of oldCounts) {
-    const nextCount = newCounts.get(key) ?? 0;
-    if (count < YAML_SHARED_THRESHOLD || nextCount < YAML_SHARED_THRESHOLD) {
-      continue;
-    }
-    const ratio = Math.abs(count - nextCount) / Math.max(count, nextCount);
-    if (ratio <= YAML_SHARED_DIFF_RATIO) {
-      shared.add(key);
-    }
-  }
-  if (shared.size === 0) {
-    return rows;
-  }
-  return rows.filter((row) => {
-    if (row?.type !== "insert" && row?.type !== "delete") {
-      return true;
-    }
-    const text = row.text ?? "";
-    const key = normalizeLine(text).trim();
-    if (!key) {
-      return true;
-    }
-    return !shared.has(key);
-  });
+	if (!normalizeLine) {
+		return rows;
+	}
+	const oldCounts = new Map<string, number>();
+	const newCounts = new Map<string, number>();
+	for (const line of oldLines) {
+		const key = normalizeLine(line).trim();
+		if (!key) {
+			continue;
+		}
+		oldCounts.set(key, (oldCounts.get(key) ?? 0) + 1);
+	}
+	for (const line of newLines) {
+		const key = normalizeLine(line).trim();
+		if (!key) {
+			continue;
+		}
+		newCounts.set(key, (newCounts.get(key) ?? 0) + 1);
+	}
+	const shared = new Set<string>();
+	for (const [key, count] of oldCounts) {
+		const nextCount = newCounts.get(key) ?? 0;
+		if (count < YAML_SHARED_THRESHOLD || nextCount < YAML_SHARED_THRESHOLD) {
+			continue;
+		}
+		const ratio = Math.abs(count - nextCount) / Math.max(count, nextCount);
+		if (ratio <= YAML_SHARED_DIFF_RATIO) {
+			shared.add(key);
+		}
+	}
+	if (shared.size === 0) {
+		return rows;
+	}
+	return rows.filter((row) => {
+		if (row?.type !== "insert" && row?.type !== "delete") {
+			return true;
+		}
+		const text = row.text ?? "";
+		const key = normalizeLine(text).trim();
+		if (!key) {
+			return true;
+		}
+		return !shared.has(key);
+	});
 }
 
 interface LineBlock {
-  type: "equal" | "delete" | "insert";
-  lines: string[];
+	type: "equal" | "delete" | "insert";
+	lines: string[];
 }
 
 function buildLineBlocks(edits: LineEdit[]): LineBlock[] {
-  const blocks: LineBlock[] = [];
-  for (const edit of edits) {
-    const last = blocks.at(-1);
-    if (last && last.type === edit.type) {
-      last.lines.push(edit.line);
-    } else {
-      blocks.push({ type: edit.type, lines: [edit.line] });
-    }
-  }
-  return blocks;
+	const blocks: LineBlock[] = [];
+	for (const edit of edits) {
+		const last = blocks.at(-1);
+		if (last && last.type === edit.type) {
+			last.lines.push(edit.line);
+		} else {
+			blocks.push({ type: edit.type, lines: [edit.line] });
+		}
+	}
+	return blocks;
 }
 
 const REORDERABLE_LINE_RE =
-  /^[A-Za-z_$][\w$-]*\s*(?:[:=]|\?|$)|^\{?\.\.\.[^}]+}?\s*,?$/;
+	/^[A-Za-z_$][\w$-]*\s*(?:[:=]|\?|$)|^\{?\.\.\.[^}]+}?\s*,?$/;
 const IMPORT_LINE_RE = /^\s*import\s+/;
 const SIDE_EFFECT_IMPORT_RE = /^\s*import\s+['"]/;
 
 function isReorderableLine(line: string) {
-  const trimmed = line.trim();
-  if (!trimmed) {
-    return false;
-  }
-  if (
-    trimmed.startsWith("<") ||
-    trimmed.startsWith("</") ||
-    trimmed === ">" ||
-    trimmed === "/>"
-  ) {
-    return false;
-  }
-  return REORDERABLE_LINE_RE.test(trimmed);
+	const trimmed = line.trim();
+	if (!trimmed) {
+		return false;
+	}
+	if (
+		trimmed.startsWith("<") ||
+		trimmed.startsWith("</") ||
+		trimmed === ">" ||
+		trimmed === "/>"
+	) {
+		return false;
+	}
+	return REORDERABLE_LINE_RE.test(trimmed);
 }
 
 function isImportLine(line: string) {
-  return IMPORT_LINE_RE.test(line.trim());
+	return IMPORT_LINE_RE.test(line.trim());
 }
 
 function isSideEffectImportLine(line: string) {
-  return SIDE_EFFECT_IMPORT_RE.test(line.trim());
+	return SIDE_EFFECT_IMPORT_RE.test(line.trim());
 }
 
 function takeLeadingImportCluster(lines: string[]) {
-  const cluster: string[] = [];
-  let index = 0;
-  let sawImport = false;
-  let inMultilineImport = false;
+	const cluster: string[] = [];
+	let index = 0;
+	let sawImport = false;
+	let inMultilineImport = false;
 
-  while (index < lines.length) {
-    const line = lines[index] ?? "";
-    const trimmed = line.trim();
-    if (!(sawImport || trimmed)) {
-      index += 1;
-      continue;
-    }
-    if (inMultilineImport) {
-      cluster.push(line);
-      index += 1;
-      if (trimmed.endsWith(";")) {
-        inMultilineImport = false;
-      }
-      continue;
-    }
-    if (isImportLine(line)) {
-      sawImport = true;
-      cluster.push(line);
-      index += 1;
-      inMultilineImport = !(
-        trimmed.endsWith(";") ||
-        trimmed.includes(" from ") ||
-        isSideEffectImportLine(trimmed)
-      );
-      continue;
-    }
-    if (sawImport && !trimmed) {
-      cluster.push(line);
-      index += 1;
-      continue;
-    }
-    break;
-  }
+	while (index < lines.length) {
+		const line = lines[index] ?? "";
+		const trimmed = line.trim();
+		if (!(sawImport || trimmed)) {
+			index += 1;
+			continue;
+		}
+		if (inMultilineImport) {
+			cluster.push(line);
+			index += 1;
+			if (trimmed.endsWith(";")) {
+				inMultilineImport = false;
+			}
+			continue;
+		}
+		if (isImportLine(line)) {
+			sawImport = true;
+			cluster.push(line);
+			index += 1;
+			inMultilineImport = !(
+				trimmed.endsWith(";") ||
+				trimmed.includes(" from ") ||
+				isSideEffectImportLine(trimmed)
+			);
+			continue;
+		}
+		if (sawImport && !trimmed) {
+			cluster.push(line);
+			index += 1;
+			continue;
+		}
+		break;
+	}
 
-  if (!sawImport) {
-    return null;
-  }
-  return {
-    cluster,
-    rest: lines.slice(index),
-  };
+	if (!sawImport) {
+		return null;
+	}
+	return {
+		cluster,
+		rest: lines.slice(index),
+	};
 }
 
 function buildLineKeyCounts(
-  lines: string[],
-  normalizeLine?: (line: string) => string
+	lines: string[],
+	normalizeLine?: (line: string) => string,
 ) {
-  const counts = new Map<string, number>();
-  for (const line of lines) {
-    const key = (normalizeLine ? normalizeLine(line) : line).trim();
-    if (!key) {
-      continue;
-    }
-    counts.set(key, (counts.get(key) ?? 0) + 1);
-  }
-  return counts;
+	const counts = new Map<string, number>();
+	for (const line of lines) {
+		const key = (normalizeLine ? normalizeLine(line) : line).trim();
+		if (!key) {
+			continue;
+		}
+		counts.set(key, (counts.get(key) ?? 0) + 1);
+	}
+	return counts;
 }
 
 function collectReorderableKeys(
-  lines: string[],
-  normalizeLine: (line: string) => string
+	lines: string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const keys: string[] = [];
-  const keyByIndex: (string | null)[] = [];
-  for (const line of lines) {
-    if (!isReorderableLine(line)) {
-      keyByIndex.push(null);
-      continue;
-    }
-    const key = normalizeLine(line).trim();
-    keys.push(key);
-    keyByIndex.push(key);
-  }
-  return { keys, keyByIndex };
+	const keys: string[] = [];
+	const keyByIndex: (string | null)[] = [];
+	for (const line of lines) {
+		if (!isReorderableLine(line)) {
+			keyByIndex.push(null);
+			continue;
+		}
+		const key = normalizeLine(line).trim();
+		keys.push(key);
+		keyByIndex.push(key);
+	}
+	return { keys, keyByIndex };
 }
 
 function collectImportKeys(
-  lines: string[],
-  normalizeLine: (line: string) => string
+	lines: string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const keys: string[] = [];
-  const keyByIndex: (string | null)[] = [];
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) {
-      return null;
-    }
-    if (!isImportLine(trimmed)) {
-      return null;
-    }
-    if (isSideEffectImportLine(trimmed)) {
-      return null;
-    }
-    const key = normalizeLine(trimmed).trim();
-    keys.push(key);
-    keyByIndex.push(key);
-  }
-  return { keys, keyByIndex };
+	const keys: string[] = [];
+	const keyByIndex: (string | null)[] = [];
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (!trimmed) {
+			return null;
+		}
+		if (!isImportLine(trimmed)) {
+			return null;
+		}
+		if (isSideEffectImportLine(trimmed)) {
+			return null;
+		}
+		const key = normalizeLine(trimmed).trim();
+		keys.push(key);
+		keyByIndex.push(key);
+	}
+	return { keys, keyByIndex };
 }
 
 function lineKeyCountsMatch(oldKeys: string[], newKeys: string[]) {
-  const oldCounts = buildLineKeyCounts(oldKeys, (line) => line);
-  const newCounts = buildLineKeyCounts(newKeys, (line) => line);
-  if (oldCounts.size !== newCounts.size) {
-    return false;
-  }
-  for (const [key, count] of oldCounts) {
-    if ((newCounts.get(key) ?? 0) !== count) {
-      return false;
-    }
-  }
-  return true;
+	const oldCounts = buildLineKeyCounts(oldKeys, (line) => line);
+	const newCounts = buildLineKeyCounts(newKeys, (line) => line);
+	if (oldCounts.size !== newCounts.size) {
+		return false;
+	}
+	for (const [key, count] of oldCounts) {
+		if ((newCounts.get(key) ?? 0) !== count) {
+			return false;
+		}
+	}
+	return true;
 }
 
 function buildLineBuckets(lines: string[], keyByIndex: (string | null)[]) {
-  const buckets = new Map<string, string[]>();
-  for (let idx = 0; idx < lines.length; idx += 1) {
-    const key = keyByIndex[idx];
-    if (!key) {
-      continue;
-    }
-    const list = buckets.get(key);
-    if (list) {
-      list.push(lines[idx] ?? "");
-    } else {
-      buckets.set(key, [lines[idx] ?? ""]);
-    }
-  }
-  return buckets;
+	const buckets = new Map<string, string[]>();
+	for (let idx = 0; idx < lines.length; idx += 1) {
+		const key = keyByIndex[idx];
+		if (!key) {
+			continue;
+		}
+		const list = buckets.get(key);
+		if (list) {
+			list.push(lines[idx] ?? "");
+		} else {
+			buckets.set(key, [lines[idx] ?? ""]);
+		}
+	}
+	return buckets;
 }
 
 function applyReorderedLines(
-  lines: string[],
-  keyByIndex: (string | null)[],
-  desiredKeys: string[],
-  buckets: Map<string, string[]>
+	lines: string[],
+	keyByIndex: (string | null)[],
+	desiredKeys: string[],
+	buckets: Map<string, string[]>,
 ) {
-  const reordered = [...lines];
-  let cursor = 0;
-  for (let idx = 0; idx < keyByIndex.length; idx += 1) {
-    if (!keyByIndex[idx]) {
-      continue;
-    }
-    const desiredKey = desiredKeys[cursor++];
-    if (!desiredKey) {
-      return null;
-    }
-    const bucket = buckets.get(desiredKey);
-    if (!bucket || bucket.length === 0) {
-      return null;
-    }
-    const nextValue = bucket.shift();
-    if (!nextValue) {
-      return null;
-    }
-    reordered[idx] = nextValue;
-  }
-  return reordered;
+	const reordered = [...lines];
+	let cursor = 0;
+	for (let idx = 0; idx < keyByIndex.length; idx += 1) {
+		if (!keyByIndex[idx]) {
+			continue;
+		}
+		const desiredKey = desiredKeys[cursor++];
+		if (!desiredKey) {
+			return null;
+		}
+		const bucket = buckets.get(desiredKey);
+		if (!bucket || bucket.length === 0) {
+			return null;
+		}
+		const nextValue = bucket.shift();
+		if (!nextValue) {
+			return null;
+		}
+		reordered[idx] = nextValue;
+	}
+	return reordered;
 }
 
 function reorderInsertLines(
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine?: (line: string) => string
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine?: (line: string) => string,
 ) {
-  if (!normalizeLine) {
-    return null;
-  }
-  const importOld = collectImportKeys(oldLines, normalizeLine);
-  const importNew = collectImportKeys(newLines, normalizeLine);
-  if (importOld && importNew) {
-    if (!lineKeyCountsMatch(importOld.keys, importNew.keys)) {
-      return null;
-    }
-    const buckets = buildLineBuckets(newLines, importNew.keyByIndex);
-    return applyReorderedLines(
-      newLines,
-      importNew.keyByIndex,
-      importOld.keys,
-      buckets
-    );
-  }
-  const old = collectReorderableKeys(oldLines, normalizeLine);
-  const next = collectReorderableKeys(newLines, normalizeLine);
-  if (old.keys.length === 0 || old.keys.length !== next.keys.length) {
-    return null;
-  }
-  if (!lineKeyCountsMatch(old.keys, next.keys)) {
-    return null;
-  }
-  const buckets = buildLineBuckets(newLines, next.keyByIndex);
-  return applyReorderedLines(newLines, next.keyByIndex, old.keys, buckets);
+	if (!normalizeLine) {
+		return null;
+	}
+	const importOld = collectImportKeys(oldLines, normalizeLine);
+	const importNew = collectImportKeys(newLines, normalizeLine);
+	if (importOld && importNew) {
+		if (!lineKeyCountsMatch(importOld.keys, importNew.keys)) {
+			return null;
+		}
+		const buckets = buildLineBuckets(newLines, importNew.keyByIndex);
+		return applyReorderedLines(
+			newLines,
+			importNew.keyByIndex,
+			importOld.keys,
+			buckets,
+		);
+	}
+	const old = collectReorderableKeys(oldLines, normalizeLine);
+	const next = collectReorderableKeys(newLines, normalizeLine);
+	if (old.keys.length === 0 || old.keys.length !== next.keys.length) {
+		return null;
+	}
+	if (!lineKeyCountsMatch(old.keys, next.keys)) {
+		return null;
+	}
+	const buckets = buildLineBuckets(newLines, next.keyByIndex);
+	return applyReorderedLines(newLines, next.keyByIndex, old.keys, buckets);
 }
 
 const LINE_MATCH_KEYWORDS = new Set([
-  "import",
-  "export",
-  "from",
-  "return",
-  "const",
-  "let",
-  "var",
-  "function",
-  "class",
-  "interface",
-  "type",
-  "enum",
-  "async",
-  "await",
-  "if",
-  "else",
-  "switch",
-  "case",
-  "default",
-  "for",
-  "while",
-  "do",
-  "try",
-  "catch",
-  "finally",
-  "throw",
-  "new",
-  "extends",
-  "implements",
-  "public",
-  "private",
-  "protected",
-  "readonly",
-  "static",
-  "get",
-  "set",
-  "yield",
-  "typeof",
-  "instanceof",
-  "in",
-  "of",
-  "as",
-  "asserts",
-  "satisfies",
-  "void",
-  "null",
-  "true",
-  "false",
+	"import",
+	"export",
+	"from",
+	"return",
+	"const",
+	"let",
+	"var",
+	"function",
+	"class",
+	"interface",
+	"type",
+	"enum",
+	"async",
+	"await",
+	"if",
+	"else",
+	"switch",
+	"case",
+	"default",
+	"for",
+	"while",
+	"do",
+	"try",
+	"catch",
+	"finally",
+	"throw",
+	"new",
+	"extends",
+	"implements",
+	"public",
+	"private",
+	"protected",
+	"readonly",
+	"static",
+	"get",
+	"set",
+	"yield",
+	"typeof",
+	"instanceof",
+	"in",
+	"of",
+	"as",
+	"asserts",
+	"satisfies",
+	"void",
+	"null",
+	"true",
+	"false",
 ]);
 const LINE_MATCH_IDENTIFIER_RE = /[A-Za-z_$][\w$]*/g;
 const LINE_MATCH_NUMBER_RE = /\b\d+(?:\.\d+)?\b/g;
 const LINE_MATCH_STRING_RE = /(["'])(?:\\.|(?!\1).)*\1/g;
 const SIMPLE_ASSIGN_RE = /^([A-Za-z_$][\w$-]*)(\s*[?:=])([\s\S]*)$/;
 const LINE_MATCH_CODE_HINT_RE =
-  /\b(import|export|return|const|let|var|function|class|interface|type|enum|async|await|throw|new)\b|=>|=/;
+	/\b(import|export|return|const|let|var|function|class|interface|type|enum|async|await|throw|new)\b|=>|=/;
 const YAML_KEY_RE = /^(\s*)([^:]+):(?:\s|$)/;
 const MOVE_CANDIDATE_RE = /[A-Za-z0-9]/;
 const LINE_INDENT_RE = /^\s*/;
@@ -2063,2116 +2062,2112 @@ const OPERATION_ANCHORED_MIN_LINE_VOLUME = 40;
 const OPERATION_ANCHORED_MAX_LINE_RATIO = 1.2;
 
 function isLineComment(line: string) {
-  const trimmed = line.trim();
-  return (
-    trimmed.startsWith("//") ||
-    trimmed.startsWith("/*") ||
-    trimmed.startsWith("*")
-  );
+	const trimmed = line.trim();
+	return (
+		trimmed.startsWith("//") ||
+		trimmed.startsWith("/*") ||
+		trimmed.startsWith("*")
+	);
 }
 
 function isCommentLineForLanguage(line: string, language?: NormalizerLanguage) {
-  if (!language || language === "*" || language === "text") {
-    return false;
-  }
-  const trimmed = line.trim();
-  if (!trimmed) {
-    return false;
-  }
-  switch (language) {
-    case "ts":
-    case "tsx":
-    case "js":
-    case "jsx":
-      return (
-        trimmed.startsWith("//") ||
-        trimmed.startsWith("/*") ||
-        trimmed.startsWith("*") ||
-        trimmed.startsWith("*/") ||
-        trimmed.startsWith("{/*")
-      );
-    case "css":
-      return (
-        trimmed.startsWith("/*") ||
-        trimmed.startsWith("*") ||
-        trimmed.startsWith("*/")
-      );
-    case "yaml":
-    case "toml":
-      return trimmed.startsWith("#");
-    case "md":
-      return trimmed.startsWith("<!--");
-    default:
-      return false;
-  }
+	if (!language || language === "*" || language === "text") {
+		return false;
+	}
+	const trimmed = line.trim();
+	if (!trimmed) {
+		return false;
+	}
+	switch (language) {
+		case "ts":
+		case "tsx":
+		case "js":
+		case "jsx":
+			return (
+				trimmed.startsWith("//") ||
+				trimmed.startsWith("/*") ||
+				trimmed.startsWith("*") ||
+				trimmed.startsWith("*/") ||
+				trimmed.startsWith("{/*")
+			);
+		case "css":
+			return (
+				trimmed.startsWith("/*") ||
+				trimmed.startsWith("*") ||
+				trimmed.startsWith("*/")
+			);
+		case "yaml":
+		case "toml":
+			return trimmed.startsWith("#");
+		case "md":
+			return trimmed.startsWith("<!--");
+		default:
+			return false;
+	}
 }
 
 function isLowInfoSemanticLine(normalized: string) {
-  if (COMMENT_DELIMITER_LINES.has(normalized)) {
-    return true;
-  }
-  if (isDecorativeComment(normalized)) {
-    return true;
-  }
-  if (LOW_INFO_PUNCTUATION_RE.test(normalized)) {
-    return true;
-  }
-  return false;
+	if (COMMENT_DELIMITER_LINES.has(normalized)) {
+		return true;
+	}
+	if (isDecorativeComment(normalized)) {
+		return true;
+	}
+	if (LOW_INFO_PUNCTUATION_RE.test(normalized)) {
+		return true;
+	}
+	return false;
 }
 
 function isDecorativeComment(normalized: string) {
-  const trimmed = normalized.trim();
-  let rest = "";
-  if (trimmed.startsWith("//")) {
-    rest = trimmed.slice(2).trim();
-  } else if (trimmed.startsWith("/*")) {
-    rest = trimmed.slice(2).trim();
-  } else if (trimmed.startsWith("*")) {
-    rest = trimmed.slice(1).trim();
-  } else {
-    return false;
-  }
-  if (!rest) {
-    return true;
-  }
-  return !ALNUM_RE.test(rest);
+	const trimmed = normalized.trim();
+	let rest = "";
+	if (trimmed.startsWith("//")) {
+		rest = trimmed.slice(2).trim();
+	} else if (trimmed.startsWith("/*")) {
+		rest = trimmed.slice(2).trim();
+	} else if (trimmed.startsWith("*")) {
+		rest = trimmed.slice(1).trim();
+	} else {
+		return false;
+	}
+	if (!rest) {
+		return true;
+	}
+	return !ALNUM_RE.test(rest);
 }
 
 function nonEmptyLines(text: string | undefined) {
-  if (!text) {
-    return [];
-  }
-  return splitLines(text).filter((line) => line.trim().length > 0);
+	if (!text) {
+		return [];
+	}
+	return splitLines(text).filter((line) => line.trim().length > 0);
 }
 
 function isCommentOnlyOperation(
-  op: DiffOperation,
-  language?: NormalizerLanguage
+	op: DiffOperation,
+	language?: NormalizerLanguage,
 ) {
-  if (!language || language === "*" || language === "text") {
-    return false;
-  }
-  const lines = [...nonEmptyLines(op.oldText), ...nonEmptyLines(op.newText)];
-  if (lines.length === 0) {
-    return false;
-  }
-  return lines.every((line) => isCommentLineForLanguage(line, language));
+	if (!language || language === "*" || language === "text") {
+		return false;
+	}
+	const lines = [...nonEmptyLines(op.oldText), ...nonEmptyLines(op.newText)];
+	if (lines.length === 0) {
+		return false;
+	}
+	return lines.every((line) => isCommentLineForLanguage(line, language));
 }
 
 function filterDiffForComments(
-  diff: DiffDocument,
-  language?: NormalizerLanguage
+	diff: DiffDocument,
+	language?: NormalizerLanguage,
 ) {
-  if (!language || language === "*" || language === "text") {
-    return diff;
-  }
-  let hasFiltered = false;
-  const operations = diff.operations.filter((op) => {
-    const commentOnly = isCommentOnlyOperation(op, language);
-    if (commentOnly) {
-      hasFiltered = true;
-    }
-    return !commentOnly;
-  });
-  if (!hasFiltered) {
-    return diff;
-  }
-  const opIds = new Set(operations.map((op) => op.id));
-  const moves = diff.moves.flatMap((move) => {
-    const filteredOps = move.operations.filter((id) => opIds.has(id));
-    if (filteredOps.length === 0) {
-      return [];
-    }
-    return [{ ...move, operations: filteredOps }];
-  });
-  const renameIds = new Set(
-    operations
-      .map((op) => op.meta?.renameGroupId)
-      .filter((id): id is string => Boolean(id))
-  );
-  const renames =
-    renameIds.size === 0
-      ? []
-      : diff.renames.filter((rename) => renameIds.has(rename.id));
-  return { ...diff, operations, moves, renames };
+	if (!language || language === "*" || language === "text") {
+		return diff;
+	}
+	let hasFiltered = false;
+	const operations = diff.operations.filter((op) => {
+		const commentOnly = isCommentOnlyOperation(op, language);
+		if (commentOnly) {
+			hasFiltered = true;
+		}
+		return !commentOnly;
+	});
+	if (!hasFiltered) {
+		return diff;
+	}
+	const opIds = new Set(operations.map((op) => op.id));
+	const moves = diff.moves.flatMap((move) => {
+		const filteredOps = move.operations.filter((id) => opIds.has(id));
+		if (filteredOps.length === 0) {
+			return [];
+		}
+		return [{ ...move, operations: filteredOps }];
+	});
+	const renameIds = new Set(
+		operations
+			.map((op) => op.meta?.renameGroupId)
+			.filter((id): id is string => Boolean(id)),
+	);
+	const renames =
+		renameIds.size === 0
+			? []
+			: diff.renames.filter((rename) => renameIds.has(rename.id));
+	return { ...diff, operations, moves, renames };
 }
 
 function buildLineMatchKey(
-  line: string,
-  normalizeLine: (line: string) => string
+	line: string,
+	normalizeLine: (line: string) => string,
 ) {
-  const normalized = normalizeLine(line);
-  const trimmed = normalized.trim();
-  if (!trimmed) {
-    return "";
-  }
-  const yamlMatch = YAML_KEY_RE.exec(line);
-  if (yamlMatch) {
-    const indent = yamlMatch[1] ?? "";
-    const key = (yamlMatch[2] ?? "").trim();
-    if (key) {
-      return `${indent}${key}:`;
-    }
-  }
-  if (isLineComment(trimmed)) {
-    if (trimmed.startsWith("//")) {
-      return "//__COMMENT__";
-    }
-    if (trimmed.startsWith("/*")) {
-      return "/*__COMMENT__";
-    }
-    return "*__COMMENT__";
-  }
-  const assignMatch = SIMPLE_ASSIGN_RE.exec(trimmed);
-  if (assignMatch) {
-    const identifier = assignMatch[1] ?? "";
-    if (identifier && !LINE_MATCH_KEYWORDS.has(identifier)) {
-      const separator = assignMatch[2] ?? "=";
-      let output = assignMatch[3] ?? "";
-      output = output.replace(LINE_MATCH_STRING_RE, '"__STR__"');
-      output = output.replace(LINE_MATCH_NUMBER_RE, "__NUM__");
-      output = output.replace(LINE_MATCH_IDENTIFIER_RE, (token) =>
-        LINE_MATCH_KEYWORDS.has(token) ? token : "__ID__"
-      );
-      return `${identifier}${separator}${output}`;
-    }
-  }
-  if (!LINE_MATCH_CODE_HINT_RE.test(trimmed)) {
-    return trimmed;
-  }
-  let output = normalized.replace(LINE_MATCH_STRING_RE, '"__STR__"');
-  output = output.replace(LINE_MATCH_NUMBER_RE, "__NUM__");
-  output = output.replace(LINE_MATCH_IDENTIFIER_RE, (token) =>
-    LINE_MATCH_KEYWORDS.has(token) ? token : "__ID__"
-  );
-  return output;
+	const normalized = normalizeLine(line);
+	const trimmed = normalized.trim();
+	if (!trimmed) {
+		return "";
+	}
+	const yamlMatch = YAML_KEY_RE.exec(line);
+	if (yamlMatch) {
+		const indent = yamlMatch[1] ?? "";
+		const key = (yamlMatch[2] ?? "").trim();
+		if (key) {
+			return `${indent}${key}:`;
+		}
+	}
+	if (isLineComment(trimmed)) {
+		if (trimmed.startsWith("//")) {
+			return "//__COMMENT__";
+		}
+		if (trimmed.startsWith("/*")) {
+			return "/*__COMMENT__";
+		}
+		return "*__COMMENT__";
+	}
+	const assignMatch = SIMPLE_ASSIGN_RE.exec(trimmed);
+	if (assignMatch) {
+		const identifier = assignMatch[1] ?? "";
+		if (identifier && !LINE_MATCH_KEYWORDS.has(identifier)) {
+			const separator = assignMatch[2] ?? "=";
+			let output = assignMatch[3] ?? "";
+			output = output.replace(LINE_MATCH_STRING_RE, '"__STR__"');
+			output = output.replace(LINE_MATCH_NUMBER_RE, "__NUM__");
+			output = output.replace(LINE_MATCH_IDENTIFIER_RE, (token) =>
+				LINE_MATCH_KEYWORDS.has(token) ? token : "__ID__",
+			);
+			return `${identifier}${separator}${output}`;
+		}
+	}
+	if (!LINE_MATCH_CODE_HINT_RE.test(trimmed)) {
+		return trimmed;
+	}
+	let output = normalized.replace(LINE_MATCH_STRING_RE, '"__STR__"');
+	output = output.replace(LINE_MATCH_NUMBER_RE, "__NUM__");
+	output = output.replace(LINE_MATCH_IDENTIFIER_RE, (token) =>
+		LINE_MATCH_KEYWORDS.has(token) ? token : "__ID__",
+	);
+	return output;
 }
 
 function getSimpleYamlComparable(trimmed: string) {
-  if (!trimmed) {
-    return "";
-  }
-  if (isLineComment(trimmed)) {
-    return trimmed;
-  }
-  return null;
+	if (!trimmed) {
+		return "";
+	}
+	if (isLineComment(trimmed)) {
+		return trimmed;
+	}
+	return null;
 }
 
 function parseYamlKey(line: string) {
-  const match = YAML_KEY_RE.exec(line);
-  if (!match) {
-    return null;
-  }
-  const indent = (match[1] ?? "").length;
-  const key = (match[2] ?? "").trim();
-  if (!key) {
-    return null;
-  }
-  return { indent, key };
+	const match = YAML_KEY_RE.exec(line);
+	if (!match) {
+		return null;
+	}
+	const indent = (match[1] ?? "").length;
+	const key = (match[2] ?? "").trim();
+	if (!key) {
+		return null;
+	}
+	return { indent, key };
 }
 
 function resolveLooseYamlComparable(
-  topKey: string,
-  indent: number,
-  key: string
+	topKey: string,
+	indent: number,
+	key: string,
 ) {
-  if (topKey === "packages" && indent === 2) {
-    return `__PKG__${key}`;
-  }
-  return key;
+	if (topKey === "packages" && indent === 2) {
+		return `__PKG__${key}`;
+	}
+	return key;
 }
 
 function resolveLooseYamlComparableWithPackages(
-  topKey: string,
-  indent: number,
-  key: string,
-  currentPackage: string,
-  packageStack: { indent: number; key: string }[]
+	topKey: string,
+	indent: number,
+	key: string,
+	currentPackage: string,
+	packageStack: { indent: number; key: string }[],
 ) {
-  if (topKey !== "packages") {
-    return {
-      key: resolveLooseYamlComparable(topKey, indent, key),
-      currentPackage,
-    };
-  }
-  if (indent === 2) {
-    packageStack.length = 0;
-    return { key: `__PKG__${key}`, currentPackage: key };
-  }
-  if (!currentPackage || indent <= 2) {
-    return {
-      key: resolveLooseYamlComparable(topKey, indent, key),
-      currentPackage,
-    };
-  }
-  while (
-    packageStack.length > 0 &&
-    (packageStack.at(-1)?.indent ?? 0) >= indent
-  ) {
-    packageStack.pop();
-  }
-  packageStack.push({ indent, key });
-  const path = packageStack.map((entry) => entry.key).join(">");
-  return { key: `${currentPackage}::${path}`, currentPackage };
+	if (topKey !== "packages") {
+		return {
+			key: resolveLooseYamlComparable(topKey, indent, key),
+			currentPackage,
+		};
+	}
+	if (indent === 2) {
+		packageStack.length = 0;
+		return { key: `__PKG__${key}`, currentPackage: key };
+	}
+	if (!currentPackage || indent <= 2) {
+		return {
+			key: resolveLooseYamlComparable(topKey, indent, key),
+			currentPackage,
+		};
+	}
+	while (
+		packageStack.length > 0 &&
+		(packageStack.at(-1)?.indent ?? 0) >= indent
+	) {
+		packageStack.pop();
+	}
+	packageStack.push({ indent, key });
+	const path = packageStack.map((entry) => entry.key).join(">");
+	return { key: `${currentPackage}::${path}`, currentPackage };
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: YAML heuristics are inherently branchy.
 function buildYamlComparableLines(
-  lines: string[],
-  normalizeLine: (line: string) => string,
-  looseKeys?: boolean
+	lines: string[],
+	normalizeLine: (line: string) => string,
+	looseKeys?: boolean,
 ) {
-  const comparables: string[] = [];
-  const stack: { indent: number; key: string }[] = [];
-  const packageStack: { indent: number; key: string }[] = [];
-  let topKey = "";
-  let currentPackage = "";
-  const findUsesKey = (startIndex: number, baseIndent: number) => {
-    for (let index = startIndex + 1; index < lines.length; index += 1) {
-      const rawLine = lines[index] ?? "";
-      const normalized = normalizeLine(rawLine);
-      const indent = (rawLine.match(LINE_INDENT_RE)?.[0] ?? "").length;
-      if (indent <= baseIndent) {
-        break;
-      }
-      const trimmed = normalized.trim();
-      const match = YAML_USES_KEY_RE.exec(trimmed);
-      if (match?.[1]) {
-        return match[1].trim();
-      }
-    }
-    return null;
-  };
-  const findNameKey = (startIndex: number, baseIndent: number) => {
-    for (let index = startIndex + 1; index < lines.length; index += 1) {
-      const rawLine = lines[index] ?? "";
-      const normalized = normalizeLine(rawLine);
-      const indent = (rawLine.match(LINE_INDENT_RE)?.[0] ?? "").length;
-      if (indent <= baseIndent) {
-        break;
-      }
-      const trimmed = normalized.trim();
-      const match = YAML_NAME_KEY_RE.exec(trimmed);
-      if (match?.[1]) {
-        return match[1].trim();
-      }
-    }
-    return null;
-  };
-  const listAnchorInfo = new Map<number, { listKey: string; anchor: string }>();
-  const listAnchorCounts = new Map<string, number>();
-  if (!looseKeys) {
-    const listContextStack: { indent: number; key: string }[] = [];
-    for (let index = 0; index < lines.length; index += 1) {
-      const line = lines[index] ?? "";
-      const normalized = normalizeLine(line);
-      const trimmed = normalized.trim();
-      const listMatch = YAML_LIST_ITEM_RE.exec(trimmed);
-      if (listMatch) {
-        const indent = (line.match(LINE_INDENT_RE)?.[0] ?? "").length;
-        while (
-          listContextStack.length > 0 &&
-          (listContextStack.at(-1)?.indent ?? 0) >= indent
-        ) {
-          listContextStack.pop();
-        }
-        const contextKey = listContextStack.map((entry) => entry.key).join(">");
-        const key = listMatch[1]?.trim() ?? "";
-        const value = listMatch[2]?.trim() ?? "";
-        const nameValue = key === "name" ? value : findNameKey(index, indent);
-        const usesValue = key === "uses" ? value : findUsesKey(index, indent);
-        let anchorBase = value ? `__ITEM__${key}::${value}` : `__ITEM__${key}`;
-        if (usesValue) {
-          anchorBase = `__ITEM__uses::${usesValue}`;
-        } else if (nameValue) {
-          anchorBase = `__ITEM__name::${nameValue}`;
-        }
-        const anchor = contextKey ? `${contextKey}::${anchorBase}` : anchorBase;
-        const listKey = anchor;
-        listAnchorInfo.set(index, { listKey, anchor });
-        listAnchorCounts.set(listKey, (listAnchorCounts.get(listKey) ?? 0) + 1);
-      }
-      const parsed = parseYamlKey(line);
-      if (parsed) {
-        const { indent, key } = parsed;
-        while (
-          listContextStack.length > 0 &&
-          (listContextStack.at(-1)?.indent ?? 0) >= indent
-        ) {
-          listContextStack.pop();
-        }
-        listContextStack.push({ indent, key });
-      }
-    }
-  }
-  const listAnchorRemaining = new Map(listAnchorCounts);
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index] ?? "";
-    const normalized = normalizeLine(line);
-    const trimmed = normalized.trim();
-    const simple = getSimpleYamlComparable(trimmed);
-    if (simple !== null) {
-      comparables.push(simple);
-      continue;
-    }
-    const listMatch = YAML_LIST_ITEM_RE.exec(trimmed);
-    if (listMatch) {
-      const indent = (line.match(LINE_INDENT_RE)?.[0] ?? "").length;
-      const key = listMatch[1]?.trim() ?? "";
-      const value = listMatch[2]?.trim() ?? "";
-      let comparable = value ? `__ITEM__${key}::${value}` : `__ITEM__${key}`;
-      if (!looseKeys) {
-        const listInfo = listAnchorInfo.get(index);
-        if (listInfo) {
-          const remaining = listAnchorRemaining.get(listInfo.listKey);
-          if (remaining !== undefined) {
-            comparable = `${listInfo.anchor}::__IDX__${remaining}`;
-            listAnchorRemaining.set(listInfo.listKey, remaining - 1);
-          } else {
-            comparable = listInfo.anchor;
-          }
-        } else {
-          const usesValue = findUsesKey(index, indent);
-          if (usesValue) {
-            comparable = `__ITEM__uses::${usesValue}`;
-          }
-        }
-      }
-      if (looseKeys) {
-        comparables.push(`${indent}:${comparable}`);
-      } else {
-        while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
-          stack.pop();
-        }
-        stack.push({ indent, key: comparable });
-        const path = stack.map((entry) => entry.key).join(">");
-        comparables.push(path);
-      }
-      continue;
-    }
-    const parsed = parseYamlKey(line);
-    if (!parsed) {
-      const contextPath = stack.map((entry) => entry.key).join(">");
-      comparables.push(
-        contextPath ? `${contextPath}::${normalized}` : normalized
-      );
-      continue;
-    }
-    const { indent, key } = parsed;
-    if (indent === 0) {
-      topKey = key;
-      currentPackage = "";
-      packageStack.length = 0;
-    }
-    if (looseKeys) {
-      const resolved = resolveLooseYamlComparableWithPackages(
-        topKey,
-        indent,
-        key,
-        currentPackage,
-        packageStack
-      );
-      currentPackage = resolved.currentPackage;
-      comparables.push(resolved.key);
-      continue;
-    }
-    while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
-      stack.pop();
-    }
-    stack.push({ indent, key });
-    const path = stack.map((entry) => entry.key).join(">");
-    comparables.push(path);
-  }
-  return comparables;
+	const comparables: string[] = [];
+	const stack: { indent: number; key: string }[] = [];
+	const packageStack: { indent: number; key: string }[] = [];
+	let topKey = "";
+	let currentPackage = "";
+	const findUsesKey = (startIndex: number, baseIndent: number) => {
+		for (let index = startIndex + 1; index < lines.length; index += 1) {
+			const rawLine = lines[index] ?? "";
+			const normalized = normalizeLine(rawLine);
+			const indent = (rawLine.match(LINE_INDENT_RE)?.[0] ?? "").length;
+			if (indent <= baseIndent) {
+				break;
+			}
+			const trimmed = normalized.trim();
+			const match = YAML_USES_KEY_RE.exec(trimmed);
+			if (match?.[1]) {
+				return match[1].trim();
+			}
+		}
+		return null;
+	};
+	const findNameKey = (startIndex: number, baseIndent: number) => {
+		for (let index = startIndex + 1; index < lines.length; index += 1) {
+			const rawLine = lines[index] ?? "";
+			const normalized = normalizeLine(rawLine);
+			const indent = (rawLine.match(LINE_INDENT_RE)?.[0] ?? "").length;
+			if (indent <= baseIndent) {
+				break;
+			}
+			const trimmed = normalized.trim();
+			const match = YAML_NAME_KEY_RE.exec(trimmed);
+			if (match?.[1]) {
+				return match[1].trim();
+			}
+		}
+		return null;
+	};
+	const listAnchorInfo = new Map<number, { listKey: string; anchor: string }>();
+	const listAnchorCounts = new Map<string, number>();
+	if (!looseKeys) {
+		const listContextStack: { indent: number; key: string }[] = [];
+		for (let index = 0; index < lines.length; index += 1) {
+			const line = lines[index] ?? "";
+			const normalized = normalizeLine(line);
+			const trimmed = normalized.trim();
+			const listMatch = YAML_LIST_ITEM_RE.exec(trimmed);
+			if (listMatch) {
+				const indent = (line.match(LINE_INDENT_RE)?.[0] ?? "").length;
+				while (
+					listContextStack.length > 0 &&
+					(listContextStack.at(-1)?.indent ?? 0) >= indent
+				) {
+					listContextStack.pop();
+				}
+				const contextKey = listContextStack.map((entry) => entry.key).join(">");
+				const key = listMatch[1]?.trim() ?? "";
+				const value = listMatch[2]?.trim() ?? "";
+				const nameValue = key === "name" ? value : findNameKey(index, indent);
+				const usesValue = key === "uses" ? value : findUsesKey(index, indent);
+				let anchorBase = value ? `__ITEM__${key}::${value}` : `__ITEM__${key}`;
+				if (usesValue) {
+					anchorBase = `__ITEM__uses::${usesValue}`;
+				} else if (nameValue) {
+					anchorBase = `__ITEM__name::${nameValue}`;
+				}
+				const anchor = contextKey ? `${contextKey}::${anchorBase}` : anchorBase;
+				const listKey = anchor;
+				listAnchorInfo.set(index, { listKey, anchor });
+				listAnchorCounts.set(listKey, (listAnchorCounts.get(listKey) ?? 0) + 1);
+			}
+			const parsed = parseYamlKey(line);
+			if (parsed) {
+				const { indent, key } = parsed;
+				while (
+					listContextStack.length > 0 &&
+					(listContextStack.at(-1)?.indent ?? 0) >= indent
+				) {
+					listContextStack.pop();
+				}
+				listContextStack.push({ indent, key });
+			}
+		}
+	}
+	const listAnchorRemaining = new Map(listAnchorCounts);
+	for (let index = 0; index < lines.length; index += 1) {
+		const line = lines[index] ?? "";
+		const normalized = normalizeLine(line);
+		const trimmed = normalized.trim();
+		const simple = getSimpleYamlComparable(trimmed);
+		if (simple !== null) {
+			comparables.push(simple);
+			continue;
+		}
+		const listMatch = YAML_LIST_ITEM_RE.exec(trimmed);
+		if (listMatch) {
+			const indent = (line.match(LINE_INDENT_RE)?.[0] ?? "").length;
+			const key = listMatch[1]?.trim() ?? "";
+			const value = listMatch[2]?.trim() ?? "";
+			let comparable = value ? `__ITEM__${key}::${value}` : `__ITEM__${key}`;
+			if (!looseKeys) {
+				const listInfo = listAnchorInfo.get(index);
+				if (listInfo) {
+					const remaining = listAnchorRemaining.get(listInfo.listKey);
+					if (remaining !== undefined) {
+						comparable = `${listInfo.anchor}::__IDX__${remaining}`;
+						listAnchorRemaining.set(listInfo.listKey, remaining - 1);
+					} else {
+						comparable = listInfo.anchor;
+					}
+				} else {
+					const usesValue = findUsesKey(index, indent);
+					if (usesValue) {
+						comparable = `__ITEM__uses::${usesValue}`;
+					}
+				}
+			}
+			if (looseKeys) {
+				comparables.push(`${indent}:${comparable}`);
+			} else {
+				while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
+					stack.pop();
+				}
+				stack.push({ indent, key: comparable });
+				const path = stack.map((entry) => entry.key).join(">");
+				comparables.push(path);
+			}
+			continue;
+		}
+		const parsed = parseYamlKey(line);
+		if (!parsed) {
+			const contextPath = stack.map((entry) => entry.key).join(">");
+			comparables.push(
+				contextPath ? `${contextPath}::${normalized}` : normalized,
+			);
+			continue;
+		}
+		const { indent, key } = parsed;
+		if (indent === 0) {
+			topKey = key;
+			currentPackage = "";
+			packageStack.length = 0;
+		}
+		if (looseKeys) {
+			const resolved = resolveLooseYamlComparableWithPackages(
+				topKey,
+				indent,
+				key,
+				currentPackage,
+				packageStack,
+			);
+			currentPackage = resolved.currentPackage;
+			comparables.push(resolved.key);
+			continue;
+		}
+		while (stack.length > 0 && (stack.at(-1)?.indent ?? 0) >= indent) {
+			stack.pop();
+		}
+		stack.push({ indent, key });
+		const path = stack.map((entry) => entry.key).join(">");
+		comparables.push(path);
+	}
+	return comparables;
 }
 
 function appendUnifiedReplaceRows(
-  rows: LineRow[],
-  deleteLines: string[],
-  insertLines: string[],
-  oldLine: number,
-  newLine: number
+	rows: LineRow[],
+	deleteLines: string[],
+	insertLines: string[],
+	oldLine: number,
+	newLine: number,
 ) {
-  let nextOld = oldLine;
-  let nextNew = newLine;
-  for (const line of deleteLines) {
-    rows.push({ type: "delete", oldLine: nextOld, newLine: null, text: line });
-    nextOld += 1;
-  }
-  for (const line of insertLines) {
-    rows.push({ type: "insert", oldLine: null, newLine: nextNew, text: line });
-    nextNew += 1;
-  }
-  return { oldLine: nextOld, newLine: nextNew };
+	let nextOld = oldLine;
+	let nextNew = newLine;
+	for (const line of deleteLines) {
+		rows.push({ type: "delete", oldLine: nextOld, newLine: null, text: line });
+		nextOld += 1;
+	}
+	for (const line of insertLines) {
+		rows.push({ type: "insert", oldLine: null, newLine: nextNew, text: line });
+		nextNew += 1;
+	}
+	return { oldLine: nextOld, newLine: nextNew };
 }
 
 function computeAlignedCost(
-  edits: LineEdit[],
-  deleteLines: string[],
-  insertLines: string[],
-  lineLayout: "split" | "unified"
+	edits: LineEdit[],
+	deleteLines: string[],
+	insertLines: string[],
+	lineLayout: "split" | "unified",
 ) {
-  let alignedCost = 0;
-  let equalCount = 0;
-  let oldIndex = 0;
-  let newIndex = 0;
-  for (const edit of edits) {
-    if (edit.type === "equal") {
-      equalCount += 1;
-      const oldText = deleteLines[oldIndex] ?? "";
-      const newText = insertLines[newIndex] ?? "";
-      if (oldText !== newText) {
-        alignedCost += lineLayout === "unified" ? 2 : 1;
-      }
-      oldIndex += 1;
-      newIndex += 1;
-      continue;
-    }
-    if (edit.type === "delete") {
-      alignedCost += 1;
-      oldIndex += 1;
-      continue;
-    }
-    alignedCost += 1;
-    newIndex += 1;
-  }
-  return { alignedCost, equalCount };
+	let alignedCost = 0;
+	let equalCount = 0;
+	let oldIndex = 0;
+	let newIndex = 0;
+	for (const edit of edits) {
+		if (edit.type === "equal") {
+			equalCount += 1;
+			const oldText = deleteLines[oldIndex] ?? "";
+			const newText = insertLines[newIndex] ?? "";
+			if (oldText !== newText) {
+				alignedCost += lineLayout === "unified" ? 2 : 1;
+			}
+			oldIndex += 1;
+			newIndex += 1;
+			continue;
+		}
+		if (edit.type === "delete") {
+			alignedCost += 1;
+			oldIndex += 1;
+			continue;
+		}
+		alignedCost += 1;
+		newIndex += 1;
+	}
+	return { alignedCost, equalCount };
 }
 
 function appendAlignedEditsRows(
-  rows: LineRow[],
-  edits: LineEdit[],
-  deleteLines: string[],
-  insertLines: string[],
-  oldLine: number,
-  newLine: number,
-  lineLayout: "split" | "unified"
+	rows: LineRow[],
+	edits: LineEdit[],
+	deleteLines: string[],
+	insertLines: string[],
+	oldLine: number,
+	newLine: number,
+	lineLayout: "split" | "unified",
 ) {
-  let nextOld = oldLine;
-  let nextNew = newLine;
-  let oldIndex = 0;
-  let newIndex = 0;
-  for (const edit of edits) {
-    if (edit.type === "equal") {
-      const oldText = deleteLines[oldIndex] ?? "";
-      const newText = insertLines[newIndex] ?? "";
-      if (lineLayout === "unified") {
-        if (oldText === newText) {
-          rows.push({
-            type: "equal",
-            oldLine: nextOld,
-            newLine: nextNew,
-            text: oldText,
-          });
-        } else {
-          rows.push({
-            type: "delete",
-            oldLine: nextOld,
-            newLine: null,
-            text: oldText,
-          });
-          rows.push({
-            type: "insert",
-            oldLine: null,
-            newLine: nextNew,
-            text: newText,
-          });
-        }
-      } else if (oldText === newText) {
-        rows.push({
-          type: "equal",
-          oldLine: nextOld,
-          newLine: nextNew,
-          text: oldText,
-        });
-      } else {
-        rows.push({
-          type: "replace",
-          oldLine: nextOld,
-          newLine: nextNew,
-          oldText,
-          newText,
-        });
-      }
-      nextOld += 1;
-      nextNew += 1;
-      oldIndex += 1;
-      newIndex += 1;
-      continue;
-    }
-    if (edit.type === "delete") {
-      const oldText = deleteLines[oldIndex] ?? "";
-      rows.push({
-        type: "delete",
-        oldLine: nextOld,
-        newLine: null,
-        text: oldText,
-      });
-      nextOld += 1;
-      oldIndex += 1;
-      continue;
-    }
-    const newText = insertLines[newIndex] ?? "";
-    rows.push({
-      type: "insert",
-      oldLine: null,
-      newLine: nextNew,
-      text: newText,
-    });
-    nextNew += 1;
-    newIndex += 1;
-  }
+	let nextOld = oldLine;
+	let nextNew = newLine;
+	let oldIndex = 0;
+	let newIndex = 0;
+	for (const edit of edits) {
+		if (edit.type === "equal") {
+			const oldText = deleteLines[oldIndex] ?? "";
+			const newText = insertLines[newIndex] ?? "";
+			if (lineLayout === "unified") {
+				if (oldText === newText) {
+					rows.push({
+						type: "equal",
+						oldLine: nextOld,
+						newLine: nextNew,
+						text: oldText,
+					});
+				} else {
+					rows.push({
+						type: "delete",
+						oldLine: nextOld,
+						newLine: null,
+						text: oldText,
+					});
+					rows.push({
+						type: "insert",
+						oldLine: null,
+						newLine: nextNew,
+						text: newText,
+					});
+				}
+			} else if (oldText === newText) {
+				rows.push({
+					type: "equal",
+					oldLine: nextOld,
+					newLine: nextNew,
+					text: oldText,
+				});
+			} else {
+				rows.push({
+					type: "replace",
+					oldLine: nextOld,
+					newLine: nextNew,
+					oldText,
+					newText,
+				});
+			}
+			nextOld += 1;
+			nextNew += 1;
+			oldIndex += 1;
+			newIndex += 1;
+			continue;
+		}
+		if (edit.type === "delete") {
+			const oldText = deleteLines[oldIndex] ?? "";
+			rows.push({
+				type: "delete",
+				oldLine: nextOld,
+				newLine: null,
+				text: oldText,
+			});
+			nextOld += 1;
+			oldIndex += 1;
+			continue;
+		}
+		const newText = insertLines[newIndex] ?? "";
+		rows.push({
+			type: "insert",
+			oldLine: null,
+			newLine: nextNew,
+			text: newText,
+		});
+		nextNew += 1;
+		newIndex += 1;
+	}
 
-  return { oldLine: nextOld, newLine: nextNew };
+	return { oldLine: nextOld, newLine: nextNew };
 }
 
 function appendAlignedReplaceRows(
-  rows: LineRow[],
-  deleteLines: string[],
-  insertLines: string[],
-  oldLine: number,
-  newLine: number,
-  lineLayout: "split" | "unified",
-  normalizeLine: (line: string) => string,
-  preferIndexPairing?: boolean,
-  useYamlComparable?: boolean,
-  oldComparableOverride?: string[],
-  newComparableOverride?: string[]
+	rows: LineRow[],
+	deleteLines: string[],
+	insertLines: string[],
+	oldLine: number,
+	newLine: number,
+	lineLayout: "split" | "unified",
+	normalizeLine: (line: string) => string,
+	preferIndexPairing?: boolean,
+	useYamlComparable?: boolean,
+	oldComparableOverride?: string[],
+	newComparableOverride?: string[],
 ) {
-  const importOldKeys = useYamlComparable
-    ? null
-    : buildMultilineImportKeys(deleteLines);
-  const importNewKeys = useYamlComparable
-    ? null
-    : buildMultilineImportKeys(insertLines);
-  const hasYamlOverride =
-    useYamlComparable &&
-    oldComparableOverride &&
-    newComparableOverride &&
-    oldComparableOverride.length === deleteLines.length &&
-    newComparableOverride.length === insertLines.length;
-  let oldComparable: string[];
-  let newComparable: string[];
-  if (useYamlComparable) {
-    if (hasYamlOverride && oldComparableOverride && newComparableOverride) {
-      oldComparable = oldComparableOverride;
-      newComparable = newComparableOverride;
-    } else {
-      oldComparable = buildYamlComparableLines(
-        deleteLines,
-        normalizeLine,
-        false
-      );
-      newComparable = buildYamlComparableLines(
-        insertLines,
-        normalizeLine,
-        false
-      );
-    }
-  } else {
-    oldComparable = deleteLines.map((line, index) => {
-      const key = buildLineMatchKey(line, normalizeLine);
-      const importKey = importOldKeys?.[index] ?? null;
-      return importKey ? `${key}__${importKey}` : key;
-    });
-    newComparable = insertLines.map((line, index) => {
-      const key = buildLineMatchKey(line, normalizeLine);
-      const importKey = importNewKeys?.[index] ?? null;
-      return importKey ? `${key}__${importKey}` : key;
-    });
-  }
-  const oldKeyCounts = buildLineKeyCounts(oldComparable, (line) => line);
-  const newKeyCounts = buildLineKeyCounts(newComparable, (line) => line);
-  const disambiguate = (
-    line: string,
-    key: string,
-    oldCount: number,
-    newCount: number
-  ) => (oldCount > 1 || newCount > 1 ? `${key}__${normalizeLine(line)}` : key);
-  const resolvedOldComparable = oldComparable.map((key, index) =>
-    key
-      ? disambiguate(
-          deleteLines[index] ?? "",
-          key,
-          oldKeyCounts.get(key) ?? 0,
-          newKeyCounts.get(key) ?? 0
-        )
-      : key
-  );
-  const resolvedNewComparable = newComparable.map((key, index) =>
-    key
-      ? disambiguate(
-          insertLines[index] ?? "",
-          key,
-          oldKeyCounts.get(key) ?? 0,
-          newKeyCounts.get(key) ?? 0
-        )
-      : key
-  );
-  const edits = diffLines(
-    deleteLines,
-    insertLines,
-    resolvedOldComparable,
-    resolvedNewComparable
-  );
-  const indexCost =
-    lineLayout === "unified"
-      ? deleteLines.length + insertLines.length
-      : Math.max(deleteLines.length, insertLines.length);
-  const { alignedCost, equalCount } = computeAlignedCost(
-    edits,
-    deleteLines,
-    insertLines,
-    lineLayout
-  );
-  const maxLen = Math.max(deleteLines.length, insertLines.length);
-  const matchRatio = maxLen > 0 ? equalCount / maxLen : 0;
-  const hasReorderableLines =
-    deleteLines.some(isReorderableLine) && insertLines.some(isReorderableLine);
-  const shouldIndexPair =
-    !(useYamlComparable || hasReorderableLines) &&
-    (alignedCost > indexCost ||
-      (preferIndexPairing && matchRatio > 0 && matchRatio < 0.35));
-  if (shouldIndexPair) {
-    return lineLayout === "unified"
-      ? appendUnifiedReplaceRows(
-          rows,
-          deleteLines,
-          insertLines,
-          oldLine,
-          newLine
-        )
-      : appendSplitReplaceRows(
-          rows,
-          deleteLines,
-          insertLines,
-          oldLine,
-          newLine
-        );
-  }
-  return appendAlignedEditsRows(
-    rows,
-    edits,
-    deleteLines,
-    insertLines,
-    oldLine,
-    newLine,
-    lineLayout
-  );
+	const importOldKeys = useYamlComparable
+		? null
+		: buildMultilineImportKeys(deleteLines);
+	const importNewKeys = useYamlComparable
+		? null
+		: buildMultilineImportKeys(insertLines);
+	const hasYamlOverride =
+		useYamlComparable &&
+		oldComparableOverride &&
+		newComparableOverride &&
+		oldComparableOverride.length === deleteLines.length &&
+		newComparableOverride.length === insertLines.length;
+	let oldComparable: string[];
+	let newComparable: string[];
+	if (useYamlComparable) {
+		if (hasYamlOverride && oldComparableOverride && newComparableOverride) {
+			oldComparable = oldComparableOverride;
+			newComparable = newComparableOverride;
+		} else {
+			oldComparable = buildYamlComparableLines(
+				deleteLines,
+				normalizeLine,
+				false,
+			);
+			newComparable = buildYamlComparableLines(
+				insertLines,
+				normalizeLine,
+				false,
+			);
+		}
+	} else {
+		oldComparable = deleteLines.map((line, index) => {
+			const key = buildLineMatchKey(line, normalizeLine);
+			const importKey = importOldKeys?.[index] ?? null;
+			return importKey ? `${key}__${importKey}` : key;
+		});
+		newComparable = insertLines.map((line, index) => {
+			const key = buildLineMatchKey(line, normalizeLine);
+			const importKey = importNewKeys?.[index] ?? null;
+			return importKey ? `${key}__${importKey}` : key;
+		});
+	}
+	const oldKeyCounts = buildLineKeyCounts(oldComparable, (line) => line);
+	const newKeyCounts = buildLineKeyCounts(newComparable, (line) => line);
+	const disambiguate = (
+		line: string,
+		key: string,
+		oldCount: number,
+		newCount: number,
+	) => (oldCount > 1 || newCount > 1 ? `${key}__${normalizeLine(line)}` : key);
+	const resolvedOldComparable = oldComparable.map((key, index) =>
+		key
+			? disambiguate(
+					deleteLines[index] ?? "",
+					key,
+					oldKeyCounts.get(key) ?? 0,
+					newKeyCounts.get(key) ?? 0,
+				)
+			: key,
+	);
+	const resolvedNewComparable = newComparable.map((key, index) =>
+		key
+			? disambiguate(
+					insertLines[index] ?? "",
+					key,
+					oldKeyCounts.get(key) ?? 0,
+					newKeyCounts.get(key) ?? 0,
+				)
+			: key,
+	);
+	const edits = diffLines(
+		deleteLines,
+		insertLines,
+		resolvedOldComparable,
+		resolvedNewComparable,
+	);
+	const indexCost =
+		lineLayout === "unified"
+			? deleteLines.length + insertLines.length
+			: Math.max(deleteLines.length, insertLines.length);
+	const { alignedCost, equalCount } = computeAlignedCost(
+		edits,
+		deleteLines,
+		insertLines,
+		lineLayout,
+	);
+	const maxLen = Math.max(deleteLines.length, insertLines.length);
+	const matchRatio = maxLen > 0 ? equalCount / maxLen : 0;
+	const hasReorderableLines =
+		deleteLines.some(isReorderableLine) && insertLines.some(isReorderableLine);
+	const shouldIndexPair =
+		!(useYamlComparable || hasReorderableLines) &&
+		(alignedCost > indexCost ||
+			(preferIndexPairing && matchRatio > 0 && matchRatio < 0.35));
+	if (shouldIndexPair) {
+		return lineLayout === "unified"
+			? appendUnifiedReplaceRows(
+					rows,
+					deleteLines,
+					insertLines,
+					oldLine,
+					newLine,
+				)
+			: appendSplitReplaceRows(
+					rows,
+					deleteLines,
+					insertLines,
+					oldLine,
+					newLine,
+				);
+	}
+	return appendAlignedEditsRows(
+		rows,
+		edits,
+		deleteLines,
+		insertLines,
+		oldLine,
+		newLine,
+		lineLayout,
+	);
 }
 
 function appendSplitReplaceRows(
-  rows: LineRow[],
-  deleteLines: string[],
-  insertLines: string[],
-  oldLine: number,
-  newLine: number
+	rows: LineRow[],
+	deleteLines: string[],
+	insertLines: string[],
+	oldLine: number,
+	newLine: number,
 ) {
-  let nextOld = oldLine;
-  let nextNew = newLine;
-  const max = Math.max(deleteLines.length, insertLines.length);
-  for (let idx = 0; idx < max; idx += 1) {
-    const oldTextLine = deleteLines[idx];
-    const newTextLine = insertLines[idx];
-    if (oldTextLine !== undefined && newTextLine !== undefined) {
-      rows.push({
-        type: "replace",
-        oldLine: nextOld,
-        newLine: nextNew,
-        oldText: oldTextLine,
-        newText: newTextLine,
-      });
-      nextOld += 1;
-      nextNew += 1;
-      continue;
-    }
-    if (oldTextLine !== undefined) {
-      rows.push({
-        type: "delete",
-        oldLine: nextOld,
-        newLine: null,
-        text: oldTextLine,
-      });
-      nextOld += 1;
-      continue;
-    }
-    if (newTextLine !== undefined) {
-      rows.push({
-        type: "insert",
-        oldLine: null,
-        newLine: nextNew,
-        text: newTextLine,
-      });
-      nextNew += 1;
-    }
-  }
-  return { oldLine: nextOld, newLine: nextNew };
+	let nextOld = oldLine;
+	let nextNew = newLine;
+	const max = Math.max(deleteLines.length, insertLines.length);
+	for (let idx = 0; idx < max; idx += 1) {
+		const oldTextLine = deleteLines[idx];
+		const newTextLine = insertLines[idx];
+		if (oldTextLine !== undefined && newTextLine !== undefined) {
+			rows.push({
+				type: "replace",
+				oldLine: nextOld,
+				newLine: nextNew,
+				oldText: oldTextLine,
+				newText: newTextLine,
+			});
+			nextOld += 1;
+			nextNew += 1;
+			continue;
+		}
+		if (oldTextLine !== undefined) {
+			rows.push({
+				type: "delete",
+				oldLine: nextOld,
+				newLine: null,
+				text: oldTextLine,
+			});
+			nextOld += 1;
+			continue;
+		}
+		if (newTextLine !== undefined) {
+			rows.push({
+				type: "insert",
+				oldLine: null,
+				newLine: nextNew,
+				text: newTextLine,
+			});
+			nextNew += 1;
+		}
+	}
+	return { oldLine: nextOld, newLine: nextNew };
 }
 
 function appendBlockRows(
-  rows: LineRow[],
-  block: LineBlock,
-  oldLine: number,
-  newLine: number,
-  lineLayout: "split" | "unified",
-  newLines?: string[],
-  allowKeyReplace?: boolean
+	rows: LineRow[],
+	block: LineBlock,
+	oldLine: number,
+	newLine: number,
+	lineLayout: "split" | "unified",
+	newLines?: string[],
+	allowKeyReplace?: boolean,
 ) {
-  let nextOld = oldLine;
-  let nextNew = newLine;
-  for (const line of block.lines) {
-    if (block.type === "equal") {
-      const newText =
-        newLines && newLines[nextNew - 1] !== undefined
-          ? (newLines[nextNew - 1] ?? "")
-          : line;
-      if (allowKeyReplace && newLines && line !== newText) {
-        if (lineLayout === "unified") {
-          rows.push({
-            type: "delete",
-            oldLine: nextOld,
-            newLine: null,
-            text: line,
-          });
-          rows.push({
-            type: "insert",
-            oldLine: null,
-            newLine: nextNew,
-            text: newText,
-          });
-        } else {
-          rows.push({
-            type: "replace",
-            oldLine: nextOld,
-            newLine: nextNew,
-            oldText: line,
-            newText,
-          });
-        }
-      } else {
-        rows.push({
-          type: "equal",
-          oldLine: nextOld,
-          newLine: nextNew,
-          text: line,
-        });
-      }
-      nextOld += 1;
-      nextNew += 1;
-      continue;
-    }
-    if (block.type === "delete") {
-      rows.push({
-        type: "delete",
-        oldLine: nextOld,
-        newLine: null,
-        text: line,
-      });
-      nextOld += 1;
-      continue;
-    }
-    rows.push({ type: "insert", oldLine: null, newLine: nextNew, text: line });
-    nextNew += 1;
-  }
-  return { oldLine: nextOld, newLine: nextNew };
+	let nextOld = oldLine;
+	let nextNew = newLine;
+	for (const line of block.lines) {
+		if (block.type === "equal") {
+			const newText =
+				newLines && newLines[nextNew - 1] !== undefined
+					? (newLines[nextNew - 1] ?? "")
+					: line;
+			if (allowKeyReplace && newLines && line !== newText) {
+				if (lineLayout === "unified") {
+					rows.push({
+						type: "delete",
+						oldLine: nextOld,
+						newLine: null,
+						text: line,
+					});
+					rows.push({
+						type: "insert",
+						oldLine: null,
+						newLine: nextNew,
+						text: newText,
+					});
+				} else {
+					rows.push({
+						type: "replace",
+						oldLine: nextOld,
+						newLine: nextNew,
+						oldText: line,
+						newText,
+					});
+				}
+			} else {
+				rows.push({
+					type: "equal",
+					oldLine: nextOld,
+					newLine: nextNew,
+					text: line,
+				});
+			}
+			nextOld += 1;
+			nextNew += 1;
+			continue;
+		}
+		if (block.type === "delete") {
+			rows.push({
+				type: "delete",
+				oldLine: nextOld,
+				newLine: null,
+				text: line,
+			});
+			nextOld += 1;
+			continue;
+		}
+		rows.push({ type: "insert", oldLine: null, newLine: nextNew, text: line });
+		nextNew += 1;
+	}
+	return { oldLine: nextOld, newLine: nextNew };
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: block merging is clearer inline.
 function buildRowsFromBlocks(
-  blocks: LineBlock[],
-  lineLayout: "split" | "unified",
-  normalizeLine?: (line: string) => string,
-  newLines?: string[],
-  useKeyMatching?: boolean,
-  useYamlComparable?: boolean,
-  oldComparable?: string[],
-  newComparable?: string[]
+	blocks: LineBlock[],
+	lineLayout: "split" | "unified",
+	normalizeLine?: (line: string) => string,
+	newLines?: string[],
+	useKeyMatching?: boolean,
+	useYamlComparable?: boolean,
+	oldComparable?: string[],
+	newComparable?: string[],
 ) {
-  const rows: LineRow[] = [];
-  let oldLine = 1;
-  let newLine = 1;
+	const rows: LineRow[] = [];
+	let oldLine = 1;
+	let newLine = 1;
 
-  for (let i = 0; i < blocks.length; i += 1) {
-    const block = blocks[i];
-    if (!block) {
-      continue;
-    }
-    const next = blocks[i + 1];
+	for (let i = 0; i < blocks.length; i += 1) {
+		const block = blocks[i];
+		if (!block) {
+			continue;
+		}
+		const next = blocks[i + 1];
 
-    if (block.type === "delete" && next?.type === "insert") {
-      const shouldAlign =
-        normalizeLine !== undefined &&
-        !useYamlComparable &&
-        block.lines.length + next.lines.length <= 4000;
-      let deleteLines = block.lines;
-      let nextInsertLines = next.lines;
-      if (shouldAlign && normalizeLine) {
-        const leadingDeleteImports = takeLeadingImportCluster(deleteLines);
-        const leadingInsertImports = takeLeadingImportCluster(nextInsertLines);
-        if (
-          leadingDeleteImports &&
-          leadingInsertImports &&
-          (leadingDeleteImports.rest.length > 0 ||
-            leadingInsertImports.rest.length > 0)
-        ) {
-          const importResult = appendAlignedReplaceRows(
-            rows,
-            leadingDeleteImports.cluster,
-            leadingInsertImports.cluster,
-            oldLine,
-            newLine,
-            lineLayout,
-            normalizeLine,
-            useKeyMatching
-          );
-          oldLine = importResult.oldLine;
-          newLine = importResult.newLine;
-          deleteLines = leadingDeleteImports.rest;
-          nextInsertLines = leadingInsertImports.rest;
-          if (deleteLines.length === 0 && nextInsertLines.length === 0) {
-            i += 1;
-            continue;
-          }
-        }
-      }
-      const reorderedLines = reorderInsertLines(
-        deleteLines,
-        nextInsertLines,
-        normalizeLine
-      );
-      const insertLines = reorderedLines ?? nextInsertLines;
-      const oldComparableSlice =
-        useYamlComparable && oldComparable
-          ? oldComparable.slice(oldLine - 1, oldLine - 1 + deleteLines.length)
-          : undefined;
-      const newComparableSlice =
-        useYamlComparable && newComparable
-          ? newComparable.slice(newLine - 1, newLine - 1 + insertLines.length)
-          : undefined;
-      let result: { oldLine: number; newLine: number };
-      if (shouldAlign && normalizeLine) {
-        result = appendAlignedReplaceRows(
-          rows,
-          deleteLines,
-          insertLines,
-          oldLine,
-          newLine,
-          lineLayout,
-          normalizeLine,
-          useKeyMatching,
-          useYamlComparable,
-          oldComparableSlice,
-          newComparableSlice
-        );
-      } else if (lineLayout === "unified") {
-        result = appendUnifiedReplaceRows(
-          rows,
-          deleteLines,
-          insertLines,
-          oldLine,
-          newLine
-        );
-      } else {
-        result = appendSplitReplaceRows(
-          rows,
-          deleteLines,
-          insertLines,
-          oldLine,
-          newLine
-        );
-      }
-      oldLine = result.oldLine;
-      newLine = result.newLine;
-      i += 1;
-      continue;
-    }
+		if (block.type === "delete" && next?.type === "insert") {
+			const shouldAlign =
+				normalizeLine !== undefined &&
+				!useYamlComparable &&
+				block.lines.length + next.lines.length <= 4000;
+			let deleteLines = block.lines;
+			let nextInsertLines = next.lines;
+			if (shouldAlign && normalizeLine) {
+				const leadingDeleteImports = takeLeadingImportCluster(deleteLines);
+				const leadingInsertImports = takeLeadingImportCluster(nextInsertLines);
+				if (
+					leadingDeleteImports &&
+					leadingInsertImports &&
+					(leadingDeleteImports.rest.length > 0 ||
+						leadingInsertImports.rest.length > 0)
+				) {
+					const importResult = appendAlignedReplaceRows(
+						rows,
+						leadingDeleteImports.cluster,
+						leadingInsertImports.cluster,
+						oldLine,
+						newLine,
+						lineLayout,
+						normalizeLine,
+						useKeyMatching,
+					);
+					oldLine = importResult.oldLine;
+					newLine = importResult.newLine;
+					deleteLines = leadingDeleteImports.rest;
+					nextInsertLines = leadingInsertImports.rest;
+					if (deleteLines.length === 0 && nextInsertLines.length === 0) {
+						i += 1;
+						continue;
+					}
+				}
+			}
+			const reorderedLines = reorderInsertLines(
+				deleteLines,
+				nextInsertLines,
+				normalizeLine,
+			);
+			const insertLines = reorderedLines ?? nextInsertLines;
+			const oldComparableSlice =
+				useYamlComparable && oldComparable
+					? oldComparable.slice(oldLine - 1, oldLine - 1 + deleteLines.length)
+					: undefined;
+			const newComparableSlice =
+				useYamlComparable && newComparable
+					? newComparable.slice(newLine - 1, newLine - 1 + insertLines.length)
+					: undefined;
+			let result: { oldLine: number; newLine: number };
+			if (shouldAlign && normalizeLine) {
+				result = appendAlignedReplaceRows(
+					rows,
+					deleteLines,
+					insertLines,
+					oldLine,
+					newLine,
+					lineLayout,
+					normalizeLine,
+					useKeyMatching,
+					useYamlComparable,
+					oldComparableSlice,
+					newComparableSlice,
+				);
+			} else if (lineLayout === "unified") {
+				result = appendUnifiedReplaceRows(
+					rows,
+					deleteLines,
+					insertLines,
+					oldLine,
+					newLine,
+				);
+			} else {
+				result = appendSplitReplaceRows(
+					rows,
+					deleteLines,
+					insertLines,
+					oldLine,
+					newLine,
+				);
+			}
+			oldLine = result.oldLine;
+			newLine = result.newLine;
+			i += 1;
+			continue;
+		}
 
-    const result = appendBlockRows(
-      rows,
-      block,
-      oldLine,
-      newLine,
-      lineLayout,
-      newLines,
-      useKeyMatching
-    );
-    oldLine = result.oldLine;
-    newLine = result.newLine;
-  }
+		const result = appendBlockRows(
+			rows,
+			block,
+			oldLine,
+			newLine,
+			lineLayout,
+			newLines,
+			useKeyMatching,
+		);
+		oldLine = result.oldLine;
+		newLine = result.newLine;
+	}
 
-  return rows;
+	return rows;
 }
 
 function rowText(row: LineRow) {
-  return row.text ?? row.oldText ?? row.newText ?? "";
+	return row.text ?? row.oldText ?? row.newText ?? "";
 }
 
 function rowOldText(row: LineRow) {
-  return row.oldText ?? row.text ?? "";
+	return row.oldText ?? row.text ?? "";
 }
 
 function rowNewText(row: LineRow) {
-  return row.newText ?? row.text ?? "";
+	return row.newText ?? row.text ?? "";
 }
 
 function addRangeLines(
-  range: Range | undefined,
-  target: Set<number>,
-  maxLine: number
+	range: Range | undefined,
+	target: Set<number>,
+	maxLine: number,
 ) {
-  const bounds = resolveRangeLineBounds(range, maxLine);
-  if (!bounds) {
-    return;
-  }
-  const { start, end } = bounds;
-  for (let line = start; line <= end; line += 1) {
-    target.add(line);
-  }
+	const bounds = resolveRangeLineBounds(range, maxLine);
+	if (!bounds) {
+		return;
+	}
+	const { start, end } = bounds;
+	for (let line = start; line <= end; line += 1) {
+		target.add(line);
+	}
 }
 
 function resolveRangeLineBounds(range: Range | undefined, maxLine: number) {
-  if (!range || maxLine <= 0) {
-    return null;
-  }
-  let start = Math.max(1, Math.min(maxLine, range.start.line));
-  let end = Math.max(1, Math.min(maxLine, range.end.line));
-  if (range.end.column <= 1 && range.end.line <= maxLine && end > start) {
-    end -= 1;
-  }
-  if (end < start) {
-    [start, end] = [end, start];
-  }
-  return { start, end };
+	if (!range || maxLine <= 0) {
+		return null;
+	}
+	let start = Math.max(1, Math.min(maxLine, range.start.line));
+	let end = Math.max(1, Math.min(maxLine, range.end.line));
+	if (range.end.column <= 1 && range.end.line <= maxLine && end > start) {
+		end -= 1;
+	}
+	if (end < start) {
+		[start, end] = [end, start];
+	}
+	return { start, end };
 }
 
 function buildLineMarkSets(
-  operations: readonly DiffOperation[],
-  oldLineCount: number,
-  newLineCount: number,
-  options: {
-    normalizeLine?: ((line: string) => string) | undefined;
-    useKeyMatching?: boolean | undefined;
-    useYamlComparable?: boolean | undefined;
-  } = {}
+	operations: readonly DiffOperation[],
+	oldLineCount: number,
+	newLineCount: number,
+	options: {
+		normalizeLine?: ((line: string) => string) | undefined;
+		useKeyMatching?: boolean | undefined;
+		useYamlComparable?: boolean | undefined;
+	} = {},
 ) {
-  const changedOld = new Set<number>();
-  const changedNew = new Set<number>();
-  const movedOld = new Set<number>();
-  const movedNew = new Set<number>();
-  const { normalizeLine, useKeyMatching, useYamlComparable } = options;
+	const changedOld = new Set<number>();
+	const changedNew = new Set<number>();
+	const movedOld = new Set<number>();
+	const movedNew = new Set<number>();
+	const { normalizeLine, useKeyMatching, useYamlComparable } = options;
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: localized line marking needs the explicit fallback branches.
-  const addLocalizedUpdateLines = (operation: DiffOperation) => {
-    if (
-      !(operation.oldRange && operation.newRange) ||
-      operation.oldText === undefined ||
-      operation.newText === undefined
-    ) {
-      addRangeLines(operation.oldRange, changedOld, oldLineCount);
-      addRangeLines(operation.newRange, changedNew, newLineCount);
-      return;
-    }
+	const addLocalizedUpdateLines = (operation: DiffOperation) => {
+		if (
+			!(operation.oldRange && operation.newRange) ||
+			operation.oldText === undefined ||
+			operation.newText === undefined
+		) {
+			addRangeLines(operation.oldRange, changedOld, oldLineCount);
+			addRangeLines(operation.newRange, changedNew, newLineCount);
+			return;
+		}
 
-    const oldLines = splitLines(operation.oldText);
-    const newLines = splitLines(operation.newText);
-    if (oldLines.length + newLines.length > UPDATE_MARK_ALIGNMENT_LIMIT) {
-      addRangeLines(operation.oldRange, changedOld, oldLineCount);
-      addRangeLines(operation.newRange, changedNew, newLineCount);
-      return;
-    }
+		const oldLines = splitLines(operation.oldText);
+		const newLines = splitLines(operation.newText);
+		if (oldLines.length + newLines.length > UPDATE_MARK_ALIGNMENT_LIMIT) {
+			addRangeLines(operation.oldRange, changedOld, oldLineCount);
+			addRangeLines(operation.newRange, changedNew, newLineCount);
+			return;
+		}
 
-    const localizedRows = buildRawLineRows(
-      oldLines,
-      newLines,
-      "split",
-      normalizeLine,
-      useKeyMatching,
-      useYamlComparable
-    );
-    for (const row of localizedRows) {
-      if (row.type === "gap" || row.type === "hunk" || row.type === "equal") {
-        continue;
-      }
-      if (
-        row.type === "replace" &&
-        normalizeLine &&
-        normalizeLine(rowOldText(row)) === normalizeLine(rowNewText(row))
-      ) {
-        continue;
-      }
-      if (row.oldLine != null) {
-        changedOld.add(operation.oldRange.start.line + row.oldLine - 1);
-      }
-      if (row.newLine != null) {
-        changedNew.add(operation.newRange.start.line + row.newLine - 1);
-      }
-    }
-  };
+		const localizedRows = buildRawLineRows(
+			oldLines,
+			newLines,
+			"split",
+			normalizeLine,
+			useKeyMatching,
+			useYamlComparable,
+		);
+		for (const row of localizedRows) {
+			if (row.type === "gap" || row.type === "hunk" || row.type === "equal") {
+				continue;
+			}
+			if (
+				row.type === "replace" &&
+				normalizeLine &&
+				normalizeLine(rowOldText(row)) === normalizeLine(rowNewText(row))
+			) {
+				continue;
+			}
+			if (row.oldLine != null) {
+				changedOld.add(operation.oldRange.start.line + row.oldLine - 1);
+			}
+			if (row.newLine != null) {
+				changedNew.add(operation.newRange.start.line + row.newLine - 1);
+			}
+		}
+	};
 
-  for (const op of operations) {
-    switch (op.type) {
-      case "insert":
-        addRangeLines(op.newRange, changedNew, newLineCount);
-        break;
-      case "delete":
-        addRangeLines(op.oldRange, changedOld, oldLineCount);
-        break;
-      case "update":
-        addLocalizedUpdateLines(op);
-        break;
-      case "move":
-        addRangeLines(op.oldRange, movedOld, oldLineCount);
-        addRangeLines(op.newRange, movedNew, newLineCount);
-        break;
-      default:
-        break;
-    }
-  }
+	for (const op of operations) {
+		switch (op.type) {
+			case "insert":
+				addRangeLines(op.newRange, changedNew, newLineCount);
+				break;
+			case "delete":
+				addRangeLines(op.oldRange, changedOld, oldLineCount);
+				break;
+			case "update":
+				addLocalizedUpdateLines(op);
+				break;
+			case "move":
+				addRangeLines(op.oldRange, movedOld, oldLineCount);
+				addRangeLines(op.newRange, movedNew, newLineCount);
+				break;
+			default:
+				break;
+		}
+	}
 
-  return { changedOld, changedNew, movedOld, movedNew };
+	return { changedOld, changedNew, movedOld, movedNew };
 }
 
 function expandRangeLines(range: Range | undefined, maxLine: number) {
-  const bounds = resolveRangeLineBounds(range, maxLine);
-  if (!bounds) {
-    return [];
-  }
-  const { start, end } = bounds;
-  const lines: number[] = [];
-  for (let line = start; line <= end; line += 1) {
-    lines.push(line);
-  }
-  return lines;
+	const bounds = resolveRangeLineBounds(range, maxLine);
+	if (!bounds) {
+		return [];
+	}
+	const { start, end } = bounds;
+	const lines: number[] = [];
+	for (let line = start; line <= end; line += 1) {
+		lines.push(line);
+	}
+	return lines;
 }
 
 function buildMoveLineMap(
-  operations: readonly DiffOperation[],
-  oldLineCount: number,
-  newLineCount: number
+	operations: readonly DiffOperation[],
+	oldLineCount: number,
+	newLineCount: number,
 ) {
-  const oldToNew = new Map<number, number>();
-  const newToOld = new Map<number, number>();
-  for (const op of operations) {
-    if (op.type !== "move") {
-      continue;
-    }
-    const oldLines = expandRangeLines(op.oldRange, oldLineCount);
-    const newLines = expandRangeLines(op.newRange, newLineCount);
-    const total = Math.min(oldLines.length, newLines.length);
-    for (let idx = 0; idx < total; idx += 1) {
-      const oldLine = oldLines[idx];
-      const newLine = newLines[idx];
-      if (!(oldLine && newLine)) {
-        continue;
-      }
-      if (oldToNew.has(oldLine) || newToOld.has(newLine)) {
-        continue;
-      }
-      oldToNew.set(oldLine, newLine);
-      newToOld.set(newLine, oldLine);
-    }
-  }
-  return { oldToNew, newToOld };
+	const oldToNew = new Map<number, number>();
+	const newToOld = new Map<number, number>();
+	for (const op of operations) {
+		if (op.type !== "move") {
+			continue;
+		}
+		const oldLines = expandRangeLines(op.oldRange, oldLineCount);
+		const newLines = expandRangeLines(op.newRange, newLineCount);
+		const total = Math.min(oldLines.length, newLines.length);
+		for (let idx = 0; idx < total; idx += 1) {
+			const oldLine = oldLines[idx];
+			const newLine = newLines[idx];
+			if (!(oldLine && newLine)) {
+				continue;
+			}
+			if (oldToNew.has(oldLine) || newToOld.has(newLine)) {
+				continue;
+			}
+			oldToNew.set(oldLine, newLine);
+			newToOld.set(newLine, oldLine);
+		}
+	}
+	return { oldToNew, newToOld };
 }
 
 function moveContextKey(text: string, normalizeLine: (line: string) => string) {
-  const normalized = normalizeLine(text).trim();
-  return normalized || text.trim();
+	const normalized = normalizeLine(text).trim();
+	return normalized || text.trim();
 }
 
 function collectContextualMoveIds(operations: readonly DiffOperation[]) {
-  return new Set(
-    operations.flatMap((op) =>
-      op.type !== "move" && op.meta?.moveId ? [op.meta.moveId] : []
-    )
-  );
+	return new Set(
+		operations.flatMap((op) =>
+			op.type !== "move" && op.meta?.moveId ? [op.meta.moveId] : [],
+		),
+	);
 }
 
 function buildMoveContextLineBuckets(
-  range: Range,
-  lines: readonly string[],
-  normalizeLine: (line: string) => string
+	range: Range,
+	lines: readonly string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const buckets = new Map<string, number[]>();
-  for (const lineNumber of expandRangeLines(range, lines.length)) {
-    const key = moveContextKey(lines[lineNumber - 1] ?? "", normalizeLine);
-    if (!key) {
-      continue;
-    }
-    const existing = buckets.get(key);
-    if (existing) {
-      existing.push(lineNumber);
-    } else {
-      buckets.set(key, [lineNumber]);
-    }
-  }
-  return buckets;
+	const buckets = new Map<string, number[]>();
+	for (const lineNumber of expandRangeLines(range, lines.length)) {
+		const key = moveContextKey(lines[lineNumber - 1] ?? "", normalizeLine);
+		if (!key) {
+			continue;
+		}
+		const existing = buckets.get(key);
+		if (existing) {
+			existing.push(lineNumber);
+		} else {
+			buckets.set(key, [lineNumber]);
+		}
+	}
+	return buckets;
 }
 
 function pairContextualMoveOperation(
-  operation: DiffOperation,
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string,
-  oldToNew: Map<number, number>,
-  newToOld: Map<number, number>
+	operation: DiffOperation,
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
+	oldToNew: Map<number, number>,
+	newToOld: Map<number, number>,
 ) {
-  if (operation.type !== "move" || !operation.oldRange || !operation.newRange) {
-    return;
-  }
-  const newCandidatesByKey = buildMoveContextLineBuckets(
-    operation.newRange,
-    newLines,
-    normalizeLine
-  );
-  const usedNew = new Set<number>();
-  for (const oldLine of expandRangeLines(operation.oldRange, oldLines.length)) {
-    const key = moveContextKey(oldLines[oldLine - 1] ?? "", normalizeLine);
-    if (!key) {
-      continue;
-    }
-    const match = takeFirstAvailable(newCandidatesByKey.get(key), usedNew);
-    if (match == null || oldToNew.has(oldLine) || newToOld.has(match)) {
-      continue;
-    }
-    usedNew.add(match);
-    oldToNew.set(oldLine, match);
-    newToOld.set(match, oldLine);
-  }
+	if (operation.type !== "move" || !operation.oldRange || !operation.newRange) {
+		return;
+	}
+	const newCandidatesByKey = buildMoveContextLineBuckets(
+		operation.newRange,
+		newLines,
+		normalizeLine,
+	);
+	const usedNew = new Set<number>();
+	for (const oldLine of expandRangeLines(operation.oldRange, oldLines.length)) {
+		const key = moveContextKey(oldLines[oldLine - 1] ?? "", normalizeLine);
+		if (!key) {
+			continue;
+		}
+		const match = takeFirstAvailable(newCandidatesByKey.get(key), usedNew);
+		if (match == null || oldToNew.has(oldLine) || newToOld.has(match)) {
+			continue;
+		}
+		usedNew.add(match);
+		oldToNew.set(oldLine, match);
+		newToOld.set(match, oldLine);
+	}
 }
 
 function buildContextualMovePairs(
-  operations: readonly DiffOperation[],
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string
+	operations: readonly DiffOperation[],
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const contextualMoveIds = collectContextualMoveIds(operations);
-  const oldToNew = new Map<number, number>();
-  const newToOld = new Map<number, number>();
-  if (contextualMoveIds.size === 0) {
-    return { oldToNew, newToOld };
-  }
-  for (const operation of operations) {
-    if (operation.type !== "move" || !contextualMoveIds.has(operation.id)) {
-      continue;
-    }
-    pairContextualMoveOperation(
-      operation,
-      oldLines,
-      newLines,
-      normalizeLine,
-      oldToNew,
-      newToOld
-    );
-  }
-  return { oldToNew, newToOld };
+	const contextualMoveIds = collectContextualMoveIds(operations);
+	const oldToNew = new Map<number, number>();
+	const newToOld = new Map<number, number>();
+	if (contextualMoveIds.size === 0) {
+		return { oldToNew, newToOld };
+	}
+	for (const operation of operations) {
+		if (operation.type !== "move" || !contextualMoveIds.has(operation.id)) {
+			continue;
+		}
+		pairContextualMoveOperation(
+			operation,
+			oldLines,
+			newLines,
+			normalizeLine,
+			oldToNew,
+			newToOld,
+		);
+	}
+	return { oldToNew, newToOld };
 }
 
 interface MoveRowEntry {
-  row: LineRow;
-  index: number;
+	row: LineRow;
+	index: number;
 }
 
 function collectMoveRows(rows: LineRow[]) {
-  const oldMoves = new Map<number, MoveRowEntry>();
-  const newMoves = new Map<number, MoveRowEntry>();
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (!row || row.type !== "move") {
-      continue;
-    }
-    const hasOld = row.oldLine != null;
-    const hasNew = row.newLine != null;
-    if (hasOld && !hasNew) {
-      oldMoves.set(row.oldLine ?? 0, { row, index });
-      continue;
-    }
-    if (hasNew && !hasOld) {
-      newMoves.set(row.newLine ?? 0, { row, index });
-    }
-  }
-  return { oldMoves, newMoves };
+	const oldMoves = new Map<number, MoveRowEntry>();
+	const newMoves = new Map<number, MoveRowEntry>();
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (!row || row.type !== "move") {
+			continue;
+		}
+		const hasOld = row.oldLine != null;
+		const hasNew = row.newLine != null;
+		if (hasOld && !hasNew) {
+			oldMoves.set(row.oldLine ?? 0, { row, index });
+			continue;
+		}
+		if (hasNew && !hasOld) {
+			newMoves.set(row.newLine ?? 0, { row, index });
+		}
+	}
+	return { oldMoves, newMoves };
 }
 
 function buildMergedMoveRow(
-  oldLine: number,
-  newLine: number,
-  oldText: string,
-  newText: string,
-  normalizeLine: (line: string) => string
+	oldLine: number,
+	newLine: number,
+	oldText: string,
+	newText: string,
+	normalizeLine: (line: string) => string,
 ): LineRow {
-  if (normalizeLine(oldText) === normalizeLine(newText)) {
-    return { type: "equal", oldLine, newLine, text: oldText };
-  }
-  return { type: "move", oldLine, newLine, oldText, newText };
+	if (normalizeLine(oldText) === normalizeLine(newText)) {
+		return { type: "equal", oldLine, newLine, text: oldText };
+	}
+	return { type: "move", oldLine, newLine, oldText, newText };
 }
 
 function mergeMoveFromOld(
-  row: LineRow,
-  newMoves: Map<number, MoveRowEntry>,
-  oldToNew: Map<number, number>,
-  used: Set<number>,
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine: (line: string) => string
+	row: LineRow,
+	newMoves: Map<number, MoveRowEntry>,
+	oldToNew: Map<number, number>,
+	used: Set<number>,
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine: (line: string) => string,
 ): LineRow | null {
-  if (row.oldLine == null || row.newLine != null) {
-    return null;
-  }
-  const oldLine = row.oldLine;
-  const newLine = oldToNew.get(oldLine) ?? null;
-  if (!newLine) {
-    return null;
-  }
-  const match = newMoves.get(newLine) ?? null;
-  if (!match) {
-    return null;
-  }
-  used.add(match.index);
-  const oldText = oldLines[oldLine - 1] ?? row.oldText ?? row.text ?? "";
-  const newText =
-    newLines[newLine - 1] ?? match.row.newText ?? match.row.text ?? "";
-  return buildMergedMoveRow(oldLine, newLine, oldText, newText, normalizeLine);
+	if (row.oldLine == null || row.newLine != null) {
+		return null;
+	}
+	const oldLine = row.oldLine;
+	const newLine = oldToNew.get(oldLine) ?? null;
+	if (!newLine) {
+		return null;
+	}
+	const match = newMoves.get(newLine) ?? null;
+	if (!match) {
+		return null;
+	}
+	used.add(match.index);
+	const oldText = oldLines[oldLine - 1] ?? row.oldText ?? row.text ?? "";
+	const newText =
+		newLines[newLine - 1] ?? match.row.newText ?? match.row.text ?? "";
+	return buildMergedMoveRow(oldLine, newLine, oldText, newText, normalizeLine);
 }
 
 function mergeMoveFromNew(
-  row: LineRow,
-  oldMoves: Map<number, MoveRowEntry>,
-  newToOld: Map<number, number>,
-  used: Set<number>,
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine: (line: string) => string
+	row: LineRow,
+	oldMoves: Map<number, MoveRowEntry>,
+	newToOld: Map<number, number>,
+	used: Set<number>,
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine: (line: string) => string,
 ): LineRow | null {
-  if (row.newLine == null || row.oldLine != null) {
-    return null;
-  }
-  const newLine = row.newLine;
-  const oldLine = newToOld.get(newLine) ?? null;
-  if (!oldLine) {
-    return null;
-  }
-  const match = oldMoves.get(oldLine) ?? null;
-  if (!match) {
-    return null;
-  }
-  used.add(match.index);
-  const oldText =
-    oldLines[oldLine - 1] ?? match.row.oldText ?? match.row.text ?? "";
-  const newText = newLines[newLine - 1] ?? row.newText ?? row.text ?? "";
-  return buildMergedMoveRow(oldLine, newLine, oldText, newText, normalizeLine);
+	if (row.newLine == null || row.oldLine != null) {
+		return null;
+	}
+	const newLine = row.newLine;
+	const oldLine = newToOld.get(newLine) ?? null;
+	if (!oldLine) {
+		return null;
+	}
+	const match = oldMoves.get(oldLine) ?? null;
+	if (!match) {
+		return null;
+	}
+	used.add(match.index);
+	const oldText =
+		oldLines[oldLine - 1] ?? match.row.oldText ?? match.row.text ?? "";
+	const newText = newLines[newLine - 1] ?? row.newText ?? row.text ?? "";
+	return buildMergedMoveRow(oldLine, newLine, oldText, newText, normalizeLine);
 }
 
 function collapseMoveRows(
-  rows: LineRow[],
-  operations: readonly DiffOperation[],
-  oldLines: string[],
-  newLines: string[],
-  normalizeLine?: (line: string) => string
+	rows: LineRow[],
+	operations: readonly DiffOperation[],
+	oldLines: string[],
+	newLines: string[],
+	normalizeLine?: (line: string) => string,
 ) {
-  if (!normalizeLine || rows.length === 0) {
-    return rows;
-  }
-  const { oldToNew, newToOld } = buildMoveLineMap(
-    operations,
-    oldLines.length,
-    newLines.length
-  );
-  if (oldToNew.size === 0) {
-    return rows;
-  }
+	if (!normalizeLine || rows.length === 0) {
+		return rows;
+	}
+	const { oldToNew, newToOld } = buildMoveLineMap(
+		operations,
+		oldLines.length,
+		newLines.length,
+	);
+	if (oldToNew.size === 0) {
+		return rows;
+	}
 
-  const { oldMoves, newMoves } = collectMoveRows(rows);
-  if (oldMoves.size === 0 && newMoves.size === 0) {
-    return rows;
-  }
+	const { oldMoves, newMoves } = collectMoveRows(rows);
+	if (oldMoves.size === 0 && newMoves.size === 0) {
+		return rows;
+	}
 
-  const used = new Set<number>();
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    if (used.has(index)) {
-      continue;
-    }
-    const row = rows[index];
-    if (!row) {
-      continue;
-    }
-    if (row.type !== "move") {
-      output.push(row);
-      continue;
-    }
-    const merged =
-      mergeMoveFromOld(
-        row,
-        newMoves,
-        oldToNew,
-        used,
-        oldLines,
-        newLines,
-        normalizeLine
-      ) ??
-      mergeMoveFromNew(
-        row,
-        oldMoves,
-        newToOld,
-        used,
-        oldLines,
-        newLines,
-        normalizeLine
-      );
-    output.push(merged ?? row);
-  }
-  return output;
+	const used = new Set<number>();
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		if (used.has(index)) {
+			continue;
+		}
+		const row = rows[index];
+		if (!row) {
+			continue;
+		}
+		if (row.type !== "move") {
+			output.push(row);
+			continue;
+		}
+		const merged =
+			mergeMoveFromOld(
+				row,
+				newMoves,
+				oldToNew,
+				used,
+				oldLines,
+				newLines,
+				normalizeLine,
+			) ??
+			mergeMoveFromNew(
+				row,
+				oldMoves,
+				newToOld,
+				used,
+				oldLines,
+				newLines,
+				normalizeLine,
+			);
+		output.push(merged ?? row);
+	}
+	return output;
 }
 
 function movePairKey(oldLine: number, newLine: number) {
-  return `${oldLine}:${newLine}`;
+	return `${oldLine}:${newLine}`;
 }
 
 function buildPromotedMoveRow(
-  oldLine: number,
-  newLine: number,
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string
+	oldLine: number,
+	newLine: number,
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
 ): LineRow | null {
-  const oldText = oldLines[oldLine - 1] ?? "";
-  const newText = newLines[newLine - 1] ?? "";
-  const oldKey = moveContextKey(oldText, normalizeLine);
-  const newKey = moveContextKey(newText, normalizeLine);
-  if (!(oldKey && newKey)) {
-    return null;
-  }
-  if (oldKey !== newKey) {
-    return null;
-  }
-  return {
-    type: "move",
-    oldLine,
-    newLine,
-    oldText,
-    newText,
-  };
+	const oldText = oldLines[oldLine - 1] ?? "";
+	const newText = newLines[newLine - 1] ?? "";
+	const oldKey = moveContextKey(oldText, normalizeLine);
+	const newKey = moveContextKey(newText, normalizeLine);
+	if (!(oldKey && newKey)) {
+		return null;
+	}
+	if (oldKey !== newKey) {
+		return null;
+	}
+	return {
+		type: "move",
+		oldLine,
+		newLine,
+		oldText,
+		newText,
+	};
 }
 
 interface MoveRowPair {
-  oldLine: number;
-  newLine: number;
+	oldLine: number;
+	newLine: number;
 }
 
 function resolveDirectMovePair(
-  row: LineRow,
-  oldToNew: ReadonlyMap<number, number>,
-  newToOld: ReadonlyMap<number, number>
+	row: LineRow,
+	oldToNew: ReadonlyMap<number, number>,
+	newToOld: ReadonlyMap<number, number>,
 ) {
-  if (row.oldLine == null || row.newLine == null) {
-    return null;
-  }
-  if (
-    oldToNew.get(row.oldLine) !== row.newLine ||
-    newToOld.get(row.newLine) !== row.oldLine
-  ) {
-    return null;
-  }
-  return { oldLine: row.oldLine, newLine: row.newLine } satisfies MoveRowPair;
+	if (row.oldLine == null || row.newLine == null) {
+		return null;
+	}
+	if (
+		oldToNew.get(row.oldLine) !== row.newLine ||
+		newToOld.get(row.newLine) !== row.oldLine
+	) {
+		return null;
+	}
+	return { oldLine: row.oldLine, newLine: row.newLine } satisfies MoveRowPair;
 }
 
 function resolveSupplementalMovePair(
-  row: LineRow,
-  oldToNew: ReadonlyMap<number, number>,
-  newToOld: ReadonlyMap<number, number>
+	row: LineRow,
+	oldToNew: ReadonlyMap<number, number>,
+	newToOld: ReadonlyMap<number, number>,
 ) {
-  if (row.type === "delete" && row.oldLine != null) {
-    const newLine = oldToNew.get(row.oldLine);
-    return newLine == null ? null : { oldLine: row.oldLine, newLine };
-  }
-  if (row.type === "insert" && row.newLine != null) {
-    const oldLine = newToOld.get(row.newLine);
-    return oldLine == null ? null : { oldLine, newLine: row.newLine };
-  }
-  return null;
+	if (row.type === "delete" && row.oldLine != null) {
+		const newLine = oldToNew.get(row.oldLine);
+		return newLine == null ? null : { oldLine: row.oldLine, newLine };
+	}
+	if (row.type === "insert" && row.newLine != null) {
+		const oldLine = newToOld.get(row.newLine);
+		return oldLine == null ? null : { oldLine, newLine: row.newLine };
+	}
+	return null;
 }
 
 function resolveMoveRowPair(
-  row: LineRow,
-  oldToNew: ReadonlyMap<number, number>,
-  newToOld: ReadonlyMap<number, number>
+	row: LineRow,
+	oldToNew: ReadonlyMap<number, number>,
+	newToOld: ReadonlyMap<number, number>,
 ) {
-  return (
-    resolveDirectMovePair(row, oldToNew, newToOld) ??
-    resolveSupplementalMovePair(row, oldToNew, newToOld)
-  );
+	return (
+		resolveDirectMovePair(row, oldToNew, newToOld) ??
+		resolveSupplementalMovePair(row, oldToNew, newToOld)
+	);
 }
 
 function appendFollowingPromotedMoveRows(
-  output: LineRow[],
-  pair: MoveRowPair | null,
-  row: LineRow,
-  oldToNew: ReadonlyMap<number, number>,
-  promotedPairs: Set<string>,
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string
+	output: LineRow[],
+	pair: MoveRowPair | null,
+	row: LineRow,
+	oldToNew: ReadonlyMap<number, number>,
+	promotedPairs: Set<string>,
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
 ) {
-  if (!pair || row.newLine == null) {
-    return;
-  }
-  let oldLine = pair.oldLine + 1;
-  let newLine = pair.newLine + 1;
-  while (oldToNew.get(oldLine) === newLine) {
-    const pairKey = movePairKey(oldLine, newLine);
-    if (promotedPairs.has(pairKey)) {
-      oldLine += 1;
-      newLine += 1;
-      continue;
-    }
-    const promoted = buildPromotedMoveRow(
-      oldLine,
-      newLine,
-      oldLines,
-      newLines,
-      normalizeLine
-    );
-    if (!promoted) {
-      break;
-    }
-    promotedPairs.add(pairKey);
-    output.push(promoted);
-    oldLine += 1;
-    newLine += 1;
-  }
+	if (!pair || row.newLine == null) {
+		return;
+	}
+	let oldLine = pair.oldLine + 1;
+	let newLine = pair.newLine + 1;
+	while (oldToNew.get(oldLine) === newLine) {
+		const pairKey = movePairKey(oldLine, newLine);
+		if (promotedPairs.has(pairKey)) {
+			oldLine += 1;
+			newLine += 1;
+			continue;
+		}
+		const promoted = buildPromotedMoveRow(
+			oldLine,
+			newLine,
+			oldLines,
+			newLines,
+			normalizeLine,
+		);
+		if (!promoted) {
+			break;
+		}
+		promotedPairs.add(pairKey);
+		output.push(promoted);
+		oldLine += 1;
+		newLine += 1;
+	}
 }
 
 function appendMoveContextRow(
-  output: LineRow[],
-  row: LineRow,
-  pair: MoveRowPair,
-  promotedPairs: Set<string>,
-  oldToNew: ReadonlyMap<number, number>,
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string
+	output: LineRow[],
+	row: LineRow,
+	pair: MoveRowPair,
+	promotedPairs: Set<string>,
+	oldToNew: ReadonlyMap<number, number>,
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
 ) {
-  const pairKey = movePairKey(pair.oldLine, pair.newLine);
-  if (promotedPairs.has(pairKey)) {
-    return;
-  }
-  const promoted = buildPromotedMoveRow(
-    pair.oldLine,
-    pair.newLine,
-    oldLines,
-    newLines,
-    normalizeLine
-  );
-  if (promoted) {
-    promotedPairs.add(pairKey);
-    output.push(promoted);
-  } else {
-    output.push(row);
-  }
-  appendFollowingPromotedMoveRows(
-    output,
-    pair,
-    row,
-    oldToNew,
-    promotedPairs,
-    oldLines,
-    newLines,
-    normalizeLine
-  );
+	const pairKey = movePairKey(pair.oldLine, pair.newLine);
+	if (promotedPairs.has(pairKey)) {
+		return;
+	}
+	const promoted = buildPromotedMoveRow(
+		pair.oldLine,
+		pair.newLine,
+		oldLines,
+		newLines,
+		normalizeLine,
+	);
+	if (promoted) {
+		promotedPairs.add(pairKey);
+		output.push(promoted);
+	} else {
+		output.push(row);
+	}
+	appendFollowingPromotedMoveRows(
+		output,
+		pair,
+		row,
+		oldToNew,
+		promotedPairs,
+		oldLines,
+		newLines,
+		normalizeLine,
+	);
 }
 
 function insertMissingPromotedMoveRows(
-  output: LineRow[],
-  oldToNew: ReadonlyMap<number, number>,
-  promotedPairs: Set<string>,
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string
+	output: LineRow[],
+	oldToNew: ReadonlyMap<number, number>,
+	promotedPairs: Set<string>,
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
 ) {
-  for (const [oldLine, newLine] of [...oldToNew.entries()].sort(
-    (left, right) => left[1] - right[1] || left[0] - right[0]
-  )) {
-    const pairKey = movePairKey(oldLine, newLine);
-    if (promotedPairs.has(pairKey)) {
-      continue;
-    }
-    const promoted = buildPromotedMoveRow(
-      oldLine,
-      newLine,
-      oldLines,
-      newLines,
-      normalizeLine
-    );
-    if (!promoted) {
-      continue;
-    }
-    let insertAt = 0;
-    for (let index = 0; index < output.length; index += 1) {
-      const row = output[index];
-      if (!row || row.type === "gap" || row.type === "hunk") {
-        continue;
-      }
-      if (
-        (row.newLine != null && row.newLine <= newLine) ||
-        (row.oldLine != null && row.oldLine <= oldLine)
-      ) {
-        insertAt = index + 1;
-      }
-    }
-    promotedPairs.add(pairKey);
-    output.splice(insertAt, 0, promoted);
-  }
+	for (const [oldLine, newLine] of [...oldToNew.entries()].sort(
+		(left, right) => left[1] - right[1] || left[0] - right[0],
+	)) {
+		const pairKey = movePairKey(oldLine, newLine);
+		if (promotedPairs.has(pairKey)) {
+			continue;
+		}
+		const promoted = buildPromotedMoveRow(
+			oldLine,
+			newLine,
+			oldLines,
+			newLines,
+			normalizeLine,
+		);
+		if (!promoted) {
+			continue;
+		}
+		let insertAt = 0;
+		for (let index = 0; index < output.length; index += 1) {
+			const row = output[index];
+			if (!row || row.type === "gap" || row.type === "hunk") {
+				continue;
+			}
+			if (
+				(row.newLine != null && row.newLine <= newLine) ||
+				(row.oldLine != null && row.oldLine <= oldLine)
+			) {
+				insertAt = index + 1;
+			}
+		}
+		promotedPairs.add(pairKey);
+		output.splice(insertAt, 0, promoted);
+	}
 }
 
 function promoteMoveContextRows(
-  rows: LineRow[],
-  operations: readonly DiffOperation[],
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine?: (line: string) => string
+	rows: LineRow[],
+	operations: readonly DiffOperation[],
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine?: (line: string) => string,
 ) {
-  if (!normalizeLine || rows.length === 0) {
-    return rows;
-  }
-  const { oldToNew, newToOld } = buildContextualMovePairs(
-    operations,
-    oldLines,
-    newLines,
-    normalizeLine
-  );
-  if (oldToNew.size === 0) {
-    return rows;
-  }
+	if (!normalizeLine || rows.length === 0) {
+		return rows;
+	}
+	const { oldToNew, newToOld } = buildContextualMovePairs(
+		operations,
+		oldLines,
+		newLines,
+		normalizeLine,
+	);
+	if (oldToNew.size === 0) {
+		return rows;
+	}
 
-  const promotedPairs = new Set<string>();
-  const output: LineRow[] = [];
+	const promotedPairs = new Set<string>();
+	const output: LineRow[] = [];
 
-  for (const row of rows) {
-    if (row.type === "gap" || row.type === "hunk") {
-      output.push(row);
-      continue;
-    }
-    const pair = resolveMoveRowPair(row, oldToNew, newToOld);
-    if (!pair) {
-      output.push(row);
-      continue;
-    }
-    appendMoveContextRow(
-      output,
-      row,
-      pair,
-      promotedPairs,
-      oldToNew,
-      oldLines,
-      newLines,
-      normalizeLine
-    );
-  }
+	for (const row of rows) {
+		if (row.type === "gap" || row.type === "hunk") {
+			output.push(row);
+			continue;
+		}
+		const pair = resolveMoveRowPair(row, oldToNew, newToOld);
+		if (!pair) {
+			output.push(row);
+			continue;
+		}
+		appendMoveContextRow(
+			output,
+			row,
+			pair,
+			promotedPairs,
+			oldToNew,
+			oldLines,
+			newLines,
+			normalizeLine,
+		);
+	}
 
-  insertMissingPromotedMoveRows(
-    output,
-    oldToNew,
-    promotedPairs,
-    oldLines,
-    newLines,
-    normalizeLine
-  );
+	insertMissingPromotedMoveRows(
+		output,
+		oldToNew,
+		promotedPairs,
+		oldLines,
+		newLines,
+		normalizeLine,
+	);
 
-  return output;
+	return output;
 }
 
 function toEqualRow(row: LineRow): LineRow {
-  return {
-    type: "equal",
-    oldLine: row.oldLine ?? null,
-    newLine: row.newLine ?? null,
-    text: rowText(row),
-  };
+	return {
+		type: "equal",
+		oldLine: row.oldLine ?? null,
+		newLine: row.newLine ?? null,
+		text: rowText(row),
+	};
 }
 
 function toInsertRow(row: LineRow): LineRow {
-  return {
-    type: "insert",
-    oldLine: null,
-    newLine: row.newLine ?? null,
-    text: rowNewText(row),
-  };
+	return {
+		type: "insert",
+		oldLine: null,
+		newLine: row.newLine ?? null,
+		text: rowNewText(row),
+	};
 }
 
 function toDeleteRow(row: LineRow): LineRow {
-  return {
-    type: "delete",
-    oldLine: row.oldLine ?? null,
-    newLine: null,
-    text: rowOldText(row),
-  };
+	return {
+		type: "delete",
+		oldLine: row.oldLine ?? null,
+		newLine: null,
+		text: rowOldText(row),
+	};
 }
 
 function toReplaceRow(row: LineRow): LineRow {
-  return {
-    type: "replace",
-    oldLine: row.oldLine ?? null,
-    newLine: row.newLine ?? null,
-    oldText: rowOldText(row),
-    newText: rowNewText(row),
-  };
+	return {
+		type: "replace",
+		oldLine: row.oldLine ?? null,
+		newLine: row.newLine ?? null,
+		oldText: rowOldText(row),
+		newText: rowNewText(row),
+	};
 }
 
 function toMoveRow(
-  row: LineRow,
-  includeOld: boolean,
-  includeNew: boolean
+	row: LineRow,
+	includeOld: boolean,
+	includeNew: boolean,
 ): LineRow {
-  const oldLine = includeOld ? (row.oldLine ?? null) : null;
-  const newLine = includeNew ? (row.newLine ?? null) : null;
-  const oldText = includeOld ? rowOldText(row) : undefined;
-  const newText = includeNew ? rowNewText(row) : undefined;
-  const output: LineRow = {
-    type: "move",
-    oldLine,
-    newLine,
-  };
-  if (oldText !== undefined) {
-    output.oldText = oldText;
-  }
-  if (newText !== undefined) {
-    output.newText = newText;
-  }
-  return output;
+	const oldLine = includeOld ? (row.oldLine ?? null) : null;
+	const newLine = includeNew ? (row.newLine ?? null) : null;
+	const oldText = includeOld ? rowOldText(row) : undefined;
+	const newText = includeNew ? rowNewText(row) : undefined;
+	const output: LineRow = {
+		type: "move",
+		oldLine,
+		newLine,
+	};
+	if (oldText !== undefined) {
+		output.oldText = oldText;
+	}
+	if (newText !== undefined) {
+		output.newText = newText;
+	}
+	return output;
 }
 
 function applyLineOperationToRow(
-  row: LineRow,
-  marks: ReturnType<typeof buildLineMarkSets>,
-  normalizeLine?: (line: string) => string
+	row: LineRow,
+	marks: ReturnType<typeof buildLineMarkSets>,
+	normalizeLine?: (line: string) => string,
 ) {
-  if (row.type === "gap" || row.type === "hunk") {
-    return row;
-  }
-  const oldLine = row.oldLine ?? null;
-  const newLine = row.newLine ?? null;
-  const oldChanged = oldLine !== null && marks.changedOld.has(oldLine);
-  const newChanged = newLine !== null && marks.changedNew.has(newLine);
-  const oldMoved = oldLine !== null && marks.movedOld.has(oldLine);
-  const newMoved = newLine !== null && marks.movedNew.has(newLine);
+	if (row.type === "gap" || row.type === "hunk") {
+		return row;
+	}
+	const oldLine = row.oldLine ?? null;
+	const newLine = row.newLine ?? null;
+	const oldChanged = oldLine !== null && marks.changedOld.has(oldLine);
+	const newChanged = newLine !== null && marks.changedNew.has(newLine);
+	const oldMoved = oldLine !== null && marks.movedOld.has(oldLine);
+	const newMoved = newLine !== null && marks.movedNew.has(newLine);
 
-  if (row.type !== "equal") {
-    return row;
-  }
+	if (row.type !== "equal") {
+		return row;
+	}
 
-  if (normalizeLine) {
-    const hasBothLines = row.oldLine != null && row.newLine != null;
-    const oldText = rowOldText(row);
-    const newText = rowNewText(row);
-    if (
-      hasBothLines &&
-      oldText !== undefined &&
-      newText !== undefined &&
-      normalizeLine(oldText) === normalizeLine(newText)
-    ) {
-      return toEqualRow(row);
-    }
-  }
+	if (normalizeLine) {
+		const hasBothLines = row.oldLine != null && row.newLine != null;
+		const oldText = rowOldText(row);
+		const newText = rowNewText(row);
+		if (
+			hasBothLines &&
+			oldText !== undefined &&
+			newText !== undefined &&
+			normalizeLine(oldText) === normalizeLine(newText)
+		) {
+			return toEqualRow(row);
+		}
+	}
 
-  if (oldChanged && newChanged) {
-    return toReplaceRow(row);
-  }
-  if (oldChanged) {
-    return toDeleteRow(row);
-  }
-  if (newChanged) {
-    return toInsertRow(row);
-  }
+	if (oldChanged && newChanged) {
+		return toReplaceRow(row);
+	}
+	if (oldChanged) {
+		return toDeleteRow(row);
+	}
+	if (newChanged) {
+		return toInsertRow(row);
+	}
 
-  if (oldMoved || newMoved) {
-    return toMoveRow(row, oldMoved, newMoved);
-  }
+	if (oldMoved || newMoved) {
+		return toMoveRow(row, oldMoved, newMoved);
+	}
 
-  return toEqualRow(row);
+	return toEqualRow(row);
 }
 
 function applyLineOperations(
-  rows: LineRow[],
-  operations: readonly DiffOperation[],
-  oldLineCount: number,
-  newLineCount: number,
-  options: {
-    normalizeLine?: ((line: string) => string) | undefined;
-    useKeyMatching?: boolean | undefined;
-    useYamlComparable?: boolean | undefined;
-  } = {}
+	rows: LineRow[],
+	operations: readonly DiffOperation[],
+	oldLineCount: number,
+	newLineCount: number,
+	options: {
+		normalizeLine?: ((line: string) => string) | undefined;
+		useKeyMatching?: boolean | undefined;
+		useYamlComparable?: boolean | undefined;
+	} = {},
 ): LineRow[] {
-  if (operations.length === 0) {
-    return rows;
-  }
+	if (operations.length === 0) {
+		return rows;
+	}
 
-  const marks = buildLineMarkSets(
-    operations,
-    oldLineCount,
-    newLineCount,
-    options
-  );
+	const marks = buildLineMarkSets(
+		operations,
+		oldLineCount,
+		newLineCount,
+		options,
+	);
 
-  return rows.map((row) =>
-    applyLineOperationToRow(row, marks, options.normalizeLine)
-  );
+	return rows.map((row) =>
+		applyLineOperationToRow(row, marks, options.normalizeLine),
+	);
 }
 
 function applyLineContext(rows: LineRow[], contextLines: number): LineRow[] {
-  if (contextLines < 0) {
-    return addHunks(rows);
-  }
+	if (contextLines < 0) {
+		return addHunks(rows);
+	}
 
-  const changeIndices = rows
-    .map((row, index) =>
-      row.type === "equal" || row.type === "gap" || row.type === "hunk"
-        ? null
-        : index
-    )
-    .filter((value): value is number => value !== null);
+	const changeIndices = rows
+		.map((row, index) =>
+			row.type === "equal" || row.type === "gap" || row.type === "hunk"
+				? null
+				: index,
+		)
+		.filter((value): value is number => value !== null);
 
-  if (changeIndices.length === 0) {
-    return rows;
-  }
+	if (changeIndices.length === 0) {
+		return rows;
+	}
 
-  const visible = new Array(rows.length).fill(false);
-  for (const index of changeIndices) {
-    const start = Math.max(0, index - contextLines);
-    const end = Math.min(rows.length - 1, index + contextLines);
-    for (let i = start; i <= end; i += 1) {
-      visible[i] = true;
-    }
-  }
+	const visible = new Array(rows.length).fill(false);
+	for (const index of changeIndices) {
+		const start = Math.max(0, index - contextLines);
+		const end = Math.min(rows.length - 1, index + contextLines);
+		for (let i = start; i <= end; i += 1) {
+			visible[i] = true;
+		}
+	}
 
-  const output: LineRow[] = [];
-  let hiddenCount = 0;
-  for (let i = 0; i < rows.length; i += 1) {
-    if (visible[i]) {
-      if (hiddenCount > 0) {
-        output.push({ type: "gap", hidden: hiddenCount });
-        hiddenCount = 0;
-      }
-      const row = rows[i];
-      if (row) {
-        output.push(row);
-      }
-      continue;
-    }
-    if (rows[i]?.type === "equal") {
-      hiddenCount += 1;
-    }
-  }
-  if (hiddenCount > 0) {
-    output.push({ type: "gap", hidden: hiddenCount });
-  }
-  return addHunks(output);
+	const output: LineRow[] = [];
+	let hiddenCount = 0;
+	for (let i = 0; i < rows.length; i += 1) {
+		if (visible[i]) {
+			if (hiddenCount > 0) {
+				output.push({ type: "gap", hidden: hiddenCount });
+				hiddenCount = 0;
+			}
+			const row = rows[i];
+			if (row) {
+				output.push(row);
+			}
+			continue;
+		}
+		if (rows[i]?.type === "equal") {
+			hiddenCount += 1;
+		}
+	}
+	if (hiddenCount > 0) {
+		output.push({ type: "gap", hidden: hiddenCount });
+	}
+	return addHunks(output);
 }
 
 function buildLineRows(
-  oldText: string,
-  newText: string,
-  contextLines: number,
-  lineLayout: "split" | "unified",
-  normalizeLine?: (line: string) => string,
-  operations: readonly DiffOperation[] = [],
-  useKeyMatching?: boolean,
-  useYamlComparable?: boolean,
-  applyOperations = true,
-  applySuppression = true
+	oldText: string,
+	newText: string,
+	contextLines: number,
+	lineLayout: "split" | "unified",
+	normalizeLine?: (line: string) => string,
+	operations: readonly DiffOperation[] = [],
+	useKeyMatching?: boolean,
+	useYamlComparable?: boolean,
+	applyOperations = true,
+	applySuppression = true,
 ): LineRow[] {
-  const oldLines = splitLines(oldText);
-  const newLines = splitLines(newText);
-  let rows = buildRawLineRows(
-    oldLines,
-    newLines,
-    lineLayout,
-    normalizeLine,
-    useKeyMatching,
-    useYamlComparable
-  );
-  if (!useYamlComparable) {
-    rows = pairIdenticalLineMoves(
-      rows,
-      normalizeLine ?? ((line: string) => line)
-    );
-  }
-  if (applyOperations) {
-    rows = applyLineOperations(
-      rows,
-      operations,
-      oldLines.length,
-      newLines.length,
-      {
-        normalizeLine,
-        useKeyMatching,
-        useYamlComparable,
-      }
-    );
-    rows = collapseMoveRows(
-      rows,
-      operations,
-      oldLines,
-      newLines,
-      normalizeLine
-    );
-    rows = promoteMoveContextRows(
-      rows,
-      operations,
-      oldLines,
-      newLines,
-      normalizeLine
-    );
-    if (applySuppression) {
-      rows = applySemanticRowSuppressions(
-        rows,
-        oldLines,
-        newLines,
-        normalizeLine,
-        useYamlComparable,
-        useKeyMatching
-      );
-    }
-  }
-  return applyLineContext(rows, contextLines);
+	const oldLines = splitLines(oldText);
+	const newLines = splitLines(newText);
+	let rows = buildRawLineRows(
+		oldLines,
+		newLines,
+		lineLayout,
+		normalizeLine,
+		useKeyMatching,
+		useYamlComparable,
+	);
+	if (!useYamlComparable) {
+		rows = pairIdenticalLineMoves(
+			rows,
+			normalizeLine ?? ((line: string) => line),
+		);
+	}
+	if (applyOperations) {
+		rows = applyLineOperations(
+			rows,
+			operations,
+			oldLines.length,
+			newLines.length,
+			{
+				normalizeLine,
+				useKeyMatching,
+				useYamlComparable,
+			},
+		);
+		rows = collapseMoveRows(
+			rows,
+			operations,
+			oldLines,
+			newLines,
+			normalizeLine,
+		);
+		rows = promoteMoveContextRows(
+			rows,
+			operations,
+			oldLines,
+			newLines,
+			normalizeLine,
+		);
+		if (applySuppression) {
+			rows = applySemanticRowSuppressions(
+				rows,
+				oldLines,
+				newLines,
+				normalizeLine,
+				useYamlComparable,
+				useKeyMatching,
+			);
+		}
+	}
+	return applyLineContext(rows, contextLines);
 }
 
 function offsetLineRow(
-  row: LineRow,
-  oldLineOffset: number,
-  newLineOffset: number
+	row: LineRow,
+	oldLineOffset: number,
+	newLineOffset: number,
 ): LineRow {
-  const oldLine =
-    row.oldLine == null ? row.oldLine : row.oldLine + oldLineOffset;
-  const newLine =
-    row.newLine == null ? row.newLine : row.newLine + newLineOffset;
-  return {
-    ...row,
-    ...(oldLine !== undefined ? { oldLine } : {}),
-    ...(newLine !== undefined ? { newLine } : {}),
-  };
+	const oldLine =
+		row.oldLine == null ? row.oldLine : row.oldLine + oldLineOffset;
+	const newLine =
+		row.newLine == null ? row.newLine : row.newLine + newLineOffset;
+	return {
+		...row,
+		...(oldLine !== undefined ? { oldLine } : {}),
+		...(newLine !== undefined ? { newLine } : {}),
+	};
 }
 
 function resolveAnchoredStartLines(
-  operation: DiffOperation,
-  oldCursor: number,
-  newCursor: number
+	operation: DiffOperation,
+	oldCursor: number,
+	newCursor: number,
 ) {
-  const oldStart = operation.oldRange?.start.line;
-  const newStart = operation.newRange?.start.line;
-  if (oldStart != null && newStart != null) {
-    return { oldStart, newStart };
-  }
-  if (oldStart != null) {
-    return {
-      oldStart,
-      newStart: newCursor + (oldStart - oldCursor),
-    };
-  }
-  if (newStart != null) {
-    return {
-      oldStart: oldCursor + (newStart - newCursor),
-      newStart,
-    };
-  }
-  return { oldStart: oldCursor, newStart: newCursor };
+	const oldStart = operation.oldRange?.start.line;
+	const newStart = operation.newRange?.start.line;
+	if (oldStart != null && newStart != null) {
+		return { oldStart, newStart };
+	}
+	if (oldStart != null) {
+		return {
+			oldStart,
+			newStart: newCursor + (oldStart - oldCursor),
+		};
+	}
+	if (newStart != null) {
+		return {
+			oldStart: oldCursor + (newStart - newCursor),
+			newStart,
+		};
+	}
+	return { oldStart: oldCursor, newStart: newCursor };
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: operation-anchored rendering is easiest to audit inline.
 function buildOperationAnchoredRows(
-  oldText: string,
-  newText: string,
-  contextLines: number,
-  lineLayout: "split" | "unified",
-  normalizeLine: (line: string) => string,
-  operations: readonly DiffOperation[],
-  useKeyMatching?: boolean,
-  useYamlComparable?: boolean
+	oldText: string,
+	newText: string,
+	contextLines: number,
+	lineLayout: "split" | "unified",
+	normalizeLine: (line: string) => string,
+	operations: readonly DiffOperation[],
+	useKeyMatching?: boolean,
+	useYamlComparable?: boolean,
 ) {
-  if (
-    operations.length === 0 ||
-    operations.some((op) => op.type === "move" || Boolean(op.meta?.moveId))
-  ) {
-    return null;
-  }
+	if (
+		operations.length === 0 ||
+		operations.some((op) => op.type === "move" || Boolean(op.meta?.moveId))
+	) {
+		return null;
+	}
 
-  const oldLines = splitLines(oldText);
-  const newLines = splitLines(newText);
-  const rows: LineRow[] = [];
-  let oldCursor = 1;
-  let newCursor = 1;
+	const oldLines = splitLines(oldText);
+	const newLines = splitLines(newText);
+	const rows: LineRow[] = [];
+	let oldCursor = 1;
+	let newCursor = 1;
 
-  const appendOperationPrefix = (oldStart: number, newStart: number) => {
-    while (oldCursor < oldStart && newCursor < newStart) {
-      rows.push({
-        type: "equal",
-        oldLine: oldCursor,
-        newLine: newCursor,
-        text: oldLines[oldCursor - 1] ?? newLines[newCursor - 1] ?? "",
-      });
-      oldCursor += 1;
-      newCursor += 1;
-    }
-    while (oldCursor < oldStart) {
-      rows.push({
-        type: "delete",
-        oldLine: oldCursor,
-        newLine: null,
-        text: oldLines[oldCursor - 1] ?? "",
-      });
-      oldCursor += 1;
-    }
-    while (newCursor < newStart) {
-      rows.push({
-        type: "insert",
-        oldLine: null,
-        newLine: newCursor,
-        text: newLines[newCursor - 1] ?? "",
-      });
-      newCursor += 1;
-    }
-    return oldCursor === oldStart && newCursor === newStart;
-  };
+	const appendOperationPrefix = (oldStart: number, newStart: number) => {
+		while (oldCursor < oldStart && newCursor < newStart) {
+			rows.push({
+				type: "equal",
+				oldLine: oldCursor,
+				newLine: newCursor,
+				text: oldLines[oldCursor - 1] ?? newLines[newCursor - 1] ?? "",
+			});
+			oldCursor += 1;
+			newCursor += 1;
+		}
+		while (oldCursor < oldStart) {
+			rows.push({
+				type: "delete",
+				oldLine: oldCursor,
+				newLine: null,
+				text: oldLines[oldCursor - 1] ?? "",
+			});
+			oldCursor += 1;
+		}
+		while (newCursor < newStart) {
+			rows.push({
+				type: "insert",
+				oldLine: null,
+				newLine: newCursor,
+				text: newLines[newCursor - 1] ?? "",
+			});
+			newCursor += 1;
+		}
+		return oldCursor === oldStart && newCursor === newStart;
+	};
 
-  for (const operation of operations) {
-    const { oldStart, newStart } = resolveAnchoredStartLines(
-      operation,
-      oldCursor,
-      newCursor
-    );
-    if (!appendOperationPrefix(oldStart, newStart)) {
-      return null;
-    }
+	for (const operation of operations) {
+		const { oldStart, newStart } = resolveAnchoredStartLines(
+			operation,
+			oldCursor,
+			newCursor,
+		);
+		if (!appendOperationPrefix(oldStart, newStart)) {
+			return null;
+		}
 
-    switch (operation.type) {
-      case "insert": {
-        if (operation.newText === undefined) {
-          return null;
-        }
-        for (const line of splitLines(operation.newText)) {
-          rows.push({
-            type: "insert",
-            oldLine: null,
-            newLine: newCursor,
-            text: line,
-          });
-          newCursor += 1;
-        }
-        break;
-      }
-      case "delete": {
-        if (operation.oldText === undefined) {
-          return null;
-        }
-        for (const line of splitLines(operation.oldText)) {
-          rows.push({
-            type: "delete",
-            oldLine: oldCursor,
-            newLine: null,
-            text: line,
-          });
-          oldCursor += 1;
-        }
-        break;
-      }
-      case "update": {
-        if (
-          operation.oldText === undefined ||
-          operation.newText === undefined
-        ) {
-          return null;
-        }
-        const opOldLines = splitLines(operation.oldText);
-        const opNewLines = splitLines(operation.newText);
-        let localRows = buildRawLineRows(
-          opOldLines,
-          opNewLines,
-          lineLayout,
-          normalizeLine,
-          useKeyMatching,
-          useYamlComparable
-        );
-        if (!useYamlComparable) {
-          localRows = pairIdenticalLineMoves(localRows, normalizeLine);
-        }
-        localRows = applySemanticRowSuppressions(
-          localRows,
-          opOldLines,
-          opNewLines,
-          normalizeLine,
-          useYamlComparable,
-          useKeyMatching
-        );
-        rows.push(
-          ...localRows.map((row) =>
-            offsetLineRow(row, oldCursor - 1, newCursor - 1)
-          )
-        );
-        oldCursor += opOldLines.length;
-        newCursor += opNewLines.length;
-        break;
-      }
-      default:
-        return null;
-    }
-  }
+		switch (operation.type) {
+			case "insert": {
+				if (operation.newText === undefined) {
+					return null;
+				}
+				for (const line of splitLines(operation.newText)) {
+					rows.push({
+						type: "insert",
+						oldLine: null,
+						newLine: newCursor,
+						text: line,
+					});
+					newCursor += 1;
+				}
+				break;
+			}
+			case "delete": {
+				if (operation.oldText === undefined) {
+					return null;
+				}
+				for (const line of splitLines(operation.oldText)) {
+					rows.push({
+						type: "delete",
+						oldLine: oldCursor,
+						newLine: null,
+						text: line,
+					});
+					oldCursor += 1;
+				}
+				break;
+			}
+			case "update": {
+				if (
+					operation.oldText === undefined ||
+					operation.newText === undefined
+				) {
+					return null;
+				}
+				const opOldLines = splitLines(operation.oldText);
+				const opNewLines = splitLines(operation.newText);
+				let localRows = buildRawLineRows(
+					opOldLines,
+					opNewLines,
+					lineLayout,
+					normalizeLine,
+					useKeyMatching,
+					useYamlComparable,
+				);
+				if (!useYamlComparable) {
+					localRows = pairIdenticalLineMoves(localRows, normalizeLine);
+				}
+				localRows = applySemanticRowSuppressions(
+					localRows,
+					opOldLines,
+					opNewLines,
+					normalizeLine,
+					useYamlComparable,
+					useKeyMatching,
+				);
+				rows.push(
+					...localRows.map((row) =>
+						offsetLineRow(row, oldCursor - 1, newCursor - 1),
+					),
+				);
+				oldCursor += opOldLines.length;
+				newCursor += opNewLines.length;
+				break;
+			}
+			default:
+				return null;
+		}
+	}
 
-  if (!appendOperationPrefix(oldLines.length + 1, newLines.length + 1)) {
-    return null;
-  }
-  if (oldCursor <= oldLines.length || newCursor <= newLines.length) {
-    return null;
-  }
-  return applyLineContext(rows, contextLines);
+	if (!appendOperationPrefix(oldLines.length + 1, newLines.length + 1)) {
+		return null;
+	}
+	if (oldCursor <= oldLines.length || newCursor <= newLines.length) {
+		return null;
+	}
+	return applyLineContext(rows, contextLines);
 }
 
 function addHunks(rows: LineRow[]): LineRow[] {
-  const output: LineRow[] = [];
-  let block: LineRow[] = [];
+	const output: LineRow[] = [];
+	let block: LineRow[] = [];
 
-  const flush = () => {
-    if (block.length === 0) {
-      return;
-    }
-    let startOld: number | null = null;
-    let startNew: number | null = null;
-    let oldCount = 0;
-    let newCount = 0;
-    for (const row of block) {
-      if (row.oldLine != null) {
-        if (startOld === null) {
-          startOld = row.oldLine;
-        }
-        oldCount += 1;
-      }
-      if (row.newLine != null) {
-        if (startNew === null) {
-          startNew = row.newLine;
-        }
-        newCount += 1;
-      }
-    }
-    const header = `@@ -${startOld ?? 0},${oldCount} +${startNew ?? 0},${newCount} @@`;
-    output.push({ type: "hunk", header });
-    output.push(...block);
-    block = [];
-  };
+	const flush = () => {
+		if (block.length === 0) {
+			return;
+		}
+		let startOld: number | null = null;
+		let startNew: number | null = null;
+		let oldCount = 0;
+		let newCount = 0;
+		for (const row of block) {
+			if (row.oldLine != null) {
+				if (startOld === null) {
+					startOld = row.oldLine;
+				}
+				oldCount += 1;
+			}
+			if (row.newLine != null) {
+				if (startNew === null) {
+					startNew = row.newLine;
+				}
+				newCount += 1;
+			}
+		}
+		const header = `@@ -${startOld ?? 0},${oldCount} +${startNew ?? 0},${newCount} @@`;
+		output.push({ type: "hunk", header });
+		output.push(...block);
+		block = [];
+	};
 
-  for (const row of rows) {
-    if (row.type === "gap") {
-      flush();
-      output.push(row);
-      continue;
-    }
-    block.push(row);
-  }
-  flush();
-  return output;
+	for (const row of rows) {
+		if (row.type === "gap") {
+			flush();
+			output.push(row);
+			continue;
+		}
+		block.push(row);
+	}
+	flush();
+	return output;
 }
 
 function renderHunkRow(row: LineRow) {
-  return `
+	return `
     <div class="sd-line sd-line--hunk">
       <div class="sd-hunk">${escapeHtml(row.header ?? "")}</div>
     </div>
@@ -4180,66 +4175,66 @@ function renderHunkRow(row: LineRow) {
 }
 
 function renderGapRow(_row: LineRow) {
-  return "";
+	return "";
 }
 
 function getUnifiedPrefix(row: LineRow) {
-  if (row.type === "insert") {
-    return "+";
-  }
-  if (row.type === "delete") {
-    return "-";
-  }
-  if (row.type === "move") {
-    return ">";
-  }
-  return "";
+	if (row.type === "insert") {
+		return "+";
+	}
+	if (row.type === "delete") {
+		return "-";
+	}
+	if (row.type === "move") {
+		return ">";
+	}
+	return "";
 }
 
 function getUnifiedText(row: LineRow, oldText: string, newText: string) {
-  if (row.type === "insert") {
-    return newText;
-  }
-  if (row.type === "delete") {
-    return oldText;
-  }
-  if (row.type === "move") {
-    if (row.newLine !== null && row.oldLine === null) {
-      return newText;
-    }
-    if (row.oldLine !== null && row.newLine === null) {
-      return oldText;
-    }
-    return row.text ?? oldText ?? newText;
-  }
-  return row.text ?? oldText;
+	if (row.type === "insert") {
+		return newText;
+	}
+	if (row.type === "delete") {
+		return oldText;
+	}
+	if (row.type === "move") {
+		if (row.newLine !== null && row.oldLine === null) {
+			return newText;
+		}
+		if (row.oldLine !== null && row.newLine === null) {
+			return oldText;
+		}
+		return row.text ?? oldText ?? newText;
+	}
+	return row.text ?? oldText;
 }
 
 function renderUnifiedRow(row: LineRow, language?: NormalizerLanguage) {
-  const oldNumber = row.oldLine?.toString() ?? "";
-  const newNumber = row.newLine?.toString() ?? "";
-  const oldText = row.oldText ?? row.text ?? "";
-  const newText = row.newText ?? row.text ?? "";
-  const rowClass = `sd-line sd-line--${row.type} sd-line--unified`;
-  const prefix = getUnifiedPrefix(row);
-  const text = getUnifiedText(row, oldText, newText);
-  let textHtml = escapeHtml(text);
-  if (row.type === "insert") {
-    if (row.oldText !== undefined && row.newText !== undefined) {
-      textHtml = renderInlineDiff(row.oldText, row.newText, language).newHtml;
-    } else {
-      textHtml = renderInlineMarkedText(text, "sd-inline-add");
-    }
-  } else if (row.type === "delete") {
-    if (row.oldText !== undefined && row.newText !== undefined) {
-      textHtml = renderInlineDiff(row.oldText, row.newText, language).oldHtml;
-    } else {
-      textHtml = renderInlineMarkedText(text, "sd-inline-del");
-    }
-  } else if (row.type === "replace") {
-    textHtml = renderInlineDiff(oldText, newText, language).newHtml;
-  }
-  return `
+	const oldNumber = row.oldLine?.toString() ?? "";
+	const newNumber = row.newLine?.toString() ?? "";
+	const oldText = row.oldText ?? row.text ?? "";
+	const newText = row.newText ?? row.text ?? "";
+	const rowClass = `sd-line sd-line--${row.type} sd-line--unified`;
+	const prefix = getUnifiedPrefix(row);
+	const text = getUnifiedText(row, oldText, newText);
+	let textHtml = escapeHtml(text);
+	if (row.type === "insert") {
+		if (row.oldText !== undefined && row.newText !== undefined) {
+			textHtml = renderInlineDiff(row.oldText, row.newText, language).newHtml;
+		} else {
+			textHtml = renderInlineMarkedText(text, "sd-inline-add");
+		}
+	} else if (row.type === "delete") {
+		if (row.oldText !== undefined && row.newText !== undefined) {
+			textHtml = renderInlineDiff(row.oldText, row.newText, language).oldHtml;
+		} else {
+			textHtml = renderInlineMarkedText(text, "sd-inline-del");
+		}
+	} else if (row.type === "replace") {
+		textHtml = renderInlineDiff(oldText, newText, language).newHtml;
+	}
+	return `
     <div class="${rowClass}">
       <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
       <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
@@ -4250,15 +4245,15 @@ function renderUnifiedRow(row: LineRow, language?: NormalizerLanguage) {
 }
 
 function renderSplitRow(row: LineRow, language?: NormalizerLanguage) {
-  const oldNumber = row.oldLine?.toString() ?? "";
-  const newNumber = row.newLine?.toString() ?? "";
-  const oldText = row.oldText ?? row.text ?? "";
-  const newText = row.newText ?? row.text ?? "";
-  const rowClass = `sd-line sd-line--${row.type}`;
+	const oldNumber = row.oldLine?.toString() ?? "";
+	const newNumber = row.newLine?.toString() ?? "";
+	const oldText = row.oldText ?? row.text ?? "";
+	const newText = row.newText ?? row.text ?? "";
+	const rowClass = `sd-line sd-line--${row.type}`;
 
-  if (row.type === "replace") {
-    const { oldHtml, newHtml } = renderInlineDiff(oldText, newText, language);
-    return `
+	if (row.type === "replace") {
+		const { oldHtml, newHtml } = renderInlineDiff(oldText, newText, language);
+		return `
       <div class="${rowClass}">
         <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
         <div class="sd-cell sd-code sd-cell--old">${oldHtml}</div>
@@ -4266,37 +4261,37 @@ function renderSplitRow(row: LineRow, language?: NormalizerLanguage) {
         <div class="sd-cell sd-code sd-cell--new">${newHtml}</div>
       </div>
     `;
-  }
+	}
 
-  if (row.type === "insert") {
-    return `
+	if (row.type === "insert") {
+		return `
       <div class="${rowClass}">
         <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
         <div class="sd-cell sd-code sd-cell--old"></div>
         <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
         <div class="sd-cell sd-code sd-cell--new">${renderInlineMarkedText(
-          newText,
-          "sd-inline-add"
-        )}</div>
+					newText,
+					"sd-inline-add",
+				)}</div>
       </div>
     `;
-  }
+	}
 
-  if (row.type === "delete") {
-    return `
+	if (row.type === "delete") {
+		return `
       <div class="${rowClass}">
         <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
         <div class="sd-cell sd-code sd-cell--old">${renderInlineMarkedText(
-          oldText,
-          "sd-inline-del"
-        )}</div>
+					oldText,
+					"sd-inline-del",
+				)}</div>
         <div class="sd-cell sd-gutter">${escapeHtml(newNumber)}</div>
         <div class="sd-cell sd-code sd-cell--new"></div>
       </div>
     `;
-  }
+	}
 
-  return `
+	return `
     <div class="${rowClass}">
       <div class="sd-cell sd-gutter">${escapeHtml(oldNumber)}</div>
       <div class="sd-cell sd-code sd-cell--old">${escapeHtml(oldText)}</div>
@@ -4307,58 +4302,58 @@ function renderSplitRow(row: LineRow, language?: NormalizerLanguage) {
 }
 
 function renderLineRow(
-  row: LineRow,
-  lineLayout: "split" | "unified",
-  language?: NormalizerLanguage
+	row: LineRow,
+	lineLayout: "split" | "unified",
+	language?: NormalizerLanguage,
 ) {
-  if (row.type === "hunk") {
-    return renderHunkRow(row);
-  }
-  if (row.type === "gap") {
-    return renderGapRow(row);
-  }
-  if (lineLayout === "unified") {
-    return renderUnifiedRow(row, language);
-  }
-  return renderSplitRow(row, language);
+	if (row.type === "hunk") {
+		return renderHunkRow(row);
+	}
+	if (row.type === "gap") {
+		return renderGapRow(row);
+	}
+	if (lineLayout === "unified") {
+		return renderUnifiedRow(row, language);
+	}
+	return renderSplitRow(row, language);
 }
 
 const METRIC_TITLE = "Estimated vs raw line changes";
 
 interface RenderContext {
-  maxOps: number;
-  batchSize: number;
-  virtualize: boolean;
-  layout: "full" | "embed";
-  summaryHtml: string;
-  headerHtml: string;
-  filePathHtml: string;
-  view: "lines" | "semantic";
-  lineMode: "raw" | "semantic";
-  contextLines: number;
-  lineLayout: "split" | "unified";
-  canRenderLines: boolean;
-  useLineView: boolean;
-  title: string;
+	maxOps: number;
+	batchSize: number;
+	virtualize: boolean;
+	layout: "full" | "embed";
+	summaryHtml: string;
+	headerHtml: string;
+	filePathHtml: string;
+	view: "lines" | "semantic";
+	lineMode: "raw" | "semantic";
+	contextLines: number;
+	lineLayout: "split" | "unified";
+	canRenderLines: boolean;
+	useLineView: boolean;
+	title: string;
 }
 
 interface HtmlShellOptions {
-  title: string;
-  layout: "full" | "embed";
-  headerHtml: string;
-  filePathHtml: string;
-  summaryHtml: string;
-  sectionHtml: string;
-  statusHtml?: string;
-  payload?: string;
-  script?: string;
+	title: string;
+	layout: "full" | "embed";
+	headerHtml: string;
+	filePathHtml: string;
+	summaryHtml: string;
+	sectionHtml: string;
+	statusHtml?: string;
+	payload?: string;
+	script?: string;
 }
 
 function buildHeaderHtml(showBanner: boolean, reductionPercent: number) {
-  if (!showBanner) {
-    return "";
-  }
-  return `
+	if (!showBanner) {
+		return "";
+	}
+	return `
     <div class="sd-banner">
       <div class="sd-brand">
         <span>Review changes with</span>
@@ -4373,36 +4368,36 @@ function buildHeaderHtml(showBanner: boolean, reductionPercent: number) {
 }
 
 function buildFilePathHtml(showFilePath: boolean, filePath?: string) {
-  if (!showFilePath) {
-    return "";
-  }
-  if (!filePath) {
-    return "";
-  }
-  return `<div class="sd-file">${escapeHtml(filePath)}</div>`;
+	if (!showFilePath) {
+		return "";
+	}
+	if (!filePath) {
+		return "";
+	}
+	return `<div class="sd-file">${escapeHtml(filePath)}</div>`;
 }
 
 function buildHtmlShell({
-  title,
-  layout,
-  headerHtml,
-  filePathHtml,
-  summaryHtml,
-  sectionHtml,
-  statusHtml,
-  payload,
-  script,
+	title,
+	layout,
+	headerHtml,
+	filePathHtml,
+	summaryHtml,
+	sectionHtml,
+	statusHtml,
+	payload,
+	script,
 }: HtmlShellOptions) {
-  const bodyClass = layout === "embed" ? "sd-embed" : "";
-  const shellClass =
-    layout === "embed" ? "sd-shell sd-shell--embed" : "sd-shell";
-  const status = statusHtml ?? "";
-  const data = payload
-    ? `<script>globalThis.__SEMADIFF_DATA__ = ${payload};</script>`
-    : "";
-  const scripts = script ? `<script>${script}</script>` : "";
+	const bodyClass = layout === "embed" ? "sd-embed" : "";
+	const shellClass =
+		layout === "embed" ? "sd-shell sd-shell--embed" : "sd-shell";
+	const status = statusHtml ?? "";
+	const data = payload
+		? `<script>globalThis.__SEMADIFF_DATA__ = ${payload};</script>`
+		: "";
+	const scripts = script ? `<script>${script}</script>` : "";
 
-  return `<!doctype html>
+	return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -4425,1102 +4420,1101 @@ function buildHtmlShell({
 }
 
 function isContextualMovePreservedRow(
-  row: LineRow,
-  contextualMovePairs: ReturnType<typeof buildContextualMovePairs> | undefined,
-  oldLines: readonly string[],
-  newLines: readonly string[],
-  normalizeLine: (line: string) => string
+	row: LineRow,
+	contextualMovePairs: ReturnType<typeof buildContextualMovePairs> | undefined,
+	oldLines: readonly string[],
+	newLines: readonly string[],
+	normalizeLine: (line: string) => string,
 ) {
-  if (row.type === "delete") {
-    if (row.oldLine == null) {
-      return false;
-    }
-    const newLine = contextualMovePairs?.oldToNew.get(row.oldLine);
-    if (newLine == null) {
-      return false;
-    }
-    return (
-      moveContextKey(oldLines[row.oldLine - 1] ?? "", normalizeLine) ===
-      moveContextKey(newLines[newLine - 1] ?? "", normalizeLine)
-    );
-  }
-  if (row.type === "insert") {
-    if (row.newLine == null) {
-      return false;
-    }
-    const oldLine = contextualMovePairs?.newToOld.get(row.newLine);
-    if (oldLine == null) {
-      return false;
-    }
-    return (
-      moveContextKey(oldLines[oldLine - 1] ?? "", normalizeLine) ===
-      moveContextKey(newLines[row.newLine - 1] ?? "", normalizeLine)
-    );
-  }
-  return false;
+	if (row.type === "delete") {
+		if (row.oldLine == null) {
+			return false;
+		}
+		const newLine = contextualMovePairs?.oldToNew.get(row.oldLine);
+		if (newLine == null) {
+			return false;
+		}
+		return (
+			moveContextKey(oldLines[row.oldLine - 1] ?? "", normalizeLine) ===
+			moveContextKey(newLines[newLine - 1] ?? "", normalizeLine)
+		);
+	}
+	if (row.type === "insert") {
+		if (row.newLine == null) {
+			return false;
+		}
+		const oldLine = contextualMovePairs?.newToOld.get(row.newLine);
+		if (oldLine == null) {
+			return false;
+		}
+		return (
+			moveContextKey(oldLines[oldLine - 1] ?? "", normalizeLine) ===
+			moveContextKey(newLines[row.newLine - 1] ?? "", normalizeLine)
+		);
+	}
+	return false;
 }
 
 function buildRenderContext(
-  diff: DiffDocument,
-  options: HtmlRenderOptions
+	diff: DiffDocument,
+	options: HtmlRenderOptions,
 ): RenderContext {
-  const maxOps = options.maxOperations ?? diff.operations.length;
-  const batchSize = options.batchSize ?? Math.min(maxOps, 200);
-  const virtualize =
-    options.virtualize ?? diff.operations.length > batchSize * 2;
-  const showBanner = options.showBanner ?? true;
-  const showSummary = options.showSummary ?? true;
-  const showFilePath = options.showFilePath ?? true;
-  const layout = options.layout ?? "full";
-  const summaryHtml = showSummary ? renderSummary(diff) : "";
-  const reduction = estimateReduction(diff);
-  const headerHtml = buildHeaderHtml(showBanner, reduction.percent);
-  const filePathHtml = buildFilePathHtml(showFilePath, options.filePath);
-  const title = escapeHtml(options.title ?? "SemaDiff");
+	const maxOps = options.maxOperations ?? diff.operations.length;
+	const batchSize = options.batchSize ?? Math.min(maxOps, 200);
+	const virtualize =
+		options.virtualize ?? diff.operations.length > batchSize * 2;
+	const showBanner = options.showBanner ?? true;
+	const showSummary = options.showSummary ?? true;
+	const showFilePath = options.showFilePath ?? true;
+	const layout = options.layout ?? "full";
+	const summaryHtml = showSummary ? renderSummary(diff) : "";
+	const reduction = estimateReduction(diff);
+	const headerHtml = buildHeaderHtml(showBanner, reduction.percent);
+	const filePathHtml = buildFilePathHtml(showFilePath, options.filePath);
+	const title = escapeHtml(options.title ?? "SemaDiff");
 
-  const view =
-    options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
-  const contextLines = options.contextLines ?? 12;
-  const lineLayout = options.lineLayout ?? "unified";
-  const lineMode = options.lineMode ?? "semantic";
+	const view =
+		options.view ?? (options.oldText && options.newText ? "lines" : "semantic");
+	const contextLines = options.contextLines ?? 12;
+	const lineLayout = options.lineLayout ?? "unified";
+	const lineMode = options.lineMode ?? "semantic";
 
-  const canRenderLines =
-    options.oldText !== undefined && options.newText !== undefined;
-  const useLineView = view === "lines" && canRenderLines;
+	const canRenderLines =
+		options.oldText !== undefined && options.newText !== undefined;
+	const useLineView = view === "lines" && canRenderLines;
 
-  return {
-    maxOps,
-    batchSize,
-    virtualize,
-    layout,
-    summaryHtml,
-    headerHtml,
-    filePathHtml,
-    view,
-    lineMode,
-    contextLines,
-    lineLayout,
-    canRenderLines,
-    useLineView,
-    title,
-  };
+	return {
+		maxOps,
+		batchSize,
+		virtualize,
+		layout,
+		summaryHtml,
+		headerHtml,
+		filePathHtml,
+		view,
+		lineMode,
+		contextLines,
+		lineLayout,
+		canRenderLines,
+		useLineView,
+		title,
+	};
 }
 
 function filterSemanticRows(
-  rows: LineRow[],
-  normalizeLine: (line: string) => string,
-  preserveOneSidedLowInfoRows = false,
-  contextualMovePairs?: ReturnType<typeof buildContextualMovePairs>,
-  oldLines: readonly string[] = [],
-  newLines: readonly string[] = []
+	rows: LineRow[],
+	normalizeLine: (line: string) => string,
+	preserveOneSidedLowInfoRows = false,
+	contextualMovePairs?: ReturnType<typeof buildContextualMovePairs>,
+	oldLines: readonly string[] = [],
+	newLines: readonly string[] = [],
 ) {
-  return rows.filter((row) => {
-    if (row.type === "gap" || row.type === "hunk") {
-      return false;
-    }
-    if (row.type === "replace") {
-      const oldValue = row.oldText ?? "";
-      const newValue = row.newText ?? "";
-      return normalizeLine(oldValue) !== normalizeLine(newValue);
-    }
-    if (row.type !== "insert" && row.type !== "delete") {
-      return true;
-    }
-    if (
-      preserveOneSidedLowInfoRows ||
-      isContextualMovePreservedRow(
-        row,
-        contextualMovePairs,
-        oldLines,
-        newLines,
-        normalizeLine
-      )
-    ) {
-      return true;
-    }
-    const normalized = normalizeLine(rowText(row)).trim();
-    return Boolean(normalized && !isLowInfoSemanticLine(normalized));
-  });
+	return rows.filter((row) => {
+		if (row.type === "gap" || row.type === "hunk") {
+			return false;
+		}
+		if (row.type === "replace") {
+			const oldValue = row.oldText ?? "";
+			const newValue = row.newText ?? "";
+			return normalizeLine(oldValue) !== normalizeLine(newValue);
+		}
+		if (row.type !== "insert" && row.type !== "delete") {
+			return true;
+		}
+		if (
+			preserveOneSidedLowInfoRows ||
+			isContextualMovePreservedRow(
+				row,
+				contextualMovePairs,
+				oldLines,
+				newLines,
+				normalizeLine,
+			)
+		) {
+			return true;
+		}
+		const normalized = normalizeLine(rowText(row)).trim();
+		return Boolean(normalized && !isLowInfoSemanticLine(normalized));
+	});
 }
 
 function toProjectedEqualRow(row: LineRow): LineRow {
-  if (row.type === "replace") {
-    return {
-      type: "equal",
-      oldLine: row.oldLine ?? null,
-      newLine: row.newLine ?? null,
-      text: rowNewText(row),
-    };
-  }
+	if (row.type === "replace") {
+		return {
+			type: "equal",
+			oldLine: row.oldLine ?? null,
+			newLine: row.newLine ?? null,
+			text: rowNewText(row),
+		};
+	}
 
-  return {
-    type: "equal",
-    oldLine: row.oldLine ?? null,
-    newLine: row.newLine ?? null,
-    text: rowText(row),
-  };
+	return {
+		type: "equal",
+		oldLine: row.oldLine ?? null,
+		newLine: row.newLine ?? null,
+		text: rowText(row),
+	};
 }
 
 function collectFollowingInsertRows(rows: LineRow[], startIndex: number) {
-  const inserts: LineRow[] = [];
-  let probe = startIndex + 1;
-  while (probe < rows.length && rows[probe]?.type === "insert") {
-    const next = rows[probe];
-    if (next) {
-      inserts.push(next);
-    }
-    probe += 1;
-  }
-  return { inserts, probe };
+	const inserts: LineRow[] = [];
+	let probe = startIndex + 1;
+	while (probe < rows.length && rows[probe]?.type === "insert") {
+		const next = rows[probe];
+		if (next) {
+			inserts.push(next);
+		}
+		probe += 1;
+	}
+	return { inserts, probe };
 }
 
 function normalizeInsertRowsAgainstOld(
-  inserts: LineRow[],
-  oldNormalized: string,
-  normalizeLine: (line: string) => string
+	inserts: LineRow[],
+	oldNormalized: string,
+	normalizeLine: (line: string) => string,
 ) {
-  let matchedInsertCount = 0;
-  const normalizedInserts = inserts.map((insertRow) => {
-    const insertNormalized = normalizeLine(rowText(insertRow)).trim();
-    if (matchesProjectedAnchor(insertNormalized, oldNormalized)) {
-      matchedInsertCount += 1;
-      return toProjectedEqualRow(insertRow);
-    }
-    return insertRow;
-  });
-  return { normalizedInserts, matchedInsertCount };
+	let matchedInsertCount = 0;
+	const normalizedInserts = inserts.map((insertRow) => {
+		const insertNormalized = normalizeLine(rowText(insertRow)).trim();
+		if (matchesProjectedAnchor(insertNormalized, oldNormalized)) {
+			matchedInsertCount += 1;
+			return toProjectedEqualRow(insertRow);
+		}
+		return insertRow;
+	});
+	return { normalizedInserts, matchedInsertCount };
 }
 
 function toProjectionFragments(normalized: string) {
-  return normalized
-    .split(PROJECTION_FRAGMENT_RE)
-    .map((fragment) => fragment.trim())
-    .filter((fragment) => fragment.length > 0);
+	return normalized
+		.split(PROJECTION_FRAGMENT_RE)
+		.map((fragment) => fragment.trim())
+		.filter((fragment) => fragment.length > 0);
 }
 
 function matchesProjectedAnchor(
-  insertNormalized: string,
-  anchorNormalized: string
+	insertNormalized: string,
+	anchorNormalized: string,
 ) {
-  if (!(insertNormalized && anchorNormalized)) {
-    return false;
-  }
-  if (anchorNormalized.includes(insertNormalized)) {
-    return true;
-  }
-  const insertFragments = toProjectionFragments(insertNormalized);
-  if (insertFragments.length === 0) {
-    return false;
-  }
-  const anchorFragments = new Set(toProjectionFragments(anchorNormalized));
-  return insertFragments.every((fragment) => anchorFragments.has(fragment));
+	if (!(insertNormalized && anchorNormalized)) {
+		return false;
+	}
+	if (anchorNormalized.includes(insertNormalized)) {
+		return true;
+	}
+	const insertFragments = toProjectionFragments(insertNormalized);
+	if (insertFragments.length === 0) {
+		return false;
+	}
+	const anchorFragments = new Set(toProjectionFragments(anchorNormalized));
+	return insertFragments.every((fragment) => anchorFragments.has(fragment));
 }
 
 function shouldDowngradeReplaceRow(
-  row: LineRow,
-  oldNormalized: string,
-  normalizeLine: (line: string) => string
+	row: LineRow,
+	oldNormalized: string,
+	normalizeLine: (line: string) => string,
 ) {
-  const newNormalized = normalizeLine(rowNewText(row)).trim();
-  return Boolean(newNormalized && oldNormalized.includes(newNormalized));
+	const newNormalized = normalizeLine(rowNewText(row)).trim();
+	return Boolean(newNormalized && oldNormalized.includes(newNormalized));
 }
 
 function reconcileAstProjectedInserts(
-  rows: LineRow[],
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	normalizeLine: (line: string) => string,
 ) {
-  if (rows.length < 2) {
-    return rows;
-  }
+	if (rows.length < 2) {
+		return rows;
+	}
 
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (!row || row.type !== "replace") {
-      if (row) {
-        output.push(row);
-      }
-      continue;
-    }
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (!row || row.type !== "replace") {
+			if (row) {
+				output.push(row);
+			}
+			continue;
+		}
 
-    const { inserts, probe } = collectFollowingInsertRows(rows, index);
-    if (inserts.length === 0) {
-      output.push(row);
-      continue;
-    }
+		const { inserts, probe } = collectFollowingInsertRows(rows, index);
+		if (inserts.length === 0) {
+			output.push(row);
+			continue;
+		}
 
-    const oldNormalized = normalizeLine(rowOldText(row)).trim();
-    if (!oldNormalized) {
-      output.push(row, ...inserts);
-      index = probe - 1;
-      continue;
-    }
+		const oldNormalized = normalizeLine(rowOldText(row)).trim();
+		if (!oldNormalized) {
+			output.push(row, ...inserts);
+			index = probe - 1;
+			continue;
+		}
 
-    const { normalizedInserts, matchedInsertCount } =
-      normalizeInsertRowsAgainstOld(inserts, oldNormalized, normalizeLine);
+		const { normalizedInserts, matchedInsertCount } =
+			normalizeInsertRowsAgainstOld(inserts, oldNormalized, normalizeLine);
 
-    if (matchedInsertCount === 0) {
-      output.push(row, ...inserts);
-      index = probe - 1;
-      continue;
-    }
+		if (matchedInsertCount === 0) {
+			output.push(row, ...inserts);
+			index = probe - 1;
+			continue;
+		}
 
-    if (shouldDowngradeReplaceRow(row, oldNormalized, normalizeLine)) {
-      output.push(toProjectedEqualRow(row));
-    } else {
-      output.push(row);
-    }
-    output.push(...normalizedInserts);
-    index = probe - 1;
-  }
+		if (shouldDowngradeReplaceRow(row, oldNormalized, normalizeLine)) {
+			output.push(toProjectedEqualRow(row));
+		} else {
+			output.push(row);
+		}
+		output.push(...normalizedInserts);
+		index = probe - 1;
+	}
 
-  return output;
+	return output;
 }
 
 function collectLeadingInsertRows(rows: LineRow[], startIndex: number) {
-  const inserts: LineRow[] = [];
-  let probe = startIndex;
-  while (probe < rows.length) {
-    const next = rows[probe];
-    if (!next || next.type !== "insert" || next.oldLine !== null) {
-      break;
-    }
-    inserts.push(next);
-    probe += 1;
-  }
-  return { inserts, probe };
+	const inserts: LineRow[] = [];
+	let probe = startIndex;
+	while (probe < rows.length) {
+		const next = rows[probe];
+		if (!next || next.type !== "insert" || next.oldLine !== null) {
+			break;
+		}
+		inserts.push(next);
+		probe += 1;
+	}
+	return { inserts, probe };
 }
 
 function normalizeRowsAgainstAnchorLine(
-  rows: LineRow[],
-  anchorNormalized: string,
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	anchorNormalized: string,
+	normalizeLine: (line: string) => string,
 ) {
-  return rows.map((row) => {
-    if (row.type !== "insert") {
-      return row;
-    }
-    const insertNormalized = normalizeLine(rowText(row)).trim();
-    if (matchesProjectedAnchor(insertNormalized, anchorNormalized)) {
-      return toProjectedEqualInsert(row);
-    }
-    return row;
-  });
+	return rows.map((row) => {
+		if (row.type !== "insert") {
+			return row;
+		}
+		const insertNormalized = normalizeLine(rowText(row)).trim();
+		if (matchesProjectedAnchor(insertNormalized, anchorNormalized)) {
+			return toProjectedEqualInsert(row);
+		}
+		return row;
+	});
 }
 
 function reconcileInsertBlocksAgainstTrailingReplace(
-  rows: LineRow[],
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	normalizeLine: (line: string) => string,
 ) {
-  if (rows.length < 2) {
-    return rows;
-  }
+	if (rows.length < 2) {
+		return rows;
+	}
 
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (!row || row.type !== "insert" || row.oldLine !== null) {
-      if (row) {
-        output.push(row);
-      }
-      continue;
-    }
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (!row || row.type !== "insert" || row.oldLine !== null) {
+			if (row) {
+				output.push(row);
+			}
+			continue;
+		}
 
-    const { inserts, probe } = collectLeadingInsertRows(rows, index);
-    if (inserts.length === 0) {
-      continue;
-    }
+		const { inserts, probe } = collectLeadingInsertRows(rows, index);
+		if (inserts.length === 0) {
+			continue;
+		}
 
-    const trailing = rows[probe];
-    if (!trailing || trailing.type !== "replace") {
-      output.push(...inserts);
-      index = probe - 1;
-      continue;
-    }
+		const trailing = rows[probe];
+		if (!trailing || trailing.type !== "replace") {
+			output.push(...inserts);
+			index = probe - 1;
+			continue;
+		}
 
-    const oldNormalized = normalizeLine(rowOldText(trailing)).trim();
-    if (!oldNormalized) {
-      output.push(...inserts, trailing);
-      index = probe;
-      continue;
-    }
+		const oldNormalized = normalizeLine(rowOldText(trailing)).trim();
+		if (!oldNormalized) {
+			output.push(...inserts, trailing);
+			index = probe;
+			continue;
+		}
 
-    const { normalizedInserts, matchedInsertCount } =
-      normalizeInsertRowsAgainstOld(inserts, oldNormalized, normalizeLine);
-    if (matchedInsertCount === 0) {
-      output.push(...inserts, trailing);
-      index = probe;
-      continue;
-    }
+		const { normalizedInserts, matchedInsertCount } =
+			normalizeInsertRowsAgainstOld(inserts, oldNormalized, normalizeLine);
+		if (matchedInsertCount === 0) {
+			output.push(...inserts, trailing);
+			index = probe;
+			continue;
+		}
 
-    output.push(...normalizedInserts);
-    if (shouldDowngradeReplaceRow(trailing, oldNormalized, normalizeLine)) {
-      output.push(toProjectedEqualRow(trailing));
-    } else {
-      output.push(trailing);
-    }
-    index = probe;
-  }
+		output.push(...normalizedInserts);
+		if (shouldDowngradeReplaceRow(trailing, oldNormalized, normalizeLine)) {
+			output.push(toProjectedEqualRow(trailing));
+		} else {
+			output.push(trailing);
+		}
+		index = probe;
+	}
 
-  return output;
+	return output;
 }
 
 function isTrailingProjectedRow(row: LineRow | undefined): row is LineRow {
-  return Boolean(
-    row &&
-      row.oldLine == null &&
-      (row.type === "equal" || row.type === "insert")
-  );
+	return Boolean(
+		row &&
+		row.oldLine == null &&
+		(row.type === "equal" || row.type === "insert"),
+	);
 }
 
 function collectTrailingProjectedRows(rows: LineRow[], startIndex: number) {
-  let probe = startIndex + 1;
-  const trailingRows: LineRow[] = [];
-  while (probe < rows.length) {
-    const trailing = rows[probe];
-    if (!isTrailingProjectedRow(trailing)) {
-      break;
-    }
-    trailingRows.push(trailing);
-    probe += 1;
-  }
-  return { trailingRows, probe };
+	let probe = startIndex + 1;
+	const trailingRows: LineRow[] = [];
+	while (probe < rows.length) {
+		const trailing = rows[probe];
+		if (!isTrailingProjectedRow(trailing)) {
+			break;
+		}
+		trailingRows.push(trailing);
+		probe += 1;
+	}
+	return { trailingRows, probe };
 }
 
 function hasTrailingProjectedInsertRows(rows: LineRow[]) {
-  return rows.some((entry) => entry.type === "insert");
+	return rows.some((entry) => entry.type === "insert");
 }
 
 function resumesOnNextOldLine(row: LineRow, next: LineRow | undefined) {
-  if (row.oldLine == null) {
-    return false;
-  }
-  const nextOldLine = next?.oldLine ?? null;
-  return nextOldLine !== null && nextOldLine === row.oldLine + 1;
+	if (row.oldLine == null) {
+		return false;
+	}
+	const nextOldLine = next?.oldLine ?? null;
+	return nextOldLine !== null && nextOldLine === row.oldLine + 1;
 }
 
 function normalizeAnchorProjectedRows(
-  rows: LineRow[],
-  anchorNormalized: string,
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	anchorNormalized: string,
+	normalizeLine: (line: string) => string,
 ) {
-  if (!anchorNormalized) {
-    return rows;
-  }
-  return normalizeRowsAgainstAnchorLine(rows, anchorNormalized, normalizeLine);
+	if (!anchorNormalized) {
+		return rows;
+	}
+	return normalizeRowsAgainstAnchorLine(rows, anchorNormalized, normalizeLine);
 }
 
 function reconcileAnchorProjectedInsertRows(
-  rows: LineRow[],
-  oldText: string,
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	oldText: string,
+	normalizeLine: (line: string) => string,
 ) {
-  if (rows.length < 3) {
-    return rows;
-  }
+	if (rows.length < 3) {
+		return rows;
+	}
 
-  const oldLines = splitLines(oldText);
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (!row || row.oldLine == null) {
-      if (row) {
-        output.push(row);
-      }
-      continue;
-    }
+	const oldLines = splitLines(oldText);
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (!row || row.oldLine == null) {
+			if (row) {
+				output.push(row);
+			}
+			continue;
+		}
 
-    output.push(row);
+		output.push(row);
 
-    const { trailingRows, probe } = collectTrailingProjectedRows(rows, index);
-    if (!hasTrailingProjectedInsertRows(trailingRows)) {
-      continue;
-    }
+		const { trailingRows, probe } = collectTrailingProjectedRows(rows, index);
+		if (!hasTrailingProjectedInsertRows(trailingRows)) {
+			continue;
+		}
 
-    if (!resumesOnNextOldLine(row, rows[probe])) {
-      output.push(...trailingRows);
-      index = probe - 1;
-      continue;
-    }
+		if (!resumesOnNextOldLine(row, rows[probe])) {
+			output.push(...trailingRows);
+			index = probe - 1;
+			continue;
+		}
 
-    const anchorNormalized = normalizeLine(
-      oldLines[row.oldLine - 1] ?? ""
-    ).trim();
-    output.push(
-      ...normalizeAnchorProjectedRows(
-        trailingRows,
-        anchorNormalized,
-        normalizeLine
-      )
-    );
-    index = probe - 1;
-  }
+		const anchorNormalized = normalizeLine(
+			oldLines[row.oldLine - 1] ?? "",
+		).trim();
+		output.push(
+			...normalizeAnchorProjectedRows(
+				trailingRows,
+				anchorNormalized,
+				normalizeLine,
+			),
+		);
+		index = probe - 1;
+	}
 
-  return output;
+	return output;
 }
 
 function reconcileProjectedInsertRows(
-  rows: LineRow[],
-  oldText: string,
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	oldText: string,
+	normalizeLine: (line: string) => string,
 ) {
-  return reconcileAnchorProjectedInsertRows(
-    reconcileInsertBlocksAgainstTrailingReplace(
-      reconcileAstProjectedInserts(rows, normalizeLine),
-      normalizeLine
-    ),
-    oldText,
-    normalizeLine
-  );
+	return reconcileAnchorProjectedInsertRows(
+		reconcileInsertBlocksAgainstTrailingReplace(
+			reconcileAstProjectedInserts(rows, normalizeLine),
+			normalizeLine,
+		),
+		oldText,
+		normalizeLine,
+	);
 }
 
 interface PendingTokenProjectionState {
-  pendingDeletes: LineRow[];
-  budget: Map<string, number>;
-  consumedFromPending: boolean;
+	pendingDeletes: LineRow[];
+	budget: Map<string, number>;
+	consumedFromPending: boolean;
 }
 
 function createPendingTokenProjectionState(): PendingTokenProjectionState {
-  return {
-    pendingDeletes: [],
-    budget: new Map<string, number>(),
-    consumedFromPending: false,
-  };
+	return {
+		pendingDeletes: [],
+		budget: new Map<string, number>(),
+		consumedFromPending: false,
+	};
 }
 
 function resetPendingTokenProjectionState(state: PendingTokenProjectionState) {
-  state.pendingDeletes = [];
-  state.budget = new Map<string, number>();
-  state.consumedFromPending = false;
+	state.pendingDeletes = [];
+	state.budget = new Map<string, number>();
+	state.consumedFromPending = false;
 }
 
 function flushPendingTokenProjectionRows(
-  state: PendingTokenProjectionState,
-  output: LineRow[]
+	state: PendingTokenProjectionState,
+	output: LineRow[],
 ) {
-  if (state.pendingDeletes.length === 0) {
-    return;
-  }
-  if (!state.consumedFromPending) {
-    output.push(...state.pendingDeletes);
-  }
-  resetPendingTokenProjectionState(state);
+	if (state.pendingDeletes.length === 0) {
+		return;
+	}
+	if (!state.consumedFromPending) {
+		output.push(...state.pendingDeletes);
+	}
+	resetPendingTokenProjectionState(state);
 }
 
 function isAstUnchangedDelete(
-  row: LineRow,
-  marks: ReturnType<typeof buildLineMarkSets>
+	row: LineRow,
+	marks: ReturnType<typeof buildLineMarkSets>,
 ) {
-  if (row.oldLine == null) {
-    return false;
-  }
-  return !(
-    marks.changedOld.has(row.oldLine) || marks.movedOld.has(row.oldLine)
-  );
+	if (row.oldLine == null) {
+		return false;
+	}
+	return !(
+		marks.changedOld.has(row.oldLine) || marks.movedOld.has(row.oldLine)
+	);
 }
 
 function queuePendingProjectedDelete(
-  row: LineRow,
-  state: PendingTokenProjectionState,
-  oldTokenByLine: Map<number, string[]>
+	row: LineRow,
+	state: PendingTokenProjectionState,
+	oldTokenByLine: Map<number, string[]>,
 ) {
-  if (row.oldLine == null) {
-    return;
-  }
-  state.pendingDeletes.push(row);
-  addTokenCounts(state.budget, oldTokenByLine.get(row.oldLine) ?? []);
+	if (row.oldLine == null) {
+		return;
+	}
+	state.pendingDeletes.push(row);
+	addTokenCounts(state.budget, oldTokenByLine.get(row.oldLine) ?? []);
 }
 
 function isStructuralAnchorRow(row: LineRow) {
-  if (row.type !== "insert" && row.type !== "delete") {
-    return false;
-  }
-  const text = rowText(row).trim();
-  if (!text) {
-    return false;
-  }
-  return STRUCTURAL_ANCHOR_END_RE.test(text);
+	if (row.type !== "insert" && row.type !== "delete") {
+		return false;
+	}
+	const text = rowText(row).trim();
+	if (!text) {
+		return false;
+	}
+	return STRUCTURAL_ANCHOR_END_RE.test(text);
 }
 
 function tryConsumeProjectedInsert(
-  row: LineRow,
-  state: PendingTokenProjectionState,
-  newTokenByLine: Map<number, string[]>
+	row: LineRow,
+	state: PendingTokenProjectionState,
+	newTokenByLine: Map<number, string[]>,
 ) {
-  if (row.newLine == null || state.pendingDeletes.length === 0) {
-    return false;
-  }
-  const tokens = newTokenByLine.get(row.newLine) ?? [];
-  if (!canConsumeTokenCounts(state.budget, tokens)) {
-    return false;
-  }
-  consumeTokenCounts(state.budget, tokens);
-  state.consumedFromPending = true;
-  return true;
+	if (row.newLine == null || state.pendingDeletes.length === 0) {
+		return false;
+	}
+	const tokens = newTokenByLine.get(row.newLine) ?? [];
+	if (!canConsumeTokenCounts(state.budget, tokens)) {
+		return false;
+	}
+	consumeTokenCounts(state.budget, tokens);
+	state.consumedFromPending = true;
+	return true;
 }
 
 function toProjectedEqualInsert(row: LineRow): LineRow {
-  return {
-    type: "equal",
-    oldLine: null,
-    newLine: row.newLine ?? null,
-    text: rowText(row),
-  };
+	return {
+		type: "equal",
+		oldLine: null,
+		newLine: row.newLine ?? null,
+		text: rowText(row),
+	};
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: token projection matching is a state-machine.
 function filterAstProjectedRows(
-  rows: LineRow[],
-  marks: ReturnType<typeof buildLineMarkSets>,
-  oldTokenByLine: Map<number, string[]>,
-  newTokenByLine: Map<number, string[]>
+	rows: LineRow[],
+	marks: ReturnType<typeof buildLineMarkSets>,
+	oldTokenByLine: Map<number, string[]>,
+	newTokenByLine: Map<number, string[]>,
 ) {
-  if (
-    rows.length === 0 ||
-    oldTokenByLine.size === 0 ||
-    newTokenByLine.size === 0
-  ) {
-    return rows;
-  }
+	if (
+		rows.length === 0 ||
+		oldTokenByLine.size === 0 ||
+		newTokenByLine.size === 0
+	) {
+		return rows;
+	}
 
-  const output: LineRow[] = [];
-  const state = createPendingTokenProjectionState();
+	const output: LineRow[] = [];
+	const state = createPendingTokenProjectionState();
 
-  for (const row of rows) {
-    if (row.type === "gap" || row.type === "hunk") {
-      flushPendingTokenProjectionRows(state, output);
-      output.push(row);
-      continue;
-    }
+	for (const row of rows) {
+		if (row.type === "gap" || row.type === "hunk") {
+			flushPendingTokenProjectionRows(state, output);
+			output.push(row);
+			continue;
+		}
 
-    if (row.type === "delete") {
-      if (isAstUnchangedDelete(row, marks)) {
-        queuePendingProjectedDelete(row, state, oldTokenByLine);
-      } else {
-        flushPendingTokenProjectionRows(state, output);
-        output.push(row);
-      }
-      continue;
-    }
+		if (row.type === "delete") {
+			if (isAstUnchangedDelete(row, marks)) {
+				queuePendingProjectedDelete(row, state, oldTokenByLine);
+			} else {
+				flushPendingTokenProjectionRows(state, output);
+				output.push(row);
+			}
+			continue;
+		}
 
-    if (
-      row.type === "insert" &&
-      !isStructuralAnchorRow(row) &&
-      tryConsumeProjectedInsert(row, state, newTokenByLine)
-    ) {
-      output.push(toProjectedEqualInsert(row));
-      continue;
-    }
+		if (
+			row.type === "insert" &&
+			!isStructuralAnchorRow(row) &&
+			tryConsumeProjectedInsert(row, state, newTokenByLine)
+		) {
+			output.push(toProjectedEqualInsert(row));
+			continue;
+		}
 
-    if (row.type === "insert" && state.pendingDeletes.length > 0) {
-      if (isStructuralAnchorRow(row)) {
-        output.push(row);
-        continue;
-      }
-      if (state.consumedFromPending) {
-        resetPendingTokenProjectionState(state);
-      } else {
-        flushPendingTokenProjectionRows(state, output);
-      }
-      output.push(row);
-      continue;
-    }
+		if (row.type === "insert" && state.pendingDeletes.length > 0) {
+			if (isStructuralAnchorRow(row)) {
+				output.push(row);
+				continue;
+			}
+			if (state.consumedFromPending) {
+				resetPendingTokenProjectionState(state);
+			} else {
+				flushPendingTokenProjectionRows(state, output);
+			}
+			output.push(row);
+			continue;
+		}
 
-    flushPendingTokenProjectionRows(state, output);
-    output.push(row);
-  }
+		flushPendingTokenProjectionRows(state, output);
+		output.push(row);
+	}
 
-  flushPendingTokenProjectionRows(state, output);
-  return output;
+	flushPendingTokenProjectionRows(state, output);
+	return output;
 }
 
 const LOCKFILE_HEADER_KEYS = new Set(["dependencies:", "peerDependencies:"]);
 
 function filterLockfileRows(rows: LineRow[]) {
-  return rows.filter((row) => {
-    if (row.type === "insert" || row.type === "delete") {
-      const text = rowText(row).trim();
-      if (LOCKFILE_HEADER_KEYS.has(text)) {
-        return false;
-      }
-    }
-    return true;
-  });
+	return rows.filter((row) => {
+		if (row.type === "insert" || row.type === "delete") {
+			const text = rowText(row).trim();
+			if (LOCKFILE_HEADER_KEYS.has(text)) {
+				return false;
+			}
+		}
+		return true;
+	});
 }
 
 function stripContextRows(rows: LineRow[]) {
-  return rows.filter((row) => row.type !== "gap" && row.type !== "hunk");
+	return rows.filter((row) => row.type !== "gap" && row.type !== "hunk");
 }
 
 function isCommentRow(row: LineRow, language?: NormalizerLanguage) {
-  switch (row.type) {
-    case "insert":
-      return isCommentLineForLanguage(rowNewText(row), language);
-    case "delete":
-      return isCommentLineForLanguage(rowOldText(row), language);
-    case "replace":
-      return (
-        isCommentLineForLanguage(rowOldText(row), language) &&
-        isCommentLineForLanguage(rowNewText(row), language)
-      );
-    case "move": {
-      const oldIs =
-        row.oldLine !== null &&
-        isCommentLineForLanguage(rowOldText(row), language);
-      const newIs =
-        row.newLine !== null &&
-        isCommentLineForLanguage(rowNewText(row), language);
-      if (row.oldLine !== null && row.newLine !== null) {
-        return oldIs && newIs;
-      }
-      return oldIs || newIs;
-    }
-    case "equal":
-      return isCommentLineForLanguage(rowText(row), language);
-    default:
-      return false;
-  }
+	switch (row.type) {
+		case "insert":
+			return isCommentLineForLanguage(rowNewText(row), language);
+		case "delete":
+			return isCommentLineForLanguage(rowOldText(row), language);
+		case "replace":
+			return (
+				isCommentLineForLanguage(rowOldText(row), language) &&
+				isCommentLineForLanguage(rowNewText(row), language)
+			);
+		case "move": {
+			const oldIs =
+				row.oldLine !== null &&
+				isCommentLineForLanguage(rowOldText(row), language);
+			const newIs =
+				row.newLine !== null &&
+				isCommentLineForLanguage(rowNewText(row), language);
+			if (row.oldLine !== null && row.newLine !== null) {
+				return oldIs && newIs;
+			}
+			return oldIs || newIs;
+		}
+		case "equal":
+			return isCommentLineForLanguage(rowText(row), language);
+		default:
+			return false;
+	}
 }
 
 function filterCommentRows(rows: LineRow[], language?: NormalizerLanguage) {
-  if (!language || language === "*" || language === "text") {
-    return rows;
-  }
-  return rows.filter((row) => !isCommentRow(row, language));
+	if (!language || language === "*" || language === "text") {
+		return rows;
+	}
+	return rows.filter((row) => !isCommentRow(row, language));
 }
 
 function hasLineChanges(rows: LineRow[]) {
-  return rows.some(
-    (row) =>
-      row.type === "insert" ||
-      row.type === "delete" ||
-      row.type === "replace" ||
-      row.type === "move"
-  );
+	return rows.some(
+		(row) =>
+			row.type === "insert" ||
+			row.type === "delete" ||
+			row.type === "replace" ||
+			row.type === "move",
+	);
 }
 
 function countLineNoise(rows: LineRow[]) {
-  let noise = 0;
-  for (const row of rows) {
-    if (
-      row.type === "insert" ||
-      row.type === "delete" ||
-      row.type === "replace" ||
-      row.type === "move"
-    ) {
-      noise += 1;
-    }
-  }
-  return noise;
+	let noise = 0;
+	for (const row of rows) {
+		if (
+			row.type === "insert" ||
+			row.type === "delete" ||
+			row.type === "replace" ||
+			row.type === "move"
+		) {
+			noise += 1;
+		}
+	}
+	return noise;
 }
 
 function countChangedLineVolume(rows: LineRow[]) {
-  let volume = 0;
-  for (const row of rows) {
-    switch (row.type) {
-      case "insert":
-      case "delete":
-        volume += 1;
-        break;
-      case "replace":
-      case "move":
-        if (row.oldLine != null) {
-          volume += 1;
-        }
-        if (row.newLine != null) {
-          volume += 1;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-  return volume;
+	let volume = 0;
+	for (const row of rows) {
+		switch (row.type) {
+			case "insert":
+			case "delete":
+				volume += 1;
+				break;
+			case "replace":
+			case "move":
+				if (row.oldLine != null) {
+					volume += 1;
+				}
+				if (row.newLine != null) {
+					volume += 1;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	return volume;
 }
 
 function chooseLowerNoiseRows(preferred: LineRow[], candidate: LineRow[]) {
-  const preferredNoise = countLineNoise(preferred);
-  const candidateNoise = countLineNoise(candidate);
-  if (candidateNoise < preferredNoise) {
-    return candidate;
-  }
-  return preferred;
+	const preferredNoise = countLineNoise(preferred);
+	const candidateNoise = countLineNoise(candidate);
+	if (candidateNoise < preferredNoise) {
+		return candidate;
+	}
+	return preferred;
 }
 
 function chooseLowerImpactRows(preferred: LineRow[], candidate: LineRow[]) {
-  const preferredVolume = countChangedLineVolume(preferred);
-  const candidateVolume = countChangedLineVolume(candidate);
-  if (candidateVolume < preferredVolume) {
-    return candidate;
-  }
-  if (candidateVolume > preferredVolume) {
-    return preferred;
-  }
-  return chooseLowerNoiseRows(preferred, candidate);
+	const preferredVolume = countChangedLineVolume(preferred);
+	const candidateVolume = countChangedLineVolume(candidate);
+	if (candidateVolume < preferredVolume) {
+		return candidate;
+	}
+	if (candidateVolume > preferredVolume) {
+		return preferred;
+	}
+	return chooseLowerNoiseRows(preferred, candidate);
 }
 
 function isMeaningfulNormalizedLine(normalized: string) {
-  return normalized.length > 0 && !isLowInfoSemanticLine(normalized);
+	return normalized.length > 0 && !isLowInfoSemanticLine(normalized);
 }
 
 function hasMeaningfulReplaceRow(
-  row: LineRow,
-  normalizeLine: (line: string) => string
+	row: LineRow,
+	normalizeLine: (line: string) => string,
 ) {
-  if (row.type !== "replace") {
-    return false;
-  }
-  const oldNormalized = normalizeLine(rowOldText(row)).trim();
-  const newNormalized = normalizeLine(rowNewText(row)).trim();
-  if (!(oldNormalized || newNormalized)) {
-    return false;
-  }
-  if (oldNormalized === newNormalized) {
-    return false;
-  }
-  return (
-    isMeaningfulNormalizedLine(oldNormalized) ||
-    isMeaningfulNormalizedLine(newNormalized)
-  );
+	if (row.type !== "replace") {
+		return false;
+	}
+	const oldNormalized = normalizeLine(rowOldText(row)).trim();
+	const newNormalized = normalizeLine(rowNewText(row)).trim();
+	if (!(oldNormalized || newNormalized)) {
+		return false;
+	}
+	if (oldNormalized === newNormalized) {
+		return false;
+	}
+	return (
+		isMeaningfulNormalizedLine(oldNormalized) ||
+		isMeaningfulNormalizedLine(newNormalized)
+	);
 }
 
 function hasMeaningfulRawLineChanges(
-  rows: LineRow[],
-  normalizeLine: (line: string) => string
+	rows: LineRow[],
+	normalizeLine: (line: string) => string,
 ) {
-  const insertDeleteDelta = new Map<string, number>();
-  for (const row of rows) {
-    if (!row) {
-      continue;
-    }
-    if (row.type === "move") {
-      return true;
-    }
-    if (hasMeaningfulReplaceRow(row, normalizeLine)) {
-      return true;
-    }
-    if (row.type !== "insert" && row.type !== "delete") {
-      continue;
-    }
-    const normalized = normalizeLine(rowText(row)).trim();
-    if (!isMeaningfulNormalizedLine(normalized)) {
-      continue;
-    }
-    const delta = row.type === "insert" ? 1 : -1;
-    insertDeleteDelta.set(
-      normalized,
-      (insertDeleteDelta.get(normalized) ?? 0) + delta
-    );
-  }
+	const insertDeleteDelta = new Map<string, number>();
+	for (const row of rows) {
+		if (!row) {
+			continue;
+		}
+		if (row.type === "move") {
+			return true;
+		}
+		if (hasMeaningfulReplaceRow(row, normalizeLine)) {
+			return true;
+		}
+		if (row.type !== "insert" && row.type !== "delete") {
+			continue;
+		}
+		const normalized = normalizeLine(rowText(row)).trim();
+		if (!isMeaningfulNormalizedLine(normalized)) {
+			continue;
+		}
+		const delta = row.type === "insert" ? 1 : -1;
+		insertDeleteDelta.set(
+			normalized,
+			(insertDeleteDelta.get(normalized) ?? 0) + delta,
+		);
+	}
 
-  for (const delta of insertDeleteDelta.values()) {
-    if (delta !== 0) {
-      return true;
-    }
-  }
-  return false;
+	for (const delta of insertDeleteDelta.values()) {
+		if (delta !== 0) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function shouldPreferRowsByLineImpact(
-  preferredRows: LineRow[],
-  otherRows: LineRow[]
+	preferredRows: LineRow[],
+	otherRows: LineRow[],
 ) {
-  const preferredVolume = countChangedLineVolume(preferredRows);
-  const otherVolume = countChangedLineVolume(otherRows);
-  if (preferredVolume === 0 || otherVolume <= preferredVolume) {
-    return false;
-  }
-  return (
-    otherVolume - preferredVolume >= SEMANTIC_FALLBACK_MIN_LINE_DELTA &&
-    otherVolume / preferredVolume >= SEMANTIC_FALLBACK_MAX_LINE_RATIO
-  );
+	const preferredVolume = countChangedLineVolume(preferredRows);
+	const otherVolume = countChangedLineVolume(otherRows);
+	if (preferredVolume === 0 || otherVolume <= preferredVolume) {
+		return false;
+	}
+	return (
+		otherVolume - preferredVolume >= SEMANTIC_FALLBACK_MIN_LINE_DELTA &&
+		otherVolume / preferredVolume >= SEMANTIC_FALLBACK_MAX_LINE_RATIO
+	);
 }
 
 function shouldPreferOperationAnchoredRows(
-  anchoredRows: LineRow[],
-  currentRows: LineRow[]
+	anchoredRows: LineRow[],
+	currentRows: LineRow[],
 ) {
-  const anchoredVolume = countChangedLineVolume(anchoredRows);
-  const currentVolume = countChangedLineVolume(currentRows);
-  if (
-    anchoredVolume === 0 ||
-    currentVolume < OPERATION_ANCHORED_MIN_LINE_VOLUME
-  ) {
-    return false;
-  }
-  return anchoredVolume <= currentVolume * OPERATION_ANCHORED_MAX_LINE_RATIO;
+	const anchoredVolume = countChangedLineVolume(anchoredRows);
+	const currentVolume = countChangedLineVolume(currentRows);
+	if (
+		anchoredVolume === 0 ||
+		currentVolume < OPERATION_ANCHORED_MIN_LINE_VOLUME
+	) {
+		return false;
+	}
+	return anchoredVolume <= currentVolume * OPERATION_ANCHORED_MAX_LINE_RATIO;
 }
 
 function chooseSemanticRowsWithFallback(
-  semanticRows: LineRow[],
-  rawRows: LineRow[],
-  normalizeLine: (line: string) => string
+	semanticRows: LineRow[],
+	rawRows: LineRow[],
+	normalizeLine: (line: string) => string,
 ) {
-  if (shouldPreferRowsByLineImpact(rawRows, semanticRows)) {
-    return rawRows;
-  }
-  if (shouldPreferRowsByLineImpact(semanticRows, rawRows)) {
-    return semanticRows;
-  }
-  const chosenRows = chooseLowerNoiseRows(semanticRows, rawRows);
-  if (hasLineChanges(chosenRows)) {
-    return chosenRows;
-  }
-  if (
-    hasLineChanges(rawRows) &&
-    hasMeaningfulRawLineChanges(rawRows, normalizeLine)
-  ) {
-    return rawRows;
-  }
-  return chosenRows;
+	if (shouldPreferRowsByLineImpact(rawRows, semanticRows)) {
+		return rawRows;
+	}
+	if (shouldPreferRowsByLineImpact(semanticRows, rawRows)) {
+		return semanticRows;
+	}
+	const chosenRows = chooseLowerNoiseRows(semanticRows, rawRows);
+	if (hasLineChanges(chosenRows)) {
+		return chosenRows;
+	}
+	if (
+		hasLineChanges(rawRows) &&
+		hasMeaningfulRawLineChanges(rawRows, normalizeLine)
+	) {
+		return rawRows;
+	}
+	return chosenRows;
 }
 
 function annotateUnifiedAdjacentPairs(rows: LineRow[]) {
-  if (rows.length <= 1) {
-    return rows;
-  }
+	if (rows.length <= 1) {
+		return rows;
+	}
 
-  const output: LineRow[] = [];
-  for (let index = 0; index < rows.length; index += 1) {
-    const row = rows[index];
-    if (!row) {
-      continue;
-    }
-    const next = rows[index + 1];
-    if (row.type === "delete" && next?.type === "insert") {
-      const oldText = rowOldText(row);
-      const newText = rowNewText(next);
-      output.push({ ...row, oldText, newText });
-      output.push({ ...next, oldText, newText });
-      index += 1;
-      continue;
-    }
-    output.push(row);
-  }
+	const output: LineRow[] = [];
+	for (let index = 0; index < rows.length; index += 1) {
+		const row = rows[index];
+		if (!row) {
+			continue;
+		}
+		const next = rows[index + 1];
+		if (row.type === "delete" && next?.type === "insert") {
+			const oldText = rowOldText(row);
+			const newText = rowNewText(next);
+			output.push({ ...row, oldText, newText });
+			output.push({ ...next, oldText, newText });
+			index += 1;
+			continue;
+		}
+		output.push(row);
+	}
 
-  return output;
+	return output;
 }
 
 function buildSyntheticContextRow(
-  oldLine: number | null,
-  newLine: number | null,
-  oldLines: string[],
-  newLines: string[],
-  synthesizeChangedRows: boolean
+	oldLine: number | null,
+	newLine: number | null,
+	oldLines: string[],
+	newLines: string[],
+	synthesizeChangedRows: boolean,
 ): LineRow | null {
-  if (oldLine === null && newLine === null) {
-    return null;
-  }
+	if (oldLine === null && newLine === null) {
+		return null;
+	}
 
-  if (oldLine !== null && newLine !== null) {
-    const oldText = oldLines[oldLine - 1] ?? "";
-    const newText = newLines[newLine - 1] ?? "";
-    if (oldText === newText) {
-      return { type: "equal", oldLine, newLine, text: newText };
-    }
-    if (!synthesizeChangedRows) {
-      return null;
-    }
-    return { type: "replace", oldLine, newLine, oldText, newText };
-  }
+	if (oldLine !== null && newLine !== null) {
+		const oldText = oldLines[oldLine - 1] ?? "";
+		const newText = newLines[newLine - 1] ?? "";
+		if (oldText === newText) {
+			return { type: "equal", oldLine, newLine, text: newText };
+		}
+		if (!synthesizeChangedRows) {
+			return null;
+		}
+		return { type: "replace", oldLine, newLine, oldText, newText };
+	}
 
-  if (oldLine !== null) {
-    if (!synthesizeChangedRows) {
-      return null;
-    }
-    return {
-      type: "delete",
-      oldLine,
-      newLine: null,
-      text: oldLines[oldLine - 1] ?? "",
-    };
-  }
+	if (oldLine !== null) {
+		if (!synthesizeChangedRows) {
+			return null;
+		}
+		return {
+			type: "delete",
+			oldLine,
+			newLine: null,
+			text: oldLines[oldLine - 1] ?? "",
+		};
+	}
 
-  if (newLine === null) {
-    return null;
-  }
+	if (newLine === null) {
+		return null;
+	}
 
-  if (!synthesizeChangedRows) {
-    return null;
-  }
-  return {
-    type: "insert",
-    oldLine: null,
-    newLine,
-    text: newLines[newLine - 1] ?? "",
-  };
+	if (!synthesizeChangedRows) {
+		return null;
+	}
+	return {
+		type: "insert",
+		oldLine: null,
+		newLine,
+		text: newLines[newLine - 1] ?? "",
+	};
 }
 
 function computeLineGap(
-  currentLine: number | null,
-  previousLine: number | null
+	currentLine: number | null,
+	previousLine: number | null,
 ): number {
-  if (currentLine === null || previousLine === null) {
-    return 0;
-  }
-  return currentLine - previousLine - 1;
+	if (currentLine === null || previousLine === null) {
+		return 0;
+	}
+	return currentLine - previousLine - 1;
 }
 
 function appendMissingContextRows(
-  output: LineRow[],
-  oldGap: number,
-  newGap: number,
-  lastOldLine: number | null,
-  lastNewLine: number | null,
-  oldLines: string[],
-  newLines: string[],
-  synthesizeChangedRows: boolean,
-  lineLayout: "split" | "unified"
+	output: LineRow[],
+	oldGap: number,
+	newGap: number,
+	lastOldLine: number | null,
+	lastNewLine: number | null,
+	oldLines: string[],
+	newLines: string[],
+	synthesizeChangedRows: boolean,
+	lineLayout: "split" | "unified",
 ) {
-  const missing = Math.max(oldGap, newGap, 0);
-  if (missing <= 0) {
-    return;
-  }
+	const missing = Math.max(oldGap, newGap, 0);
+	if (missing <= 0) {
+		return;
+	}
 
-  if (synthesizeChangedRows) {
-    appendChangedGapRows(
-      output,
-      oldGap,
-      newGap,
-      lastOldLine,
-      lastNewLine,
-      oldLines,
-      newLines,
-      lineLayout
-    );
-    return;
-  }
+	if (synthesizeChangedRows) {
+		appendChangedGapRows(
+			output,
+			oldGap,
+			newGap,
+			lastOldLine,
+			lastNewLine,
+			oldLines,
+			newLines,
+			lineLayout,
+		);
+		return;
+	}
 
-  appendSyntheticGapRows(
-    output,
-    missing,
-    oldGap,
-    newGap,
-    lastOldLine,
-    lastNewLine,
-    oldLines,
-    newLines,
-    synthesizeChangedRows
-  );
+	appendSyntheticGapRows(
+		output,
+		missing,
+		oldGap,
+		newGap,
+		lastOldLine,
+		lastNewLine,
+		oldLines,
+		newLines,
+		synthesizeChangedRows,
+	);
 }
 
 function appendChangedGapRows(
-  output: LineRow[],
-  oldGap: number,
-  newGap: number,
-  lastOldLine: number | null,
-  lastNewLine: number | null,
-  oldLines: string[],
-  newLines: string[],
-  lineLayout: "split" | "unified"
+	output: LineRow[],
+	oldGap: number,
+	newGap: number,
+	lastOldLine: number | null,
+	lastNewLine: number | null,
+	oldLines: string[],
+	newLines: string[],
+	lineLayout: "split" | "unified",
 ) {
-  const oldStart = oldGap > 0 && lastOldLine !== null ? lastOldLine + 1 : null;
-  const newStart = newGap > 0 && lastNewLine !== null ? lastNewLine + 1 : null;
-  const gapOldLines =
-    oldStart !== null
-      ? oldLines.slice(oldStart - 1, oldStart - 1 + oldGap)
-      : [];
-  const gapNewLines =
-    newStart !== null
-      ? newLines.slice(newStart - 1, newStart - 1 + newGap)
-      : [];
-  const gapRows = buildRawLineRows(gapOldLines, gapNewLines, lineLayout);
-  output.push(
-    ...gapRows.map((row) =>
-      offsetLineRow(row, (oldStart ?? 1) - 1, (newStart ?? 1) - 1)
-    )
-  );
+	const oldStart = oldGap > 0 && lastOldLine !== null ? lastOldLine + 1 : null;
+	const newStart = newGap > 0 && lastNewLine !== null ? lastNewLine + 1 : null;
+	const gapOldLines =
+		oldStart !== null
+			? oldLines.slice(oldStart - 1, oldStart - 1 + oldGap)
+			: [];
+	const gapNewLines =
+		newStart !== null
+			? newLines.slice(newStart - 1, newStart - 1 + newGap)
+			: [];
+	const gapRows = buildRawLineRows(gapOldLines, gapNewLines, lineLayout);
+	output.push(
+		...gapRows.map((row) =>
+			offsetLineRow(row, (oldStart ?? 1) - 1, (newStart ?? 1) - 1),
+		),
+	);
 }
 
 function appendSyntheticGapRows(
-  output: LineRow[],
-  missing: number,
-  oldGap: number,
-  newGap: number,
-  lastOldLine: number | null,
-  lastNewLine: number | null,
-  oldLines: string[],
-  newLines: string[],
-  synthesizeChangedRows: boolean
+	output: LineRow[],
+	missing: number,
+	oldGap: number,
+	newGap: number,
+	lastOldLine: number | null,
+	lastNewLine: number | null,
+	oldLines: string[],
+	newLines: string[],
+	synthesizeChangedRows: boolean,
 ) {
-  for (let offset = 1; offset <= missing; offset += 1) {
-    const missingOldLine =
-      oldGap >= offset && lastOldLine !== null ? lastOldLine + offset : null;
-    const missingNewLine =
-      newGap >= offset && lastNewLine !== null ? lastNewLine + offset : null;
-    const synthetic = buildSyntheticContextRow(
-      missingOldLine,
-      missingNewLine,
-      oldLines,
-      newLines,
-      synthesizeChangedRows
-    );
-    if (synthetic) {
-      output.push(synthetic);
-    }
-  }
+	for (let offset = 1; offset <= missing; offset += 1) {
+		const missingOldLine =
+			oldGap >= offset && lastOldLine !== null ? lastOldLine + offset : null;
+		const missingNewLine =
+			newGap >= offset && lastNewLine !== null ? lastNewLine + offset : null;
+		const synthetic = buildSyntheticContextRow(
+			missingOldLine,
+			missingNewLine,
+			oldLines,
+			newLines,
+			synthesizeChangedRows,
+		);
+		if (synthetic) {
+			output.push(synthetic);
+		}
+	}
 }
 
 function isContextSeparatorRow(row: LineRow) {
-  return row.type === "hunk" || row.type === "gap";
+	return row.type === "hunk" || row.type === "gap";
 }
 
 function expandLineDiscontinuities(
-  rows: LineRow[],
-  oldText: string,
-  newText: string,
-  synthesizeChangedRows = true,
-  lineLayout: "split" | "unified" = "split"
+	rows: LineRow[],
+	oldText: string,
+	newText: string,
+	synthesizeChangedRows = true,
+	lineLayout: "split" | "unified" = "split",
 ) {
-  if (rows.length === 0) {
-    return rows;
-  }
+	if (rows.length === 0) {
+		return rows;
+	}
 
-  const oldLines = splitLines(oldText);
-  const newLines = splitLines(newText);
-  const output: LineRow[] = [];
-  let lastOldLine: number | null = null;
-  let lastNewLine: number | null = null;
+	const oldLines = splitLines(oldText);
+	const newLines = splitLines(newText);
+	const output: LineRow[] = [];
+	let lastOldLine: number | null = null;
+	let lastNewLine: number | null = null;
 
-  for (const row of rows) {
-    if (isContextSeparatorRow(row)) {
-      continue;
-    }
+	for (const row of rows) {
+		if (isContextSeparatorRow(row)) {
+			continue;
+		}
 
-    const oldGap = computeLineGap(row.oldLine ?? null, lastOldLine);
-    const newGap = computeLineGap(row.newLine ?? null, lastNewLine);
-    appendMissingContextRows(
-      output,
-      oldGap,
-      newGap,
-      lastOldLine,
-      lastNewLine,
-      oldLines,
-      newLines,
-      synthesizeChangedRows,
-      lineLayout
-    );
+		const oldGap = computeLineGap(row.oldLine ?? null, lastOldLine);
+		const newGap = computeLineGap(row.newLine ?? null, lastNewLine);
+		appendMissingContextRows(
+			output,
+			oldGap,
+			newGap,
+			lastOldLine,
+			lastNewLine,
+			oldLines,
+			newLines,
+			synthesizeChangedRows,
+			lineLayout,
+		);
 
-    output.push(row);
+		output.push(row);
 
-    if (row.oldLine != null) {
-      lastOldLine = row.oldLine;
-    }
-    if (row.newLine != null) {
-      lastNewLine = row.newLine;
-    }
-  }
+		if (row.oldLine != null) {
+			lastOldLine = row.oldLine;
+		}
+		if (row.newLine != null) {
+			lastNewLine = row.newLine;
+		}
+	}
 
-  return output;
+	return output;
 }
 
 function buildLineVirtualScript(
-  batchSize: number,
-  lineLayout: "split" | "unified",
-  language?: NormalizerLanguage,
-  semanticMode = false
+	batchSize: number,
+	lineLayout: "split" | "unified",
+	language?: NormalizerLanguage,
+	semanticMode = false,
 ) {
-  return `
+	return `
     const raw = globalThis.__SEMADIFF_DATA__;
     const parsed = raw && typeof raw === "object"
       ? raw
@@ -5766,7 +5760,7 @@ function buildLineVirtualScript(
 }
 
 function buildOpsVirtualScript(batchSize: number) {
-  return `
+	return `
     const raw = globalThis.__SEMADIFF_DATA__;
     const parsed = raw && typeof raw === "object"
       ? raw
@@ -5911,329 +5905,329 @@ function buildOpsVirtualScript(batchSize: number) {
 }
 
 function renderLineView(
-  diff: DiffDocument,
-  options: HtmlRenderOptions,
-  context: RenderContext
+	diff: DiffDocument,
+	options: HtmlRenderOptions,
+	context: RenderContext,
 ) {
-  if (!context.canRenderLines) {
-    return "";
-  }
-  const isYamlPath =
-    options.filePath?.endsWith(".yml") || options.filePath?.endsWith(".yaml");
-  const yamlLanguage = options.language === "yaml" || Boolean(isYamlPath);
-  const semanticLanguage = yamlLanguage ? "yaml" : options.language;
-  const oldText = options.oldText ?? "";
-  const newText = options.newText ?? "";
-  const oldLineCount = splitLines(oldText).length;
-  const newLineCount = splitLines(newText).length;
-  const isPnpmLock =
-    options.filePath?.endsWith("pnpm-lock.yaml") ||
-    (oldText.includes("lockfileVersion:") && oldText.includes("importers:")) ||
-    (newText.includes("lockfileVersion:") && newText.includes("importers:"));
-  const hideComments = Boolean(options.hideComments);
-  const applyHideComments = (nextRows: LineRow[]) =>
-    applyLineContext(
-      filterCommentRows(stripContextRows(nextRows), options.language),
-      context.contextLines
-    );
-  const buildRowsForMode = (mode: "semantic" | "raw") => {
-    const semanticMode = mode === "semantic";
-    const normalizeLine = semanticMode
-      ? (line: string) => normalizeLineForSemantic(line, semanticLanguage)
-      : undefined;
-    const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
-    const useYamlComparable = Boolean(normalizeLine && yamlLanguage);
-    let modeRows = buildLineRows(
-      oldText,
-      newText,
-      context.contextLines,
-      context.lineLayout,
-      normalizeLine,
-      diff.operations,
-      useKeyMatching,
-      useYamlComparable,
-      semanticMode,
-      semanticMode
-    );
-    if (semanticMode && normalizeLine) {
-      const semanticOldLines = splitLines(oldText);
-      const semanticNewLines = splitLines(newText);
-      const contextualMovePairs = buildContextualMovePairs(
-        diff.operations,
-        semanticOldLines,
-        semanticNewLines,
-        normalizeLine
-      );
-      const anchoredRows = buildOperationAnchoredRows(
-        oldText,
-        newText,
-        context.contextLines,
-        context.lineLayout,
-        normalizeLine,
-        diff.operations,
-        useKeyMatching,
-        useYamlComparable
-      );
-      if (anchoredRows && hasLineChanges(anchoredRows)) {
-        modeRows = chooseLowerImpactRows(modeRows, anchoredRows);
-      }
-      const oldTokenByLine = buildLineTokenMap(
-        oldText,
-        options.semanticTokens?.old,
-        semanticLanguage
-      );
-      const newTokenByLine = buildLineTokenMap(
-        newText,
-        options.semanticTokens?.new,
-        semanticLanguage
-      );
-      if (oldTokenByLine.size > 0 && newTokenByLine.size > 0) {
-        const marks = buildLineMarkSets(
-          diff.operations,
-          oldLineCount,
-          newLineCount,
-          {
-            normalizeLine,
-            useKeyMatching,
-            useYamlComparable,
-          }
-        );
-        modeRows = filterAstProjectedRows(
-          modeRows,
-          marks,
-          oldTokenByLine,
-          newTokenByLine
-        );
-      }
-      modeRows = filterSemanticRows(
-        modeRows,
-        normalizeLine,
-        oldLineCount === 0 || newLineCount === 0,
-        contextualMovePairs,
-        semanticOldLines,
-        semanticNewLines
-      );
-    }
-    if (useKeyMatching) {
-      modeRows = filterLockfileRows(modeRows);
-    }
-    return hideComments ? applyHideComments(modeRows) : modeRows;
-  };
-  const expandRows = (inputRows: LineRow[], synthesizeChangedRows = true) =>
-    expandLineDiscontinuities(
-      context.lineLayout === "unified"
-        ? annotateUnifiedAdjacentPairs(inputRows)
-        : inputRows,
-      oldText,
-      newText,
-      synthesizeChangedRows,
-      context.lineLayout
-    );
-  const buildOperationAnchoredCandidateRows = () => {
-    const anchoredRows = buildOperationAnchoredRows(
-      oldText,
-      newText,
-      context.contextLines,
-      context.lineLayout,
-      (line) => line,
-      diff.operations
-    );
-    if (!(anchoredRows && hasLineChanges(anchoredRows))) {
-      return null;
-    }
-    const filteredAnchoredRows = suppressBalancedImportChanges(
-      anchoredRows,
-      splitLines(oldText),
-      splitLines(newText),
-      (line) => line
-    );
-    return hideComments
-      ? applyHideComments(filteredAnchoredRows)
-      : filteredAnchoredRows;
-  };
-  let rows =
-    context.lineMode === "raw"
-      ? expandRows(buildRowsForMode("raw"))
-      : (() => {
-          const semanticRows = reconcileProjectedInsertRows(
-            expandRows(buildRowsForMode("semantic")),
-            oldText,
-            (line) => normalizeLineForSemantic(line, semanticLanguage)
-          );
-          const rawRows = expandRows(buildRowsForMode("raw"));
-          return chooseSemanticRowsWithFallback(semanticRows, rawRows, (line) =>
-            normalizeLineForSemantic(line, semanticLanguage)
-          );
-        })();
-  let usedOperationAnchoredRows = false;
-  const operationAnchoredRows = buildOperationAnchoredCandidateRows();
-  if (
-    operationAnchoredRows &&
-    (shouldPreferRowsByLineImpact(operationAnchoredRows, rows) ||
-      shouldPreferOperationAnchoredRows(operationAnchoredRows, rows))
-  ) {
-    rows = operationAnchoredRows;
-    usedOperationAnchoredRows = true;
-  }
-  const stabilizedRows = dedupeExactLineRows(
-    usedOperationAnchoredRows
-      ? rows
-      : collapseSharedLineChanges(
-          rows,
-          context.lineMode === "raw"
-            ? (line) => line
-            : (line) => normalizeLineForSemantic(line, semanticLanguage)
-        )
-  );
-  const visibleRows = applyLineContext(
-    stripContextRows(stabilizedRows),
-    context.contextLines
-  );
-  if (!hasLineChanges(visibleRows)) {
-    return "";
-  }
+	if (!context.canRenderLines) {
+		return "";
+	}
+	const isYamlPath =
+		options.filePath?.endsWith(".yml") || options.filePath?.endsWith(".yaml");
+	const yamlLanguage = options.language === "yaml" || Boolean(isYamlPath);
+	const semanticLanguage = yamlLanguage ? "yaml" : options.language;
+	const oldText = options.oldText ?? "";
+	const newText = options.newText ?? "";
+	const oldLineCount = splitLines(oldText).length;
+	const newLineCount = splitLines(newText).length;
+	const isPnpmLock =
+		options.filePath?.endsWith("pnpm-lock.yaml") ||
+		(oldText.includes("lockfileVersion:") && oldText.includes("importers:")) ||
+		(newText.includes("lockfileVersion:") && newText.includes("importers:"));
+	const hideComments = Boolean(options.hideComments);
+	const applyHideComments = (nextRows: LineRow[]) =>
+		applyLineContext(
+			filterCommentRows(stripContextRows(nextRows), options.language),
+			context.contextLines,
+		);
+	const buildRowsForMode = (mode: "semantic" | "raw") => {
+		const semanticMode = mode === "semantic";
+		const normalizeLine = semanticMode
+			? (line: string) => normalizeLineForSemantic(line, semanticLanguage)
+			: undefined;
+		const useKeyMatching = Boolean(normalizeLine && isPnpmLock);
+		const useYamlComparable = Boolean(normalizeLine && yamlLanguage);
+		let modeRows = buildLineRows(
+			oldText,
+			newText,
+			context.contextLines,
+			context.lineLayout,
+			normalizeLine,
+			diff.operations,
+			useKeyMatching,
+			useYamlComparable,
+			semanticMode,
+			semanticMode,
+		);
+		if (semanticMode && normalizeLine) {
+			const semanticOldLines = splitLines(oldText);
+			const semanticNewLines = splitLines(newText);
+			const contextualMovePairs = buildContextualMovePairs(
+				diff.operations,
+				semanticOldLines,
+				semanticNewLines,
+				normalizeLine,
+			);
+			const anchoredRows = buildOperationAnchoredRows(
+				oldText,
+				newText,
+				context.contextLines,
+				context.lineLayout,
+				normalizeLine,
+				diff.operations,
+				useKeyMatching,
+				useYamlComparable,
+			);
+			if (anchoredRows && hasLineChanges(anchoredRows)) {
+				modeRows = chooseLowerImpactRows(modeRows, anchoredRows);
+			}
+			const oldTokenByLine = buildLineTokenMap(
+				oldText,
+				options.semanticTokens?.old,
+				semanticLanguage,
+			);
+			const newTokenByLine = buildLineTokenMap(
+				newText,
+				options.semanticTokens?.new,
+				semanticLanguage,
+			);
+			if (oldTokenByLine.size > 0 && newTokenByLine.size > 0) {
+				const marks = buildLineMarkSets(
+					diff.operations,
+					oldLineCount,
+					newLineCount,
+					{
+						normalizeLine,
+						useKeyMatching,
+						useYamlComparable,
+					},
+				);
+				modeRows = filterAstProjectedRows(
+					modeRows,
+					marks,
+					oldTokenByLine,
+					newTokenByLine,
+				);
+			}
+			modeRows = filterSemanticRows(
+				modeRows,
+				normalizeLine,
+				oldLineCount === 0 || newLineCount === 0,
+				contextualMovePairs,
+				semanticOldLines,
+				semanticNewLines,
+			);
+		}
+		if (useKeyMatching) {
+			modeRows = filterLockfileRows(modeRows);
+		}
+		return hideComments ? applyHideComments(modeRows) : modeRows;
+	};
+	const expandRows = (inputRows: LineRow[], synthesizeChangedRows = true) =>
+		expandLineDiscontinuities(
+			context.lineLayout === "unified"
+				? annotateUnifiedAdjacentPairs(inputRows)
+				: inputRows,
+			oldText,
+			newText,
+			synthesizeChangedRows,
+			context.lineLayout,
+		);
+	const buildOperationAnchoredCandidateRows = () => {
+		const anchoredRows = buildOperationAnchoredRows(
+			oldText,
+			newText,
+			context.contextLines,
+			context.lineLayout,
+			(line) => line,
+			diff.operations,
+		);
+		if (!(anchoredRows && hasLineChanges(anchoredRows))) {
+			return null;
+		}
+		const filteredAnchoredRows = suppressBalancedImportChanges(
+			anchoredRows,
+			splitLines(oldText),
+			splitLines(newText),
+			(line) => line,
+		);
+		return hideComments
+			? applyHideComments(filteredAnchoredRows)
+			: filteredAnchoredRows;
+	};
+	let rows =
+		context.lineMode === "raw"
+			? expandRows(buildRowsForMode("raw"))
+			: (() => {
+					const semanticRows = reconcileProjectedInsertRows(
+						expandRows(buildRowsForMode("semantic")),
+						oldText,
+						(line) => normalizeLineForSemantic(line, semanticLanguage),
+					);
+					const rawRows = expandRows(buildRowsForMode("raw"));
+					return chooseSemanticRowsWithFallback(semanticRows, rawRows, (line) =>
+						normalizeLineForSemantic(line, semanticLanguage),
+					);
+				})();
+	let usedOperationAnchoredRows = false;
+	const operationAnchoredRows = buildOperationAnchoredCandidateRows();
+	if (
+		operationAnchoredRows &&
+		(shouldPreferRowsByLineImpact(operationAnchoredRows, rows) ||
+			shouldPreferOperationAnchoredRows(operationAnchoredRows, rows))
+	) {
+		rows = operationAnchoredRows;
+		usedOperationAnchoredRows = true;
+	}
+	const stabilizedRows = dedupeExactLineRows(
+		usedOperationAnchoredRows
+			? rows
+			: collapseSharedLineChanges(
+					rows,
+					context.lineMode === "raw"
+						? (line) => line
+						: (line) => normalizeLineForSemantic(line, semanticLanguage),
+				),
+	);
+	const visibleRows = applyLineContext(
+		stripContextRows(stabilizedRows),
+		context.contextLines,
+	);
+	if (!hasLineChanges(visibleRows)) {
+		return "";
+	}
 
-  const summaryHtml = context.summaryHtml;
+	const summaryHtml = context.summaryHtml;
 
-  if (!context.virtualize) {
-    const body = visibleRows
-      .map((row) =>
-        renderLineRow(
-          row,
-          context.lineLayout,
-          context.lineMode === "semantic" ? semanticLanguage : undefined
-        )
-      )
-      .join("\n");
-    const sectionHtml = `<section class="sd-lines">${body}</section>`;
-    return buildHtmlShell({
-      title: context.title,
-      layout: context.layout,
-      headerHtml: context.headerHtml,
-      filePathHtml: context.filePathHtml,
-      summaryHtml,
-      sectionHtml,
-    });
-  }
+	if (!context.virtualize) {
+		const body = visibleRows
+			.map((row) =>
+				renderLineRow(
+					row,
+					context.lineLayout,
+					context.lineMode === "semantic" ? semanticLanguage : undefined,
+				),
+			)
+			.join("\n");
+		const sectionHtml = `<section class="sd-lines">${body}</section>`;
+		return buildHtmlShell({
+			title: context.title,
+			layout: context.layout,
+			headerHtml: context.headerHtml,
+			filePathHtml: context.filePathHtml,
+			summaryHtml,
+			sectionHtml,
+		});
+	}
 
-  const payload = escapeScript(
-    Schema.encodeSync(LinePayloadJson)({
-      rows: visibleRows,
-      batchSize: context.batchSize,
-      lineLayout: context.lineLayout,
-    })
-  );
-  const sectionHtml = `<section class="sd-lines" id="sd-ops"></section>`;
-  const statusHtml = `<div id="sd-status"></div>`;
-  const script = buildLineVirtualScript(
-    context.batchSize,
-    context.lineLayout,
-    semanticLanguage,
-    context.lineMode === "semantic"
-  );
-  return buildHtmlShell({
-    title: context.title,
-    layout: context.layout,
-    headerHtml: context.headerHtml,
-    filePathHtml: context.filePathHtml,
-    summaryHtml,
-    sectionHtml,
-    statusHtml,
-    payload,
-    script,
-  });
+	const payload = escapeScript(
+		Schema.encodeSync(LinePayloadJson)({
+			rows: visibleRows,
+			batchSize: context.batchSize,
+			lineLayout: context.lineLayout,
+		}),
+	);
+	const sectionHtml = `<section class="sd-lines" id="sd-ops"></section>`;
+	const statusHtml = `<div id="sd-status"></div>`;
+	const script = buildLineVirtualScript(
+		context.batchSize,
+		context.lineLayout,
+		semanticLanguage,
+		context.lineMode === "semantic",
+	);
+	return buildHtmlShell({
+		title: context.title,
+		layout: context.layout,
+		headerHtml: context.headerHtml,
+		filePathHtml: context.filePathHtml,
+		summaryHtml,
+		sectionHtml,
+		statusHtml,
+		payload,
+		script,
+	});
 }
 
 function dedupeExactLineRows(rows: LineRow[]) {
-  const seen = new Set<string>();
-  return rows.filter((row) => {
-    const key = JSON.stringify(row);
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
+	const seen = new Set<string>();
+	return rows.filter((row) => {
+		const key = JSON.stringify(row);
+		if (seen.has(key)) {
+			return false;
+		}
+		seen.add(key);
+		return true;
+	});
 }
 
 function renderOperationsView(diff: DiffDocument, context: RenderContext) {
-  if (!context.virtualize) {
-    const ops = diff.operations.slice(0, context.maxOps);
-    const body = ops.map(renderOperation).join("\n");
-    const truncated =
-      diff.operations.length > ops.length
-        ? `<div class="sd-truncated">Showing ${ops.length} of ${diff.operations.length} operations.</div>`
-        : "";
-    const sectionHtml = `<section class="sd-diff">${body}</section>${truncated}`;
-    return buildHtmlShell({
-      title: context.title,
-      layout: context.layout,
-      headerHtml: context.headerHtml,
-      filePathHtml: context.filePathHtml,
-      summaryHtml: context.summaryHtml,
-      sectionHtml,
-    });
-  }
+	if (!context.virtualize) {
+		const ops = diff.operations.slice(0, context.maxOps);
+		const body = ops.map(renderOperation).join("\n");
+		const truncated =
+			diff.operations.length > ops.length
+				? `<div class="sd-truncated">Showing ${ops.length} of ${diff.operations.length} operations.</div>`
+				: "";
+		const sectionHtml = `<section class="sd-diff">${body}</section>${truncated}`;
+		return buildHtmlShell({
+			title: context.title,
+			layout: context.layout,
+			headerHtml: context.headerHtml,
+			filePathHtml: context.filePathHtml,
+			summaryHtml: context.summaryHtml,
+			sectionHtml,
+		});
+	}
 
-  const opsData = diff.operations.map((op) => ({
-    id: op.id,
-    type: op.type,
-    oldText: op.oldText ?? "",
-    newText: op.newText ?? "",
-    confidence: op.meta?.confidence ?? null,
-    oldRange: op.oldRange ?? null,
-    newRange: op.newRange ?? null,
-  }));
+	const opsData = diff.operations.map((op) => ({
+		id: op.id,
+		type: op.type,
+		oldText: op.oldText ?? "",
+		newText: op.newText ?? "",
+		confidence: op.meta?.confidence ?? null,
+		oldRange: op.oldRange ?? null,
+		newRange: op.newRange ?? null,
+	}));
 
-  const payload = escapeScript(
-    Schema.encodeSync(OpsPayloadJson)({
-      operations: opsData,
-      batchSize: context.batchSize,
-    })
-  );
-  const sectionHtml = `<section class="sd-diff" id="sd-ops"></section>`;
-  const statusHtml = `<div id="sd-status"></div>`;
-  const script = buildOpsVirtualScript(context.batchSize);
-  return buildHtmlShell({
-    title: context.title,
-    layout: context.layout,
-    headerHtml: context.headerHtml,
-    filePathHtml: context.filePathHtml,
-    summaryHtml: context.summaryHtml,
-    sectionHtml,
-    statusHtml,
-    payload,
-    script,
-  });
+	const payload = escapeScript(
+		Schema.encodeSync(OpsPayloadJson)({
+			operations: opsData,
+			batchSize: context.batchSize,
+		}),
+	);
+	const sectionHtml = `<section class="sd-diff" id="sd-ops"></section>`;
+	const statusHtml = `<div id="sd-status"></div>`;
+	const script = buildOpsVirtualScript(context.batchSize);
+	return buildHtmlShell({
+		title: context.title,
+		layout: context.layout,
+		headerHtml: context.headerHtml,
+		filePathHtml: context.filePathHtml,
+		summaryHtml: context.summaryHtml,
+		sectionHtml,
+		statusHtml,
+		payload,
+		script,
+	});
 }
 
 export function renderHtml(
-  diff: DiffDocument,
-  options: HtmlRenderOptions = {}
+	diff: DiffDocument,
+	options: HtmlRenderOptions = {},
 ) {
-  const diffForRender =
-    options.hideComments && options.language
-      ? filterDiffForComments(diff, options.language)
-      : diff;
-  const context = buildRenderContext(diffForRender, options);
-  if (context.useLineView && context.canRenderLines) {
-    return renderLineView(diffForRender, options, context);
-  }
-  return renderOperationsView(diffForRender, context);
+	const diffForRender =
+		options.hideComments && options.language
+			? filterDiffForComments(diff, options.language)
+			: diff;
+	const context = buildRenderContext(diffForRender, options);
+	if (context.useLineView && context.canRenderLines) {
+		return renderLineView(diffForRender, options, context);
+	}
+	return renderOperationsView(diffForRender, context);
 }
 
 export const __testing = {
-  buildSyntheticContextRow,
-  buildContextualMovePairs,
-  buildOperationAnchoredRows,
-  chooseSemanticRowsWithFallback,
-  countChangedLineVolume,
-  expandLineDiscontinuities,
-  filterAstProjectedRows,
-  filterLockfileRows,
-  filterSemanticRows,
-  hasMeaningfulRawLineChanges,
-  renderInlineDiff,
-  shouldPreferOperationAnchoredRows,
-  shouldPreferRowsByLineImpact,
+	buildSyntheticContextRow,
+	buildContextualMovePairs,
+	buildOperationAnchoredRows,
+	chooseSemanticRowsWithFallback,
+	countChangedLineVolume,
+	expandLineDiscontinuities,
+	filterAstProjectedRows,
+	filterLockfileRows,
+	filterSemanticRows,
+	hasMeaningfulRawLineChanges,
+	renderInlineDiff,
+	shouldPreferOperationAnchoredRows,
+	shouldPreferRowsByLineImpact,
 };

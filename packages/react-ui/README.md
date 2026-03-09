@@ -22,11 +22,11 @@ import { SemaDiffExplorer } from "@semadiff/react-ui";
 import "@semadiff/react-ui/styles.css";
 
 const client = createHttpPrDiffClient({
-  baseUrl: "https://your-app.example.com",
+	baseUrl: "https://your-app.example.com",
 });
 
 export function DiffScreen() {
-  return <SemaDiffExplorer className="sd-app" client={client} />;
+	return <SemaDiffExplorer className="sd-app" client={client} />;
 }
 ```
 

@@ -1,26 +1,26 @@
 {
-  "name": "@semadiff/pr-client",
-  "version": "0.1.0",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "rslib build"
-  },
-  "dependencies": {
-    "@semadiff/pr-backend": "workspace:*"
-  },
-  "peerDependencies": {
-    "effect": ">=4.0.0-beta.5 <5"
-  }
+	"name": "@semadiff/pr-client",
+	"version": "0.1.0",
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"default": "./dist/index.js"
+		},
+		"./package.json": "./package.json"
+	},
+	"scripts": {
+		"build": "rslib build"
+	},
+	"dependencies": {
+		"@semadiff/pr-backend": "workspace:*"
+	},
+	"peerDependencies": {
+		"effect": ">=4.0.0-beta.5 <5"
+	}
 }

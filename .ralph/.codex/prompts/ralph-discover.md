@@ -3,6 +3,7 @@
 Autonom research och validering för att skapa en komplett PRD från PROJECT-BRIEF.
 
 ## Usage
+
 ```
 /prompts:ralph-discover                    # Använder docs/PROJECT-BRIEF.md
 /prompts:ralph-discover --input brief.md   # Custom input file
@@ -12,6 +13,7 @@ Autonom research och validering för att skapa en komplett PRD från PROJECT-BRI
 ## LANGUAGE SETTING
 
 **FIRST: Detect language automatically**
+
 ```bash
 LANG=$(grep -o '"language"[[:space:]]*:[[:space:]]*"[^"]*"' .ralph/config.json 2>/dev/null | cut -d'"' -f4)
 echo "Language: ${LANG:-en}"
@@ -24,11 +26,13 @@ Use the detected language for ALL output.
 ## STEP 1: Input Source
 
 ### If PROJECT-BRIEF exists:
+
 ```bash
 cat docs/PROJECT-BRIEF.md 2>/dev/null
 ```
 
 Visa brief och bekräfta:
+
 ```
 Found PROJECT-BRIEF.md:
 - Idea: {one-liner}
@@ -43,6 +47,7 @@ Reply with number:
 ### If no brief (or greenfield selected):
 
 Kör förenklad discovery:
+
 ```
 What are we building?
 
@@ -97,12 +102,14 @@ If custom, ask for frontend, backend, deploy target.
 Om web search inte är tillgängligt, använd `dev-browser` för att navigera och samla in källor manuellt.
 
 Sök aktivt efter:
+
 - "{category} apps 2024"
 - "{product type} market size"
 - "best {category} tools comparison"
 - "{competitor name} reviews"
 
 **Analysera:**
+
 - Topp 3-5 konkurrenter
 - Deras styrkor och svagheter
 - Pricing models
@@ -157,6 +164,7 @@ JOURNEY: {Namn på flow, t.ex. "First todo"}
 ```
 
 **Minimum flows:**
+
 - Onboarding/signup
 - Core action (create todo, send message, etc.)
 - Return visit
@@ -174,14 +182,15 @@ Ta alla feature ideas från PROJECT-BRIEF och prioritera:
 
 **MoSCoW Method:**
 
-| Priority | Features | Rationale |
-|----------|----------|-----------|
-| **Must** | {kritiskt för MVP} | Utan detta funkar inte appen |
-| **Should** | {viktigt men inte kritiskt} | Förbättrar upplevelsen |
-| **Could** | {nice-to-have} | Om tid finns |
-| **Won't** | {out of scope för v1} | Framtida version |
+| Priority   | Features                    | Rationale                    |
+| ---------- | --------------------------- | ---------------------------- |
+| **Must**   | {kritiskt för MVP}          | Utan detta funkar inte appen |
+| **Should** | {viktigt men inte kritiskt} | Förbättrar upplevelsen       |
+| **Could**  | {nice-to-have}              | Om tid finns                 |
+| **Won't**  | {out of scope för v1}       | Framtida version             |
 
 **Effort/Impact Matrix:**
+
 ```
         HIGH IMPACT
              │
@@ -204,20 +213,22 @@ Ta alla feature ideas från PROJECT-BRIEF och prioritera:
 
 **Validera tech stack:**
 
-| Component | Choice | Rationale | Risk |
-|-----------|--------|-----------|------|
-| Frontend | {React/Vue/etc} | {varför} | {potential issues} |
-| Backend | {Supabase/etc} | {varför} | {potential issues} |
-| Auth | {method} | {varför} | {potential issues} |
-| Database | {type} | {varför} | {potential issues} |
-| Hosting | {provider} | {varför} | {potential issues} |
+| Component | Choice          | Rationale | Risk               |
+| --------- | --------------- | --------- | ------------------ |
+| Frontend  | {React/Vue/etc} | {varför}  | {potential issues} |
+| Backend   | {Supabase/etc}  | {varför}  | {potential issues} |
+| Auth      | {method}        | {varför}  | {potential issues} |
+| Database  | {type}          | {varför}  | {potential issues} |
+| Hosting   | {provider}      | {varför}  | {potential issues} |
 
 **WebSearch:** Sök efter:
+
 - "{tech} + {tech} integration"
 - "{tech} limitations"
 - "{tech} best practices 2024"
 
 **Identify:**
+
 - Technical risks
 - Unknown unknowns
 - Dependencies
@@ -233,14 +244,15 @@ Ta alla feature ideas från PROJECT-BRIEF och prioritera:
 
 **Checklist:**
 
-| Area | Requirement | Implementation |
-|------|-------------|----------------|
-| Auth | {how users login} | {JWT/session/etc} |
-| Data | {what data stored} | {encryption/etc} |
-| GDPR | {EU users?} | {consent/deletion/export} |
-| PCI | {payments?} | {Stripe/etc handles it} |
+| Area | Requirement        | Implementation            |
+| ---- | ------------------ | ------------------------- |
+| Auth | {how users login}  | {JWT/session/etc}         |
+| Data | {what data stored} | {encryption/etc}          |
+| GDPR | {EU users?}        | {consent/deletion/export} |
+| PCI  | {payments?}        | {Stripe/etc handles it}   |
 
 **WebSearch:** Om relevant:
+
 - "GDPR requirements for {app type}"
 - "{industry} compliance requirements"
 
@@ -252,12 +264,12 @@ Ta alla feature ideas från PROJECT-BRIEF och prioritera:
 💼 BUSINESS MODEL
 ```
 
-| Aspect | Description |
-|--------|-------------|
-| **Revenue** | {hur tjänar vi pengar?} |
-| **Pricing** | {free/freemium/paid/subscription} |
-| **Costs** | {hosting, APIs, etc} |
-| **Unit economics** | {cost per user, etc} |
+| Aspect             | Description                       |
+| ------------------ | --------------------------------- |
+| **Revenue**        | {hur tjänar vi pengar?}           |
+| **Pricing**        | {free/freemium/paid/subscription} |
+| **Costs**          | {hosting, APIs, etc}              |
+| **Unit economics** | {cost per user, etc}              |
 
 **If learning project:** Note that business model is "N/A - learning project"
 
@@ -317,17 +329,17 @@ Utmana ALLT innan PRD anses klar:
 
 ## DEFINITION OF DONE - Discovery
 
-| Kriterium | Verifiering |
-|-----------|-------------|
-| ✅ Alla 8 tekniker körda | Checklist komplett |
-| ✅ Minst 3 konkurrenter analyserade | Market research klar |
-| ✅ Minst 2 personas | Med goals & pains |
-| ✅ Core user journeys | Alla MVP-flows mappade |
-| ✅ Features prioriterade | MoSCoW eller liknande |
-| ✅ Tech stack validerat | Risker identifierade |
-| ✅ Security requirements | Definierade |
-| ✅ Devil's advocate passerad | Alla utmaningar addresserade |
-| ✅ Open Questions tom | Eller endast nice-to-have |
+| Kriterium                           | Verifiering                  |
+| ----------------------------------- | ---------------------------- |
+| ✅ Alla 8 tekniker körda            | Checklist komplett           |
+| ✅ Minst 3 konkurrenter analyserade | Market research klar         |
+| ✅ Minst 2 personas                 | Med goals & pains            |
+| ✅ Core user journeys               | Alla MVP-flows mappade       |
+| ✅ Features prioriterade            | MoSCoW eller liknande        |
+| ✅ Tech stack validerat             | Risker identifierade         |
+| ✅ Security requirements            | Definierade                  |
+| ✅ Devil's advocate passerad        | Alla utmaningar addresserade |
+| ✅ Open Questions tom               | Eller endast nice-to-have    |
 
 ---
 
@@ -339,83 +351,109 @@ När ALLA tekniker är klara, skapa `docs/PRD.md`:
 # [Produktnamn] - Product Requirements Document
 
 ## Executive Summary
+
 {2-3 meningar som sammanfattar produkten}
 
 ## Vision & Problem Statement
+
 {Vad löser vi? Varför behövs detta?}
 {Referera till PROJECT-BRIEF motivation}
 
 ## Market Analysis
+
 ### Competitive Landscape
+
 {Konkurrenter och positionering}
 
 ### Market Opportunity
+
 {Gaps vi fyller}
 
 ## Target Users
+
 ### Primary Persona: {Namn}
+
 {Full persona description}
 
 ### Secondary Persona: {Namn}
+
 {Full persona description}
 
 ## User Journeys
+
 ### Journey 1: {namn}
+
 {Detaljerat flow}
 
 ### Journey 2: {namn}
+
 {Detaljerat flow}
 
 ## Feature Requirements
 
 ### Must Have (MVP)
-| Feature | Description | Acceptance Criteria |
-|---------|-------------|---------------------|
-| {feature} | {what} | {how we know it works} |
+
+| Feature   | Description | Acceptance Criteria    |
+| --------- | ----------- | ---------------------- |
+| {feature} | {what}      | {how we know it works} |
 
 ### Should Have
+
 {prioriterad lista}
 
 ### Could Have
+
 {prioriterad lista}
 
 ### Won't Have (v1)
+
 {explicit out of scope}
 
 ## Technical Architecture
+
 ### Stack
+
 {Frontend, Backend, Database, etc}
 
 ### System Diagram
+
 {ASCII eller beskrivning}
 
 ### Integrations
+
 {Externa API:er och tjänster}
 
 ### Technical Risks
+
 {Identifierade risker och mitigations}
 
 ## Security & Compliance
+
 {Auth, data, GDPR, etc}
 
 ## Business Model
+
 {Revenue, pricing, costs - eller "N/A learning project"}
 
 ## Success Metrics
+
 {Hur vet vi att produkten lyckas?}
 
 ## Open Questions
+
 {MÅSTE VARA TOM för production-ready PRD}
 {OK att ha "nice-to-have" frågor}
 
 ## Appendix
+
 ### From PROJECT-BRIEF
+
 {Länk eller sammanfattning av brainstorm-fasen}
 
 ---
 
-*Generated by Ralph Analyst Mode*
-*Next step: /prompts:ralph-plan to create implementation specs*
+_Generated by Ralph Analyst Mode_
+_Next step: /prompts:ralph-plan to create implementation specs_
 ```
 
 ---
@@ -425,11 +463,13 @@ När ALLA tekniker är klara, skapa `docs/PRD.md`:
 ### 1. Create/Update AGENTS.md
 
 Om template valdes, kopiera:
+
 ```bash
 cp .ralph/templates/stacks/{template}/AGENTS.md AGENTS.md
 ```
 
 Om custom, generera AGENTS.md med:
+
 - Project description
 - Tech stack
 - Security rules
@@ -438,6 +478,7 @@ Om custom, generera AGENTS.md med:
 ### 2. Create .env.example
 
 Om relevant (Supabase, etc):
+
 ```bash
 cat > .env.example << 'EOF'
 # Supabase

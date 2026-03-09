@@ -1,13 +1,15 @@
 import { join } from "node:path";
+
 import { expect, test } from "@playwright/test";
+
 import { ensureExtensionBuilt } from "./helpers/extension-build";
 
 const contentScriptPath = join(
-  process.cwd(),
-  "packages",
-  "github-extension",
-  "dist",
-  "content.js"
+	process.cwd(),
+	"packages",
+	"github-extension",
+	"dist",
+	"content.js",
 );
 
 const prHtml = `<!doctype html>
@@ -23,9 +25,9 @@ const prHtml = `<!doctype html>
 </html>`;
 
 test("overlay injects on PR page", async ({ page }) => {
-  await ensureExtensionBuilt();
+	await ensureExtensionBuilt();
 
-  await page.setContent(prHtml);
-  await page.addScriptTag({ path: contentScriptPath, type: "module" });
-  await expect(page.locator("#semadiff-toggle")).toBeVisible();
+	await page.setContent(prHtml);
+	await page.addScriptTag({ path: contentScriptPath, type: "module" });
+	await expect(page.locator("#semadiff-toggle")).toBeVisible();
 });

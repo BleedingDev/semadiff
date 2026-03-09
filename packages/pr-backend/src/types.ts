@@ -1,132 +1,132 @@
 import { DiffDocumentSchema } from "@semadiff/core";
 import {
-  FileReviewGuideSchema as ReviewGuideFileReviewGuideSchema,
-  PrReviewSummarySchema as ReviewGuidePrReviewSummarySchema,
+	FileReviewGuideSchema as ReviewGuideFileReviewGuideSchema,
+	PrReviewSummarySchema as ReviewGuidePrReviewSummarySchema,
 } from "@semadiff/review-guide";
 import { Schema } from "effect";
 
 export type PrFileStatus = "added" | "modified" | "removed" | "renamed";
 
 export interface PrRef {
-  owner: string;
-  repo: string;
-  number: number;
+	owner: string;
+	repo: string;
+	number: number;
 }
 
 export interface PrMeta {
-  title: string;
-  url: string;
-  baseSha: string;
-  headSha: string;
-  additions: number;
-  deletions: number;
-  changedFiles: number;
+	title: string;
+	url: string;
+	baseSha: string;
+	headSha: string;
+	additions: number;
+	deletions: number;
+	changedFiles: number;
 }
 
 export interface PrFileSummary {
-  filename: string;
-  status: PrFileStatus;
-  additions: number;
-  deletions: number;
-  changes: number;
-  sha: string;
-  previousFilename?: string | undefined;
-  reductionPercent?: number | undefined;
-  operations?: number | undefined;
-  moveCount?: number | undefined;
-  renameCount?: number | undefined;
-  binary?: boolean | undefined;
-  oversized?: boolean | undefined;
-  language?: string | undefined;
-  warnings?: readonly string[] | undefined;
+	filename: string;
+	status: PrFileStatus;
+	additions: number;
+	deletions: number;
+	changes: number;
+	sha: string;
+	previousFilename?: string | undefined;
+	reductionPercent?: number | undefined;
+	operations?: number | undefined;
+	moveCount?: number | undefined;
+	renameCount?: number | undefined;
+	binary?: boolean | undefined;
+	oversized?: boolean | undefined;
+	language?: string | undefined;
+	warnings?: readonly string[] | undefined;
 }
 
 export interface PrSummary {
-  pr: PrMeta;
-  files: PrFileSummary[];
+	pr: PrMeta;
+	files: PrFileSummary[];
 }
 
 export interface FileDiffPayload {
-  file: PrFileSummary;
-  semanticHtml: string;
-  linesHtml: string;
+	file: PrFileSummary;
+	semanticHtml: string;
+	linesHtml: string;
 }
 
 export interface FileDiffDocument {
-  file: PrFileSummary;
-  diff: import("@semadiff/core").DiffDocument;
+	file: PrFileSummary;
+	diff: import("@semadiff/core").DiffDocument;
 }
 
 export interface AuthStatus {
-  hasToken: boolean;
+	hasToken: boolean;
 }
 
 export type {
-  EvidenceRef,
-  FileReviewGuide,
-  PrReviewSummary,
-  ReviewContext,
+	EvidenceRef,
+	FileReviewGuide,
+	PrReviewSummary,
+	ReviewContext,
 } from "@semadiff/review-guide";
 
 export const PrFileStatusSchema = Schema.Literals([
-  "added",
-  "modified",
-  "removed",
-  "renamed",
+	"added",
+	"modified",
+	"removed",
+	"renamed",
 ] as const);
 
 export const PrRefSchema = Schema.Struct({
-  owner: Schema.String,
-  repo: Schema.String,
-  number: Schema.Number,
+	owner: Schema.String,
+	repo: Schema.String,
+	number: Schema.Number,
 });
 
 export const PrMetaSchema = Schema.Struct({
-  title: Schema.String,
-  url: Schema.String,
-  baseSha: Schema.String,
-  headSha: Schema.String,
-  additions: Schema.Number,
-  deletions: Schema.Number,
-  changedFiles: Schema.Number,
+	title: Schema.String,
+	url: Schema.String,
+	baseSha: Schema.String,
+	headSha: Schema.String,
+	additions: Schema.Number,
+	deletions: Schema.Number,
+	changedFiles: Schema.Number,
 });
 
 export const PrFileSummarySchema = Schema.Struct({
-  filename: Schema.String,
-  status: PrFileStatusSchema,
-  additions: Schema.Number,
-  deletions: Schema.Number,
-  changes: Schema.Number,
-  sha: Schema.String,
-  previousFilename: Schema.optional(Schema.String),
-  reductionPercent: Schema.optional(Schema.Number),
-  operations: Schema.optional(Schema.Number),
-  moveCount: Schema.optional(Schema.Number),
-  renameCount: Schema.optional(Schema.Number),
-  binary: Schema.optional(Schema.Boolean),
-  oversized: Schema.optional(Schema.Boolean),
-  language: Schema.optional(Schema.String),
-  warnings: Schema.optional(Schema.Array(Schema.String)),
+	filename: Schema.String,
+	status: PrFileStatusSchema,
+	additions: Schema.Number,
+	deletions: Schema.Number,
+	changes: Schema.Number,
+	sha: Schema.String,
+	previousFilename: Schema.optional(Schema.String),
+	reductionPercent: Schema.optional(Schema.Number),
+	operations: Schema.optional(Schema.Number),
+	moveCount: Schema.optional(Schema.Number),
+	renameCount: Schema.optional(Schema.Number),
+	binary: Schema.optional(Schema.Boolean),
+	oversized: Schema.optional(Schema.Boolean),
+	language: Schema.optional(Schema.String),
+	warnings: Schema.optional(Schema.Array(Schema.String)),
 });
 
 export const PrSummarySchema = Schema.Struct({
-  pr: PrMetaSchema,
-  files: Schema.Array(PrFileSummarySchema),
+	pr: PrMetaSchema,
+	files: Schema.Array(PrFileSummarySchema),
 });
 
 export const FileDiffPayloadSchema = Schema.Struct({
-  file: PrFileSummarySchema,
-  semanticHtml: Schema.String,
-  linesHtml: Schema.String,
+	file: PrFileSummarySchema,
+	semanticHtml: Schema.String,
+	linesHtml: Schema.String,
 });
 
 export const FileDiffDocumentSchema = Schema.Struct({
-  file: PrFileSummarySchema,
-  diff: DiffDocumentSchema,
+	file: PrFileSummarySchema,
+	diff: DiffDocumentSchema,
 });
 
 export const AuthStatusSchema = Schema.Struct({
-  hasToken: Schema.Boolean,
+	hasToken: Schema.Boolean,
 });
 export const FileReviewGuideSchema = ReviewGuideFileReviewGuideSchema;
 export const PrReviewSummarySchema = ReviewGuidePrReviewSummarySchema;

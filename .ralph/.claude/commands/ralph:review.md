@@ -3,6 +3,7 @@
 Check if Ralph is done and review the results.
 
 ## Usage
+
 ```
 /ralph:review
 /ralph:review --tunnel   # Also open SSH tunnel for testing
@@ -11,6 +12,7 @@ Check if Ralph is done and review the results.
 ## Language Setting
 
 **FIRST: Detect language automatically**
+
 ```bash
 LANG=$(grep -o '"language"[[:space:]]*:[[:space:]]*"[^"]*"' .ralph/config.json 2>/dev/null | cut -d'"' -f4)
 echo "Language: ${LANG:-en}"
@@ -36,6 +38,7 @@ ssh $VM_USER@$VM_IP 'pgrep -f "ralph.sh|claude" && echo "RUNNING" || echo "NOT_R
 ```
 
 If RUNNING:
+
 ```
 Ralph is still running on VM!
 
@@ -44,6 +47,7 @@ Follow progress:
 
 Come back when Ralph is done.
 ```
+
 STOP HERE - don't give more options.
 
 If NOT_RUNNING -> continue to step 3.
@@ -55,6 +59,7 @@ ssh $VM_USER@$VM_IP "cd ~/projects/$(basename $(git remote get-url origin) .git)
 ```
 
 Show:
+
 - Number of commits Ralph made
 - Which specs were run
 
@@ -78,6 +83,7 @@ ssh -L 5173:localhost:5173 -L 54321:localhost:54321 $VM_USER@$VM_IP
 ```
 
 Show:
+
 ```
 Tunnels open!
 - App: http://localhost:5173

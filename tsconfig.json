@@ -1,59 +1,59 @@
 {
-  "files": [],
-  "references": [
-    {
-      "path": "packages/core"
-    },
-    {
-      "path": "packages/entity-core"
-    },
-    {
-      "path": "packages/parsers"
-    },
-    {
-      "path": "packages/parser-tree-sitter-node"
-    },
-    {
-      "path": "packages/parser-tree-sitter-wasm"
-    },
-    {
-      "path": "packages/parser-swc"
-    },
-    {
-      "path": "packages/parser-lightningcss"
-    },
-    {
-      "path": "packages/render-terminal"
-    },
-    {
-      "path": "packages/render-html"
-    },
-    {
-      "path": "packages/benchmark-harness"
-    },
-    {
-      "path": "packages/pr-backend"
-    },
-    {
-      "path": "packages/pr-client"
-    },
-    {
-      "path": "packages/review-guide"
-    },
-    {
-      "path": "packages/react"
-    },
-    {
-      "path": "packages/react-ui"
-    },
-    {
-      "path": "packages/cli/tsconfig.build.json"
-    },
-    {
-      "path": "packages/github-extension"
-    },
-    {
-      "path": "packages/test-corpus"
-    }
-  ]
+	"files": [],
+	"references": [
+		{
+			"path": "packages/core"
+		},
+		{
+			"path": "packages/entity-core"
+		},
+		{
+			"path": "packages/parsers"
+		},
+		{
+			"path": "packages/parser-tree-sitter-node"
+		},
+		{
+			"path": "packages/parser-tree-sitter-wasm"
+		},
+		{
+			"path": "packages/parser-swc"
+		},
+		{
+			"path": "packages/parser-lightningcss"
+		},
+		{
+			"path": "packages/render-terminal"
+		},
+		{
+			"path": "packages/render-html"
+		},
+		{
+			"path": "packages/benchmark-harness"
+		},
+		{
+			"path": "packages/pr-backend"
+		},
+		{
+			"path": "packages/pr-client"
+		},
+		{
+			"path": "packages/review-guide"
+		},
+		{
+			"path": "packages/react"
+		},
+		{
+			"path": "packages/react-ui"
+		},
+		{
+			"path": "packages/cli/tsconfig.build.json"
+		},
+		{
+			"path": "packages/github-extension"
+		},
+		{
+			"path": "packages/test-corpus"
+		}
+	]
 }

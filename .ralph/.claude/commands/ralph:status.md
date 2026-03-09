@@ -3,6 +3,7 @@
 Visa Ralph's progress på VM utan att SSH:a manuellt.
 
 ## Usage
+
 ```
 /ralph:status
 /ralph:status --log      # Visa senaste log-rader
@@ -14,12 +15,14 @@ Visa Ralph's progress på VM utan att SSH:a manuellt.
 Läs VM-config och hämta status via SSH.
 
 **STEG 1: LÄS VM CONFIG**
+
 ```bash
 source ~/.ralph-vm
 # Ger: VM_IP, VM_USER
 ```
 
 **STEG 2: HÄMTA STATUS**
+
 ```bash
 ssh $VM_USER@$VM_IP << 'EOF'
 cd ~/projects/$(ls -t ~/projects | head -1)
@@ -71,6 +74,7 @@ EOF
 ```
 
 **OUTPUT FORMAT:**
+
 ```
 === RALPH STATUS ===
 
@@ -84,6 +88,7 @@ EOF
 
 **OM --log FLAGGA:**
 Visa mer log:
+
 ```bash
 ssh $VM_USER@$VM_IP "tail -50 ~/projects/*/ralph-deploy.log"
 ```

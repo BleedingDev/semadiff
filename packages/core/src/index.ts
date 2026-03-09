@@ -1,55 +1,55 @@
 export type {
-  Config,
-  ConfigInput,
-  ConfigResolution,
-  ConfigSource,
-  ConfigSources,
-  NormalizerConfig,
-  NormalizerOverrides,
-  NormalizerSettings,
+	Config,
+	ConfigInput,
+	ConfigResolution,
+	ConfigSource,
+	ConfigSources,
+	NormalizerConfig,
+	NormalizerOverrides,
+	NormalizerSettings,
 } from "./config.js";
 export {
-  ConfigInputSchema,
-  ConfigSchema,
-  ConfigValidationError,
-  decodeConfigInput,
-  decodeConfigInputJson,
-  defaultConfig,
-  defaultSources,
-  mergeConfig,
+	ConfigInputSchema,
+	ConfigSchema,
+	ConfigValidationError,
+	decodeConfigInput,
+	decodeConfigInputJson,
+	defaultConfig,
+	defaultSources,
+	mergeConfig,
 } from "./config.js";
 export type { DiagnosticsBundle } from "./diagnostics.js";
 export { createDiagnosticsBundle } from "./diagnostics.js";
 export { DiagnosticsBundleSchema } from "./diagnostics-schema.js";
 export type {
-  DiffDocument,
-  DiffOperation,
-  MoveGroup,
-  Position,
-  Range,
-  RenameGroup,
+	DiffDocument,
+	DiffOperation,
+	MoveGroup,
+	Position,
+	Range,
+	RenameGroup,
 } from "./diff.js";
 export { structuralDiff } from "./diff.js";
 export {
-  DiffDocumentSchema,
-  DiffOperationSchema,
-  MoveGroupSchema,
-  PositionSchema,
-  RangeSchema,
-  RenameGroupSchema,
+	DiffDocumentSchema,
+	DiffOperationSchema,
+	MoveGroupSchema,
+	PositionSchema,
+	RangeSchema,
+	RenameGroupSchema,
 } from "./diff-schema.js";
 export type { ExplainDocument, ExplainOperation } from "./explain.js";
 export { explainDiff } from "./explain.js";
 export type {
-  NormalizerLanguage,
-  NormalizerRule,
-  NormalizerRuleSummary,
-  NormalizerSafety,
+	NormalizerLanguage,
+	NormalizerRule,
+	NormalizerRuleSummary,
+	NormalizerSafety,
 } from "./normalizers.js";
 export {
-  listNormalizerRules,
-  normalizeText,
-  normalizeTextForLanguage,
+	listNormalizerRules,
+	normalizeText,
+	normalizeTextForLanguage,
 } from "./normalizers.js";
 export { renderJson } from "./render-json.js";
 export type { TelemetryService } from "./telemetry.js";

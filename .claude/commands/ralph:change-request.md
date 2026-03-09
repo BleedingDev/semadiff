@@ -3,6 +3,7 @@
 Entry point för ändringar i existerande app. Analyserar scope och skapar plan.
 
 ## Usage
+
 ```
 /ralph:change-request                    # Interactive
 /ralph:change-request "add dark mode"    # With description
@@ -11,15 +12,16 @@ Entry point för ändringar i existerande app. Analyserar scope och skapar plan.
 
 ## When to Use
 
-| Scenario | Command |
-|----------|---------|
-| New app from scratch | `/ralph:idea` → `/ralph:discover` |
+| Scenario                | Command                                 |
+| ----------------------- | --------------------------------------- |
+| New app from scratch    | `/ralph:idea` → `/ralph:discover`       |
 | Changes to existing app | `/ralph:change-request` → `/ralph:plan` |
-| Bug fixes after testing | `/ralph:change-request --bug` |
+| Bug fixes after testing | `/ralph:change-request --bug`           |
 
 ## Language Setting
 
 **FIRST: Detect language automatically**
+
 ```bash
 LANG=$(grep -o '"language"[[:space:]]*:[[:space:]]*"[^"]*"' .ralph/config.json 2>/dev/null | cut -d'"' -f4)
 echo "Language: ${LANG:-en}"
@@ -52,6 +54,7 @@ cat docs/IMPLEMENTATION_PLAN.md 2>/dev/null | head -50
 ```
 
 **Output:** Project summary:
+
 - Tech stack detected
 - Existing structure
 - Previous specs (if any)
@@ -96,13 +99,14 @@ Your observations:
 
 Analyze the change request and categorize:
 
-| Scope | Criteria | Analysis Depth |
-|-------|----------|----------------|
-| **Small** | 1-3 files, no new dependencies, < 2h work | Minimal - direct to spec |
-| **Medium** | 4-10 files, minor architecture changes, 2-8h work | Impact analysis |
-| **Large** | 10+ files, new patterns/dependencies, 8h+ work | Full analysis, mini-PRD |
+| Scope      | Criteria                                          | Analysis Depth           |
+| ---------- | ------------------------------------------------- | ------------------------ |
+| **Small**  | 1-3 files, no new dependencies, < 2h work         | Minimal - direct to spec |
+| **Medium** | 4-10 files, minor architecture changes, 2-8h work | Impact analysis          |
+| **Large**  | 10+ files, new patterns/dependencies, 8h+ work    | Full analysis, mini-PRD  |
 
 **Factors to consider:**
+
 - Number of files affected
 - New dependencies needed?
 - Database changes?
@@ -110,6 +114,7 @@ Analyze the change request and categorize:
 - New patterns introduced?
 
 Show assessment:
+
 ```
 Scope Assessment: {SMALL/MEDIUM/LARGE}
 
@@ -137,20 +142,24 @@ Reply with number:
 ```
 
 Create single spec file:
+
 ```markdown
 # CR: {Brief description}
 
 {What needs to change}
 
 ## Requirements
+
 - {Requirement 1}
 - {Requirement 2}
 
 ## Files to modify
+
 - {file1.tsx}
 - {file2.ts}
 
 ## Done when
+
 - [ ] Build passes
 - [ ] {Specific verification}
 ```
@@ -166,6 +175,7 @@ Create single spec file:
 ```
 
 **Analyze:**
+
 1. Which files will be affected?
 2. Which components need changes?
 3. Any shared utilities impacted?
@@ -173,26 +183,32 @@ Create single spec file:
 5. Test coverage implications?
 
 **Output Impact Report:**
+
 ```markdown
 ## Impact Analysis
 
 ### Files to Modify
-| File | Change Type | Risk |
-|------|-------------|------|
+
+| File   | Change Type            | Risk           |
+| ------ | ---------------------- | -------------- |
 | {file} | {modify/create/delete} | {low/med/high} |
 
 ### Dependencies
+
 - {New packages needed}
 - {Existing packages affected}
 
 ### Database
+
 - {Schema changes}
 - {Migration needed?}
 
 ### Breaking Changes
+
 - {List any breaking changes}
 
 ### Test Impact
+
 - {Which tests need updating}
 - {New tests needed}
 ```
@@ -229,35 +245,43 @@ Create single spec file:
    - Critical path
 
 **WebSearch** (if needed):
+
 - Best practices for {change type}
 - {technology} migration guide
 - Common pitfalls for {pattern}
 
 **Output Mini-PRD:**
+
 ```markdown
 ## Change Request Analysis
 
 ### Summary
+
 {What we're changing and why}
 
 ### Technical Approach
+
 {How we'll implement this}
 
 ### Risks & Mitigations
-| Risk | Mitigation |
-|------|------------|
+
+| Risk   | Mitigation   |
+| ------ | ------------ |
 | {risk} | {mitigation} |
 
 ### Phases
-| Phase | Scope | Specs |
-|-------|-------|-------|
-| 1 | {scope} | {N} |
-| 2 | {scope} | {N} |
+
+| Phase | Scope   | Specs |
+| ----- | ------- | ----- |
+| 1     | {scope} | {N}   |
+| 2     | {scope} | {N}   |
 
 ### Rollback Plan
+
 {How to undo if needed}
 
 ### Success Criteria
+
 - {criterion 1}
 - {criterion 2}
 ```
@@ -278,47 +302,57 @@ Create `docs/CHANGE-REQUEST-{date}.md`:
 **Requestor:** User
 
 ## Summary
+
 {1-2 sentences describing the change}
 
 ## Background
+
 {Why this change is needed}
 
 ## Requirements
+
 {What specifically needs to be done}
 
 ## Scope Assessment
+
 {From STEP 3}
 
 ## Impact Analysis
+
 {From STEP 4 - for MEDIUM/LARGE only}
 
 ## Technical Approach
+
 {High-level approach}
 
 ## Files Affected
-| File | Change |
-|------|--------|
+
+| File   | Change         |
+| ------ | -------------- |
 | {file} | {what changes} |
 
 ## Specs to Create
-| Spec | Description |
-|------|-------------|
-| CR-01-{name} | {what} |
-| CR-02-{name} | {what} |
+
+| Spec         | Description |
+| ------------ | ----------- |
+| CR-01-{name} | {what}      |
+| CR-02-{name} | {what}      |
 
 ## Success Criteria
+
 - [ ] {criterion 1}
 - [ ] {criterion 2}
 
 ## Risks
-| Risk | Mitigation |
-|------|------------|
-| {risk} | {plan} |
+
+| Risk   | Mitigation |
+| ------ | ---------- |
+| {risk} | {plan}     |
 
 ---
 
-*Generated by Ralph Change Request*
-*Next step: /ralph:plan --change-request*
+_Generated by Ralph Change Request_
+_Next step: /ralph:plan --change-request_
 ```
 
 ---
@@ -326,6 +360,7 @@ Create `docs/CHANGE-REQUEST-{date}.md`:
 ## STEP 6: Generate Specs
 
 ### For Bug Fixes:
+
 ```
 .ralph-specs/
 ├── CR-01-fix-{bug}.md
@@ -334,6 +369,7 @@ Create `docs/CHANGE-REQUEST-{date}.md`:
 ```
 
 ### For Features/Enhancements:
+
 ```
 .ralph-specs/
 ├── CR-01-{feature-part-1}.md
@@ -342,28 +378,35 @@ Create `docs/CHANGE-REQUEST-{date}.md`:
 ```
 
 **Spec format:**
+
 ```markdown
 # CR-{NN}: {Brief description}
 
 {What needs to be done - 1-2 sentences}
 
 ## Context
+
 - Existing: {what exists now}
 - Change: {what should change}
 
 ## Requirements
+
 - {Requirement 1}
 - {Requirement 2}
 
 ## Files to modify
+
 - {file1.tsx} - {what change}
 - {file2.ts} - {what change}
 
 ## E2E Test
+
 Update/create test in `e2e/{feature}.spec.ts`:
+
 - {what to verify}
 
 ## Done when
+
 - [ ] Build passes
 - [ ] E2E test passes
 - [ ] {Specific verification}
@@ -371,6 +414,7 @@ Update/create test in `e2e/{feature}.spec.ts`:
 ```
 
 **IMPORTANT:**
+
 - Keep specs MINIMAL (max 20 lines)
 - One spec = one focused change
 - Include regression check
@@ -391,29 +435,31 @@ If `docs/IMPLEMENTATION_PLAN.md` exists, append:
 **Scope:** {scope}
 
 ### CR Specs
+
 - [ ] CR-01-{name}.md
 - [ ] CR-02-{name}.md
 - **HARD STOP** - Verify all CR changes
 
 ### CR Traceability
-| Requirement | Spec |
-|-------------|------|
-| {req 1} | CR-01 |
-| {req 2} | CR-02 |
+
+| Requirement | Spec  |
+| ----------- | ----- |
+| {req 1}     | CR-01 |
+| {req 2}     | CR-02 |
 ```
 
 ---
 
 ## DEFINITION OF DONE - Change Request
 
-| Kriterium | Verifiering |
-|-----------|-------------|
-| ✅ Codebase analyzed | Förstår existerande struktur |
-| ✅ Scope assessed | S/M/L med rationale |
-| ✅ Impact analyzed | (för M/L) Filer och risker identifierade |
-| ✅ CHANGE-REQUEST.md skapad | Dokumentation komplett |
-| ✅ Specs genererade | CR-*.md filer |
-| ✅ Regression planned | Specs inkluderar regression check |
+| Kriterium                   | Verifiering                              |
+| --------------------------- | ---------------------------------------- |
+| ✅ Codebase analyzed        | Förstår existerande struktur             |
+| ✅ Scope assessed           | S/M/L med rationale                      |
+| ✅ Impact analyzed          | (för M/L) Filer och risker identifierade |
+| ✅ CHANGE-REQUEST.md skapad | Dokumentation komplett                   |
+| ✅ Specs genererade         | CR-\*.md filer                           |
+| ✅ Regression planned       | Specs inkluderar regression check        |
 
 ---
 

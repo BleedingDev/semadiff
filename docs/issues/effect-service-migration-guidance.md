@@ -69,11 +69,11 @@ Before:
 
 ```ts
 class UserRepo extends Effect.Service<UserRepo>()("UserRepo", {
-  effect: Effect.gen(function*() {
-    const db = yield* Database;
-    return { find: (id: string) => db.find(id) };
-  }),
-  dependencies: [Database.Default]
+	effect: Effect.gen(function* () {
+		const db = yield* Database;
+		return { find: (id: string) => db.find(id) };
+	}),
+	dependencies: [Database.Default],
 }) {}
 ```
 
@@ -81,10 +81,10 @@ After:
 
 ```ts
 class UserRepo extends ServiceMap.Service<UserRepo>()("UserRepo", {
-  make: Effect.gen(function*() {
-    const db = yield* Database;
-    return { find: (id: string) => db.find(id) };
-  })
+	make: Effect.gen(function* () {
+		const db = yield* Database;
+		return { find: (id: string) => db.find(id) };
+	}),
 }) {}
 
 const UserRepoLive = Layer.effect(UserRepo, UserRepo.make);

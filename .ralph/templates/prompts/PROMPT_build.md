@@ -10,7 +10,7 @@
 
 1. Läs IMPLEMENTATION_PLAN.md → identifiera nästa task
 2. Sök befintlig kod med subagents (upp till 500 parallella)
-3. Ha src/* som referens för patterns
+3. Ha src/\* som referens för patterns
 
 ---
 
@@ -66,7 +66,7 @@ grep -r "ComponentName" src/components/
 
 3. Kör ALLTID efter ny fil:
    npm run build
-   
+
    Om build misslyckas → fixa INNAN commit
 ```
 
@@ -90,7 +90,7 @@ curl -s http://localhost:5173 | head -20
 # 3. Kolla att alla routes fungerar
 # - / (redirect)
 # - /login
-# - /register  
+# - /register
 # - /todos (om auth klar)
 
 # 4. Om Supabase används - verifiera anslutning
@@ -98,6 +98,7 @@ curl -s http://localhost:5173 | head -20
 ```
 
 **HARD STOP är INTE godkänd förrän:**
+
 - [ ] `npm run build` lyckas utan fel
 - [ ] Appen startar och visar rätt sida
 - [ ] Grundläggande navigation fungerar

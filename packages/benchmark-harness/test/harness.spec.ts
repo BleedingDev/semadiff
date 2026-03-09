@@ -1,35 +1,37 @@
 import { join } from "node:path";
+
 import { describe, expect, test } from "vitest";
+
 import {
-  loadBenchmarkCases,
-  runBenchmarkSuite,
-  runSemadiffCase,
+	loadBenchmarkCases,
+	runBenchmarkSuite,
+	runSemadiffCase,
 } from "../src/index.js";
 
 const caseRoot = join(import.meta.dirname, "../../../bench/cases/gold/micro");
 
 function stripRuntime<T extends { result: { durationMs: number } }>(value: T) {
-  return {
-    ...value,
-    result: {
-      ...value.result,
-      durationMs: 0,
-    },
-  };
+	return {
+		...value,
+		result: {
+			...value.result,
+			durationMs: 0,
+		},
+	};
 }
 
 describe("benchmark harness", () => {
-  test("loads the seeded gold micro cases", () => {
-    const cases = loadBenchmarkCases(caseRoot);
-    expect(
-      cases.map((benchmarkCase) => ({
-        id: benchmarkCase.id,
-        language: benchmarkCase.language,
-        kind: benchmarkCase.kind,
-        fileIds: benchmarkCase.files.map((file) => file.id),
-        capabilities: benchmarkCase.capabilities,
-      }))
-    ).toMatchInlineSnapshot(`
+	test("loads the seeded gold micro cases", () => {
+		const cases = loadBenchmarkCases(caseRoot);
+		expect(
+			cases.map((benchmarkCase) => ({
+				id: benchmarkCase.id,
+				language: benchmarkCase.language,
+				kind: benchmarkCase.kind,
+				fileIds: benchmarkCase.files.map((file) => file.id),
+				capabilities: benchmarkCase.capabilities,
+			})),
+		).toMatchInlineSnapshot(`
       [
         {
           "capabilities": {
@@ -112,17 +114,17 @@ describe("benchmark harness", () => {
         },
       ]
     `);
-  });
+	});
 
-  test("projects the rename case through the semadiff adapter", () => {
-    const benchmarkCase = loadBenchmarkCases(caseRoot).find(
-      (entry) => entry.id === "rename-local-ts-001"
-    );
-    expect(benchmarkCase).toBeDefined();
-    if (!benchmarkCase) {
-      throw new Error("Expected rename-local-ts-001 to exist.");
-    }
-    expect(stripRuntime(runSemadiffCase(benchmarkCase))).toMatchInlineSnapshot(`
+	test("projects the rename case through the semadiff adapter", () => {
+		const benchmarkCase = loadBenchmarkCases(caseRoot).find(
+			(entry) => entry.id === "rename-local-ts-001",
+		);
+		expect(benchmarkCase).toBeDefined();
+		if (!benchmarkCase) {
+			throw new Error("Expected rename-local-ts-001 to exist.");
+		}
+		expect(stripRuntime(runSemadiffCase(benchmarkCase))).toMatchInlineSnapshot(`
       {
         "capabilities": {
           "entity": true,
@@ -263,59 +265,59 @@ describe("benchmark harness", () => {
         "toolVersion": "0.1.0",
       }
     `);
-  });
+	});
 
-  test("scores single-file entity truth without explicit file ids", () => {
-    const benchmarkCase = loadBenchmarkCases(caseRoot).find(
-      (entry) => entry.id === "update-ts-001"
-    );
-    expect(benchmarkCase).toBeDefined();
-    if (!benchmarkCase) {
-      throw new Error("Expected update-ts-001 to exist.");
-    }
-    const report = runBenchmarkSuite([benchmarkCase], { caseRoot });
-    const evaluation = report.cases[0]?.evaluation.entity;
-    expect(evaluation).toEqual({
-      status: "scored",
-      expectedEntities: 2,
-      actualEntities: 2,
-      matchedEntities: 2,
-      entityPrecision: 1,
-      entityRecall: 1,
-      entityF1: 1,
-      expectedChanges: 1,
-      actualChanges: 1,
-      matchedChanges: 1,
-      changePrecision: 1,
-      changeRecall: 1,
-      changeF1: 1,
-    });
-  });
+	test("scores single-file entity truth without explicit file ids", () => {
+		const benchmarkCase = loadBenchmarkCases(caseRoot).find(
+			(entry) => entry.id === "update-ts-001",
+		);
+		expect(benchmarkCase).toBeDefined();
+		if (!benchmarkCase) {
+			throw new Error("Expected update-ts-001 to exist.");
+		}
+		const report = runBenchmarkSuite([benchmarkCase], { caseRoot });
+		const evaluation = report.cases[0]?.evaluation.entity;
+		expect(evaluation).toEqual({
+			status: "scored",
+			expectedEntities: 2,
+			actualEntities: 2,
+			matchedEntities: 2,
+			entityPrecision: 1,
+			entityRecall: 1,
+			entityF1: 1,
+			expectedChanges: 1,
+			actualChanges: 1,
+			matchedChanges: 1,
+			changePrecision: 1,
+			changeRecall: 1,
+			changeF1: 1,
+		});
+	});
 
-  test("scores the seeded suite with stable review metrics", () => {
-    const report = runBenchmarkSuite(loadBenchmarkCases(caseRoot), {
-      caseRoot,
-    });
-    expect({
-      cases: report.cases.map((entry) => ({
-        caseId: entry.caseId,
-        review: entry.evaluation.review,
-        performance: {
-          ...entry.evaluation.performance,
-          runtimeMs: 0,
-        },
-        output: stripRuntime(entry.output),
-      })),
-      summary: {
-        ...report.summary,
-        performance: {
-          ...report.summary.performance,
-          totalRuntimeMs: 0,
-          medianRuntimeMs: 0,
-          p95RuntimeMs: 0,
-        },
-      },
-    }).toMatchInlineSnapshot(`
+	test("scores the seeded suite with stable review metrics", () => {
+		const report = runBenchmarkSuite(loadBenchmarkCases(caseRoot), {
+			caseRoot,
+		});
+		expect({
+			cases: report.cases.map((entry) => ({
+				caseId: entry.caseId,
+				review: entry.evaluation.review,
+				performance: {
+					...entry.evaluation.performance,
+					runtimeMs: 0,
+				},
+				output: stripRuntime(entry.output),
+			})),
+			summary: {
+				...report.summary,
+				performance: {
+					...report.summary.performance,
+					totalRuntimeMs: 0,
+					medianRuntimeMs: 0,
+					p95RuntimeMs: 0,
+				},
+			},
+		}).toMatchInlineSnapshot(`
       {
         "cases": [
           {
@@ -1332,5 +1334,5 @@ describe("benchmark harness", () => {
         },
       }
     `);
-  });
+	});
 });

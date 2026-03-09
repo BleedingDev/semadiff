@@ -3,6 +3,7 @@
 Stoppa Ralph gracefully på VM.
 
 ## Usage
+
 ```
 /ralph:abort
 /ralph:abort --force     # Kill utan att vänta
@@ -11,11 +12,13 @@ Stoppa Ralph gracefully på VM.
 ## Instructions
 
 **STEG 1: LÄS VM CONFIG**
+
 ```bash
 source ~/.ralph-vm
 ```
 
 **STEG 2: STOPPA RALPH**
+
 ```bash
 ssh $VM_USER@$VM_IP << 'EOF'
 echo "=== STOPPING RALPH ==="
@@ -53,6 +56,7 @@ EOF
 ```
 
 **STEG 3: VISA STATUS**
+
 ```bash
 # Visa vad som sparades
 ssh $VM_USER@$VM_IP << 'EOF'
@@ -74,6 +78,7 @@ EOF
 ```
 
 **OUTPUT:**
+
 ```
 === STOPPING RALPH ===
 Found PIDs: 12345 12346
@@ -87,6 +92,7 @@ Last commit: abc123 Ralph: 15-user-profile
 
 **OM --force FLAGGA:**
 Skippa graceful, kör direkt:
+
 ```bash
 ssh $VM_USER@$VM_IP "pkill -9 -f 'ralph.sh|orchestrator.sh|claude'"
 ```

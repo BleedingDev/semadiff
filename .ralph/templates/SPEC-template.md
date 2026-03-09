@@ -14,16 +14,20 @@
 ## Functional Requirements (FR)
 
 ### FR1: {Krav 1}
+
 {Detaljerad beskrivning}
 
 **Acceptance Criteria:**
+
 - [ ] {Testbart kriterium 1}
 - [ ] {Testbart kriterium 2}
 
 ### FR2: {Krav 2}
+
 {Detaljerad beskrivning}
 
 **Acceptance Criteria:**
+
 - [ ] {Testbart kriterium}
 
 ---
@@ -31,18 +35,21 @@
 ## Technical Implementation
 
 ### Filer att skapa/ändra
+
 - `src/path/to/file.ts` - {vad}
 - `src/path/to/other.ts` - {vad}
 
 ### Datamodell (om relevant)
+
 ```typescript
 interface Example {
-  id: string;
-  // ...
+	id: string;
+	// ...
 }
 ```
 
 ### API/Endpoints (om relevant)
+
 - `GET /api/resource` - {beskrivning}
 - `POST /api/resource` - {beskrivning}
 
@@ -55,19 +62,21 @@ interface Example {
 **Testfil:** `e2e/{spec-name}.spec.ts`
 
 **Tester att skriva:**
+
 ```typescript
-test('{beskrivning av test 1}', async ({ page }) => {
-  // 1. {Steg 1}
-  // 2. {Steg 2}
-  // 3. Verifiera {resultat}
+test("{beskrivning av test 1}", async ({ page }) => {
+	// 1. {Steg 1}
+	// 2. {Steg 2}
+	// 3. Verifiera {resultat}
 });
 
-test('{beskrivning av test 2}', async ({ page }) => {
-  // ...
+test("{beskrivning av test 2}", async ({ page }) => {
+	// ...
 });
 ```
 
 **Vad testet ska verifiera:**
+
 - [ ] {User flow fungerar}
 - [ ] {Edge case hanteras}
 - [ ] {Error state visas korrekt}

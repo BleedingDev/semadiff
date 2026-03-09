@@ -39,23 +39,23 @@ Result envelope:
 
 ```ts
 interface PrDiffClientContract {
-  getPrSummary(input: { prUrl: string }): Promise<PrDiffResult<PrSummary>>;
-  getFileDiff(input: {
-    prUrl: string;
-    filename: string;
-    contextLines?: number;
-    lineLayout?: "split" | "unified";
-    lineMode?: "semantic" | "raw";
-    hideComments?: boolean;
-    detectMoves?: boolean;
-  }): Promise<PrDiffResult<FileDiffPayload>>;
-  getFileDiffDocument(input: {
-    prUrl: string;
-    filename: string;
-    contextLines?: number;
-    lineLayout?: "split" | "unified";
-    detectMoves?: boolean;
-  }): Promise<PrDiffResult<FileDiffDocument>>;
+	getPrSummary(input: { prUrl: string }): Promise<PrDiffResult<PrSummary>>;
+	getFileDiff(input: {
+		prUrl: string;
+		filename: string;
+		contextLines?: number;
+		lineLayout?: "split" | "unified";
+		lineMode?: "semantic" | "raw";
+		hideComments?: boolean;
+		detectMoves?: boolean;
+	}): Promise<PrDiffResult<FileDiffPayload>>;
+	getFileDiffDocument(input: {
+		prUrl: string;
+		filename: string;
+		contextLines?: number;
+		lineLayout?: "split" | "unified";
+		detectMoves?: boolean;
+	}): Promise<PrDiffResult<FileDiffDocument>>;
 }
 ```
 
@@ -63,15 +63,15 @@ interface PrDiffClientContract {
 
 ```ts
 interface PrDiffEffectClientContract {
-  getPrSummary(
-    input: { prUrl: string }
-  ): Effect.Effect<PrSummary, PrDiffClientError>;
-  getFileDiff(
-    input: GetFileDiffInput
-  ): Effect.Effect<FileDiffPayload, PrDiffClientError>;
-  getFileDiffDocument(
-    input: GetFileDiffDocumentInput
-  ): Effect.Effect<FileDiffDocument, PrDiffClientError>;
+	getPrSummary(input: {
+		prUrl: string;
+	}): Effect.Effect<PrSummary, PrDiffClientError>;
+	getFileDiff(
+		input: GetFileDiffInput,
+	): Effect.Effect<FileDiffPayload, PrDiffClientError>;
+	getFileDiffDocument(
+		input: GetFileDiffDocumentInput,
+	): Effect.Effect<FileDiffDocument, PrDiffClientError>;
 }
 ```
 
@@ -81,31 +81,34 @@ This plate documents the target API; implementation begins in the extraction pla
 
 ```ts
 interface SemaDiffExplorerProps {
-  client: PrDiffClientContract;
-  prUrl?: string;
-  initialPrUrl?: string;
-  onPrUrlChange?: (prUrl: string) => void;
-  selectedFile?: string | null;
-  onSelectedFileChange?: (filename: string | null) => void;
-  fileFilter?: string;
-  onFileFilterChange?: (value: string) => void;
-  lineLayout?: "split" | "unified";
-  onLineLayoutChange?: (layout: "split" | "unified") => void;
-  hideComments?: boolean;
-  onHideCommentsChange?: (hide: boolean) => void;
-  compareMoves?: boolean;
-  onCompareMovesChange?: (value: boolean) => void;
-  onDiffLoaded?: (filename: string, result: PrDiffResult<FileDiffPayload>) => void;
+	client: PrDiffClientContract;
+	prUrl?: string;
+	initialPrUrl?: string;
+	onPrUrlChange?: (prUrl: string) => void;
+	selectedFile?: string | null;
+	onSelectedFileChange?: (filename: string | null) => void;
+	fileFilter?: string;
+	onFileFilterChange?: (value: string) => void;
+	lineLayout?: "split" | "unified";
+	onLineLayoutChange?: (layout: "split" | "unified") => void;
+	hideComments?: boolean;
+	onHideCommentsChange?: (hide: boolean) => void;
+	compareMoves?: boolean;
+	onCompareMovesChange?: (value: boolean) => void;
+	onDiffLoaded?: (
+		filename: string,
+		result: PrDiffResult<FileDiffPayload>,
+	) => void;
 }
 
 interface UseSemaDiffExplorerStateInput {
-  client: PrDiffClientContract;
-  prUrl?: string;
-  initialPrUrl?: string;
-  contextLines?: number;
-  lineLayout?: "split" | "unified";
-  hideComments?: boolean;
-  compareMoves?: boolean;
+	client: PrDiffClientContract;
+	prUrl?: string;
+	initialPrUrl?: string;
+	contextLines?: number;
+	lineLayout?: "split" | "unified";
+	hideComments?: boolean;
+	compareMoves?: boolean;
 }
 ```
 
@@ -120,11 +123,11 @@ import { SemaDiffExplorer } from "@semadiff/react-ui";
 import "@semadiff/react-ui/styles.css";
 
 const client = createHttpPrDiffClient({
-  baseUrl: "https://your-app.example.com",
+	baseUrl: "https://your-app.example.com",
 });
 
 export function DiffScreen() {
-  return <SemaDiffExplorer className="sd-app" client={client} />;
+	return <SemaDiffExplorer className="sd-app" client={client} />;
 }
 ```
 

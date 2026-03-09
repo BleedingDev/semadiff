@@ -2,27 +2,28 @@
 
 import { execSync } from "node:child_process";
 import {
-  accessSync,
-  constants,
-  mkdirSync,
-  readFileSync,
-  writeFileSync,
+	accessSync,
+	constants,
+	mkdirSync,
+	readFileSync,
+	writeFileSync,
 } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
 import type { NormalizerSettings } from "@semadiff/core";
 import {
-  ConfigSchema,
-  createDiagnosticsBundle,
-  explainDiff,
-  renderJson,
-  structuralDiff,
-  Telemetry,
-  TelemetryLive,
+	ConfigSchema,
+	createDiagnosticsBundle,
+	explainDiff,
+	renderJson,
+	structuralDiff,
+	Telemetry,
+	TelemetryLive,
 } from "@semadiff/core";
 import {
-  buildEntityDocumentFromSources,
-  buildHybridDiffDocument,
+	buildEntityDocumentFromSources,
+	buildHybridDiffDocument,
 } from "@semadiff/entity-core";
 import { lightningCssParsers } from "@semadiff/parser-lightningcss";
 import { swcParsers } from "@semadiff/parser-swc";
@@ -30,1644 +31,1649 @@ import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
 import type { LanguageId, TokenRange } from "@semadiff/parsers";
 import { makeRegistry } from "@semadiff/parsers";
 import {
-  renderTerminal,
-  renderTerminalLinesFromHtml,
+	renderTerminal,
+	renderTerminalLinesFromHtml,
 } from "@semadiff/render-terminal";
 import { Cause, Console, Effect, Exit, Schema } from "effect";
 import { Argument, Command, Flag } from "effect/unstable/cli";
+
 import { resolveConfig } from "./config/resolve.js";
 import {
-  type CollectedGitHybridInput,
-  collectGitFileChanges,
-  parseStdinFileChanges,
-  type ResolvedFileChange,
-  resolveGitHybridMode,
+	type CollectedGitHybridInput,
+	collectGitFileChanges,
+	parseStdinFileChanges,
+	type ResolvedFileChange,
+	resolveGitHybridMode,
 } from "./git-hybrid.js";
 import {
-  openInspectWorkbench,
-  renderInspectWorkbench,
-  resolveInspectOutputPath,
-  writeInspectWorkbench,
+	openInspectWorkbench,
+	renderInspectWorkbench,
+	resolveInspectOutputPath,
+	writeInspectWorkbench,
 } from "./inspect-workbench.js";
 import { cliRuntimeLayer } from "./runtime-layer.js";
 
 const Args = {
-  text: ({ name }: { name: string }) => Argument.string(name),
-  integer: ({ name }: { name: string }) => Argument.integer(name),
-  repeated: <A>(argument: Argument.Argument<A>) =>
-    argument.pipe(Argument.variadic),
-  withDefault: Argument.withDefault,
+	text: ({ name }: { name: string }) => Argument.string(name),
+	integer: ({ name }: { name: string }) => Argument.integer(name),
+	repeated: <A>(argument: Argument.Argument<A>) =>
+		argument.pipe(Argument.variadic),
+	withDefault: Argument.withDefault,
 } as const;
 
 const Options = {
-  text: (name: string) => Flag.string(name),
-  integer: (name: string) => Flag.integer(name),
-  boolean: (name: string) => Flag.boolean(name),
-  choice: <const Choices extends readonly string[]>(
-    name: string,
-    choices: Choices
-  ) => Flag.choice(name, choices),
-  withDefault: Flag.withDefault,
-  withDescription: Flag.withDescription,
+	text: (name: string) => Flag.string(name),
+	integer: (name: string) => Flag.integer(name),
+	boolean: (name: string) => Flag.boolean(name),
+	choice: <const Choices extends readonly string[]>(
+		name: string,
+		choices: Choices,
+	) => Flag.choice(name, choices),
+	withDefault: Flag.withDefault,
+	withDescription: Flag.withDescription,
 } as const;
 
 const isSourceRun = fileURLToPath(import.meta.url).includes(
-  `${path.sep}packages${path.sep}cli${path.sep}src${path.sep}`
+	`${path.sep}packages${path.sep}cli${path.sep}src${path.sep}`,
 );
 type PrBackendModule = typeof import("../../pr-backend/src/index.js");
 const prBackendModule = (await import(
-  isSourceRun
-    ? new URL("../../pr-backend/src/index.ts", import.meta.url).href
-    : "@semadiff/pr-backend"
+	isSourceRun
+		? new URL("../../pr-backend/src/index.ts", import.meta.url).href
+		: "@semadiff/pr-backend"
 )) as PrBackendModule;
 const { FileDiffDocumentSchema, PrDiffLive, PrDiffService, PrSummarySchema } =
-  prBackendModule;
+	prBackendModule;
 
 interface DiffArgs {
-  oldPath: string;
-  newPath: string;
-  format: "ansi" | "plain" | "json";
-  layout: "unified" | "side-by-side";
-  view: "semantic" | "lines";
-  experimentalHybrid: boolean;
-  language?: LanguageId;
+	oldPath: string;
+	newPath: string;
+	format: "ansi" | "plain" | "json";
+	layout: "unified" | "side-by-side";
+	view: "semantic" | "lines";
+	experimentalHybrid: boolean;
+	language?: LanguageId;
 }
 
 interface GitHybridFileOutput {
-  id: string;
-  status: string;
-  oldPath: string | null;
-  newPath: string | null;
-  language: string;
-  diff: ReturnType<typeof structuralDiff>;
+	id: string;
+	status: string;
+	oldPath: string | null;
+	newPath: string | null;
+	language: string;
+	diff: ReturnType<typeof structuralDiff>;
 }
 
 interface GitHybridWarning {
-  kind: "binary-skipped";
-  path: string;
-  message: string;
+	kind: "binary-skipped";
+	path: string;
+	message: string;
 }
 
 interface GitHybridEntitySource {
-  oldText: string;
-  newText: string;
-  language?: string | undefined;
-  oldRoot?: unknown;
-  newRoot?: unknown;
-  oldPath?: string | undefined;
-  newPath?: string | undefined;
-  diff: ReturnType<typeof structuralDiff>;
+	oldText: string;
+	newText: string;
+	language?: string | undefined;
+	oldRoot?: unknown;
+	newRoot?: unknown;
+	oldPath?: string | undefined;
+	newPath?: string | undefined;
+	diff: ReturnType<typeof structuralDiff>;
 }
 
 type GitHybridProcessedChange =
-  | {
-      kind: "warning";
-      warning: GitHybridWarning;
-    }
-  | {
-      kind: "file";
-      file: GitHybridFileOutput;
-      entitySource: GitHybridEntitySource;
-    };
+	| {
+			kind: "warning";
+			warning: GitHybridWarning;
+	  }
+	| {
+			kind: "file";
+			file: GitHybridFileOutput;
+			entitySource: GitHybridEntitySource;
+	  };
 
 function readInput(path: string): string {
-  if (path === "-") {
-    return readFileSync(0, "utf8");
-  }
-  return readFileSync(path, "utf8");
+	if (path === "-") {
+		return readFileSync(0, "utf8");
+	}
+	return readFileSync(path, "utf8");
 }
 
 function isBinary(text: string) {
-  return text.includes("\u0000");
+	return text.includes("\u0000");
 }
 
 function encodeJson(_schema: unknown, value: unknown, space?: number) {
-  return JSON.stringify(value, null, space);
+	return JSON.stringify(value, null, space);
 }
 
 const languageChoices = [
-  "ts",
-  "tsx",
-  "js",
-  "jsx",
-  "css",
-  "json",
-  "md",
-  "toml",
-  "yaml",
-  "text",
-  "auto",
+	"ts",
+	"tsx",
+	"js",
+	"jsx",
+	"css",
+	"json",
+	"md",
+	"toml",
+	"yaml",
+	"text",
+	"auto",
 ] as const;
 
 const ParserCapabilitySchema = Schema.Struct({
-  hasAstKinds: Schema.Boolean,
-  hasTokenRanges: Schema.Boolean,
-  supportsErrorRecovery: Schema.Boolean,
-  supportsIncrementalParse: Schema.Boolean,
+	hasAstKinds: Schema.Boolean,
+	hasTokenRanges: Schema.Boolean,
+	supportsErrorRecovery: Schema.Boolean,
+	supportsIncrementalParse: Schema.Boolean,
 });
 const ParserCapabilitiesSchema = Schema.Record(
-  Schema.String,
-  ParserCapabilitySchema
+	Schema.String,
+	ParserCapabilitySchema,
 );
 const DoctorReportSchema = Schema.Struct({
-  bun: Schema.String,
-  git: Schema.String,
-  cwd: Schema.String,
-  canWriteCwd: Schema.Boolean,
-  parsers: ParserCapabilitiesSchema,
+	bun: Schema.String,
+	git: Schema.String,
+	cwd: Schema.String,
+	canWriteCwd: Schema.Boolean,
+	parsers: ParserCapabilitiesSchema,
 });
 const DoctorReportJson = Schema.fromJsonString(DoctorReportSchema);
 
 const NormalizerIdSchema = Schema.Literals([
-  "whitespace",
-  "tailwind",
-  "importOrder",
-  "numericLiterals",
+	"whitespace",
+	"tailwind",
+	"importOrder",
+	"numericLiterals",
 ] as const);
 const NormalizerLanguageSchema = Schema.Literals([
-  "ts",
-  "tsx",
-  "js",
-  "jsx",
-  "css",
-  "json",
-  "md",
-  "toml",
-  "yaml",
-  "text",
-  "*",
+	"ts",
+	"tsx",
+	"js",
+	"jsx",
+	"css",
+	"json",
+	"md",
+	"toml",
+	"yaml",
+	"text",
+	"*",
 ] as const);
 const NormalizerSafetySchema = Schema.Literals([
-  "conservative",
-  "aggressive",
+	"conservative",
+	"aggressive",
 ] as const);
 const NormalizerRuleSummarySchema = Schema.Struct({
-  id: NormalizerIdSchema,
-  description: Schema.String,
-  language: NormalizerLanguageSchema,
-  safety: NormalizerSafetySchema,
-  defaultEnabled: Schema.Boolean,
+	id: NormalizerIdSchema,
+	description: Schema.String,
+	language: NormalizerLanguageSchema,
+	safety: NormalizerSafetySchema,
+	defaultEnabled: Schema.Boolean,
 });
 const NormalizerRulesSchema = Schema.Array(NormalizerRuleSummarySchema);
 
 const ConfigSourceSchema = Schema.Literals([
-  "default",
-  "project",
-  "user",
-  "env",
+	"default",
+	"project",
+	"user",
+	"env",
 ] as const);
 const NormalizerSourceSchema = Schema.Struct({
-  whitespace: ConfigSourceSchema,
-  tailwind: ConfigSourceSchema,
-  importOrder: ConfigSourceSchema,
-  numericLiterals: ConfigSourceSchema,
+	whitespace: ConfigSourceSchema,
+	tailwind: ConfigSourceSchema,
+	importOrder: ConfigSourceSchema,
+	numericLiterals: ConfigSourceSchema,
 });
 const NormalizerSourceOverridesSchema = Schema.Struct({
-  whitespace: Schema.optional(ConfigSourceSchema),
-  tailwind: Schema.optional(ConfigSourceSchema),
-  importOrder: Schema.optional(ConfigSourceSchema),
-  numericLiterals: Schema.optional(ConfigSourceSchema),
+	whitespace: Schema.optional(ConfigSourceSchema),
+	tailwind: Schema.optional(ConfigSourceSchema),
+	importOrder: Schema.optional(ConfigSourceSchema),
+	numericLiterals: Schema.optional(ConfigSourceSchema),
 });
 const NormalizerSourcesSchema = Schema.Struct({
-  global: NormalizerSourceSchema,
-  perLanguage: Schema.Record(Schema.String, NormalizerSourceOverridesSchema),
+	global: NormalizerSourceSchema,
+	perLanguage: Schema.Record(Schema.String, NormalizerSourceOverridesSchema),
 });
 const ConfigSourcesSchema = Schema.Struct({
-  normalizers: NormalizerSourcesSchema,
-  renderer: Schema.Struct({
-    format: ConfigSourceSchema,
-    layout: ConfigSourceSchema,
-  }),
-  telemetry: Schema.Struct({
-    enabled: ConfigSourceSchema,
-    exporter: ConfigSourceSchema,
-    endpoint: ConfigSourceSchema,
-  }),
+	normalizers: NormalizerSourcesSchema,
+	renderer: Schema.Struct({
+		format: ConfigSourceSchema,
+		layout: ConfigSourceSchema,
+	}),
+	telemetry: Schema.Struct({
+		enabled: ConfigSourceSchema,
+		exporter: ConfigSourceSchema,
+		endpoint: ConfigSourceSchema,
+	}),
 });
 const ResolvedConfigOutputSchema = Schema.Struct({
-  config: ConfigSchema,
-  sources: ConfigSourcesSchema,
-  normalizerRules: NormalizerRulesSchema,
-  paths: Schema.Struct({
-    project: Schema.String,
-    user: Schema.String,
-  }),
+	config: ConfigSchema,
+	sources: ConfigSourcesSchema,
+	normalizerRules: NormalizerRulesSchema,
+	paths: Schema.Struct({
+		project: Schema.String,
+		user: Schema.String,
+	}),
 });
 const ResolvedConfigOutputJson = Schema.fromJsonString(
-  ResolvedConfigOutputSchema
+	ResolvedConfigOutputSchema,
 );
 
 const BenchCaseSchema = Schema.Struct({
-  id: Schema.String,
-  durationMs: Schema.Number,
-  operationCount: Schema.Number,
-  moveCount: Schema.Number,
-  renameCount: Schema.Number,
+	id: Schema.String,
+	durationMs: Schema.Number,
+	operationCount: Schema.Number,
+	moveCount: Schema.Number,
+	renameCount: Schema.Number,
 });
 const BenchReportSchema = Schema.Struct({
-  version: Schema.String,
-  timestamp: Schema.String,
-  threshold: Schema.Number,
-  cases: Schema.Array(BenchCaseSchema),
-  totals: Schema.Struct({
-    durationMs: Schema.Number,
-  }),
+	version: Schema.String,
+	timestamp: Schema.String,
+	threshold: Schema.Number,
+	cases: Schema.Array(BenchCaseSchema),
+	totals: Schema.Struct({
+		durationMs: Schema.Number,
+	}),
 });
 const BenchReportJson = Schema.fromJsonString(BenchReportSchema);
 const BenchRegressionSchema = Schema.Struct({
-  id: Schema.String,
-  baselineMs: Schema.Number,
-  currentMs: Schema.Number,
-  regression: Schema.Boolean,
+	id: Schema.String,
+	baselineMs: Schema.Number,
+	currentMs: Schema.Number,
+	regression: Schema.Boolean,
 });
 const BenchOutputSchema = Schema.Struct({
-  report: BenchReportSchema,
-  baselinePath: Schema.String,
-  regressions: Schema.Array(BenchRegressionSchema),
+	report: BenchReportSchema,
+	baselinePath: Schema.String,
+	regressions: Schema.Array(BenchRegressionSchema),
 });
 const BenchOutputJson = Schema.fromJsonString(BenchOutputSchema);
 
 const DiffOperationTypeSchema = Schema.Literals([
-  "insert",
-  "delete",
-  "update",
-  "move",
+	"insert",
+	"delete",
+	"update",
+	"move",
 ] as const);
 const ExplainOperationSchema = Schema.Struct({
-  id: Schema.String,
-  type: DiffOperationTypeSchema,
-  rationale: Schema.String,
-  confidence: Schema.optional(Schema.Number),
-  moveId: Schema.optional(Schema.String),
-  renameGroupId: Schema.optional(Schema.String),
+	id: Schema.String,
+	type: DiffOperationTypeSchema,
+	rationale: Schema.String,
+	confidence: Schema.optional(Schema.Number),
+	moveId: Schema.optional(Schema.String),
+	renameGroupId: Schema.optional(Schema.String),
 });
 const ExplainDocumentSchema = Schema.Struct({
-  version: Schema.Literal("0.1.0"),
-  operations: Schema.Array(ExplainOperationSchema),
-  moves: Schema.Array(
-    Schema.Struct({
-      id: Schema.String,
-      confidence: Schema.Number,
-      rationale: Schema.String,
-    })
-  ),
-  renames: Schema.Array(
-    Schema.Struct({
-      id: Schema.String,
-      from: Schema.String,
-      to: Schema.String,
-      occurrences: Schema.Number,
-      confidence: Schema.Number,
-      rationale: Schema.String,
-    })
-  ),
+	version: Schema.Literal("0.1.0"),
+	operations: Schema.Array(ExplainOperationSchema),
+	moves: Schema.Array(
+		Schema.Struct({
+			id: Schema.String,
+			confidence: Schema.Number,
+			rationale: Schema.String,
+		}),
+	),
+	renames: Schema.Array(
+		Schema.Struct({
+			id: Schema.String,
+			from: Schema.String,
+			to: Schema.String,
+			occurrences: Schema.Number,
+			confidence: Schema.Number,
+			rationale: Schema.String,
+		}),
+	),
 });
 const ExplainDocumentJson = Schema.fromJsonString(ExplainDocumentSchema);
 
 class CliSystemError extends Schema.TaggedErrorClass<CliSystemError>()(
-  "CliSystemError",
-  {
-    operation: Schema.String,
-    error: Schema.Defect,
-  }
+	"CliSystemError",
+	{
+		operation: Schema.String,
+		error: Schema.Defect,
+	},
 ) {}
 
 const formatOption = Options.choice("format", [
-  "ansi",
-  "plain",
-  "json",
+	"ansi",
+	"plain",
+	"json",
 ] as const).pipe(
-  Options.withDefault("ansi"),
-  Options.withDescription("Output format.")
+	Options.withDefault("ansi"),
+	Options.withDescription("Output format."),
 );
 const layoutOption = Options.choice("layout", [
-  "unified",
-  "side-by-side",
+	"unified",
+	"side-by-side",
 ] as const).pipe(
-  Options.withDefault("unified"),
-  Options.withDescription("Diff layout.")
+	Options.withDefault("unified"),
+	Options.withDescription("Diff layout."),
 );
 const viewOption = Options.choice("view", ["semantic", "lines"] as const).pipe(
-  Options.withDefault("lines"),
-  Options.withDescription("Render semantic ops or line diff view.")
+	Options.withDefault("lines"),
+	Options.withDescription("Render semantic ops or line diff view."),
 );
 const languageOption = Options.choice("language", languageChoices).pipe(
-  Options.withDefault("auto"),
-  Options.withDescription("Language hint (auto to infer).")
+	Options.withDefault("auto"),
+	Options.withDescription("Language hint (auto to infer)."),
 );
 const inspectOutputOption = Options.text("output").pipe(
-  Options.withDefault(""),
-  Options.withDescription("HTML output path (temp file if omitted).")
+	Options.withDefault(""),
+	Options.withDescription("HTML output path (temp file if omitted)."),
 );
 const inspectOpenOption = Options.boolean("open").pipe(
-  Options.withDefault(false),
-  Options.withDescription(
-    "Open the generated workbench in the default browser."
-  )
+	Options.withDefault(false),
+	Options.withDescription(
+		"Open the generated workbench in the default browser.",
+	),
 );
 const inspectIncludeCodeOption = Options.boolean("include-code").pipe(
-  Options.withDefault(false),
-  Options.withDescription(
-    "Include source snippets in the embedded diagnostics bundle."
-  )
+	Options.withDefault(false),
+	Options.withDescription(
+		"Include source snippets in the embedded diagnostics bundle.",
+	),
 );
 const experimentalHybridOption = Options.boolean("experimental-hybrid").pipe(
-  Options.withDefault(false),
-  Options.withDescription(
-    "Emit experimental hybrid sidecar data when --format json."
-  )
+	Options.withDefault(false),
+	Options.withDescription(
+		"Emit experimental hybrid sidecar data when --format json.",
+	),
 );
 const prContextOption = Options.integer("context").pipe(
-  Options.withDefault(3),
-  Options.withDescription("Line context for diff caching (default 3).")
+	Options.withDefault(3),
+	Options.withDescription("Line context for diff caching (default 3)."),
 );
 const prMovesOption = Options.boolean("moves").pipe(
-  Options.withDefault(true),
-  Options.withDescription("Enable move detection.")
+	Options.withDefault(true),
+	Options.withDescription("Enable move detection."),
 );
 const prSummaryCompactOption = Options.boolean("compact").pipe(
-  Options.withDefault(false),
-  Options.withDescription("Print compact JSON (no whitespace).")
+	Options.withDefault(false),
+	Options.withDescription("Print compact JSON (no whitespace)."),
 );
 const gitHybridCwdOption = Options.text("cwd").pipe(
-  Options.withDefault("."),
-  Options.withDescription("Directory to resolve the git repository from.")
+	Options.withDefault("."),
+	Options.withDescription("Directory to resolve the git repository from."),
 );
 const gitHybridWorkingTreeOption = Options.boolean("working-tree").pipe(
-  Options.withDefault(false),
-  Options.withDescription("Compare HEAD against the current working tree.")
+	Options.withDefault(false),
+	Options.withDescription("Compare HEAD against the current working tree."),
 );
 const gitHybridStagedOption = Options.boolean("staged").pipe(
-  Options.withDefault(false),
-  Options.withDescription("Compare HEAD against the staged index.")
+	Options.withDefault(false),
+	Options.withDescription("Compare HEAD against the staged index."),
 );
 const gitHybridCommitOption = Options.text("commit").pipe(
-  Options.withDefault(""),
-  Options.withDescription("Analyze a single commit against its first parent.")
+	Options.withDefault(""),
+	Options.withDescription("Analyze a single commit against its first parent."),
 );
 const gitHybridFromOption = Options.text("from").pipe(
-  Options.withDefault(""),
-  Options.withDescription("Start revision for a git range.")
+	Options.withDefault(""),
+	Options.withDescription("Start revision for a git range."),
 );
 const gitHybridToOption = Options.text("to").pipe(
-  Options.withDefault(""),
-  Options.withDescription("End revision for a git range.")
+	Options.withDefault(""),
+	Options.withDescription("End revision for a git range."),
 );
 const gitHybridStdinOption = Options.boolean("stdin-file-changes").pipe(
-  Options.withDefault(false),
-  Options.withDescription("Read JSON FileChange[] from stdin instead of git.")
+	Options.withDefault(false),
+	Options.withDescription("Read JSON FileChange[] from stdin instead of git."),
 );
 
 function inferLanguageFromPath(path?: string): LanguageId | undefined {
-  if (!path || path === "-") {
-    return undefined;
-  }
-  const ext = path.split(".").pop()?.toLowerCase();
-  switch (ext) {
-    case "ts":
-      return "ts";
-    case "tsx":
-      return "tsx";
-    case "js":
-      return "js";
-    case "jsx":
-      return "jsx";
-    case "css":
-      return "css";
-    case "json":
-      return "json";
-    case "md":
-    case "markdown":
-      return "md";
-    case "toml":
-      return "toml";
-    case "yaml":
-    case "yml":
-      return "yaml";
-    default:
-      return undefined;
-  }
+	if (!path || path === "-") {
+		return undefined;
+	}
+	const ext = path.split(".").pop()?.toLowerCase();
+	switch (ext) {
+		case "ts":
+			return "ts";
+		case "tsx":
+			return "tsx";
+		case "js":
+			return "js";
+		case "jsx":
+			return "jsx";
+		case "css":
+			return "css";
+		case "json":
+			return "json";
+		case "md":
+		case "markdown":
+			return "md";
+		case "toml":
+			return "toml";
+		case "yaml":
+		case "yml":
+			return "yaml";
+		default:
+			return undefined;
+	}
 }
 
 function readLanguageHint(value?: string | undefined): LanguageId | undefined {
-  if (!(value && value !== "auto")) {
-    return undefined;
-  }
-  if ((languageChoices as readonly string[]).includes(value)) {
-    return value as LanguageId;
-  }
-  throw new Error(`Unsupported language hint: ${value}`);
+	if (!(value && value !== "auto")) {
+		return undefined;
+	}
+	if ((languageChoices as readonly string[]).includes(value)) {
+		return value as LanguageId;
+	}
+	throw new Error(`Unsupported language hint: ${value}`);
 }
 
 function collectGitHybridInput(params: {
-  cwd: string;
-  workingTree: boolean;
-  staged: boolean;
-  commit: string;
-  from: string;
-  to: string;
-  stdinFileChanges: boolean;
+	cwd: string;
+	workingTree: boolean;
+	staged: boolean;
+	commit: string;
+	from: string;
+	to: string;
+	stdinFileChanges: boolean;
 }): CollectedGitHybridInput {
-  const mode = resolveGitHybridMode({
-    workingTree: params.workingTree,
-    staged: params.staged,
-    commit: params.commit,
-    from: params.from,
-    to: params.to,
-    stdinFileChanges: params.stdinFileChanges,
-  });
-  return mode.kind === "stdin-file-changes"
-    ? {
-        source: { kind: "stdin-file-changes" },
-        changes: parseStdinFileChanges(readFileSync(0, "utf8")),
-      }
-    : collectGitFileChanges({ cwd: params.cwd, mode });
+	const mode = resolveGitHybridMode({
+		workingTree: params.workingTree,
+		staged: params.staged,
+		commit: params.commit,
+		from: params.from,
+		to: params.to,
+		stdinFileChanges: params.stdinFileChanges,
+	});
+	return mode.kind === "stdin-file-changes"
+		? {
+				source: { kind: "stdin-file-changes" },
+				changes: parseStdinFileChanges(readFileSync(0, "utf8")),
+			}
+		: collectGitFileChanges({ cwd: params.cwd, mode });
 }
 
 function processGitHybridChangeEffect(params: {
-  change: ResolvedFileChange;
-  normalizers: NormalizerSettings;
+	change: ResolvedFileChange;
+	normalizers: NormalizerSettings;
 }) {
-  return Effect.gen(function* () {
-    const preferredPath =
-      params.change.newPath ?? params.change.oldPath ?? "<stdin>";
-    if (isBinary(params.change.oldText) || isBinary(params.change.newText)) {
-      return {
-        kind: "warning",
-        warning: {
-          kind: "binary-skipped",
-          path: preferredPath,
-          message: "Binary file skipped from experimental git-hybrid output.",
-        },
-      } satisfies GitHybridProcessedChange;
-    }
-    const requestedLanguage =
-      readLanguageHint(params.change.language) ??
-      inferLanguageFromPath(
-        params.change.newPath ?? params.change.oldPath ?? undefined
-      );
-    const makeParseInput = (content: string, filePath?: string) => ({
-      content,
-      ...(filePath ? { path: filePath } : {}),
-      ...(requestedLanguage ? { language: requestedLanguage } : {}),
-    });
-    const telemetry = yield* Telemetry;
-    const parsedOld = yield* telemetry.span(
-      "parse",
-      {
-        command: "git-hybrid",
-        side: "old",
-        path: params.change.oldPath,
-        id: params.change.id,
-      },
-      parserRegistry.parse(
-        makeParseInput(
-          params.change.oldText,
-          params.change.oldPath ?? undefined
-        )
-      )
-    );
-    const parsedNew = yield* telemetry.span(
-      "parse",
-      {
-        command: "git-hybrid",
-        side: "new",
-        path: params.change.newPath,
-        id: params.change.id,
-      },
-      parserRegistry.parse(
-        makeParseInput(
-          params.change.newText,
-          params.change.newPath ?? undefined
-        )
-      )
-    );
-    const effectiveLanguage =
-      requestedLanguage ?? parsedOld.language ?? parsedNew.language;
-    const diff = yield* telemetry.span(
-      "diff",
-      {
-        command: "git-hybrid",
-        id: params.change.id,
-        status: params.change.status,
-        language: effectiveLanguage,
-      },
-      Effect.sync(() =>
-        structuralDiff(params.change.oldText, params.change.newText, {
-          normalizers: params.normalizers,
-          language: effectiveLanguage,
-          oldRoot: parsedOld.root,
-          newRoot: parsedNew.root,
-          ...(parsedOld.tokens !== undefined
-            ? { oldTokens: parsedOld.tokens }
-            : {}),
-          ...(parsedNew.tokens !== undefined
-            ? { newTokens: parsedNew.tokens }
-            : {}),
-        })
-      )
-    );
-    return {
-      kind: "file",
-      file: {
-        id: params.change.id,
-        status: params.change.status,
-        oldPath: params.change.oldPath,
-        newPath: params.change.newPath,
-        language: effectiveLanguage,
-        diff,
-      },
-      entitySource: {
-        oldText: params.change.oldText,
-        newText: params.change.newText,
-        language: effectiveLanguage,
-        oldRoot: parsedOld.root,
-        newRoot: parsedNew.root,
-        ...(params.change.oldPath ? { oldPath: params.change.oldPath } : {}),
-        ...(params.change.newPath ? { newPath: params.change.newPath } : {}),
-        diff,
-      },
-    } satisfies GitHybridProcessedChange;
-  });
+	return Effect.gen(function* () {
+		const preferredPath =
+			params.change.newPath ?? params.change.oldPath ?? "<stdin>";
+		if (isBinary(params.change.oldText) || isBinary(params.change.newText)) {
+			return {
+				kind: "warning",
+				warning: {
+					kind: "binary-skipped",
+					path: preferredPath,
+					message: "Binary file skipped from experimental git-hybrid output.",
+				},
+			} satisfies GitHybridProcessedChange;
+		}
+		const requestedLanguage =
+			readLanguageHint(params.change.language) ??
+			inferLanguageFromPath(
+				params.change.newPath ?? params.change.oldPath ?? undefined,
+			);
+		const makeParseInput = (content: string, filePath?: string) => ({
+			content,
+			...(filePath ? { path: filePath } : {}),
+			...(requestedLanguage ? { language: requestedLanguage } : {}),
+		});
+		const telemetry = yield* Telemetry;
+		const parsedOld = yield* telemetry.span(
+			"parse",
+			{
+				command: "git-hybrid",
+				side: "old",
+				path: params.change.oldPath,
+				id: params.change.id,
+			},
+			parserRegistry.parse(
+				makeParseInput(
+					params.change.oldText,
+					params.change.oldPath ?? undefined,
+				),
+			),
+		);
+		const parsedNew = yield* telemetry.span(
+			"parse",
+			{
+				command: "git-hybrid",
+				side: "new",
+				path: params.change.newPath,
+				id: params.change.id,
+			},
+			parserRegistry.parse(
+				makeParseInput(
+					params.change.newText,
+					params.change.newPath ?? undefined,
+				),
+			),
+		);
+		const effectiveLanguage =
+			requestedLanguage ?? parsedOld.language ?? parsedNew.language;
+		const diff = yield* telemetry.span(
+			"diff",
+			{
+				command: "git-hybrid",
+				id: params.change.id,
+				status: params.change.status,
+				language: effectiveLanguage,
+			},
+			Effect.sync(() =>
+				structuralDiff(params.change.oldText, params.change.newText, {
+					normalizers: params.normalizers,
+					language: effectiveLanguage,
+					oldRoot: parsedOld.root,
+					newRoot: parsedNew.root,
+					...(parsedOld.tokens !== undefined
+						? { oldTokens: parsedOld.tokens }
+						: {}),
+					...(parsedNew.tokens !== undefined
+						? { newTokens: parsedNew.tokens }
+						: {}),
+				}),
+			),
+		);
+		return {
+			kind: "file",
+			file: {
+				id: params.change.id,
+				status: params.change.status,
+				oldPath: params.change.oldPath,
+				newPath: params.change.newPath,
+				language: effectiveLanguage,
+				diff,
+			},
+			entitySource: {
+				oldText: params.change.oldText,
+				newText: params.change.newText,
+				language: effectiveLanguage,
+				oldRoot: parsedOld.root,
+				newRoot: parsedNew.root,
+				...(params.change.oldPath ? { oldPath: params.change.oldPath } : {}),
+				...(params.change.newPath ? { newPath: params.change.newPath } : {}),
+				diff,
+			},
+		} satisfies GitHybridProcessedChange;
+	});
 }
 
 function runGitHybridEffect(params: {
-  compact: boolean;
-  collected: CollectedGitHybridInput;
-  normalizers: NormalizerSettings;
+	compact: boolean;
+	collected: CollectedGitHybridInput;
+	normalizers: NormalizerSettings;
 }) {
-  return Effect.gen(function* () {
-    const files: GitHybridFileOutput[] = [];
-    const warnings: GitHybridWarning[] = [];
-    const entitySources: GitHybridEntitySource[] = [];
-    for (const change of params.collected.changes) {
-      const processed = yield* processGitHybridChangeEffect({
-        change,
-        normalizers: params.normalizers,
-      });
-      if (processed.kind === "warning") {
-        warnings.push(processed.warning);
-        continue;
-      }
-      files.push(processed.file);
-      entitySources.push(processed.entitySource);
-    }
-    const entities = buildEntityDocumentFromSources({
-      sources: entitySources,
-    });
-    const telemetry = yield* Telemetry;
-    yield* telemetry.log("git_hybrid_complete", {
-      source: params.collected.source.kind,
-      fileCount: files.length,
-      warningCount: warnings.length,
-    });
-    return encodeJson(
-      null,
-      {
-        version: "0.1.0",
-        source: params.collected.source,
-        files,
-        ...(entities ? { entities } : {}),
-        ...(warnings.length > 0 ? { warnings } : {}),
-      },
-      params.compact ? undefined : 2
-    );
-  });
+	return Effect.gen(function* () {
+		const files: GitHybridFileOutput[] = [];
+		const warnings: GitHybridWarning[] = [];
+		const entitySources: GitHybridEntitySource[] = [];
+		for (const change of params.collected.changes) {
+			const processed = yield* processGitHybridChangeEffect({
+				change,
+				normalizers: params.normalizers,
+			});
+			if (processed.kind === "warning") {
+				warnings.push(processed.warning);
+				continue;
+			}
+			files.push(processed.file);
+			entitySources.push(processed.entitySource);
+		}
+		const entities = buildEntityDocumentFromSources({
+			sources: entitySources,
+		});
+		const telemetry = yield* Telemetry;
+		yield* telemetry.log("git_hybrid_complete", {
+			source: params.collected.source.kind,
+			fileCount: files.length,
+			warningCount: warnings.length,
+		});
+		return encodeJson(
+			null,
+			{
+				version: "0.1.0",
+				source: params.collected.source,
+				files,
+				...(entities ? { entities } : {}),
+				...(warnings.length > 0 ? { warnings } : {}),
+			},
+			params.compact ? undefined : 2,
+		);
+	});
 }
 
 const parserRegistry = makeRegistry([
-  ...swcParsers,
-  ...lightningCssParsers,
-  ...treeSitterWasmParsers,
+	...swcParsers,
+	...lightningCssParsers,
+	...treeSitterWasmParsers,
 ]);
 
 type FilePairDiffResult =
-  | { kind: "binary" }
-  | {
-      kind: "diff";
-      oldText: string;
-      newText: string;
-      effectiveLanguage?: LanguageId;
-      diff: ReturnType<typeof structuralDiff>;
-      oldTokens?: readonly TokenRange[];
-      newTokens?: readonly TokenRange[];
-    };
+	| { kind: "binary" }
+	| {
+			kind: "diff";
+			oldText: string;
+			newText: string;
+			effectiveLanguage?: LanguageId;
+			diff: ReturnType<typeof structuralDiff>;
+			oldTokens?: readonly TokenRange[];
+			newTokens?: readonly TokenRange[];
+	  };
 
 function resolveRequestedLanguage(params: {
-  oldPath: string;
-  newPath: string;
-  language: (typeof languageChoices)[number];
+	oldPath: string;
+	newPath: string;
+	language: (typeof languageChoices)[number];
 }) {
-  if (params.language === "auto") {
-    return inferLanguageFromPath(
-      params.oldPath !== "-" ? params.oldPath : params.newPath
-    );
-  }
-  return params.language as LanguageId;
+	if (params.language === "auto") {
+		return inferLanguageFromPath(
+			params.oldPath !== "-" ? params.oldPath : params.newPath,
+		);
+	}
+	return params.language as LanguageId;
 }
 
 function makeFileParseInput(params: {
-  content: string;
-  path?: string;
-  language?: LanguageId;
+	content: string;
+	path?: string;
+	language?: LanguageId;
 }) {
-  return {
-    content: params.content,
-    ...(params.path ? { path: params.path } : {}),
-    ...(params.language ? { language: params.language } : {}),
-  };
+	return {
+		content: params.content,
+		...(params.path ? { path: params.path } : {}),
+		...(params.language ? { language: params.language } : {}),
+	};
 }
 
 function buildFilePairDiffEffect(params: {
-  oldPath: string;
-  newPath: string;
-  language: (typeof languageChoices)[number];
-  normalizers: NormalizerSettings;
+	oldPath: string;
+	newPath: string;
+	language: (typeof languageChoices)[number];
+	normalizers: NormalizerSettings;
 }) {
-  return Effect.gen(function* () {
-    const inferredLanguage = resolveRequestedLanguage(params);
-    const oldText = readInput(params.oldPath);
-    const newText = readInput(params.newPath);
-    if (isBinary(oldText) || isBinary(newText)) {
-      return { kind: "binary" } satisfies FilePairDiffResult;
-    }
-    const parsedOld = yield* parserRegistry.parse(
-      makeFileParseInput({
-        content: oldText,
-        path: params.oldPath,
-        ...(inferredLanguage ? { language: inferredLanguage } : {}),
-      })
-    );
-    const parsedNew = yield* parserRegistry.parse(
-      makeFileParseInput({
-        content: newText,
-        path: params.newPath,
-        ...(inferredLanguage ? { language: inferredLanguage } : {}),
-      })
-    );
-    const effectiveLanguage =
-      inferredLanguage ?? parsedOld.language ?? parsedNew.language;
-    const diff = structuralDiff(oldText, newText, {
-      normalizers: params.normalizers,
-      ...(effectiveLanguage ? { language: effectiveLanguage } : {}),
-      oldRoot: parsedOld.root,
-      newRoot: parsedNew.root,
-      ...(parsedOld.tokens !== undefined
-        ? { oldTokens: parsedOld.tokens }
-        : {}),
-      ...(parsedNew.tokens !== undefined
-        ? { newTokens: parsedNew.tokens }
-        : {}),
-    });
-    return {
-      kind: "diff",
-      oldText,
-      newText,
-      ...(effectiveLanguage ? { effectiveLanguage } : {}),
-      diff,
-      ...(parsedOld.tokens !== undefined
-        ? { oldTokens: parsedOld.tokens }
-        : {}),
-      ...(parsedNew.tokens !== undefined
-        ? { newTokens: parsedNew.tokens }
-        : {}),
-    } satisfies FilePairDiffResult;
-  });
+	return Effect.gen(function* () {
+		const inferredLanguage = resolveRequestedLanguage(params);
+		const oldText = readInput(params.oldPath);
+		const newText = readInput(params.newPath);
+		if (isBinary(oldText) || isBinary(newText)) {
+			return { kind: "binary" } satisfies FilePairDiffResult;
+		}
+		const parsedOld = yield* parserRegistry.parse(
+			makeFileParseInput({
+				content: oldText,
+				path: params.oldPath,
+				...(inferredLanguage ? { language: inferredLanguage } : {}),
+			}),
+		);
+		const parsedNew = yield* parserRegistry.parse(
+			makeFileParseInput({
+				content: newText,
+				path: params.newPath,
+				...(inferredLanguage ? { language: inferredLanguage } : {}),
+			}),
+		);
+		const effectiveLanguage =
+			inferredLanguage ?? parsedOld.language ?? parsedNew.language;
+		const diff = structuralDiff(oldText, newText, {
+			normalizers: params.normalizers,
+			...(effectiveLanguage ? { language: effectiveLanguage } : {}),
+			oldRoot: parsedOld.root,
+			newRoot: parsedNew.root,
+			...(parsedOld.tokens !== undefined
+				? { oldTokens: parsedOld.tokens }
+				: {}),
+			...(parsedNew.tokens !== undefined
+				? { newTokens: parsedNew.tokens }
+				: {}),
+		});
+		return {
+			kind: "diff",
+			oldText,
+			newText,
+			...(effectiveLanguage ? { effectiveLanguage } : {}),
+			diff,
+			...(parsedOld.tokens !== undefined
+				? { oldTokens: parsedOld.tokens }
+				: {}),
+			...(parsedNew.tokens !== undefined
+				? { newTokens: parsedNew.tokens }
+				: {}),
+		} satisfies FilePairDiffResult;
+	});
 }
 
 function runDiffEffect(params: {
-  oldText: string;
-  newText: string;
-  format: DiffArgs["format"];
-  layout: DiffArgs["layout"];
-  view: DiffArgs["view"];
-  experimentalHybrid: boolean;
-  language?: LanguageId;
-  normalizers: NormalizerSettings;
-  oldPath?: string;
-  newPath?: string;
-  telemetryContext?: Record<string, unknown>;
+	oldText: string;
+	newText: string;
+	format: DiffArgs["format"];
+	layout: DiffArgs["layout"];
+	view: DiffArgs["view"];
+	experimentalHybrid: boolean;
+	language?: LanguageId;
+	normalizers: NormalizerSettings;
+	oldPath?: string;
+	newPath?: string;
+	telemetryContext?: Record<string, unknown>;
 }) {
-  return Effect.gen(function* () {
-    const telemetry = yield* Telemetry;
-    const parseLanguage = params.language;
-    const makeParseInput = (content: string, path?: string) => ({
-      content,
-      ...(path ? { path } : {}),
-      ...(parseLanguage ? { language: parseLanguage } : {}),
-    });
-    const parsedOld = yield* telemetry.span(
-      "parse",
-      { side: "old", path: params.oldPath, ...params.telemetryContext },
-      parserRegistry.parse(makeParseInput(params.oldText, params.oldPath))
-    );
-    const parsedNew = yield* telemetry.span(
-      "parse",
-      { side: "new", path: params.newPath, ...params.telemetryContext },
-      parserRegistry.parse(makeParseInput(params.newText, params.newPath))
-    );
-    const effectiveLanguage =
-      params.language ?? parsedOld.language ?? parsedNew.language;
-    const oldNodeCount = parsedOld.lines.length;
-    const newNodeCount = parsedNew.lines.length;
-    const oldSizeBytes = Buffer.byteLength(params.oldText, "utf8");
-    const newSizeBytes = Buffer.byteLength(params.newText, "utf8");
-    yield* telemetry.span(
-      "normalize",
-      { language: effectiveLanguage },
-      Effect.sync(() => undefined)
-    );
-    const diff = yield* telemetry.span(
-      "diff",
-      {
-        language: effectiveLanguage,
-        oldSize: params.oldText.length,
-        newSize: params.newText.length,
-        oldSizeBytes,
-        newSizeBytes,
-        oldNodeCount,
-        newNodeCount,
-        ...params.telemetryContext,
-      },
-      Effect.sync(() =>
-        structuralDiff(params.oldText, params.newText, {
-          normalizers: params.normalizers,
-          language: effectiveLanguage,
-          oldRoot: parsedOld.root,
-          newRoot: parsedNew.root,
-          ...(parsedOld.tokens !== undefined
-            ? { oldTokens: parsedOld.tokens }
-            : {}),
-          ...(parsedNew.tokens !== undefined
-            ? { newTokens: parsedNew.tokens }
-            : {}),
-        })
-      )
-    );
-    yield* telemetry.metric(
-      "semadiff.diff.operations",
-      diff.operations.length,
-      {
-        language: effectiveLanguage,
-        ...params.telemetryContext,
-      }
-    );
-    yield* telemetry.metric("semadiff.diff.moves", diff.moves.length, {
-      language: effectiveLanguage,
-      ...params.telemetryContext,
-    });
-    yield* telemetry.metric("semadiff.diff.renames", diff.renames.length, {
-      language: effectiveLanguage,
-      ...params.telemetryContext,
-    });
-    yield* telemetry.log("diff_complete", {
-      operationCount: diff.operations.length,
-      moveCount: diff.moves.length,
-      renameCount: diff.renames.length,
-      language: effectiveLanguage,
-      oldNodeCount,
-      newNodeCount,
-      oldSizeBytes,
-      newSizeBytes,
-      ...params.telemetryContext,
-    });
+	return Effect.gen(function* () {
+		const telemetry = yield* Telemetry;
+		const parseLanguage = params.language;
+		const makeParseInput = (content: string, path?: string) => ({
+			content,
+			...(path ? { path } : {}),
+			...(parseLanguage ? { language: parseLanguage } : {}),
+		});
+		const parsedOld = yield* telemetry.span(
+			"parse",
+			{ side: "old", path: params.oldPath, ...params.telemetryContext },
+			parserRegistry.parse(makeParseInput(params.oldText, params.oldPath)),
+		);
+		const parsedNew = yield* telemetry.span(
+			"parse",
+			{ side: "new", path: params.newPath, ...params.telemetryContext },
+			parserRegistry.parse(makeParseInput(params.newText, params.newPath)),
+		);
+		const effectiveLanguage =
+			params.language ?? parsedOld.language ?? parsedNew.language;
+		const oldNodeCount = parsedOld.lines.length;
+		const newNodeCount = parsedNew.lines.length;
+		const oldSizeBytes = Buffer.byteLength(params.oldText, "utf8");
+		const newSizeBytes = Buffer.byteLength(params.newText, "utf8");
+		yield* telemetry.span(
+			"normalize",
+			{ language: effectiveLanguage },
+			Effect.sync(() => undefined),
+		);
+		const diff = yield* telemetry.span(
+			"diff",
+			{
+				language: effectiveLanguage,
+				oldSize: params.oldText.length,
+				newSize: params.newText.length,
+				oldSizeBytes,
+				newSizeBytes,
+				oldNodeCount,
+				newNodeCount,
+				...params.telemetryContext,
+			},
+			Effect.sync(() =>
+				structuralDiff(params.oldText, params.newText, {
+					normalizers: params.normalizers,
+					language: effectiveLanguage,
+					oldRoot: parsedOld.root,
+					newRoot: parsedNew.root,
+					...(parsedOld.tokens !== undefined
+						? { oldTokens: parsedOld.tokens }
+						: {}),
+					...(parsedNew.tokens !== undefined
+						? { newTokens: parsedNew.tokens }
+						: {}),
+				}),
+			),
+		);
+		yield* telemetry.metric(
+			"semadiff.diff.operations",
+			diff.operations.length,
+			{
+				language: effectiveLanguage,
+				...params.telemetryContext,
+			},
+		);
+		yield* telemetry.metric("semadiff.diff.moves", diff.moves.length, {
+			language: effectiveLanguage,
+			...params.telemetryContext,
+		});
+		yield* telemetry.metric("semadiff.diff.renames", diff.renames.length, {
+			language: effectiveLanguage,
+			...params.telemetryContext,
+		});
+		yield* telemetry.log("diff_complete", {
+			operationCount: diff.operations.length,
+			moveCount: diff.moves.length,
+			renameCount: diff.renames.length,
+			language: effectiveLanguage,
+			oldNodeCount,
+			newNodeCount,
+			oldSizeBytes,
+			newSizeBytes,
+			...params.telemetryContext,
+		});
 
-    const output = yield* telemetry.span(
-      "render",
-      {
-        operationCount: diff.operations.length,
-        moveCount: diff.moves.length,
-        renameCount: diff.renames.length,
-        ...params.telemetryContext,
-      },
-      Effect.sync(() => {
-        if (params.format === "json") {
-          if (params.experimentalHybrid) {
-            return JSON.stringify(
-              buildHybridDiffDocument({
-                diff,
-                oldText: params.oldText,
-                newText: params.newText,
-                language: effectiveLanguage,
-                oldRoot: parsedOld.root,
-                newRoot: parsedNew.root,
-                ...(params.oldPath ? { oldPath: params.oldPath } : {}),
-                ...(params.newPath ? { newPath: params.newPath } : {}),
-              }),
-              null,
-              2
-            );
-          }
-          return renderJson(diff);
-        }
-        return renderTerminal(diff, {
-          format: params.format,
-          layout: params.layout,
-          view: params.view,
-          oldText: params.oldText,
-          newText: params.newText,
-          language: effectiveLanguage,
-        });
-      })
-    );
+		const output = yield* telemetry.span(
+			"render",
+			{
+				operationCount: diff.operations.length,
+				moveCount: diff.moves.length,
+				renameCount: diff.renames.length,
+				...params.telemetryContext,
+			},
+			Effect.sync(() => {
+				if (params.format === "json") {
+					if (params.experimentalHybrid) {
+						return JSON.stringify(
+							buildHybridDiffDocument({
+								diff,
+								oldText: params.oldText,
+								newText: params.newText,
+								language: effectiveLanguage,
+								oldRoot: parsedOld.root,
+								newRoot: parsedNew.root,
+								...(params.oldPath ? { oldPath: params.oldPath } : {}),
+								...(params.newPath ? { newPath: params.newPath } : {}),
+							}),
+							null,
+							2,
+						);
+					}
+					return renderJson(diff);
+				}
+				return renderTerminal(diff, {
+					format: params.format,
+					layout: params.layout,
+					view: params.view,
+					oldText: params.oldText,
+					newText: params.newText,
+					language: effectiveLanguage,
+				});
+			}),
+		);
 
-    return output;
-  });
+		return output;
+	});
 }
 
 const diffCommand = Command.make(
-  "diff",
-  {
-    oldPath: Args.text({ name: "old" }),
-    newPath: Args.text({ name: "new" }),
-    format: formatOption,
-    layout: layoutOption,
-    view: viewOption,
-    experimentalHybrid: experimentalHybridOption,
-    language: languageOption,
-  },
-  ({ oldPath, newPath, format, layout, view, experimentalHybrid, language }) =>
-    resolveConfig.pipe(
-      Effect.flatMap((resolved) => {
-        const telemetryOptions = {
-          enabled: resolved.config.telemetry.enabled,
-          exporter: resolved.config.telemetry.exporter,
-          ...(resolved.config.telemetry.endpoint
-            ? { endpoint: resolved.config.telemetry.endpoint }
-            : {}),
-        };
-        const telemetryLayer = TelemetryLive(telemetryOptions);
-        return Effect.gen(function* () {
-          const inferredLanguage =
-            language === "auto"
-              ? inferLanguageFromPath(oldPath !== "-" ? oldPath : newPath)
-              : (language as LanguageId);
-          const telemetry = yield* Telemetry;
-          const oldText = yield* telemetry.span(
-            "read",
-            { side: "old", path: oldPath },
-            Effect.sync(() => readInput(oldPath))
-          );
-          const newText = yield* telemetry.span(
-            "read",
-            { side: "new", path: newPath },
-            Effect.sync(() => readInput(newPath))
-          );
+	"diff",
+	{
+		oldPath: Args.text({ name: "old" }),
+		newPath: Args.text({ name: "new" }),
+		format: formatOption,
+		layout: layoutOption,
+		view: viewOption,
+		experimentalHybrid: experimentalHybridOption,
+		language: languageOption,
+	},
+	({ oldPath, newPath, format, layout, view, experimentalHybrid, language }) =>
+		resolveConfig.pipe(
+			Effect.flatMap((resolved) => {
+				const telemetryOptions = {
+					enabled: resolved.config.telemetry.enabled,
+					exporter: resolved.config.telemetry.exporter,
+					...(resolved.config.telemetry.endpoint
+						? { endpoint: resolved.config.telemetry.endpoint }
+						: {}),
+				};
+				const telemetryLayer = TelemetryLive(telemetryOptions);
+				return Effect.gen(function* () {
+					const inferredLanguage =
+						language === "auto"
+							? inferLanguageFromPath(oldPath !== "-" ? oldPath : newPath)
+							: (language as LanguageId);
+					const telemetry = yield* Telemetry;
+					const oldText = yield* telemetry.span(
+						"read",
+						{ side: "old", path: oldPath },
+						Effect.sync(() => readInput(oldPath)),
+					);
+					const newText = yield* telemetry.span(
+						"read",
+						{ side: "new", path: newPath },
+						Effect.sync(() => readInput(newPath)),
+					);
 
-          if (isBinary(oldText) || isBinary(newText)) {
-            yield* Console.log("Binary file detected; semantic diff skipped.");
-            return;
-          }
+					if (isBinary(oldText) || isBinary(newText)) {
+						yield* Console.log("Binary file detected; semantic diff skipped.");
+						return;
+					}
 
-          const program = runDiffEffect({
-            oldText,
-            newText,
-            format,
-            layout,
-            view,
-            experimentalHybrid,
-            normalizers: resolved.config.normalizers,
-            oldPath,
-            newPath,
-            telemetryContext: { command: "diff" },
-            ...(inferredLanguage ? { language: inferredLanguage } : {}),
-          });
+					const program = runDiffEffect({
+						oldText,
+						newText,
+						format,
+						layout,
+						view,
+						experimentalHybrid,
+						normalizers: resolved.config.normalizers,
+						oldPath,
+						newPath,
+						telemetryContext: { command: "diff" },
+						...(inferredLanguage ? { language: inferredLanguage } : {}),
+					});
 
-          const output = yield* telemetry.span(
-            "run",
-            { command: "diff" },
-            program
-          );
-          yield* Console.log(output);
-        }).pipe(Effect.provide(telemetryLayer));
-      })
-    )
+					const output = yield* telemetry.span(
+						"run",
+						{ command: "diff" },
+						program,
+					);
+					yield* Console.log(output);
+				}).pipe(Effect.provide(telemetryLayer));
+			}),
+		),
 ).pipe(Command.withDescription("Run a semantic diff between two files."));
 
 const gitHybridCommand = Command.make(
-  "git-hybrid",
-  {
-    cwd: gitHybridCwdOption,
-    compact: prSummaryCompactOption,
-    workingTree: gitHybridWorkingTreeOption,
-    staged: gitHybridStagedOption,
-    commit: gitHybridCommitOption,
-    from: gitHybridFromOption,
-    to: gitHybridToOption,
-    stdinFileChanges: gitHybridStdinOption,
-  },
-  ({ cwd, compact, workingTree, staged, commit, from, to, stdinFileChanges }) =>
-    resolveConfig.pipe(
-      Effect.flatMap((resolved) => {
-        const telemetryOptions = {
-          enabled: resolved.config.telemetry.enabled,
-          exporter: resolved.config.telemetry.exporter,
-          ...(resolved.config.telemetry.endpoint
-            ? { endpoint: resolved.config.telemetry.endpoint }
-            : {}),
-        };
-        const telemetryLayer = TelemetryLive(telemetryOptions);
-        return Effect.gen(function* () {
-          const collected = collectGitHybridInput({
-            cwd,
-            workingTree,
-            staged,
-            commit,
-            from,
-            to,
-            stdinFileChanges,
-          });
-          const output = yield* runGitHybridEffect({
-            compact,
-            collected,
-            normalizers: resolved.config.normalizers,
-          });
-          yield* Console.log(output);
-        }).pipe(Effect.provide(telemetryLayer));
-      })
-    )
+	"git-hybrid",
+	{
+		cwd: gitHybridCwdOption,
+		compact: prSummaryCompactOption,
+		workingTree: gitHybridWorkingTreeOption,
+		staged: gitHybridStagedOption,
+		commit: gitHybridCommitOption,
+		from: gitHybridFromOption,
+		to: gitHybridToOption,
+		stdinFileChanges: gitHybridStdinOption,
+	},
+	({ cwd, compact, workingTree, staged, commit, from, to, stdinFileChanges }) =>
+		resolveConfig.pipe(
+			Effect.flatMap((resolved) => {
+				const telemetryOptions = {
+					enabled: resolved.config.telemetry.enabled,
+					exporter: resolved.config.telemetry.exporter,
+					...(resolved.config.telemetry.endpoint
+						? { endpoint: resolved.config.telemetry.endpoint }
+						: {}),
+				};
+				const telemetryLayer = TelemetryLive(telemetryOptions);
+				return Effect.gen(function* () {
+					const collected = collectGitHybridInput({
+						cwd,
+						workingTree,
+						staged,
+						commit,
+						from,
+						to,
+						stdinFileChanges,
+					});
+					const output = yield* runGitHybridEffect({
+						compact,
+						collected,
+						normalizers: resolved.config.normalizers,
+					});
+					yield* Console.log(output);
+				}).pipe(Effect.provide(telemetryLayer));
+			}),
+		),
 ).pipe(
-  Command.withDescription(
-    "Emit experimental multi-file hybrid JSON from git or stdin file changes."
-  )
+	Command.withDescription(
+		"Emit experimental multi-file hybrid JSON from git or stdin file changes.",
+	),
 );
 
 const prSummaryCommand = Command.make(
-  "summary",
-  {
-    prUrl: Args.text({ name: "pr" }),
-    compact: prSummaryCompactOption,
-  },
-  ({ prUrl, compact }) =>
-    Effect.gen(function* () {
-      const service = yield* PrDiffService;
-      const summary = yield* service.getSummary(prUrl);
-      const json = encodeJson(
-        PrSummarySchema,
-        summary,
-        compact ? undefined : 2
-      );
-      yield* Console.log(json);
-    }).pipe(Effect.provide(PrDiffLive))
+	"summary",
+	{
+		prUrl: Args.text({ name: "pr" }),
+		compact: prSummaryCompactOption,
+	},
+	({ prUrl, compact }) =>
+		Effect.gen(function* () {
+			const service = yield* PrDiffService;
+			const summary = yield* service.getSummary(prUrl);
+			const json = encodeJson(
+				PrSummarySchema,
+				summary,
+				compact ? undefined : 2,
+			);
+			yield* Console.log(json);
+		}).pipe(Effect.provide(PrDiffLive)),
 ).pipe(Command.withDescription("Fetch PR summary from GitHub."));
 
 const prFileCommand = Command.make(
-  "file",
-  {
-    prUrl: Args.text({ name: "pr" }),
-    file: Args.text({ name: "file" }),
-    format: formatOption,
-    layout: layoutOption,
-    view: viewOption,
-    context: prContextOption,
-    moves: prMovesOption,
-  },
-  ({ prUrl, file, format, layout, view, context, moves }) =>
-    Effect.gen(function* () {
-      const service = yield* PrDiffService;
-      const lineLayout = layout === "side-by-side" ? "split" : "unified";
-      if (format === "json") {
-        const result = yield* service.getFileDiffDocument(
-          prUrl,
-          file,
-          context,
-          lineLayout,
-          moves
-        );
-        yield* Console.log(encodeJson(FileDiffDocumentSchema, result, 2));
-        return;
-      }
-      if (view === "lines") {
-        const result = yield* service.getFileDiff(
-          prUrl,
-          file,
-          context,
-          lineLayout,
-          "semantic",
-          false,
-          moves
-        );
-        if (result.file.warnings?.length) {
-          for (const warning of result.file.warnings) {
-            yield* Console.log(`WARNING: ${warning}`);
-          }
-        }
-        yield* Console.log(
-          `File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`
-        );
-        const output = renderTerminalLinesFromHtml(result.linesHtml, {
-          format,
-          layout,
-          contextLines: context,
-        });
-        yield* Console.log(output);
-        return;
-      }
-      const result = yield* service.getFileDiffDocument(
-        prUrl,
-        file,
-        context,
-        lineLayout,
-        moves
-      );
-      if (result.file.warnings?.length) {
-        for (const warning of result.file.warnings) {
-          yield* Console.log(`WARNING: ${warning}`);
-        }
-      }
-      yield* Console.log(
-        `File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`
-      );
-      const output = renderTerminal(result.diff, {
-        format,
-        layout,
-        view,
-      });
-      yield* Console.log(output);
-    }).pipe(Effect.provide(PrDiffLive))
+	"file",
+	{
+		prUrl: Args.text({ name: "pr" }),
+		file: Args.text({ name: "file" }),
+		format: formatOption,
+		layout: layoutOption,
+		view: viewOption,
+		context: prContextOption,
+		moves: prMovesOption,
+	},
+	({ prUrl, file, format, layout, view, context, moves }) =>
+		Effect.gen(function* () {
+			const service = yield* PrDiffService;
+			const lineLayout = layout === "side-by-side" ? "split" : "unified";
+			if (format === "json") {
+				const result = yield* service.getFileDiffDocument(
+					prUrl,
+					file,
+					context,
+					lineLayout,
+					moves,
+				);
+				yield* Console.log(encodeJson(FileDiffDocumentSchema, result, 2));
+				return;
+			}
+			if (view === "lines") {
+				const result = yield* service.getFileDiff(
+					prUrl,
+					file,
+					context,
+					lineLayout,
+					"semantic",
+					false,
+					moves,
+				);
+				if (result.file.warnings?.length) {
+					for (const warning of result.file.warnings) {
+						yield* Console.log(`WARNING: ${warning}`);
+					}
+				}
+				yield* Console.log(
+					`File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`,
+				);
+				const output = renderTerminalLinesFromHtml(result.linesHtml, {
+					format,
+					layout,
+					contextLines: context,
+				});
+				yield* Console.log(output);
+				return;
+			}
+			const result = yield* service.getFileDiffDocument(
+				prUrl,
+				file,
+				context,
+				lineLayout,
+				moves,
+			);
+			if (result.file.warnings?.length) {
+				for (const warning of result.file.warnings) {
+					yield* Console.log(`WARNING: ${warning}`);
+				}
+			}
+			yield* Console.log(
+				`File: ${result.file.filename} (${result.file.additions}+ / ${result.file.deletions}-)`,
+			);
+			const output = renderTerminal(result.diff, {
+				format,
+				layout,
+				view,
+			});
+			yield* Console.log(output);
+		}).pipe(Effect.provide(PrDiffLive)),
 ).pipe(Command.withDescription("Render semantic diff for a PR file."));
 
 const prCommand = Command.make("pr", {}, () => Effect.void).pipe(
-  Command.withSubcommands([prSummaryCommand, prFileCommand])
+	Command.withSubcommands([prSummaryCommand, prFileCommand]),
 );
 
 const gitExternalCommand = Command.make(
-  "git-external",
-  {
-    path: Args.text({ name: "path" }),
-    oldFile: Args.text({ name: "oldFile" }),
-    oldHex: Args.text({ name: "oldHex" }),
-    oldMode: Args.text({ name: "oldMode" }),
-    newFile: Args.text({ name: "newFile" }),
-    newHex: Args.text({ name: "newHex" }),
-    newMode: Args.text({ name: "newMode" }),
-    extra: Args.repeated(Args.text({ name: "extra" })),
-  },
-  ({ oldFile, newFile }) =>
-    resolveConfig.pipe(
-      Effect.flatMap((resolved) => {
-        const telemetryOptions = {
-          enabled: resolved.config.telemetry.enabled,
-          exporter: resolved.config.telemetry.exporter,
-          ...(resolved.config.telemetry.endpoint
-            ? { endpoint: resolved.config.telemetry.endpoint }
-            : {}),
-        };
-        const telemetryLayer = TelemetryLive(telemetryOptions);
-        return Effect.gen(function* () {
-          const telemetry = yield* Telemetry;
-          const oldText =
-            oldFile === "/dev/null"
-              ? ""
-              : yield* telemetry.span(
-                  "read",
-                  { side: "old", path: oldFile },
-                  Effect.sync(() => readInput(oldFile))
-                );
-          const newText =
-            newFile === "/dev/null"
-              ? ""
-              : yield* telemetry.span(
-                  "read",
-                  { side: "new", path: newFile },
-                  Effect.sync(() => readInput(newFile))
-                );
-          const inferredLanguage =
-            inferLanguageFromPath(
-              oldFile !== "/dev/null" ? oldFile : newFile
-            ) ?? undefined;
-          if (isBinary(oldText) || isBinary(newText)) {
-            yield* Console.log("Binary file detected; semantic diff skipped.");
-            return;
-          }
-          const program = runDiffEffect({
-            oldText,
-            newText,
-            format: resolved.config.renderer.format,
-            layout: resolved.config.renderer.layout,
-            view: "lines",
-            experimentalHybrid: false,
-            normalizers: resolved.config.normalizers,
-            oldPath: oldFile,
-            newPath: newFile,
-            telemetryContext: { command: "git-external" },
-            ...(inferredLanguage ? { language: inferredLanguage } : {}),
-          });
-          const output = yield* telemetry.span(
-            "run",
-            { command: "git-external" },
-            program
-          );
-          yield* Console.log(output);
-        }).pipe(Effect.provide(telemetryLayer));
-      })
-    )
+	"git-external",
+	{
+		path: Args.text({ name: "path" }),
+		oldFile: Args.text({ name: "oldFile" }),
+		oldHex: Args.text({ name: "oldHex" }),
+		oldMode: Args.text({ name: "oldMode" }),
+		newFile: Args.text({ name: "newFile" }),
+		newHex: Args.text({ name: "newHex" }),
+		newMode: Args.text({ name: "newMode" }),
+		extra: Args.repeated(Args.text({ name: "extra" })),
+	},
+	({ oldFile, newFile }) =>
+		resolveConfig.pipe(
+			Effect.flatMap((resolved) => {
+				const telemetryOptions = {
+					enabled: resolved.config.telemetry.enabled,
+					exporter: resolved.config.telemetry.exporter,
+					...(resolved.config.telemetry.endpoint
+						? { endpoint: resolved.config.telemetry.endpoint }
+						: {}),
+				};
+				const telemetryLayer = TelemetryLive(telemetryOptions);
+				return Effect.gen(function* () {
+					const telemetry = yield* Telemetry;
+					const oldText =
+						oldFile === "/dev/null"
+							? ""
+							: yield* telemetry.span(
+									"read",
+									{ side: "old", path: oldFile },
+									Effect.sync(() => readInput(oldFile)),
+								);
+					const newText =
+						newFile === "/dev/null"
+							? ""
+							: yield* telemetry.span(
+									"read",
+									{ side: "new", path: newFile },
+									Effect.sync(() => readInput(newFile)),
+								);
+					const inferredLanguage =
+						inferLanguageFromPath(
+							oldFile !== "/dev/null" ? oldFile : newFile,
+						) ?? undefined;
+					if (isBinary(oldText) || isBinary(newText)) {
+						yield* Console.log("Binary file detected; semantic diff skipped.");
+						return;
+					}
+					const program = runDiffEffect({
+						oldText,
+						newText,
+						format: resolved.config.renderer.format,
+						layout: resolved.config.renderer.layout,
+						view: "lines",
+						experimentalHybrid: false,
+						normalizers: resolved.config.normalizers,
+						oldPath: oldFile,
+						newPath: newFile,
+						telemetryContext: { command: "git-external" },
+						...(inferredLanguage ? { language: inferredLanguage } : {}),
+					});
+					const output = yield* telemetry.span(
+						"run",
+						{ command: "git-external" },
+						program,
+					);
+					yield* Console.log(output);
+				}).pipe(Effect.provide(telemetryLayer));
+			}),
+		),
 ).pipe(Command.withDescription("Git external diff adapter (7-arg contract)."));
 
 const difftoolCommand = Command.make(
-  "difftool",
-  {
-    local: Args.text({ name: "local" }).pipe(Args.withDefault("")),
-    remote: Args.text({ name: "remote" }).pipe(Args.withDefault("")),
-  },
-  ({ local, remote }) =>
-    resolveConfig.pipe(
-      Effect.flatMap((resolved) => {
-        const telemetryOptions = {
-          enabled: resolved.config.telemetry.enabled,
-          exporter: resolved.config.telemetry.exporter,
-          ...(resolved.config.telemetry.endpoint
-            ? { endpoint: resolved.config.telemetry.endpoint }
-            : {}),
-        };
-        const telemetryLayer = TelemetryLive(telemetryOptions);
-        return Effect.gen(function* () {
-          const localPath = local || process.env.LOCAL;
-          const remotePath = remote || process.env.REMOTE;
-          if (!(localPath && remotePath)) {
-            yield* Console.error("difftool requires LOCAL and REMOTE paths");
-            return;
-          }
-          const telemetry = yield* Telemetry;
-          const oldText = yield* telemetry.span(
-            "read",
-            { side: "old", path: localPath },
-            Effect.sync(() => readInput(localPath))
-          );
-          const newText = yield* telemetry.span(
-            "read",
-            { side: "new", path: remotePath },
-            Effect.sync(() => readInput(remotePath))
-          );
-          if (isBinary(oldText) || isBinary(newText)) {
-            yield* Console.log("Binary file detected; semantic diff skipped.");
-            return;
-          }
-          const inferredLanguage =
-            inferLanguageFromPath(localPath) ?? undefined;
-          const output = yield* telemetry.span(
-            "run",
-            { command: "difftool" },
-            runDiffEffect({
-              oldText,
-              newText,
-              format: resolved.config.renderer.format,
-              layout: resolved.config.renderer.layout,
-              view: "lines",
-              experimentalHybrid: false,
-              normalizers: resolved.config.normalizers,
-              oldPath: localPath,
-              newPath: remotePath,
-              telemetryContext: { command: "difftool" },
-              ...(inferredLanguage ? { language: inferredLanguage } : {}),
-            })
-          );
-          yield* Console.log(output);
-        }).pipe(Effect.provide(telemetryLayer));
-      })
-    )
+	"difftool",
+	{
+		local: Args.text({ name: "local" }).pipe(Args.withDefault("")),
+		remote: Args.text({ name: "remote" }).pipe(Args.withDefault("")),
+	},
+	({ local, remote }) =>
+		resolveConfig.pipe(
+			Effect.flatMap((resolved) => {
+				const telemetryOptions = {
+					enabled: resolved.config.telemetry.enabled,
+					exporter: resolved.config.telemetry.exporter,
+					...(resolved.config.telemetry.endpoint
+						? { endpoint: resolved.config.telemetry.endpoint }
+						: {}),
+				};
+				const telemetryLayer = TelemetryLive(telemetryOptions);
+				return Effect.gen(function* () {
+					const localPath = local || process.env.LOCAL;
+					const remotePath = remote || process.env.REMOTE;
+					if (!(localPath && remotePath)) {
+						yield* Console.error("difftool requires LOCAL and REMOTE paths");
+						return;
+					}
+					const telemetry = yield* Telemetry;
+					const oldText = yield* telemetry.span(
+						"read",
+						{ side: "old", path: localPath },
+						Effect.sync(() => readInput(localPath)),
+					);
+					const newText = yield* telemetry.span(
+						"read",
+						{ side: "new", path: remotePath },
+						Effect.sync(() => readInput(remotePath)),
+					);
+					if (isBinary(oldText) || isBinary(newText)) {
+						yield* Console.log("Binary file detected; semantic diff skipped.");
+						return;
+					}
+					const inferredLanguage =
+						inferLanguageFromPath(localPath) ?? undefined;
+					const output = yield* telemetry.span(
+						"run",
+						{ command: "difftool" },
+						runDiffEffect({
+							oldText,
+							newText,
+							format: resolved.config.renderer.format,
+							layout: resolved.config.renderer.layout,
+							view: "lines",
+							experimentalHybrid: false,
+							normalizers: resolved.config.normalizers,
+							oldPath: localPath,
+							newPath: remotePath,
+							telemetryContext: { command: "difftool" },
+							...(inferredLanguage ? { language: inferredLanguage } : {}),
+						}),
+					);
+					yield* Console.log(output);
+				}).pipe(Effect.provide(telemetryLayer));
+			}),
+		),
 ).pipe(
-  Command.withDescription("Difftool wrapper compatible with git difftool.")
+	Command.withDescription("Difftool wrapper compatible with git difftool."),
 );
 
 const installGitCommand = Command.make("install-git", {}, () =>
-  Effect.gen(function* () {
-    const snippet = [
-      "# Semadiff external diff",
-      "[diff]",
-      "  external = semadiff git-external",
-      '[difftool "semadiff"]',
-      "  cmd = semadiff difftool $LOCAL $REMOTE",
-      "# verify",
-      "#   git diff --ext-diff",
-      "#   git show --ext-diff",
-      "#   git log -p --ext-diff",
-      "#   git difftool --tool=semadiff",
-    ].join("\n");
-    yield* Console.log(snippet);
-  })
+	Effect.gen(function* () {
+		const snippet = [
+			"# Semadiff external diff",
+			"[diff]",
+			"  external = semadiff git-external",
+			'[difftool "semadiff"]',
+			"  cmd = semadiff difftool $LOCAL $REMOTE",
+			"# verify",
+			"#   git diff --ext-diff",
+			"#   git show --ext-diff",
+			"#   git log -p --ext-diff",
+			"#   git difftool --tool=semadiff",
+		].join("\n");
+		yield* Console.log(snippet);
+	}),
 ).pipe(Command.withDescription("Print git config snippets for semadiff."));
 
 const doctorCommand = Command.make("doctor", {}, () =>
-  Effect.gen(function* () {
-    const bunVersion = process.versions.bun ?? "unknown";
-    const gitVersion = yield* Effect.try({
-      try: () => execSync("git --version").toString().trim(),
-      catch: (error) => new CliSystemError({ operation: "git-version", error }),
-    }).pipe(Effect.catch(() => Effect.succeed("not found")));
-    const canWriteCwd = yield* Effect.try({
-      try: () => {
-        accessSync(process.cwd(), constants.W_OK);
-        return true;
-      },
-      catch: (error) => new CliSystemError({ operation: "access-cwd", error }),
-    }).pipe(Effect.catch(() => Effect.succeed(false)));
-    const report = {
-      bun: bunVersion,
-      git: gitVersion,
-      cwd: process.cwd(),
-      canWriteCwd,
-      parsers: parserRegistry.listCapabilities(),
-    };
-    const json = encodeJson(DoctorReportJson, report, 2);
-    yield* Console.log(json);
-  })
+	Effect.gen(function* () {
+		const bunVersion = process.versions.bun ?? "unknown";
+		const gitVersion = yield* Effect.try({
+			try: () => execSync("git --version").toString().trim(),
+			catch: (error) => new CliSystemError({ operation: "git-version", error }),
+		}).pipe(Effect.catch(() => Effect.succeed("not found")));
+		const canWriteCwd = yield* Effect.try({
+			try: () => {
+				accessSync(process.cwd(), constants.W_OK);
+				return true;
+			},
+			catch: (error) => new CliSystemError({ operation: "access-cwd", error }),
+		}).pipe(Effect.catch(() => Effect.succeed(false)));
+		const report = {
+			bun: bunVersion,
+			git: gitVersion,
+			cwd: process.cwd(),
+			canWriteCwd,
+			parsers: parserRegistry.listCapabilities(),
+		};
+		const json = encodeJson(DoctorReportJson, report, 2);
+		yield* Console.log(json);
+	}),
 ).pipe(
-  Command.withDescription("Report environment details and parser capabilities.")
+	Command.withDescription(
+		"Report environment details and parser capabilities.",
+	),
 );
 
 const benchBaselineOption = Options.text("baseline").pipe(
-  Options.withDefault("bench/baseline.json"),
-  Options.withDescription("Baseline JSON path.")
+	Options.withDefault("bench/baseline.json"),
+	Options.withDescription("Baseline JSON path."),
 );
 const benchWriteOption = Options.boolean("write-baseline").pipe(
-  Options.withDefault(false),
-  Options.withDescription("Write the current run as the baseline.")
+	Options.withDefault(false),
+	Options.withDescription("Write the current run as the baseline."),
 );
 const benchThresholdOption = Options.text("threshold").pipe(
-  Options.withDefault("0.1"),
-  Options.withDescription("Regression threshold ratio.")
+	Options.withDefault("0.1"),
+	Options.withDescription("Regression threshold ratio."),
 );
 
 const benchCommand = Command.make(
-  "bench",
-  {
-    baseline: benchBaselineOption,
-    writeBaseline: benchWriteOption,
-    threshold: benchThresholdOption,
-  },
-  ({ baseline, writeBaseline, threshold }) =>
-    Effect.gen(function* () {
-      const baselinePath = baseline;
-      const thresholdValue = Number.parseFloat(threshold);
-      const regressionThreshold = Number.isFinite(thresholdValue)
-        ? thresholdValue
-        : 0.1;
-      const yamlLarge = Array.from(
-        { length: 200 },
-        (_, index) => `key_${index}: ${index}`
-      ).join("\n");
-      const yamlLargeUpdated = Array.from(
-        { length: 200 },
-        (_, index) => `key_${index}: ${index + 1}`
-      ).join("\n");
-      const tomlLarge = Array.from(
-        { length: 200 },
-        (_, index) => `key_${index} = ${index}`
-      ).join("\n");
-      const tomlLargeUpdated = Array.from(
-        { length: 200 },
-        (_, index) => `key_${index} = ${index + 1}`
-      ).join("\n");
-      const tsMediumOld = Array.from(
-        { length: 120 },
-        (_, index) => `export const value${index} = ${index};`
-      ).join("\n");
-      const tsMediumNew = Array.from(
-        { length: 120 },
-        (_, index) => `export const value${index} = ${index + 1};`
-      ).join("\n");
-      const cssMediumOld = Array.from(
-        { length: 80 },
-        (_, index) =>
-          `.class-${index} { color: #${(index * 3).toString(16).padStart(6, "0")}; }`
-      ).join("\n");
-      const cssMediumNew = Array.from(
-        { length: 80 },
-        (_, index) =>
-          `.class-${index} { color: #${(index * 7).toString(16).padStart(6, "0")}; }`
-      ).join("\n");
+	"bench",
+	{
+		baseline: benchBaselineOption,
+		writeBaseline: benchWriteOption,
+		threshold: benchThresholdOption,
+	},
+	({ baseline, writeBaseline, threshold }) =>
+		Effect.gen(function* () {
+			const baselinePath = baseline;
+			const thresholdValue = Number.parseFloat(threshold);
+			const regressionThreshold = Number.isFinite(thresholdValue)
+				? thresholdValue
+				: 0.1;
+			const yamlLarge = Array.from(
+				{ length: 200 },
+				(_, index) => `key_${index}: ${index}`,
+			).join("\n");
+			const yamlLargeUpdated = Array.from(
+				{ length: 200 },
+				(_, index) => `key_${index}: ${index + 1}`,
+			).join("\n");
+			const tomlLarge = Array.from(
+				{ length: 200 },
+				(_, index) => `key_${index} = ${index}`,
+			).join("\n");
+			const tomlLargeUpdated = Array.from(
+				{ length: 200 },
+				(_, index) => `key_${index} = ${index + 1}`,
+			).join("\n");
+			const tsMediumOld = Array.from(
+				{ length: 120 },
+				(_, index) => `export const value${index} = ${index};`,
+			).join("\n");
+			const tsMediumNew = Array.from(
+				{ length: 120 },
+				(_, index) => `export const value${index} = ${index + 1};`,
+			).join("\n");
+			const cssMediumOld = Array.from(
+				{ length: 80 },
+				(_, index) =>
+					`.class-${index} { color: #${(index * 3).toString(16).padStart(6, "0")}; }`,
+			).join("\n");
+			const cssMediumNew = Array.from(
+				{ length: 80 },
+				(_, index) =>
+					`.class-${index} { color: #${(index * 7).toString(16).padStart(6, "0")}; }`,
+			).join("\n");
 
-      const cases = [
-        {
-          id: "small-js",
-          oldText: "const foo = 1;\\nfoo + foo;",
-          newText: "const bar = 2;\\nbar + bar;",
-        },
-        {
-          id: "tailwind",
-          oldText: '<div className="text-sm bg-red-500" />',
-          newText: '<div className="bg-red-500 text-sm" />',
-        },
-        {
-          id: "tailwind-heavy",
-          oldText:
-            '<div className="p-2 m-2 text-sm bg-red-500 font-semibold text-white rounded shadow" />',
-          newText:
-            '<div className="text-white shadow rounded font-semibold bg-red-500 text-sm p-2 m-2" />',
-        },
-        {
-          id: "moved-block",
-          oldText: "alpha\\nblock\\none\\nblock\\ntwo\\nomega",
-          newText: "alpha\\nomega\\nblock\\none\\nblock\\ntwo",
-        },
-        {
-          id: "yaml-large",
-          oldText: yamlLarge,
-          newText: yamlLargeUpdated,
-        },
-        {
-          id: "toml-large",
-          oldText: tomlLarge,
-          newText: tomlLargeUpdated,
-        },
-        {
-          id: "ts-medium",
-          oldText: tsMediumOld,
-          newText: tsMediumNew,
-        },
-        {
-          id: "css-medium",
-          oldText: cssMediumOld,
-          newText: cssMediumNew,
-        },
-      ];
+			const cases = [
+				{
+					id: "small-js",
+					oldText: "const foo = 1;\\nfoo + foo;",
+					newText: "const bar = 2;\\nbar + bar;",
+				},
+				{
+					id: "tailwind",
+					oldText: '<div className="text-sm bg-red-500" />',
+					newText: '<div className="bg-red-500 text-sm" />',
+				},
+				{
+					id: "tailwind-heavy",
+					oldText:
+						'<div className="p-2 m-2 text-sm bg-red-500 font-semibold text-white rounded shadow" />',
+					newText:
+						'<div className="text-white shadow rounded font-semibold bg-red-500 text-sm p-2 m-2" />',
+				},
+				{
+					id: "moved-block",
+					oldText: "alpha\\nblock\\none\\nblock\\ntwo\\nomega",
+					newText: "alpha\\nomega\\nblock\\none\\nblock\\ntwo",
+				},
+				{
+					id: "yaml-large",
+					oldText: yamlLarge,
+					newText: yamlLargeUpdated,
+				},
+				{
+					id: "toml-large",
+					oldText: tomlLarge,
+					newText: tomlLargeUpdated,
+				},
+				{
+					id: "ts-medium",
+					oldText: tsMediumOld,
+					newText: tsMediumNew,
+				},
+				{
+					id: "css-medium",
+					oldText: cssMediumOld,
+					newText: cssMediumNew,
+				},
+			];
 
-      const results = cases.map((item) => {
-        const start = Date.now();
-        const diff = structuralDiff(item.oldText, item.newText);
-        const durationMs = Date.now() - start;
-        return {
-          id: item.id,
-          durationMs,
-          operationCount: diff.operations.length,
-          moveCount: diff.moves.length,
-          renameCount: diff.renames.length,
-        };
-      });
+			const results = cases.map((item) => {
+				const start = Date.now();
+				const diff = structuralDiff(item.oldText, item.newText);
+				const durationMs = Date.now() - start;
+				return {
+					id: item.id,
+					durationMs,
+					operationCount: diff.operations.length,
+					moveCount: diff.moves.length,
+					renameCount: diff.renames.length,
+				};
+			});
 
-      const report = {
-        version: "0.1.0",
-        timestamp: new Date().toISOString(),
-        threshold: regressionThreshold,
-        cases: results,
-        totals: {
-          durationMs: results.reduce(
-            (sum, result) => sum + result.durationMs,
-            0
-          ),
-        },
-      };
+			const report = {
+				version: "0.1.0",
+				timestamp: new Date().toISOString(),
+				threshold: regressionThreshold,
+				cases: results,
+				totals: {
+					durationMs: results.reduce(
+						(sum, result) => sum + result.durationMs,
+						0,
+					),
+				},
+			};
 
-      const baselineRaw = yield* Effect.try({
-        try: () => readFileSync(baselinePath, "utf8"),
-        catch: (error) =>
-          new CliSystemError({ operation: "read-benchmark-baseline", error }),
-      }).pipe(Effect.catch(() => Effect.succeed(null)));
-      const baselineReport =
-        baselineRaw === null
-          ? null
-          : yield* Effect.try({
-              try: () => Schema.decodeUnknownSync(BenchReportJson)(baselineRaw),
-              catch: () => null,
-            });
+			const baselineRaw = yield* Effect.try({
+				try: () => readFileSync(baselinePath, "utf8"),
+				catch: (error) =>
+					new CliSystemError({ operation: "read-benchmark-baseline", error }),
+			}).pipe(Effect.catch(() => Effect.succeed(null)));
+			const baselineReport =
+				baselineRaw === null
+					? null
+					: yield* Effect.try({
+							try: () => Schema.decodeUnknownSync(BenchReportJson)(baselineRaw),
+							catch: () => null,
+						});
 
-      const regressions =
-        baselineReport?.cases
-          ?.map((baseCase) => {
-            const current = results.find((result) => result.id === baseCase.id);
-            if (!current) {
-              return null;
-            }
-            const delta = current.durationMs - baseCase.durationMs;
-            const ratio =
-              baseCase.durationMs === 0 ? 0 : delta / baseCase.durationMs;
-            return {
-              id: baseCase.id,
-              baselineMs: baseCase.durationMs,
-              currentMs: current.durationMs,
-              regression: ratio > regressionThreshold,
-            };
-          })
-          .filter(
-            (
-              entry
-            ): entry is Schema.Schema.Type<typeof BenchRegressionSchema> =>
-              entry !== null
-          ) ?? [];
+			const regressions =
+				baselineReport?.cases
+					?.map((baseCase) => {
+						const current = results.find((result) => result.id === baseCase.id);
+						if (!current) {
+							return null;
+						}
+						const delta = current.durationMs - baseCase.durationMs;
+						const ratio =
+							baseCase.durationMs === 0 ? 0 : delta / baseCase.durationMs;
+						return {
+							id: baseCase.id,
+							baselineMs: baseCase.durationMs,
+							currentMs: current.durationMs,
+							regression: ratio > regressionThreshold,
+						};
+					})
+					.filter(
+						(
+							entry,
+						): entry is Schema.Schema.Type<typeof BenchRegressionSchema> =>
+							entry !== null,
+					) ?? [];
 
-      if (writeBaseline) {
-        const dir = baselinePath.split("/").slice(0, -1).join("/");
-        if (dir) {
-          mkdirSync(dir, { recursive: true });
-        }
-        const reportJson = encodeJson(BenchReportJson, report, 2);
-        writeFileSync(baselinePath, reportJson);
-      }
+			if (writeBaseline) {
+				const dir = baselinePath.split("/").slice(0, -1).join("/");
+				if (dir) {
+					mkdirSync(dir, { recursive: true });
+				}
+				const reportJson = encodeJson(BenchReportJson, report, 2);
+				writeFileSync(baselinePath, reportJson);
+			}
 
-      const outputJson = encodeJson(BenchOutputJson, {
-        report,
-        baselinePath,
-        regressions,
-      });
-      yield* Console.log(outputJson);
+			const outputJson = encodeJson(BenchOutputJson, {
+				report,
+				baselinePath,
+				regressions,
+			});
+			yield* Console.log(outputJson);
 
-      const hasRegression = regressions.some(
-        (entry) => (entry as { regression?: boolean }).regression
-      );
-      if (hasRegression) {
-        yield* Console.error("Benchmark regression detected.");
-        process.exitCode = 1;
-      }
-    })
+			const hasRegression = regressions.some(
+				(entry) => (entry as { regression?: boolean }).regression,
+			);
+			if (hasRegression) {
+				yield* Console.error("Benchmark regression detected.");
+				process.exitCode = 1;
+			}
+		}),
 ).pipe(Command.withDescription("Run benchmarks and compare to baseline."));
 
 const explainCommand = Command.make(
-  "explain",
-  {
-    oldPath: Args.text({ name: "old" }),
-    newPath: Args.text({ name: "new" }),
-    language: languageOption,
-  },
-  ({ oldPath, newPath, language }) =>
-    Effect.gen(function* () {
-      const resolved = yield* resolveConfig;
-      const result = yield* buildFilePairDiffEffect({
-        oldPath,
-        newPath,
-        language,
-        normalizers: resolved.config.normalizers,
-      });
-      if (result.kind === "binary") {
-        yield* Console.log("Binary file detected; semantic diff skipped.");
-        return;
-      }
-      const explainJson = encodeJson(
-        ExplainDocumentJson,
-        explainDiff(result.diff),
-        2
-      );
-      yield* Console.log(explainJson);
-    })
+	"explain",
+	{
+		oldPath: Args.text({ name: "old" }),
+		newPath: Args.text({ name: "new" }),
+		language: languageOption,
+	},
+	({ oldPath, newPath, language }) =>
+		Effect.gen(function* () {
+			const resolved = yield* resolveConfig;
+			const result = yield* buildFilePairDiffEffect({
+				oldPath,
+				newPath,
+				language,
+				normalizers: resolved.config.normalizers,
+			});
+			if (result.kind === "binary") {
+				yield* Console.log("Binary file detected; semantic diff skipped.");
+				return;
+			}
+			const explainJson = encodeJson(
+				ExplainDocumentJson,
+				explainDiff(result.diff),
+				2,
+			);
+			yield* Console.log(explainJson);
+		}),
 ).pipe(Command.withDescription("Explain diff decisions as JSON."));
 
 const inspectCommand = Command.make(
-  "inspect",
-  {
-    oldPath: Args.text({ name: "old" }),
-    newPath: Args.text({ name: "new" }),
-    language: languageOption,
-    output: inspectOutputOption,
-    open: inspectOpenOption,
-    includeCode: inspectIncludeCodeOption,
-  },
-  ({ oldPath, newPath, language, output, open, includeCode }) =>
-    Effect.gen(function* () {
-      const resolved = yield* resolveConfig;
-      const result = yield* buildFilePairDiffEffect({
-        oldPath,
-        newPath,
-        language,
-        normalizers: resolved.config.normalizers,
-      });
-      if (result.kind === "binary") {
-        yield* Console.log("Binary file detected; semantic diff skipped.");
-        return;
-      }
-      const explain = explainDiff(result.diff);
-      const diagnostics = createDiagnosticsBundle({
-        diff: result.diff,
-        config: resolved.config,
-        includeCode,
-      });
-      const html = renderInspectWorkbench({
-        oldPath,
-        newPath,
-        oldText: result.oldText,
-        newText: result.newText,
-        ...(result.effectiveLanguage
-          ? { language: result.effectiveLanguage }
-          : {}),
-        diff: result.diff,
-        explain,
-        diagnostics,
-        ...(result.oldTokens !== undefined
-          ? { oldTokens: result.oldTokens }
-          : {}),
-        ...(result.newTokens !== undefined
-          ? { newTokens: result.newTokens }
-          : {}),
-      });
-      const outputPath = yield* Effect.try({
-        try: () => resolveInspectOutputPath(output),
-        catch: (error) =>
-          new CliSystemError({ operation: "resolve-inspect-output", error }),
-      });
-      yield* Effect.try({
-        try: () => writeInspectWorkbench(outputPath, html),
-        catch: (error) =>
-          new CliSystemError({ operation: "write-inspect-workbench", error }),
-      });
-      yield* Console.log(
-        output
-          ? `Inspect workbench written to ${outputPath}`
-          : `Inspect workbench written to temporary file ${outputPath}`
-      );
-      if (open) {
-        yield* Effect.try({
-          try: () => openInspectWorkbench(outputPath),
-          catch: (error) =>
-            new CliSystemError({ operation: "open-inspect-workbench", error }),
-        });
-        yield* Console.log("Opened inspect workbench in the default browser.");
-      }
-    })
+	"inspect",
+	{
+		oldPath: Args.text({ name: "old" }),
+		newPath: Args.text({ name: "new" }),
+		language: languageOption,
+		output: inspectOutputOption,
+		open: inspectOpenOption,
+		includeCode: inspectIncludeCodeOption,
+	},
+	({ oldPath, newPath, language, output, open, includeCode }) =>
+		Effect.gen(function* () {
+			const resolved = yield* resolveConfig;
+			const result = yield* buildFilePairDiffEffect({
+				oldPath,
+				newPath,
+				language,
+				normalizers: resolved.config.normalizers,
+			});
+			if (result.kind === "binary") {
+				yield* Console.log("Binary file detected; semantic diff skipped.");
+				return;
+			}
+			const explain = explainDiff(result.diff);
+			const diagnostics = createDiagnosticsBundle({
+				diff: result.diff,
+				config: resolved.config,
+				includeCode,
+			});
+			const html = renderInspectWorkbench({
+				oldPath,
+				newPath,
+				oldText: result.oldText,
+				newText: result.newText,
+				...(result.effectiveLanguage
+					? { language: result.effectiveLanguage }
+					: {}),
+				diff: result.diff,
+				explain,
+				diagnostics,
+				...(result.oldTokens !== undefined
+					? { oldTokens: result.oldTokens }
+					: {}),
+				...(result.newTokens !== undefined
+					? { newTokens: result.newTokens }
+					: {}),
+			});
+			const outputPath = yield* Effect.try({
+				try: () => resolveInspectOutputPath(output),
+				catch: (error) =>
+					new CliSystemError({ operation: "resolve-inspect-output", error }),
+			});
+			yield* Effect.try({
+				try: () => writeInspectWorkbench(outputPath, html),
+				catch: (error) =>
+					new CliSystemError({ operation: "write-inspect-workbench", error }),
+			});
+			yield* Console.log(
+				output
+					? `Inspect workbench written to ${outputPath}`
+					: `Inspect workbench written to temporary file ${outputPath}`,
+			);
+			if (open) {
+				yield* Effect.try({
+					try: () => openInspectWorkbench(outputPath),
+					catch: (error) =>
+						new CliSystemError({ operation: "open-inspect-workbench", error }),
+				});
+				yield* Console.log("Opened inspect workbench in the default browser.");
+			}
+		}),
 ).pipe(
-  Command.withDescription("Generate an offline HTML workbench for a file pair.")
+	Command.withDescription(
+		"Generate an offline HTML workbench for a file pair.",
+	),
 );
 
 const configCommand = Command.make("config", {}, () =>
-  Effect.gen(function* () {
-    const resolved = yield* resolveConfig;
-    const json = encodeJson(ResolvedConfigOutputJson, resolved, 2);
-    yield* Console.log(json);
-  })
+	Effect.gen(function* () {
+		const resolved = yield* resolveConfig;
+		const json = encodeJson(ResolvedConfigOutputJson, resolved, 2);
+		yield* Console.log(json);
+	}),
 ).pipe(Command.withDescription("Print resolved config with provenance."));
 
 const app = Command.make("semadiff", {}, () => Effect.void).pipe(
-  Command.withSubcommands([
-    diffCommand,
-    gitHybridCommand,
-    gitExternalCommand,
-    difftoolCommand,
-    installGitCommand,
-    configCommand,
-    doctorCommand,
-    benchCommand,
-    explainCommand,
-    inspectCommand,
-    prCommand,
-  ])
+	Command.withSubcommands([
+		diffCommand,
+		gitHybridCommand,
+		gitExternalCommand,
+		difftoolCommand,
+		installGitCommand,
+		configCommand,
+		doctorCommand,
+		benchCommand,
+		explainCommand,
+		inspectCommand,
+		prCommand,
+	]),
 );
 
 function normalizeArgv(argv: string[]) {
-  if (argv.length <= 2) {
-    return argv;
-  }
-  const head = argv.slice(0, 2);
-  const rest = argv.slice(2);
-  const patterns: Array<{ path: string[] }> = [
-    { path: ["diff"] },
-    { path: ["inspect"] },
-    { path: ["pr", "file"] },
-    { path: ["pr", "summary"] },
-  ];
+	if (argv.length <= 2) {
+		return argv;
+	}
+	const head = argv.slice(0, 2);
+	const rest = argv.slice(2);
+	const patterns: Array<{ path: string[] }> = [
+		{ path: ["diff"] },
+		{ path: ["inspect"] },
+		{ path: ["pr", "file"] },
+		{ path: ["pr", "summary"] },
+	];
 
-  const normalizeTail = (tokens: string[]) => {
-    const options: string[] = [];
-    const positionals: string[] = [];
-    for (let i = 0; i < tokens.length; i += 1) {
-      const token = tokens[i] ?? "";
-      if (token === "--") {
-        positionals.push(...tokens.slice(i + 1));
-        break;
-      }
-      if (token.startsWith("-")) {
-        options.push(token);
-        if (!token.includes("=")) {
-          const next = tokens[i + 1];
-          if (next && !next.startsWith("-")) {
-            options.push(next);
-            i += 1;
-          }
-        }
-        continue;
-      }
-      positionals.push(token);
-    }
-    return [...options, ...positionals];
-  };
+	const normalizeTail = (tokens: string[]) => {
+		const options: string[] = [];
+		const positionals: string[] = [];
+		for (let i = 0; i < tokens.length; i += 1) {
+			const token = tokens[i] ?? "";
+			if (token === "--") {
+				positionals.push(...tokens.slice(i + 1));
+				break;
+			}
+			if (token.startsWith("-")) {
+				options.push(token);
+				if (!token.includes("=")) {
+					const next = tokens[i + 1];
+					if (next && !next.startsWith("-")) {
+						options.push(next);
+						i += 1;
+					}
+				}
+				continue;
+			}
+			positionals.push(token);
+		}
+		return [...options, ...positionals];
+	};
 
-  for (const pattern of patterns) {
-    const { path } = pattern;
-    const idx = rest.findIndex((_value, index) =>
-      path.every((segment, offset) => rest[index + offset] === segment)
-    );
-    if (idx === -1) {
-      continue;
-    }
-    const start = idx + path.length;
-    const before = rest.slice(0, start);
-    const after = rest.slice(start);
-    const normalized = normalizeTail(after);
-    return [...head, ...before, ...normalized];
-  }
+	for (const pattern of patterns) {
+		const { path } = pattern;
+		const idx = rest.findIndex((_value, index) =>
+			path.every((segment, offset) => rest[index + offset] === segment),
+		);
+		if (idx === -1) {
+			continue;
+		}
+		const start = idx + path.length;
+		const before = rest.slice(0, start);
+		const after = rest.slice(start);
+		const normalized = normalizeTail(after);
+		return [...head, ...before, ...normalized];
+	}
 
-  return argv;
+	return argv;
 }
 
 const cli = Command.runWith(app, {
-  version: "0.1.0",
+	version: "0.1.0",
 });
 
 const runMain = async () => {
-  const argv = normalizeArgv(process.argv).slice(2);
-  const main = Effect.provide(cli(argv), cliRuntimeLayer);
-  const exit = await Effect.runPromiseExit(main);
-  if (Exit.isFailure(exit)) {
-    process.exitCode = 1;
-    process.stderr.write(`${Cause.pretty(exit.cause)}\n`);
-  }
+	const argv = normalizeArgv(process.argv).slice(2);
+	const main = Effect.provide(cli(argv), cliRuntimeLayer);
+	const exit = await Effect.runPromiseExit(main);
+	if (Exit.isFailure(exit)) {
+		process.exitCode = 1;
+		process.stderr.write(`${Cause.pretty(exit.cause)}\n`);
+	}
 };
 
 await runMain();

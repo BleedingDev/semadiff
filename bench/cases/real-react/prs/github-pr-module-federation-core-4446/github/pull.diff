@@ -898,7 +898,7 @@ index 4643fbbeca7..f4d124307b3 100644
 +  }
 +
    const validEcmaIdentifierRegex =
-     // biome-ignore lint/suspicious/noMisleadingCharacterClass: works
+     // lint-ignore lint/suspicious/noMisleadingCharacterClass: works
      /^[$_\p{ID_Start}][$_\u{200C}\u{200D}\p{ID_Continue}]*$/u;
 @@ -27,7 +64,7 @@ function validateFilename(filename: string | undefined) {
    }

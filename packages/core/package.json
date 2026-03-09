@@ -1,23 +1,23 @@
 {
-  "name": "@semadiff/core",
-  "version": "0.1.0",
-  "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "schemas"
-  ],
-  "scripts": {
-    "build": "tsc -p tsconfig.json"
-  },
-  "exports": {
-    ".": "./dist/index.js",
-    "./schemas/diff-document.schema.json": "./schemas/diff-document.schema.json",
-    "./schemas/explain.schema.json": "./schemas/explain.schema.json",
-    "./schemas/diagnostics.schema.json": "./schemas/diagnostics.schema.json"
-  },
-  "peerDependencies": {
-    "effect": ">=4.0.0-beta.5 <5"
-  }
+	"name": "@semadiff/core",
+	"version": "0.1.0",
+	"files": [
+		"dist",
+		"schemas"
+	],
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": "./dist/index.js",
+		"./schemas/diff-document.schema.json": "./schemas/diff-document.schema.json",
+		"./schemas/explain.schema.json": "./schemas/explain.schema.json",
+		"./schemas/diagnostics.schema.json": "./schemas/diagnostics.schema.json"
+	},
+	"scripts": {
+		"build": "tsc -p tsconfig.json"
+	},
+	"peerDependencies": {
+		"effect": ">=4.0.0-beta.5 <5"
+	}
 }
