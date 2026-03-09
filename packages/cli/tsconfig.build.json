@@ -35,6 +35,9 @@
       "path": "../pr-backend"
     },
     {
+      "path": "../render-html"
+    },
+    {
       "path": "../render-terminal"
     }
   ],

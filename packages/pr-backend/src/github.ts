@@ -299,14 +299,43 @@ const withGitHubRetry = <A, R>(
 
 export const PullRequestSchema = Schema.Struct({
   title: Schema.String,
+  body: Schema.optional(Schema.String),
   html_url: Schema.String,
-  base: Schema.Struct({ sha: Schema.String }),
-  head: Schema.Struct({ sha: Schema.String }),
+  user: Schema.optional(
+    Schema.Struct({
+      login: Schema.String,
+    })
+  ),
+  labels: Schema.optional(
+    Schema.Array(
+      Schema.Struct({
+        name: Schema.String,
+      })
+    )
+  ),
+  base: Schema.Struct({
+    sha: Schema.String,
+    ref: Schema.optional(Schema.String),
+  }),
+  head: Schema.Struct({
+    sha: Schema.String,
+    ref: Schema.optional(Schema.String),
+  }),
   additions: Schema.Number,
   deletions: Schema.Number,
   changed_files: Schema.Number,
 });
 export type PullRequest = Schema.Schema.Type<typeof PullRequestSchema>;
+
+export const PullRequestCommitSchema = Schema.Struct({
+  sha: Schema.String,
+  commit: Schema.Struct({
+    message: Schema.String,
+  }),
+});
+export type PullRequestCommit = Schema.Schema.Type<
+  typeof PullRequestCommitSchema
+>;
 
 export const PullRequestFileSchema = Schema.Struct({
   filename: Schema.String,
@@ -335,6 +364,12 @@ export interface GitHubClientService {
     ref: PrRef
   ) => Effect.Effect<
     PullRequestFile[],
+    GitHubRequestError | GitHubRateLimitError | GitHubDecodeError
+  >;
+  readonly listPullRequestCommits: (
+    ref: PrRef
+  ) => Effect.Effect<
+    PullRequestCommit[],
     GitHubRequestError | GitHubRateLimitError | GitHubDecodeError
   >;
   readonly getFileText: (params: {
@@ -559,6 +594,38 @@ const listPullRequestFiles = Effect.fn("GitHub.listPullRequestFiles")(
   }
 );
 
+const listPullRequestCommits = Effect.fn("GitHub.listPullRequestCommits")(
+  function* (
+    config: GitHubConfigService,
+    cache: GitHubCacheService,
+    ref: PrRef
+  ) {
+    const results: PullRequestCommit[] = [];
+    let page = 1;
+    while (true) {
+      const url = `${config.apiBase}/repos/${ref.owner}/${ref.repo}/pulls/${ref.number}/commits?per_page=100&page=${page}`;
+      const json = yield* withGitHubRetry(
+        requestJson(config, cache, url, API_CACHE_TTL_MS)
+      );
+      const decoded = yield* Effect.try({
+        try: () =>
+          Schema.decodeUnknownSync(Schema.Array(PullRequestCommitSchema))(json),
+        catch: (error) =>
+          new GitHubDecodeError({
+            url,
+            message: error instanceof Error ? error.message : String(error),
+          }),
+      });
+      results.push(...decoded);
+      if (decoded.length < 100) {
+        break;
+      }
+      page += 1;
+    }
+    return results;
+  }
+);
+
 const getFileText = Effect.fn("GitHub.getFileText")(function* (
   config: GitHubConfigService,
   cache: GitHubCacheService,
@@ -585,6 +652,8 @@ export const GitHubClientLive = Layer.effect(
     return GitHubClient.of({
       getPullRequest: (ref) => getPullRequest(config, cache, ref),
       listPullRequestFiles: (ref) => listPullRequestFiles(config, cache, ref),
+      listPullRequestCommits: (ref) =>
+        listPullRequestCommits(config, cache, ref),
       getFileText: (params) => getFileText(config, cache, params),
     });
   })

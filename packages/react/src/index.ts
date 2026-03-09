@@ -1,12 +1,16 @@
 import type {
   FileDiffPayload,
+  FileReviewGuide,
   GetFileDiffInput,
+  GetFileReviewGuideInput,
+  GetPrReviewSummaryInput,
   GetPrSummaryInput,
   PrDiffClientContract,
   PrDiffClientError,
   PrDiffLineLayout,
   PrDiffResult,
   PrFileSummary,
+  PrReviewSummary,
   PrSummary,
 } from "@semadiff/pr-client";
 import { useEffect, useMemo, useState } from "react";
@@ -32,19 +36,42 @@ export interface SemaDiffFileDiffClient {
   ) => ReturnType<PrDiffClientContract["getFileDiff"]>;
 }
 
+export interface SemaDiffReviewSummaryClient {
+  getPrReviewSummary: (
+    input: GetPrReviewSummaryInput,
+    request?: { signal?: AbortSignal }
+  ) => ReturnType<PrDiffClientContract["getPrReviewSummary"]>;
+}
+
+export interface SemaDiffFileReviewGuideClient {
+  getFileReviewGuide: (
+    input: GetFileReviewGuideInput,
+    request?: { signal?: AbortSignal }
+  ) => ReturnType<PrDiffClientContract["getFileReviewGuide"]>;
+}
+
 export interface UseSemaDiffExplorerOptions {
-  client: SemaDiffSummaryClient & SemaDiffFileDiffClient;
+  client: SemaDiffSummaryClient &
+    SemaDiffFileDiffClient &
+    SemaDiffReviewSummaryClient &
+    SemaDiffFileReviewGuideClient;
   prUrl?: string;
   contextLines?: number;
   initialLineLayout?: PrDiffLineLayout;
   initialHideComments?: boolean;
   initialCompareMoves?: boolean;
+  debugLogger?:
+    | ((event: string, details: Record<string, unknown>) => void)
+    | undefined;
 }
 
 export interface UseSemaDiffExplorerResult {
   summary: PrSummary | null;
   summaryLoading: boolean;
   summaryError: PrDiffClientError | null;
+  reviewSummary: PrReviewSummary | null;
+  reviewSummaryLoading: boolean;
+  reviewSummaryError: PrDiffClientError | null;
   selectedSummary: PrFileSummary | null;
   filteredFiles: PrFileSummary[];
   fileFilter: string;
@@ -57,6 +84,11 @@ export interface UseSemaDiffExplorerResult {
   diffError: PrDiffClientError | null;
   diffLoading: boolean;
   diffHtml: string | null;
+  reviewGuideCache: Record<string, PrDiffResult<FileReviewGuide>>;
+  reviewGuideResult: PrDiffResult<FileReviewGuide> | null;
+  reviewGuideData: FileReviewGuide | null;
+  reviewGuideError: PrDiffClientError | null;
+  reviewGuideLoading: boolean;
   prefetchState: PrefetchState;
   lineLayout: PrDiffLineLayout;
   setLineLayout: (layout: PrDiffLineLayout) => void;
@@ -80,18 +112,49 @@ const clampContextLines = (value?: number) => {
   return Math.min(Math.max(Math.trunc(value), -1), 20);
 };
 
+const logHookDebug = (
+  logger:
+    | ((event: string, details: Record<string, unknown>) => void)
+    | undefined,
+  event: string,
+  details: Record<string, unknown>
+) => {
+  if (!logger) {
+    return;
+  }
+  logger(event, details);
+};
+
+const reviewGuideCacheKey = (params: {
+  filename: string;
+  contextLines: number;
+  compareMoves: boolean;
+}) =>
+  [
+    params.filename,
+    `context=${params.contextLines}`,
+    `moves=${params.compareMoves ? "on" : "off"}`,
+  ].join("|");
+
 export const useSemaDiffExplorer = (
   options: UseSemaDiffExplorerOptions
 ): UseSemaDiffExplorerResult => {
   const prUrl = options.prUrl;
   const contextLines = clampContextLines(options.contextLines);
+  const debugLogger = options.debugLogger;
   const [summaryResult, setSummaryResult] =
     useState<PrDiffResult<PrSummary> | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [reviewSummaryResult, setReviewSummaryResult] =
+    useState<PrDiffResult<PrReviewSummary> | null>(null);
+  const [reviewSummaryLoading, setReviewSummaryLoading] = useState(false);
   const [fileFilter, setFileFilter] = useState("");
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [diffCache, setDiffCache] = useState<
     Record<string, PrDiffResult<FileDiffPayload>>
+  >({});
+  const [reviewGuideCache, setReviewGuideCache] = useState<
+    Record<string, PrDiffResult<FileReviewGuide>>
   >({});
   const [prefetchState, setPrefetchState] = useState<PrefetchState>({
     active: false,
@@ -110,21 +173,31 @@ export const useSemaDiffExplorer = (
     options.initialCompareMoves ?? true
   );
   const summary = toData(summaryResult);
+  const reviewSummary = toData(reviewSummaryResult);
 
   useEffect(() => {
     if (!prUrl) {
       setSummaryResult(null);
       setSummaryLoading(false);
+      logHookDebug(debugLogger, "summary:clear", {});
       return;
     }
     let active = true;
     setSummaryLoading(true);
     const controller = new AbortController();
+    logHookDebug(debugLogger, "summary:fetch:start", {
+      prUrl,
+      refreshToken,
+    });
     options.client
       .getPrSummary({ prUrl }, { signal: controller.signal })
       .then((result) => {
         if (active) {
           setSummaryResult(result);
+          logHookDebug(debugLogger, "summary:fetch:complete", {
+            prUrl,
+            ok: result.ok,
+          });
         }
       })
       .finally(() => {
@@ -136,7 +209,43 @@ export const useSemaDiffExplorer = (
       active = false;
       controller.abort();
     };
-  }, [options.client, prUrl]);
+  }, [debugLogger, options.client, prUrl, refreshToken]);
+
+  useEffect(() => {
+    if (!prUrl) {
+      setReviewSummaryResult(null);
+      setReviewSummaryLoading(false);
+      logHookDebug(debugLogger, "review-summary:clear", {});
+      return;
+    }
+    let active = true;
+    setReviewSummaryLoading(true);
+    const controller = new AbortController();
+    logHookDebug(debugLogger, "review-summary:fetch:start", {
+      prUrl,
+      refreshToken,
+    });
+    options.client
+      .getPrReviewSummary({ prUrl }, { signal: controller.signal })
+      .then((result) => {
+        if (active) {
+          setReviewSummaryResult(result);
+          logHookDebug(debugLogger, "review-summary:fetch:complete", {
+            prUrl,
+            ok: result.ok,
+          });
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setReviewSummaryLoading(false);
+        }
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [debugLogger, options.client, prUrl, refreshToken]);
 
   useEffect(() => {
     if (!summary?.files.length) {
@@ -191,11 +300,16 @@ export const useSemaDiffExplorer = (
   useEffect(() => {
     if (!(summary && prUrl)) {
       setDiffCache({});
+      setReviewGuideCache({});
       setPrefetchState({
         active: false,
         loaded: 0,
         total: 0,
         runId: refreshToken,
+      });
+      logHookDebug(debugLogger, "cache:clear", {
+        prUrl,
+        refreshToken,
       });
       return;
     }
@@ -211,7 +325,17 @@ export const useSemaDiffExplorer = (
     const runId = refreshToken;
 
     setDiffCache({});
+    setReviewGuideCache({});
     setPrefetchState({ active: true, loaded: 0, total, runId });
+    logHookDebug(debugLogger, "diff-prefetch:start", {
+      prUrl,
+      total,
+      contextLines,
+      lineLayout,
+      hideComments,
+      compareMoves,
+      runId,
+    });
 
     const runNext = () => {
       if (!active) {
@@ -245,6 +369,11 @@ export const useSemaDiffExplorer = (
               return;
             }
             setDiffCache((previous) => ({ ...previous, [filename]: result }));
+            logHookDebug(debugLogger, "diff-prefetch:file-complete", {
+              filename,
+              ok: result.ok,
+              runId,
+            });
           })
           .finally(() => {
             if (!active) {
@@ -264,6 +393,10 @@ export const useSemaDiffExplorer = (
                 active: false,
                 runId,
               }));
+              logHookDebug(debugLogger, "diff-prefetch:complete", {
+                runId,
+                total,
+              });
               return;
             }
             runNext();
@@ -283,8 +416,12 @@ export const useSemaDiffExplorer = (
         active: false,
         runId,
       }));
+      logHookDebug(debugLogger, "diff-prefetch:abort", {
+        runId,
+      });
     };
   }, [
+    debugLogger,
     summary,
     prUrl,
     contextLines,
@@ -293,6 +430,85 @@ export const useSemaDiffExplorer = (
     refreshToken,
     compareMoves,
     options.client,
+  ]);
+
+  const selectedReviewGuideKey = useMemo(
+    () =>
+      selectedFile
+        ? reviewGuideCacheKey({
+            filename: selectedFile,
+            contextLines,
+            compareMoves,
+          })
+        : null,
+    [compareMoves, contextLines, selectedFile]
+  );
+
+  useEffect(() => {
+    if (!(prUrl && selectedFile && selectedReviewGuideKey)) {
+      return;
+    }
+    if (reviewGuideCache[selectedReviewGuideKey]) {
+      logHookDebug(debugLogger, "review-guide:cache-hit", {
+        key: selectedReviewGuideKey,
+        filename: selectedFile,
+      });
+      return;
+    }
+
+    let active = true;
+    const controller = new AbortController();
+    logHookDebug(debugLogger, "review-guide:fetch:start", {
+      key: selectedReviewGuideKey,
+      filename: selectedFile,
+      contextLines,
+      lineLayout,
+      compareMoves,
+    });
+    options.client
+      .getFileReviewGuide(
+        {
+          prUrl,
+          filename: selectedFile,
+          contextLines,
+          lineLayout,
+          detectMoves: compareMoves,
+        },
+        { signal: controller.signal }
+      )
+      .then((result) => {
+        if (!active) {
+          return;
+        }
+        setReviewGuideCache((previous) => ({
+          ...previous,
+          [selectedReviewGuideKey]: result,
+        }));
+        logHookDebug(debugLogger, "review-guide:fetch:complete", {
+          key: selectedReviewGuideKey,
+          filename: selectedFile,
+          ok: result.ok,
+        });
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+      logHookDebug(debugLogger, "review-guide:fetch:abort", {
+        key: selectedReviewGuideKey,
+        filename: selectedFile,
+      });
+    };
+  }, [
+    compareMoves,
+    contextLines,
+    debugLogger,
+    lineLayout,
+    options.client,
+    prUrl,
+    reviewGuideCache,
+    selectedFile,
+    selectedReviewGuideKey,
   ]);
 
   const diffResult = selectedFile ? (diffCache[selectedFile] ?? null) : null;
@@ -304,11 +520,23 @@ export const useSemaDiffExplorer = (
   const diffHtml = diffData?.linesHtml ?? null;
   const selectedSummary =
     summary?.files.find((file) => file.filename === selectedFile) ?? null;
+  const reviewGuideResult = selectedReviewGuideKey
+    ? (reviewGuideCache[selectedReviewGuideKey] ?? null)
+    : null;
+  const reviewGuideData = toData(reviewGuideResult);
+  const reviewGuideError = toError(reviewGuideResult);
+  const reviewGuideLoading =
+    !!selectedFile &&
+    !!selectedReviewGuideKey &&
+    !reviewGuideCache[selectedReviewGuideKey];
 
   return {
     summary,
     summaryLoading,
     summaryError: toError(summaryResult),
+    reviewSummary,
+    reviewSummaryLoading,
+    reviewSummaryError: toError(reviewSummaryResult),
     selectedSummary,
     filteredFiles,
     fileFilter,
@@ -321,6 +549,11 @@ export const useSemaDiffExplorer = (
     diffError,
     diffLoading,
     diffHtml,
+    reviewGuideCache,
+    reviewGuideResult,
+    reviewGuideData,
+    reviewGuideError,
+    reviewGuideLoading,
     prefetchState,
     lineLayout,
     setLineLayout,

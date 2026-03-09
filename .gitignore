@@ -16,3 +16,8 @@ packages/**/.turbo
 packages/parser-tree-sitter-wasm/src/semadiff-wasm
 .env
 isolate-*-v8.log
+*.tsbuildinfo
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db

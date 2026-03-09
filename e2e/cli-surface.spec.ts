@@ -9,6 +9,7 @@ test("semadiff --help lists commands", () => {
 
   const output = execSync(`${bunBinary} ${cliPath} --help`).toString();
   expect(output).toContain("diff");
+  expect(output).toContain("inspect");
   expect(output).toContain("git-external");
   expect(output).toContain("difftool");
   expect(output).toContain("install-git");

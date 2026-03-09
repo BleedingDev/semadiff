@@ -16,7 +16,8 @@
     { "path": "../core" },
     { "path": "../render-html" },
     { "path": "../parsers" },
-    { "path": "../parser-tree-sitter-wasm" }
+    { "path": "../parser-tree-sitter-wasm" },
+    { "path": "../review-guide" }
   ],
   "include": ["src"]
 }

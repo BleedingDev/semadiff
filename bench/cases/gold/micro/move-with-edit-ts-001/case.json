@@ -122,6 +122,24 @@
     "graphEdges": [],
     "impact": []
   },
+  "reviewGuide": {
+    "reviewFirst": [
+      "src/example.ts"
+    ],
+    "fileChecks": [
+      {
+        "path": "src/example.ts",
+        "expectedPriority": "review_first",
+        "expectedCategory": "source",
+        "requiredQuestionRuleIds": [
+          "question:check_tests"
+        ],
+        "requiredReasonRuleIds": [
+          "guidance:moves"
+        ]
+      }
+    ]
+  },
   "capabilities": {
     "review": true,
     "entity": true,

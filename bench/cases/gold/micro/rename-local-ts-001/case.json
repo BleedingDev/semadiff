@@ -85,6 +85,24 @@
     "graphEdges": [],
     "impact": []
   },
+  "reviewGuide": {
+    "reviewFirst": [
+      "src/compute.ts"
+    ],
+    "fileChecks": [
+      {
+        "path": "src/compute.ts",
+        "expectedPriority": "review_first",
+        "expectedCategory": "source",
+        "requiredQuestionRuleIds": [
+          "question:check_tests"
+        ],
+        "requiredReasonRuleIds": [
+          "guidance:renames"
+        ]
+      }
+    ]
+  },
   "capabilities": {
     "review": true,
     "entity": true,

@@ -2,7 +2,9 @@
 
 import type {
   FileDiffPayload,
+  FileReviewGuide,
   PrDiffResult,
+  PrReviewSummary,
   PrSummary,
 } from "@semadiff/pr-backend";
 import {
@@ -79,19 +81,142 @@ const DIFF_FIXTURE: FileDiffPayload = {
   linesHtml: "<html><body><div>ok</div></body></html>",
 };
 
+const REVIEW_SUMMARY_FIXTURE: PrReviewSummary = {
+  version: "0.1.0",
+  ruleVersion: "0.1.0",
+  themes: ["1 source file carries active code-review weight."],
+  queue: [
+    {
+      filename: "apps/n1/next.config.ts",
+      priority: "review_first",
+      classification: {
+        primaryCategory: "source",
+        categories: ["source"],
+        trustBand: "deterministic_inference",
+        reasons: ["Default source-file classification."],
+      },
+      reasons: [
+        {
+          id: "reason:queue",
+          scope: "pr",
+          message: "Review this config change early.",
+          trustBand: "deterministic_inference",
+          ruleId: "priority:source",
+          evidence: [],
+        },
+      ],
+      warnings: [],
+    },
+  ],
+  deprioritized: [],
+  deprioritizedGroups: [],
+  warnings: [],
+};
+
+const REVIEW_GUIDE_FIXTURE: FileReviewGuide = {
+  version: "0.1.0",
+  ruleVersion: "0.1.0",
+  filename: "apps/n1/next.config.ts",
+  priority: "review_first",
+  classification: {
+    primaryCategory: "source",
+    categories: ["source"],
+    trustBand: "deterministic_inference",
+    reasons: ["Default source-file classification."],
+  },
+  summary: "Review this config change carefully.",
+  reasons: [
+    {
+      id: "reason:file",
+      scope: "file",
+      message: "Configuration changes can alter application behavior.",
+      trustBand: "structural_fact",
+      ruleId: "reason:config_change",
+      evidence: [],
+    },
+  ],
+  questions: [
+    {
+      id: "question:file",
+      question: "Does this config change affect deployment or routing?",
+      rationale: "Configuration updates often affect runtime behavior.",
+      trustBand: "contextual_hint",
+      suggestedAction: "open_file",
+      ruleId: "question:config_runtime",
+      evidence: [],
+    },
+  ],
+  warnings: [],
+  diagnostics: {
+    version: "0.1.0",
+    ruleVersion: "0.1.0",
+    ruleHits: [],
+    scoreBreakdown: [],
+    evidenceIndex: [],
+    traceSummary: {
+      ruleHitCount: 0,
+      scoreEntryCount: 0,
+      evidenceCount: 0,
+    },
+    consistency: {
+      missingRuleIds: [],
+      emptyEvidenceOwners: [],
+      warnings: [],
+    },
+    trustBandCounts: {
+      structuralFact: 1,
+      deterministicInference: 1,
+      contextualHint: 1,
+      lowConfidence: 0,
+    },
+  },
+};
+
+const REVIEW_SUMMARY_TWO_FILES: PrReviewSummary = {
+  ...REVIEW_SUMMARY_FIXTURE,
+  queue: [
+    REVIEW_SUMMARY_FIXTURE.queue[0],
+    {
+      ...REVIEW_SUMMARY_FIXTURE.queue[0],
+      filename: "apps/n1/package.json",
+      priority: "review_next",
+      reasons: [
+        {
+          id: "reason:package",
+          scope: "pr",
+          message: "Review dependency metadata after the config change.",
+          trustBand: "deterministic_inference",
+          ruleId: "priority:metadata",
+          evidence: [],
+        },
+      ],
+    },
+  ],
+};
+
 const ok = <T,>(data: T): PrDiffResult<T> => ({ ok: true, data });
 
 const createClient = () => ({
   getPrSummary: vi.fn(async () => ok(SUMMARY_FIXTURE)),
+  getPrReviewSummary: vi.fn(async () => ok(REVIEW_SUMMARY_FIXTURE)),
   getFileDiff: vi.fn(async () => ok(DIFF_FIXTURE)),
+  getFileReviewGuide: vi.fn(async () => ok(REVIEW_GUIDE_FIXTURE)),
 });
 
 const createTwoFileClient = () => ({
   getPrSummary: vi.fn(async () => ok(SUMMARY_TWO_FILES)),
+  getPrReviewSummary: vi.fn(async () => ok(REVIEW_SUMMARY_TWO_FILES)),
   getFileDiff: vi.fn(async (input: { filename: string }) =>
     ok({
       ...DIFF_FIXTURE,
       file: { ...DIFF_FIXTURE.file, filename: input.filename },
+    })
+  ),
+  getFileReviewGuide: vi.fn(async (input: { filename: string }) =>
+    ok({
+      ...REVIEW_GUIDE_FIXTURE,
+      filename: input.filename,
+      summary: `Review ${input.filename} carefully.`,
     })
   ),
 });
@@ -182,6 +307,35 @@ describe("SemaDiffExplorer controls", () => {
     expect(screen.queryByText(REVIEW_CARD_TEXT)).toBeNull();
   });
 
+  test("renders the review queue and selected-file guide", async () => {
+    const client = createClient();
+
+    render(
+      <SemaDiffExplorer
+        client={client}
+        contextLines={-1}
+        prUrl="https://github.com/NMIT-WR/new-engine/pull/237"
+      />
+    );
+
+    await waitFor(() =>
+      expect(client.getPrReviewSummary).toHaveBeenCalledTimes(1)
+    );
+    await waitFor(() =>
+      expect(client.getFileReviewGuide).toHaveBeenCalledTimes(1)
+    );
+
+    expect(screen.getByText("Review Queue")).toBeDefined();
+    expect(
+      screen.getByText(
+        "Start with the files carrying the highest review weight."
+      )
+    ).toBeDefined();
+    expect(screen.getByText("File Guide")).toBeDefined();
+    expect(screen.getByText("Why this file matters")).toBeDefined();
+    expect(screen.getByText("Diagnostics")).toBeDefined();
+  });
+
   test("emits selected file changes for URL persistence", async () => {
     const client = createTwoFileClient();
     const onSelectedFileChange = vi.fn();
@@ -201,7 +355,13 @@ describe("SemaDiffExplorer controls", () => {
       )
     );
 
-    screen.getByRole("button", { name: PACKAGE_FILE_BUTTON_TEXT }).click();
+    const packageButtons = screen.getAllByRole("button", {
+      name: PACKAGE_FILE_BUTTON_TEXT,
+    });
+    const packageFileRow = packageButtons.find((button) =>
+      button.className.includes("sd-file-row")
+    );
+    packageFileRow?.click();
 
     await waitFor(() =>
       expect(onSelectedFileChange).toHaveBeenLastCalledWith(

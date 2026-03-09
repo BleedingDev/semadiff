@@ -4,23 +4,32 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { loadBenchmarkCases } from "./cases.js";
 import { runBenchmarkComparisonSuite } from "./compare.js";
+import {
+  formatReviewGuideDiagnostics,
+  runReviewGuideSuite,
+} from "./review-guide.js";
 import { runBenchmarkSuite } from "./run.js";
+import type { BenchmarkReviewGuideReport } from "./types.js";
 
 interface CliOptions {
   cases: string;
   output?: string | undefined;
   help: boolean;
+  mode: "benchmark" | "review-guide";
   tools: string[];
+  verbose: boolean;
 }
 
 function usage() {
   return [
-    "Usage: benchmark-harness [--cases <dir>] [--output <file>] [--tools <list>]",
+    "Usage: benchmark-harness [--cases <dir>] [--output <file>] [--tools <list>] [--mode <benchmark|review-guide>]",
     "",
     "Options:",
     "  --cases   Benchmark case root directory (default: bench/cases/gold/micro)",
+    "  --mode    Output standard diff benchmarks or deterministic review-guide evaluation",
     "  --output  Write the JSON report to a file as well as stdout",
     "  --tools   Comma-separated tools (default: semadiff)",
+    "  --verbose Print per-case review-guide diagnostics to stderr",
     "  --help    Show this message",
   ].join("\n");
 }
@@ -44,7 +53,9 @@ function parseArgs(argv: readonly string[]): CliOptions {
   const options: CliOptions = {
     cases: "bench/cases/gold/micro",
     help: false,
+    mode: "benchmark",
     tools: ["semadiff"],
+    verbose: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -58,6 +69,17 @@ function parseArgs(argv: readonly string[]): CliOptions {
       case "--cases": {
         const parsed = readOptionValue(argv, index, "--cases");
         options.cases = parsed.value;
+        index = parsed.nextIndex;
+        break;
+      }
+      case "--mode": {
+        const parsed = readOptionValue(argv, index, "--mode");
+        if (parsed.value !== "benchmark" && parsed.value !== "review-guide") {
+          throw new Error(
+            `Unsupported mode "${parsed.value}". Expected benchmark or review-guide.`
+          );
+        }
+        options.mode = parsed.value;
         index = parsed.nextIndex;
         break;
       }
@@ -79,12 +101,27 @@ function parseArgs(argv: readonly string[]): CliOptions {
         index = parsed.nextIndex;
         break;
       }
+      case "--verbose":
+        options.verbose = true;
+        break;
       default:
         throw new Error(`Unknown argument: ${value}`);
     }
   }
 
   return options;
+}
+
+function logReviewGuideSummary(report: BenchmarkReviewGuideReport) {
+  process.stderr.write(
+    `[review-guide] cases=${report.summary.cases} passed=${report.summary.passedCases} failed=${report.summary.failedCases} queueRecall=${report.summary.averageQueueRecall ?? "n/a"} selectedRecall=${report.summary.averageSelectedRecall ?? "n/a"}\n`
+  );
+}
+
+function logReviewGuideDetails(report: BenchmarkReviewGuideReport) {
+  for (const benchmarkCase of report.cases) {
+    process.stderr.write(`${formatReviewGuideDiagnostics(benchmarkCase)}\n`);
+  }
 }
 
 try {
@@ -96,13 +133,24 @@ try {
 
   const caseRoot = resolve(process.cwd(), options.cases);
   const benchmarkCases = loadBenchmarkCases(caseRoot);
-  const report =
-    options.tools.length === 1 && options.tools[0] === "semadiff"
-      ? runBenchmarkSuite(benchmarkCases, { caseRoot })
-      : runBenchmarkComparisonSuite(benchmarkCases, {
-          caseRoot,
-          tools: options.tools,
-        });
+  const report = (() => {
+    if (options.mode === "review-guide") {
+      return runReviewGuideSuite(benchmarkCases, { caseRoot });
+    }
+    if (options.tools.length === 1 && options.tools[0] === "semadiff") {
+      return runBenchmarkSuite(benchmarkCases, { caseRoot });
+    }
+    return runBenchmarkComparisonSuite(benchmarkCases, {
+      caseRoot,
+      tools: options.tools,
+    });
+  })();
+  if (options.mode === "review-guide") {
+    logReviewGuideSummary(report as BenchmarkReviewGuideReport);
+    if (options.verbose) {
+      logReviewGuideDetails(report as BenchmarkReviewGuideReport);
+    }
+  }
   const output = `${JSON.stringify(report, null, 2)}\n`;
 
   if (options.output) {

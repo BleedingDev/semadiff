@@ -1,4 +1,10 @@
-import { GitHubConfig, PrDiffLive, PrDiffService } from "@semadiff/pr-backend";
+import {
+  GitHubConfig,
+  PrDiffLive,
+  PrDiffService,
+  PrReviewLive,
+  PrReviewService,
+} from "@semadiff/pr-backend";
 import { createServerFn } from "@tanstack/react-start";
 import { Cause, Effect, Option } from "effect";
 import type { AuthStatus, ServerResult } from "../shared/types";
@@ -17,8 +23,22 @@ interface FileDiffInput {
   detectMoves?: boolean;
 }
 
+interface ReviewSummaryInput {
+  prUrl: string;
+}
+
+interface FileReviewGuideInput {
+  prUrl: string;
+  filename: string;
+  contextLines?: number;
+  lineLayout?: "split" | "unified";
+  detectMoves?: boolean;
+}
+
 const summaryInputValidator = (data: SummaryInput) => data;
 const fileDiffInputValidator = (data: FileDiffInput) => data;
+const reviewSummaryInputValidator = (data: ReviewSummaryInput) => data;
+const fileReviewGuideInputValidator = (data: FileReviewGuideInput) => data;
 
 const describeError = (error: unknown) => {
   if (Array.isArray(error)) {
@@ -134,6 +154,29 @@ const runServerEffect = <A>(effect: Effect.Effect<A, unknown, PrDiffService>) =>
     )
   );
 
+const runReviewServerEffect = <A>(
+  effect: Effect.Effect<A, unknown, PrReviewService>
+) =>
+  Effect.runPromise(
+    effect.pipe(
+      Effect.provide(PrReviewLive),
+      Effect.tapError((error) =>
+        Effect.logError("Review server effect failed", describeError(error))
+      ),
+      Effect.tapCause((cause) =>
+        Effect.logError("Review server effect cause", Cause.pretty(cause))
+      ),
+      Effect.match({
+        onSuccess: (data) => ({ ok: true, data }) satisfies ServerResult<A>,
+        onFailure: (error) =>
+          ({
+            ok: false,
+            error: formatError(error as { _tag?: string; message?: string }),
+          }) satisfies ServerResult<A>,
+      })
+    )
+  );
+
 const runConfigEffect = <A>(effect: Effect.Effect<A, unknown, GitHubConfig>) =>
   Effect.runPromise(
     effect.pipe(
@@ -157,6 +200,18 @@ export const getPrSummary = createServerFn({ method: "GET" })
       Effect.gen(function* () {
         const service = yield* PrDiffService;
         return yield* service.getSummary(prUrl);
+      })
+    );
+  });
+
+export const getPrReviewSummary = createServerFn({ method: "GET" })
+  .inputValidator(reviewSummaryInputValidator)
+  .handler(({ data }) => {
+    const prUrl = data?.prUrl ?? "";
+    return runReviewServerEffect(
+      Effect.gen(function* () {
+        const service = yield* PrReviewService;
+        return yield* service.getReviewSummary(prUrl);
       })
     );
   });
@@ -195,6 +250,33 @@ export const getFileDiff = createServerFn({ method: "GET" })
           lineLayout,
           lineMode,
           hideComments,
+          detectMoves
+        );
+      })
+    );
+  });
+
+export const getFileReviewGuide = createServerFn({ method: "GET" })
+  .inputValidator(fileReviewGuideInputValidator)
+  .handler(({ data }) => {
+    const prUrl = data?.prUrl ?? "";
+    const filename = data?.filename ?? "";
+    const contextLines =
+      typeof data.contextLines === "number" &&
+      Number.isFinite(data.contextLines)
+        ? Math.min(Math.max(Math.trunc(data.contextLines), -1), 20)
+        : -1;
+    const lineLayout = data.lineLayout === "split" ? "split" : "unified";
+    const detectMoves =
+      typeof data.detectMoves === "boolean" ? data.detectMoves : true;
+    return runReviewServerEffect(
+      Effect.gen(function* () {
+        const service = yield* PrReviewService;
+        return yield* service.getFileReviewGuide(
+          prUrl,
+          filename,
+          contextLines,
+          lineLayout,
           detectMoves
         );
       })

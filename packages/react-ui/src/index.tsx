@@ -1,10 +1,14 @@
 import type {
   FileDiffPayload,
+  FileReviewGuide,
   PrFileSummary,
+  PrReviewSummary,
   PrSummary,
 } from "@semadiff/pr-client";
 import type {
   SemaDiffFileDiffClient,
+  SemaDiffFileReviewGuideClient,
+  SemaDiffReviewSummaryClient,
   SemaDiffSummaryClient,
 } from "@semadiff/react";
 import { useSemaDiffExplorer } from "@semadiff/react";
@@ -36,6 +40,24 @@ const getDiffEmptyMessage = (file: PrFileSummary) => {
   }
   return "No changes detected.";
 };
+
+const formatPriorityLabel = (priority: string) =>
+  priority
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+
+const formatCategoryLabel = (category: string) =>
+  category
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+
+const formatActionLabel = (action: string) =>
+  action
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
 
 const FIRST_CHANGED_LINE_SELECTOR =
   ".sd-line--insert, .sd-line--delete, .sd-line--replace, .sd-line--move";
@@ -87,6 +109,7 @@ interface HeaderProps {
 
 interface FilePanelProps {
   summary: PrSummary | null;
+  reviewSummary: PrReviewSummary | null;
   filteredFiles: PrFileSummary[];
   fileFilter: string;
   onFileFilterChange: (next: string) => void;
@@ -108,6 +131,14 @@ interface DiffPanelHeaderProps {
 }
 
 interface DiffPanelBodyProps {
+  selectedFile: string | null;
+  onSelectFile: (filename: string) => void;
+  reviewSummary: PrReviewSummary | null;
+  reviewSummaryLoading: boolean;
+  reviewSummaryError: { message: string } | null;
+  reviewGuideData: FileReviewGuide | null;
+  reviewGuideError: { message: string } | null;
+  reviewGuideLoading: boolean;
   diffLoading: boolean;
   diffError: { message: string } | null;
   diffData: FileDiffPayload | null;
@@ -118,7 +149,10 @@ interface DiffPanelBodyProps {
 interface DiffPanelProps extends DiffPanelHeaderProps, DiffPanelBodyProps {}
 
 export interface SemaDiffExplorerProps {
-  client: SemaDiffSummaryClient & SemaDiffFileDiffClient;
+  client: SemaDiffSummaryClient &
+    SemaDiffFileDiffClient &
+    SemaDiffReviewSummaryClient &
+    SemaDiffFileReviewGuideClient;
   prUrl?: string;
   onPrUrlSubmit?: (prUrl: string) => void;
   selectedFile?: string;
@@ -128,6 +162,9 @@ export interface SemaDiffExplorerProps {
   inputPlaceholder?: string;
   submitLabel?: string;
   className?: string;
+  debugLogger?:
+    | ((event: string, details: Record<string, unknown>) => void)
+    | undefined;
 }
 
 function ToggleButton({
@@ -216,12 +253,24 @@ function Header({
 
 function FilePanel({
   summary,
+  reviewSummary,
   filteredFiles,
   fileFilter,
   onFileFilterChange,
   selectedFile,
   onSelectFile,
 }: FilePanelProps) {
+  const reviewEntries = useMemo(
+    () =>
+      new Map(
+        [
+          ...(reviewSummary?.queue ?? []),
+          ...(reviewSummary?.deprioritized ?? []),
+        ].map((entry) => [entry.filename, entry])
+      ),
+    [reviewSummary]
+  );
+
   return (
     <aside className="sd-panel">
       <div className="sd-panel-header">
@@ -252,6 +301,7 @@ function FilePanel({
         {filteredFiles.map((file) => {
           const percent = formatPercent(file.reductionPercent);
           const isActive = selectedFile === file.filename;
+          const reviewEntry = reviewEntries.get(file.filename);
           return (
             <button
               className={getFileRowClass(isActive)}
@@ -264,12 +314,31 @@ function FilePanel({
                 <span className={`sd-status sd-status--${file.status}`}>
                   {file.status}
                 </span>
+                {reviewEntry && (
+                  <span
+                    className={`sd-review-pill sd-review-pill--${reviewEntry.priority}`}
+                  >
+                    {formatPriorityLabel(reviewEntry.priority)}
+                  </span>
+                )}
+                {reviewEntry && (
+                  <span className="sd-review-pill sd-review-pill--category">
+                    {formatCategoryLabel(
+                      reviewEntry.classification.primaryCategory
+                    )}
+                  </span>
+                )}
                 <ChangeTotals
                   additions={file.additions}
                   deletions={file.deletions}
                 />
                 <span>{percent}</span>
               </div>
+              {reviewEntry?.reasons[0] && (
+                <div className="sd-file-review-copy">
+                  {reviewEntry.reasons[0].message}
+                </div>
+              )}
               <div className="sd-bar">
                 <div
                   className="sd-bar-fill"
@@ -385,7 +454,236 @@ function DiffPanelHeader({
   );
 }
 
+function ReviewSummaryStrip({
+  reviewSummary,
+  reviewSummaryLoading,
+  reviewSummaryError,
+  selectedFile,
+  onSelectFile,
+}: {
+  reviewSummary: PrReviewSummary | null;
+  reviewSummaryLoading: boolean;
+  reviewSummaryError: { message: string } | null;
+  selectedFile: string | null;
+  onSelectFile: (filename: string) => void;
+}) {
+  if (reviewSummaryLoading && !reviewSummary) {
+    return (
+      <section className="sd-review-card">
+        <div className="sd-review-card-kicker">Review Queue</div>
+        <div className="sd-review-card-copy">Building PR review guidance…</div>
+      </section>
+    );
+  }
+
+  if (reviewSummaryError) {
+    return (
+      <section className="sd-review-card sd-review-card--error">
+        <div className="sd-review-card-kicker">Review Queue</div>
+        <div className="sd-review-card-copy">
+          Error loading review guidance: {reviewSummaryError.message}
+        </div>
+      </section>
+    );
+  }
+
+  if (!reviewSummary) {
+    return null;
+  }
+
+  return (
+    <section className="sd-review-card">
+      <div className="sd-review-card-header">
+        <div>
+          <div className="sd-review-card-kicker">Review Queue</div>
+          <div className="sd-review-card-title">
+            Start with the files carrying the highest review weight.
+          </div>
+        </div>
+        <div className="sd-review-card-meta">
+          {reviewSummary.queue.length} queued
+        </div>
+      </div>
+      {reviewSummary.themes.length > 0 && (
+        <div className="sd-review-card-copy">
+          {reviewSummary.themes.join(" ")}
+        </div>
+      )}
+      <div className="sd-review-chip-row">
+        {reviewSummary.queue.slice(0, 4).map((entry) => (
+          <button
+            className={
+              selectedFile === entry.filename
+                ? "sd-review-chip sd-review-chip--active"
+                : "sd-review-chip"
+            }
+            key={entry.filename}
+            onClick={() => onSelectFile(entry.filename)}
+            type="button"
+          >
+            <span
+              className={`sd-review-pill sd-review-pill--${entry.priority}`}
+            >
+              {formatPriorityLabel(entry.priority)}
+            </span>
+            <span>{entry.filename}</span>
+          </button>
+        ))}
+      </div>
+      {reviewSummary.warnings.length > 0 && (
+        <div className="sd-review-note">
+          {reviewSummary.warnings.slice(0, 2).map((warning) => (
+            <div className="sd-review-note-item" key={warning}>
+              {warning}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ReviewGuideCard({
+  selectedFile,
+  reviewGuideData,
+  reviewGuideError,
+  reviewGuideLoading,
+}: {
+  selectedFile: string | null;
+  reviewGuideData: FileReviewGuide | null;
+  reviewGuideError: { message: string } | null;
+  reviewGuideLoading: boolean;
+}) {
+  if (!selectedFile) {
+    return null;
+  }
+
+  if (reviewGuideLoading && !reviewGuideData) {
+    return (
+      <section className="sd-review-card">
+        <div className="sd-review-card-kicker">File Guide</div>
+        <div className="sd-review-card-copy">
+          Loading review guide for {selectedFile}…
+        </div>
+      </section>
+    );
+  }
+
+  if (reviewGuideError) {
+    return (
+      <section className="sd-review-card sd-review-card--error">
+        <div className="sd-review-card-kicker">File Guide</div>
+        <div className="sd-review-card-copy">
+          Error loading file guidance: {reviewGuideError.message}
+        </div>
+      </section>
+    );
+  }
+
+  if (!reviewGuideData) {
+    return null;
+  }
+
+  return (
+    <section className="sd-review-card">
+      <div className="sd-review-card-header">
+        <div>
+          <div className="sd-review-card-kicker">File Guide</div>
+          <div className="sd-review-card-title">{reviewGuideData.filename}</div>
+        </div>
+        <div className="sd-review-chip-row">
+          <span
+            className={`sd-review-pill sd-review-pill--${reviewGuideData.priority}`}
+          >
+            {formatPriorityLabel(reviewGuideData.priority)}
+          </span>
+          <span className="sd-review-pill sd-review-pill--category">
+            {formatCategoryLabel(
+              reviewGuideData.classification.primaryCategory
+            )}
+          </span>
+        </div>
+      </div>
+      <div className="sd-review-card-copy">{reviewGuideData.summary}</div>
+      {reviewGuideData.reasons.length > 0 && (
+        <div className="sd-review-section">
+          <div className="sd-review-section-title">Why this file matters</div>
+          <div className="sd-review-list">
+            {reviewGuideData.reasons.slice(0, 3).map((reason) => (
+              <div className="sd-review-list-item" key={reason.id}>
+                {reason.message}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {reviewGuideData.questions.length > 0 && (
+        <div className="sd-review-section">
+          <div className="sd-review-section-title">Review questions</div>
+          <div className="sd-review-list">
+            {reviewGuideData.questions.slice(0, 3).map((question) => (
+              <div className="sd-review-list-item" key={question.id}>
+                <strong>{question.question}</strong>
+                <span className="sd-review-inline-tag">
+                  {formatActionLabel(question.suggestedAction)}
+                </span>
+                <div className="sd-review-list-copy">{question.rationale}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {reviewGuideData.warnings.length > 0 && (
+        <div className="sd-review-note">
+          {reviewGuideData.warnings.map((warning) => (
+            <div className="sd-review-note-item" key={warning}>
+              {warning}
+            </div>
+          ))}
+        </div>
+      )}
+      {reviewGuideData.diagnostics && (
+        <details className="sd-review-diagnostics">
+          <summary>Diagnostics</summary>
+          <div className="sd-review-diagnostics-grid">
+            <span>
+              Rule hits: {reviewGuideData.diagnostics.traceSummary.ruleHitCount}
+            </span>
+            <span>
+              Evidence refs:{" "}
+              {reviewGuideData.diagnostics.traceSummary.evidenceCount}
+            </span>
+            <span>
+              Score entries:{" "}
+              {reviewGuideData.diagnostics.traceSummary.scoreEntryCount}
+            </span>
+          </div>
+          {reviewGuideData.diagnostics.consistency.warnings.length > 0 && (
+            <div className="sd-review-note">
+              {reviewGuideData.diagnostics.consistency.warnings.map(
+                (warning) => (
+                  <div className="sd-review-note-item" key={warning}>
+                    {warning}
+                  </div>
+                )
+              )}
+            </div>
+          )}
+        </details>
+      )}
+    </section>
+  );
+}
+
 function DiffPanelBody({
+  selectedFile,
+  onSelectFile,
+  reviewSummary,
+  reviewSummaryLoading,
+  reviewSummaryError,
+  reviewGuideData,
+  reviewGuideError,
+  reviewGuideLoading,
   diffLoading,
   diffError,
   diffData,
@@ -447,6 +745,19 @@ function DiffPanelBody({
 
   return (
     <div className="sd-panel-body">
+      <ReviewSummaryStrip
+        onSelectFile={onSelectFile}
+        reviewSummary={reviewSummary}
+        reviewSummaryError={reviewSummaryError}
+        reviewSummaryLoading={reviewSummaryLoading}
+        selectedFile={selectedFile}
+      />
+      <ReviewGuideCard
+        reviewGuideData={reviewGuideData}
+        reviewGuideError={reviewGuideError}
+        reviewGuideLoading={reviewGuideLoading}
+        selectedFile={selectedFile}
+      />
       {warningBanner}
       {content}
     </div>
@@ -457,6 +768,7 @@ function DiffPanel({
   summary,
   selectedSummary,
   selectedFile,
+  onSelectFile,
   lineLayout,
   hideComments,
   compareMoves,
@@ -464,6 +776,12 @@ function DiffPanel({
   onLineLayoutChange,
   onHideCommentsChange,
   onCompareMovesChange,
+  reviewSummary,
+  reviewSummaryLoading,
+  reviewSummaryError,
+  reviewGuideData,
+  reviewGuideError,
+  reviewGuideLoading,
   diffLoading,
   diffError,
   diffData,
@@ -490,6 +808,14 @@ function DiffPanel({
         diffHtml={diffHtml}
         diffLoading={diffLoading}
         iframeRef={iframeRef}
+        onSelectFile={onSelectFile}
+        reviewGuideData={reviewGuideData}
+        reviewGuideError={reviewGuideError}
+        reviewGuideLoading={reviewGuideLoading}
+        reviewSummary={reviewSummary}
+        reviewSummaryError={reviewSummaryError}
+        reviewSummaryLoading={reviewSummaryLoading}
+        selectedFile={selectedFile}
       />
     </section>
   );
@@ -506,6 +832,7 @@ export function SemaDiffExplorer({
   inputPlaceholder,
   submitLabel,
   className,
+  debugLogger,
 }: SemaDiffExplorerProps) {
   const [localPrUrl, setLocalPrUrl] = useState(prUrl ?? "");
   const [input, setInput] = useState(prUrl ?? "");
@@ -524,6 +851,9 @@ export function SemaDiffExplorer({
     summary,
     summaryLoading,
     summaryError,
+    reviewSummary,
+    reviewSummaryLoading,
+    reviewSummaryError,
     selectedSummary,
     filteredFiles,
     fileFilter,
@@ -534,6 +864,9 @@ export function SemaDiffExplorer({
     diffError,
     diffLoading,
     diffHtml,
+    reviewGuideData,
+    reviewGuideError,
+    reviewGuideLoading,
     lineLayout,
     setLineLayout,
     hideComments,
@@ -545,6 +878,7 @@ export function SemaDiffExplorer({
     client: stableClient,
     prUrl: effectivePrUrl,
     contextLines,
+    debugLogger,
   });
   const effectiveSelectedFile = controlledSelectedFile ?? selectedFile;
 
@@ -603,6 +937,7 @@ export function SemaDiffExplorer({
           filteredFiles={filteredFiles}
           onFileFilterChange={setFileFilter}
           onSelectFile={setSelectedFile}
+          reviewSummary={reviewSummary}
           selectedFile={effectiveSelectedFile}
           summary={summary}
         />
@@ -619,6 +954,13 @@ export function SemaDiffExplorer({
           onHideCommentsChange={setHideComments}
           onLineLayoutChange={setLineLayout}
           onRefresh={refresh}
+          onSelectFile={setSelectedFile}
+          reviewGuideData={reviewGuideData}
+          reviewGuideError={reviewGuideError}
+          reviewGuideLoading={reviewGuideLoading}
+          reviewSummary={reviewSummary}
+          reviewSummaryError={reviewSummaryError}
+          reviewSummaryLoading={reviewSummaryLoading}
           selectedFile={effectiveSelectedFile}
           selectedSummary={selectedSummary ?? null}
           summary={summary}

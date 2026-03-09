@@ -13,6 +13,7 @@ import { fileURLToPath } from "node:url";
 import type { NormalizerSettings } from "@semadiff/core";
 import {
   ConfigSchema,
+  createDiagnosticsBundle,
   explainDiff,
   renderJson,
   structuralDiff,
@@ -26,7 +27,7 @@ import {
 import { lightningCssParsers } from "@semadiff/parser-lightningcss";
 import { swcParsers } from "@semadiff/parser-swc";
 import { treeSitterWasmParsers } from "@semadiff/parser-tree-sitter-wasm";
-import type { LanguageId } from "@semadiff/parsers";
+import type { LanguageId, TokenRange } from "@semadiff/parsers";
 import { makeRegistry } from "@semadiff/parsers";
 import {
   renderTerminal,
@@ -42,6 +43,12 @@ import {
   type ResolvedFileChange,
   resolveGitHybridMode,
 } from "./git-hybrid.js";
+import {
+  openInspectWorkbench,
+  renderInspectWorkbench,
+  resolveInspectOutputPath,
+  writeInspectWorkbench,
+} from "./inspect-workbench.js";
 import { cliRuntimeLayer } from "./runtime-layer.js";
 
 const Args = {
@@ -348,6 +355,22 @@ const languageOption = Options.choice("language", languageChoices).pipe(
   Options.withDefault("auto"),
   Options.withDescription("Language hint (auto to infer).")
 );
+const inspectOutputOption = Options.text("output").pipe(
+  Options.withDefault(""),
+  Options.withDescription("HTML output path (temp file if omitted).")
+);
+const inspectOpenOption = Options.boolean("open").pipe(
+  Options.withDefault(false),
+  Options.withDescription(
+    "Open the generated workbench in the default browser."
+  )
+);
+const inspectIncludeCodeOption = Options.boolean("include-code").pipe(
+  Options.withDefault(false),
+  Options.withDescription(
+    "Include source snippets in the embedded diagnostics bundle."
+  )
+);
 const experimentalHybridOption = Options.boolean("experimental-hybrid").pipe(
   Options.withDefault(false),
   Options.withDescription(
@@ -617,6 +640,100 @@ const parserRegistry = makeRegistry([
   ...lightningCssParsers,
   ...treeSitterWasmParsers,
 ]);
+
+type FilePairDiffResult =
+  | { kind: "binary" }
+  | {
+      kind: "diff";
+      oldText: string;
+      newText: string;
+      effectiveLanguage?: LanguageId;
+      diff: ReturnType<typeof structuralDiff>;
+      oldTokens?: readonly TokenRange[];
+      newTokens?: readonly TokenRange[];
+    };
+
+function resolveRequestedLanguage(params: {
+  oldPath: string;
+  newPath: string;
+  language: (typeof languageChoices)[number];
+}) {
+  if (params.language === "auto") {
+    return inferLanguageFromPath(
+      params.oldPath !== "-" ? params.oldPath : params.newPath
+    );
+  }
+  return params.language as LanguageId;
+}
+
+function makeFileParseInput(params: {
+  content: string;
+  path?: string;
+  language?: LanguageId;
+}) {
+  return {
+    content: params.content,
+    ...(params.path ? { path: params.path } : {}),
+    ...(params.language ? { language: params.language } : {}),
+  };
+}
+
+function buildFilePairDiffEffect(params: {
+  oldPath: string;
+  newPath: string;
+  language: (typeof languageChoices)[number];
+  normalizers: NormalizerSettings;
+}) {
+  return Effect.gen(function* () {
+    const inferredLanguage = resolveRequestedLanguage(params);
+    const oldText = readInput(params.oldPath);
+    const newText = readInput(params.newPath);
+    if (isBinary(oldText) || isBinary(newText)) {
+      return { kind: "binary" } satisfies FilePairDiffResult;
+    }
+    const parsedOld = yield* parserRegistry.parse(
+      makeFileParseInput({
+        content: oldText,
+        path: params.oldPath,
+        ...(inferredLanguage ? { language: inferredLanguage } : {}),
+      })
+    );
+    const parsedNew = yield* parserRegistry.parse(
+      makeFileParseInput({
+        content: newText,
+        path: params.newPath,
+        ...(inferredLanguage ? { language: inferredLanguage } : {}),
+      })
+    );
+    const effectiveLanguage =
+      inferredLanguage ?? parsedOld.language ?? parsedNew.language;
+    const diff = structuralDiff(oldText, newText, {
+      normalizers: params.normalizers,
+      ...(effectiveLanguage ? { language: effectiveLanguage } : {}),
+      oldRoot: parsedOld.root,
+      newRoot: parsedNew.root,
+      ...(parsedOld.tokens !== undefined
+        ? { oldTokens: parsedOld.tokens }
+        : {}),
+      ...(parsedNew.tokens !== undefined
+        ? { newTokens: parsedNew.tokens }
+        : {}),
+    });
+    return {
+      kind: "diff",
+      oldText,
+      newText,
+      ...(effectiveLanguage ? { effectiveLanguage } : {}),
+      diff,
+      ...(parsedOld.tokens !== undefined
+        ? { oldTokens: parsedOld.tokens }
+        : {}),
+      ...(parsedNew.tokens !== undefined
+        ? { newTokens: parsedNew.tokens }
+        : {}),
+    } satisfies FilePairDiffResult;
+  });
+}
 
 function runDiffEffect(params: {
   oldText: string;
@@ -1365,45 +1482,99 @@ const explainCommand = Command.make(
   ({ oldPath, newPath, language }) =>
     Effect.gen(function* () {
       const resolved = yield* resolveConfig;
-      const inferredLanguage =
-        language === "auto"
-          ? inferLanguageFromPath(oldPath !== "-" ? oldPath : newPath)
-          : (language as LanguageId);
-      const oldText = readInput(oldPath);
-      const newText = readInput(newPath);
-      if (isBinary(oldText) || isBinary(newText)) {
+      const result = yield* buildFilePairDiffEffect({
+        oldPath,
+        newPath,
+        language,
+        normalizers: resolved.config.normalizers,
+      });
+      if (result.kind === "binary") {
         yield* Console.log("Binary file detected; semantic diff skipped.");
         return;
       }
-      const makeParseInput = (content: string, path?: string) => ({
-        content,
-        ...(path ? { path } : {}),
-        ...(inferredLanguage ? { language: inferredLanguage } : {}),
-      });
-      const parsedOld = yield* parserRegistry.parse(
-        makeParseInput(oldText, oldPath)
+      const explainJson = encodeJson(
+        ExplainDocumentJson,
+        explainDiff(result.diff),
+        2
       );
-      const parsedNew = yield* parserRegistry.parse(
-        makeParseInput(newText, newPath)
-      );
-      const effectiveLanguage =
-        inferredLanguage ?? parsedOld.language ?? parsedNew.language;
-      const diff = structuralDiff(oldText, newText, {
-        normalizers: resolved.config.normalizers,
-        ...(effectiveLanguage ? { language: effectiveLanguage } : {}),
-        oldRoot: parsedOld.root,
-        newRoot: parsedNew.root,
-        ...(parsedOld.tokens !== undefined
-          ? { oldTokens: parsedOld.tokens }
-          : {}),
-        ...(parsedNew.tokens !== undefined
-          ? { newTokens: parsedNew.tokens }
-          : {}),
-      });
-      const explainJson = encodeJson(ExplainDocumentJson, explainDiff(diff), 2);
       yield* Console.log(explainJson);
     })
 ).pipe(Command.withDescription("Explain diff decisions as JSON."));
+
+const inspectCommand = Command.make(
+  "inspect",
+  {
+    oldPath: Args.text({ name: "old" }),
+    newPath: Args.text({ name: "new" }),
+    language: languageOption,
+    output: inspectOutputOption,
+    open: inspectOpenOption,
+    includeCode: inspectIncludeCodeOption,
+  },
+  ({ oldPath, newPath, language, output, open, includeCode }) =>
+    Effect.gen(function* () {
+      const resolved = yield* resolveConfig;
+      const result = yield* buildFilePairDiffEffect({
+        oldPath,
+        newPath,
+        language,
+        normalizers: resolved.config.normalizers,
+      });
+      if (result.kind === "binary") {
+        yield* Console.log("Binary file detected; semantic diff skipped.");
+        return;
+      }
+      const explain = explainDiff(result.diff);
+      const diagnostics = createDiagnosticsBundle({
+        diff: result.diff,
+        config: resolved.config,
+        includeCode,
+      });
+      const html = renderInspectWorkbench({
+        oldPath,
+        newPath,
+        oldText: result.oldText,
+        newText: result.newText,
+        ...(result.effectiveLanguage
+          ? { language: result.effectiveLanguage }
+          : {}),
+        diff: result.diff,
+        explain,
+        diagnostics,
+        ...(result.oldTokens !== undefined
+          ? { oldTokens: result.oldTokens }
+          : {}),
+        ...(result.newTokens !== undefined
+          ? { newTokens: result.newTokens }
+          : {}),
+      });
+      const outputPath = yield* Effect.try({
+        try: () => resolveInspectOutputPath(output),
+        catch: (error) =>
+          new CliSystemError({ operation: "resolve-inspect-output", error }),
+      });
+      yield* Effect.try({
+        try: () => writeInspectWorkbench(outputPath, html),
+        catch: (error) =>
+          new CliSystemError({ operation: "write-inspect-workbench", error }),
+      });
+      yield* Console.log(
+        output
+          ? `Inspect workbench written to ${outputPath}`
+          : `Inspect workbench written to temporary file ${outputPath}`
+      );
+      if (open) {
+        yield* Effect.try({
+          try: () => openInspectWorkbench(outputPath),
+          catch: (error) =>
+            new CliSystemError({ operation: "open-inspect-workbench", error }),
+        });
+        yield* Console.log("Opened inspect workbench in the default browser.");
+      }
+    })
+).pipe(
+  Command.withDescription("Generate an offline HTML workbench for a file pair.")
+);
 
 const configCommand = Command.make("config", {}, () =>
   Effect.gen(function* () {
@@ -1424,6 +1595,7 @@ const app = Command.make("semadiff", {}, () => Effect.void).pipe(
     doctorCommand,
     benchCommand,
     explainCommand,
+    inspectCommand,
     prCommand,
   ])
 );
@@ -1436,6 +1608,7 @@ function normalizeArgv(argv: string[]) {
   const rest = argv.slice(2);
   const patterns: Array<{ path: string[] }> = [
     { path: ["diff"] },
+    { path: ["inspect"] },
     { path: ["pr", "file"] },
     { path: ["pr", "summary"] },
   ];

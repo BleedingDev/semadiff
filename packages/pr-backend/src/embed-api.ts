@@ -1,5 +1,11 @@
 import type { Effect } from "effect";
-import type { FileDiffDocument, FileDiffPayload, PrSummary } from "./types.js";
+import type {
+  FileDiffDocument,
+  FileDiffPayload,
+  FileReviewGuide,
+  PrReviewSummary,
+  PrSummary,
+} from "./types.js";
 
 export type PrDiffLineLayout = "split" | "unified";
 export type PrDiffLineMode = "semantic" | "raw";
@@ -44,6 +50,18 @@ export interface GetFileDiffDocumentInput {
   detectMoves?: boolean | undefined;
 }
 
+export interface GetPrReviewSummaryInput {
+  prUrl: string;
+}
+
+export interface GetFileReviewGuideInput {
+  prUrl: string;
+  filename: string;
+  contextLines?: number | undefined;
+  lineLayout?: PrDiffLineLayout | undefined;
+  detectMoves?: boolean | undefined;
+}
+
 export interface PrDiffClientContract {
   readonly getPrSummary: (
     input: GetPrSummaryInput
@@ -54,6 +72,12 @@ export interface PrDiffClientContract {
   readonly getFileDiffDocument: (
     input: GetFileDiffDocumentInput
   ) => Promise<PrDiffResult<FileDiffDocument>>;
+  readonly getPrReviewSummary: (
+    input: GetPrReviewSummaryInput
+  ) => Promise<PrDiffResult<PrReviewSummary>>;
+  readonly getFileReviewGuide: (
+    input: GetFileReviewGuideInput
+  ) => Promise<PrDiffResult<FileReviewGuide>>;
 }
 
 export interface PrDiffEffectClientContract {
@@ -66,4 +90,10 @@ export interface PrDiffEffectClientContract {
   readonly getFileDiffDocument: (
     input: GetFileDiffDocumentInput
   ) => Effect.Effect<FileDiffDocument, PrDiffClientError>;
+  readonly getPrReviewSummary: (
+    input: GetPrReviewSummaryInput
+  ) => Effect.Effect<PrReviewSummary, PrDiffClientError>;
+  readonly getFileReviewGuide: (
+    input: GetFileReviewGuideInput
+  ) => Effect.Effect<FileReviewGuide, PrDiffClientError>;
 }

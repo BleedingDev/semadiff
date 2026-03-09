@@ -166,6 +166,9 @@ importers:
       '@semadiff/render-html':
         specifier: workspace:*
         version: link:../render-html
+      '@semadiff/review-guide':
+        specifier: workspace:*
+        version: link:../review-guide
       effect:
         specifier: 4.0.0-beta.5
         version: 4.0.0-beta.5
@@ -203,6 +206,9 @@ importers:
       '@semadiff/pr-backend':
         specifier: workspace:*
         version: link:../pr-backend
+      '@semadiff/render-html':
+        specifier: workspace:*
+        version: link:../render-html
       '@semadiff/render-terminal':
         specifier: workspace:*
         version: link:../render-terminal
@@ -250,6 +256,9 @@ importers:
       '@semadiff/render-html':
         specifier: workspace:*
         version: link:../render-html
+      '@semadiff/review-guide':
+        specifier: workspace:*
+        version: link:../review-guide
       effect:
         specifier: 4.0.0-beta.5
         version: 4.0.0-beta.5
@@ -399,6 +408,9 @@ importers:
       '@semadiff/render-html':
         specifier: workspace:*
         version: link:../render-html
+      '@semadiff/review-guide':
+        specifier: workspace:*
+        version: link:../review-guide
       effect:
         specifier: '>=4.0.0-beta.5 <5'
         version: 4.0.0-beta.5
@@ -421,9 +433,15 @@ importers:
         specifier: '>=19.0.0'
         version: 19.2.3
     devDependencies:
+      '@testing-library/react':
+        specifier: ^16.2.0
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.9))(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@types/react':
         specifier: ^19.0.12
         version: 19.2.9
+      jsdom:
+        specifier: ^27.0.0
+        version: 27.4.0
 
   packages/react-ui:
     dependencies:
@@ -458,6 +476,15 @@ importers:
       '@semadiff/render-html':
         specifier: workspace:*
         version: link:../render-html
+
+  packages/review-guide:
+    dependencies:
+      '@semadiff/core':
+        specifier: workspace:*
+        version: link:../core
+      effect:
+        specifier: '>=4.0.0-beta.5 <5'
+        version: 4.0.0-beta.5
 
   packages/test-corpus: {}
 

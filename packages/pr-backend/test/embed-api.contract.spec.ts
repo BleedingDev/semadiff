@@ -2,6 +2,8 @@ import { describe, expectTypeOf, test } from "vitest";
 import type {
   GetFileDiffDocumentInput,
   GetFileDiffInput,
+  GetFileReviewGuideInput,
+  GetPrReviewSummaryInput,
   GetPrSummaryInput,
   PrDiffClientContract,
   PrDiffClientError,
@@ -13,6 +15,8 @@ import type {
 import type {
   FileDiffDocument,
   FileDiffPayload,
+  FileReviewGuide,
+  PrReviewSummary,
   PrSummary,
 } from "../src/types.js";
 
@@ -28,6 +32,12 @@ describe("embed API contract", () => {
       (
         input: GetFileDiffDocumentInput
       ) => Promise<PrDiffResult<FileDiffDocument>>
+    >();
+    expectTypeOf<PrDiffClientContract["getPrReviewSummary"]>().toEqualTypeOf<
+      (input: GetPrReviewSummaryInput) => Promise<PrDiffResult<PrReviewSummary>>
+    >();
+    expectTypeOf<PrDiffClientContract["getFileReviewGuide"]>().toEqualTypeOf<
+      (input: GetFileReviewGuideInput) => Promise<PrDiffResult<FileReviewGuide>>
     >();
   });
 
@@ -46,6 +56,16 @@ describe("embed API contract", () => {
       PrDiffEffectClientContract["getFileDiffDocument"]
     >().returns.toEqualTypeOf<
       import("effect").Effect<FileDiffDocument, PrDiffClientError>
+    >();
+    expectTypeOf<
+      PrDiffEffectClientContract["getPrReviewSummary"]
+    >().returns.toEqualTypeOf<
+      import("effect").Effect<PrReviewSummary, PrDiffClientError>
+    >();
+    expectTypeOf<
+      PrDiffEffectClientContract["getFileReviewGuide"]
+    >().returns.toEqualTypeOf<
+      import("effect").Effect<FileReviewGuide, PrDiffClientError>
     >();
   });
 

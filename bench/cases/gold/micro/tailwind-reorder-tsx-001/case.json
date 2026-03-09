@@ -42,6 +42,18 @@
     "graphEdges": [],
     "impact": []
   },
+  "reviewGuide": {
+    "reviewNext": [
+      "src/button.tsx"
+    ],
+    "fileChecks": [
+      {
+        "path": "src/button.tsx",
+        "expectedPriority": "review_next",
+        "expectedCategory": "source"
+      }
+    ]
+  },
   "capabilities": {
     "review": true,
     "entity": true,

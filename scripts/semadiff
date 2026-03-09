@@ -4,4 +4,74 @@ set -euo pipefail
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 repo_root="$(cd -- "${script_dir}/.." && pwd)"
 
-exec bun "${repo_root}/packages/cli/src/index.ts" "$@"
+dist_entry="${repo_root}/packages/cli/dist/index.js"
+source_entry="${repo_root}/packages/cli/src/index.ts"
+
+sanitize_path() {
+  local entry
+  local sanitized=""
+  local home_proto_shims="${HOME}/.proto/shims"
+  local old_ifs="${IFS}"
+  IFS=":"
+  for entry in ${PATH:-}; do
+    if [[ "${entry}" == "${home_proto_shims}" ]]; then
+      continue
+    fi
+    if [[ -n "${sanitized}" ]]; then
+      sanitized="${sanitized}:"
+    fi
+    sanitized="${sanitized}${entry}"
+  done
+  IFS="${old_ifs}"
+  printf '%s\n' "${sanitized}"
+}
+
+find_runtime() {
+  local tool="$1"
+  shift
+  local candidate
+  for candidate in "$@"; do
+    if [[ -n "${candidate}" && -x "${candidate}" ]]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+
+  local sanitized_path
+  sanitized_path="$(sanitize_path)"
+  if [[ -n "${sanitized_path}" ]] && PATH="${sanitized_path}" command -v "${tool}" >/dev/null 2>&1; then
+    PATH="${sanitized_path}" command -v "${tool}"
+    return 0
+  fi
+
+  return 1
+}
+
+node_bin="$(find_runtime node \
+  "${SEMADIFF_NODE_BIN:-}" \
+  "${HOME}/.proto/bin/node" \
+  "/opt/homebrew/bin/node" \
+  "/usr/local/bin/node")" || node_bin=""
+
+bun_bin="$(find_runtime bun \
+  "${SEMADIFF_BUN_BIN:-}" \
+  "${HOME}/.proto/bin/bun" \
+  "${HOME}/.bun/bin/bun" \
+  "/opt/homebrew/bin/bun" \
+  "/usr/local/bin/bun")" || bun_bin=""
+
+if [[ "${SEMADIFF_USE_SOURCE:-0}" != "1" && -f "${dist_entry}" && -n "${node_bin}" ]]; then
+  exec "${node_bin}" "${dist_entry}" "$@"
+fi
+
+if [[ -n "${bun_bin}" ]]; then
+  exec "${bun_bin}" "${source_entry}" "$@"
+fi
+
+if [[ -f "${dist_entry}" && -n "${node_bin}" ]]; then
+  exec "${node_bin}" "${dist_entry}" "$@"
+fi
+
+echo "semadiff launcher could not find a working Node or Bun runtime." >&2
+echo "Set SEMADIFF_NODE_BIN or SEMADIFF_BUN_BIN to a real binary path." >&2
+exit 1

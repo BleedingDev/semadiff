@@ -38,6 +38,9 @@
       "path": "packages/pr-client"
     },
     {
+      "path": "packages/review-guide"
+    },
+    {
       "path": "packages/react"
     },
     {

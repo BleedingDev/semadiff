@@ -19,6 +19,8 @@ import type {
   BenchmarkMoveTruth,
   BenchmarkOperationTruth,
   BenchmarkRenameTruth,
+  BenchmarkReviewGuideExpectations,
+  BenchmarkReviewGuideFileExpectation,
   BenchmarkTruth,
 } from "./types.js";
 
@@ -37,6 +39,26 @@ const entityChangeKinds = [
   "moved",
   "renamed",
 ] as const satisfies readonly EntityChangeKind[];
+const reviewPriorities = [
+  "review_first",
+  "review_next",
+  "skim",
+  "deprioritized",
+  "manual_review",
+] as const;
+const reviewCategories = [
+  "source",
+  "test",
+  "docs",
+  "config",
+  "generated",
+  "lockfile",
+  "vendored",
+  "binary",
+  "oversized",
+  "parser_fallback",
+  "unknown",
+] as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -205,6 +227,128 @@ function parseStringArray(
     }
     return entry;
   });
+}
+
+function parseReviewGuideFileExpectation(
+  value: unknown,
+  location: string
+): BenchmarkReviewGuideFileExpectation {
+  if (!isRecord(value)) {
+    throw new Error(`Expected ${location} to be an object.`);
+  }
+  const fileId = readOptionalString(value, "fileId");
+  const path = readOptionalString(value, "path");
+  const expectedPriority = readOptionalString(value, "expectedPriority");
+  const expectedCategory = readOptionalString(value, "expectedCategory");
+  if (
+    expectedPriority &&
+    !reviewPriorities.includes(
+      expectedPriority as (typeof reviewPriorities)[number]
+    )
+  ) {
+    throw new Error(
+      `Expected ${location}.expectedPriority to be one of ${reviewPriorities.join(", ")}.`
+    );
+  }
+  if (
+    expectedCategory &&
+    !reviewCategories.includes(
+      expectedCategory as (typeof reviewCategories)[number]
+    )
+  ) {
+    throw new Error(
+      `Expected ${location}.expectedCategory to be one of ${reviewCategories.join(", ")}.`
+    );
+  }
+  return {
+    ...(fileId ? { fileId } : {}),
+    ...(path ? { path } : {}),
+    ...(expectedPriority
+      ? {
+          expectedPriority:
+            expectedPriority as BenchmarkReviewGuideFileExpectation["expectedPriority"],
+        }
+      : {}),
+    ...(expectedCategory
+      ? {
+          expectedCategory:
+            expectedCategory as BenchmarkReviewGuideFileExpectation["expectedCategory"],
+        }
+      : {}),
+    ...(parseStringArray(
+      value.requiredQuestionRuleIds,
+      `${location}.requiredQuestionRuleIds`
+    )
+      ? {
+          requiredQuestionRuleIds: parseStringArray(
+            value.requiredQuestionRuleIds,
+            `${location}.requiredQuestionRuleIds`
+          ),
+        }
+      : {}),
+    ...(parseStringArray(
+      value.requiredReasonRuleIds,
+      `${location}.requiredReasonRuleIds`
+    )
+      ? {
+          requiredReasonRuleIds: parseStringArray(
+            value.requiredReasonRuleIds,
+            `${location}.requiredReasonRuleIds`
+          ),
+        }
+      : {}),
+    ...(parseStringArray(value.requiredWarnings, `${location}.requiredWarnings`)
+      ? {
+          requiredWarnings: parseStringArray(
+            value.requiredWarnings,
+            `${location}.requiredWarnings`
+          ),
+        }
+      : {}),
+  };
+}
+
+function parseReviewGuideExpectations(
+  value: unknown,
+  location: string
+): BenchmarkReviewGuideExpectations | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+  if (!isRecord(value)) {
+    throw new Error(`Expected ${location} to be an object.`);
+  }
+  const reviewFirst = parseStringArray(
+    value.reviewFirst,
+    `${location}.reviewFirst`
+  );
+  const reviewNext = parseStringArray(
+    value.reviewNext,
+    `${location}.reviewNext`
+  );
+  const deprioritized = parseStringArray(
+    value.deprioritized,
+    `${location}.deprioritized`
+  );
+  const manualReview = parseStringArray(
+    value.manualReview,
+    `${location}.manualReview`
+  );
+  const fileChecks = Array.isArray(value.fileChecks)
+    ? value.fileChecks.map((entry, index) =>
+        parseReviewGuideFileExpectation(
+          entry,
+          `${location}.fileChecks[${index}]`
+        )
+      )
+    : undefined;
+  return {
+    ...(reviewFirst ? { reviewFirst } : {}),
+    ...(reviewNext ? { reviewNext } : {}),
+    ...(deprioritized ? { deprioritized } : {}),
+    ...(manualReview ? { manualReview } : {}),
+    ...(fileChecks ? { fileChecks } : {}),
+  };
 }
 
 function parseCaseSource(
@@ -630,6 +774,10 @@ function parseCaseFile(caseFilePath: string): BenchmarkCase {
   const caseDirectory = resolve(caseFilePath, "..");
   const language = parseLanguage(raw.language, `${caseFilePath}.language`);
   const source = parseCaseSource(raw.source, `${caseFilePath}.source`);
+  const reviewGuide = parseReviewGuideExpectations(
+    raw.reviewGuide,
+    `${caseFilePath}.reviewGuide`
+  );
   if (!language) {
     throw new Error(`Expected ${caseFilePath}.language to be present.`);
   }
@@ -658,6 +806,7 @@ function parseCaseFile(caseFilePath: string): BenchmarkCase {
     ),
     sourcePath: caseFilePath,
     ...(source ? { source } : {}),
+    ...(reviewGuide ? { reviewGuide } : {}),
   };
   validateTruthReferences(benchmarkCase);
   return benchmarkCase;

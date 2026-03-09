@@ -43,5 +43,6 @@ test("bug report copies diagnostics by default", async ({ page }) => {
   await page.getByRole("button", { name: "Report bug" }).click();
   const clipboard = await page.evaluate(() => (window as any).__clipboard);
   expect(clipboard).toContain("Diagnostics");
+  expect(clipboard).toContain("Review Guidance");
   expect(clipboard).toMatch(REDACTED_JSON_FIELD_REGEX);
 });

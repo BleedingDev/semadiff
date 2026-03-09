@@ -27,6 +27,7 @@ pnpm --filter @semadiff/cli build
 ## Main Commands
 
 - `diff`: compare two files and render semantic or line-oriented output.
+- `inspect`: generate an offline HTML workbench for a file pair.
 - `git-hybrid`: emit multi-file JSON from the working tree, staged changes, commit ranges, or stdin.
 - `install-git`: print the git config snippets for `git diff` and `git difftool`.
 - `config`: print the resolved config plus field provenance.
@@ -42,6 +43,10 @@ pnpm --filter @semadiff/cli build
 # Emit JSON plus experimental hybrid sidecar data
 ./scripts/semadiff diff old.ts new.ts --format json --experimental-hybrid
 
+# Generate an offline inspect workbench
+./scripts/semadiff inspect old.ts new.ts --output tmp/inspect.html
+./scripts/semadiff inspect old.ts new.ts --output tmp/inspect.html --include-code --open
+
 # Work with staged or unstaged git changes
 ./scripts/semadiff git-hybrid --staged
 ./scripts/semadiff git-hybrid --working-tree
@@ -56,6 +61,10 @@ pnpm --filter @semadiff/cli build
 ./scripts/semadiff config
 ./scripts/semadiff doctor
 ```
+
+`inspect` writes a self-contained HTML file. Add `--include-code` to keep source
+snippets in the embedded diagnostics bundle, and `--open` to launch the file in
+your default browser after it is generated.
 
 ## Related Docs
 

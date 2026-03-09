@@ -16,12 +16,14 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "benchmark": "node dist/cli.js --cases ../../bench/cases/gold/micro"
+    "benchmark": "node dist/cli.js --cases ../../bench/cases/gold/micro",
+    "review-guide-benchmark": "node dist/cli.js --mode review-guide --cases ../../bench/cases/real/prs"
   },
   "dependencies": {
     "@semadiff/core": "workspace:*",
     "@semadiff/entity-core": "workspace:*",
     "@semadiff/parser-swc": "workspace:*",
+    "@semadiff/review-guide": "workspace:*",
     "@semadiff/render-html": "workspace:*",
     "effect": "4.0.0-beta.5"
   },

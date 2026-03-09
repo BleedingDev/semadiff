@@ -26,6 +26,9 @@ pnpm install
 # Compare two files.
 ./scripts/semadiff diff old.ts new.ts --format ansi
 
+# Generate an offline HTML workbench for deeper inspection.
+./scripts/semadiff inspect old.ts new.ts --output tmp/inspect.html
+
 # Inspect staged changes as hybrid JSON.
 ./scripts/semadiff git-hybrid --staged
 
@@ -38,6 +41,9 @@ pnpm install
 ```bash
 # File-to-file semantic diff
 ./scripts/semadiff diff old.ts new.ts --format json --experimental-hybrid
+
+# Generate a self-contained inspect workbench
+./scripts/semadiff inspect old.ts new.ts --output tmp/inspect.html --open
 
 # Multi-file git-aware JSON for tooling and experiments
 ./scripts/semadiff git-hybrid --working-tree

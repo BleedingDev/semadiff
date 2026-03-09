@@ -1,5 +1,6 @@
 export * from "./embed-api.js";
 export * from "./github.js";
 export * from "./pr-diff.js";
+export * from "./pr-review.js";
 export * from "./pr-url.js";
 export * from "./types.js";

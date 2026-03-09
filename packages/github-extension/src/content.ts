@@ -13,6 +13,13 @@ import { Effect, Schema } from "effect";
 import type { BlobResult } from "./blob";
 import { fetchBlob } from "./blob";
 import { logger } from "./logger";
+import {
+  composeExtensionFileGuide,
+  type FileReviewGuide,
+  findExtensionReviewEntry,
+  type PrReviewSummary,
+  summarizeExtensionReview,
+} from "./review-guide";
 
 const STORAGE_KEY = "semadiff-overlay-open";
 const TELEMETRY_KEY = "semadiff-telemetry";
@@ -275,6 +282,8 @@ function collectFilePaths(): string[] {
 }
 
 let lastDiff: DiffDocument | null = null;
+let lastReviewSummary: PrReviewSummary | null = null;
+const lastFileReviewGuides = new Map<string, FileReviewGuide>();
 
 function emptyDiff(): DiffDocument {
   return {
@@ -386,10 +395,142 @@ function estimateReduction(diff: DiffDocument) {
   };
 }
 
+function formatReviewLabel(value: string) {
+  return value
+    .split("_")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
+function createReviewPill(label: string, modifier?: string) {
+  const pill = document.createElement("span");
+  pill.className = modifier
+    ? `sd-review-pill sd-review-pill--${modifier}`
+    : "sd-review-pill";
+  pill.textContent = label;
+  return pill;
+}
+
+function renderBannerReviewSummary(
+  target: HTMLElement,
+  summary: PrReviewSummary
+) {
+  target.replaceChildren();
+  target.className = "sd-banner-guide";
+
+  const title = document.createElement("div");
+  title.className = "sd-banner-guide-title";
+  title.textContent = "Review queue";
+
+  const copy = document.createElement("div");
+  copy.className = "sd-banner-guide-copy";
+  copy.textContent =
+    summary.themes[0] ??
+    `Queued ${summary.queue.length} file(s) for review guidance.`;
+
+  const meta = document.createElement("div");
+  meta.className = "sd-banner-guide-meta";
+  meta.textContent = `${summary.queue.length} queued · ${summary.deprioritized.length} deprioritized`;
+
+  target.append(title, copy, meta);
+}
+
+function renderReviewEntrySummary(
+  target: HTMLElement,
+  entry: ReturnType<typeof findExtensionReviewEntry>
+) {
+  target.replaceChildren();
+  target.className = "sd-review-slot";
+  if (!entry) {
+    return;
+  }
+
+  const chipRow = document.createElement("div");
+  chipRow.className = "sd-review-chip-row";
+  chipRow.append(
+    createReviewPill(formatReviewLabel(entry.priority), entry.priority),
+    createReviewPill(
+      formatReviewLabel(entry.classification.primaryCategory),
+      "category"
+    )
+  );
+
+  const copy = document.createElement("div");
+  copy.className = "sd-review-copy";
+  copy.textContent =
+    entry.reasons[0]?.message ??
+    "Deterministic review guidance will expand after diff load.";
+
+  target.append(chipRow, copy);
+}
+
+function renderFileReviewGuide(target: HTMLElement, guide: FileReviewGuide) {
+  target.replaceChildren();
+  target.className = "sd-review-slot sd-review-slot--detailed";
+
+  const header = document.createElement("div");
+  header.className = "sd-review-chip-row";
+  header.append(
+    createReviewPill(formatReviewLabel(guide.priority), guide.priority),
+    createReviewPill(
+      formatReviewLabel(guide.classification.primaryCategory),
+      "category"
+    )
+  );
+
+  const summary = document.createElement("div");
+  summary.className = "sd-review-copy";
+  summary.textContent = guide.summary;
+
+  const reasons = document.createElement("div");
+  reasons.className = "sd-review-list";
+  for (const reason of guide.reasons.slice(0, 2)) {
+    const item = document.createElement("div");
+    item.className = "sd-review-list-item";
+    item.textContent = reason.message;
+    reasons.appendChild(item);
+  }
+
+  const questions = document.createElement("div");
+  questions.className = "sd-review-list";
+  for (const question of guide.questions.slice(0, 2)) {
+    const item = document.createElement("div");
+    item.className = "sd-review-list-item";
+    const title = document.createElement("strong");
+    title.textContent = question.question;
+    const rationale = document.createElement("div");
+    rationale.className = "sd-review-copy sd-review-copy--muted";
+    rationale.textContent = question.rationale;
+    item.append(title, rationale);
+    questions.appendChild(item);
+  }
+
+  const diagnostics = document.createElement("details");
+  diagnostics.className = "sd-review-diagnostics";
+  const diagnosticsSummary = document.createElement("summary");
+  diagnosticsSummary.textContent = "Diagnostics";
+  const diagnosticsMeta = document.createElement("div");
+  diagnosticsMeta.className = "sd-review-diagnostics-meta";
+  diagnosticsMeta.textContent = guide.diagnostics
+    ? `${guide.diagnostics.traceSummary.ruleHitCount} rule hits · ${guide.diagnostics.traceSummary.evidenceCount} evidence refs`
+    : "No diagnostics available.";
+  diagnostics.append(diagnosticsSummary, diagnosticsMeta);
+
+  target.append(header, summary);
+  if (guide.reasons.length > 0) {
+    target.appendChild(reasons);
+  }
+  if (guide.questions.length > 0) {
+    target.appendChild(questions);
+  }
+  target.appendChild(diagnostics);
+}
+
 function renderDiffResult(params: {
   diff: DiffDocument;
   container: HTMLElement;
   diffSlot: HTMLElement;
+  reviewSlot: HTMLElement;
   statusText: HTMLElement;
   statusMeta: HTMLElement;
   barFill: HTMLElement;
@@ -405,6 +546,7 @@ function renderDiffResult(params: {
     diff,
     container,
     diffSlot,
+    reviewSlot,
     statusText,
     statusMeta,
     barFill,
@@ -450,6 +592,28 @@ function renderDiffResult(params: {
   container.dataset.loaded = "true";
   button.textContent = "Loaded";
   button.disabled = true;
+  const initialReviewPriority = findExtensionReviewEntry(
+    lastReviewSummary,
+    path
+  )?.priority;
+  const guide = composeExtensionFileGuide({
+    path,
+    diff,
+    ...(fileNode?.dataset.semadiffLanguage
+      ? { language: fileNode.dataset.semadiffLanguage }
+      : {}),
+    ...(initialReviewPriority
+      ? { initialPriority: initialReviewPriority }
+      : {}),
+    title: document.title,
+  });
+  lastFileReviewGuides.set(path, guide);
+  renderFileReviewGuide(reviewSlot, guide);
+  telemetrySpan("reviewGuide", {
+    path,
+    priority: guide.priority,
+    reasonCount: guide.reasons.length,
+  });
   telemetrySpan("render", { path });
 
   const fullReplaceEnabled = readSessionStorage(FULL_REPLACE_KEY) === "true";
@@ -471,6 +635,7 @@ async function loadDiffForFile(params: {
   path: string;
   container: HTMLElement;
   diffSlot: HTMLElement;
+  reviewSlot: HTMLElement;
   errorNode: HTMLElement;
   statusText: HTMLElement;
   statusMeta: HTMLElement;
@@ -486,6 +651,7 @@ async function loadDiffForFile(params: {
     path,
     container,
     diffSlot,
+    reviewSlot,
     errorNode,
     statusText,
     statusMeta,
@@ -511,6 +677,9 @@ async function loadDiffForFile(params: {
   ]);
   const language =
     parsedHead.language !== "text" ? parsedHead.language : parsedBase.language;
+  if (fileNode) {
+    fileNode.dataset.semadiffLanguage = language;
+  }
   telemetrySpan("diff", { path, language });
   const diff = structuralDiff(contents.baseContent, contents.headContent, {
     normalizers: defaultConfig.normalizers,
@@ -529,6 +698,7 @@ async function loadDiffForFile(params: {
     diff,
     container,
     diffSlot,
+    reviewSlot,
     statusText,
     statusMeta,
     barFill,
@@ -579,7 +749,9 @@ function mountOverlay() {
   metricLabel.className = "sd-metric-label";
   metricLabel.textContent = "smaller";
   metric.append(metricValue, metricLabel);
-  banner.append(brand, metric);
+  const bannerGuide = document.createElement("div");
+  bannerGuide.className = "sd-banner-guide";
+  banner.append(brand, bannerGuide, metric);
 
   const actions = document.createElement("div");
   actions.className = "sd-controls";
@@ -595,9 +767,29 @@ function mountOverlay() {
       diff: lastDiff ?? emptyDiff(),
       includeCode,
     });
+    const reviewDiagnostics = JSON.stringify(
+      {
+        reviewSummary: lastReviewSummary
+          ? {
+              themes: lastReviewSummary.themes,
+              warnings: lastReviewSummary.warnings,
+              diagnostics: lastReviewSummary.diagnostics,
+            }
+          : null,
+        fileGuides: Array.from(lastFileReviewGuides.values()).map((guide) => ({
+          filename: guide.filename,
+          priority: guide.priority,
+          summary: guide.summary,
+          warnings: guide.warnings,
+          diagnostics: guide.diagnostics,
+        })),
+      },
+      null,
+      2
+    );
     const body = `Diagnostics:\\n\\n${Schema.encodeSync(DiagnosticsBundleJson)(
       diagnostics
-    )}`;
+    )}\\n\\nReview Guidance:\\n\\n${reviewDiagnostics}`;
     try {
       await navigator.clipboard.writeText(body);
       // biome-ignore lint/suspicious/noAlert: native alert provides immediate feedback.
@@ -621,6 +813,14 @@ function mountOverlay() {
   const list = document.createElement("div");
   list.className = "sd-table";
   const files = collectFilePaths();
+  const reviewSummary = summarizeExtensionReview(files, document.title);
+  lastReviewSummary = reviewSummary;
+  renderBannerReviewSummary(bannerGuide, reviewSummary);
+  telemetrySpan("reviewSummary", {
+    fileCount: files.length,
+    queued: reviewSummary.queue.length,
+    deprioritized: reviewSummary.deprioritized.length,
+  });
   const aggregate = { operations: 0, changeLines: 0 };
   if (files.length === 0) {
     const empty = document.createElement("div");
@@ -665,6 +865,12 @@ function mountOverlay() {
 
     const actionsRow = document.createElement("div");
     actionsRow.className = "sd-actions";
+    const reviewSlot = document.createElement("div");
+    reviewSlot.className = "sd-review-slot";
+    renderReviewEntrySummary(
+      reviewSlot,
+      findExtensionReviewEntry(reviewSummary, path)
+    );
 
     const diffSlot = document.createElement("div");
     diffSlot.className = "sd-diff-slot";
@@ -708,6 +914,7 @@ function mountOverlay() {
           path,
           container,
           diffSlot,
+          reviewSlot,
           errorNode: statusText,
           statusText,
           statusMeta,
@@ -766,7 +973,7 @@ function mountOverlay() {
 
     actionsRow.append(button, jump, comment, resolve);
     row.append(name, status, actionsRow);
-    container.append(row, diffSlot);
+    container.append(row, reviewSlot, diffSlot);
     list.appendChild(container);
   }
 

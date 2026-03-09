@@ -79,6 +79,21 @@
     "graphEdges": [],
     "impact": []
   },
+  "reviewGuide": {
+    "reviewNext": [
+      "src/rename.ts"
+    ],
+    "fileChecks": [
+      {
+        "path": "src/rename.ts",
+        "expectedPriority": "review_next",
+        "expectedCategory": "source",
+        "requiredQuestionRuleIds": [
+          "question:check_tests"
+        ]
+      }
+    ]
+  },
   "capabilities": {
     "review": true,
     "entity": true,

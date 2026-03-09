@@ -9,5 +9,14 @@
     "sourceMap": true,
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "references": [
+    { "path": "../core" },
+    { "path": "../render-html" },
+    { "path": "../parsers" },
+    { "path": "../parser-tree-sitter-wasm" },
+    { "path": "../parser-swc" },
+    { "path": "../parser-lightningcss" },
+    { "path": "../review-guide" }
+  ]
 }

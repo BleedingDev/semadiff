@@ -30,6 +30,7 @@
     "@semadiff/parser-tree-sitter-wasm": "workspace:*",
     "@semadiff/parsers": "workspace:*",
     "@semadiff/pr-backend": "workspace:*",
+    "@semadiff/render-html": "workspace:*",
     "@semadiff/render-terminal": "workspace:*",
     "effect": "4.0.0-beta.5"
   },

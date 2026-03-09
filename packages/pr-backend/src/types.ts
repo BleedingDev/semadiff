@@ -1,4 +1,8 @@
 import { DiffDocumentSchema } from "@semadiff/core";
+import {
+  FileReviewGuideSchema as ReviewGuideFileReviewGuideSchema,
+  PrReviewSummarySchema as ReviewGuidePrReviewSummarySchema,
+} from "@semadiff/review-guide";
 import { Schema } from "effect";
 
 export type PrFileStatus = "added" | "modified" | "removed" | "renamed";
@@ -56,6 +60,13 @@ export interface FileDiffDocument {
 export interface AuthStatus {
   hasToken: boolean;
 }
+
+export type {
+  EvidenceRef,
+  FileReviewGuide,
+  PrReviewSummary,
+  ReviewContext,
+} from "@semadiff/review-guide";
 
 export const PrFileStatusSchema = Schema.Literals([
   "added",
@@ -117,3 +128,5 @@ export const FileDiffDocumentSchema = Schema.Struct({
 export const AuthStatusSchema = Schema.Struct({
   hasToken: Schema.Boolean,
 });
+export const FileReviewGuideSchema = ReviewGuideFileReviewGuideSchema;
+export const PrReviewSummarySchema = ReviewGuidePrReviewSummarySchema;

@@ -21,6 +21,9 @@
       "path": "../parser-swc"
     },
     {
+      "path": "../review-guide"
+    },
+    {
       "path": "../render-html"
     }
   ],

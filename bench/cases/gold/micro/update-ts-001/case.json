@@ -79,6 +79,21 @@
     "graphEdges": [],
     "impact": []
   },
+  "reviewGuide": {
+    "reviewNext": [
+      "src/value.ts"
+    ],
+    "fileChecks": [
+      {
+        "path": "src/value.ts",
+        "expectedPriority": "review_next",
+        "expectedCategory": "source",
+        "requiredQuestionRuleIds": [
+          "question:check_tests"
+        ]
+      }
+    ]
+  },
   "capabilities": {
     "review": true,
     "entity": true,
