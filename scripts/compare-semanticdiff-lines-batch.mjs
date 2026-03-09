@@ -155,7 +155,6 @@ if (!bun) {
 const prList = decodeJson(await bun.file(listPath).text(), listPath);
 const results = [];
 for (const pr of prList) {
-	// eslint-disable-next-line no-await-in-loop
 	results.push(await runCompare(pr));
 }
 
