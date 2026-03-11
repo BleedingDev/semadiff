@@ -2,6 +2,7 @@
 	"database": "dolt",
 	"backend": "dolt",
 	"dolt_mode": "server",
-	"dolt_database": "dolt",
+	"dolt_server_host": "127.0.0.1",
+	"dolt_database": "semantic_diff_rewrite",
 	"project_id": "799c2d2d-d105-44f6-bb7d-6a392cea92c3"
 }
